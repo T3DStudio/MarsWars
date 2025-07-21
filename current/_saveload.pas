@@ -2,113 +2,88 @@
 
 procedure saveload_MenuSelectedInfo;
 var f :file;
-   hp :byte;
-   vr :integer=0;
    fn :shortstring;
-   ms :cardinal;
-   mw :word;
-   pls:TPList;
+vbyte1:byte;
+vint  :integer=0;
+vcard :cardinal;
 begin
-   ms:=0;
-   vr:=0;
-   mw:=0;
-   hp:=0;
-   FillChar(pls,Sizeof(pls),0);
-
    svld_str_info:='';
 
-   fn:=str_f_svld+svld_list[svld_list_sel]+str_e_svld;
-   if(length(svld_list[svld_list_sel])>0)then
-   if(FileExists(fn))then
+   if(length(svld_str_fname)=0)then exit;
+
+   fn:=str_f_svld+svld_str_fname+str_e_svld;
+
+   if(not FileExists(fn))then
    begin
-      assign(f,fn);
-      {$I-}
-      reset(f,1);
-      {$I+}
-      if(ioresult<>0)then
-      begin
-         svld_str_info:=str_svld_errors_open;
-         close(f);
-         exit;
-      end;
-      if(FileSize(f)<>svld_file_size)then
-      begin
-         svld_str_info:=str_svld_errors_wdata;
-         close(f);
-         exit;
-      end;
-      BlockRead(f,vr,SizeOf(ver));
-      if(vr=ver)then
-      begin
-         BlockRead(f,vr,sizeof(menu_s2));
-         if(vr=ms2_camp)then
-         begin
-            BlockRead(f,vr,sizeof(cmp_sel));
-            if(0<=vr)and(vr<=LastMission)then
-            begin
-               svld_str_info:=str_camp_name[vr];
-               vr:=0;
-               BlockRead(f,vr,sizeof(cmp_skill));
-               if(0<=vr)and(vr<=CMPMaxSkills)then
-               begin
-                  svld_str_info+=tc_nl1+str_cmpdif+tc_nl1+str_cmpd[vr];
-                  BlockRead(f,vr,sizeof(cmp_data_b1));
-                  BlockRead(f,vr,sizeof(cmp_data_b2));
-                  BlockRead(f,vr,sizeof(cmp_data_b3));
-                  BlockRead(f,vr,sizeof(cmp_data_c1));
-               end
-               else svld_str_info:=str_svld_errors_wver;
-            end
-            else svld_str_info:=str_svld_errors_wver;
-         end
-         else
-         begin
-            BlockRead(f,vr,sizeof(cmp_sel     ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_skill   ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_data_b1 ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_data_b2 ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_data_b3 ));vr:=0;
-            BlockRead(f,vr,sizeof(cmp_data_c1 ));vr:=0;
-
-            BlockRead(f,ms,sizeof(map_seed    ));svld_str_info:=str_map+': '+c2s(ms)+tc_nl3+' ';
-            BlockRead(f,vr,sizeof(map_iseed   ));vr:=0;
-            BlockRead(f,mw,sizeof(map_mw      ));svld_str_info+=str_m_siz+w2s(mw)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_obs     ));
-            if(vr>7)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                    else       svld_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';vr:=0;
-            BlockRead(f,vr,sizeof(map_symmetry));svld_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
-            BlockRead(f,vr,sizeof(theme_i     ));
-            if(vr>=theme_n)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end;  vr:=0;
-            BlockRead(f,vr,sizeof(g_mode      ));
-            if not(vr in allgamemodes)then begin svld_str_info:=str_svld_errors_wver;close(f);exit; end
-                                      else       svld_str_info+=str_gmode[vr  ]+tc_nl3+tc_default;
-
-            vr:=0;
-            BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-            BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
-
-            BlockRead(f,hp,sizeof(HPlayer  ));
-
-            BlockRead(f,pls,SizeOf(TPList));
-
-            for vr:=1 to MaxPlayers do
-            begin
-               if(vr=hp)
-               then svld_str_info+=chr(vr)+'*'+tc_default
-               else svld_str_info+=chr(vr)+'#'+tc_default;
-
-               if(pls[vr].state>PS_None)then
-                 if(pls[vr].team=0)
-                 then svld_str_info+=str_observer[1]           +','+t2c(pls[vr].team)+','
-                 else svld_str_info+=str_race[pls[vr].mrace][2]+','+t2c(pls[vr].team)+',';
-               svld_str_info+=pls[vr].name+tc_nl3
-            end;
-         end;
-      end
-      else svld_str_info:=str_svld_errors_wver;
+      svld_str_info:=str_svld_errors_file;
+      exit;
+   end;
+   assign(f,fn);
+   {$I-}
+   reset(f,1);
+   {$I+}
+   if(ioresult<>0)then
+   begin
+      svld_str_info:=str_svld_errors_open;
       close(f);
+      exit;
+   end;
+   if(FileSize(f)<>svld_file_size)then
+   begin
+      svld_str_info:=str_svld_errors_wdata;
+      close(f);
+      exit;
+   end;
+
+   vcard :=0;
+   vbyte1:=255;
+   {$I-}
+   BlockRead(f,vbyte1,SizeOf(g_version));
+   if(vbyte1=g_version)then
+   begin
+      vbyte1:=255;
+      BlockRead(f,vbyte1,sizeof(g_type));
+      case vbyte1 of
+      gt_campaing : begin
+                       vbyte1:=255;
+                       vint  :=-1;
+                       BlockRead(f,vint,sizeof(cmp_sel));
+
+                       if(vint<0)
+                       or(LastMission<vint)
+                       then svld_str_info:=str_svld_errors_wver
+                       else
+                       begin
+                          BlockRead(f,vbyte1,sizeof(cmp_skill));
+                          if(CMPMaxSkills<vbyte1)
+                          then svld_str_info:=str_svld_errors_wver
+                          else svld_str_info:=str_camp_MissionName[vint]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
+
+                          BlockRead(f,vbyte1,sizeof(cmp_data_b1));
+                          BlockRead(f,vbyte1,sizeof(cmp_data_b2));
+                          BlockRead(f,vbyte1,sizeof(cmp_data_b3));
+                          BlockRead(f,vcard ,sizeof(cmp_data_c1));
+                       end;
+
+                    end;
+      gt_scirmish : begin
+                       BlockRead(f,vint  ,sizeof(cmp_sel    ));
+                       BlockRead(f,vbyte1,sizeof(cmp_skill  ));
+                       BlockRead(f,vbyte1,sizeof(cmp_data_b1));
+                       BlockRead(f,vbyte1,sizeof(cmp_data_b2));
+                       BlockRead(f,vbyte1,sizeof(cmp_data_b3));
+                       BlockRead(f,vcard ,sizeof(cmp_data_c1));
+
+                       if(not FileReadBaseGameInfo(f,@svld_str_info))then svld_str_info:=str_svld_errors_wdata;
+                    end;
+      else svld_str_info:=str_svld_errors_wver;
+      end;
    end
-   else svld_str_info:=str_svld_errors_file;
+   else svld_str_info:=str_svld_errors_wver;
+   {$I+}
+   if(IOResult<>0)then svld_str_info:=str_svld_errors_wdata;
+
+   close(f);
 end;
 
 procedure saveload_Select;
@@ -126,80 +101,108 @@ begin
 end;
 
 procedure saveload_MakeFolderList;
-var Info : TSearchRec;
-       s : shortstring;
+var Info:TSearchRec;
+       s:shortstring;
 begin
    svld_list_scroll:=0;
    svld_list_size  :=0;
    setlength(svld_list,0);
    if(FindFirst(str_f_svld+'*'+str_e_svld,faReadonly,info)=0)then
-    repeat
-       s:=info.Name;
-       delete(s,length(s)-(length(str_e_svld)-1),length(str_e_svld));
-       if(length(s)>0)then
-       begin
-          svld_list_size+=1;
-          setlength(svld_list,svld_list_size);
-          svld_list[svld_list_size-1]:=s;
-       end;
-    until (FindNext(info)<>0);
+     repeat
+        s:=info.Name;
+        delete(s,length(s)-(length(str_e_svld)-1),length(str_e_svld));
+        if(length(s)>0)then
+        begin
+           svld_list_size+=1;
+           setlength(svld_list,svld_list_size);
+           svld_list[svld_list_size-1]:=s;
+        end;
+     until (FindNext(info)<>0);
    FindClose(info);
 
    saveload_Select;
 end;
 
-procedure saveload_CalcSaveSize;
+procedure saveload_MakeSaveData;
+var p:byte;
+procedure AddItem(pdata:pointer;sdata:cardinal);
 begin
-   svld_file_size:=
-   SizeOf(ver              )+
-   SizeOf(menu_s2          )+
-   SizeOf(cmp_sel          )+
-   SizeOf(cmp_skill        )+
-   SizeOf(cmp_data_b1      )+
-   SizeOf(cmp_data_b2      )+
-   SizeOf(cmp_data_b3      )+
-   SizeOf(cmp_data_c1      )+
-   SizeOf(map_seed         )+
-   SizeOf(map_iseed        )+
-   SizeOf(map_mw           )+
-   SizeOf(map_obs          )+
-   SizeOf(theme_i          )+
-   SizeOf(g_mode           )+
-   SizeOf(g_fixed_positions)+
-   SizeOf(g_generators     )+
-   SizeOf(HPlayer          )+
-   SizeOf(TPList           )+
-   SizeOf(g_units          )+
-   SizeOf(g_missiles       )+
-   SizeOf(g_effects         )+
-   SizeOf(map_dds          )+
-   SizeOf(vid_cam_x        )+
-   SizeOf(vid_cam_y        )+
-   SizeOf(PlayerColor      )+
-   SizeOf(G_Step           )+
-   SizeOf(vid_blink_timer1 )+
-   SizeOf(vid_blink_timer2 )+
-   SizeOf(m_brush          )+
-   SizeOf(g_inv_wave_n     )+
-   SizeOf(g_inv_wave_t_next)+
-   SizeOf(g_inv_wave_t_curr)+
-   SizeOf(g_cpoints        )+
-   SizeOf(g_royal_r        )+
-   SizeOf(g_status         )+
-   SizeOf(g_cycle_order    )+
-   SizeOf(g_cycle_regen    )+
-   SizeOf(ui_alarms        )+
-   SizeOf(map_psx          )+
-   SizeOf(map_psy          )+
-   SizeOf(map_rpos         )+
-   SizeOf(theme_map_lqt    )+
-   SizeOf(theme_map_blqt   )+
-   SizeOf(theme_map_trt    )+
-   SizeOf(theme_map_crt    )+1;
+   svld_itemn+=1;
+   setlength(svld_items,svld_itemn);
+   with svld_items[svld_itemn-1] do
+   begin
+      data_p:=pdata;
+      data_s:=sdata;
+   end;
+   svld_file_size+=sdata;
+end;
+begin
+   svld_itemn:=0;
+   setlength(svld_items,0);
+   svld_file_size:=0;
+
+   // 'CAPTION' part
+   AddItem(@g_version           ,SizeOf(g_version        ));
+   AddItem(@g_type              ,SizeOf(g_type           ));
+   AddItem(@cmp_sel             ,SizeOf(cmp_sel          ));
+   AddItem(@cmp_skill           ,SizeOf(cmp_skill        ));
+   AddItem(@cmp_data_b1         ,sizeof(cmp_data_b1      ));
+   AddItem(@cmp_data_b2         ,sizeof(cmp_data_b2      ));
+   AddItem(@cmp_data_b3         ,sizeof(cmp_data_b3      ));
+   AddItem(@cmp_data_c1         ,sizeof(cmp_data_c1      ));
+   AddItem(@map_scenario        ,SizeOf(map_scenario     ));
+   AddItem(@map_generators      ,SizeOf(map_generators   ));
+   AddItem(@map_seed            ,SizeOf(map_seed         ));
+   AddItem(@map_Size            ,SizeOf(map_Size         ));
+   AddItem(@map_Obstacles       ,SizeOf(map_Obstacles    ));
+   AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
+   AddItem(@theme_i             ,SizeOf(theme_i          ));
+   AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
+   AddItem(@G_Step              ,SizeOf(G_Step           ));
+   for p:=1 to MaxPlayers do
+     with g_players[p] do
+     begin
+        AddItem(@state,SizeOf(state));
+        AddItem(@name ,SizeOf(name ));
+        AddItem(@mrace,SizeOf(mrace));
+        AddItem(@team ,SizeOf(team ));
+     end;
+
+   // other
+   AddItem(@g_FixedPositions    ,SizeOf(g_FixedPositions ));
+   AddItem(@g_players           ,SizeOf(TPList           ));
+   AddItem(@g_units             ,SizeOf(g_units          ));
+   AddItem(@g_missiles          ,SizeOf(g_missiles       ));
+   AddItem(@g_effects           ,SizeOf(g_effects        ));
+   AddItem(@g_random_i          ,SizeOf(g_random_i       ));
+   AddItem(@g_random_p          ,SizeOf(g_random_p       ));
+   AddItem(@g_inv_wave_n        ,SizeOf(g_inv_wave_n     ));
+   AddItem(@g_inv_wave_t_next   ,SizeOf(g_inv_wave_t_next));
+   AddItem(@g_inv_wave_t_curr   ,SizeOf(g_inv_wave_t_curr));
+   AddItem(@g_KeyPoints         ,SizeOf(g_KeyPoints      ));
+   AddItem(@g_royal_r           ,SizeOf(g_royal_r        ));
+   AddItem(@g_status            ,SizeOf(g_status         ));
+   AddItem(@g_cycle_order       ,SizeOf(g_cycle_order    ));
+   AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen    ));
+   AddItem(@map_dds             ,SizeOf(map_dds          ));
+   AddItem(@map_psx             ,SizeOf(map_psx          ));
+   AddItem(@map_psy             ,SizeOf(map_psy          ));
+   AddItem(@ui_cam_x            ,SizeOf(ui_cam_x         ));
+   AddItem(@ui_cam_y            ,SizeOf(ui_cam_y         ));
+   AddItem(@ui_blink_timer1     ,SizeOf(ui_blink_timer1  ));
+   AddItem(@ui_blink_timer2     ,SizeOf(ui_blink_timer2  ));
+   AddItem(@ui_alarms           ,SizeOf(ui_alarms        ));
+   AddItem(@PlayerColors        ,SizeOf(PlayerColors     ));
+   AddItem(@m_brush             ,SizeOf(m_brush          ));
+   AddItem(@theme_map_Liquid    ,SizeOf(theme_map_Liquid    ));
+   AddItem(@theme_map_LiquidBack,SizeOf(theme_map_LiquidBack));
+   AddItem(@theme_map_Terrain   ,SizeOf(theme_map_Terrain   ));
+   AddItem(@theme_map_Crater    ,SizeOf(theme_map_Crater    ));
 end;
 
 function saveload_Save(check:boolean):boolean;
 var f:file;
+    i:integer;
 begin
    saveload_Save:=false;
 
@@ -218,52 +221,12 @@ begin
    {$I+}
    if(ioresult<>0)then exit;
 
-   BlockWrite(f,ver              ,SizeOf(ver              ));
-   BlockWrite(f,menu_s2          ,SizeOf(menu_s2          ));
-   BlockWrite(f,cmp_sel          ,SizeOf(cmp_sel          ));
-   BlockWrite(f,cmp_skill        ,SizeOf(cmp_skill        ));
-   BlockWrite(f,cmp_data_b1      ,sizeof(cmp_data_b1      ));
-   BlockWrite(f,cmp_data_b2      ,sizeof(cmp_data_b2      ));
-   BlockWrite(f,cmp_data_b3      ,sizeof(cmp_data_b3      ));
-   BlockWrite(f,cmp_data_c1      ,sizeof(cmp_data_c1      ));
-   BlockWrite(f,map_seed         ,SizeOf(map_seed         ));
-   BlockWrite(f,map_iseed        ,SizeOf(map_iseed        ));
-   BlockWrite(f,map_mw           ,SizeOf(map_mw           ));
-   BlockWrite(f,map_obs          ,SizeOf(map_obs          ));
-   BlockWrite(f,map_symmetry     ,sizeof(map_symmetry     ));
-   BlockWrite(f,theme_i          ,SizeOf(theme_i          ));
-   BlockWrite(f,g_mode           ,SizeOf(g_mode           ));
-   BlockWrite(f,g_fixed_positions,SizeOf(g_fixed_positions));
-   BlockWrite(f,g_generators     ,SizeOf(g_generators     ));
-   BlockWrite(f,HPlayer          ,SizeOf(HPlayer          ));
-   BlockWrite(f,g_players        ,SizeOf(TPList           ));
-   BlockWrite(f,g_units          ,SizeOf(g_units          ));
-   BlockWrite(f,g_missiles       ,SizeOf(g_missiles       ));
-   BlockWrite(f,g_effects        ,SizeOf(g_effects        ));
-   BlockWrite(f,map_dds          ,SizeOf(map_dds          ));
-   BlockWrite(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
-   BlockWrite(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
-   BlockWrite(f,PlayerColor      ,SizeOf(PlayerColor      ));
-   BlockWrite(f,G_Step           ,SizeOf(G_Step           ));
-   BlockWrite(f,vid_blink_timer1 ,SizeOf(vid_blink_timer1 ));
-   BlockWrite(f,vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
-   BlockWrite(f,m_brush          ,SizeOf(m_brush          ));
-   BlockWrite(f,g_inv_wave_n     ,SizeOf(g_inv_wave_n     ));
-   BlockWrite(f,g_inv_wave_t_next,SizeOf(g_inv_wave_t_next));
-   BlockWrite(f,g_inv_wave_t_curr,SizeOf(g_inv_wave_t_curr));
-   BlockWrite(f,g_cpoints        ,SizeOf(g_cpoints        ));
-   BlockWrite(f,g_royal_r        ,SizeOf(g_royal_r        ));
-   BlockWrite(f,g_status         ,SizeOf(g_status         ));
-   BlockWrite(f,g_cycle_order    ,SizeOf(g_cycle_order    ));
-   BlockWrite(f,g_cycle_regen    ,SizeOf(g_cycle_regen    ));
-   BlockWrite(f,ui_alarms        ,SizeOf(ui_alarms        ));
-   BlockWrite(f,map_psx          ,SizeOf(map_psx          ));
-   BlockWrite(f,map_psy          ,SizeOf(map_psy          ));
-   BlockWrite(f,map_rpos         ,SizeOf(map_rpos         ));
-   BlockWrite(f,theme_map_lqt    ,SizeOf(theme_map_lqt    ));
-   BlockWrite(f,theme_map_blqt   ,SizeOf(theme_map_blqt   ));
-   BlockWrite(f,theme_map_trt    ,SizeOf(theme_map_trt    ));
-   BlockWrite(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
+   {$I-}
+   if(svld_itemn>0)then
+    for i:=0 to svld_itemn-1 do
+     with svld_items[i] do
+      BlockWrite(f,data_p^,data_s);
+   {$I+}
 
    close(f);
 
@@ -272,7 +235,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLogChat(HPlayer,log_to_all,str_gsaved,true);
+   GameLogChat(LocalPlayer,log_to_all,str_gsaved,true);
 end;
 
 
@@ -286,69 +249,39 @@ begin
 
    if(svld_list_sel<0)
    or(svld_list_sel>=svld_list_size)
+   or(length(svld_str_fname)=0)
    or(not menu_SaveLoadTab)then exit;
 
    saveload_Load:=true;
 
    if(check)then exit;
 
-   fn:=str_f_svld+svld_list[svld_list_sel]+str_e_svld;
-  if(length(svld_list[svld_list_sel])>0)then
+   fn:=str_f_svld+svld_str_fname+str_e_svld;
    if(FileExists(fn))then
    begin
       assign(f,fn);
-      {$I-}reset(f,1);{$I+} if (ioresult<>0) then exit;
-      if(FileSize(f)<>svld_file_size)then begin close(f); exit; end;
-      BlockRead(f,vr,SizeOf(ver));
-      if(vr=ver)then
+      {$I-}
+      reset(f,1);
+      {$I+}
+      if(ioresult<>0)then exit;
+      if(FileSize(f)<>svld_file_size)then
+      begin
+         close(f);
+         exit;
+      end;
+      {$I-}
+      BlockRead(f,vr,SizeOf(g_version));
+      {$I+}
+      if(vr=g_version)then
       begin
          GameDefaultAll;
 
-         BlockRead(f,menu_s2          ,SizeOf(menu_s2          ));
-         BlockRead(f,cmp_sel          ,SizeOf(cmp_sel          ));
-         BlockRead(f,cmp_skill        ,SizeOf(cmp_skill        ));
-         BlockRead(f,cmp_data_b1      ,sizeof(cmp_data_b1      ));
-         BlockRead(f,cmp_data_b2      ,sizeof(cmp_data_b2      ));
-         BlockRead(f,cmp_data_b3      ,sizeof(cmp_data_b3      ));
-         BlockRead(f,cmp_data_c1      ,sizeof(cmp_data_c1      ));
-         BlockRead(f,map_seed         ,SizeOf(map_seed         ));
-         BlockRead(f,map_iseed        ,SizeOf(map_iseed        ));
-         BlockRead(f,map_mw           ,SizeOf(map_mw           ));
-         BlockRead(f,map_obs          ,SizeOf(map_obs          ));
-         BlockRead(f,map_symmetry     ,sizeof(map_symmetry     ));
-         BlockRead(f,theme_i          ,SizeOf(theme_i          ));map_seed2theme;
-         BlockRead(f,g_mode           ,SizeOf(g_mode           ));
-         BlockRead(f,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(f,g_generators     ,SizeOf(g_generators     ));
-         BlockRead(f,HPlayer          ,SizeOf(HPlayer          ));
-         BlockRead(f,g_players        ,SizeOf(TPList           ));
-         BlockRead(f,g_units          ,SizeOf(g_units          ));
-         BlockRead(f,g_missiles       ,SizeOf(g_missiles       ));
-         BlockRead(f,g_effects        ,SizeOf(g_effects        ));
-         BlockRead(f,map_dds          ,SizeOf(map_dds          ));
-         BlockRead(f,vid_cam_x        ,SizeOf(vid_cam_x        ));
-         BlockRead(f,vid_cam_y        ,SizeOf(vid_cam_y        ));
-         BlockRead(f,PlayerColor      ,SizeOf(PlayerColor      ));
-         BlockRead(f,G_Step           ,SizeOf(G_Step           ));
-         BlockRead(f,vid_blink_timer1 ,SizeOf(vid_blink_timer1 ));
-         BlockRead(f,vid_blink_timer2 ,SizeOf(vid_blink_timer2 ));
-         BlockRead(f,m_brush          ,SizeOf(m_brush          ));
-         BlockRead(f,g_inv_wave_n     ,SizeOf(g_inv_wave_n     ));
-         BlockRead(f,g_inv_wave_t_next,SizeOf(g_inv_wave_t_next));
-         BlockRead(f,g_inv_wave_t_curr,SizeOf(g_inv_wave_t_curr));
-         BlockRead(f,g_cpoints        ,SizeOf(g_cpoints        ));
-         BlockRead(f,g_royal_r        ,SizeOf(g_royal_r        ));
-         BlockRead(f,g_status         ,SizeOf(g_status         ));
-         BlockRead(f,g_cycle_order    ,SizeOf(g_cycle_order    ));
-         BlockRead(f,g_cycle_regen    ,SizeOf(g_cycle_regen    ));
-         BlockRead(f,ui_alarms        ,SizeOf(ui_alarms        ));
-         BlockRead(f,map_psx          ,SizeOf(map_psx          ));
-         BlockRead(f,map_psy          ,SizeOf(map_psy          ));
-         BlockRead(f,map_rpos         ,SizeOf(map_rpos         ));
-         BlockRead(f,theme_map_lqt    ,SizeOf(theme_map_lqt    ));
-         BlockRead(f,theme_map_blqt   ,SizeOf(theme_map_blqt   ));
-         BlockRead(f,theme_map_trt    ,SizeOf(theme_map_trt    ));
-         BlockRead(f,theme_map_crt    ,SizeOf(theme_map_crt    ));
+         {$I-}
+         if(svld_itemn>1)then
+          for u:=1 to svld_itemn-1 do
+           with svld_items[u] do
+            BlockRead(f,byte(data_p^),data_s);
+         {$I+}
 
          for u:=1 to MaxUnits do
           with g_units[u] do
@@ -357,10 +290,15 @@ begin
              uid   :=@g_uids[uidi];
           end;
 
-         cmp_minfo_lpage:=str_camp_infon[cmp_sel] div vid_campi_scrlstep;
+         if(ioresult<>0)then
+         begin
+            GameDefaultAll;
+            svld_str_info:=str_svld_errors_open;
+            exit;
+         end;
 
          map_vars;
-         if(menu_s2=ms2_camp)then SetThemeCampaing(cmp_sel);
+         if(g_type=gt_campaing)then SetThemeCampaing(cmp_sel);
 
          map_MakeThemeSprites;
          map_RefreshDoodadsCells;
@@ -385,13 +323,14 @@ begin
 
    if(svld_list_sel<0)
    or(svld_list_sel>=svld_list_size)
+   or(length(svld_str_fname)=0)
    or(not menu_SaveLoadTab)then exit;
 
    saveload_Delete:=true;
 
    if(check)then exit;
 
-   fn:=str_f_svld+svld_list[svld_list_sel]+str_e_svld;
+   fn:=str_f_svld+svld_str_fname+str_e_svld;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);

@@ -57,7 +57,7 @@ begin
      if(RectInCam(x,y,r,r,0))then
      begin
         ro:=0;
-        with g_players[HPlayer] do
+        with g_players[LocalPlayer] do
          case m_brush of
 1..255         : ro:=r-bld_dec_mr;
 co_pability    : if(ui_uibtn_pabilityu<>nil)then
@@ -137,7 +137,7 @@ begin
 
         mmx:=round(x*map_mmcx);
         mmy:=round(y*map_mmcx);
-        mmr:=max2(1,round(r*map_mmcx));
+        mmr:=max2i(1,round(r*map_mmcx));
      end;
 end;
 

@@ -258,7 +258,7 @@ begin
          x:=r+trunc(i*cos(dir*degtorad));
          y:=r+trunc(i*sin(dir*degtorad));
          filledcircleColor(surf,x,y,p,c_purple);
-         dir+=max2(1,(trunc(p*180/(pi*r)) div 3)*4 );
+         dir+=max2i(1,(trunc(p*180/(pi*r)) div 3)*4 );
          rand+=13;
       end;
    end;
@@ -285,10 +285,10 @@ var ts : psdl_surface;
 a,i,
 wsp,hsp: integer;
 begin
-   if(theme_map_plqt=theme_map_lqt)and(theme_map_plqt>0)then exit;
-   theme_map_plqt:=theme_map_lqt;
+   if(theme_map_pLiquid=theme_map_Liquid)and(theme_map_pLiquid>0)then exit;
+   theme_map_pLiquid:=theme_map_Liquid;
 
-   if(theme_map_lqt<0)or(theme_map_lqt>=theme_spr_liquidn)then
+   if(theme_map_Liquid<0)or(theme_map_Liquid>=theme_spr_liquidn)then
    begin
       ts                :=r_dterrain;
       theme_liquid_animt:=0;
@@ -297,16 +297,16 @@ begin
    end
    else
    begin
-      ts                :=theme_spr_liquids[theme_map_lqt].surf;
-      theme_liquid_animt:=theme_anm_liquids[theme_map_lqt];
-      theme_liquid_color:=theme_clr_liquids[theme_map_lqt];
-      theme_liquid_animm:=theme_ant_liquids[theme_map_lqt];
+      ts                :=theme_spr_liquids[theme_map_Liquid].surf;
+      theme_liquid_animt:=theme_anm_liquids[theme_map_Liquid];
+      theme_liquid_color:=theme_clr_liquids[theme_map_Liquid];
+      theme_liquid_animm:=theme_ant_liquids[theme_map_Liquid];
    end;
 
    case theme_liquid_animt of
    0: begin
          wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
-         hsp:=(ts^.h div 4)*((abs(map_iseed) mod 3)-1);
+         hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
          if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
       end;
    else
@@ -341,12 +341,12 @@ procedure gfx_MapMakeLiquidBack;
 var ts :psdl_surface;
     i  :byte;
 begin
-   if(theme_map_pblqt=theme_map_blqt)and(theme_map_blqt>0)then exit;
-   theme_map_pblqt:=theme_map_blqt;
+   if(theme_map_pLiquidBack=theme_map_LiquidBack)and(theme_map_LiquidBack>0)then exit;
+   theme_map_pLiquidBack:=theme_map_LiquidBack;
 
-   if(theme_map_blqt<0)or(theme_map_blqt>=theme_spr_terrainn)
+   if(theme_map_LiquidBack<0)or(theme_map_LiquidBack>=theme_spr_terrainn)
    then ts := r_dterrain
-   else ts := theme_spr_terrains[theme_map_blqt].surf;
+   else ts := theme_spr_terrains[theme_map_LiquidBack].surf;
 
    for i:=1 to LiquidRs do
     with spr_liquidb[i] do
@@ -367,12 +367,12 @@ procedure gfx_MapMakeCrater;
 var ts : psdl_surface;
     i  : integer;
 begin
-   if(theme_map_pcrt=theme_map_crt)and(theme_map_pcrt>0)then exit;
-   theme_map_pcrt:=theme_map_crt;
+   if(theme_map_pCrater=theme_map_Crater)and(theme_map_pCrater>0)then exit;
+   theme_map_pCrater:=theme_map_Crater;
 
-   if(theme_map_crt<0)or(theme_map_crt>=theme_spr_terrainn)
+   if(theme_map_Crater<0)or(theme_map_Crater>=theme_spr_terrainn)
    then ts := r_dterrain
-   else ts := theme_spr_terrains[theme_map_crt].surf;
+   else ts := theme_spr_terrains[theme_map_Crater].surf;
 
    for i:=1 to crater_ri do
     with spr_crater[i] do
@@ -394,8 +394,8 @@ procedure gfx_MapMakeTerrain;
 var x,y,w,h:integer;
     ter_s  :pSDL_Surface;
 begin
-   if(theme_map_ptrt=theme_map_trt)and(theme_map_ptrt>0)then exit;
-   theme_map_ptrt:=theme_map_trt;
+   if(theme_map_pTerrain=theme_map_Terrain)and(theme_map_pTerrain>0)then exit;
+   theme_map_pTerrain:=theme_map_Terrain;
 
    if(vid_terrain<>nil) then
    begin
@@ -403,7 +403,7 @@ begin
       vid_terrain:=nil;
    end;
 
-   if(theme_map_trt<0)or(theme_map_trt>=theme_spr_terrainn)then
+   if(theme_map_Terrain<0)or(theme_map_Terrain>=theme_spr_terrainn)then
    begin
       ter_w:=1;
       ter_h:=1;
@@ -412,7 +412,7 @@ begin
    end
    else
    begin
-      ter_s:=theme_spr_terrains[theme_map_trt].surf;
+      ter_s:=theme_spr_terrains[theme_map_Terrain].surf;
 
       ter_w:=ter_s^.w;
       ter_h:=ter_s^.h;
@@ -509,8 +509,9 @@ begin
    r_empty   :=gfx_CreateSDLSurface(1,1);
    SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
 
-   r_minimap :=gfx_CreateSDLSurface(vid_panelw-1,vid_panelw-1);
-   r_bminimap:=gfx_CreateSDLSurface(vid_panelw-1,vid_panelw-1);
+   r_minimap :=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
+   r_mminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
+   r_bminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
 
    for x:=1 to vid_mvs do new(vid_vsl[x]);
 
@@ -558,38 +559,35 @@ begin
       SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(surf,0,0));
    end;
 
-
    spr_mback:= gfx_LoadSDLSurface('mback'   ,false,true);
    spr_mlogo:= gfx_LoadSDLSurface('mlogo'   ,false,true);
-   spr_mbtn := gfx_LoadSDLSurface('mbtn'    ,false,true);
 
-   menu_cx:=spr_mback^.w div 2;
 
-   r_menu:=gfx_CreateSDLSurface(max2(vid_minw,spr_mback^.w), max2(vid_minh,spr_mback^.h));
+   r_menu:=gfx_CreateSDLSurface(menu_w, menu_h);
 
-   spr_b_action   := gfx_LoadButton('b_action' ,vid_bw);
-   spr_b_paction  := gfx_LoadButton('b_paction',vid_bw);
-   spr_b_delete   := gfx_LoadButton('b_destroy',vid_bw);
-   spr_b_attack   := gfx_LoadButton('b_attack' ,vid_bw);
-   spr_b_rebuild  := gfx_LoadButton('b_rebuild',vid_bw);
-   spr_b_move     := gfx_LoadButton('b_move'   ,vid_bw);
-   spr_b_patrol   := gfx_LoadButton('b_patrol' ,vid_bw);
-   spr_b_apatrol  := gfx_LoadButton('b_apatrol',vid_bw);
-   spr_b_stop     := gfx_LoadButton('b_stop'   ,vid_bw);
-   spr_b_hold     := gfx_LoadButton('b_hold'   ,vid_bw);
-   spr_b_selall   := gfx_LoadButton('b_selall' ,vid_bw);
-   spr_b_cancel   := gfx_LoadButton('b_cancle' ,vid_bw);
-   spr_b_rfast    := gfx_LoadButton('b_rfast'  ,vid_bw);
-   spr_b_rskip    := gfx_LoadButton('b_rskip'  ,vid_bw);
-   spr_b_rback    := gfx_LoadButton('b_rback'  ,vid_bw);
-   spr_b_rfog     := gfx_LoadButton('b_fog'    ,vid_bw);
-   spr_b_rlog     := gfx_LoadButton('b_log'    ,vid_bw);
-   spr_b_rstop    := gfx_LoadButton('b_rstop'  ,vid_bw);
-   spr_b_rvis     := gfx_LoadButton('b_rvis'   ,vid_bw);
-   spr_b_rclck    := gfx_LoadButton('b_rclick' ,vid_bw);
-   spr_b_mmark    := gfx_LoadButton('b_mmark'  ,vid_bw);
+   spr_b_action   := gfx_LoadButton('b_action' ,ui_ButtonW1);
+   spr_b_paction  := gfx_LoadButton('b_paction',ui_ButtonW1);
+   spr_b_delete   := gfx_LoadButton('b_destroy',ui_ButtonW1);
+   spr_b_attack   := gfx_LoadButton('b_attack' ,ui_ButtonW1);
+   spr_b_rebuild  := gfx_LoadButton('b_rebuild',ui_ButtonW1);
+   spr_b_move     := gfx_LoadButton('b_move'   ,ui_ButtonW1);
+   spr_b_patrol   := gfx_LoadButton('b_patrol' ,ui_ButtonW1);
+   spr_b_apatrol  := gfx_LoadButton('b_apatrol',ui_ButtonW1);
+   spr_b_stop     := gfx_LoadButton('b_stop'   ,ui_ButtonW1);
+   spr_b_hold     := gfx_LoadButton('b_hold'   ,ui_ButtonW1);
+   spr_b_selall   := gfx_LoadButton('b_selall' ,ui_ButtonW1);
+   spr_b_cancel   := gfx_LoadButton('b_cancle' ,ui_ButtonW1);
+   spr_b_rfast    := gfx_LoadButton('b_rfast'  ,ui_ButtonW1);
+   spr_b_rskip    := gfx_LoadButton('b_rskip'  ,ui_ButtonW1);
+   spr_b_rback    := gfx_LoadButton('b_rback'  ,ui_ButtonW1);
+   spr_b_rfog     := gfx_LoadButton('b_fog'    ,ui_ButtonW1);
+   spr_b_rlog     := gfx_LoadButton('b_log'    ,ui_ButtonW1);
+   spr_b_rstop    := gfx_LoadButton('b_rstop'  ,ui_ButtonW1);
+   spr_b_rvis     := gfx_LoadButton('b_rvis'   ,ui_ButtonW1);
+   spr_b_rclck    := gfx_LoadButton('b_rclick' ,ui_ButtonW1);
+   spr_b_mmark    := gfx_LoadButton('b_mmark'  ,ui_ButtonW1);
 
-   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadButton('tabs'+b2s(x),vid_tbw);
+   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadButton('tabs'+b2s(x),ui_TabButtonW);
 
    spr_cursor     := gfx_LoadSDLSurface('cursor'   ,true ,true);
 
@@ -767,7 +765,7 @@ begin
    for r:=1 to r_cnt do
    with spr_b_up[r,x] do
    begin
-      surf:= gfx_LoadButton(race_upgrades[r]+'b_up'+b2s(x),vid_bw);
+      surf:= gfx_LoadButton(race_upgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
       w   := surf^.w;h    := w;
       hw  := w div 2;hh   := hw;
    end;
@@ -788,8 +786,8 @@ begin
       with un_btn do
       begin
          case _urace of
-         r_hell: surf:= gfx_LoadButtonFS(_uid2spr(u,315,0)^.surf,vid_BW );
-         r_uac : surf:= gfx_LoadButtonFS(_uid2spr(u,225,0)^.surf,vid_BW );
+         r_hell: surf:= gfx_LoadButtonFS(_uid2spr(u,315,0)^.surf,ui_ButtonW1 );
+         r_uac : surf:= gfx_LoadButtonFS(_uid2spr(u,225,0)^.surf,ui_ButtonW1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -797,8 +795,8 @@ begin
       with un_sbtn do
       begin
          case _urace of
-         r_hell: surf:= gfx_LoadButtonFS(_uid2spr(u,315,0)^.surf,vid_oiw,1 );
-         r_uac : surf:= gfx_LoadButtonFS(_uid2spr(u,225,0)^.surf,vid_oiw,1 );
+         r_hell: surf:= gfx_LoadButtonFS(_uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1 );
+         r_uac : surf:= gfx_LoadButtonFS(_uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -843,7 +841,7 @@ begin
    vid_mha:= vid_cam_h+vid_ab*2;
 
    ix:=longint(map_seed) mod vid_mwa;
-   iy:=(map_iseed*5+ix)  mod vid_mha;
+   iy:=(g_random_i*5+ix)  mod vid_mha;
    rn:=ix*iy;
    for i:=1 to _tdecaln do
     with _tdecals[i-1] do
@@ -885,7 +883,7 @@ begin
    ui_apmy      := ui_fpsy+txt_line_h3;
 
 
-   ui_menu_btnsy:= vid_panelll-1;
+   ui_menu_btnsy:= ui_CtrlPanelBH-1;
    ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
 
    vid_fog_vfw  :=(vid_cam_w div fog_cw)+2;
@@ -902,13 +900,13 @@ procedure vid_RemakeScreenSurfaces;
 var i,y:integer;
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
-   if(vid_ppos<2)
+   if(ui_ControlPanelPos<2)
    then lineColor(r_panel,x0,y0,x1,y1,color)
    else lineColor(r_panel,y0,x0,y1,x1,color);
 end;
 procedure prect(x0,y0,x1,y1:integer;color:cardinal);
 begin
-   if(vid_ppos<2)
+   if(ui_ControlPanelPos<2)
    then rectangleColor(r_panel,x0,y0,x1,y1,color)
    else rectangleColor(r_panel,y0,x0,y1,x1,color);
 end;
@@ -917,68 +915,68 @@ begin
    gfx_FreeSDLSurface(r_panel   );
    gfx_FreeSDLSurface(r_dterrain);
 
-   if(vid_ppos<2)then // left-right
+   if(ui_ControlPanelPos<2)then // left-right
    begin
-      vid_cam_w:=vid_vw-vid_panelw;
+      vid_cam_w:=vid_vw-ui_CtrlPanelW;
       vid_cam_h:=vid_vh;
 
-      if(vid_ppos=0)
-      then vid_mapx:=vid_panelw
+      if(ui_ControlPanelPos=0)
+      then vid_mapx:=ui_CtrlPanelW
       else vid_mapx:=0;
       vid_mapy:=0;
 
-      if(vid_ppos=0)
+      if(ui_ControlPanelPos=0)
       then vid_panelx:=0
       else vid_panelx:=vid_cam_w-1;
       vid_panely:=0;
 
-      r_uipanel:=gfx_CreateSDLSurface(vid_panelw+1,vid_vh);
-      r_panel  :=gfx_CreateSDLSurface(vid_panelw+1,vid_vh);
+      r_uipanel:=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
+      r_panel  :=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
 
-      vlineColor(r_panel,vid_BW ,vid_panelw+vid_BW,vid_panelh,c_white);
-      vlineColor(r_panel,vid_2BW,vid_panelw+vid_BW,vid_panelh,c_white);
+      vlineColor(r_panel,ui_ButtonW1 ,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
+      vlineColor(r_panel,ui_ButtonW2,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
    end
    else
    begin
       vid_cam_w:=vid_vw;
-      vid_cam_h:=vid_vh-vid_panelw;
+      vid_cam_h:=vid_vh-ui_CtrlPanelW;
 
       vid_mapx:=0;
-      if(vid_ppos=2)
-      then vid_mapy:=vid_panelw-1
+      if(ui_ControlPanelPos=2)
+      then vid_mapy:=ui_CtrlPanelW-1
       else vid_mapy:=0;
 
       vid_panelx:=0;
-      if(vid_ppos=2)
+      if(ui_ControlPanelPos=2)
       then vid_panely:=0
       else vid_panely:=vid_cam_h-1;
 
-      r_uipanel:=gfx_CreateSDLSurface(vid_vw,vid_panelw+1);
-      r_panel  :=gfx_CreateSDLSurface(vid_vw,vid_panelw+1);
+      r_uipanel:=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
+      r_panel  :=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
 
-      hlineColor(r_panel,vid_panelw+vid_BW,vid_panelh,vid_BW ,c_white);
-      hlineColor(r_panel,vid_panelw+vid_BW,vid_panelh,vid_2BW,c_white);
+      hlineColor(r_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW1 ,c_white);
+      hlineColor(r_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW2,c_white);
    end;
 
    vid_cam_hw:=vid_cam_w div 2;
    vid_cam_hh:=vid_cam_h div 2;
 
    rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);
-   pline(0,vid_panelw,vid_panelw,vid_panelw,c_white);
+   pline(0,ui_CtrlPanelW,ui_CtrlPanelW,ui_CtrlPanelW,c_white);
 
-   //pline(0,vid_panelw+ui_h3bw,r_panel^.w,vid_panelw+ui_h3bw,c_white);
-   pline(0,vid_panelw+vid_BW ,r_panel^.w,vid_panelw+vid_BW ,c_white);
+   //pline(0,ui_CtrlPanelW+ui_h3bw,r_panel^.w,ui_CtrlPanelW+ui_h3bw,c_white);
+   pline(0,ui_CtrlPanelW+ui_ButtonW1 ,r_panel^.w,ui_CtrlPanelW+ui_ButtonW1 ,c_white);
 
    for y:=0 to 3 do
-   pline(y*vid_tBW,vid_panelw,y*vid_tBW,vid_panelw+vid_BW,c_white);
+   pline(y*ui_TabButtonW,ui_CtrlPanelW,y*ui_TabButtonW,ui_CtrlPanelW+ui_ButtonW1,c_white);
 
    i:=4;
-   y:=vid_BW*i;
-   while (i<=vid_panelll) do
+   y:=ui_ButtonW1*i;
+   while (i<=ui_CtrlPanelBH) do
    begin
-      pline(0,y,vid_panelw,y,c_white);
+      pline(0,y,ui_CtrlPanelW,y,c_white);
       i+=1;
-      y+=vid_BW;
+      y+=ui_ButtonW1;
    end;
 
    draw_sdlsurface(r_uipanel,0,0,r_panel);
@@ -990,11 +988,11 @@ end;
 
 procedure vid_MakeScreen;
 begin
-   if (r_screen<>nil) then sdl_freesurface(r_screen);
+   if(r_screen<>nil)then sdl_freesurface(r_screen);
 
-   if(vid_fullscreen)
-   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN)
-   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags);
+   if(vid_windowed)
+   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags)
+   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN);
 
    if(r_screen=nil)then begin WriteSDLError; exit; end;
 

@@ -1,118 +1,93 @@
 
 
 procedure replay_MenuSelectedInfo;
-const pl_n_ch : array[false..true] of char = ('#','*');
-var   f:file;
-vr,t,hp,tm:byte;
-     fn:shortstring;
-     mw:integer;
-     wr:cardinal;
+var  f:file;
+    fn:shortstring;
+vbyte1:byte;
 begin
    rpls_str_info:='';
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
 
+   if(length(rpls_list[rpls_list_sel])=0)then exit;
+
    fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
-
-   if(length(rpls_list[rpls_list_sel])>0)then
-   if(FileExists(fn))then
+   if(not FileExists(fn))then
    begin
-      {$I-}
-      assign(f,fn);
-      reset (f,1);
-      {$I+}
-      if(ioresult<>0)then
-      begin
-         rpls_str_info:=str_svld_errors_open;
-         exit;
-      end;
-      if(FileSize(f)<rpls_file_head_size)then
-      begin
-         close(f);
-         rpls_str_info:=str_svld_errors_wdata;
-         exit;
-      end;
-      vr:=0;
-      {$I-}
-      BlockRead(f,vr,SizeOf(Ver));
-      if(vr=Ver)then
-      begin
-         hp:=0;
-         vr:=0;
-         mw:=0;
-         wr:=0;
-         BlockRead(f,wr,sizeof(map_seed    ));rpls_str_info:=str_map+': '+c2s(wr)+tc_nl3+' ';wr:=0;
-         BlockRead(f,mw,SizeOf(map_mw      ));rpls_str_info+=str_m_siz+i2s(mw)   +tc_nl3+' ';mw:=0;
-         BlockRead(f,vr,sizeof(map_obs     ));
-         if(vr<=7)then begin rpls_str_info+=str_m_obs+_str_mx(vr)+tc_nl3+' ';  end
-                  else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(map_symmetry));rpls_str_info+=str_m_sym+b2cc[vr>0]+tc_nl3+' ';mw:=0;
+      rpls_str_info:=str_svld_errors_file;
+      exit;
+   end;
 
-         BlockRead(f,vr,sizeof(g_mode      ));
-         if(vr in allgamemodes)then begin rpls_str_info+=str_gmode[vr]+tc_nl3;              end
-                               else begin rpls_str_info:=str_svld_errors_wver;close(f);exit;end;
-         BlockRead(f,vr,sizeof(g_fixed_positions));vr:=0;
-         BlockRead(f,vr,sizeof(g_generators    ));vr:=0;
-         BlockRead(f,hp,SizeOf(HPlayer          ));
-
-         for vr:=1 to MaxPlayers do
-         begin
-            BlockRead(f,fn ,sizeof(fn));
-
-            rpls_str_info+=chr(vr)+pl_n_ch[vr=hp]+tc_default;
-
-            t:=0;
-            tm:=0;
-            BlockRead(f,t,1);
-            if(t=PS_none)then
-            begin
-               rpls_str_info+=fn+tc_nl3;
-               BlockRead(f,mw,3);
-            end
-            else
-            begin
-               BlockRead(f,t ,1);
-               BlockRead(f,tm,1);
-               BlockRead(f,t ,1);
-
-               if(t=0)
-               then rpls_str_info+=str_observer[1]
-               else
-                 if(tm<=r_cnt)
-                 then rpls_str_info+=str_race[tm][2]
-                 else rpls_str_info+='?';
-               rpls_str_info+=','+t2c(t)+','+fn+tc_nl3;
-            end;
-         end;
-      end
-      else rpls_str_info:=str_svld_errors_wver;
-      if(IOResult<>0)then rpls_str_info:=str_svld_errors_wver;
-      {$I+}
+   assign(f,fn);
+   {$I-}
+   reset (f,1);
+   {$I+}
+   if(ioresult<>0)then
+   begin
+      rpls_str_info:=str_svld_errors_open;
+      exit;
+   end;
+   if(FileSize(f)<rpls_file_head_size)then
+   begin
       close(f);
-   end
-   else rpls_str_info:=str_svld_errors_file;
+      rpls_str_info:=str_svld_errors_wdata;
+      exit;
+   end;
+
+   vbyte1:=0;
+   {$I-}
+   BlockRead(f,vbyte1,SizeOf(g_version));
+   if(vbyte1<>g_version)
+   then rpls_str_info:=str_svld_errors_wver
+   else
+     if(not FileReadBaseGameInfo(f,@rpls_str_info))then rpls_str_info:=str_svld_errors_wdata;
+
+   {$I+}
+   if(IOResult<>0)then rpls_str_info:=str_svld_errors_wdata;
+   close(f);
 end;
 
-procedure replay_CalcHeaderSize;
+procedure replay_MakeReplayHeaderData;
+var p:byte;
+procedure AddItem(pdata:pointer;sdata:cardinal);
 begin
-   rpls_file_head_size
-                 :=SizeOf(ver              )
-                  +SizeOf(map_seed         )
-                  +SizeOf(map_mw           )
-                  +SizeOf(map_obs          )
-                  +SizeOf(map_symmetry     )
+   rpls_head_itemn+=1;
+   setlength(rpls_head_items,rpls_head_itemn);
+   with rpls_head_items[rpls_head_itemn-1] do
+   begin
+      data_p:=pdata;
+      data_s:=sdata;
+   end;
+   rpls_file_head_size+=sdata;
+end;
+begin
+   rpls_head_itemn:=0;
+   setlength(rpls_head_items,0);
+   rpls_file_head_size:=0;
 
-                  +SizeOf(g_mode           )
-                  +SizeOf(g_fixed_positions)
-                  +SizeOf(g_generators     )
-                  +sizeof(rpls_player      );
-   with g_players[0] do
-   rpls_file_head_size
-                 +=(sizeof(name )
-                   +sizeof(state)
-                   +sizeof(race )
-                   +sizeof(mrace)
-                   +sizeof(team ))*MaxPlayers;
+   AddItem(@g_version           ,SizeOf(g_version        ));
+   AddItem(@map_scenario        ,SizeOf(map_scenario     ));
+   AddItem(@map_generators      ,SizeOf(map_generators   ));
+   AddItem(@map_seed            ,SizeOf(map_seed         ));
+   AddItem(@map_Size            ,SizeOf(map_Size         ));
+   AddItem(@map_Obstacles       ,SizeOf(map_Obstacles    ));
+   AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
+   AddItem(@theme_i             ,SizeOf(theme_i          ));
+   AddItem(@rpls_player         ,SizeOf(rpls_player      ));
+   AddItem(@G_Step              ,SizeOf(G_Step           ));
+   for p:=1 to MaxPlayers do
+     with g_players[p] do
+     begin
+        AddItem(@state,SizeOf(state));
+        AddItem(@name ,SizeOf(name ));
+        AddItem(@mrace,SizeOf(mrace));
+        AddItem(@team ,SizeOf(team ));
+     end;
+
+   for p:=1 to MaxPlayers do
+     with g_players[p] do
+       AddItem(@race,SizeOf(race));
+   AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
 end;
 
 function replay_GetProgress:single;
@@ -133,11 +108,11 @@ begin
    or(rpls_state  <>rpls_read)then exit;
 
    if(rpls_ReadPosN>0)then
-    with rpls_ReadPosL[rpls_ReadPosN-1] do
-    begin
-       if( g_Step<=rp_gtick)then exit;
-       if((g_Step -rp_gtick)<fr_fps2)then exit;
-    end;
+     with rpls_ReadPosL[rpls_ReadPosN-1] do
+     begin
+        if( g_Step<=rp_gtick)then exit;
+        if((g_Step -rp_gtick)<fr_fps2)then exit;
+     end;
 
    rpls_ReadPosN+=1;
    setlength(rpls_ReadPosL,rpls_ReadPosN);
@@ -158,16 +133,16 @@ begin
    ni:=0;
    vi:=0;
    for i:=0 to rpls_ReadPosN-1 do
-    with rpls_ReadPosL[i] do
-     if(rp_gtick<=timetick)then
-     begin
-        vt:=abs(rp_gtick-timetick);
-        if(vt<vi)or(ni=0)then
-        begin
-           ni:=i;
-           vi:=vt;
-        end;
-     end;
+     with rpls_ReadPosL[i] do
+       if(rp_gtick<=timetick)then
+       begin
+          vt:=abs(rp_gtick-timetick);
+          if(vt<vi)or(ni=0)then
+          begin
+             ni:=i;
+             vi:=vt;
+          end;
+       end;
 
    with rpls_ReadPosL[ni] do
    begin
@@ -176,11 +151,11 @@ begin
    end;
    rpls_step:=2;
    for i:=1 to MaxUnits do
-    with g_units[i] do
-    begin
-       vx:=x;
-       vy:=y;
-    end;
+     with g_units[i] do
+     begin
+        vx:=x;
+        vy:=y;
+     end;
 end;
 
 procedure replay_Abort;
@@ -213,7 +188,7 @@ var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=str_f_rpls+rpls_str_name+'_'+str_DateTime+str_e_rpls;
+   rpls_str_path:=str_f_rpls+rpls_NamePrefix+'_'+str_DateTime+str_e_rpls;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -230,35 +205,17 @@ begin
       rpls_fstatus:=rpls_write;
       rpls_state  :=rpls_write;
       rpls_u      :=MaxPlayerUnits+1;
-      rpls_player :=HPlayer;
+      rpls_player :=LocalPlayer;
       rpls_log_c  :=0;
       rpls_plcam  :=false;
       rpls_ticks  :=0;
 
       {$I-}
-      BlockWrite(rpls_file,ver              ,SizeOf(ver              ));
-      BlockWrite(rpls_file,map_seed         ,SizeOf(map_seed         ));
-      BlockWrite(rpls_file,map_mw           ,SizeOf(map_mw           ));
-      BlockWrite(rpls_file,map_obs          ,SizeOf(map_obs          ));
-      BlockWrite(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
-
-      BlockWrite(rpls_file,g_mode           ,SizeOf(g_mode           ));
-      BlockWrite(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-      BlockWrite(rpls_file,g_generators     ,SizeOf(g_generators     ));
-      BlockWrite(rpls_file,rpls_player      ,sizeof(rpls_player      ));
+      if(rpls_head_itemn>0)then
+       for p:=0 to rpls_head_itemn-1 do
+        with rpls_head_items[p] do
+         BlockWrite(rpls_file,data_p^,data_s);
       {$I+}
-
-      for p:=1 to MaxPlayers do
-       with g_players[p] do
-       begin
-          {$I-}
-          BlockWrite(rpls_file,name ,sizeof(name ));
-          BlockWrite(rpls_file,state,sizeof(state));
-          BlockWrite(rpls_file,race ,sizeof(race ));
-          BlockWrite(rpls_file,mrace,sizeof(mrace));
-          BlockWrite(rpls_file,team ,sizeof(team ));
-          {$I+}
-       end;
 
       if(ioresult<>0)then
       begin
@@ -273,8 +230,8 @@ procedure replay_WriteGameFrame;
 begin
    if((rpls_ticks mod 2)<>0)then exit;
 
-   _vx:=byte((vid_cam_x+vid_cam_hw) shr vxyc);
-   _vy:=byte((vid_cam_y+vid_cam_hh) shr vxyc);
+   _vx:=byte((ui_cam_x+vid_cam_hw) shr vxyc);
+   _vy:=byte((ui_cam_y+vid_cam_hh) shr vxyc);
 
    gs:=G_Status and %00111111;
    i :=gs;
@@ -310,7 +267,7 @@ end;
 
 
 // READ
-procedure replay_Readhead;
+procedure replay_ReadHead;
 var p:byte;
 begin
    replay_Abort;
@@ -358,10 +315,10 @@ begin
 
       i:=0;
       {$I-}
-      BlockRead(rpls_file,i,SizeOf(Ver));
+      BlockRead(rpls_file,i,SizeOf(g_version));
       {$I+}
 
-      if(i<>ver)then
+      if(i<>g_version)then
       begin
          replay_Abort;
          g_started    :=false;
@@ -372,19 +329,24 @@ begin
          GameDefaultAll;
 
          {$I-}
-         BlockRead(rpls_file,map_seed         ,SizeOf(map_seed         ));
-         BlockRead(rpls_file,map_mw           ,SizeOf(map_mw           ));
-         BlockRead(rpls_file,map_obs          ,SizeOf(map_obs          ));
-         BlockRead(rpls_file,map_symmetry     ,SizeOf(map_symmetry     ));
-         BlockRead(rpls_file,g_mode           ,SizeOf(g_mode           ));
-         BlockRead(rpls_file,g_fixed_positions,SizeOf(g_fixed_positions));
-         BlockRead(rpls_file,g_generators     ,SizeOf(g_generators     ));
-         BlockRead(rpls_file,rpls_player      ,sizeof(rpls_player      ));
+         if(rpls_head_itemn>1)then
+          for p:=1 to rpls_head_itemn-1 do
+           with rpls_head_items[p] do
+            BlockRead(rpls_file,byte(data_p^),data_s);
          {$I+}
 
-         if(map_mw<MinSMapW)or(map_mw>MaxSMapW)
-         or(map_obs>7)
-         or not(g_mode in allgamemodes)
+         if(ioresult<>0)then
+         begin
+            replay_Abort;
+            rpls_str_info:=str_svld_errors_wver;
+            GameDefaultAll;
+            exit;
+         end;
+
+         if(map_Size<map_MinSize)or(map_Size>map_MaxSize)
+         or(map_Obstacles >map_MaxObstacles)
+         or(map_Generators>map_MaxGenerators)
+         or not(map_scenario in allmapscenarios)
          or(rpls_player>MaxPlayers)then
          begin
             replay_Abort;
@@ -396,23 +358,17 @@ begin
 
          for p:=1 to MaxPlayers do
           with g_players[p] do
-          begin
-             {$I-}
-             BlockRead(rpls_file,name ,sizeof(name ));
-             BlockRead(rpls_file,state,sizeof(state));
-             BlockRead(rpls_file,race ,sizeof(race ));
-             BlockRead(rpls_file,mrace,sizeof(mrace));
-             BlockRead(rpls_file,team ,sizeof(team ));
-             {$I+}
-          end;
-
-         if(ioresult<>0)then
-         begin
-            replay_Abort;
-            rpls_str_info:=str_svld_errors_wver;
-            GameDefaultAll;
-            exit;
-         end;
+            if(length(name)>MaxPlayerNameLen)
+            or not(state in [ps_none,ps_human,ps_ai])
+            or(race >r_cnt)
+            or(mrace>r_cnt)
+            or(team >MaxPlayers)then
+            begin
+               replay_Abort;
+               rpls_str_info:=str_svld_errors_wver;
+               GameDefaultAll;
+               exit;
+            end;
 
          if(rpls_pnu=0)then rpls_pnu:=NetTickN;
          UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
@@ -422,13 +378,13 @@ begin
          rpls_state  :=rpls_read;
          rpls_pnu    :=0;
          rpls_ticks  :=0;
-         HPlayer     :=rpls_player;
-         UIPlayer    :=HPlayer;
+         LocalPlayer     :=rpls_player;
+         UIPlayer    :=LocalPlayer;
 
          rpls_plcam  :=false;
 
          map_premap;
-         MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
+         MoveCamToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
 
          CameraBounds;
          ui_tab    :=3;
@@ -492,30 +448,40 @@ begin
 
    if(rpls_plcam)then
    begin
-      vid_cam_x:=(vid_cam_x+integer(rpls_vidx shl vxyc)-vid_cam_hw) div 2;
-      vid_cam_y:=(vid_cam_y+integer(rpls_vidy shl vxyc)-vid_cam_hh) div 2;
+      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl vxyc)-vid_cam_hw) div 2;
+      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl vxyc)-vid_cam_hh) div 2;
       CameraBounds;
    end;
 
    if(gs=gs_replaypause)then G_Status:=gs;
 end;
 
-
 begin
-   rpls_ticks+=1;
-   if(not G_Started)or(rpls_state=rpls_none)or(menu_s2=ms2_camp)
+   if(rpls_RecordTryPause>0)
+   then rpls_RecordTryPause-=1
+   else
+     if(rpls_Record)and(g_Started)and(rpls_state=rpls_none)then
+     begin
+        rpls_state:=rpls_write;
+        rpls_RecordTryPause:=fr_fps2;
+     end;
+
+   if(not G_Started)or(rpls_state=rpls_none)or(g_type=gt_campaing)
    then replay_Abort
    else
      if(G_Started)then
-       case rpls_state of
+     begin
+        rpls_ticks+=1;
+        case rpls_state of
 rpls_write : if(rpls_fstatus<>rpls_write)
              then replay_WriteHead
              else replay_WriteGameFrame;
 rpls_read  : if(rpls_fstatus<>rpls_read)
              then replay_Readhead
              else replay_ReadGameFrame;
-       else replay_Abort;
-       end;
+        else replay_Abort;
+        end;
+     end;
 end;
 
 procedure replay_Select;
@@ -526,33 +492,27 @@ begin
      if(not g_started)then rpls_str_info:='';
 end;
 
-procedure replay_MakeFolderList(resetSelect:boolean=true);
+procedure replay_MakeFolderList;
 var Info : TSearchRec;
        s : shortstring;
 begin
    rpls_list_scroll:=0;
-   rpls_list_size:=0;
+   rpls_list_size  :=0;
    setlength(rpls_list,0);
    if(FindFirst(str_f_rpls+'*'+str_e_rpls,faReadonly,info)=0)then
-    repeat
-       s:=info.Name;
-       delete(s,length(s)-(length(str_e_rpls)-1),length(str_e_rpls));
-       if(length(s)>0)then
-       begin
-          rpls_list_size+=1;
-          setlength(rpls_list,rpls_list_size);
-          rpls_list[rpls_list_size-1]:=s;
-       end;
-    until (FindNext(info)<>0);
+     repeat
+        s:=info.Name;
+        delete(s,length(s)-(length(str_e_rpls)-1),length(str_e_rpls));
+        if(length(s)>0)then
+        begin
+           rpls_list_size+=1;
+           setlength(rpls_list,rpls_list_size);
+           rpls_list[rpls_list_size-1]:=s;
+        end;
+     until (FindNext(info)<>0);
    FindClose(info);
 
-   if(resetSelect)then
-   begin
-      rpls_list_sel:=-1;
-      rpls_str_info:='';
-   end;
-   if(not G_Started)then
-     replay_Select;
+   replay_Select;
 end;
 
 function replay_Play(check:boolean):boolean;
@@ -567,9 +527,9 @@ begin
    replay_Play:=true;
    if(check)then exit;
 
-   menu_s2:=ms2_scir;
+   g_type    :=gt_scirmish;
    rpls_state:=rpls_read;
-   g_started:=true;
+   g_started :=true;
 end;
 
 function replay_Delete(check:boolean):boolean;
@@ -589,7 +549,7 @@ begin
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
-      replay_MakeFolderList(false);
+      replay_MakeFolderList;
    end;
 end;
 

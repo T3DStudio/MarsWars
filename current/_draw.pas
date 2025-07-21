@@ -12,8 +12,8 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_players[HPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)
-   then UIPlayer:=HPlayer
+   if(not g_players[LocalPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)
+   then UIPlayer:=LocalPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
 
@@ -70,11 +70,11 @@ begin
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    ' '+b2c[ui_uibtn_sabilityu=nil]+
    ' '+b2c[ui_uibtn_pabilityu=nil]+
-   //' '+b2c[fog_check(mouse_map_x-vid_cam_x,mouse_map_y-vid_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
+   //' '+b2c[fog_check(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
    ' '+i2s(i)+' '+i2s(n)
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
-   ' '+tc_green+w2s(pf_pathgrid_areas[mm3(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
+   ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
    ' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
    ' '+tc_orange+i2s(g_players[UIPlayer].ai_attack_timer)+
    ' '+tc_green+b2c[g_players[UIPlayer].ai_ReadyForAttack]}

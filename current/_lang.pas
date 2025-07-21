@@ -20,11 +20,11 @@ begin
    end;
 end;
 
-function _i2s(i:integer):shortstring;
+function i2sSign(i:integer):shortstring;
 begin
   if(i<0)
-  then _i2s:=    i2s(i)
-  else _i2s:='+'+i2s(i);
+  then i2sSign:=    i2s(i)
+  else i2sSign:='+'+i2s(i);
 end;
 
 function l2s(limit,base:longint):shortstring; // limit 2 string
@@ -60,50 +60,50 @@ end;
 
 
 
-function _gHK(ucl:byte):shortstring;  // hotkey units&upgrades tab
+function HotKeyBase2Str(ucl:byte):shortstring;  // hotkey units&upgrades tab
 begin
-   _gHK:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkey1[ucl]>0)then
+   HotKeyBase2Str:='';
+   if(ucl<=max_HotKeys)then
+    if(HotKeysBase1[ucl]>0)then
     begin
-       if(_hotkey2[ucl]>0)then
-       _gHK:=     tc_lime+GetKeyName(_hotkey2[ucl])+tc_default+'+';
-       _gHK:=_gHK+tc_lime+GetKeyName(_hotkey1[ucl])+tc_default;
+       if(HotKeysBase2[ucl]>0)then
+       HotKeyBase2Str:=               tc_lime+GetKeyName(HotKeysBase2[ucl])+tc_default+'+';
+       HotKeyBase2Str:=HotKeyBase2Str+tc_lime+GetKeyName(HotKeysBase1[ucl])+tc_default;
     end;
 end;
-function _gHKA(ucl:byte):shortstring;  // hotkey actions tab
+function HotKeyAction2Str(ucl:byte):shortstring;  // hotkey actions tab
 begin
-   _gHKA:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkeyA[ucl]>0)then
+   HotKeyAction2Str:='';
+   if(ucl<=max_HotKeys)then
+    if(HotKeysAction1[ucl]>0)then
     begin
-       if(_hotkeyA2[ucl]>0)then
-       _gHKA:=      tc_lime+GetKeyName(_hotkeyA2[ucl])+tc_default+'+';
-       _gHKA:=_gHKA+tc_lime+GetKeyName(_hotkeyA [ucl])+tc_default;
+       if(HotKeysAction2[ucl]>0)then
+       HotKeyAction2Str:=                 tc_lime+GetKeyName(HotKeysAction2[ucl])+tc_default+'+';
+       HotKeyAction2Str:=HotKeyAction2Str+tc_lime+GetKeyName(HotKeysAction1 [ucl])+tc_default;
     end;
 end;
-function _gHKR(ucl:byte):shortstring;  // hotkey replays tab
+function HotKeyReplay2Str(ucl:byte):shortstring;  // hotkey replays tab
 begin
-   _gHKR:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkeyR[ucl]>0)then
-     _gHKR:=tc_lime+GetKeyName(_hotkeyR [ucl])+tc_default;
+   HotKeyReplay2Str:='';
+   if(ucl<=max_HotKeys)then
+    if(HotKeysReplay[ucl]>0)then
+     HotKeyReplay2Str:=tc_lime+GetKeyName(HotKeysReplay [ucl])+tc_default;
 end;
-function _gHKO(ucl:byte):shortstring;  // hotkey observer tab
+function HotKeyObserver2Str(ucl:byte):shortstring;  // hotkey observer tab
 begin
-   _gHKO:='';
-   if(ucl<=_mhkeys)then
-    if(_hotkeyO[ucl]>0)then
-     _gHKO:=tc_lime+GetKeyName(_hotkeyO [ucl])+tc_default;
+   HotKeyObserver2Str:='';
+   if(ucl<=max_HotKeys)then
+    if(HotKeysObserv[ucl]>0)then
+     HotKeyObserver2Str:=tc_lime+GetKeyName(HotKeysObserv [ucl])+tc_default;
 end;
 
 
 procedure _mkHStrACT(ucl:byte;hint:shortstring);
 var hk:shortstring;
 begin
-   if(ucl<=_mhkeys)then
+   if(ucl<=max_HotKeys)then
    begin
-      hk:=_gHKA(ucl);
+      hk:=HotKeyAction2Str(ucl);
       if(length(hk)>0)
       then str_hint_a[ucl]:=hint+' ('+hk+')'
       else str_hint_a[ucl]:=hint;
@@ -113,11 +113,11 @@ end;
 procedure _mkHStrRPL(ucl:byte;hint:shortstring;noHK:boolean);
 var hk:shortstring;
 begin
-   if(ucl<=_mhkeys)then
+   if(ucl<=max_HotKeys)then
    begin
       if(noHK)
       then hk:=''
-      else hk:=_gHKR(ucl);
+      else hk:=HotKeyReplay2Str(ucl);
       if(length(hk)>0)
       then str_hint_r[ucl]:=hint+' ('+hk+')'
       else str_hint_r[ucl]:=hint;
@@ -126,11 +126,11 @@ end;
 procedure _mkHStrOBS(ucl:byte;hint:shortstring;noHK:boolean);
 var hk:shortstring;
 begin
-   if(ucl<=_mhkeys)then
+   if(ucl<=max_HotKeys)then
    begin
       if(noHK)
       then hk:=''
-      else hk:=_gHKO(ucl);
+      else hk:=HotKeyObserver2Str(ucl);
       if(length(hk)>0)
       then str_hint_o[ucl]:=hint+' ('+hk+')'
       else str_hint_o[ucl]:=hint;
@@ -156,7 +156,7 @@ begin
    end;
 end;
 
-procedure _ADDSTR(s:pshortstring;ad,sep:shortstring);
+procedure STRADD(s:pshortstring;ad,sep:shortstring);
 begin
    if(length(ad)>0)then
      if(length(s^)=0)
@@ -164,26 +164,26 @@ begin
      else s^:=s^+sep+ad;
 end;
 
-function findprd(uid:byte):shortstring;
+function FindSourceProd(uid:byte):shortstring;
 var i:byte;
    up,
    bp: shortstring;
 begin
    up:='';
    bp:='';
-   findprd:='';
+   FindSourceProd:='';
    for i:=0 to 255 do
    begin
-      if(uid in g_uids[i].ups_units  )then _ADDSTR(@up,g_uids[i].un_txt_name,sep_comma);
-      if(uid in g_uids[i].ups_builder)then _ADDSTR(@bp,g_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_units  )then STRADD(@up,g_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].ups_builder)then STRADD(@bp,g_uids[i].un_txt_name,sep_comma);
    end;
 
-   if(length(up)>0)then _ADDSTR(@findprd,up,sep_comma);
-   if(length(bp)>0)then _ADDSTR(@findprd,bp,sep_comma);
+   if(length(up)>0)then STRADD(@FindSourceProd,up,sep_comma);
+   if(length(bp)>0)then STRADD(@FindSourceProd,bp,sep_comma);
 end;
 
 
-function _makeAttributeStr(pu:PTUnit;auid:byte):shortstring;
+function str_UnitAttributes(pu:PTUnit;auid:byte):shortstring;
 begin
    if(pu=nil)then
    begin
@@ -197,44 +197,44 @@ begin
          hits:=-32000;
       end;
    end;
-   _makeAttributeStr:='';
+   str_UnitAttributes:='';
    with pu^  do
    with uid^ do
    begin
       if(hits>fdead_hits)then
        if(hits>0)
-       then _ADDSTR(@_makeAttributeStr,str_attr_alive    ,sep_comma)
-       else _ADDSTR(@_makeAttributeStr,str_attr_dead     ,sep_comma);
+       then STRADD(@str_UnitAttributes,str_attr_alive    ,sep_comma)
+       else STRADD(@str_UnitAttributes,str_attr_dead     ,sep_comma);
 
       if(_ukbuilding)
-      then _ADDSTR(@_makeAttributeStr,str_attr_building  ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_unit      ,sep_comma);
+      then STRADD(@str_UnitAttributes,str_attr_building  ,sep_comma)
+      else STRADD(@str_UnitAttributes,str_attr_unit      ,sep_comma);
       if(_ukmech)
-      then _ADDSTR(@_makeAttributeStr,str_attr_mech      ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_bio       ,sep_comma);
+      then STRADD(@str_UnitAttributes,str_attr_mech      ,sep_comma)
+      else STRADD(@str_UnitAttributes,str_attr_bio       ,sep_comma);
       if(_uklight)
-      then _ADDSTR(@_makeAttributeStr,str_attr_light     ,sep_comma)
-      else _ADDSTR(@_makeAttributeStr,str_attr_heavy     ,sep_comma);
+      then STRADD(@str_UnitAttributes,str_attr_light     ,sep_comma)
+      else STRADD(@str_UnitAttributes,str_attr_heavy     ,sep_comma);
       if(ukfly)
-      then _ADDSTR(@_makeAttributeStr,str_attr_fly       ,sep_comma)
+      then STRADD(@str_UnitAttributes,str_attr_fly       ,sep_comma)
       else
         if(ukfloater)
-        then _ADDSTR(@_makeAttributeStr,str_attr_floater,sep_comma)
-        else _ADDSTR(@_makeAttributeStr,str_attr_ground ,sep_comma);
+        then STRADD(@str_UnitAttributes,str_attr_floater,sep_comma)
+        else STRADD(@str_UnitAttributes,str_attr_ground ,sep_comma);
       if(transportM>0)
-      then _ADDSTR(@_makeAttributeStr,str_attr_transport,sep_comma);
+      then STRADD(@str_UnitAttributes,str_attr_transport,sep_comma);
       if(level>0)then
         if(not _ukbuilding)
-        or(_ukbuilding and (_isbarrack or _issmith))then _ADDSTR(@_makeAttributeStr,str_attr_level+b2s(level+1),sep_comma);
+        or(_ukbuilding and (_isbarrack or _issmith))then STRADD(@str_UnitAttributes,str_attr_level+b2s(level+1),sep_comma);
       if(buff[ub_Detect]>0)or(_detector)
-      then _ADDSTR(@_makeAttributeStr,str_attr_detector,sep_comma);
+      then STRADD(@str_UnitAttributes,str_attr_detector,sep_comma);
       if(buff[ub_Invuln]>0)
-      then _ADDSTR(@_makeAttributeStr,str_attr_invuln,sep_comma)
+      then STRADD(@str_UnitAttributes,str_attr_invuln,sep_comma)
       else
         if(buff[ub_Pain]>0)
-        then _ADDSTR(@_makeAttributeStr,str_attr_stuned,sep_comma);
+        then STRADD(@str_UnitAttributes,str_attr_stuned,sep_comma);
 
-      _makeAttributeStr:='['+_makeAttributeStr+tc_default+']';
+      str_UnitAttributes:='['+str_UnitAttributes+tc_default+']';
    end;
 end;
 
@@ -245,8 +245,8 @@ begin
    if(addifboth)
    or( ((flags and f1)>0)<>((flags and f2)>0) )then
    begin
-      if((flags and f1)>0)then _ADDSTR(@BaseFlags2Str,s1^,sep_comma);
-      if((flags and f2)>0)then _ADDSTR(@BaseFlags2Str,s2^,sep_comma);
+      if((flags and f1)>0)then STRADD(@BaseFlags2Str,s1^,sep_comma);
+      if((flags and f2)>0)then STRADD(@BaseFlags2Str,s2^,sep_comma);
    end;
 end;
 begin
@@ -266,31 +266,31 @@ begin
 end;
 
 
-function DamageStr(dmod:byte):shortstring;
+function str_DamageHint(dmod:byte):shortstring;
 var i:byte;
 begin
-   DamageStr:='';
+   str_DamageHint:='';
    for i:=0 to MaxDamageModFactors do
-    with g_dmods[dmod][i] do
+    with g_DamageMods[dmod][i] do
      if(dm_factor<>100)and(dm_flags>0)then
-      _ADDSTR(@DamageStr,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
+      STRADD(@str_DamageHint,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
 
-function _req2s(basename:shortstring;reqn:byte):shortstring;
+function str_ReqNum2s(basename:shortstring;reqn:byte):shortstring;
 begin
-   _req2s:=basename;
-   if(reqn>1)then _req2s+='(x'+b2s(reqn)+')';
+   str_ReqNum2s:=basename;
+   if(reqn>1)then str_ReqNum2s+='(x'+b2s(reqn)+')';
 end;
 
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then _ADDSTR(@AddReq,'"'+_req2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
-  if(rupid>0)then _ADDSTR(@AddReq,'"'+_req2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
+  if(ruid >0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
 end;
 
-function _MakeDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
+function str_MakeUnitDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
 function RebuildStr(uid:byte;levelup:boolean):shortstring;
 begin
   if(levelup)
@@ -298,20 +298,20 @@ begin
   else RebuildStr:='"'+g_uids[uid].un_txt_name+'"';
 end;
 begin
-   _MakeDefaultDescription:='';
+   str_MakeUnitDefaultDescription:='';
     with g_uids[uid] do
     begin
        if(not for_doc)then
-       _ADDSTR(@_MakeDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
-       //_ADDSTR(@_MakeDefaultDescription,str_srange+i2s(_srange),sep_sdot);
+       STRADD(@str_MakeUnitDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
+       //STRADD(@str_MakeUnitDefaultDescription,str_srange+i2s(_srange),sep_sdot);
 
-       if(_isbuilder    )then _ADDSTR(@_MakeDefaultDescription,str_builder,sep_sdot);
-       if(_isbarrack    )then _ADDSTR(@_MakeDefaultDescription,str_barrack,sep_sdot);
-       if(_issmith      )then _ADDSTR(@_MakeDefaultDescription,str_smith  ,sep_sdot);
-       if(_genergy    >0)then _ADDSTR(@_MakeDefaultDescription,str_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
+       if(_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_builder,sep_sdot);
+       if(_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_barrack,sep_sdot);
+       if(_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_smith  ,sep_sdot);
+       if(_genergy    >0)then STRADD(@str_MakeUnitDefaultDescription,str_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
        if(_rebuild_uid>0)and(_ability<>uab_RebuildInPoint)then
        begin
-          _ADDSTR(@_MakeDefaultDescription,
+          STRADD(@str_MakeUnitDefaultDescription,
           str_CanRebuildTo+
           RebuildStr(_rebuild_uid,_rebuild_uid=uid)+
           AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot );
@@ -319,20 +319,20 @@ begin
        if(_ability>0)then
        begin
           if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
-          then _ADDSTR(@_MakeDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,uid=_rebuild_uid)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
+          then STRADD(@str_MakeUnitDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,uid=_rebuild_uid)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
           else
             if(length(str_ability_name[_ability])>0)
-            then _ADDSTR(@_MakeDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
+            then STRADD(@str_MakeUnitDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
        end;
 
-       if(_splashresist)or(_ukmech)then _ADDSTR(@_MakeDefaultDescription,str_splashresist,sep_sdot);
+       if(_splashresist)or(_ukmech)then STRADD(@str_MakeUnitDefaultDescription,str_splashresist,sep_sdot);
 
-       _ADDSTR(@_MakeDefaultDescription,basedesc,sep_sdot);;
-       if(length(_MakeDefaultDescription)>0)then _MakeDefaultDescription+='.';
+       STRADD(@str_MakeUnitDefaultDescription,basedesc,sep_sdot);;
+       if(length(str_MakeUnitDefaultDescription)>0)then str_MakeUnitDefaultDescription+='.';
     end;
 end;
 
-function WeaponTargets(tflags:cardinal;tset:TSoB):shortstring;
+function str_WeaponTargets(tflags:cardinal;tset:TSoB):shortstring;
 var u:byte;
   inset:TSoB;
   innum:byte;
@@ -341,7 +341,7 @@ var u:byte;
   instr,
   exstr:shortstring;
 begin
-  WeaponTargets:='';
+  str_WeaponTargets:='';
   instr:='';
   exstr:='';
    if(tset<>uids_all     )then
@@ -375,33 +375,33 @@ begin
       begin
          for u:=1 to 255 do
           if(u in inset)then
-           _ADDSTR(@instr,g_uids[u].un_txt_name,sep_comma);
+           STRADD(@instr,g_uids[u].un_txt_name,sep_comma);
          if(length(instr)>0)then instr:='['+instr+']';
       end;
       if(exnum<3)then
       begin
          for u:=1 to 255 do
           if(u in exset)then
-           _ADDSTR(@exstr,g_uids[u].un_txt_name,sep_comma);
+           STRADD(@exstr,g_uids[u].un_txt_name,sep_comma);
          if(length(exstr)>0)then exstr:=str_except+' ['+exstr+']';
       end;
    end;
 
    if(length(instr)>0)
-   then WeaponTargets:=instr
+   then str_WeaponTargets:=instr
    else
      if(length(exstr)>0)
-     then WeaponTargets:=BaseFlags2Str(tflags)+' '+exstr
-     else WeaponTargets:=BaseFlags2Str(tflags);
+     then str_WeaponTargets:=BaseFlags2Str(tflags)+' '+exstr
+     else str_WeaponTargets:=BaseFlags2Str(tflags);
 end;
 
-function _MakeWeaponDPS(uid,wid:byte):shortstring;
+function str_MakeWeaponDPS(uid,wid:byte):shortstring;
 var BaseDmg,
     ocount : integer;
     i,n    : byte;
     sps    : single;
 begin
-  _MakeWeaponDPS:='';
+  str_MakeWeaponDPS:='';
   with g_uids[uid] do
   with _a_weap[wid] do
   begin
@@ -435,11 +435,11 @@ begin
      if(BaseDmg>0)then
      begin
         if(aw_type=wpt_heal)
-        then _ADDSTR(@_MakeWeaponDPS,tc_lime+i2s(BaseDmg)+tc_default,'')
-        else _ADDSTR(@_MakeWeaponDPS,tc_red +i2s(BaseDmg)+tc_default,'');
+        then STRADD(@str_MakeWeaponDPS,tc_lime+i2s(BaseDmg)+tc_default,'')
+        else STRADD(@str_MakeWeaponDPS,tc_red +i2s(BaseDmg)+tc_default,'');
 
         if(ocount>1)
-        then _MakeWeaponDPS+='x'+i2s(ocount);
+        then str_MakeWeaponDPS+='x'+i2s(ocount);
      end;
 
      if(aw_type=wpt_suicide)
@@ -448,11 +448,11 @@ begin
        if(aw_fakeshots>0)
        then sps:=(fr_fps1*n/aw_rld)/aw_fakeshots
        else sps:=(fr_fps1*n/aw_rld);
-     _ADDSTR(@_MakeWeaponDPS,'*'+Float2Str(sps),'');
+     STRADD(@str_MakeWeaponDPS,'*'+Float2Str(sps),'');
   end;
 end;
 
-function _MakeWeaponString(uid,wid:byte;docSTR:boolean):shortstring;
+function str_MakeWeaponString(uid,wid:byte;docSTR:boolean):shortstring;
 const tab : array[false..true] of shortstring = ('-','- ');
 var
 dmod_str:shortstring;
@@ -460,68 +460,68 @@ begin
   with g_uids[uid] do
    with _a_weap[wid] do
    begin
-      _MakeWeaponString:='';
+      str_MakeWeaponString:='';
       case aw_type of
       0             : exit;
       wpt_missle,
       wpt_directdmg,
       wpt_directdmgZ: if(aw_max_range<0)
-                      then _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_melee    ,sep_scomma)
-                      else _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
-      wpt_resurect  :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
-      wpt_heal      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
-      wpt_unit      :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].un_txt_name+'"',sep_scomma);
-      wpt_suicide   :      _ADDSTR(@_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
+                      then STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_melee    ,sep_scomma)
+                      else STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
+      wpt_resurect  :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
+      wpt_heal      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
+      wpt_unit      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].un_txt_name+'"',sep_scomma);
+      wpt_suicide   :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
       end;
 
       if(docSTR)then
       begin
          if(aw_min_range>0)then
-         _ADDSTR(@_MakeWeaponString,'min. range: '+i2s(aw_min_range),sep_scomma);
+         STRADD(@str_MakeWeaponString,'min. range: '+i2s(aw_min_range),sep_scomma);
 
          if(aw_max_range=aw_srange)then
          begin
-            _ADDSTR(@_MakeWeaponString,'max. range: vision range',sep_scomma);
-            if(_a_BonusAntiFlyRange     <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '     +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
-            if(_a_BonusAntiGroundRange  <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '  +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
-            if(_a_BonusAntiUnitRange    <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-unit range: '    +_i2s(_a_BonusAntiUnitRange    ),sep_scomma);
-            if(_a_BonusAntiBuildingRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-building range: '+_i2s(_a_BonusAntiBuildingRange),sep_scomma);
+            STRADD(@str_MakeWeaponString,'max. range: vision range',sep_scomma);
+            if(_a_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
+            if(_a_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
+            if(_a_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(_a_BonusAntiUnitRange    ),sep_scomma);
+            if(_a_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(_a_BonusAntiBuildingRange),sep_scomma);
          end
          else
            if(aw_max_range<aw_srange) // melee
-           then //_ADDSTR(@_MakeWeaponString,'max range: melee',sep_scomma)
+           then //STRADD(@str_MakeWeaponString,'max range: melee',sep_scomma)
            else
              if(aw_max_range>=aw_fsr0)then  // relative srange
              begin
                 if(aw_max_range<>aw_fsr)
-                then _ADDSTR(@_MakeWeaponString,'max. range: vision range'+_i2s(aw_max_range-aw_fsr),sep_scomma)
-                else _ADDSTR(@_MakeWeaponString,'max. range: vision range',sep_scomma);
+                then STRADD(@str_MakeWeaponString,'max. range: vision range'+i2sSign(aw_max_range-aw_fsr),sep_scomma)
+                else STRADD(@str_MakeWeaponString,'max. range: vision range',sep_scomma);
              end
              else
              begin
-                _ADDSTR(@_MakeWeaponString,'max. range: '+i2s(aw_max_range),sep_scomma);  // absolute
-                if(_a_BonusAntiFlyRange     <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-fly range: '     +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
-                if(_a_BonusAntiGroundRange  <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-ground range: '  +_i2s(_a_BonusAntiFlyRange     ),sep_scomma);
-                if(_a_BonusAntiUnitRange    <>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-unit range: '    +_i2s(_a_BonusAntiUnitRange    ),sep_scomma);
-                if(_a_BonusAntiBuildingRange<>0)then _ADDSTR(@_MakeWeaponString,'bonus anti-building range: '+_i2s(_a_BonusAntiBuildingRange),sep_scomma);
+                STRADD(@str_MakeWeaponString,'max. range: '+i2s(aw_max_range),sep_scomma);  // absolute
+                if(_a_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
+                if(_a_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
+                if(_a_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(_a_BonusAntiUnitRange    ),sep_scomma);
+                if(_a_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(_a_BonusAntiBuildingRange),sep_scomma);
              end;
       end;
 
       if(aw_type=wpt_directdmgZ)then
-      _ADDSTR(@_MakeWeaponString,str_weapon_zombie,sep_scomma);
+      STRADD(@str_MakeWeaponString,str_weapon_zombie,sep_scomma);
 
-      _ADDSTR(@_MakeWeaponString,str_weapon_targets+WeaponTargets(aw_tarf,aw_uids),sep_scomma);
+      STRADD(@str_MakeWeaponString,str_weapon_targets+str_WeaponTargets(aw_tarf,aw_uids),sep_scomma);
 
-      _ADDSTR(@_MakeWeaponString,str_weapon_damage+' '+_MakeWeaponDPS(uid,wid),sep_scomma);
+      STRADD(@str_MakeWeaponString,str_weapon_damage+' '+str_MakeWeaponDPS(uid,wid),sep_scomma);
       if(docSTR)then
       begin
          if(aw_type=wpt_missle)then
           with g_mids[aw_oid] do
-           if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
+           if(mid_base_splashr>0)then  STRADD(@str_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          if(aw_type=wpt_suicide)and(_death_missile>0)then
           with g_mids[_death_missile] do
-           if(mid_base_splashr>0)then  _ADDSTR(@_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
+           if(mid_base_splashr>0)then  STRADD(@str_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          dmod_str:='';
          case aw_tarprior of
@@ -544,54 +544,54 @@ wtp_max_hits     : dmod_str:='highest hits';
 wtp_GroundLight  : dmod_str:='[ground,light]';
          end;
          if(length(dmod_str)>0)then
-           _ADDSTR(@_MakeWeaponString,'target priority: '+dmod_str,sep_scomma);
+           STRADD(@str_MakeWeaponString,'target priority: '+dmod_str,sep_scomma);
 
          if(aw_dupgr>0)then
-           _ADDSTR(@_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr]._up_name+'('+_i2s(aw_dupgr_s)+')',sep_scomma);
+           STRADD(@str_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr]._up_name+'('+i2sSign(aw_dupgr_s)+')',sep_scomma);
       end;
 
       dmod_str:='';
 
       case aw_type of
-      wpt_suicide   : if(_death_missile>0)then dmod_str:=DamageStr(_death_missile_dmod);
+      wpt_suicide   : if(_death_missile>0)then dmod_str:=str_DamageHint(_death_missile_dmod);
       wpt_missle,
       wpt_directdmg,
-      wpt_directdmgZ: if(aw_dmod>0)then dmod_str:=DamageStr(aw_dmod);
+      wpt_directdmgZ: if(aw_dmod>0)then dmod_str:=str_DamageHint(aw_dmod);
       end;
 
       if(length(dmod_str)>0)then
         if(docSTR)
-        then _ADDSTR(@_MakeWeaponString,dmod_str,', factor: ')
-        else _ADDSTR(@_MakeWeaponString,dmod_str,': '      );
+        then STRADD(@str_MakeWeaponString,dmod_str,', factor: ')
+        else STRADD(@str_MakeWeaponString,dmod_str,': '      );
 
-      _ADDSTR(@_MakeWeaponString,AddReq(aw_ruid,aw_rupgr,aw_rupgr_l),sep_scomma);
+      STRADD(@str_MakeWeaponString,AddReq(aw_ruid,aw_rupgr,aw_rupgr_l),sep_scomma);
 
-      if(docSTR)then _MakeWeaponString:=RemoveSpecChars(_MakeWeaponString);
+      if(docSTR)then str_MakeWeaponString:=RemoveSpecChars(str_MakeWeaponString);
    end;
 end;
 
-function _MakeWeaponsDescription(uid:byte;docSTR:boolean):shortstring;
+function str_MakeWeaponsDescription(uid:byte;docSTR:boolean):shortstring;
 var w:byte;
 weapons_str:shortstring;
 begin
-  _MakeWeaponsDescription:='';
+  str_MakeWeaponsDescription:='';
   with g_uids[uid] do
   begin
      weapons_str:='';
      if(_attack=atm_always)then
       for w:=0 to MaxUnitWeapons do
        with _a_weap[w] do
-        _ADDSTR(@weapons_str,_MakeWeaponString(uid,w,docSTR),sep_sdots);
+        STRADD(@weapons_str,str_MakeWeaponString(uid,w,docSTR),sep_sdots);
 
      if(length(weapons_str)>0)then
       if(docSTR)
-      then _ADDSTR(@_MakeWeaponsDescription,weapons_str,sep_sdot)
-      else _ADDSTR(@_MakeWeaponsDescription,str_UnitArming+weapons_str,sep_sdot);
+      then STRADD(@str_MakeWeaponsDescription,weapons_str,sep_sdot)
+      else STRADD(@str_MakeWeaponsDescription,str_UnitArming+weapons_str,sep_sdot);
   end;
-  if(length(_MakeWeaponsDescription)>0)then _MakeWeaponsDescription+='.';
+  if(length(str_MakeWeaponsDescription)>0)then str_MakeWeaponsDescription+='.';
 end;
 
-function _makeUpgrBaseHint(upid,curlvl:byte):shortstring;
+function str_makeUpgrBaseHint(upid,curlvl:byte):shortstring;
 var HK,
     ENRG,
     TIME,
@@ -600,7 +600,7 @@ var HK,
 begin
   with g_upids[upid] do
   begin
-     HK  :=_gHK(_up_btni);
+     HK  :=HotKeyBase2Str(_up_btni);
      ENRG:='';
      TIME:='';
      INFO:='';
@@ -610,14 +610,14 @@ begin
      else
        if(curlvl>_up_max)and(curlvl<255)then curlvl:=_up_max;
 
-     HK:=_gHK(_up_btni);
+     HK:=HotKeyBase2Str(_up_btni);
      if(_up_renerg>0)then
        if(curlvl<255)
        then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
        else
          if(_up_max>0)then
          begin
-            for i:=1 to _up_max do _ADDSTR(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
+            for i:=1 to _up_max do STRADD(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
             ENRG:=tc_aqua+ENRG+tc_default;
          end;
      if(_up_time  >0)then
@@ -626,20 +626,20 @@ begin
        else
          if(_up_max>0)then
          begin
-            for i:=1 to _up_max do _ADDSTR(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
+            for i:=1 to _up_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
             TIME:=tc_white+TIME+tc_default;
          end;
-     if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
-     if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
-     if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
-     _ADDSTR(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default,sep_comma);
-     if(_up_max>1)and(_up_mfrg)then _ADDSTR(@INFO,tc_red+'*'+tc_default,sep_comma);
+     if(length(HK  )>0)then STRADD(@INFO,HK  ,sep_comma);
+     if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
+     if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
+     STRADD(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default,sep_comma);
+     if(_up_max>1)and(_up_mfrg)then STRADD(@INFO,tc_red+'*'+tc_default,sep_comma);
 
-     _makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+tc_nl1+_up_descr;
+     str_makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+tc_nl1+_up_descr;
   end;
 end;
 
-procedure _makeHints;
+procedure str_makeHints;
 var
 uid         :byte;
 ENRG,HK,PROD,LMT,INFO,
@@ -664,28 +664,28 @@ begin
       end
       else
       begin
-         HK:=_gHK(_ucl);
+         HK:=HotKeyBase2Str(_ucl);
          if(_renergy>0)then ENRG:=tc_aqua +i2s(_renergy)+tc_default;
          if(_btime  >0)then TIME:=tc_white+i2s(_btime  )+tc_default;
          LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
 
-         PROD:=findprd(uid);
-         if(_ruid1>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
-         if(_ruid2>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
-         if(_ruid3>0)then _ADDSTR(@REQ,_req2s(g_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
-         if(_rupgr>0)then _ADDSTR(@REQ,_req2s(g_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
+         PROD:=FindSourceProd(uid);
+         if(_ruid1>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
+         if(_ruid2>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
+         if(_ruid3>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
+         if(_rupgr>0)then STRADD(@REQ,str_ReqNum2s(g_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
 
-         if(length(HK  )>0)then _ADDSTR(@INFO,HK  ,sep_comma);
-         if(length(ENRG)>0)then _ADDSTR(@INFO,ENRG,sep_comma);
-         if(length(LMT )>0)then _ADDSTR(@INFO,LMT ,sep_comma);
-         if(length(TIME)>0)then _ADDSTR(@INFO,TIME,sep_comma);
+         if(length(HK  )>0)then STRADD(@INFO,HK  ,sep_comma);
+         if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
+         if(length(LMT )>0)then STRADD(@INFO,LMT ,sep_comma);
+         if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
 
-         un_txt_fdescr :=_MakeDefaultDescription(uid,un_txt_udescr,false);
+         un_txt_fdescr :=str_MakeUnitDefaultDescription(uid,un_txt_udescr,false);
 
-         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+_makeAttributeStr(nil,uid);
+         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+str_UnitAttributes(nil,uid);
          un_txt_uihintS:=un_txt_name+tc_nl1;
          un_txt_uihint2:=un_txt_fdescr;
-         un_txt_uihint3:=_MakeWeaponsDescription(uid,false);
+         un_txt_uihint3:=str_MakeWeaponsDescription(uid,false);
          un_txt_uihint4:='';
 
          if(length(REQ )>0)then un_txt_uihint4+=tc_yellow+str_requirements+tc_default+REQ+tc_nl1
@@ -703,8 +703,8 @@ begin
    begin
       REQ  :='';
 
-      if(_up_ruid  >0)then _ADDSTR(@REQ,g_uids [_up_ruid ].un_txt_name,sep_comma);
-      if(_up_rupgr >0)then _ADDSTR(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
+      if(_up_ruid  >0)then STRADD(@REQ,g_uids [_up_ruid ].un_txt_name,sep_comma);
+      if(_up_rupgr >0)then STRADD(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
 
       _up_hint:='';
       if(length(REQ)>0)then _up_hint+=tc_yellow+str_requirements+tc_default+REQ;
@@ -811,40 +811,84 @@ procedure lng_eng;
 var t: shortstring;
     i:byte;
 begin
-   str_MMap              := 'MAP';
-   str_MPlayers          := 'PLAYERS';
+   str_Caption_Map        := 'MAP';
+   str_Caption_Players    := 'PLAYERS';
+   str_Caption_Multiplayer:= 'MULTIPLAYER';
+
    str_MObjectives       := 'OBJECTIVES';
-   str_menu_s1[ms1_sett] := 'SETTINGS';
-   str_menu_s1[ms1_svld] := 'SAVE/LOAD';
-   str_menu_s1[ms1_reps] := 'REPLAYS';
-   str_menu_s2[ms2_camp] := 'CAMPAIGNS';
-   str_menu_s2[ms2_scir] := 'SKIRMISH';
-   str_menu_s2[ms2_mult] := 'MULTIPLAYER';
-   str_menu_s3[ms3_game] := 'GAME';
-   str_menu_s3[ms3_vido] := 'VIDEO';
-   str_menu_s3[ms3_sond] := 'SOUND';
-   str_start             := 'START';
-   str_surrender         := 'SURRENDER';
-   str_quit              := 'QUIT';
-   str_exit              := 'EXIT';
-   str_back              := 'BACK';
-   str_m_siz             := 'Size: ';
-   str_m_obs             := 'Obstacles: ';
-   str_m_sym             := 'Symmetric: ';
-   str_map               := 'Map';
-   str_players           := 'Players';
-   str_mrandom           := 'Random map';
-   str_musicvol          := 'Music volume';
-   str_soundvol          := 'Sound volume';
-   str_scrollspd         := 'Scroll speed';
-   str_mousescrl         := 'Mouse scroll';
-   str_fullscreen        := 'Windowed:';
-   str_plname            := 'Player name';
-   str_lng[true]         := 'RUS';
-   str_lng[false]        := 'ENG';
-   str_maction           := 'Right-click action';
-   str_maction2[true ]   := tc_lime  +'move'  +tc_default;
-   str_maction2[false]   := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
+
+   str_menu_Tutorials    := 'TUTORIALS';
+   str_menu_Campaings    := 'CAMPAIGNS';
+   str_menu_Scirmish     := 'SKIRMISH';
+   str_menu_SaveLoad     := 'SAVE/LOAD';
+   str_menu_LoadGame     := 'LOAD GAME';
+   str_menu_Replays      := 'REPLAYS';
+   str_menu_Settings     := 'SETTINGS';
+
+   str_menu_Start        := 'START';
+   str_menu_Surrender    := 'SURRENDER';
+   str_menu_Break        := 'BREAK MISSION';
+   str_menu_Exit         := 'EXIT';
+   str_menu_Back         := 'BACK';
+
+   str_menu_SetGame      := 'GAME';
+   str_menu_SetReplay    := 'GAME RECORDING';
+   str_menu_SetVideo     := 'VIDEO';
+   str_menu_SetSound     := 'SOUND';
+
+   str_SR_RecordGames    := 'Record games';
+   str_SR_Quality        := 'File size/quality';
+   str_SR_ReplayPrefix   := 'Replay prefix';
+
+   str_SG_ScrollSpeed            := 'Scroll speed';
+   str_SG_MouseScroll            := 'Mouse scroll';
+   str_SG_PlayerName             := 'Player name';
+   str_SG_LanguageL[true]        := 'RUS';
+   str_SG_LanguageL[false]       := 'ENG';
+   str_SG_RightClickAct          := 'Right-click action';
+   str_SG_RightClickActL[true ]  := tc_lime  +'move'  +tc_default;
+   str_SG_RightClickActL[false]  := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
+
+   str_FileInfo                  := 'FILE INFO';
+   str_FileSave                  := 'Save';
+   str_FileLoad                  := 'Load';
+   str_FileDelete                := 'Delete';
+
+   str_map                       := 'Map';
+   str_map_Seed                  := 'Seed';
+   str_map_Size                  := 'Size';
+   str_map_Obstacles             := 'Obstacles';
+   str_map_Symmetry              := 'Symmetric';
+   str_map_Random                := 'Random map';
+
+   str_map_Scenario              := 'Scenario';
+   str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Skirmish'    +tc_default;
+   str_map_ScenarioL[mc_3x3     ]:= tc_orange+'3x3'         +tc_default;
+   str_map_ScenarioL[mc_2x2x2   ]:= tc_yellow+'2x2x2'       +tc_default;
+   str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Key points'  +tc_default;
+   str_map_ScenarioL[mc_invasion]:= tc_blue  +'Invasion'    +tc_default;
+   str_map_ScenarioL[mc_KotH    ]:= tc_purple+'KotH'        +tc_default;
+   str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
+
+   str_map_Generators            := 'Generators';
+   str_map_GeneratorsL[0]        := '-';
+   str_map_GeneratorsL[1]        := '5 min';
+   str_map_GeneratorsL[2]        := '10 min';
+   str_map_GeneratorsL[3]        := '15 min';
+   str_map_GeneratorsL[4]        := '20 min';
+   str_map_GeneratorsL[5]        := 'infinity';
+
+   str_SV_Windowed       := 'Windowed';
+   str_SV_ResolutionApply:= 'Apply resolution';
+   str_SV_ResolutionW    := 'Resolution (width)';
+   str_SV_ResolutionH    := 'Resolution (height)';
+   str_SV_MenuScale      := 'Menu scaling';
+   str_SV_MenuScaleSmooth:= 'Smooth scaled menu';
+   str_SV_ShowFPS        := 'Show FPS';
+
+   str_Players           := 'Players';
+   str_SS_MusicVolume    := 'Music volume';
+   str_SS_SoundVolume    := 'Sound volume';
    str_race[r_random]    := tc_white +'RANDOM'+tc_default;
    str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
    str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
@@ -856,51 +900,49 @@ begin
    str_gsaved            := 'Game saved';
    str_repend            := 'Replay ended!';
    str_reperror          := 'Read file error!';
-   str_save              := 'Save';
-   str_load              := 'Load';
-   str_delete            := 'Delete';
+
    str_svld_errors_file  := 'File not'+tc_nl3+'exists!';
    str_svld_errors_open  := 'Can`t open'+tc_nl3+'file!';
-   str_svld_errors_wdata := 'Wrong file'+tc_nl3+'size!';
+   str_svld_errors_wdata := 'Wrong file'+tc_nl3+'data!';
    str_svld_errors_wver  := 'Wrong version!';
    str_time              := 'Time: ';
    str_menu              := 'Menu';
-   str_player_def        := ' was terminated!';
+   str_PlayerDefeat      := ' was terminated!';
    str_inv_time          := 'Wave #';
    str_inv_ml            := 'Monsters limit: ';
-   str_play              := 'Play';
-   str_replay            := 'RECORD';
-   str_replay_name       := 'Replay prefix:';
-   str_cmpdif            := 'Difficulty: ';
-   str_waitsv            := 'Awaiting server...';
-   str_goptions          := 'GAME OPTIONS';
+   str_ReplayPlay        := 'Play';
+
+   str_Camp_Difficulty   := 'Difficulty';
+   str_WaitForServer     := 'Awaiting server...';
+   str_Caption_GOptions  := 'GAME OPTIONS';
    str_server            := 'SERVER';
    str_client            := 'CLIENT';
    str_menu_chat         := 'CHAT(ALL PLAYERS)';
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
-   str_randoms           := 'Random skirmish';
-   str_apply             := 'apply';
-   str_plout             := ' left the game';
-   str_player_surrender  := ' surrenders!';
-   str_aislots           := 'Fill empty slots:';
-   str_resol             := 'Resolution';
-   str_language          := 'UI language';
+
+   str_GO_Random           := 'Random skirmish';
+   str_GO_AISlots           := 'Fill empty slots';
+
+   str_PlayerLeft             := ' left the game';
+   str_PlayerSurrender  := ' surrenders!';
+
+
+
+   str_SG_Language       := 'UI language';
    str_requirements      := 'Requirements: ';
    str_req               := 'Req.: ';
    str_orders            := 'Unit groups: ';
    str_all               := 'All';
    str_uprod             := tc_lime+'Produced by: '   +tc_default;
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
-   str_ColoredShadow     := 'Colored shadows';
+   str_SG_ColoredShadow  := 'Colored shadows';
    str_kothtime          := 'Center capture time left: ';
    str_kothtime_act      := 'Time left until center area is active: ';
    str_kothwinner        := ' is King of the Hill!';
-   str_DeadObservers     := 'Observer mode after lose:';
-   str_menu_scale        := 'Menu scaling';
-   str_menu_scales       := 'Smooth scaled menu';
-   str_FPS               := 'Show FPS';
-   str_APM               := 'Show APM';
+   str_GO_DefeatedObs     := 'Observer mode after lose';
+
+   str_SG_ShowAPM        := 'Show APM';
    str_ability           := 'Special ability: ';
    str_transformation    := 'transformation to ';
    str_upgradeslvl       := 'Upgrades: ';
@@ -908,20 +950,20 @@ begin
    str_except            := 'except';
    str_splashresist      := 'Immune to splash damage';
    str_TargetLimit       := 'target limit';
-   str_NextTrack         := 'Play next track';
-   str_ReloadMusic       := 'Load new playlist';
+   str_SS_NextTrack      := 'Play next track';
+   str_SS_ReloadMusic    := 'Load new playlist';
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
-   str_MusicListSize     := 'Music playlist size';
+   str_SS_MusicListSize     := 'Music playlist size';
    str_menu_controls     := '- use the left and right mouse buttons to manipulate the menu items -';
    str_RecordingStart    := 'Start recording: ';
    str_RecordingStop     := 'Stop recording: ';
-   str_PTPlayer          := 'PLAYER';
-   str_PTState           := 'STATUS';
-   str_PTRace            := 'RACE';
-   str_PTTeam            := 'TEAM';
-   str_PTColor           := 'COLOR';
-   str_PTPing            := 'PING+';
+   str_PT_Player          := 'PLAYER';
+   str_PT_State           := 'STATUS';
+   str_PT_Race            := 'RACE';
+   str_PT_Team            := 'TEAM';
+   str_PT_Color           := 'COLOR';
+   str_PT_Ping            := 'PING+';
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -988,82 +1030,64 @@ begin
    str_attr_detector     := tc_purple+'detector'    ;
    str_attr_transport    := tc_gray  +'transport'   ;
 
-   str_panelpos          := 'Control panel position';
-   str_panelposp[0]      := tc_lime  +'left'  +tc_default;
-   str_panelposp[1]      := tc_orange+'right' +tc_default;
-   str_panelposp[2]      := tc_yellow+'top'   +tc_default;
-   str_panelposp[3]      := tc_aqua  +'bottom'+tc_default;
+   str_SG_ControlPanelPos          := 'Control panel position';
+   str_SG_ControlPanelPosL[0]      := tc_lime  +'left'  +tc_default;
+   str_SG_ControlPanelPosL[1]      := tc_orange+'right' +tc_default;
+   str_SG_ControlPanelPosL[2]      := tc_yellow+'top'   +tc_default;
+   str_SG_ControlPanelPosL[3]      := tc_aqua  +'bottom'+tc_default;
 
-   str_uhbar             := 'Health bars';
-   str_uhbars[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
-   str_uhbars[1]         := tc_aqua  +'always'  +tc_default;
-   str_uhbars[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
+   str_SG_HealthBars             := 'Health bars';
+   str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
+   str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
+   str_SG_HealthBarsL[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
 
-   str_pcolor            := 'Players color';
-   str_pcolors[0]        := tc_white +'default'+tc_default;
-   str_pcolors[1]        := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_pcolors[2]        := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_pcolors[3]        := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
-   str_pcolors[4]        := tc_purple+'teams'  +tc_default;
-   str_pcolors[5]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
+   str_SG_PlayersColor            := 'Players color';
+   str_SG_PlayersColorL[0]        := tc_white +'default'+tc_default;
+   str_SG_PlayersColorL[1]        := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[2]        := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[3]        := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[4]        := tc_purple+'teams'  +tc_default;
+   str_SG_PlayersColorL[5]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
 
-   str_fstarts           := 'Fixed player starts:';
+   str_GO_FixedStarts           := 'Fixed player starts';
 
-   str_pnua[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
-   str_pnua[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
-   str_pnua[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
-   str_pnua[3]           := tc_lime  +'x4 '+tc_default+'/'+tc_orange+' x4';
-   str_pnua[4]           := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+' x5';
-   str_pnua[5]           := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+' x6';
-   str_pnua[6]           := tc_orange+'x7 '+tc_default+'/'+tc_lime  +' x7';
-   str_pnua[7]           := tc_orange+'x8 '+tc_default+'/'+tc_lime  +' x8';
-   str_pnua[8]           := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +' x9';
-   str_pnua[9]           := tc_red   +'x10'+tc_default+'/'+tc_aqua  +' x10';
+   str_ReplayQualityL[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
+   str_ReplayQualityL[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
+   str_ReplayQualityL[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
+   str_ReplayQualityL[3]           := tc_lime  +'x4 '+tc_default+'/'+tc_orange+' x4';
+   str_ReplayQualityL[4]           := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+' x5';
+   str_ReplayQualityL[5]           := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+' x6';
+   str_ReplayQualityL[6]           := tc_orange+'x7 '+tc_default+'/'+tc_lime  +' x7';
+   str_ReplayQualityL[7]           := tc_orange+'x8 '+tc_default+'/'+tc_lime  +' x8';
+   str_ReplayQualityL[8]           := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +' x9';
+   str_ReplayQualityL[9]           := tc_red   +'x10'+tc_default+'/'+tc_aqua  +' x10';
 
-   str_npnua[0]          := tc_red   +'x1 ';
-   str_npnua[1]          := tc_red   +'x2 ';
-   str_npnua[2]          := tc_orange+'x3 ';
-   str_npnua[3]          := tc_orange+'x4 ';
-   str_npnua[4]          := tc_yellow+'x5 ';
-   str_npnua[5]          := tc_yellow+'x6 ';
-   str_npnua[6]          := tc_lime  +'x7 ';
-   str_npnua[7]          := tc_lime  +'x8 ';
-   str_npnua[8]          := tc_aqua  +'x9 ';
-   str_npnua[9]          := tc_aqua  +'x10';
+   str_NetQualityL[0]          := tc_red   +'x1 ';
+   str_NetQualityL[1]          := tc_red   +'x2 ';
+   str_NetQualityL[2]          := tc_orange+'x3 ';
+   str_NetQualityL[3]          := tc_orange+'x4 ';
+   str_NetQualityL[4]          := tc_yellow+'x5 ';
+   str_NetQualityL[5]          := tc_yellow+'x6 ';
+   str_NetQualityL[6]          := tc_lime  +'x7 ';
+   str_NetQualityL[7]          := tc_lime  +'x8 ';
+   str_NetQualityL[8]          := tc_aqua  +'x9 ';
+   str_NetQualityL[9]          := tc_aqua  +'x10';
 
-   str_cmpd[0]           := tc_aqua  +'I`m too young to die'+tc_default;
-   str_cmpd[1]           := tc_lime  +'Hey, not too rough'  +tc_default;
-   str_cmpd[2]           := tc_yellow+'Hurt me plenty'      +tc_default;
-   str_cmpd[3]           := tc_orange+'Ultra-Violence'      +tc_default;
-   str_cmpd[4]           := tc_red   +'Nightmare'           +tc_default;
+   str_Camp_DifficultyL[0]           := tc_aqua  +'I`m too young to die'+tc_default;
+   str_Camp_DifficultyL[1]           := tc_lime  +'Hey, not too rough'  +tc_default;
+   str_Camp_DifficultyL[2]           := tc_yellow+'Hurt me plenty'      +tc_default;
+   str_Camp_DifficultyL[3]           := tc_orange+'Ultra-Violence'      +tc_default;
+   str_Camp_DifficultyL[4]           := tc_red   +'Nightmare'           +tc_default;
 
-   str_gmodet            := 'Game mode:';
-   str_gmode[gm_scirmish]:= tc_lime  +'Skirmish'        +tc_default;
-   str_gmode[gm_3x3     ]:= tc_orange+'3x3'             +tc_default;
-   str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'           +tc_default;
-   str_gmode[gm_capture ]:= tc_aqua  +'Capturing points'+tc_default;
-   str_gmode[gm_invasion]:= tc_blue  +'Invasion'        +tc_default;
-   str_gmode[gm_KotH    ]:= tc_purple+'King of the Hill'+tc_default;
-   str_gmode[gm_royale  ]:= tc_red   +'Royal Battle'    +tc_default;
 
-   str_generators        := 'Generators:';
-   str_generatorsO[0]    := 'own';
-   str_generatorsO[1]    := 'neutral(5 min)';
-   str_generatorsO[2]    := 'neutral(10 min)';
-   str_generatorsO[3]    := 'neutral(15 min)';
-   str_generatorsO[4]    := 'neutral(20 min)';
-   str_generatorsO[5]    := 'neutral(infinity)';
-
-   str_team              := 'Team:';
-   str_srace             := 'Race:';
-   str_ready             := 'Ready: ';
-   str_udpport           := 'UDP port:';
+   str_NetReady          := 'Ready';
+   str_udpport           := 'UDP port';
    str_svup[false]       := 'Start server';
    str_svup[true ]       := 'Stop server';
    str_connect[false]    := 'Connect';
    str_connect[true ]    := 'Disconnect';
-   str_pnu               := 'File size/quality: ';
-   str_npnu              := 'Units update rate: ';
+
+   str_npnu              := 'Units update rate';
    str_connecting        := 'Connecting...';
    str_portblocked       := 'Port is blocked!';
    str_sver              := 'Wrong version!';
@@ -1180,7 +1204,7 @@ begin
    _mkHStrUid(UID_UTechCenter      ,'Science Facility'              ,'');
    _mkHStrUid(UID_UComputerStation ,'Computer Station'              ,'');
    _mkHStrUid(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
-   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
+   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
    _mkHStrUid(UID_UMine            ,'Mine'                          ,'');
 
    _mkHStrUid(UID_Sergant          ,'Shotguner'                     ,'');
@@ -1244,7 +1268,7 @@ begin
    _mkHStrACT(10,'Select all battle units' );
    _mkHStrACT(11,'Destroy'          );
    _mkHStrACT(12,'Alarm mark'       );
-   _mkHStrACT(13,str_maction);
+   _mkHStrACT(13,str_SG_RightClickAct);
 
    _mkHStrRPL(0 ,'Faster game speed'    ,false);
    _mkHStrRPL(1 ,'Left click: back 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
@@ -1299,31 +1323,31 @@ begin
    str_cmp_Location  := tc_gray+'Location: '+tc_default;
    str_cmp_Area      := tc_gray+'Area: '    +tc_default;
 
-   str_camp_name[0 ] := 'Hell#1: And Hell Followed (Tutorial)';
-   str_camp_name[1 ] := 'Hell#2: Invasion to the Phobos';
-   str_camp_name[2 ] := 'Hell#3: The Military Industry';
-   str_camp_name[3 ] := 'Hell#4: the Deimos Anomaly';
-   str_camp_name[4 ] := 'Hell#5: Nuclear Moon';
-   str_camp_name[5 ] := 'Hell#6: Fear';
-   str_camp_name[6 ] := 'Hell#7: Ghosts of Mars';
-   str_camp_name[7 ] := 'Hell#8: ';
-   str_camp_name[8 ] := 'Hell#9: Hell on Mars';
-   str_camp_name[9 ] := 'Hell#10: Hell On Earth';
-   str_camp_name[10] := 'Hell#11: Industrial Zone';
-   str_camp_name[11] := 'Hell#12: Cosmodrome';
+   str_camp_MissionName[0 ] := 'Hell#1: And Hell Followed (Tutorial)';
+   str_camp_MissionName[1 ] := 'Hell#2: Invasion to the Phobos';
+   str_camp_MissionName[2 ] := 'Hell#3: The Military Industry';
+   str_camp_MissionName[3 ] := 'Hell#4: the Deimos Anomaly';
+   str_camp_MissionName[4 ] := 'Hell#5: Nuclear Moon';
+   str_camp_MissionName[5 ] := 'Hell#6: Fear';
+   str_camp_MissionName[6 ] := 'Hell#7: Ghosts of Mars';
+   str_camp_MissionName[7 ] := 'Hell#8: ';
+   str_camp_MissionName[8 ] := 'Hell#9: Hell on Mars';
+   str_camp_MissionName[9 ] := 'Hell#10: Hell On Earth';
+   str_camp_MissionName[10] := 'Hell#11: Industrial Zone';
+   str_camp_MissionName[11] := 'Hell#12: Cosmodrome';
 
-   str_camp_name[12] := 'UAC#1: Command Center';
-   str_camp_name[13] := 'UAC#2: Super Generators';
-   str_camp_name[14] := 'UAC#3: Phobos Anomaly';
-   str_camp_name[15] := 'UAC#4: Deimos Anomaly 2';
-   str_camp_name[16] := 'UAC#5: Lab';
-   str_camp_name[17] := 'UAC#6: Fortress of Mystery';
-   str_camp_name[18] := 'UAC#7: City of the Damned';
-   str_camp_name[19] := 'UAC#8: Slough of Despair';
-   str_camp_name[20] := 'UAC#9: Mt. Erebus';
-   str_camp_name[21] := 'UAC#10: Dead Zone';
-   str_camp_name[22] := 'UAC#11:    ';
-   str_camp_name[23] := 'UAC#12: Battle For Mars';
+   str_camp_MissionName[12] := 'UAC#1: Command Center';
+   str_camp_MissionName[13] := 'UAC#2: Super Generators';
+   str_camp_MissionName[14] := 'UAC#3: Phobos Anomaly';
+   str_camp_MissionName[15] := 'UAC#4: Deimos Anomaly 2';
+   str_camp_MissionName[16] := 'UAC#5: Lab';
+   str_camp_MissionName[17] := 'UAC#6: Fortress of Mystery';
+   str_camp_MissionName[18] := 'UAC#7: City of the Damned';
+   str_camp_MissionName[19] := 'UAC#8: Slough of Despair';
+   str_camp_MissionName[20] := 'UAC#9: Mt. Erebus';
+   str_camp_MissionName[21] := 'UAC#10: Dead Zone';
+   str_camp_MissionName[22] := 'UAC#11:    ';
+   str_camp_MissionName[23] := 'UAC#12: Battle For Mars';
 
    str_camp_map [0 ] := str_cmp_map(str_cmp_unk ,'HELL WORLD','Portal valley');
    str_camp_map [1 ] := str_cmp_map('15.11.2145','PHOBOS'    ,'Hall crater'   );
@@ -1412,45 +1436,88 @@ begin
    str_camp_obj [23] := '- Destroy all bases and armies of hell';  }
 
 
-   _makeHints;
+   str_makeHints;
 end;
 
 procedure lng_rus;
 var t: shortstring;
     i: byte;
 begin
-  str_MMap              := 'КАРТА';
-  str_MPlayers          := 'ИГРОКИ';
-  str_MObjectives       := 'ЗАДАЧИ';
-  str_menu_s1[ms1_sett] := 'НАСТРОЙКИ';
-  str_menu_s1[ms1_svld] := 'СОХР./ЗАГР.';
-  str_menu_s1[ms1_reps] := 'ЗАПИСИ';
-  str_menu_s2[ms2_camp] := 'КАМПАНИИ';
-  str_menu_s2[ms2_scir] := 'СХВАТКА';
-  str_menu_s2[ms2_mult] := 'СЕТЕВАЯ ИГРА';
-  str_menu_s3[ms3_game] := 'ИГРА';
-  str_menu_s3[ms3_vido] := 'ГРАФИКА';
-  str_menu_s3[ms3_sond] := 'ЗВУК';
-  str_start             := 'НАЧАТЬ';
-  str_surrender         := 'СДАТЬСЯ';
-  str_quit              := 'ВЫЙТИ';
-  str_exit              := 'ВЫХОД';
-  str_back              := 'НАЗАД';
-  str_m_siz             := 'Размер: ';
-  str_m_obs             := 'Преграды: ';
-  str_m_sym             := 'Симметрия: ';
+  str_Caption_Map        := 'КАРТА';
+  str_Caption_Players    := 'ИГРОКИ';
+  str_Caption_Multiplayer:= 'СЕТЕВАЯ ИГРА';
+  str_Caption_GOptions   := 'ПАРАМЕТРЫ ИГРЫ';
+  str_MObjectives        := 'ЗАДАЧИ';
+
+  str_menu_Tutorials    := 'ОБУЧЕНИЕ';
+  str_menu_Campaings    := 'КАМПАНИИ';
+  str_menu_Scirmish     := 'СХВАТКА';
+  str_menu_SaveLoad     := 'СОХР./ЗАГР.';
+  str_menu_LoadGame     := 'ЗАГРУЗИТЬ ИГРУ';
+  str_menu_Replays      := 'ЗАПИСИ';
+  str_menu_Settings     := 'НАСТРОЙКИ';
+
+  str_menu_Start        := 'НАЧАТЬ';
+  str_menu_Surrender    := 'СДАТЬСЯ';
+  str_menu_Break        := 'ПРЕРВАТЬ МИССИЮ';
+  str_menu_Exit         := 'ВЫХОД';
+  str_menu_Back         := 'НАЗАД';
+
+  str_menu_SetGame      := 'ИГРА';
+  str_menu_SetReplay    := 'ЗАПИСЬ ИГРЫ';
+  str_menu_SetVideo     := 'ГРАФИКА';
+  str_menu_SetSound     := 'ЗВУК';
+
+  str_SR_RecordGames    := 'Записывать игры';
+  str_SR_ReplayPrefix   := 'Префикс записи';
+  str_SR_Quality        := 'Размер/качество';
+
+  str_FileInfo          := 'ИНФОРМАЦИЯ';
+  str_FileSave          := 'Сохранить';
+  str_FileLoad          := 'Загрузить';
+  str_FileDelete        := 'Удалить';
+
   str_map               := 'Карта';
-  str_players           := 'Игроки';
-  str_mrandom           := 'Случайная карта';
-  str_musicvol          := 'Громкость музыки';
-  str_soundvol          := 'Громкость звуков';
-  str_scrollspd         := 'Скорость пр.';
-  str_mousescrl         := 'Прокр. мышью';
-  str_fullscreen        := 'В окне:';
-  str_plname            := 'Имя игрока';
-  str_maction           := 'Действие на правый клик';
-  str_maction2[true ]   := tc_lime+'движение'+tc_default;
-  str_maction2[false]   := tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
+  str_map_Seed          := 'Номер';
+  str_map_Size          := 'Размер';
+  str_map_Obstacles     := 'Преграды';
+  str_map_Symmetry      := 'Симметрия';
+  str_map_Random        := 'Случайная карта';
+
+  str_map_Scenario              := 'Сценарий';
+  str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Схватка'          +tc_default;
+  str_map_ScenarioL[mc_3x3     ]:= tc_orange+'3x3'              +tc_default;
+  str_map_ScenarioL[mc_2x2x2   ]:= tc_yellow+'2x2x2'            +tc_default;
+  str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Захват точек'     +tc_default;
+  str_map_ScenarioL[mc_invasion]:= tc_blue  +'Вторжение'        +tc_default;
+  str_map_ScenarioL[mc_KotH    ]:= tc_purple+'Царь горы'        +tc_default;
+  str_map_ScenarioL[mc_royale  ]:= tc_red   +'Королевская битва'+tc_default;
+
+  str_map_Generators            := 'Генераторы';
+  str_map_GeneratorsL[0]        := 'свои';
+  str_map_GeneratorsL[1]        := '5 мин.';
+  str_map_GeneratorsL[2]        := '10 мин.';
+  str_map_GeneratorsL[3]        := '15 мин.';
+  str_map_GeneratorsL[4]        := '20 мин.';
+  str_map_GeneratorsL[5]        := 'вечные';
+
+  str_Players           := 'Игроки';
+
+  str_SS_MusicVolume          := 'Громкость музыки';
+  str_SS_SoundVolume          := 'Громкость звуков';
+  str_SG_PlayerName           := 'Имя игрока';
+  str_SG_RightClickAct        := 'Действие на правый клик';
+  str_SG_RightClickActL[true ]:= tc_lime+'движение'+tc_default;
+  str_SG_RightClickActL[false]:= tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
+  str_SG_ScrollSpeed          := 'Скорость пр.';
+  str_SG_MouseScroll          := 'Прокр. мышью';
+  str_SG_Language       := 'Язык интерфейса';
+
+  str_SV_ResolutionApply:= 'Применить разрешение';
+  str_SV_ResolutionW    := 'Разрешение (ширина)';
+  str_SV_ResolutionH    := 'Разрешение (высота)';
+  str_SV_Windowed       := 'В окне:';
+
   str_race[r_random]    := tc_white+'ЛЮБАЯ'  +tc_default;
   str_observer          := 'ЗРИТЕЛЬ';
   str_pause             := 'Пауза';
@@ -1460,51 +1527,49 @@ begin
   str_gsaved            := 'Игра сохранена';
   str_repend            := 'Конец записи!';
   str_reperror          := 'Ошибка при чтении файла!';
-  str_save              := 'Сохранить';
-  str_load              := 'Загрузить';
-  str_delete            := 'Удалить';
+
   str_svld_errors_file  := 'Файл не'+tc_nl3+'существует!';
   str_svld_errors_open  := 'Неполучилось'+tc_nl3+'открыть файл!';
-  str_svld_errors_wdata := 'Неправильный'+tc_nl3+'размер файла!';
+  str_svld_errors_wdata := 'Неправильные'+tc_nl3+'данные файла!';
   str_svld_errors_wver  := 'Неправильная'+tc_nl3+'версия файла!';
   str_time              := 'Время: ';
   str_menu              := 'Меню';
-  str_player_def        := ' уничтожен!';
+  str_PlayerDefeat        := ' уничтожен!';
   str_inv_time          := 'Волна #';
   str_inv_ml            := 'Армия монстров: ';
-  str_play              := 'Проиграть';
-  str_replay            := 'ЗАПИСЬ';
-  str_replay_name       := 'Префикс записи:';
-  str_cmpdif            := 'Сложность: ';
-  str_waitsv            := 'Ожидание сервера...';
-  str_goptions          := 'ПАРАМЕТРЫ ИГРЫ';
+  str_ReplayPlay              := 'Проиграть';
+
+  str_Camp_Difficulty            := 'Сложность';
+  str_WaitForServer            := 'Ожидание сервера...';
+
   str_server            := 'СЕРВЕР';
   str_client            := 'КЛИЕНТ';
   str_menu_chat         := 'ЧАТ(ВСЕ ИГРОКИ)';
   str_chat_all          := 'ВСЕ:';
   str_chat_allies       := 'СОЮЗНИКИ:';
-  str_randoms           := 'Случайная схватка';
-  str_apply             := 'применить';
-  str_plout             := ' покинул игру';
-  str_player_surrender  := ' сдается!';
-  str_aislots           := 'Заполнить пустые слоты:';
-  str_resol             := 'Разрешение';
-  str_language          := 'Язык интерфейса';
+  str_GO_Random           := 'Случайная схватка';
+
+  str_PlayerLeft             := ' покинул игру';
+  str_PlayerSurrender  := ' сдается!';
+  str_GO_AISlots           := 'Заполнить пустые слоты';
+
+
+
   str_requirements      := 'Требования: ';
   str_req               := 'Треб.: ';
   str_orders            := 'Отряды: ';
   str_all               := 'Все';
   str_uprod             := tc_lime+'Создается в: '+tc_default;
   str_bprod             := tc_lime+'Чем может быть построен: '     +tc_default;
-  str_ColoredShadow     := 'Цветные тени';
+  str_SG_ColoredShadow  := 'Цветные тени';
   str_kothtime          := 'Время до захвата центра: ';
   str_kothtime_act      := 'Время до активации центральной зоны: ';
   str_kothwinner        := ' - Царь Горы!';
-  str_DeadObservers     := 'Наблюдатель после поражения:';
-  str_menu_scale        := 'Растягивание меню';
-  str_menu_scales       := 'Гладкое растянутое меню';
-  str_FPS               := 'Показать FPS';
-  str_APM               := 'Показать APM';
+  str_GO_DefeatedObs     := 'Наблюдатель после поражения';
+  str_SV_MenuScale        := 'Растягивание меню';
+  str_SV_MenuScaleSmooth       := 'Гладкое растянутое меню';
+  str_SV_ShowFPS               := 'Показать FPS';
+  str_SG_ShowAPM               := 'Показать APM';
   str_ability           := 'Специальная способность: ';
   str_transformation    := 'превращение в ';
   str_upgradeslvl       := 'Улучшения: ';
@@ -1512,20 +1577,20 @@ begin
   str_except            := 'кроме';
   str_splashresist      := 'Невосприимчив к взрывной волне';
   str_TargetLimit       := 'лимит цели';
-  str_NextTrack         := 'Следующий трек';
-  str_ReloadMusic       := 'Загрузить новый плейлист';
+  str_SS_NextTrack         := 'Следующий трек';
+  str_SS_ReloadMusic       := 'Загрузить новый плейлист';
   str_PlayerPaused      := 'игрок приостановил игру';
   str_PlayerResumed     := 'игрок возобновил игру';
-  str_MusicListSize     := 'Размер плейлиста';
+  str_SS_MusicListSize     := 'Размер плейлиста';
   str_menu_controls     := '- используйте левую и правую кнопки мыши для управления пунктами меню -';
   str_RecordingStart    := 'Начало записи: ';
   str_RecordingStop     := 'Остановка записи: ';
-  str_PTPlayer          := 'ИГРОК';
-  str_PTState           := 'СТАТУС';
-  str_PTRace            := 'РАСА';
-  str_PTTeam            := 'КЛАН';
-  str_PTColor           := 'ЦВЕТ';
-  str_PTPing            := 'ПИНГ+';
+  str_PT_Player          := 'ИГРОК';
+  str_PT_State           := 'СТАТУС';
+  str_PT_Race            := 'РАСА';
+  str_PT_Team            := 'КЛАН';
+  str_PT_Color           := 'ЦВЕТ';
+  str_PT_Ping            := 'ПИНГ+';
 
   str_builder           := 'Строитель';
   str_barrack           := 'Производит юнитов';
@@ -1592,53 +1657,34 @@ begin
   str_attr_detector     := tc_purple+'детектор'      ;
   str_attr_transport    := tc_gray  +'транспорт'     ;
 
-  str_panelpos          := 'Положение игровой панели';
-  str_panelposp[0]      := tc_lime  +'слева' +tc_default;
-  str_panelposp[1]      := tc_orange+'справа'+tc_default;
-  str_panelposp[2]      := tc_yellow+'вверху'+tc_default;
-  str_panelposp[3]      := tc_aqua  +'внизу' +tc_default;
+  str_SG_ControlPanelPos          := 'Положение игровой панели';
+  str_SG_ControlPanelPosL[0]      := tc_lime  +'слева' +tc_default;
+  str_SG_ControlPanelPosL[1]      := tc_orange+'справа'+tc_default;
+  str_SG_ControlPanelPosL[2]      := tc_yellow+'вверху'+tc_default;
+  str_SG_ControlPanelPosL[3]      := tc_aqua  +'внизу' +tc_default;
 
-  str_uhbar             := 'Полоски здоровья';
-  str_uhbars[0]         := tc_lime  +'выбранные'+tc_default+'+'+tc_red+'поврежд.'+tc_default;
-  str_uhbars[1]         := tc_aqua  +'всегда'   +tc_default;
-  str_uhbars[2]         := tc_orange+'только '  +tc_lime+'выбранные'+tc_default;
+  str_SG_HealthBars             := 'Полоски здоровья';
+  str_SG_HealthBarsL[0]         := tc_lime  +'выбранные'+tc_default+'+'+tc_red+'поврежд.'+tc_default;
+  str_SG_HealthBarsL[1]         := tc_aqua  +'всегда'   +tc_default;
+  str_SG_HealthBarsL[2]         := tc_orange+'только '  +tc_lime+'выбранные'+tc_default;
 
-  str_pcolor            := 'Цвета игроков';
-  str_pcolors[0]        := tc_white +'по умолчанию'+tc_default;
-  str_pcolors[1]        := tc_lime  +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
-  str_pcolors[2]        := tc_white +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
-  str_pcolors[3]        := tc_white +'свои '+tc_aqua  +'союзники '+tc_red+'враги'+tc_default;
-  str_pcolors[4]        := tc_purple+'команды'+tc_default;
-  str_pcolors[5]        := tc_white +'свои '+tc_purple+'команды'+tc_default;
+  str_SG_PlayersColor            := 'Цвета игроков';
+  str_SG_PlayersColorL[0]        := tc_white +'по умолчанию'+tc_default;
+  str_SG_PlayersColorL[1]        := tc_lime  +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
+  str_SG_PlayersColorL[2]        := tc_white +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
+  str_SG_PlayersColorL[3]        := tc_white +'свои '+tc_aqua  +'союзники '+tc_red+'враги'+tc_default;
+  str_SG_PlayersColorL[4]        := tc_purple+'команды'+tc_default;
+  str_SG_PlayersColorL[5]        := tc_white +'свои '+tc_purple+'команды'+tc_default;
 
-  str_fstarts           := 'Фиксированные старты:';
+  str_GO_FixedStarts            := 'Фиксированные старты';
 
-  str_gmodet            := 'Режим игры:';
-  str_gmode[gm_scirmish]:= tc_lime  +'Схватка'           +tc_default;
-  str_gmode[gm_3x3     ]:= tc_orange+'3x3'               +tc_default;
-  str_gmode[gm_2x2x2   ]:= tc_yellow+'2x2x2'             +tc_default;
-  str_gmode[gm_capture ]:= tc_aqua  +'Захват точек'      +tc_default;
-  str_gmode[gm_invasion]:= tc_blue  +'Вторжение'         +tc_default;
-  str_gmode[gm_KotH    ]:= tc_purple+'Царь горы'         +tc_default;
-  str_gmode[gm_royale  ]:= tc_red   +'Королевская битва' +tc_default;
-
-  str_generators        := 'Генераторы:';
-  str_generatorsO[0]    := 'свои';
-  str_generatorsO[1]    := 'нейтральные(5 мин.)';
-  str_generatorsO[2]    := 'нейтральные(10 мин.)';
-  str_generatorsO[3]    := 'нейтральные(15 мин.)';
-  str_generatorsO[4]    := 'нейтральные(20 мин.)';
-  str_generatorsO[5]    := 'нейтральные(бесконечные)';
-
-  str_team              := 'Клан:';
-  str_srace             := 'Раса:';
-  str_ready             := 'Готов: ';
-  str_udpport           := 'UDP порт:';
+  str_NetReady          := 'Готов';
+  str_udpport           := 'UDP порт';
   str_svup[false]       := 'Включить сервер';
   str_svup[true ]       := 'Выключить сервер';
   str_connect[false]    := 'Подключится';
   str_connect[true ]    := 'Отключится';
-  str_pnu               := 'Размер/качество: ';
+
   str_npnu              := 'Обновление юнитов: ';
   str_connecting        := 'Соединение...';
   str_portblocked       := 'Порт занят!';
@@ -1739,7 +1785,7 @@ begin
   _mkHStrUid(UID_UTechCenter     ,'Научный Центр'              ,'');
   _mkHStrUid(UID_UComputerStation,'Компьютерная Станция'       ,'');
   _mkHStrUid(UID_URadar          ,'Радар'                      ,'Разведует карту. Перезарядка способности - '+tc_aqua+i2s(radar_reload_sec)+tc_default+' сек');
-  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +DamageStr(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
+  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
   _mkHStrUid(UID_UMine           ,'Мина'                       ,'');
 
   _mkHStrUid(UID_Sergant         ,'Сержант'                ,'');
@@ -1803,7 +1849,7 @@ begin
   _mkHStrACT(10,'Выбрать всех боевых незанятых юнитов');
   _mkHStrACT(11,'Уничтожить'          );
   _mkHStrACT(12,'Поставить метку'     );
-  _mkHStrACT(13,str_maction           );
+  _mkHStrACT(13,str_SG_RightClickAct           );
 
   _mkHStrRPL(0 ,'Включить/выключить ускоренный просмотр',false);
   _mkHStrRPL(1 ,'Левый клик: назад на 2 секунды ('                                 +tc_lime+'W'+tc_default+')'+tc_nl1+
@@ -1872,14 +1918,14 @@ begin
   cmp_AddPlot(0,false,'- Адская Крепость должна уцелеть' );
   cmp_AddPlot(0,false,'- Уничтожить вторгшихся захватчиков');
 
-  {str_camp_name[0]         := 'Hell #1: Вторжение на Фобос';
-  str_camp_name[1]         := 'Hell #2: Военная база';
-  str_camp_name[2]         := 'Hell #3: Вторжение на Деймос';
-  str_camp_name[3]         := 'Hell #4: Пентаграмма смерти';
-  str_camp_name[4]         := 'Hell #7: Каньон';
-  str_camp_name[5]         := 'Hell #8: Ад на Марсе';
-  str_camp_name[6]         := 'Hell #5: Ад на Земле';
-  str_camp_name[7]         := 'Hell #6: Космодром';
+  {str_camp_MissionName[0]         := 'Hell #1: Вторжение на Фобос';
+  str_camp_MissionName[1]         := 'Hell #2: Военная база';
+  str_camp_MissionName[2]         := 'Hell #3: Вторжение на Деймос';
+  str_camp_MissionName[3]         := 'Hell #4: Пентаграмма смерти';
+  str_camp_MissionName[4]         := 'Hell #7: Каньон';
+  str_camp_MissionName[5]         := 'Hell #8: Ад на Марсе';
+  str_camp_MissionName[6]         := 'Hell #5: Ад на Земле';
+  str_camp_MissionName[7]         := 'Hell #6: Космодром';
 
   str_camp_obj[0]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
   str_camp_obj[1]         := '-Уничтожь военную базу';
@@ -1899,7 +1945,7 @@ begin
   str_camp_map[6]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';
   str_camp_map[7]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';  }
 
-  _makeHints;
+  str_makeHints;
 end;
 
 
@@ -1927,8 +1973,8 @@ begin
         writeln(f,un_txt_name);
         writeln(f);
 
-        writeln(f,'Hotkey: ',RemoveSpecChars(_gHK(_ucl)));
-        writeln(f,'Categories/Attributes: ',RemoveSpecChars(_makeAttributeStr(nil,u)));
+        writeln(f,'Hotkey: ',RemoveSpecChars(HotKeyBase2Str(_ucl)));
+        writeln(f,'Categories/Attributes: ',RemoveSpecChars(str_UnitAttributes(nil,u)));
         writeln(f,'Max hits: ',_mhits);
         //if(_base_armor>0)then
         //writeln(f,'Base armor: ',_base_armor);
@@ -1963,49 +2009,49 @@ begin
            for w:=0 to MaxUnitWeapons do
             with _a_weap[w] do
             begin
-               tmp:=_MakeWeaponString(u,w,true);
+               tmp:=str_MakeWeaponString(u,w,true);
                if(length(tmp)>0)then writeln(f,tmp,';');
             end;
         end;
 
 
         writeln(f,'Upgrades:');
-        upgrLine(_upgr_srange,'vision range '+_i2s(_upgr_srange_step));
+        upgrLine(_upgr_srange,'vision range '+i2sSign(_upgr_srange_step));
         if(not _ukbuilding)then
-        upgrLine(upgr_race_unit_srange[_urace],'vision range '+_i2s(upgr_race_srange_unit_bonus[_urace]));
+        upgrLine(upgr_race_unit_srange[_urace],'vision range '+i2sSign(upgr_race_srange_unit_bonus[_urace]));
 
         if(_ukbuilding)
-        then upgrLine(_upgr_armor,'armor '+_i2s(UpgradeBuildArmorBonus))
-        else upgrLine(_upgr_armor,'armor '+_i2s(UpgradeUnitArmorBonus ));
+        then upgrLine(_upgr_armor,'armor '+i2sSign(UpgradeBuildArmorBonus))
+        else upgrLine(_upgr_armor,'armor '+i2sSign(UpgradeUnitArmorBonus ));
 
         if(_ukbuilding)
-        then upgrLine(upgr_race_armor_build[_urace],'armor '+_i2s(UpgradeBuildArmorBonus))
+        then upgrLine(upgr_race_armor_build[_urace],'armor '+i2sSign(UpgradeBuildArmorBonus))
         else
           if(_ukmech)
-          then upgrLine(upgr_race_armor_mech[_urace],'armor '+_i2s(UpgradeUnitArmorBonus))
-          else upgrLine(upgr_race_armor_bio [_urace],'armor '+_i2s(UpgradeUnitArmorBonus));
+          then upgrLine(upgr_race_armor_mech[_urace],'armor '+i2sSign(UpgradeUnitArmorBonus))
+          else upgrLine(upgr_race_armor_bio [_urace],'armor '+i2sSign(UpgradeUnitArmorBonus));
 
-        upgrLine(_upgr_regen,'hits regeneration '+_i2s(BaseArmorBonus1));
+        upgrLine(_upgr_regen,'hits regeneration '+i2sSign(BaseArmorBonus1));
         if(_ukbuilding)
-        then upgrLine(upgr_race_regen_build[_urace],'hits regeneration '+_i2s(BaseArmorBonus1))
+        then upgrLine(upgr_race_regen_build[_urace],'hits regeneration '+i2sSign(BaseArmorBonus1))
         else
           if(_ukmech)
-          then upgrLine(upgr_race_regen_mech[_urace],'hits regeneration '+_i2s(BaseArmorBonus1))
-          else upgrLine(upgr_race_regen_bio [_urace],'hits regeneration '+_i2s(BaseArmorBonus1));
+          then upgrLine(upgr_race_regen_mech[_urace],'hits regeneration '+i2sSign(BaseArmorBonus1))
+          else upgrLine(upgr_race_regen_bio [_urace],'hits regeneration '+i2sSign(BaseArmorBonus1));
 
         if(_ukbuilding)
         then
         else
           if(_ukmech)
-          then upgrLine(upgr_race_mspeed_mech[_urace],'movement speed '+_i2s(2))
-          else upgrLine(upgr_race_mspeed_bio [_urace],'movement speed '+_i2s(2));
+          then upgrLine(upgr_race_mspeed_mech[_urace],'movement speed '+i2sSign(2))
+          else upgrLine(upgr_race_mspeed_bio [_urace],'movement speed '+i2sSign(2));
 
         if(not _ukbuilding)and(_painc>0)and(_urace=r_hell)then
-        upgrLine(upgr_hell_pains,'PainState threshold '+_i2s(_painc_upgr_step));
+        upgrLine(upgr_hell_pains,'PainState threshold '+i2sSign(_painc_upgr_step));
 
         writeln(f);
 
-        writeln(f,RemoveSpecChars(_MakeDefaultDescription(u,un_txt_udescr,true)));
+        writeln(f,RemoveSpecChars(str_MakeUnitDefaultDescription(u,un_txt_udescr,true)));
 
         writeln(f);
         {
@@ -2021,13 +2067,13 @@ begin
     with g_upids[u] do
      if(length(_up_name)>0)then
      begin
-        writeln(f,RemoveSpecChars(_makeUpgrBaseHint(u,255)));
+        writeln(f,RemoveSpecChars(str_makeUpgrBaseHint(u,255)));
         writeln(f,RemoveSpecChars(_up_hint));
         writeln(f);
      end;
    writeln(f);
 {
-s1:=_makeUpgrBaseHint(uid,upgr[uid]+1);
+s1:=str_makeUpgrBaseHint(uid,upgr[uid]+1);
 hs1:=@s1;
 hs4:=@g_upids[uid]._up_hint;
 }

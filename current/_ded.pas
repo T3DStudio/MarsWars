@@ -10,7 +10,7 @@ begin
    end
    else
    begin
-      HPlayer:=0;
+      LocalPlayer:=0;
       PlayersSetDefault;
    end;
 
@@ -41,7 +41,6 @@ procedure Dedicated_screenLine(s1:shortstring;x1:byte;
                                s5:shortstring;x5:byte;
                                s6:shortstring;x6:byte);
 var s: shortstring;
-
 procedure ss(sp:pshortstring;x:byte);
 var i,t:byte;
 begin
@@ -56,9 +55,8 @@ begin
       t+=1;
    end;
 end;
-
 begin
-   s:='                                                                      ';
+   s:='                                                                                 ';
    if(x1>0)then ss(@s1,x1);
    if(x2>0)then ss(@s2,x2);
    if(x3>0)then ss(@s3,x3);
@@ -71,26 +69,26 @@ end;
 procedure ps(p:byte);
 begin
    if(p=0)
-   then        Dedicated_screenLine(str_plname,1   , str_plstat          ,15, str_srace      ,25, str_team ,35, '',0, '',0)   // captions
+   then        Dedicated_screenLine(str_PlayerName,1   , str_plstat          ,15, str_srace      ,25, str_team ,35, '',0, '',0)   // captions
    else with g_players[p] do
         if(state=ps_none)
-        then   Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''       ,35, '',0, '',0)
+        then   Dedicated_screenLine(name          ,1   , PlayerGetStatus(p)  ,15, '--'           ,25, ''       ,35, '',0, '',0)
         else
           if(team=0)
-          then Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(team),35, '',0, '',0)
-          else Dedicated_screenLine(name      ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(team),35, '',0, '',0);
+          then Dedicated_screenLine(name          ,1   , PlayerGetStatus(p)  ,15, str_observer   ,25, t2c(team),35, '',0, '',0)
+          else Dedicated_screenLine(name          ,1   , PlayerGetStatus(p)  ,15, str_race[mrace],25, t2c(team),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
 begin
    if(g_started)
-   then SVGameStatus:=str_grun
-   else SVGameStatus:=str_gnstarted;
+   then SVGameStatus:=str_GameStarted
+   else SVGameStatus:=str_GameLobby;
    case G_status of
 gs_running    : ;
-1..MaxPlayers : SVGameStatus:=str_gpaused+b2s(G_Status)
+1..MaxPlayers : SVGameStatus:=str_GamePaused+b2s(G_Status)
    else
-     if(gs_win_team0<=G_status)and(G_status<=gs_win_team6)then SVGameStatus:=str_gwinner+b2s(G_Status-gs_win_team0);
+     if(gs_win_team0<=G_status)and(G_status<=gs_win_team6)then SVGameStatus:=str_GameEnded+b2s(G_Status-gs_win_team0);
    end;
 end;
 
@@ -106,25 +104,24 @@ begin
    if(consoley<=fr_fps1)then
    begin
       case consoley of
-      0 : writeln(str_wcaption,' ',str_cprt,str_udpport,net_port);
-      1 : writeln(str_gstatus, SVGameStatus);
-      2 : writeln(str_gsettings);
-      3 : writeln('         ',str_gmodet       ,str_gmode  [g_mode ]          );
-      6 : writeln('         ',str_fstarts      ,b2c[g_fixed_positions]        );
-      8 : writeln('         ',str_aislots      ,g_ai_slots                    );
-      10: writeln('         ',str_cgenerators  ,str_cgeneratorsM[g_generators]);
-      11: writeln('         ',str_deadobservers,b2c[g_deadobservers ]         );
-      12: writeln;
-      13: Dedicated_screenLine(str_map,1, str_m_seed   ,10, str_m_siz  ,25, str_m_obs        ,35,str_m_sym        ,45,'',56);
-      14: Dedicated_screenLine(''     ,1, c2s(map_seed),10, i2s(map_mw),25,  _str_mx(map_obs),35,b2c[map_symmetry],45,'',56);
-      15: writeln;
-      16: ps(0);
-      18: ps(1);
-      20: ps(2);
-      22: ps(3);
-      24: ps(4);
-      26: ps(5);
-      28: ps(6);
+      0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_port);
+      1 : writeln(str_GameStatus, SVGameStatus);
+      2 : writeln(str_GameOptions);
+      4 : writeln('   ',str_game_FixedPositions,b2c[g_FixedPositions]           );
+      6 : writeln('   ',str_game_AISlots       ,g_AISlots                       );
+      8 : writeln('   ',str_game_DefeatedObs   ,b2c[g_DefeatedObs ]             );
+      10: writeln;
+      12: writeln(str_MapOptions);
+      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size ,45, str_map_Obstacles   ,55, str_map_Symmetry ,70);
+      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_size),45, strMX(map_obstacles),55, b2c[map_symmetry],70);
+      18: writeln;
+      20: ps(0);
+      22: ps(1);
+      24: ps(2);
+      26: ps(3);
+      28: ps(4);
+      30: ps(5);
+      32: ps(6);
       end;
 
       consoley+=1;

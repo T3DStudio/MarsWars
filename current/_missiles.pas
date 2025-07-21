@@ -140,7 +140,7 @@ begin
    ApplyDamageMod:=base_damage;
    if(tu<>nil)then
      for i:=0 to MaxDamageModFactors do
-      with g_dmods[dmod][i] do
+      with g_DamageMods[dmod][i] do
        if(dm_flags>0)then
         if(CheckUnitBaseFlags(tu,dm_flags))then
          case dm_factor of
@@ -164,7 +164,7 @@ procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake
 var m,d:integer;
     tu:PTUnit;
 begin
-    for m:=1 to MaxUnits do
+    for m:=0 to MaxUnits do
     with g_missiles[m] do
     if(vstep<=0)then
     begin
@@ -283,7 +283,7 @@ begin
 
              if(not fake)then
              begin
-                rdamage:=mm3(0,trunc(rdamage*(1-(ud/mid_base_splashr))),rdamage);
+                rdamage:=mm3i(0,trunc(rdamage*(1-(ud/mid_base_splashr))),rdamage);
                 unit_damage(tu,rdamage,painX,player,false);
              end;
           end;
@@ -296,7 +296,7 @@ const  mb_s0 = fr_fps1 div 5;
 var m,u:integer;
      tu:PTUnit;
 begin
-   for m:=1 to MaxMissiles do
+   for m:=0 to MaxMissiles do
    with g_missiles[m] do
    with g_mids[mid] do
    if(vstep>0)then
@@ -309,7 +309,7 @@ begin
         else
           if(tu^.x<>tu^.vx)
           or(tu^.y<>tu^.vy)
-          or(max2(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
+          or(max2i(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
             case homing of
 mh_magnetic : begin
                  x  +=sign(tu^.x-x)*3;

@@ -30,8 +30,8 @@ begin
    if(slatemp<>nil)then
     with slatemp^ do
     begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
+       x      := ax-ui_cam_x;
+       y      := ay-ui_cam_y;
        depth  := adepth;
        shadowz:= ashadowz;
        shadowc:= ashadowc;
@@ -46,8 +46,8 @@ begin
    if(slatemp<>nil)then
     with slatemp^ do
     begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
+       x      := ax-ui_cam_x;
+       y      := ay-ui_cam_y;
        depth  := adepth;
        shadowz:= ashadowz;
        shadowc:= c_ablack;
@@ -63,8 +63,8 @@ begin
    if(slatemp<>nil)then
     with slatemp^ do
     begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
+       x      := ax-ui_cam_x;
+       y      := ay-ui_cam_y;
        depth  :=  sd_marker;
        shadowz:= -32000;
        sprite := aspr;
@@ -78,8 +78,8 @@ begin
    if(slatemp<>nil)then
     with slatemp^ do
     begin
-       x      := ax-vid_cam_x;
-       y      := ay-vid_cam_y;
+       x      := ax-ui_cam_x;
+       y      := ay-ui_cam_y;
        depth  := adepth;
        shadowz:= -32000;
        sprite := aspr;
@@ -245,8 +245,8 @@ begin
       color  :=acolor;
 
       tw:=length(text)*font_hw;
-      x0:=mm3(vid_cam_x+tw     ,x0,vid_cam_x+vid_cam_w-tw    );
-      y0:=mm3(vid_cam_y+font_hw,y0,vid_cam_y+vid_cam_h-font_w);
+      x0:=mm3i(ui_cam_x+tw     ,x0,ui_cam_x+vid_cam_w-tw    );
+      y0:=mm3i(ui_cam_y+font_hw,y0,ui_cam_y+vid_cam_h-font_w);
    end;
 end;
 procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
@@ -260,24 +260,24 @@ begin
       x1      :=x0+aspr^.w;
       y1      :=y0+aspr^.h;
 
-      if(x0<vid_cam_x)then
+      if(x0<ui_cam_x)then
       begin
-         x0:=vid_cam_x;
+         x0:=ui_cam_x;
          x1:=x0+aspr^.w;
       end;
-      if(x1>(vid_cam_x+vid_cam_w))then
+      if(x1>(ui_cam_x+vid_cam_w))then
       begin
-         x1:=(vid_cam_x+vid_cam_w);
+         x1:=(ui_cam_x+vid_cam_w);
          x0:=x1-aspr^.w;
       end;
-      if(y0<vid_cam_y)then
+      if(y0<ui_cam_y)then
       begin
-         y0:=vid_cam_y;
+         y0:=ui_cam_y;
          y1:=y0+aspr^.h;
       end;
-      if(y1>(vid_cam_y+vid_cam_h))then
+      if(y1>(ui_cam_y+vid_cam_h))then
       begin
-         y1:=(vid_cam_y+vid_cam_h);
+         y1:=(ui_cam_y+vid_cam_h);
          y0:=y1-aspr^.h;
       end;
 
@@ -307,28 +307,28 @@ var v:integer;
 begin
    if(per<0)then per:=0;
    if(per>1)then per:=1;
-   if(ax0<vid_cam_x)then
+   if(ax0<ui_cam_x)then
    begin
       v:=ax1-ax0;
-      ax0:=vid_cam_x;
+      ax0:=ui_cam_x;
       ax1:=ax0+v;
    end;
-   if(ax1>(vid_cam_x+vid_cam_w))then
+   if(ax1>(ui_cam_x+vid_cam_w))then
    begin
       v:=ax1-ax0;
-      ax1:=(vid_cam_x+vid_cam_w);
+      ax1:=(ui_cam_x+vid_cam_w);
       ax0:=ax1-v;
    end;
-   if(ay0<vid_cam_y)then
+   if(ay0<ui_cam_y)then
    begin
       v:=ay1-ay0;
-      ay0:=vid_cam_y;
+      ay0:=ui_cam_y;
       ay1:=ay0+v;
    end;
-   if(ay1>(vid_cam_y+vid_cam_h))then
+   if(ay1>(ui_cam_y+vid_cam_h))then
    begin
       v:=ay1-ay0;
-      ay1:=(vid_cam_y+vid_cam_h);
+      ay1:=(ui_cam_y+vid_cam_h);
       ay0:=ay1-v;
    end;
 
@@ -388,7 +388,7 @@ begin
       if(srect)
       then hbar:=true
       else
-        case vid_uhbars of
+        case ui_HealthBars of
       0: if(hits<_mhits)then hbar:=true;
       1: hbar:=true;
         end;
@@ -444,8 +444,8 @@ end;
 procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
-   case g_mode of
-gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,ui_max_color[r_blink1_colorb]);
+   case map_scenario of
+mc_royale: circleColor(tar,lx+map_hmw-ui_cam_x,ly+map_hmw-ui_cam_y,g_royal_r,ui_max_color[r_blink1_colorb]);
    end;
 
 
@@ -454,14 +454,14 @@ gm_royale: circleColor(tar,lx+map_hmw-vid_cam_x,ly+map_hmw-vid_cam_y,g_royal_r,u
     begin
        vid_prims-=1;
 
-       x0+=lx-vid_cam_x;
-       y0+=ly-vid_cam_y;
+       x0+=lx-ui_cam_x;
+       y0+=ly-ui_cam_y;
        if(kind=uinfo_rect)
        or(kind=uinfo_box)
        or(kind=uinfo_line)then
        begin
-          x1+=lx-vid_cam_x;
-          y1+=ly-vid_cam_y;
+          x1+=lx-ui_cam_x;
+          y1+=ly-ui_cam_y;
           if(kind<>uinfo_line)then
           begin
           if(x0>x1)then begin t:=x0;x0:=x1;x1:=t;end;
@@ -507,12 +507,12 @@ var i,t,
     spr  :PTMWTexture;
 begin
    draw_sdlsurface(tar,
-   lx-vid_cam_x mod ter_w,
-   ly-vid_cam_y mod ter_h,
+   lx-ui_cam_x mod ter_w,
+   ly-ui_cam_y mod ter_h,
    vid_terrain);
 
-   vx:=vid_cam_x-vid_ab;
-   vy:=vid_cam_y-vid_ab;
+   vx:=ui_cam_x-vid_ab;
+   vy:=ui_cam_y-vid_ab;
 
    if(theme_decaln>0)then
     for i:=1 to _tdecaln do
@@ -552,8 +552,8 @@ var t,i:integer;
    ddir:single;
   color:cardinal;
 begin
-   for t:=1 to MaxCPoints do
-    with g_cpoints[t] do
+   for t:=0 to LastKeyPoint do
+    with g_KeyPoints[t] do
      if(cpCaptureR>0)and(RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then
      begin
         color:=GetCPColor(t);
@@ -571,7 +571,7 @@ begin
            end;
         end
         else
-          if(t=1)and(g_mode=gm_koth)then
+          if(t=0)and(map_scenario=mc_KotH)then
           begin
              for i:=1 to 24 do
              begin
@@ -647,16 +647,16 @@ begin
     for ci:=1 to pfNodes_c do
      with pfNodes[ci] do
      begin
-        ssx:=(pos_x*pf_pathmap_w+pf_pathmap_hw)-vid_cam_x+lx;
-        ssy:=(pos_y*pf_pathmap_w+pf_pathmap_hw)-vid_cam_y+ly;
+        ssx:=(pos_x*pf_pathmap_w+pf_pathmap_hw)-ui_cam_x+lx;
+        ssy:=(pos_y*pf_pathmap_w+pf_pathmap_hw)-ui_cam_y+ly;
         circleColor(tar,ssx,ssy,16,c_lime);
-        cx:=(rootx*pf_pathmap_w+pf_pathmap_hw)-vid_cam_x+lx;
-        cy:=(rooty*pf_pathmap_w+pf_pathmap_hw)-vid_cam_y+ly;
+        cx:=(rootx*pf_pathmap_w+pf_pathmap_hw)-ui_cam_x+lx;
+        cy:=(rooty*pf_pathmap_w+pf_pathmap_hw)-ui_cam_y+ly;
         linecolor(tar,ssx,ssy,cx,cy,c_green);
      end;
 
-   ssx:=lx-(vid_cam_x mod pf_pathmap_w);
-   sty:=ly-(vid_cam_y mod pf_pathmap_w);
+   ssx:=lx-(ui_cam_x mod pf_pathmap_w);
+   sty:=ly-(ui_cam_y mod pf_pathmap_w);
 
    ci:=5;
 
@@ -670,8 +670,8 @@ begin
       ssy:=sty;
       while(ssy<vid_vh)do
       begin
-         cx:= (vid_cam_x+ssx+pf_pathmap_hw-lx) div pf_pathmap_w ;
-         cy:= (vid_cam_y+ssy+pf_pathmap_hw-ly) div pf_pathmap_w;
+         cx:= (ui_cam_x+ssx+pf_pathmap_hw-lx) div pf_pathmap_w ;
+         cy:= (ui_cam_y+ssy+pf_pathmap_hw-ly) div pf_pathmap_w;
          pf:=pf_pathgrid_areas[cx , cy  ];
 
          if(pf=pf_solid)
@@ -707,7 +707,7 @@ begin
       end;
       if(ui_msk>0)then
       begin
-         boxColor(tar,vid_panelw,0,vid_cam_w,vid_cam_h,rgba2c(255,255,255,ui_msk));
+         boxColor(tar,ui_CtrlPanelW,0,vid_cam_w,vid_cam_h,rgba2c(255,255,255,ui_msk));
          if(vid_rtui=0)then dec(ui_msks,1);
       end;
    end;  }
@@ -722,10 +722,10 @@ begin
 
    //draw_text(r_screen,750,0,b2pm[map_ffly] , ta_right,255, c_white);
 
-  { with g_players[HPlayer] do
+  { with g_players[LocalPlayer] do
    begin
-      draw_text(r_screen,vid_panelw,200,i2s(ai_pushtimei) , ta_left,255, c_white);
-      draw_text(r_screen,vid_panelw,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
+      draw_text(r_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_left,255, c_white);
+      draw_text(r_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
    end;       }
 
    if(ks_shift>0) then
@@ -755,8 +755,8 @@ begin
     with uid^ do
      if(hits>dead_hits)or(u=ai_scout_u_cur)then
      begin
-        ix:=x-vid_cam_x+vid_mapx;
-        iy:=y-vid_cam_y+vid_mapy;
+        ix:=x-ui_cam_x+vid_mapx;
+        iy:=y-ui_cam_y+vid_mapy;
 
         //draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, PlayerGetColor(playeri));
 
@@ -767,18 +767,18 @@ begin
           // circleColor(r_screen,ix,iy,srange,c_white);
            if(sel)then
            begin
-              //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-vid_cam_x  ,vid_mapy+pf_mv_ny-vid_cam_y  ,c_red );
-              //lineColor(r_screen,ix,iy,vid_mapx+mv_x    -vid_cam_x+1,vid_mapy+mv_y    -vid_cam_y+1,c_lime);
+              //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-ui_cam_x  ,vid_mapy+pf_mv_ny-ui_cam_y  ,c_red );
+              //lineColor(r_screen,ix,iy,vid_mapx+mv_x    -ui_cam_x+1,vid_mapy+mv_y    -ui_cam_y+1,c_lime);
 
-              //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_x+vid_mapx;
-              //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-vid_cam_y+vid_mapy;
+              //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_x+vid_mapx;
+              //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_y+vid_mapy;
 
                //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
-              lineColor(r_screen,ix+1,iy+1,uo_x+vid_mapx-vid_cam_x  ,uo_y-vid_cam_y  ,c_white);
+              lineColor(r_screen,ix+1,iy+1,uo_x+vid_mapx-ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
 
               if(aiu_alarm_d<32000)then
-              lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-vid_cam_x  ,aiu_alarm_y+vid_mapy-vid_cam_y  ,c_red );
+              lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-ui_cam_x  ,aiu_alarm_y+vid_mapy-ui_cam_y  ,c_red );
            end;
 
            draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
@@ -796,20 +796,20 @@ begin
         end;
 
         {if(hits>0)and(transport=0)then
-        if(playeri=HPlayer)then
+        if(playeri=LocalPlayer)then
         begin
            if(isbuild)then
            begin
               if(alrm_x>0)then
-               lineColor(r_screen,ix,iy,alrm_x-vid_cam_x,alrm_y-vid_cam_y,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
+               lineColor(r_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
            end
            else
            begin
               if(alrm_x>0)then
-               lineColor(r_screen,ix,iy,alrm_x-vid_cam_x,alrm_y-vid_cam_y,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
+               lineColor(r_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
            end;
            if(uo_x>0)then
-            lineColor(r_screen,ix,iy,uo_x-vid_cam_x,uo_y-vid_cam_y,c_white);
+            lineColor(r_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);
         end;
 
         draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, PlayerGetColor(playeri));}
@@ -820,8 +820,8 @@ begin
         begin
            //draw_text(r_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop]), ta_left,255, plcolor[player]);
 
-           //if(tar1>0)then lineColor(r_screen,ix,iy,g_units[tar1].x-vid_cam_x,g_units[tar1].y-vid_cam_y,c_white);
-            //lineColor(r_screen,ix+10,iy+10,uo_x-vid_cam_x,uo_y-vid_cam_y,c_white);  and(player=HPlayer)
+           //if(tar1>0)then lineColor(r_screen,ix,iy,g_units[tar1].x-ui_cam_x,g_units[tar1].y-ui_cam_y,c_white);
+            //lineColor(r_screen,ix+10,iy+10,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);  and(player=LocalPlayer)
         end;
 
          //draw_text(r_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
@@ -831,7 +831,7 @@ begin
 
         {if(hits>0)then                      +' '+i2s(utrain)
          if(k_shift>2)
-         then lineColor(r_screen,ix,iy,uo_x-vid_cam_x,uo_y-vid_cam_y,c_black)
+         then lineColor(r_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_black)
          else
            if(alrm_x<>0)then
 
@@ -842,12 +842,12 @@ begin
      end;
 
    if(ks_ctrl>0)then
-   for u:=1 to MaxMissiles do
+   for u:=0 to MaxMissiles do
    with g_missiles[u] do
    if(vstep>0)then
    begin
-      ix:=vx-vid_cam_x+vid_mapx;
-      iy:=vy-vid_cam_y+vid_mapy;
+      ix:=vx-ui_cam_x+vid_mapx;
+      iy:=vy-ui_cam_y+vid_mapy;
 
       circleColor(r_screen,ix,iy,5,c_lime);
       draw_text(r_screen,ix,iy,i2s(dir), ta_left,255, c_white);
@@ -856,8 +856,8 @@ begin
    {for u:=0 to 255 do
     if(ordx[u]>0)then
     begin
-       ix:=ordx[u]-vid_cam_x;
-       iy:=ordy[u]-vid_cam_y;
+       ix:=ordx[u]-ui_cam_x;
+       iy:=ordy[u]-ui_cam_y;
 
        draw_text(r_screen,ix,iy,i2s(u), ta_left,255, c_white);
     end; }

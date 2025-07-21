@@ -4,14 +4,14 @@ var i:byte;
 begin
    net_NewPlayer:=0;
    for i:=1 to MaxPlayers do
-    if(i<>HPlayer)then
+    if(i<>LocalPlayer)then
      with g_players[i] do
       if(state=PS_None)then
       begin
          net_NewPlayer:=i;
          nip          :=sip;
          nport        :=sp;
-         state        :=PS_Play;
+         state        :=ps_human;
          ttl          :=0;
          {$IFNDEF _FULLGAME}
          GameLogCommon(i,0,'MarsWars dedicated server, '+str_ver,false);
@@ -25,9 +25,9 @@ var i:byte;
 begin
    net_GetPlayer:=0;
    for i:=1 to MaxPlayers do
-    if(i<>HPlayer)then
+    if(i<>LocalPlayer)then
      with g_players[i] do
-      if(state=PS_Play)and(nip=aip)and(nport=ap)then
+      if(state=ps_human)and(nip=aip)and(nport=ap)then
       begin
          net_GetPlayer:=i;
          if(ttl>=fr_fps1)then {$IFNDEF _FULLGAME}screen_redraw{$ELSE}vid_menu_redraw{$ENDIF}:=true;
@@ -46,12 +46,12 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      if(length(name)>NameLen)then setlength(name,NameLen);
+      if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
       if(oldname<>name)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
 
       i:=net_readbyte;
-      if(g_mode in gm_fixed_teams)and(i<>0)and(team<>0)
-      then i:=PlayerValidateTeam(g_mode,pid);
+      if(map_scenario in mc_fixed_teams)and(i<>0)and(team<>0)
+      then i:=PlayerValidateTeam(map_scenario,pid);
 
       if(i<>team)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
       team:=i;
@@ -92,20 +92,20 @@ begin
     end;
 
    net_writebyte(pid         );
-   net_writebyte(HPlayer     );
+   net_writebyte(LocalPlayer     );
 
-   net_writeint (map_mw      );
-   net_writebyte(map_obs     );
+   net_writeint (map_Size      );
+   net_writebyte(map_Obstacles     );
    net_writecard(map_seed    );
-   net_writebool(map_symmetry);
+   net_writebool(map_Symmetry);
 
-   net_writebyte(g_mode           );
-   net_writebool(g_fixed_positions);
-   net_writebyte(g_ai_slots       );
-   net_writebyte(g_generators     );
-   net_writebool(g_deadobservers  );
+   net_writebyte(map_scenario           );
+   net_writebool(g_FixedPositions);
+   net_writebyte(g_AISlots       );
+   net_writebyte(map_generators     );
+   net_writebool(g_DefeatedObs  );
 
-   if(G_Started)and(not g_fixed_positions)then
+   if(G_Started)and(not g_FixedPositions)then
     for i:=1 to MaxPlayers do
     begin
        net_writeint(map_psx[i]);
@@ -142,7 +142,7 @@ begin
       if(mid=nmid_connect)then
       begin
          i:=net_readbyte;
-         if(i<>ver)then
+         if(i<>g_version)then
          begin
             net_clearbuffer;
             net_writebyte(nmid_wrong_ver);
@@ -274,18 +274,20 @@ nmid_pause       : begin
                                             map_seed:=c;
                                             if(screen_redraw)then map_premap;
                                          end;
+                 nmid_lobby_MScenario,
+                 nmid_lobby_MGenerators,
                  nmid_lobby_MSize,
                  nmid_lobby_MObs,
                  nmid_lobby_MSym,
                  nmid_lobby_MRandom,
-                 nmid_lobby_GMode,
-                 nmid_lobby_GFixPos,
+
+                 nmid_lobby_GFixedPositions,
                  nmid_lobby_GAISlots,
-                 nmid_lobby_GGen,
-                 nmid_lobby_GDeadObs,
-                 nmid_lobby_GRandomScir: begin
-                                         menu_GameMapSetting(mid,net_readbool);
-                                         screen_redraw:=true;
+                 nmid_lobby_GDefeatedObs,
+                 nmid_lobby_GRandomScirmish
+                                       : begin
+                                            GameSetOption(mid,net_readbool,false);
+                                            screen_redraw:=true;
                                          end;
                  {$ENDIF}
                  end;
@@ -303,9 +305,9 @@ nmid_pause       : begin
    net_period_step:=(net_period mod NetTickN)=0;
 
    for i:=1 to MaxPlayers do
-    if(i<>HPlayer)then
+    if(i<>LocalPlayer)then
      with g_players[i] do
-      if(state=PS_Play)and(ttl<ClientTTL)then
+      if(state=ps_human)and(ttl<ClientTTL)then
       begin
          if(G_Started)and(net_period_step)then
          begin
@@ -353,20 +355,20 @@ begin
    redraw_menu:=false;
    new_map    :=false;
 
-   if(_rmInt (@map_mw           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@map_obs          ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmInt (@map_Size           ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@map_Obstacles          ))then begin redraw_menu:=true;new_map:=true;end;
    if(_rmCard(@map_seed         ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmBool(@map_symmetry     ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_mode           ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmBool(@g_fixed_positions))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmByte(@g_ai_slots       ))then begin redraw_menu:=true;              end;
-   if(_rmByte(@g_generators     ))then begin redraw_menu:=true;new_map:=true;end;
-   if(_rmBool(@g_deadobservers  ))then begin redraw_menu:=true;              end;
+   if(_rmBool(@map_Symmetry     ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@map_scenario           ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmBool(@g_FixedPositions))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmByte(@g_AISlots       ))then begin redraw_menu:=true;              end;
+   if(_rmByte(@map_generators     ))then begin redraw_menu:=true;new_map:=true;end;
+   if(_rmBool(@g_DefeatedObs  ))then begin redraw_menu:=true;              end;
 
    if(new_map    )then Map_premap;
    if(redraw_menu)then vid_menu_redraw:=true;
 
-   if(StartGame)and(not g_fixed_positions)then
+   if(StartGame)and(not g_FixedPositions)then
     for i:=1 to MaxPlayers do
     begin
        map_psx[i]:=net_readint;
@@ -382,7 +384,7 @@ begin
    begin
       oldname:=name;
       name   :=net_readstring;
-      if(length(name)>NameLen)then setlength(name,NameLen);
+      if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
       if(oldname<>name)then vid_menu_redraw:=true;
 
       i      :=team;
@@ -440,8 +442,8 @@ nmid_notconnected: begin
                       GameDefaultAll;
                    end;
 nmid_chatclupd   : begin
-                      _rudata_log(HPlayer,false);
-                      net_chat_shlm:=chat_shlm_t;
+                      _rudata_log(LocalPlayer,false);
+                      net_chat_shlm:=chat_LastMsgTime;
                       net_period:=0;
                    end;
 nmid_lobby_info  : begin
@@ -457,8 +459,8 @@ nmid_lobby_info  : begin
                           PlayerSetSkirmishTech(i);
                        end;
 
-                      i:=HPlayer;
-                      HPlayer:=net_readbyte;if(HPlayer    <>i)then vid_menu_redraw:=true;
+                      i:=LocalPlayer;
+                      LocalPlayer:=net_readbyte;if(LocalPlayer    <>i)then vid_menu_redraw:=true;
                       i:=net_cl_Hoster;
                       net_cl_Hoster:=net_readbyte;
                       if(net_cl_Hoster<>i)then vid_menu_redraw:=true;
@@ -473,8 +475,8 @@ nmid_lobby_info  : begin
                          begin
                             MainMenu  :=false;
                             ServerSide:=false;
-                            MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
-                            if(g_players[HPlayer].team=0)then
+                            MoveCamToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
+                            if(g_players[LocalPlayer].team=0)then
                             begin
                                ui_tab  :=3;
                                UIPlayer:=0;
@@ -497,7 +499,7 @@ nmid_lobby_info  : begin
             G_Status:=net_readbyte;
 
             if(G_Status=gs_running)
-            then _rclinet_gframe(HPlayer,false,false);
+            then _rclinet_gframe(LocalPlayer,false,false);
          end;
       end;
    end;
@@ -508,18 +510,18 @@ nmid_lobby_info  : begin
       if (G_Started=false) then
       begin
          net_writebyte  (nmid_connect);
-         net_writebyte  (ver);
+         net_writebyte  (g_version);
          net_writestring(PlayerName );
          net_writebyte  (PlayerTeam );
          net_writebyte  (PlayerRace );
          net_writebool  (PlayerReady);
-         net_writebyte  (_cl_pnua[net_pnui]);
+         net_writebyte  (Quality2Units[net_cl_Quality]);
          net_writecard  (net_log_n  );
       end
       else
       begin
          net_writebyte(nmid_client_info);
-         net_writebyte(_cl_pnua[net_pnui]);
+         net_writebyte(Quality2Units[net_cl_Quality]);
          net_writecard(net_log_n);
       end;
       net_send(net_cl_svip,net_cl_svport);

@@ -187,8 +187,8 @@ function net_LastinPort:word    ;begin net_LastinPort:=net_buffer^.address.port;
 
 procedure net_sv_sport;
 begin
-   net_port:=s2w(net_sv_pstr);
-   net_sv_pstr:=w2s(net_port);
+   net_port:=s2w(net_sv_StrPort);
+   net_sv_StrPort:=w2s(net_port);
 end;
 
 function ip2c(s:shortstring;isip:pboolean):cardinal;
@@ -238,16 +238,16 @@ ipstruct: TIPaddress;
 begin
    addr_str:='';
    port_str:='';
-   p    :=pos(':',net_cl_svstr);
+   p    :=pos(':',net_cl_StrAddr);
    if(p>0)then
    begin
-      addr_str:=copy(net_cl_svstr,1,p-1);
-      delete(net_cl_svstr,1,p);
-      port_str:=net_cl_svstr;
+      addr_str:=copy(net_cl_StrAddr,1,p-1);
+      delete(net_cl_StrAddr,1,p);
+      port_str:=net_cl_StrAddr;
    end
    else
    begin
-      addr_str:=net_cl_svstr;
+      addr_str:=net_cl_StrAddr;
       port_str:='10666';
    end;
 
@@ -258,11 +258,11 @@ begin
    if(isip)then
    begin
       net_cl_svip  :=ipc;
-      net_cl_svstr:=c2ip(net_cl_svip)+':'+port_str;
+      net_cl_StrAddr:=c2ip(net_cl_svip)+':'+port_str;
    end
    else
    begin
-      net_cl_svstr:=addr_str+':'+port_str;
+      net_cl_StrAddr:=addr_str+':'+port_str;
       addr_str+=#0;
       pstr:=@addr_str[1];
       if(SDLNet_ResolveHost(ipstruct,pstr,net_cl_svport)=0)

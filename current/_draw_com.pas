@@ -147,9 +147,9 @@ var i  :byte;
 begin
    for i:=0 to MaxPlayers do
    begin
-      if(g_mode in [gm_invasion,gm_koth])and(i=0)then continue;
+      if(map_scenario in [mc_invasion,mc_KotH])and(i=0)then continue;
 
-      //if(g_ai_slots=0)then
+      //if(g_AISlots=0)then
       // if(g_players[i].state=ps_none)then continue;
 
       x:=round(map_psx[i]*map_mmcx);
@@ -164,10 +164,10 @@ end;
 procedure map_MinimapCPoints;
 var i  :byte;
 begin
-   for i:=1 to MaxCPoints do
-    with g_cpoints[i] do
+   for i:=0 to LastKeyPoint do
+    with g_KeyPoints[i] do
      if(cpCaptureR>0)then
-      if((i=0)and(g_mode=gm_koth))or(cpenergy<=0)
+      if((i=0)and(map_scenario=mc_KotH))or(cpenergy<=0)
       then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
       else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );
 end;
@@ -177,10 +177,9 @@ begin
    sdl_FillRect(r_minimap,nil,0);
    map_MinimapUpdateBackground;
    draw_sdlsurface(r_minimap,0,0,r_bminimap);
-   if(g_fixed_positions)then map_MinimapPlayerStarts;
+   if(g_FixedPositions)then map_MinimapPlayerStarts;
    map_MinimapCPoints;
-   draw_sdlsurface(spr_mback,ui_menu_map_x0,ui_menu_map_y0,r_minimap);
-   rectangleColor(spr_mback,ui_menu_map_x0,ui_menu_map_y0,ui_menu_map_x0+r_minimap^.w,ui_menu_map_y0+r_minimap^.h,c_white);
+   draw_sdlsurface(r_mminimap,0,0,r_minimap);
    vid_menu_redraw:=vid_menu_redraw or MainMenu;
 end;
 
@@ -214,8 +213,8 @@ begin
    }
    ui_AddMarker:=false;
 
-   ax:=mm3(1,ax,map_mw);
-   ay:=mm3(1,ay,map_mw);
+   ax:=mm3i(1,ax,map_Size);
+   ay:=mm3i(1,ay,map_Size);
 
    mx:=trunc(ax*map_mmcx);
    my:=trunc(ay*map_mmcx);

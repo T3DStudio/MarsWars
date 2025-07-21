@@ -39,13 +39,13 @@ smt_missile : if(animk=sms_death)
               else i:=dd;
 
 smt_buiding : case animk of
-        sms_build: i:=mm3(0,anim,2);
+        sms_build: i:=mm3i(0,anim,2);
         sms_death: exit;
               else i:=aa3(3,3+anim,sk);
               end;
 
 smt_turret  : case animk of
-        sms_build: i:=mm3(0,anim,2);
+        sms_build: i:=mm3i(0,anim,2);
         sms_dattack,
         sms_mattack,
         sms_cast : i:=11+dd;
@@ -54,7 +54,7 @@ smt_turret  : case animk of
               end;
 
 smt_turret2 : case animk of
-        sms_build: i:=mm3(0,anim,2);
+        sms_build: i:=mm3i(0,anim,2);
         sms_death: exit;
               else i:=3 +dd;
               end;
@@ -305,7 +305,7 @@ smt_terminat :case animk of
          if(i>sk)then stat^:=2;
       end;
 
-      _sm2s:=@sl[mm3(0,i,sk)];
+      _sm2s:=@sl[mm3i(0,i,sk)];
    end;
 end;
 

@@ -82,19 +82,21 @@ end;
 
 procedure map_RandomBase;
 begin
-   map_iseed   := word(map_seed);
-   map_rpos    := byte(map_seed);
+   g_random_i:= word(map_seed);
+   g_random_p:= byte(map_seed);
 end;
 
 procedure map_vars;
 begin
    map_RandomBase;
 
-   map_b1      := map_mw-map_b0;
-   map_hmw     := map_mw div 2;
+   map_b1      := map_Size-map_b0;
+   map_hmw     := map_Size div 2;
    {$IFDEF _FULLGAME}
-   if(menu_s2<>ms2_camp)then map_mw:=mm3(MinSMapW,map_mw,MaxSMapW);
-   map_mmcx    := (vid_panelw-2)/map_mw;
+   if(g_type<>gt_campaing)then
+   map_Size      := mm3i(map_MinSize,map_Size,map_MaxSize);
+
+   map_mmcx    := (ui_CtrlPanelW-2)/map_Size;
    map_mmvw    := trunc(vid_cam_w*map_mmcx)+1;
    map_mmvh    := trunc(vid_cam_h*map_mmcx)+1;
    {$ENDIF}
@@ -111,7 +113,7 @@ begin
    _PlayerStartHere:=false;
 
    if(check_symmetry)then
-    if(point_dist_int(x,y,map_mw-x,map_mw-y)<m)then
+    if(point_dist_int(x,y,map_Size-x,map_Size-y)<m)then
     begin
        _PlayerStartHere:=true;
        exit;
@@ -136,16 +138,16 @@ begin
    _CPointHere:=false;
 
    if(check_symmetry)then
-    if(point_dist_int(x,y,map_mw-x,map_mw-y)<(m*2))then
+    if(point_dist_int(x,y,map_Size-x,map_Size-y)<(m*2))then
     begin
        _CPointHere:=true;
        exit;
     end;
 
-   for p:=1 to MaxCpoints do
-    with g_cpoints[p] do
+   for p:=0 to LastKeyPoint do
+    with g_KeyPoints[p] do
      if(cpCaptureR>0)then
-      if(point_dist_int(x,y,cpx,cpy)<(m+max2(cpsolidr,cpCaptureR)))then
+      if(point_dist_int(x,y,cpx,cpy)<(m+max2i(cpsolidr,cpCaptureR)))then
       begin
          _CPointHere:=true;
          break;
@@ -168,13 +170,13 @@ end;
 procedure map_Starts_Default;
 var ix,iy,i,u,c,bb0,bb1,dst:integer;
 begin
-   bb0:=base_1r+(map_mw-MinSMapW) div 7;
-   bb1:=map_mw-(bb0*2);
-   dst:=(map_mw div 5)+base_1r;
+   bb0:=base_1r+(map_Size-map_MinSize) div 7;
+   bb1:=map_Size-(bb0*2);
+   dst:=(map_Size div 5)+base_1r;
 
    for i:=1 to MaxPlayers do
    begin
-      if(map_symmetry)and(i>3)then break;
+      if(map_Symmetry)and(i>3)then break;
       c:=0;
       u:=dst;
       while true do
@@ -185,27 +187,29 @@ begin
          if(c>500 )then u-=1;
 
          if(c>1000)
-         or(_PlayerStartHere(ix,iy,u,map_symmetry)=false)then break;
+         or(_PlayerStartHere(ix,iy,u,map_Symmetry)=false)then break;
       end;
 
       map_psx[i]:=ix;
       map_psy[i]:=iy;
-      if(map_symmetry)then
+      if(map_Symmetry)then
       begin
-         map_psx[i+3]:=map_mw-map_psx[i];
-         map_psy[i+3]:=map_mw-map_psy[i];
+         map_psx[i+3]:=map_Size-map_psx[i];
+         map_psy[i+3]:=map_Size-map_psy[i];
       end;
    end;
 end;
 
-procedure map_ShuffleStarts;
-var x,y:byte;
-    i:integer;
+procedure map_ShuffleStarts(teamShuffle:boolean);
+var
+x,y:byte;
+  i:integer;
 begin
    for x:=1 to MaxPlayers do
-    for y:=1 to MaxPlayers do
-     if(random(2)=0)then
+   for y:=1 to MaxPlayers do
+     if(random(2)=0)and(x<>y)then
      begin
+        if(teamShuffle)and(g_players[x].team<>g_players[y].team)then continue;
         i:=map_psx[x];map_psx[x]:=map_psx[y];map_psx[y]:=i;
         i:=map_psy[x];map_psy[x]:=map_psy[y];map_psy[y]:=i;
      end;
@@ -214,8 +218,8 @@ end;
 procedure map_CPoints_UpdatePFZone;
 var pn:integer;
 begin
-   for pn:=1 to MaxCPoints do
-    with g_cpoints[pn] do
+   for pn:=0 to LastKeyPoint do
+    with g_KeyPoints[pn] do
      if(cpCaptureR>0)then cpzone:=pf_get_area(cpx,cpy);
 end;
 
@@ -224,17 +228,17 @@ var ix,iy,i,u,b,c:integer;
 function _setcpoint(px,py:integer):boolean;
 var pn:byte;
 begin
-   for pn:=1 to MaxCPoints do
-    if(g_cpoints[pn].cpCaptureR<=0)then break;
+   for pn:=0 to LastKeyPoint do
+    if(g_KeyPoints[pn].cpCaptureR<=0)then break;
 
-   if(pn>MaxCPoints)then
+   if(pn>LastKeyPoint)then
    begin
       _setcpoint:=true;
       exit;
    end
    else _setcpoint:=false;
 
-   with g_cpoints[pn] do
+   with g_KeyPoints[pn] do
    begin
       cpx          :=px;
       cpy          :=py;
@@ -253,26 +257,26 @@ begin
    end;
 end;
 begin
-   if(newpoints)then FillChar(g_cpoints,SizeOf(g_cpoints),0);
-   u:=map_mw div 50;
-   b:=map_mw-(u*2);
+   if(newpoints)then FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
+   u:=map_Size div 50;
+   b:=map_Size-(u*2);
 
    i:=0;
    while(i<num)do
    begin
-      i+=1+byte(map_symmetry);
+      i+=1+byte(map_Symmetry);
       c:=0;
       while(c<1000)do
       begin
          ix:=u+_random(b);
          iy:=u+_random(b);
 
-         if (not _PlayerStartHere(ix,iy,base_1rh,map_symmetry))
-         and(not _CPointHere(ix,iy,base_1rh,map_symmetry))then
+         if (not _PlayerStartHere(ix,iy,base_1rh,map_Symmetry))
+         and(not _CPointHere(ix,iy,base_1rh,map_Symmetry))then
          begin
             if(_setcpoint(ix,iy))then exit;
-            if(map_symmetry)then
-             if(_setcpoint(map_mw-ix,map_mw-iy))then exit;
+            if(map_Symmetry)then
+             if(_setcpoint(map_Size-ix,map_Size-iy))then exit;
             break;
          end;
          c+=1;
@@ -289,12 +293,12 @@ begin
       map_psy[i]:=-5000;
    end;
 
-   case g_mode of
-gm_3x3 :
+   case map_scenario of
+mc_3x3 :
       begin
-         ix:=map_mw div 2;
-         iy:=base_2r+(map_mw div 25);
-         u :=ix-(map_mw div 7);
+         ix:=map_Size div 2;
+         iy:=base_2r+(map_Size div 25);
+         u :=ix-(map_Size div 7);
          i :=map_seed mod 360;
 
          map_psx[1]:=trunc(ix+cos(i*degtorad)*u);
@@ -306,17 +310,17 @@ gm_3x3 :
          map_psx[3]:=map_psx[1]+trunc(cos(i*degtorad)*iy);
          map_psy[3]:=map_psy[1]+trunc(sin(i*degtorad)*iy);
 
-         map_psx[4]:=map_mw-map_psx[1];
-         map_psy[4]:=map_mw-map_psy[1];
-         map_psx[5]:=map_mw-map_psx[2];
-         map_psy[5]:=map_mw-map_psy[2];
-         map_psx[6]:=map_mw-map_psx[3];
-         map_psy[6]:=map_mw-map_psy[3];
+         map_psx[4]:=map_Size-map_psx[1];
+         map_psy[4]:=map_Size-map_psy[1];
+         map_psx[5]:=map_Size-map_psx[2];
+         map_psy[5]:=map_Size-map_psy[2];
+         map_psx[6]:=map_Size-map_psx[3];
+         map_psy[6]:=map_Size-map_psy[3];
       end;
-gm_2x2x2:
+mc_2x2x2:
       begin
-         ix:=map_mw div 2;
-         iy:=base_2r+(map_mw div 30);
+         ix:=map_Size div 2;
+         iy:=base_2r+(map_Size div 30);
          u :=ix-(ix div 3);
          c :=map_seed mod 360;
 
@@ -340,41 +344,38 @@ gm_2x2x2:
          map_psx[6]:=map_psx[5]+trunc(cos(i*degtorad)*iy);
          map_psy[6]:=map_psy[5]+trunc(sin(i*degtorad)*iy);
       end;
-gm_invasion:
+mc_invasion:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
          map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),base_2r);
       end;
-gm_KotH:
+mc_KotH:
       begin
          map_psx[0]:=map_hmw;
          map_psy[0]:=map_hmw;
-         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 8));
-         if(not g_fixed_positions)then map_ShuffleStarts;
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_Size div 8));
       end;
-gm_royale :
+mc_royale :
       begin
-         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_mw div 5));
-         if(not g_fixed_positions)then map_ShuffleStarts;
+         map_Starts_Circle(map_hmw,map_hmw,integer(map_seed),map_hmw-(map_Size div 5));
       end;
-gm_capture:
+mc_capture:
       begin
          map_Starts_Default;
-         if(not g_fixed_positions)then map_ShuffleStarts;
       end;
    else
          map_Starts_Default;
-         if(not g_fixed_positions)then map_ShuffleStarts;
    end;
+   if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
 end;
 
 procedure map_CPoints;
 begin
-   FillChar(g_cpoints,SizeOf(g_cpoints),0);
+   FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
 
-   case g_mode of
-gm_KotH   : with g_cpoints[1] do
+   case map_scenario of
+mc_KotH   : with g_KeyPoints[0] do
             begin
                cpx:=map_hmw;
                cpy:=map_hmw;
@@ -387,11 +388,11 @@ gm_KotH   : with g_cpoints[1] do
                cpmr:=round(cpCaptureR*map_mmcx)+1;
                {$ENDIF}
             end;
-gm_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
+mc_capture: map_CPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0,true);
    end;
 
-   if(g_generators>0)then
-    map_CPoints_Default(MaxCPoints,50,gm_cptp_gr,gm_cptp_gr-25,g_cgenerators_energy,gm_cptp_gtime,g_cgenerators_ltime[g_generators],false);
+   if(map_generators>0)then
+    map_CPoints_Default(LastKeyPoint,50,gm_cptp_gr,gm_cptp_gr-25,map_generators_Energy,gm_cptp_gtime,map_generators_LifeTime[map_generators],false);
 end;
 
 function _dnear(td:byte;ix,iy:pinteger):boolean;
@@ -400,12 +401,12 @@ begin
    _dnear:=false;
 
    with map_dds[0] do
-   if(map_symmetry)then
+   if(map_Symmetry)then
    begin
       t:=td;
       r:=DID_R[td];
-      x:=map_mw-ix^;
-      y:=map_mw-iy^;
+      x:=map_Size-ix^;
+      y:=map_Size-iy^;
    end
    else
    begin
@@ -431,10 +432,10 @@ begin
    or(_PlayerStartHere (ix,iy,doodad_r,false))
    then _checkPlace:=true
    else
-     if(map_symmetry)then
+     if(map_Symmetry)then
      begin
-        ix:=map_mw-ix;
-        iy:=map_mw-iy;
+        ix:=map_Size-ix;
+        iy:=map_Size-iy;
         if(_dnear(di,@ix,@iy))
         or(_PlayerStartHere (ix,iy,doodad_r,false))then _checkPlace:=true;
      end;
@@ -447,7 +448,7 @@ begin
    else
    begin
       _dds_a(ix^,iy^,di);
-      if(map_symmetry)then _dds_a(map_mw-ix^,map_mw-iy^,di);
+      if(map_Symmetry)then _dds_a(map_Size-ix^,map_Size-iy^,di);
       _trysetdd:=true;
    end;
 end;
@@ -506,7 +507,7 @@ begin
 
    cx:=(map_hmw mod cellw);
    if(cx>=cellhw)then cx-=cellw;
-   cx:=map_mw-cx;
+   cx:=map_Size-cx;
    odd:=false;
 
    iy:=map_hmw;
@@ -519,15 +520,15 @@ begin
       odd:=not odd;
       while(ix>-cellhw)do
       begin
-         if(not _PlayerStartHere(ix,iy,base_1r+cellw,map_symmetry))then
+         if(not _PlayerStartHere(ix,iy,base_1r+cellw,map_Symmetry))then
          begin
             _dds_a(ix,iy,1);
             map_FillSea+=1;
          end;
          if(iy<>0)then
-           if(not _PlayerStartHere(map_mw-ix,map_mw-iy,base_1r+cellw,map_symmetry))then
+           if(not _PlayerStartHere(map_Size-ix,map_Size-iy,base_1r+cellw,map_Symmetry))then
            begin
-              _dds_a(map_mw-ix,map_mw-iy,1);
+              _dds_a(map_Size-ix,map_Size-iy,1);
               map_FillSea+=1;
            end;
          ix-=cellw;
@@ -551,24 +552,24 @@ begin
       setlength(l,n);
    end;
 
-   ddc:=trunc(MaxDoodads*((sqr(map_mw) div ddc_div)/ddc_cf))+1;
+   ddc:=trunc(MaxDoodads*((sqr(map_Size) div ddc_div)/ddc_cf))+1;
 
-   if(map_symmetry)
-   then ddc:=mm3(1,round(ddc/2),MaxDoodads)
-   else ddc:=mm3(1,      ddc   ,MaxDoodads);
+   if(map_Symmetry)
+   then ddc:=mm3i(1,round(ddc/2),MaxDoodads)
+   else ddc:=mm3i(1,      ddc   ,MaxDoodads);
 
-   //if(map_obs=7)then ddc-=map_FillSea;
+   //if(map_Obstacles=7)then ddc-=map_FillSea;
    //if(ddc<1)then ddc:=1;
 
    rks :=0;
    lqs :=0;
 
    i  :=(ddc div 11);
-   ix :=i*map_obs;
+   ix :=i*map_Obstacles;
    lqs:=ix div 4;
    rks:=ix-lqs;
 
-   ir :=base_1r+(map_mw div 100);
+   ir :=base_1r+(map_Size div 100);
    ix :=map_seed;
    iy :=0;
 
@@ -577,8 +578,8 @@ begin
       cnt:=0;
       while true do
       begin
-         ix:=_randomx(ix,map_mw);
-         iy:=_randomx(iy,map_mw); //+ix*cnt
+         ix:=_randomx(ix,map_Size);
+         iy:=_randomx(iy,map_Size); //+ix*cnt
 
          if(_PickDoodad(@ix,@iy,@lqs,@rks,ir))then break;
 
@@ -603,15 +604,18 @@ end;
 procedure Map_randomseed;
 begin
    map_seed:=random($FFFFFFFF)+(SDL_GetTicks shl 5);
+   {$IFDEF _FULLGAME}
+   menu_mseed:=c2s(map_seed);
+   {$ENDIF}
 end;
 
 procedure Map_randommap;
 begin
    Map_randomseed;
 
-   map_mw :=MinSMapW+round(random(MaxSMapW-MinSMapW)/StepSMap)*StepSMap;
-   map_obs:=random(8);
-   map_symmetry:=random(2)>0;
+   map_Size :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
+   map_Obstacles:=random(8);
+   map_Symmetry:=random(2)>0;
 end;
 
 procedure Map_premap({$IFDEF _FULLGAME}camp_theme:boolean=false{$ENDIF});

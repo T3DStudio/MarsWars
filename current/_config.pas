@@ -1,38 +1,39 @@
 
 const
 
-cfg_key_name    = 'player_name';
-cfg_key_sndv    = 'sound_volume';
-cfg_key_mlistn  = 'music_list_size';
-cfg_key_mscv    = 'music_volume';
-cfg_key_vspd    = 'scroll_speed';
-cfg_key_fscr    = 'fullscreen';
-cfg_key_vmm     = 'mouse_scroll';
-cfg_key_shdws   = 'colored_shadows';
-cfg_key_saddr   = 'server_addr';
-cfg_key_sport   = 'server_port';
-cfg_key_lng     = 'language';
-cfg_key_mai     = 'right_mouse_action';
-cfg_key_vidvw   = 'vid_width';
-cfg_key_vidvh   = 'vid_height';
-cfg_key_gsp     = 'g_show_positions';
-cfg_key_gai     = 'g_default_ai';
-cfg_key_gcg     = 'g_generators';
-cfg_key_rpnui   = 'UPT_replay';
-cfg_key_npnui   = 'UPT_network';
-cfg_key_ppos    = 'vid_panel';
-cfg_key_uhbar   = 'vid_health_bars';
-cfg_key_plcol   = 'vid_player_colors';
-cfg_key_APM     = 'vid_APM';
-cfg_key_FPS     = 'vid_FPS';
-cfg_key_menuSc  = 'vid_menu_scale';
-cfg_key_menuSs  = 'vid_menu_scale_smooth';
+cfg_key_PlayerName      = 'player_name';
+cfg_key_SoundVolume     = 'sound_volume';
+cfg_key_MusicVolume     = 'music_volume';
+cfg_key_MusicListSize   = 'music_list_size';
+cfg_key_NetSErverAddr   = 'net_server_addr';
+cfg_key_NetServerPort   = 'net_server_port';
+cfg_key_NetQuality      = 'net_quality';
+cfg_key_UICamScrollSpeed= 'ui_cam_scroll_speed';
+cfg_key_UICamMouseScroll= 'ui_mouse_scroll';
+cfg_key_UIColoredShadows= 'ui_colored_shadows';
+cfg_key_UILanguage      = 'ui_language';
+cfg_key_UIRMBAction     = 'ui_right_mouse_action';
+cfg_key_UICtrlPanelPos  = 'ui_ctrl_panel_pos';
+cfg_key_UIHealthBars    = 'ui_health_bars';
+cfg_key_UIPlayersColor  = 'ui_players_color';
+cfg_key_UIShowAPM       = 'ui_show_APM';
+cfg_key_VidResolutionW  = 'vid_width';
+cfg_key_VidResolutionH  = 'vid_height';
+cfg_key_VidWindowed     = 'vid_windowed';
+cfg_key_VidShowFPS      = 'vid_show_FPS';
+cfg_key_MapGenerators   = 'map_generators';
+cfg_key_GFixedSpawns    = 'g_fixed_positions';
+cfg_key_GAISlots        = 'g_AI_slots';
+cfg_key_GRecord         = 'g_record';
+cfg_key_GRecordQuality  = 'g_record_quality';
+cfg_key_menuScalse      = 'menu_scale';
+cfg_key_menuScaleSmooth = 'menu_scale_smooth';
 
 
 function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
 function si12b(b:single):byte  ;begin si12b:=trunc(b*255);end;
 
-procedure cfg_setval(vr,vl:string);
+procedure cfg_setval(vr,vl:shortstring);
 var vlw:word;
     vli:integer;
 begin
@@ -40,32 +41,33 @@ begin
    vli:=s2i(vl);
 
    case vr of
-cfg_key_name  : PlayerName       := vl;
-cfg_key_sndv  : snd_svolume1     := b2si1(vlw);
-cfg_key_mscv  : snd_mvolume1     := b2si1(vlw);
-cfg_key_mlistn: snd_musicListSize:= vlw;
-cfg_key_vspd  : vid_CamSpeed     := vli;
-cfg_key_fscr  : vid_fullscreen   :=(vl=b2c[true]);
-cfg_key_vmm   : vid_CamMScroll   :=(vl=b2c[true]);
-cfg_key_shdws : vid_ColoredShadow:=(vl=b2c[true]);
-cfg_key_saddr : net_cl_svstr     := vl;
-cfg_key_sport : net_sv_pstr      := vl;
-cfg_key_lng   : ui_language      :=(vl=b2c[true]);
-cfg_key_mai   : m_action         :=(vl=b2c[true]);
-cfg_key_vidvw : vid_vw           := vli;
-cfg_key_vidvh : vid_vh           := vli;
-cfg_key_gsp   : g_fixed_positions:=(vl=b2c[true]);
-cfg_key_gai   : g_ai_slots       := vlw;
-cfg_key_gcg   : g_generators    := vlw;
-cfg_key_rpnui : rpls_pnui        := vlw;
-cfg_key_npnui : net_pnui         := vlw;
-cfg_key_ppos  : vid_ppos         := vlw;
-cfg_key_uhbar : vid_uhbars       := vlw;
-cfg_key_plcol : vid_plcolors     := vlw;
-cfg_key_APM   : vid_APM          :=(vl=b2c[true]);
-cfg_key_FPS   : vid_FPS          :=(vl=b2c[true]);
-cfg_key_menuSc: vid_menu_scale   :=(vl=b2c[true]);
-cfg_key_menuSs: vid_menu_scales  :=(vl=b2c[true]);
+cfg_key_PlayerName      : PlayerName         := vl;
+cfg_key_SoundVolume     : snd_SoundVolume    := vlw;
+cfg_key_MusicVolume     : snd_MusicVolume    := vlw;
+cfg_key_MusicListSize   : snd_musicListSize  := vlw;
+cfg_key_NetSErverAddr   : net_cl_StrAddr     := vl;
+cfg_key_NetServerPort   : net_sv_StrPort     := vl;
+cfg_key_NetQuality      : net_cl_Quality     := vlw;
+cfg_key_UICamScrollSpeed: ui_CamSpeed        := vli;
+cfg_key_UICamMouseScroll: ui_MouseScroll     :=(vl=b2c[true]);
+cfg_key_UIColoredShadows: ui_ColoredShadow   :=(vl=b2c[true]);
+cfg_key_UILanguage      : ui_language        :=(vl=b2c[true]);
+cfg_key_UIRMBAction     : m_RightClickAct    :=(vl=b2c[true]);
+cfg_key_UICtrlPanelPos  : ui_ControlPanelPos := vlw;
+cfg_key_UIHealthBars    : ui_HealthBars      := vlw;
+cfg_key_UIPlayersColor  : ui_PlayersColor    := vlw;
+cfg_key_UIShowAPM       : ui_ShowAPM         :=(vl=b2c[true]);
+cfg_key_VidResolutionW  : vid_vw             := vli;
+cfg_key_VidResolutionH  : vid_vh             := vli;
+cfg_key_VidWindowed     : vid_windowed       :=(vl=b2c[true]);
+cfg_key_VidShowFPS      : vid_ShowFPS        :=(vl=b2c[true]);
+cfg_key_GFixedSpawns    : g_FixedPositions  :=(vl=b2c[true]);
+cfg_key_GAISlots        : g_AISlots         := vlw;
+cfg_key_MapGenerators   : map_generators     := vlw;
+cfg_key_GRecord         : rpls_Record        :=(vl=b2c[true]);
+cfg_key_GRecordQuality  : rpls_Quality       := vlw;
+cfg_key_menuScalse      : menu_scale         :=(vl=b2c[true]);
+cfg_key_menuScaleSmooth : menu_ScaleSmooth   :=(vl=b2c[true]);
    end;
 
 end;
@@ -90,9 +92,9 @@ procedure cfg_read;
 var f:text;
     s:shortstring;
 begin
-   if FileExists(cfgfn) then
+   if(FileExists(str_ConfigFName))then
    begin
-      assign(f,cfgfn);
+      assign(f,str_ConfigFName);
       {$I-}reset(f);{$I+} if (ioresult<>0) then exit;
       while not eof(f) do
       begin
@@ -101,31 +103,34 @@ begin
       end;
       close(f);
 
-      if(snd_svolume1<0  )then snd_svolume1:=0 else if(snd_svolume1>1)then snd_svolume1:=1;
-      if(snd_mvolume1<0  )then snd_svolume1:=0 else if(snd_mvolume1>1)then snd_mvolume1:=1;
+      if(snd_SoundVolume>snd_MaxSoundVolume)then snd_SoundVolume:=snd_MaxSoundVolume;
+      if(snd_MusicVolume>snd_MaxSoundVolume)then snd_MusicVolume:=snd_MaxSoundVolume;
+      snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
+      snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
+
       if(snd_musicListSize=0)
       then snd_musicListSize:=1
       else
         if(snd_musicListSize>snd_musicListSizeMax)then snd_musicListSize:=snd_musicListSizeMax;
-      vid_CamSpeed:=mm3(1,vid_CamSpeed,127);
+      ui_CamSpeed:=byte(mm3i(1,ui_CamSpeed,vid_MaxCamSpeed));
 
-      if(length(PlayerName)>NameLen)then SetLength(PlayerName,NameLen);
+      if(length(PlayerName)>MaxPlayerNameLen)then SetLength(PlayerName,MaxPlayerNameLen);
 
-      vid_vw:=mm3(vid_minw,vid_vw,vid_maxw);
-      vid_vh:=mm3(vid_minh,vid_vh,vid_maxh);
+      vid_vw:=mm3i(vid_minw,vid_vw,vid_maxw);
+      vid_vh:=mm3i(vid_minh,vid_vh,vid_maxh);
 
-      if(g_ai_slots   >gms_g_maxai  )then g_ai_slots   :=gms_g_maxai;
-      if(g_generators >gms_g_maxgens)then g_generators :=gms_g_maxgens;
+      if(g_AISlots     >g_MaxAISlots    )then g_AISlots    :=g_MaxAISlots;
+      if(map_generators >map_MaxGenerators  )then map_generators:=map_MaxGenerators;
 
-      if(rpls_pnui   >_cl_pnun_rpls  )then rpls_pnui   :=_cl_pnun_rpls;
-      if(net_pnui    >_cl_pnun       )then net_pnui    :=_cl_pnun;
+      if(rpls_Quality   >rpls_MaxQuality)then rpls_Quality  :=rpls_MaxQuality;
+      if(net_cl_Quality >net_MaxQuality )then net_cl_Quality:=net_MaxQuality;
 
-      if(vid_ppos    >3              )then vid_ppos    :=0;
-      if(vid_uhbars  >2              )then vid_uhbars  :=0;
-      if(vid_plcolors>vid_maxplcolors)then vid_plcolors:=0;
+      if(ui_ControlPanelPos>vid_MaxControlPanelPos)then ui_ControlPanelPos:=0;
+      if(ui_HealthBars     >vid_MaxHealthBars     )then ui_HealthBars     :=0;
+      if(ui_PlayersColor   >vid_MaxPlayersColor   )then ui_PlayersColor   :=0;
    end;
-   m_vrx:=vid_vw;
-   m_vry:=vid_vh;
+   menu_ResolutionWi:=vid_vw;
+   menu_ResolutionHi:=vid_vh;
    net_cl_saddr;
    net_sv_sport;
 end;
@@ -133,35 +138,36 @@ end;
 procedure cfg_write;
 var f:text;
 begin
-   assign(f,cfgfn);
+   assign(f,str_ConfigFName);
 {$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
 
-   writeln(f,cfg_key_name  ,'=',PlayerName            );
-   writeln(f,cfg_key_sndv  ,'=',si12b(snd_svolume1)   );
-   writeln(f,cfg_key_mscv  ,'=',si12b(snd_mvolume1)   );
-   writeln(f,cfg_key_mlistn,'=',snd_musicListSize     );
-   writeln(f,cfg_key_fscr  ,'=',b2c[vid_fullscreen]   );
-   writeln(f,cfg_key_vspd  ,'=',vid_CamSpeed          );
-   writeln(f,cfg_key_vmm   ,'=',b2c[vid_CamMScroll]   );
-   writeln(f,cfg_key_shdws ,'=',b2c[vid_ColoredShadow]);
-   writeln(f,cfg_key_saddr ,'=',net_cl_svstr          );
-   writeln(f,cfg_key_sport ,'=',net_sv_pstr           );
-   writeln(f,cfg_key_lng   ,'=',b2c[ui_language]      );
-   writeln(f,cfg_key_mai   ,'=',b2c[m_action]         );
-   writeln(f,cfg_key_vidvw ,'=',vid_vw                );
-   writeln(f,cfg_key_vidvh ,'=',vid_vh                );
-   writeln(f,cfg_key_rpnui ,'=',rpls_pnui             );
-   writeln(f,cfg_key_npnui ,'=',net_pnui              );
-   writeln(f,cfg_key_gsp   ,'=',b2c[g_fixed_positions]);
-   writeln(f,cfg_key_gai   ,'=',g_ai_slots            );
-   writeln(f,cfg_key_gcg   ,'=',g_generators          );
-   writeln(f,cfg_key_ppos  ,'=',vid_ppos              );
-   writeln(f,cfg_key_uhbar ,'=',vid_uhbars            );
-   writeln(f,cfg_key_plcol ,'=',vid_plcolors          );
-   writeln(f,cfg_key_APM   ,'=',b2c[vid_APM]          );
-   writeln(f,cfg_key_FPS   ,'=',b2c[vid_FPS]          );
-   writeln(f,cfg_key_menuSc,'=',b2c[vid_menu_scale]   );
-   writeln(f,cfg_key_menuSs,'=',b2c[vid_menu_scales]  );
+   writeln(f,cfg_key_PlayerName      ,'=',PlayerName            );
+   writeln(f,cfg_key_SoundVolume     ,'=',snd_SoundVolume       );
+   writeln(f,cfg_key_MusicVolume     ,'=',snd_MusicVolume       );
+   writeln(f,cfg_key_MusicListSize   ,'=',snd_musicListSize     );
+   writeln(f,cfg_key_NetSErverAddr   ,'=',net_cl_StrAddr        );
+   writeln(f,cfg_key_NetServerPort   ,'=',net_sv_StrPort        );
+   writeln(f,cfg_key_NetQuality      ,'=',net_cl_Quality        );
+   writeln(f,cfg_key_UICamScrollSpeed,'=',ui_CamSpeed           );
+   writeln(f,cfg_key_UICamMouseScroll,'=',b2c[ui_MouseScroll]   );
+   writeln(f,cfg_key_UIColoredShadows,'=',b2c[ui_ColoredShadow] );
+   writeln(f,cfg_key_UILanguage      ,'=',b2c[ui_language]      );
+   writeln(f,cfg_key_UIRMBAction     ,'=',b2c[m_RightClickAct]  );
+   writeln(f,cfg_key_UICtrlPanelPos  ,'=',ui_ControlPanelPos    );
+   writeln(f,cfg_key_UIHealthBars    ,'=',ui_HealthBars         );
+   writeln(f,cfg_key_UIPlayersColor  ,'=',ui_PlayersColor       );
+   writeln(f,cfg_key_UIShowAPM       ,'=',b2c[ui_ShowAPM]       );
+   writeln(f,cfg_key_VidResolutionW  ,'=',vid_vw                );
+   writeln(f,cfg_key_VidResolutionH  ,'=',vid_vh                );
+   writeln(f,cfg_key_VidWindowed     ,'=',b2c[vid_windowed]     );
+   writeln(f,cfg_key_VidShowFPS      ,'=',b2c[vid_ShowFPS]      );
+   writeln(f,cfg_key_MapGenerators   ,'=',map_generators        );
+   writeln(f,cfg_key_GRecord         ,'=',b2c[rpls_Record]      );
+   writeln(f,cfg_key_GRecordQuality  ,'=',rpls_Quality          );
+   writeln(f,cfg_key_GFixedSpawns    ,'=',b2c[g_FixedPositions]);
+   writeln(f,cfg_key_GAISlots        ,'=',g_AISlots            );
+   writeln(f,cfg_key_menuScalse      ,'=',b2c[menu_scale]       );
+   writeln(f,cfg_key_menuScaleSmooth ,'=',b2c[menu_ScaleSmooth] );
 
    close(f);
 end;

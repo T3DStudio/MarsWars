@@ -3,7 +3,7 @@ procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
 var p:byte;
 begin
    if(newOwnerPlayer<=MaxPlayers)then
-   with g_cpoints[i] do
+   with g_KeyPoints[i] do
    if(cpOwnerPlayer<>newOwnerPlayer)then
    begin
       if(cpOwnerTeam>0)then
@@ -41,12 +41,12 @@ iOwnerTeam,
 iOwnerPlayer,
 iArmy,iTeams :integer;
 begin
-   for i:=1 to MaxCPoints do
-    with g_cpoints[i] do
+   for i:=0 to LastKeyPoint do
+    with g_KeyPoints[i] do
     if(cpCaptureR>0)then
     begin
        p:=0;
-       if(g_mode=gm_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
+       if(map_scenario=mc_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
        if(cplifetime>0)and(cpOwnerTeam>0)then
        begin
           cplifetime-=1;
@@ -87,7 +87,7 @@ begin
        end;
 
        if((iTeams=0)and(cpenergy>0))
-       or((i=1)and(g_mode=gm_koth)and(g_step<g_step_koth_pause))then
+       or((i=0)and(map_scenario=mc_KotH)and(g_step<g_step_koth_pause))then
        begin
           iTeams:=1;
           iOwnerPlayer:=0;
@@ -106,7 +106,7 @@ begin
              if(cpTimerOwnerTeam<>iOwnerTeam)then
              begin
                 cpTimerOwnerTeam:=iOwnerTeam;
-                if(i=1)and(g_mode=gm_koth)then GameLogKotHControl;
+                if(i=0)and(map_scenario=mc_KotH)then GameLogKotHControl;
                 cpTimer:=0;
              end;
              if(cpTimer<cpCaptureTime)
@@ -131,8 +131,8 @@ begin
    wteam_n      :=0;
    cp_captured_n:=0;
 
-   for i:=1 to MaxCPoints do
-    with g_cpoints[i] do
+   for i:=0 to LastKeyPoint do
+    with g_KeyPoints[i] do
      if(cpCaptureR>0)and(cpenergy<=0)then
      begin
         cp_captured_n+=1;

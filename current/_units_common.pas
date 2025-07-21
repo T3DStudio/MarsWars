@@ -258,8 +258,8 @@ begin
    begin
       _px:=x;
       _py:=y;
-      x:=mm3(1,ax,map_mw);
-      y:=mm3(1,ay,map_mw);
+      x:=mm3i(1,ax,map_Size);
+      y:=mm3i(1,ay,map_Size);
       if(x<>_px)or(y<>_py)then
       begin
          unit_update_xy(pu);
@@ -338,7 +338,7 @@ end;
 procedure missiles_clear_tar(u:integer;ResetTarget:boolean);
 var i:integer;
 begin
-   for i:=1 to MaxUnits do
+   for i:=0 to MaxUnits do
     with g_missiles[i] do
      if(vstep>0)and(tar=u)then
      begin
@@ -356,15 +356,15 @@ procedure teleport_CalcReload(tu:PTUnit;limit:integer);
 begin
    // tu - teleporter
    with tu^ do
-    with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(hteleport_rldPerLimit-mm3(0,upgr[upgr_hell_teleport],hteleport_rldPerLimit));
+    with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(hteleport_rldPerLimit-mm3i(0,upgr[upgr_hell_teleport],hteleport_rldPerLimit));
 end;
 
 procedure unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
 begin
    with pu^ do
    begin
-      tx:=mm3(0,tx,map_mw);
-      ty:=mm3(0,ty,map_mw);
+      tx:=mm3i(0,tx,map_Size);
+      ty:=mm3i(0,ty,map_Size);
       {$IFDEF _FULLGAME}
       effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
@@ -615,9 +615,9 @@ begin
       tr+=bld_dec_mr;
    end;
 
-   if(_ukfly=false)then
-    for u:=1 to MaxCPoints do
-     with g_cpoints[u] do
+   if(not _ukfly)then
+    for u:=0 to LastKeyPoint do
+     with g_KeyPoints[u] do
       if(cpCaptureR>0)and(cpNoBuildR>0)then
       begin
          o:=cpNoBuildR;
@@ -716,8 +716,8 @@ begin
       if(0<dr)then msth_1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
-   tx:=mm3(map_b0,tx,map_b1);
-   ty:=mm3(map_b0,ty,map_b1);
+   tx:=mm3i(map_b0,tx,map_b1);
+   ty:=mm3i(map_b0,ty,map_b1);
    newx^:=tx;
    newy^:=ty;
 end;
@@ -749,12 +749,12 @@ begin
 
    if(flylevel)then exit;
 
-   for u:=1 to MaxCPoints do
-    with g_cpoints[u] do
+   for u:=0 to LastKeyPoint do
+    with g_KeyPoints[u] do
      if(cpCaptureR>0)then
      begin
         if(building)
-        then dx:=max2(cpsolidr,cpNoBuildR)
+        then dx:=max2i(cpsolidr,cpNoBuildR)
         else dx:=cpsolidr;
         if(dx<=0)then continue;
         if(point_dist_int(tx,ty,cpx,cpy)<dx)then
@@ -804,8 +804,8 @@ begin
       exit;
    end;
 
-   for u:=1 to MaxCPoints do
-    with g_cpoints[u] do
+   for u:=0 to LastKeyPoint do
+    with g_KeyPoints[u] do
      if(cpCaptureR>0)and(cpNoBuildR>0)then
       if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then
       begin
@@ -848,7 +848,7 @@ begin
    begin
       obstacles:=true;
 
-      if(obstacles)and(g_players[playern].state=ps_comp)then
+      if(obstacles)and(g_players[playern].state=ps_ai)then
         if(pf_IfObstacleZone(pf_get_area(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
    end;
 
@@ -884,8 +884,8 @@ begin
       then exit;
 
       math_push_out(x0,y0,_r,unum,@x0,@y0,ukfly, true, team );
-      x0:=mm3(1,x0,map_mw);
-      y0:=mm3(1,y0,map_mw);
+      x0:=mm3i(1,x0,map_Size);
+      y0:=mm3i(1,y0,map_Size);
 
       unit_ability_HKeepBlink:=0;
       if(check)then exit;
@@ -928,8 +928,8 @@ begin
 
       if(srange<point_dist_int(x,y,x0,y0))then msth_1c_push(@x0,@y0,x,y,srange-1);
       math_push_out(x0,y0,_r,unum,@x0,@y0,ukfly, true ,team );
-      x0:=mm3(1,x0,map_mw);
-      y0:=mm3(1,y0,map_mw);
+      x0:=mm3i(1,x0,map_Size);
+      y0:=mm3i(1,y0,map_Size);
 
       unit_ability_HTowerBlink:=ureq_landplace;
       if(point_dist_int(x,y,x0,y0)>srange)then exit;
@@ -1565,7 +1565,7 @@ begin
            barrack_spawn(pu,uprod_u[i],upgr[upgr_mult_product]);
            unit_ProdStopUnitLine(pu,255,i,false);
         end
-        else uprod_r[i]:=max2(1,uprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+        else uprod_r[i]:=max2i(1,uprod_r[i]-1*(upgr[upgr_fast_product]+1) );
    end;
 end;
 
@@ -1591,7 +1591,7 @@ begin
            unit_ProdStopUpgradeLine(pu,255,i,false);
            GameLogUpgradeComplete(playeri,_uid,x,y);
         end
-        else pprod_r[i]:=max2(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+        else pprod_r[i]:=max2i(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
    end;
 end;
 
@@ -1735,8 +1735,8 @@ begin
     begin
        unit_dec_Rcntrs(pu);
 
-       if(playeri>0)or(g_mode<>gm_invasion)then
-         if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(menu_s2<>ms2_camp){$ENDIF}
+       if(playeri>0)or(map_scenario<>mc_invasion)then
+         if(army<=0)and(state>ps_none){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}
          then GameLogPlayerDefeated(playeri);
     end;
 end;
@@ -1769,7 +1769,7 @@ begin
       with uid^ do
       begin
          if(_ukbuilding)and(buildcd)then
-           if(_ability<>uab_HellVision)or(not iscomplete)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+           if(_ability<>uab_HellVision)or(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
          zfall:=_zfall;
       end;
 
@@ -1931,11 +1931,11 @@ UID_LostSoul      : begin
                          if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
-UID_UTransport    : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
-UID_APC           : begin level:=min2(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
+UID_UTransport    : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
+UID_APC           : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
       end;
       if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
-      if(playeri=0)and(g_mode=gm_invasion)then
+      if(playeri=0)and(map_scenario=mc_invasion)then
       begin
          ukfloater:=true;
          if(cycle_order<4 )

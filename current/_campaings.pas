@@ -47,8 +47,8 @@ begin
 end;
 procedure cmp_SetPStartMir(p1,p2:byte);
 begin
-   map_psx[p1]:=map_mw-map_psx[p2];
-   map_psy[p1]:=map_mw-map_psy[p2];
+   map_psx[p1]:=map_Size-map_psx[p2];
+   map_psy[p1]:=map_Size-map_psy[p2];
 end;
 procedure cmp_FillPStartsCircle(pstart,pnum:byte;cx,cy,cr,cd:integer);
 var p:byte;
@@ -75,7 +75,7 @@ begin
    begin
       state:=t;
       race :=r;
-      if(p=HPlayer)then name:=PlayerName;
+      if(p=LocalPlayer)then name:=PlayerName;
    end;
 end;
 procedure cmp_CreateUnit(playeri:byte;ux,uy:integer;uuid:byte);
@@ -90,39 +90,39 @@ begin
    cmp_data_b3:= 0;
    cmp_data_c1:= 0;
 
-   g_deadobservers:=false;
+   g_DefeatedObs:=false;
    case cmp_sel of
 0  : begin
-        g_mode      :=gm_scirmish;
-        g_generators:=0;
+        map_scenario      :=mc_scirmish;
+        map_generators:=0;
         map_seed    :=666;
-        map_mw      :=4000;
-        map_obs     :=4;
-        map_symmetry:=false;
+        map_Size      :=4000;
+        map_Obstacles     :=4;
+        map_Symmetry:=false;
         map_vars;
 
-        HPlayer :=1;
+        LocalPlayer :=1;
         UIPlayer:=1;
 
-        cmp_SetPlayer(HPlayer,r_hell,ps_play);
-        cmp_SetPlayer(4      ,r_uac ,ps_comp);
+        cmp_SetPlayer(LocalPlayer,r_hell,ps_human);
+        cmp_SetPlayer(4      ,r_uac ,ps_ai);
 
         cmp_ClearPStarts;
-        cmp_SetPStart(1,map_mw div 4,map_mw div 3);
+        cmp_SetPStart(1,map_Size div 4,map_Size div 3);
         cmp_SetPStartMir(4,1);
 
-        cmp_CreateUnit(HPlayer,map_psx[HPlayer],map_psy[HPlayer],UID_HKeep);
+        cmp_CreateUnit(LocalPlayer,map_psx[LocalPlayer],map_psy[LocalPlayer],UID_HKeep);
 
         cmp_CreateUnit(4,map_psx[4]-150,map_psy[4]-150,UID_UCommandCenter);
         cmp_CreateUnit(4,map_psx[4]+150,map_psy[4]+150,UID_UPortal);
 
-        PlayerSetAllowedUnits(HPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HTower,
+        PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HTower,
                                         UID_Imp,UID_Demon], MaxUnits,true);
      end;
    end;
 
    Map_premap(true);
-   MoveCamToPoint(map_psx[HPlayer],map_psy[HPlayer]);
+   MoveCamToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
 end;
 
 procedure cmp_MissionCode;
@@ -131,7 +131,7 @@ begin
    case cmp_sel of
 0  : begin
         // tutorial stages, subtasks
-        with g_players[HPlayer] do
+        with g_players[LocalPlayer] do
         begin
            {if(menergy<2000)
            then cmp_data_b1:=1
@@ -139,7 +139,7 @@ begin
              if(menergy<2000)}
 
         end;
-        if(g_players[4].ucl_e[true,0]=0)then GameSetStatusWinnerTeam(g_players[HPlayer].team);
+        if(g_players[4].ucl_e[true,0]=0)then GameSetStatusWinnerTeam(g_players[LocalPlayer].team);
 
      end;
    end;

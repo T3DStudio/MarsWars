@@ -211,7 +211,7 @@ end;
 procedure GameMusicReLoad;
 begin
    StopSoundSource(sss_music);
-   _LoadingScreen(@str_loading_msc,c_aqua);
+   LoadingScreen(@str_loading_msc,c_aqua);
    SoundSetUnLoad(snd_music_game);
 
    snd_music_game:=MusicSetLoad('music\game\',snd_musicListSize);
@@ -488,7 +488,7 @@ begin
     with log_l[log_i] do
      case mtype of
 0..MaxPlayers         : if(mtype<>playern)
-                        or((rpls_state>=rpls_read)and(HPlayer=0))then SoundPlayUI(snd_chat);
+                        or((rpls_state>=rpls_read)and(LocalPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
 lmt_player_chat,
@@ -560,7 +560,7 @@ end;
 
 procedure SoundControl;
 begin
-   if(vid_blink_timer1 =0)then SoundMusicControll(false);
+   if(ui_blink_timer1 =0)then SoundMusicControll(false);
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
    if(snd_mmap_ticks   >0)then snd_mmap_ticks   -=1;
@@ -607,7 +607,7 @@ begin
    // COMMON
    //
 
-   _LoadingScreen(@str_loading_sfx,c_green);
+   LoadingScreen(@str_loading_sfx,c_green);
 
    snd_click                :=SoundSetLoad('click'           );
    snd_chat                 :=SoundSetLoad('chat'            );

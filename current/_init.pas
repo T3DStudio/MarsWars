@@ -17,7 +17,7 @@ begin
 
    gfx_InitColors;
    vid_MakeScreen;
-   _LoadingScreen(@str_loading_gfx,c_yellow);
+   LoadingScreen(@str_loading_gfx,c_yellow);
    gfx_LoadAll(true);
    cmp_Init;
 
@@ -70,8 +70,8 @@ begin
 
    cfg_read;
 
-   saveload_CalcSaveSize;
-   replay_CalcHeaderSize;
+   saveload_MakeSaveData;
+   replay_MakeReplayHeaderData;
 
    if not(InitVideo)then exit;
    if not(InitSound)then exit;

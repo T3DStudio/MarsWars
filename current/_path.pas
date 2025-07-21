@@ -21,10 +21,10 @@ begin
     with map_dds[d] do
      if(t>0)and(r>=pf_pathmap_w)then
      begin
-        sx:=mm3(0,(x-r) div pf_pathmap_w,pf_pathmap_c);
-        sy:=mm3(0,(y-r) div pf_pathmap_w,pf_pathmap_c);
-        ex:=mm3(0,(x+r) div pf_pathmap_w,pf_pathmap_c);
-        ey:=mm3(0,(y+r) div pf_pathmap_w,pf_pathmap_c);
+        sx:=mm3i(0,(x-r) div pf_pathmap_w,pf_pathmap_c);
+        sy:=mm3i(0,(y-r) div pf_pathmap_w,pf_pathmap_c);
+        ex:=mm3i(0,(x+r) div pf_pathmap_w,pf_pathmap_c);
+        ey:=mm3i(0,(y+r) div pf_pathmap_w,pf_pathmap_c);
 
         for ix:=sx to ex do
          for iy:=sy to ey do
@@ -32,7 +32,7 @@ begin
            pf_pathgrid_areas[ix,iy]:=pf_solid;
      end;
 
-   ex:=round(map_mw/pf_pathmap_w);
+   ex:=round(map_Size/pf_pathmap_w);
    for sx:=0 to pf_pathmap_c do
    for sy:=0 to pf_pathmap_c do
     if(sx>=ex)or(sy>=ex)then pf_pathgrid_areas[sx,sy]:=pf_solid;

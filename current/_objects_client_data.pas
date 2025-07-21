@@ -867,7 +867,7 @@ end;
 
       end;
 
-      if(_ucl<=ui_ubtns)then
+      if(_ucl<=ui_ButtonsNum)then
         if  (ui_panel_uids[_urace,byte(not _ukbuilding),_ucl] =0)
         then ui_panel_uids[_urace,byte(not _ukbuilding),_ucl]:=u;
 
@@ -929,7 +929,7 @@ end;
       begin
          ui_panel_uids[r,2,_up_btni]:=u;
          i+=1;
-         if(i>ui_ubtns)then break;
+         if(i>ui_ButtonsNum)then break;
       end;
    end;
 

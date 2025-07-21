@@ -81,13 +81,13 @@ begin
             else clog_n^:=log_n-1;
           if(log_n>clog_n^)then
           begin
-             s:=min3(log_n,log_n-clog_n^,MaxPlayerLog);
+             s:=min3i(log_n,log_n-clog_n^,MaxPlayerLog);
              clog_n^:=log_n;
           end;
        end
        else
        begin
-          s:=min2(clog_n^,MaxPlayerLog);
+          s:=min2i(clog_n^,MaxPlayerLog);
           clog_n^:=0;
        end;
 
@@ -172,7 +172,7 @@ function _wudata_rld(r:pinteger;rpl:boolean):byte;
 begin
    if(r^<=0)
    then _wudata_rld:=0
-   else _wudata_rld:=mm3(1,(r^ div fr_fps1)+1,255);
+   else _wudata_rld:=mm3i(1,(r^ div fr_fps1)+1,255);
    _wudata_byte(_wudata_rld,rpl);
 end;
 
@@ -355,7 +355,7 @@ begin
 
    wdcptime^:=(wdcptime^+1) mod 2;
 
-   with g_cpoints[cpi] do
+   with g_KeyPoints[cpi] do
     if(cpCaptureR<=0)
     then _wudata_byte(0,rpl)
     else
@@ -404,28 +404,28 @@ begin
    then wstepb1:=(wstep mod fr_fps1 )=0  // every 2 second
    else wstepb1:=wstepb0;                // every second
 
-   if(rpl=false)and(wstepb1)then
+   if(not rpl)and(wstepb1)then
     with g_players[POVPlayer] do _wudata_rld(@build_cd,rpl);
 
    if(wstepb0)then
-     if(g_mode=gm_capture)
-     or(g_mode=gm_KotH)
-     or(g_generators>0)then
-      for i:=1 to MaxCPoints do
+     if(map_scenario=mc_capture)
+     or(map_scenario=mc_KotH)
+     or(map_generators>0)then
+      for i:=1 to LastKeyPoint do
        _wclinet_cpoint(i,rpl);
 
    if(wstepb1)then
-     case g_mode of
-gm_invasion : begin
+     case map_scenario of
+mc_invasion : begin
               _wudata_byte(g_inv_wave_n     ,rpl);
               _wudata_int (g_inv_wave_t_next,rpl);
               end;
-gm_royale   : _wudata_int(g_royal_r,rpl);
+mc_royale   : _wudata_int(g_royal_r,rpl);
      end;
 
    if(rpl)then
    begin
-      _PNU:=_cl_pnua[rpls_pnui];
+      _PNU:=Quality2Units[rpls_Quality];
       _N_U:=@rpls_u;
    end
    else
@@ -443,7 +443,7 @@ gm_royale   : _wudata_int(g_royal_r,rpl);
    if(g_player_astatus>0)then
    begin
       _wudata_byte(_PNU,rpl);
-      _PNU:=min2(g_cl_units,_PNU*4);
+      _PNU:=min2i(g_cl_units,_PNU*4);
 
       if(wstepb0)then
       begin
@@ -716,7 +716,7 @@ begin
                 if(buff[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
                 with uid^ do
-                  if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+                  if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                 effect_UnitDeath(uu,true,@vis);
              end;
           end;
@@ -794,7 +794,7 @@ begin
               if(pu^.hits>0)and(hits<=0)and(buff[ub_Resurect]=0)then  // death
               begin
                  with uid^ do
-                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2(build_cd+step_build_reload,max_build_reload);
+                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(uu,hits<=fdead_hits,@vis);
 
                  with uid^ do
@@ -1201,11 +1201,11 @@ begin
          case bp of
          0: begin
                bv:=_rudata_byte(rpl,0);
-               upgr[n]:=min2(_up_max,bv and %00001111);
+               upgr[n]:=min2i(_up_max,bv and %00001111);
                bp:=1;
             end;
          1: begin
-               upgr[n]:=min2(_up_max,bv shr 4);
+               upgr[n]:=min2i(_up_max,bv shr 4);
                bp:=0;
             end;
          end;
@@ -1223,7 +1223,7 @@ end;
 procedure _rclinet_cpoint(cpi:byte;rpl,no_effect:boolean);
 var b,t,p:byte;
 begin
-   with g_cpoints[cpi] do
+   with g_KeyPoints[cpi] do
    begin
       b:=_rudata_byte(rpl,0);
       t:=b and %00000011;
@@ -1282,27 +1282,27 @@ begin
      _rudata_rld(@build_cd,rpl);
 
    if(wstepb0)then
-     if(g_mode=gm_capture)
-     or(g_mode=gm_KotH)
-     or(g_generators>0)then
-      for i:=1 to MaxCPoints do
+     if(map_scenario=mc_capture)
+     or(map_scenario=mc_KotH)
+     or(map_generators>0)then
+      for i:=1 to LastKeyPoint do
        _rclinet_cpoint(i,rpl,fast_skip);
 
    if(wstepb1)then
-     case g_mode of
-gm_invasion : begin
+     case map_scenario of
+mc_invasion : begin
               g_inv_wave_n     :=_rudata_byte(rpl,0);
               g_inv_wave_t_next:=_rudata_int (rpl,0);
               end;
-gm_royale   : g_royal_r:=_rudata_int(rpl,0);
+mc_royale   : g_royal_r:=_rudata_int(rpl,0);
      end;
 
-   if(g_mode=gm_invasion)then i:=byte(GetBBit(@g_player_astatus,0));
+   if(map_scenario=mc_invasion)then i:=byte(GetBBit(@g_player_astatus,0));
 
    g_player_astatus:=_rudata_byte(rpl,0);
    if(g_player_astatus>0)then
    begin
-      if(g_mode=gm_invasion)then
+      if(map_scenario=mc_invasion)then
         if(i=0)and(i<>byte(GetBBit(@g_player_astatus,0)) )then SoundPlayUnit(snd_teleport,nil,nil);
 
       g_players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);

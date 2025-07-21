@@ -8,16 +8,16 @@ begin
    if(random(2)=0)then
    begin
       if(random(2)=0)
-      then tx:=map_mw
+      then tx:=map_Size
       else tx:=0;
-      ty:=random(map_mw);
+      ty:=random(map_Size);
    end
    else
    begin
       if(random(2)=0)
-      then ty:=map_mw
+      then ty:=map_Size
       else ty:=0;
-      tx:=random(map_mw);
+      tx:=random(map_Size);
    end;
    SpawnMonster:=unit_add(tx,ty,0,uid,0,true,true,0);
    if(SpawnMonster)then limit-=g_uids[uid]._limituse;
@@ -94,7 +94,7 @@ end;
 function WaveTime(base:integer):integer;
 begin
    WaveTime:=base;
-   WaveTime+=round(g_inv_wave_t_curr/fr_fps2*(MinSMapW/map_mw));
+   WaveTime+=round(g_inv_wave_t_curr/fr_fps2*(map_MinSize/map_Size));
    WaveTime+=4*g_inv_wave_n;
 end;
 
@@ -119,7 +119,7 @@ begin
             19 : g_inv_wave_t_next:=120;
             else g_inv_wave_t_next:=WaveTime(60);
             end;
-            g_inv_wave_t_next:=mm3(30,g_inv_wave_t_next,max_wave_time_s)*fr_fps1;
+            g_inv_wave_t_next:=mm3i(30,g_inv_wave_t_next,max_wave_time_s)*fr_fps1;
          end;
       end
       else

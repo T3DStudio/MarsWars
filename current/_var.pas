@@ -11,12 +11,13 @@ _EVENT            : pSDL_EVENT;
 
 g_started         : boolean  = false;
 g_status          : byte     = 0;
-g_mode            : byte     = 0;
-g_fixed_positions : boolean  = false;
-g_generators      : byte     = 0;
-g_ai_slots        : byte     = player_default_ai_level;
-g_deadobservers   : boolean  = true;
+
+g_type            : byte     = 0; // 0 = none, 1 = scirmish, 2 - campaing
+g_FixedPositions  : boolean  = false;
+g_AISlots         : byte     = player_default_ai_level;
+g_DefeatedObs     : boolean  = true;
 g_step            : cardinal = 0;
+
 g_player_astatus  : byte     = 0;
 g_player_rstatus  : byte     = 0;
 g_cl_units        : integer  = 0;
@@ -26,7 +27,7 @@ g_inv_wave_n      : byte     = 0;
 g_inv_wave_t_next : integer  = 0;
 g_inv_wave_t_curr : integer  = 0;
 g_royal_r         : integer  = 0;
-g_cpoints         : array[1..MaxCPoints] of TCTPoint;
+g_KeyPoints       : array[0..LastKeyPoint] of TKeyPoint;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -41,7 +42,7 @@ g_players         : TPList;
 g_units           : array[0..MaxUnits   ] of TUnit;
 g_punits          : array[0..MaxUnits   ] of PTUnit;
 
-g_missiles        : array[1..MaxMissiles] of TMissile;
+g_missiles        : array[0..MaxMissiles] of TMissile;
 
 g_cycle_order     : integer = 0;
 g_cycle_regen     : integer = 0;
@@ -49,25 +50,27 @@ g_cycle_regen     : integer = 0;
 g_uids            : array[byte] of TUID;
 g_upids           : array[byte] of TUPID;
 g_mids            : array[byte] of TMID;
-g_dmods           : array[byte] of TDamageMod;
+g_DamageMods      : array[byte] of TDamageMod;
+
+g_random_i        : word    = 0;
+g_random_p        : byte    = 0;
 
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 
-HPlayer           : byte = 1; // 'this' player
+LocalPlayer           : byte = 1; // 'this' player
 
 _playerAPM        : array[0..MaxPlayers] of TAPMCounter;
 
-
+map_scenario      : byte     = 0;
+map_generators    : byte     = 0;
 map_seed          : cardinal = 1;
-map_iseed         : word     = 0;
-map_rpos          : byte     = 0;
-map_mw            : integer  = 5000;
+map_Size          : integer  = 5000;
 map_hmw           : integer  = 2500;
 map_decor_gap     : integer  = 40;
 map_b1            : integer  = 0;
-map_obs           : byte     = 1;
-map_symmetry      : boolean  = true;
+map_Obstacles     : byte     = 1;
+map_Symmetry      : boolean  = true;
 map_psx           : array[0..MaxPlayers] of integer;
 map_psy           : array[0..MaxPlayers] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
@@ -91,7 +94,7 @@ net_cpoints_t     : TWCPDataTime;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
-rpls_pnui         : byte = 0;
+rpls_Quality         : byte = 0;
 rpls_wudata_t     : TWUDataTime;
 rpls_cpoints_t    : TWCPDataTime;
 
@@ -152,6 +155,7 @@ r_panel,
 r_uipanel,
 r_empty,
 r_minimap,
+r_mminimap,
 r_bminimap,
 r_screen,
 r_dterrain,
@@ -176,26 +180,26 @@ r_minimap_scan_blink
                   : boolean = false;
 
 ingame_chat       : byte = 0;
-vid_fullscreen    : boolean = false;
+vid_windowed      : boolean = true;
 r_draw            : boolean = true;
 
 vid_menu_redraw   : boolean  = true;
 
 MainMenu          : boolean = true;
+menu_page         : byte = 0;
+menu_settings     : byte = mi_settings_Game;
 menu_item         : integer;
-menu_s1           : byte = ms1_sett;
-menu_s2           : byte = ms2_scir;
-menu_s3           : byte = ms3_game;
+menu_items        : array[byte] of TMenuItem;
+menu_rebuild      : boolean = true;
 
-menu_cx           : integer;
+menu_ResolutionWi,
+menu_ResolutionHi : integer;
 
 menu_ihint        : byte=0;
 menu_ihintpi      : byte=255;
 menu_ihintlx      : array[0..menu_ihintn] of integer = (228,570,228,570);
 menu_ihintly      : array[0..menu_ihintn] of integer = (76 ,76 ,307,271);
 
-m_vrx,
-m_vry             : integer;
 menu_mseed        : shortstring = '1';
 menu_bmseed       : cardinal = 1;
 
@@ -204,13 +208,14 @@ PlayerTeam        : byte = 1;
 PlayerReady       : boolean = false;
 PlayerRace        : byte = 0;
 
-PlayerColor       : array[0..MaxPlayers] of cardinal;
+PlayerColors       : array[0..MaxPlayers] of cardinal;
 
 UIPlayer          : byte = 1;
 
-vid_menu_scale    : boolean = true;
-vid_menu_scales   : boolean = false;
+menu_scale        : boolean = true;
+menu_ScaleSmooth  : boolean = false;
 
+vid_ShowFPS       : boolean = true;
 vid_vw            : integer = 800;
 vid_vh            : integer = 600;
 vid_cam_w         : integer = 800;
@@ -224,22 +229,21 @@ vid_vmb_y1        : integer = 594;
 vid_mwa           : integer = 0;
 vid_mha           : integer = 0;
 vid_terrain       : pSDL_SURFACE;
-vid_cam_x         : integer = 0;
-vid_cam_y         : integer = 0;
+ui_cam_x         : integer = 0;
+ui_cam_y         : integer = 0;
 vid_cam_cx        : integer = 0;
 vid_cam_cy        : integer = 0;
 vid_cam_fx        : integer = 0;
 vid_cam_fy        : integer = 0;
-vid_CamSpeed      : integer = 25;
 vid_mmvx,
 vid_mmvy          : integer;
-vid_uhbars        : byte = 0;
-vid_plcolors      : byte = 0;
-vid_APM           : boolean = false;
-vid_FPS           : boolean = false;
-vid_CamMScroll    : boolean = false;
-vid_ColoredShadow : boolean = true;
-vid_ppos          : byte = 0;
+ui_CamSpeed       : integer = 25;
+ui_HealthBars     : byte = 0;
+ui_PlayersColor   : byte = 0;
+ui_ShowAPM        : boolean = false;
+ui_MouseScroll    : boolean = false;
+ui_ColoredShadow  : boolean = true;
+ui_ControlPanelPos: byte = 0;
 vid_panelx        : integer = 0;
 vid_panely        : integer = 0;
 vid_mapx          : integer = 0;
@@ -248,8 +252,8 @@ vid_vsl           : array[1..vid_mvs] of PTVisSpr;
 vid_vsls          : word = 0;
 vid_prim          : array of TVisPrim;
 vid_prims         : word = 0;
-vid_blink_timer1  : integer = 0;
-vid_blink_timer2  : integer = 0;
+ui_blink_timer1  : integer = 0;
+ui_blink_timer2  : integer = 0;
 
 vid_fog_grid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
 vid_fog_pgrid     : array[0..fog_vfwm,0..fog_vfhm] of byte;
@@ -267,8 +271,8 @@ ter_h             : integer;
 
 font_ca           : array[char] of TMWTexture;
 
-_eids             : array[byte] of TEID;
-g_effects          : array[1..vid_mvs] of TEffect;
+g_eids            : array[byte] of TEID;
+g_effects         : array[1..vid_mvs] of TEffect;
 
 ms_eid_bio_death_uids
                   : TSoB;
@@ -286,36 +290,38 @@ cmp_data_b2       : byte = 0;
 cmp_data_b3       : byte = 0;
 cmp_data_c1       : cardinal = 0;
 cmp_mmap          : array[0..LastMission] of pSDL_Surface;
-cmp_minfo_page    : integer = 0;
-cmp_minfo_lpage   : integer = 0;
 
 net_error_timer   : byte = 0;
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
 net_cl_Hoster     : byte = 0;
-net_cl_svstr      : shortstring = '127.0.0.1:10666';
-net_sv_pstr       : shortstring = '10666';
+net_cl_StrAddr    : shortstring = '127.0.0.1:10666';
+net_sv_StrPort    : shortstring = '10666';
 net_chat_shlm     : integer = 0;
 net_chat_str      : shortstring = '';
 net_chat_tar      : byte = 255;
-net_pnui          : byte = 4;
+net_cl_Quality    : byte = 4;
 
 svld_str_info     : shortstring = '';
 svld_str_fname    : shortstring = '';
-svld_list         : array of shortstring;
+svld_items        : array of TSaveLoadItem;
+svld_itemn        : integer = 0;
+svld_list         : TStringList;
 svld_list_size    : integer = 0;
 svld_list_sel     : integer = 0;
 svld_list_scroll  : integer = 0;
 svld_file_size    : cardinal = 0;
 
+rpls_Record       : boolean = true;
+rpls_RecordTryPause:integer = 0;
 rpls_fstatus      : byte = 0;    // file status (none,write,read)
 rpls_pnu          : integer = 0; // quality
-rpls_str_name     : shortstring = 'LastReplay';
+rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info     : shortstring = '';
 rpls_state        : byte = rpls_none;
-rpls_list         : array of shortstring;
+rpls_list         : TStringList;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
@@ -329,12 +335,14 @@ rpls_showlog      : boolean = false;
 rpls_plcam        : boolean = false;
 rpls_fog          : boolean = false;
 rpls_ticks        : byte = 0;
+rpls_head_items   : array of TSaveLoadItem;
+rpls_head_itemn   : integer = 0;
 rpls_file_head_size
                   : cardinal = 0;
 rpls_file_size    : cardinal = 0;
 rpls_log_c        : cardinal = 0;
 
-cmp_scroll        : integer = 0;
+camp_list_scroll        : integer = 0;
 cmp_sel           : integer = 0;
 
 
@@ -351,8 +359,8 @@ m_brushy,
 m_brush           : integer;
 m_bx,
 m_by              : integer;
-m_vmove           : boolean = false;
-m_action          : boolean = true;
+m_DragCamMove           : boolean = false;
+m_RightClickAct          : boolean = true;
 m_mmap_move       : boolean = false;
 
 ui_language       : boolean = false;
@@ -361,7 +369,7 @@ ui_UnitSelectedNU : integer = 0;
 ui_UnitSelectedpU : integer = 0;
 ui_UnitSelectedn  : byte = 0;
 ui_tab            : byte = 0;
-ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ubtns] of byte;
+ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ButtonsNum] of byte;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 
 ui_orders_n,                                             //
@@ -495,22 +503,22 @@ c_black           : cardinal;
 //  THEMES
 //
 
-theme_i           : integer = 0;
+theme_i              : integer = 0;
 
-theme_liquid_animt: byte;
-theme_liquid_animm: byte;
-theme_liquid_color: cardinal = 0;
+theme_liquid_animt   : byte;
+theme_liquid_animm   : byte;
+theme_liquid_color   : cardinal = 0;
 
-theme_map_trt     : integer=0;
-theme_map_ptrt    : integer = -1;
-theme_map_crt     : integer=0;
-theme_map_pcrt    : integer = -1;
-theme_map_lqt     : integer=0;
-theme_map_plqt    : integer = -1;
-theme_map_blqt    : integer=0;
-theme_map_pblqt   : integer = -1;
-theme_liquid_style: byte = 0;
-theme_crater_style: byte = 0;
+theme_map_Terrain    : integer = 0;
+theme_map_pTerrain   : integer = -1;
+theme_map_Crater     : integer = 0;
+theme_map_pCrater    : integer = -1;
+theme_map_Liquid     : integer = 0;
+theme_map_pLiquid    : integer = -1;
+theme_map_LiquidBack : integer = 0;
+theme_map_pLiquidBack: integer = -1;
+theme_liquid_style   : byte = 0;
+theme_crater_style   : byte = 0;
 
 theme_decals,
 theme_decors,
@@ -750,7 +758,6 @@ spr_b_cancel,
 spr_b_delete,
 spr_mback,
 spr_mlogo,
-spr_mbtn,
 spr_cursor        : pSDL_Surface;
 spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
 spr_b_ab          : array[byte] of pSDL_Surface;
@@ -769,7 +776,34 @@ spr_cp_gen        : TMWTexture;
 
 str_ability_name  : array[byte     ] of shortstring;
 str_race          : array[0..r_cnt ] of shortstring;
-str_gmode         : array[0..gm_cnt] of shortstring;
+str_map_ScenarioL         : array[0..mc_count] of shortstring;
+
+str_menu_Campaings,
+str_menu_Tutorials,
+str_menu_Scirmish,
+str_menu_SaveLoad,
+str_menu_LoadGame,
+str_menu_Replays,
+str_menu_Settings,
+
+str_menu_Start,
+str_menu_Surrender,
+str_menu_Break,
+str_menu_Exit,
+str_menu_Back,
+
+str_menu_SetGame,
+str_menu_SetReplay,
+str_menu_SetVideo,
+str_menu_SetSound,
+
+str_SR_RecordGames,
+
+str_SV_ResolutionW,
+str_SV_ResolutionH,
+
+str_FileInfo,
+
 str_sability,
 str_spability,
 str_need_energy,
@@ -800,12 +834,12 @@ str_smith,
 str_IncEnergyLevel,
 str_CanRebuildTo,
 str_TargetLimit,
-str_NextTrack,
-str_MusicListSize,
+str_SS_NextTrack,
+str_SS_MusicListSize,
 str_menu_controls,
 str_RecordingStart,
 str_RecordingStop,
-str_ReloadMusic,
+str_SS_ReloadMusic,
 str_PlayerPaused,
 str_PlayerResumed,
 str_attr_alive,
@@ -851,53 +885,50 @@ str_production_busy,
 str_cant_advanced,
 str_NeedMoreProd,
 str_MaximumReached,
-str_m_siz,
-str_m_obs,
-str_m_sym,
-str_plname,
-str_aislots,
-str_generators,
-str_DeadObservers,
-str_team,
-str_srace,
-str_ready,
-str_fstarts,
-str_gmodet,
-str_plout,
-str_player_surrender,
-str_player_def    : shortstring;
-str_generatorsO   : array[0..gms_g_maxgens] of shortstring;
-str_pcolors       : array[0..vid_maxplcolors] of shortstring;
-str_uhbars        : array[0..2] of shortstring;
-str_panelposp     : array[0..3] of shortstring;
-str_panelpos,
-str_ColoredShadow,
-str_uhbar,
-str_pcolor,
+str_map_Seed,
+str_map_Size,
+str_map_Obstacles,
+str_map_Symmetry,
+str_SG_PlayerName,
+str_GO_AISlots,
+str_map_Generators,
+str_GO_DefeatedObs,
+str_NetReady,
+str_GO_FixedStarts,
+str_map_Scenario,
+str_PlayerLeft,
+str_PlayerSurrender,
+str_PlayerDefeat   : shortstring;
+str_map_GeneratorsL   : array[0..map_MaxGenerators] of shortstring;
+str_SG_PlayersColorL       : array[0..vid_MaxPlayersColor] of shortstring;
+str_SG_HealthBarsL         : array[0..2] of shortstring;
+str_SG_ControlPanelPosL    : array[0..3] of shortstring;
+str_SG_ControlPanelPos,
+str_SG_ColoredShadow,
+str_SG_HealthBars,
+str_SG_PlayersColor,
 str_all,
 str_orders,
 str_requirements,
 str_req,
 str_uprod,
 str_bprod,
-str_language,
-str_resol,
-str_apply,
-str_randoms,
+str_SG_Language,
+str_SV_ResolutionApply,
+str_GO_Random,
 str_menu_chat,
 str_chat_all,
 str_chat_allies,
 str_server,
 str_client,
-str_goptions,
-str_waitsv,
+str_Caption_GOptions,
+str_WaitForServer,
 str_gsunknown,
-str_cmpdif,
+str_Camp_Difficulty,
 str_repend,
 str_reperror,
-str_replay,
-str_replay_name,
-str_play,
+str_SR_ReplayPrefix,
+str_ReplayPlay,
 str_inv_ml,
 str_inv_time,
 str_menu,
@@ -905,11 +936,11 @@ str_time,
 str_kothtime,
 str_kothtime_act,
 str_kothwinner,
-str_players,
+str_Players,
 str_map,
-str_save,
-str_load,
-str_delete,
+str_FileSave,
+str_FileLoad,
+str_FileDelete,
 str_gsaved,
 str_pause,
 str_observer,
@@ -921,56 +952,52 @@ str_sgst,
 str_udpport,
 str_connecting,
 str_portblocked,
-str_pnu,
+str_SR_Quality,
 str_npnu,
-str_soundvol,
-str_musicvol,
-str_maction,
-str_scrollspd,
-str_mousescrl,
-str_fullscreen,
-str_menu_scale,
-str_menu_scales,
-str_FPS,
-str_APM,
-str_mrandom,
+str_SS_SoundVolume,
+str_SS_MusicVolume,
+str_SG_RightClickAct,
+str_SG_ScrollSpeed,
+str_SG_MouseScroll,
+str_SV_Windowed,
+str_SV_MenuScale,
+str_SV_MenuScaleSmooth,
+str_SV_ShowFPS,
+str_SG_ShowAPM,
+str_map_Random,
 str_svld_errors_file,
 str_svld_errors_open,
 str_svld_errors_wdata,
 str_svld_errors_wver,
-str_PTPlayer,
-str_PTState,
-str_PTRace,
-str_PTTeam,
-str_PTColor,
-str_PTPing,
-str_start,
-str_surrender,
-str_quit,
-str_exit,
-str_back,
+str_PT_Player,
+str_PT_State,
+str_PT_Race,
+str_PT_Team,
+str_PT_Color,
+str_PT_Ping,
 str_cmp_unk,
 str_cmp_Date,
 str_cmp_Location,
 str_cmp_Area,
 str_MObjectives,
-str_MMap,
-str_MPlayers      : shortstring;
-str_npnua,
-str_pnua          : array[0.._cl_pnun] of shortstring;
-str_cmpd          : array[0..CMPMaxSkills] of shortstring;
+str_Caption_Multiplayer,
+str_Caption_Map,
+str_Caption_Players      : shortstring;
+str_NetQualityL,
+str_ReplayQualityL          : array[0..net_MaxQuality] of shortstring;
+str_Camp_DifficultyL          : array[0..CMPMaxSkills] of shortstring;
 str_hint_t        : array[0..3] of shortstring;
 str_hint_army     : shortstring;
 str_hint_energy   : shortstring;
 str_hint_m        : array[0..2 ] of shortstring;
 str_hint_a,
 str_hint_r,
-str_hint_o        : array[0.._mhkeys] of shortstring;
+str_hint_o        : array[0..max_HotKeys] of shortstring;
 str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
 str_menu_hint     : array[byte] of shortstring;
 
-str_camp_name,
+str_camp_MissionName,
 //str_camp_obj,
 //str_camp_plot,
 str_camp_map      : array[0..LastMission] of shortstring;
@@ -979,11 +1006,8 @@ str_camp_infon    : array[0..LastMission] of integer;
 
 str_connect,
 str_svup,
-str_lng,
-str_maction2      : array[false..true] of shortstring;
-str_menu_s1,
-str_menu_s2,
-str_menu_s3       : array[0..2] of shortstring;
+str_SG_LanguageL,
+str_SG_RightClickActL      : array[false..true] of shortstring;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -994,6 +1018,8 @@ str_menu_s3       : array[0..2] of shortstring;
 SLpos              : array[0..2] of TALfloat;
 SLori              : array[0..5] of TALfloat;
 
+snd_SoundVolume    : byte = 50;
+snd_MusicVolume    : byte = 50;
 snd_svolume1       : single = 0.5;
 snd_mvolume1       : single = 0.5;
 snd_musicListSize  : byte = 5;

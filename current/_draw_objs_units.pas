@@ -1,7 +1,7 @@
 
 procedure _unit_minimap(pu:PTUnit);
 begin
-   if(vid_blink_timer1=0)and(MainMenu=false)and(r_draw)then
+   if(ui_blink_timer1=0)and(MainMenu=false)and(r_draw)then
     with pu^  do
     with uid^ do
     begin
@@ -168,11 +168,11 @@ begin
    begin
       ui_orders_x[i]:=x;
       ui_orders_y[i]:=y;
-      ui_orders_d[i]:=point_dist_int(x,y,vid_cam_x+vid_cam_hw,vid_cam_y+vid_cam_hh);
+      ui_orders_d[i]:=point_dist_int(x,y,ui_cam_x+vid_cam_hw,ui_cam_y+vid_cam_hh);
    end
    else
    begin
-      d:=point_dist_int(x,y,vid_cam_x+vid_cam_hw,vid_cam_y+vid_cam_hh);
+      d:=point_dist_int(x,y,ui_cam_x+vid_cam_hw,ui_cam_y+vid_cam_hh);
       if(d<ui_orders_d[i])then
       begin
          ui_orders_x[i]:=x;
@@ -287,7 +287,7 @@ uab_CCFly         : begin
       end
       else
       begin
-         t:=min2(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
+         t:=min2i(_btime,((_mhits-hits+_bstep) div _bstep) div 2);
          if(_ukbuilding)then
          begin
             if(t>0)then
@@ -334,7 +334,7 @@ function _EID2Spr(eid:byte):PTMWTexture;
 begin
    _EID2Spr:=@spr_dummy;
 
-   with _eids[eid] do
+   with g_eids[eid] do
     if(smodel<>nil)then
      if(smodel^.sn>0)then
       _EID2Spr:=@smodel^.sl[0];
@@ -435,7 +435,7 @@ begin
 end;
 
 procedure _unit_alive_sprite(pu:PTUnit;noanim:boolean);
-const _btnas: array[0..MaxUnitLevel] of integer = (0,vid_hBW,vid_BW,vid_BW+vid_hBW);
+const _btnas: array[0..MaxUnitLevel] of integer = (0,ui_ButtonWh,ui_ButtonW1,ui_ButtonW1+ui_ButtonWh);
 var spr : PTMWTexture;
 depth,
 alphab,
@@ -472,7 +472,7 @@ begin
 
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin
-            if((unum mod vid_blink_period2)=vid_blink_timer2)
+            if((unum mod vid_blink_period2)=ui_blink_timer2)
             then _unit_level_string(pu);
 
             depth:=_unit_SpriteDepth(pu);
@@ -490,7 +490,7 @@ begin
 
             if(un_eid_summon_spr[level]<>nil)then
              if(buff[ub_Summoned]>0)then
-              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3(0,buff[ub_Summoned]*4,255));
+              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buff[ub_Summoned]*4,255));
 
             if(buff[ub_ArchFire]>0)then
              with spr_h_p6 do
@@ -513,8 +513,8 @@ begin
                 begin
                    for t:=0 to MaxUnitLevel do
                    begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+vid_BW*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
+                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
+                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
                    end;
                 end;
 
@@ -545,7 +545,7 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
               else
                 if(buff[ub_Invis]>0)then alpha:=alpha shr 1;
 
-            if(vid_ColoredShadow)
+            if(ui_ColoredShadow)
             then ColorShadow:=ShadowColor(PlayerGetColor(playeri))
             else ColorShadow:=c_ablack;
 
@@ -571,7 +571,7 @@ begin
 
        if(_unit_fogrev(pu))then
         if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3(0,abs(hits-fdead_hits)*4,255),0,0);
+         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3i(0,abs(hits-fdead_hits)*4,255),0,0);
     end;
 end;
 

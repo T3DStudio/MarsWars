@@ -157,8 +157,8 @@ afree  :byte;
 begin
    afree  :=255;
    anobase:=255;  //no base alarm, low priority, can be replaced by base alarm
-   ax:=mm3(1,ax,map_mw);
-   ay:=mm3(1,ay,map_mw);
+   ax:=mm3i(1,ax,map_Size);
+   ay:=mm3i(1,ay,map_Size);
    with pplayer^ do
     for a:=0 to MaxPlayers do
      with ai_alarms[a] do
@@ -200,9 +200,9 @@ end;
 procedure ai_MakeScirmishStartAlarms(p:byte);
 var i:byte;
 begin
-   if(not g_fixed_positions)then
+   if(not g_FixedPositions)then
    begin
-      if(map_symmetry)then ai_PlayerSetAlarm(@g_players[p],map_mw-map_psx[p],map_mw-map_psy[p],1,base_1r,true,pf_get_area(map_mw-map_psx[p],map_mw-map_psy[p]));
+      if(map_Symmetry)then ai_PlayerSetAlarm(@g_players[p],map_Size-map_psx[p],map_Size-map_psy[p],1,base_1r,true,pf_get_area(map_Size-map_psx[p],map_Size-map_psy[p]));
    end
    else
       for i:=1 to MaxPlayers do
@@ -313,7 +313,7 @@ end;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;
 begin
    ai_HighPriorityTarget:=false;
-   if(player^.state=ps_comp)then
+   if(player^.state=ps_ai)then
      if(player^.ai_flags and aif_army_smart_prio)>0 then
        ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^._genergy>0);
 end;
@@ -383,8 +383,8 @@ begin
       begin
          ai_CollectDIDSquare(@aiu_FiledSquareNear,x,y,srange);
 
-         tx:=min2(x,map_mw-x);
-         ty:=min2(y,map_mw-y);
+         tx:=min2i(x,map_Size-x);
+         ty:=min2i(y,map_Size-y);
          if(tx<srange)or(ty<srange)then
          begin
             srs:=round(pi*sqr(srange));
@@ -506,8 +506,8 @@ begin
 
       // nearest point/generator
       ai_cpoint_koth:=false;
-      for i:=1 to MaxCPoints do
-       with g_cpoints[i] do
+      for i:=0 to LastKeyPoint do
+       with g_KeyPoints[i] do
          if(cpCaptureR>0)then
          begin
             if(cpOwnerTeam=team)then
@@ -520,13 +520,13 @@ begin
                else ai_cpoint_n+=1;
             end;
 
-            if(g_mode=gm_royale)then
+            if(map_scenario=mc_royale)then
               if(g_royal_r<(cp_ToCenterD+100))then continue;
 
             if(cpx<=0)
             or(cpy<=0)
-            or(cpx>=map_mw)
-            or(cpy>=map_mw)then continue;
+            or(cpx>=map_Size)
+            or(cpy>=map_Size)then continue;
 
             if(transportM>0)and(_attack<>atm_bunker)then
               if(pf_IfObstacleZone(cpzone))
@@ -540,7 +540,7 @@ begin
                    or _isbarrack)
                    then continue;
 
-            koth_point:=(i=1)and(g_mode=gm_koth)and(g_step>=g_step_koth_pause);
+            koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_step>=g_step_koth_pause);
 
             if(not koth_point)then
               if((cpunitst_pstate[team]>=ul3)and(d> cpCaptureR))
@@ -551,7 +551,7 @@ begin
                if(d<ai_generator_d)then
                begin
                   ai_generator_d :=d;
-                  ai_generator_cp:=@g_cpoints[i];
+                  ai_generator_cp:=@g_KeyPoints[i];
                end;
             end
             else
@@ -559,7 +559,7 @@ begin
               begin
                  ai_cpoint_d   :=d;
                  ai_cpoint_r   :=cpCaptureR;
-                 ai_cpoint_cp  :=@g_cpoints[i];
+                 ai_cpoint_cp  :=@g_KeyPoints[i];
                  ai_cpoint_koth:=koth_point;
               end;
 
@@ -804,7 +804,7 @@ begin
                and(tu^.uidi<>UID_HEyeNest )
                and(tu^.aiu_alarm_d<base_1rh)then
                  if((tu^.aiu_limitaround_enemy-tu^.aiu_limitaround_ally)>=0)
-                 or(g_mode=gm_invasion)
+                 or(map_scenario=mc_invasion)
                  then _setNearestTarget(@ai_abase_u,@ai_abase_d,ud);
 
                // teleporter beacon
@@ -1039,7 +1039,7 @@ begin
       ai_scout_u_new  :=0;
       ai_scout_u_new_w:=0;
 
-     if(g_mode=gm_royale)then
+     if(map_scenario=mc_royale)then
       for a:=0 to MaxPlayers do
        with ai_alarms[a] do
         if(aia_enemy_limit>0)then
@@ -1053,7 +1053,7 @@ begin
          then ai_scout_timer:=0
          else
            if(ai_scout_timer=0)
-           then ai_scout_timer:=max2(1,ai_attack_delay)
+           then ai_scout_timer:=max2i(1,ai_attack_delay)
            else ai_timer(@ai_scout_timer,0);
 
          ai_ReadyForAttack:=(armylimit>=ai_limit_border)
@@ -1064,7 +1064,7 @@ begin
          then ai_attack_timer:=0
          else
            if(ai_attack_timer=0)
-           then ai_attack_timer:=max2(1,ai_attack_delay)
+           then ai_attack_timer:=max2i(1,ai_attack_delay)
            else ai_timer(@ai_attack_timer,fr_fps60);
       end;
    end;
@@ -1074,10 +1074,10 @@ procedure ai_scout_pick(pu:PTUnit);
 var w:integer;
    tu:PTUnit;
 begin
-   if(g_mode=gm_koth    )
-   or(g_mode=gm_capture )
-   or(g_mode=gm_invasion)
-   or(g_mode=gm_royale  )then exit;
+   if(map_scenario=mc_KotH    )
+   or(map_scenario=mc_capture )
+   or(map_scenario=mc_invasion)
+   or(map_scenario=mc_royale  )then exit;
 
    with pu^ do
    begin

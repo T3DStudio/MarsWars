@@ -14,7 +14,7 @@ end;
 
 procedure _unit_CalcForR(pu:PTUnit);
 begin
-   with pu^ do fsr:=mm3(1,srange div fog_cw,MFogM);
+   with pu^ do fsr:=mm3i(1,srange div fog_cw,MFogM);
 end;
 {$ENDIF}
 
@@ -1449,7 +1449,7 @@ end;
       if(_ukbuilding)then
       begin
          _zombie_hits:=_mhits div 4;
-         _srange:=max2(_r+_r,_srange);
+         _srange:=max2i(_r+_r,_srange);
       end;
 
       if(_limituse>=MinUnitLimit)then
@@ -1583,7 +1583,7 @@ begin
   and((flags and f2)=0)then flags:=flags or f1 or f2;
 end;
 begin
-   with g_dmods[dm][n] do
+   with g_DamageMods[dm][n] do
    begin
       CorrentFlags(wtr_unit ,wtr_building);
       CorrentFlags(wtr_bio  ,wtr_mech    );
@@ -1595,7 +1595,7 @@ begin
    end;
 end;
 begin
-   FillChar(g_dmods,SizeOf(g_dmods),0);
+   FillChar(g_DamageMods,SizeOf(g_DamageMods),0);
 
    SetDMOD(dm_AntiUnitBioHeavy2,0,200,wtr_unit    +wtr_bio +wtr_heavy           );
    SetDMOD(dm_SSGShot2         ,0,200,wtr_unit    +wtr_bio +wtr_heavy           );

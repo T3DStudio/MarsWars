@@ -3,17 +3,17 @@ procedure initEffects;
 var x:byte;
 procedure _setEID(sm:PTMWSModel;sms:byte);
 begin
-   with _eids[x] do
+   with g_eids[x] do
    begin
       smodel      :=sm;
       anim_smstate:=sms;
    end;
 end;
 begin
-   FillChar(_eids,SizeOf(_eids),0);
+   FillChar(g_eids,SizeOf(g_eids),0);
 
    for x:=0 to 255 do
-   with _eids[x] do
+   with g_eids[x] do
    begin
       anim_smstate:=sms_death;
       smodel:=spr_pdmodel;
@@ -110,7 +110,7 @@ begin
       y :=ey;
       d :=ed;
       z :=az;
-      sm:=_eids[ee].smodel;
+      sm:=g_eids[ee].smodel;
 
       anim_last_i_t:= it;
       anim_step    := ans;
@@ -140,7 +140,7 @@ begin
 end;
 
 begin
-   if(MainMenu)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(_eids[ee].smodel=nil)then exit;
+   if(MainMenu)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
 
    if not MapPointInScreenP(ex,ey,true)then exit;
 
@@ -252,7 +252,7 @@ procedure missiles_sprites;
 var  m:integer;
    spr:PTMWTexture;
 begin
-   for m:=1 to MaxMissiles do
+   for m:=0 to MaxMissiles do
    with g_missiles[m] do
    if(MapPointInScreenP(vx,vy,true))then
    with g_mids[mid] do
@@ -281,7 +281,7 @@ begin
    for ei:=1 to vid_mvs do
     with g_effects[ei] do
      if(anim_last_i_t<>0)then
-     with _eids[eid] do
+     with g_eids[eid] do
      begin
         alpha:=255;
 
@@ -293,7 +293,7 @@ EID_HKeep_H,
 EID_HAKeep_H  : alpha:=anim_last_i_t*4;
 EID_HKeep_S,
 EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
-         else alpha:=min2(255,anim_last_i_t);
+         else alpha:=min2i(255,anim_last_i_t);
          end;
 
         if(noanim=false)then

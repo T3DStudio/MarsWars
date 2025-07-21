@@ -5,7 +5,7 @@ pinteger = ^integer;
 
 const
 
-ver                    : byte = 234;
+g_version              : byte = 234;
 
 degtorad               = pi/180;
 
@@ -43,8 +43,8 @@ APM_1Period            = fr_fps60;
 //  Game settings borders
 //
 
-gms_g_maxai            = 11; // 0-11 max skirmish AI skills
-gms_g_maxgens          = 5;  // 0-5  max neutrall generators options
+g_MaxAISlots           = 11; // 0-11 max skirmish AI skills
+map_MaxGenerators      = 5;  // 0-5  max neutrall generators options
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -52,21 +52,25 @@ gms_g_maxgens          = 5;  // 0-5  max neutrall generators options
 //
 
 ps_none                = 0;  // player state
-ps_play                = 1;
-ps_comp                = 2;
+ps_human               = 1;
+ps_ai                  = 2;
 
-gm_scirmish            = 0;  // game mode
-gm_3x3                 = 1;
-gm_2x2x2               = 2;
-gm_capture             = 3;
-gm_invasion            = 4;
-gm_KotH                = 5;
-gm_royale              = 6;
+mc_scirmish            = 0;  // map scenario
+mc_3x3                 = 1;
+mc_2x2x2               = 2;
+mc_capture             = 3;
+mc_invasion            = 4;
+mc_KotH                = 5;
+mc_royale              = 6;
 
-gm_fixed_teams         : set of byte = [gm_3x3,gm_2x2x2,gm_invasion];
+mc_fixed_teams         : set of byte = [mc_3x3,mc_2x2x2,mc_invasion];
 
-allgamemodes           : set of byte = [gm_scirmish,gm_3x3,gm_2x2x2,gm_capture,gm_invasion,gm_KotH,gm_royale];
-gm_cnt                 = 6;
+allmapscenarios        : set of byte = [mc_scirmish,mc_3x3,mc_2x2x2,mc_capture,mc_invasion,mc_KotH,mc_royale];
+mc_count               = 6;
+
+gt_none                = 0;   // game type
+gt_scirmish            = 1;
+gt_campaing            = 2;
 
 gs_running             = 0;  //
 {gs_paused1            = 1; 1..MaxPlayers
@@ -98,21 +102,23 @@ MaxPlayers             = 6; //0-6
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-MaxCPoints             = MaxPlayers*2;
+LastKeyPoint           = MaxPlayers*2-1;
 
-MaxSMapW               = 8000;
-MinSMapW               = 2000;
-StepSMap               = 250;
+map_MaxSize            = 8000;
+map_MinSize            = 2000;
+map_SizeMenuStep       = 250;
+
+map_MaxObstacles       = 7;
 
 map_b0                 = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  CPoints life
+//  Key Points life
 //
 
-g_cgenerators_ltime    : array[0..gms_g_maxgens] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
-g_cgenerators_energy   = 900;
+map_generators_LifeTime: array[0..map_MaxGenerators] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+map_generators_Energy  = 900;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -127,7 +133,7 @@ InvMaxWaves            = 20;
 //
 
 pf_pathmap_w           = 40;
-pf_pathmap_c           = (MaxSMapW div pf_pathmap_w)+1;
+pf_pathmap_c           = (map_MaxSize div pf_pathmap_w)+1;
 
 pf_pathmap_hw          = pf_pathmap_w div 2;
 
@@ -228,10 +234,10 @@ uia_newstrict          = 2;  }
 //  NETGAME
 //
 
-_cl_pnun               = 9;
-_cl_pnun_rpls          = _cl_pnun div 2;
-                                                    // 60 140 220 300 380 460 540 620 700 800
-_cl_pnua               : array[0.._cl_pnun] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
+net_MaxQuality         = 9;
+rpls_MaxQuality        = net_MaxQuality div 2;
+                                                          // 60 140 220 300 380 460 540 620 700 800
+Quality2Units          : array[0..net_MaxQuality] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
 ClientTTL              = fr_fps1*10;
 ServerTTL              = fr_fps1;
@@ -243,45 +249,37 @@ ns_none                = 0;
 ns_server              = 1;
 ns_client              = 2;
 
-nmid_lobby_info        = 3;
-nmid_connect           = 4;
-nmid_client_info       = 5;
-nmid_log_chat          = 6;
-nmid_chatclupd         = 7;
-nmid_snapshot          = 8;
-nmid_pause             = 9;
-nmid_server_full       = 10;
-nmid_wrong_ver         = 11;
-nmid_game_started      = 12;
-nmid_notconnected      = 13;
-nmid_order             = 14;
-nmid_player_leave      = 15;
-nmid_map_mark          = 16;
-nmid_player_surrender  = 17;
-nmid_lobby_PPosSwap    = 18;
-nmid_lobby_PAIUp       = 19;
-nmid_lobby_PAIToggle   = 20;
-nmid_lobby_PRace       = 21;
-nmid_lobby_PTeam       = 22;
-nmid_lobby_MSeed       = 23;
-nmid_lobby_MSize       = 24;
-nmid_lobby_MObs        = 25;
-nmid_lobby_MSym        = 26;
-nmid_lobby_MRandom     = 27;
-nmid_lobby_GMode       = 28;
-nmid_lobby_GFixPos     = 29;
-nmid_lobby_GAISlots    = 30;
-nmid_lobby_GGen        = 31;
-nmid_lobby_GDeadObs    = 32;
-nmid_lobby_GRandomScir = 33;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  PLAYER ORDERS
-//
-
-uo_build               = 1;
-uo_corder              = 2;
+nmid_lobby_info           = 3;
+nmid_connect              = 4;
+nmid_client_info          = 5;
+nmid_log_chat             = 6;
+nmid_chatclupd            = 7;
+nmid_snapshot             = 8;
+nmid_pause                = 9;
+nmid_server_full          = 10;
+nmid_wrong_ver            = 11;
+nmid_game_started         = 12;
+nmid_notconnected         = 13;
+nmid_order                = 14;
+nmid_player_leave         = 15;
+nmid_map_mark             = 16;
+nmid_player_surrender     = 17;
+nmid_lobby_PPosSwap       = 18;
+nmid_lobby_PAIUp          = 19;
+nmid_lobby_PAIToggle      = 20;
+nmid_lobby_PRace          = 21;
+nmid_lobby_PTeam          = 22;
+nmid_lobby_MSeed          = 23;
+nmid_lobby_MScenario      = 24;
+nmid_lobby_MGenerators    = 25;
+nmid_lobby_MSize          = 26;
+nmid_lobby_MObs           = 27;
+nmid_lobby_MSym           = 28;
+nmid_lobby_MRandom        = 29;
+nmid_lobby_GFixedPositions= 30;
+nmid_lobby_GAISlots       = 31;
+nmid_lobby_GDefeatedObs   = 32;
+nmid_lobby_GRandomScirmish= 33;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -311,6 +309,14 @@ ureq_usesability       : cardinal = 1 shl 19; // need use 'special ability' orde
 ureq_reloading         : cardinal = 1 shl 20; // reloading
 ureq_landplace         : cardinal = 1 shl 21; // can't land here
 ureq_invalidtar        : cardinal = 1 shl 22; // invalid target
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  PLAYER ORDERS
+//
+
+uo_build               = 1;
+uo_corder              = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -364,7 +370,7 @@ atm_inapc              = 4;   // can attack only when in apc
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Weapon: requirements to attacker and some flags
+//  Weapon: requirements to attacker and some bits
 //
 
 wpr_any                : cardinal =  0;
@@ -383,7 +389,7 @@ aw_hmelee              = -64;           // default heal/reapir melee range
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Target requirements flags
+//  Target requirements bits
 //
 
 wtr_owner_p            : cardinal = 1;         // own
@@ -460,7 +466,7 @@ wtp_GroundLight        = 23;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  AI FLAGS
+//  AI bits
 //
 
 ai_limit_border        = MaxPlayerLimit-(7*MinUnitLimit);
@@ -517,11 +523,11 @@ MaxDoodads             = 800;
 
 //
 ddc_div                = 1000000;
-ddc_cf                 = (MaxSMapW*MaxSMapW) div ddc_div; // 36
+ddc_cf                 = (map_MaxSize*map_MaxSize) div ddc_div; // 36
 
 // doodads cell
 dcw                    = 200;
-dcn                    = MaxSMapW div dcw;
+dcn                    = map_MaxSize div dcw;
 
 DID_LiquidR1           = 1;
 DID_LiquidR2           = 2;
@@ -536,9 +542,6 @@ dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
 MaxDIDs                = 7;
 
 DID_R                  : array[0..MaxDIDs] of smallint = (0,380,300,220,160,102,57,17);
-
-//pi*_r*_r
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -567,7 +570,6 @@ upgr_hell_heye         = 18; // hell Eye time
 upgr_hell_totminv      = 19; // totem and eye invisible
 upgr_hell_bldrep       = 20; // build restoration
 upgr_hell_tblink       = 21; // teleport towers
-//upgr_hell_invuln       = 24; // hell invuln powerup
 
 
 upgr_uac_attack        = 31; // distance attack               // t1
@@ -592,7 +594,6 @@ upgr_uac_transport     = 48; // transport capacity upgrade
 upgr_uac_radar_r       = 49; // Radar
 upgr_uac_plasmt        = 50; // plasma weapons fro anti-ground turret
 upgr_uac_turarm        = 51; // turrets armor
-//upgr_uac_rstrike       = 54; // rstrike launch
 
 
 upgr_fog_vision        = 249;
@@ -674,7 +675,7 @@ dm_RSMShot             = 11; //   2*[buildings]
 dm_Siege3              = 12; //   3*[buildings]
 dm_Siege4              = 13; //   4*[buildings]
 dm_Lost                = 14; //                      0.5*[mech]
-dm_BFG                 = 15; //   0.5*[buildings]
+dm_BFG                 = 15; // 0.5*[buildings]
 dm_AntiBio2            = 16; //   2*[unit bio]
 
 
@@ -854,14 +855,14 @@ UID_APC                = 94;
 uids_hell              = [1 ..49];
 uids_uac               = [50..99];
 
-uids_marines           = [UID_Engineer ,UID_Medic  ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_FPlasmagunner ,UID_BFGMarine ];
-uids_zimbas            = [UID_ZEngineer,UID_ZMedic ,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZFPlasmagunner,UID_ZBFGMarine];
+uids_marines           = [UID_Engineer ,UID_Medic ,UID_Sergant ,UID_SSergant ,UID_Commando ,UID_Antiaircrafter ,UID_SiegeMarine , UID_FPlasmagunner ,UID_BFGMarine ];
+uids_zimbas            = [UID_ZEngineer,UID_ZMedic,UID_ZSergant,UID_ZSSergant,UID_ZCommando,UID_ZAntiaircrafter,UID_ZSiegeMarine, UID_ZFPlasmagunner,UID_ZBFGMarine];
 uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,UID_Revenant,UID_Mancubus,UID_Arachnotron]+uids_zimbas;
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-uid_race_start_fbase   : array[1..r_cnt] of smallint = (UID_HKeep    ,UID_UCommandCenter );
-uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep   ,UID_UACommandCenter);
+uid_race_start_fbase   : array[1..r_cnt] of smallint = (UID_HKeep ,UID_UCommandCenter );
+uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep,UID_UACommandCenter);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -911,7 +912,7 @@ fr_mancubus_rld_s3     = fr_fpsd2;
 
 fr_archvile_s          = fr_fps1+fr_fpsd6;
 
-NameLen                = 13;
+MaxPlayerNameLen       = 13;
 
 dead_hits              = -ptime1*fr_fps1;
 fdead_hits             = dead_hits+fr_fps3;
@@ -994,83 +995,82 @@ snd_musicListSizeMax   = 10;
 //  HOTKEYS
 //
 
-_mhkeys  = 26;
-_hotkey1 : array[0.._mhkeys] of cardinal = (SDLK_R , SDLK_T , SDLK_Y ,
-                                            SDLK_F , SDLK_G , SDLK_H ,
-                                            SDLK_V , SDLK_B , SDLK_N ,
+max_HotKeys  = 26;
+HotKeysBase1 : array[0..max_HotKeys] of cardinal   = (SDLK_R , SDLK_T , SDLK_Y ,
+                                                      SDLK_F , SDLK_G , SDLK_H ,
+                                                      SDLK_V , SDLK_B , SDLK_N ,
 
-                                            SDLK_U , SDLK_I , SDLK_O ,
-                                            SDLK_J , SDLK_K , SDLK_L ,
-                                            SDLK_R , SDLK_T , SDLK_Y ,
+                                                      SDLK_U , SDLK_I , SDLK_O ,
+                                                      SDLK_J , SDLK_K , SDLK_L ,
+                                                      SDLK_R , SDLK_T , SDLK_Y ,
 
-                                            SDLK_F , SDLK_G , SDLK_H ,
-                                            SDLK_V , SDLK_B , SDLK_N ,
-                                            SDLK_R , SDLK_T , SDLK_Y );
+                                                      SDLK_F , SDLK_G , SDLK_H ,
+                                                      SDLK_V , SDLK_B , SDLK_N ,
+                                                      SDLK_R , SDLK_T , SDLK_Y );
 
-_hotkey2 : array[0.._mhkeys] of cardinal = (0      , 0      , 0      ,
-                                            0      , 0      , 0      ,
-                                            0      , 0      , 0      ,
+HotKeysBase2 : array[0..max_HotKeys] of cardinal   = (0      , 0      , 0      ,
+                                                      0      , 0      , 0      ,
+                                                      0      , 0      , 0      ,
 
-                                            0      , 0      , 0      ,
-                                            0      , 0      , 0      ,
-                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
+                                                      0      , 0      , 0      ,
+                                                      0      , 0      , 0      ,
+                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
 
-                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
-                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
-                                            SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt);
+                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
+                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
+                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt);
 
-_hotkeyA : array[0.._mhkeys] of cardinal = (SDLK_Q    , SDLK_W    , SDLK_E ,
-                                            SDLK_A    , SDLK_S    , SDLK_D ,
-                                            SDLK_Z    , SDLK_X    , SDLK_C ,
+HotKeysAction1 : array[0..max_HotKeys] of cardinal = (SDLK_Q    , SDLK_W    , SDLK_E ,
+                                                      SDLK_A    , SDLK_S    , SDLK_D ,
+                                                      SDLK_Z    , SDLK_X    , SDLK_C ,
 
-                                            SDLK_C    , SDLK_F2   , SDLK_Delete,
-                                            SDLK_F5   , SDLK_SPACE, 0,
-                                            0         , 0         , 0,
+                                                      SDLK_C    , SDLK_F2   , SDLK_Delete,
+                                                      SDLK_F5   , SDLK_SPACE, 0,
+                                                      0         , 0         , 0,
 
-                                            0,0,0,
-                                            0,0,0,
-                                            0,0,0);
-_hotkeyA2: array[0.._mhkeys] of cardinal = (0          , 0         , 0 ,
-                                            0          , 0         , 0 ,
-                                            0          , 0         , 0 ,
+                                                      0,0,0,
+                                                      0,0,0,
+                                                      0,0,0);
+HotKeysAction2: array[0..max_HotKeys] of cardinal  = (0          , 0         , 0 ,
+                                                      0          , 0         , 0 ,
+                                                      0          , 0         , 0 ,
 
-                                            SDLK_LCtrl , 0         , 0,
-                                            0          , SDLK_LCtrl, 0,
-                                            0          , 0         , 0,
+                                                      SDLK_LCtrl , 0         , 0,
+                                                      0          , SDLK_LCtrl, 0,
+                                                      0          , 0         , 0,
 
-                                            0,0,0,
-                                            0,0,0,
-                                            0,0,0);
+                                                      0,0,0,
+                                                      0,0,0,
+                                                      0,0,0);
 
-_hotkeyR : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_E ,
-                                            SDLK_A , SDLK_S , SDLK_D ,
-                                            SDLK_Z , 0      , SDLK_0 ,
+HotKeysReplay : array[0..max_HotKeys] of cardinal  = (SDLK_Q , SDLK_W , SDLK_E ,
+                                                      SDLK_A , SDLK_S , SDLK_D ,
+                                                      SDLK_Z , 0      , SDLK_0 ,
 
-                                            SDLK_1 , SDLK_2 , SDLK_3 ,
-                                            SDLK_4 , SDLK_5 , SDLK_6 ,
-                                            0,0,0,
+                                                      SDLK_1 , SDLK_2 , SDLK_3 ,
+                                                      SDLK_4 , SDLK_5 , SDLK_6 ,
+                                                      0,0,0,
 
-                                            0,0,0,
-                                            0,0,0,
-                                            0,0,0);
-_hotkeyO : array[0.._mhkeys] of cardinal = (SDLK_Q , SDLK_W , SDLK_0 ,
-                                            SDLK_1 , SDLK_2 , SDLK_3 ,
-                                            SDLK_4 , SDLK_5 , SDLK_6 ,
+                                                      0,0,0,
+                                                      0,0,0,
+                                                      0,0,0);
+HotKeysObserv : array[0..max_HotKeys] of cardinal  = (SDLK_Q , SDLK_W , SDLK_0 ,
+                                                      SDLK_1 , SDLK_2 , SDLK_3 ,
+                                                      SDLK_4 , SDLK_5 , SDLK_6 ,
 
-                                            0,0,0,
-                                            0,0,0,
-                                            0,0,0,
+                                                      0,0,0,
+                                                      0,0,0,
+                                                      0,0,0,
 
-                                            0,0,0,
-                                            0,0,0,
-                                            0,0,0);
+                                                      0,0,0,
+                                                      0,0,0,
+                                                      0,0,0);
 
 
 _buffst                : array[false..true] of smallint = (0,_ub_infinity);
 
 str_ps_sv              : char = '@';
 
-char_start             : char = '+';
 char_gen               : char = '*';
 char_cp                : char = '=';
 
@@ -1081,7 +1081,11 @@ char_advanced          = #10;
 
 spr_upgrade_icons      = 24;
 
-vid_maxplcolors        = 5;
+vid_MaxPlayersColor    = 5;
+vid_MaxHealthBars      = 2;
+vid_MaxControlPanelPos = 3;
+vid_MaxCamSpeed        = 127;
+snd_MaxSoundVolume     = 200;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1092,14 +1096,14 @@ vid_maxplcolors        = 5;
 sd_liquid_back         = -32500;
 sd_liquid              = -32000;
 // neytral generators
-sd_tcraters            = MaxSMapW+sd_liquid;    // -24000
+sd_tcraters            = map_MaxSize+sd_liquid;    // -24000
 // doodads
-sd_brocks              = MaxSMapW+sd_tcraters;  // -16000
-sd_srocks              = MaxSMapW+sd_brocks;    // -8000
-sd_build               = MaxSMapW+sd_srocks;    //  0
-sd_ground              = MaxSMapW+sd_build;     //  8000
-sd_fly                 = MaxSMapW+sd_ground;    //  16000
-sd_marker              = MaxSMapW+sd_fly;       //  24000
+sd_brocks              = map_MaxSize+sd_tcraters;  // -16000
+sd_srocks              = map_MaxSize+sd_brocks;    // -8000
+sd_build               = map_MaxSize+sd_srocks;    //  0
+sd_ground              = map_MaxSize+sd_build;     //  8000
+sd_fly                 = map_MaxSize+sd_ground;    //  16000
+sd_marker              = map_MaxSize+sd_fly;       //  24000
 
 map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
 
@@ -1202,6 +1206,8 @@ ta_left                = 0;
 ta_middle              = 1;
 ta_right               = 2;
 ta_chat                = 3;
+ta_miMU                = 4;
+ta_miMD                = 5;
 
 font_w                 = 8;
 font_hw                = font_w div 2;
@@ -1237,11 +1243,6 @@ vid_minh               = 600;
 vid_maxw               = 1920;
 vid_maxh               = 1080;
 
-vid_wl_n               = 11;
-vid_hl_n               = 8;
-vid_wl                 : array[0..vid_wl_n-1] of Smallint = (vid_minw,960,1024,1280,1360,1366,1400,1440,1600,1680,vid_maxw);
-vid_hl                 : array[0..vid_hl_n-1] of Smallint = (vid_minh,680,720 ,768 ,800 ,900 ,1050,vid_maxh);
-
 vid_ab                 = 128;
 vid_mvs                = 1000; // max vis sprites;
 vid_blink_persecond    = 6;
@@ -1255,117 +1256,35 @@ ui_alarm_time          = vid_blink_period2;
 vid_BWd                = 26;
 {$ENDIF}
 
-vid_BW                 = 48;
-vid_2BW                = vid_BW*2;
-vid_panelw             = vid_BW*3;
-vid_panelll            = 13;
-vid_panelh             = vid_BW*vid_panelll;
-vid_tBW                = vid_panelw div 4;
-vid_hBW                = vid_BW div 2;
-vid_oiw                = 18;
-vid_oihw               = vid_oiw+(vid_oiw div 2);
-vid_oisw               = vid_oiw-(vid_oiw div 4);
-vid_oips               = 2*vid_oiw+vid_oisw;
-vid_svld_m             = 7;
-vid_rpls_m             = 8;
-vid_camp_m             = 10;
-vid_campi_m            = 9;
-vid_campi_scrlstep     = vid_campi_m+1;
+ui_ButtonW1            = 48;
+ui_ButtonW2            = ui_ButtonW1*2;
+ui_ButtonWh            = ui_ButtonW1 div 2;
+ui_CtrlPanelW          = ui_ButtonW1*3;
+ui_CtrlPanelBH         = 13;
+ui_CtrlPanelH          = ui_ButtonW1*ui_CtrlPanelBH;
+ui_TabButtonW          = ui_CtrlPanelW div 4;
+
+ui_GroupIcoW1          = 18;
+ui_GroupIcoW1h         = ui_GroupIcoW1+(ui_GroupIcoW1 div 2);
+ui_GroupIcoWq3         = ui_GroupIcoW1-(ui_GroupIcoW1 div 4);
+ui_GroupIcoW2q3        = 2*ui_GroupIcoW1+ui_GroupIcoWq3;
 
 ui_max_alarms          = 12;
 
-ui_bottomsy            = vid_BW*4;
-ui_hwp                 = vid_panelw div 2;
-ui_ubtns               = 23;
+ui_bottomsy            = ui_ButtonW1*4;
+ui_hwp                 = ui_CtrlPanelW div 2;
+ui_ButtonsNum          = 23;
 
-ui_menu_map_zx0        = 76;
-ui_menu_map_zy0        = 110;
-ui_menu_map_zx1        = 381;
-ui_menu_map_zy1        = 289;
-ui_menu_map_ys         = 19;
-ui_menu_map_x0         = ((ui_menu_map_zx0+ui_menu_map_zx1) div 2)- vid_panelw;
-ui_menu_map_y0         = ((ui_menu_map_zy0+ui_menu_map_zy1) div 2)-(vid_panelw div 2);
-ui_menu_map_rx0        = ui_menu_map_x0+16+vid_panelw;
-ui_menu_map_rx1        = ui_menu_map_zx1-12;
-ui_menu_map_y1         = ui_menu_map_y0+(ui_menu_map_ys*7);
-ui_menu_map_tx0        = ui_menu_map_rx0+6;
-ui_menu_map_tx1        = ui_menu_map_rx0+((ui_menu_map_rx1-ui_menu_map_rx0) div 2);
-
-ui_menu_ssr_x0         = 76;
-ui_menu_ssr_y0         = 326;
-ui_menu_ssr_x1         = 381;
-ui_menu_ssr_y1         = 523;
-ui_menu_ssr_xs         = 102;
-ui_menu_ssr_xhs        = ui_menu_ssr_xs div 2;
-ui_menu_ssr_xhhs       = ui_menu_ssr_xhs div 2;
-ui_menu_ssr_ys         = 18;
-ui_menu_ssr_barl       = 127;
-ui_menu_ssr_x3         = ui_menu_ssr_x1-10;
-ui_menu_ssr_x2         = ui_menu_ssr_x3-ui_menu_ssr_barl;
-ui_menu_ssr_x4         = ui_menu_ssr_x0+ui_menu_ssr_xs;
-ui_menu_ssr_x5         = ui_menu_ssr_x0+ui_menu_ssr_xs*2;
-ui_menu_ssr_x6         = ui_menu_ssr_x5+ui_menu_ssr_xhs;
-ui_menu_ssr_x7         = ui_menu_ssr_x3-ui_menu_ssr_barl;
-ui_menu_ssr_x7t        = ui_menu_ssr_x7-font_w;
-ui_menu_ssr_x7r        = ui_menu_ssr_x7+font_w;
-ui_menu_ssr_xt0        = ui_menu_ssr_x6-ui_menu_ssr_xhhs;
-ui_menu_ssr_xt1        = ui_menu_ssr_x6+ui_menu_ssr_xhhs;
-ui_menu_ssl_x0         = (ui_menu_ssr_x0+ui_menu_ssr_x1) div 2;
-
-ui_menu_pls_x0         = 418;
-ui_menu_pls_y0         = 110;
-ui_menu_pls_x1         = 723;
-ui_menu_pls_y1         = 253;
-ui_menu_pls_ys         = 18;
-ui_menu_pls_zh         = (MaxPlayers*ui_menu_pls_ys);
-ui_menu_pls_xc         = (ui_menu_pls_x0+ui_menu_pls_x1) div 2;
-ui_menu_pls_zy0        = ((ui_menu_pls_y0+ui_menu_pls_y1) div 2)-(ui_menu_pls_zh div 2)-2;
-ui_menu_pls_zy1        = ui_menu_pls_zy0+ui_menu_pls_zh;
-ui_menu_pls_zy2        = ui_menu_pls_zy1+ui_menu_pls_ys;
-ui_menu_pls_zxn        = ui_menu_pls_x0;      // start
-ui_menu_pls_zxs        = ui_menu_pls_zxn+130; // name
-ui_menu_pls_zxr        = ui_menu_pls_zxs+24;  // status
-ui_menu_pls_zxt        = ui_menu_pls_zxr+68;  // race
-ui_menu_pls_zxc        = ui_menu_pls_zxt+40;  // team
-ui_menu_pls_zxe        = ui_menu_pls_x1;      // color box
-ui_menu_pls_zxnt       =  ui_menu_pls_zxn+6;
-ui_menu_pls_zxst       = (ui_menu_pls_zxs+ui_menu_pls_zxr) div 2;
-ui_menu_pls_zxrt       = (ui_menu_pls_zxr+ui_menu_pls_zxt) div 2;
-ui_menu_pls_zxtt       = (ui_menu_pls_zxt+ui_menu_pls_zxc) div 2;
-ui_menu_pls_zxc1       = ui_menu_pls_zxc+8;
-ui_menu_pls_zxc2       = ui_menu_pls_zxe-8;
-ui_menu_pls_zxct       = (ui_menu_pls_zxc+ui_menu_pls_zxe) div 2;
-
-ui_menu_csm_x0         = 418;
-ui_menu_csm_y0         = 290;
-ui_menu_csm_x1         = 723;
-ui_menu_csm_y1         = 522;
-ui_menu_csm_xs         = 102;
-ui_menu_csm_xhs        = ui_menu_csm_xs div 2;
-ui_menu_csm_ys         = 18;
-ui_menu_csm_2ys        = ui_menu_csm_ys*2;
-//ui_menu_csm_yhs        = ui_menu_csm_ys div 2;
-ui_menu_csm_ycs        = 10;
-ui_menu_csm_xct        = ui_menu_csm_x0+2;
-ui_menu_csm_xc         = (ui_menu_csm_x0+ui_menu_csm_x1) div 2;
-ui_menu_csm_x2         = ui_menu_csm_x0+ui_menu_csm_xs;
-ui_menu_csm_x3         = ui_menu_csm_x2+ui_menu_csm_xs;
-ui_menu_csm_xt0        = ui_menu_csm_x0+8;
-ui_menu_csm_xt1        = ui_menu_csm_x0+24;
-ui_menu_csm_xt2        = ui_menu_csm_x1-8;
-ui_menu_csm_xt3        = ui_menu_csm_xc+8;
 
 menu_ihintn            = 3;
 
 chat_type              : array[false..true] of char = ('|',' ');
-chat_shlm_t            = fr_fps1*3;
-chat_shlm_max          = chat_shlm_t*6;
+chat_LastMsgTime       = fr_fps1*3;
+chat_LastMsgTimeMax    = chat_LastMsgTime*6;
 
-ui_menu_chat_height    = 14; // lines
-ui_menu_chat_width     = 37; // chars
+ui_dBW                 = ui_ButtonW1-font_w-3;
 
-ui_dBW                 = vid_BW-font_w-3;
-
+// ui alarms
 
 aummat_attacked_u      = 1;
 aummat_attacked_b      = 2;
@@ -1420,17 +1339,191 @@ fog_vfhm               = (vid_maxh div fog_cw)+2;
 //  MENU
 //
 
-ms1_sett               = 0;
-ms1_svld               = 1;
-ms1_reps               = 2;
+mi_Back                = 1;
+mi_Break                = 2;
+mi_Exit                = 3;
 
-ms2_camp               = 0;
-ms2_scir               = 1;
-ms2_mult               = 2;
+mi_Start               = 10;
+mi_Surrender           = 11;
+mi_Campaings           = 12;
+mi_Scirmish            = 13;
+mi_SaveLoad            = 14;
+mi_Replays             = 15;
+mi_Settings            = 16;
 
-ms3_game               = 0;
-ms3_vido               = 1;
-ms3_sond               = 2;
+mi_caption_Campaings   = 20;
+mi_caption_Scirmish    = 21;
+mi_caption_SaveLoad    = 22;
+mi_caption_Replays     = 23;
+mi_caption_Settings    = 24;
+
+////  SETTINGS
+mi_settings_Game       = 30;
+mi_settings_Record     = 31;
+mi_settings_Video      = 32;
+mi_settings_Sound      = 33;
+
+mi_SG_ColoredShadows   = 40;
+mi_SG_ShowAPM          = 41;
+mi_SG_HealthBars       = 42;
+mi_SG_RightClickAction = 43;
+mi_SG_ScrollSpeed      = 44;
+mi_SG_MouseScroll      = 45;
+mi_SG_PlayerName       = 46;
+mi_SG_Language         = 47;
+mi_SG_ControlPanelPos  = 48;
+mi_SG_PlayersColor     = 49;
+
+mi_SR_RecordGames      = 50;
+mi_SR_RecordPrefix     = 51;
+mi_SR_RecordQuality    = 52;
+
+mi_SV_ResolutionW      = 60;
+mi_SV_ResolutionH      = 61;
+mi_SV_ResolutionApply  = 62;
+mi_SV_Windowed         = 63;
+mi_SV_ShowFPS          = 64;
+mi_SV_MenuScaling      = 65;
+mi_SV_SmoothScaled     = 66;
+
+mi_SS_SoundVolume      = 70;
+mi_SS_MusicVolume      = 71;
+mi_SS_PlayerNext       = 72;
+mi_SS_PlaylistSize     = 73;
+mi_SS_ReloadPlaylist   = 74;
+
+////  REPLAYS
+mi_Replays_list        = 80;
+mi_Replays_info        = 81;
+mi_Replays_play        = 82;
+mi_Replays_delete      = 83;
+
+////  SAVE LOAD
+mi_SaveLoad_list       = 90;
+mi_SaveLoad_info       = 91;
+mi_SaveLoad_fname      = 92;
+mi_SaveLoad_save       = 93;
+mi_SaveLoad_load       = 94;
+mi_SaveLoad_delete     = 95;
+
+// SCIRMISH PLAYERS BLOCK
+mi_Players_Panel       = 100;
+mi_Players_NameC       = 101;
+mi_Players_StateC      = 102;
+mi_Players_RaceC       = 103;
+mi_Players_TeamC       = 104;
+mi_Players_ColorC      = 105;
+mi_Players_PingC       = 106;
+mi_Players_Ready       = 107;
+
+mi_Players_Name1       = 111;
+mi_Players_Name2       = 112;
+mi_Players_Name3       = 113;
+mi_Players_Name4       = 114;
+mi_Players_Name5       = 115;
+mi_Players_Name6       = 116;
+
+mi_Players_State1      = 121;
+mi_Players_State2      = 122;
+mi_Players_State3      = 123;
+mi_Players_State4      = 124;
+mi_Players_State5      = 125;
+mi_Players_State6      = 126;
+
+mi_Players_Race1       = 131;
+mi_Players_Race2       = 132;
+mi_Players_Race3       = 133;
+mi_Players_Race4       = 134;
+mi_Players_Race5       = 135;
+mi_Players_Race6       = 136;
+
+mi_Players_Team1       = 141;
+mi_Players_Team2       = 142;
+mi_Players_Team3       = 143;
+mi_Players_Team4       = 144;
+mi_Players_Team5       = 145;
+mi_Players_Team6       = 146;
+
+mi_Players_Ping1       = 151;
+mi_Players_Ping2       = 152;
+mi_Players_Ping3       = 153;
+mi_Players_Ping4       = 154;
+mi_Players_Ping5       = 155;
+mi_Players_Ping6       = 156;
+
+// SCIRMISH MAP BLOCK
+mi_Map_Panel           = 160;
+mi_Map_Map             = 161;
+mi_Map_Scenario        = 162;
+mi_Map_Generators      = 163;
+mi_Map_Seed            = 164;
+mi_Map_Size            = 165;
+mi_Map_Obstacles       = 166;
+mi_Map_Symmetry        = 167;
+mi_Map_Theme           = 168;
+mi_Map_Random          = 169;
+
+// SCIRMISH GAME BLOCK
+mi_Game_Panel          = 170;
+mi_Game_FixedPositions = 171;
+mi_Game_AISlots        = 172;
+mi_Game_DefeatedObs    = 173;
+mi_Game_Random         = 174;
+
+// SCIRMISH MULTIPLAYER BLOCK
+mi_MP_Panel            = 180;
+mi_MP_ServerStart      = 181;
+mi_MP_ServerStop       = 182;
+mi_MP_ServerPort       = 183;
+mi_MP_ClientConnect    = 184;
+mi_MP_ClientDisconnect = 185;
+mi_MP_ClientAddress    = 186;
+mi_MP_ClientQuality    = 187;
+mi_MP_ClientLANSearch  = 188;
+mi_MP_Chat             = 189;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+menu_w                 = 800;
+menu_hw                = menu_w div 2;
+menu_h                 = 600;
+menu_hh                = menu_h div 2;
+menu_logoh             = 64;
+
+menu_BaseW             = 28;
+menu_BasehW            = menu_BaseW div 2;
+menu_SmallW            =(menu_BaseW div 4)*3;
+menu_ListLineH         =(menu_BaseW div 3)*2;
+menu_ListLinehH        = menu_ListLineH div 2;
+
+menu_BigButtonW        = menu_BaseW*4;
+menu_BigButtonhW       = menu_BigButtonW div 2;
+menu_BigButtonH        = menu_BaseW;
+menu_BigButtonhH       = menu_BigButtonH div 2;
+menu_StepFromBottom    = menu_BaseW+menu_BasehW;
+menu_ItemCaptionhW     = menu_BaseW*3;
+
+menu_underLogoY        = menu_logoh+menu_BaseW;
+menu_CaptionH          = menu_BaseW;
+menu_underCaptionY     = menu_underLogoY+menu_CaptionH+menu_BaseW;
+
+menu_border0           = 100;
+menu_border1           = 125;
+menu_border2           = 150;
+menu_BarStepX          = font_3hw;
+
+menu_BaseListH         = 16;
+menu_ListLineWChars    = 40;
+menu_ListW             = menu_ListLineWChars*font_w+2*font_w;
+//menu_SaveLoadInfoWChars= ((menu_w-menu_border2-menu_border2-menu_ListW-menu_BasehW)-2*font_w) div font_w;
+
+menu_PlayersNameW      = font_3w+MaxPlayerNameLen*font_w;
+menu_PlayersStateW     = font_3hw+menu_ListLineH;
+menu_PlayersRaceW      = font_3hw+8*font_w;
+menu_PlayersTeamW      = font_3hw+4*font_w;
+menu_PlayersPingW      = font_3hw+4*font_w;
+menu_PlayersW          = menu_PlayersNameW+menu_PlayersStateW+menu_PlayersRaceW+menu_PlayersTeamW+menu_PlayersPingW;
 
 LastMission            = 23;
 CMPMaxSkills           = 4;
@@ -1440,7 +1533,7 @@ CMPMaxSkills           = 4;
 //  BASE STRINGS
 //
 
-cfgfn                  : shortstring = 'cfg';
+str_ConfigFName        : shortstring = 'marswars.cfg';
 str_screenshot         : shortstring = 'MVSCR_';
 str_loading_gfx        : shortstring = 'LOADING GRAPHICS...'+#0;
 str_loading_sfx        : shortstring = 'LOADING SOUNDS...'+#0;
@@ -1500,9 +1593,9 @@ sep_wdash              = tc_white+'-';
 //
 
 k_chrtt                = fr_fps1 div 3;
-k_kbstr                : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
-k_kbdig                : set of Char = ['0'..'9'];
-k_kbaddr               : set of Char = ['0'..'9','.',':'];
+CharSetCommon          : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
+CharSetDigits          : set of Char = ['0'..'9'];
+CharSetAddress         : set of Char = ['0'..'9','.',':'];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1528,40 +1621,38 @@ theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH B
 {$ELSE }
 
 
-str_gnstarted            : shortstring = 'Not started';
-str_grun                 : shortstring = 'Run';
-str_gpaused              : shortstring = 'Paused by player #';
-str_gwinner              : shortstring = 'Won by a team #';
-str_udpport              : shortstring = ' UPD port: ';
-str_gstatus              : shortstring = 'Game status:   ';
-str_gsettings            : shortstring = 'Game settings:';
-str_map                  : shortstring = 'Map';
+str_GameLobby            : shortstring = 'Lobby';
+str_GameStarted          : shortstring = 'Run';
+str_GamePaused           : shortstring = 'Paused by player #';
+str_GameEnded            : shortstring = 'Won by a team #';
+str_UDPPort              : shortstring = ' UPD port: ';
+str_GameStatus           : shortstring = 'Game status: ';
+str_GameOptions          : shortstring = 'Game options:';
+str_MapOptions           : shortstring = 'Map options:';
 
-str_m_seed               : shortstring = 'Seed';
-str_m_siz                : shortstring = 'Size';
-str_m_obs                : shortstring = 'Obstacles';
-str_m_sym                : shortstring = 'Symmetry';
-str_aislots              : shortstring = 'Fill empty slots:         ';
-str_fstarts              : shortstring = 'Fixed player starts:      ';
-str_gmodet               : shortstring = 'Game mode:                ';
-str_cgenerators          : shortstring = 'Neutral generators:       ';
-str_deadobservers        : shortstring = 'Observer mode after lose: ';
-str_plname               : shortstring = 'Player name';
+str_map_Scenario         : shortstring = 'Scenario';
+str_map_Generators       : shortstring = 'Generators';
+str_map_Seed             : shortstring = 'Seed';
+str_map_Size             : shortstring = 'Size';
+str_map_Obstacles        : shortstring = 'Obstacles';
+str_map_Symmetry         : shortstring = 'Symmetry';
+str_game_AISlots         : shortstring = 'Fill empty slots:         ';
+str_game_FixedPositions  : shortstring = 'Fixed player starts:      ';
+str_game_DefeatedObs     : shortstring = 'Observer mode after lose: ';
+str_PlayerName           : shortstring = 'Player name';
 str_PlayerPaused         : shortstring = 'player paused the game';
 str_PlayerResumed        : shortstring = 'player has resumed the game';
-str_plout                : shortstring = ' left the game';
-str_player_surrender     : shortstring = ' surrenders!';
-//str_player_def           : shortstring = ' was terminated!';
+str_PlayerLeft           : shortstring = ' left the game';
+str_PlayerSurrender      : shortstring = ' surrenders!';
 
-str_cgeneratorsM         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
+str_map_GeneratorsL         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
 
 str_plstat               : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
-//str_ready                : shortstring = 'Ready';
 
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
-str_gmode                : array[0..gm_cnt      ] of shortstring = ('Skirmish','Two bases','Three bases','Capturing points','Invasion','Assault','Royal Battle');
+str_map_ScenarioL        : array[0..mc_count    ] of shortstring = ('Skirmish','3x3','2x2x2','Key points','Invasion','Assault','Royal Battle');
 str_observer             : shortstring = 'OBSERVER';
 
 {$ENDIF}

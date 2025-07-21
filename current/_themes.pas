@@ -370,18 +370,18 @@ theme_bliquids,
 theme_terrains    : TIntList;
 }
 
-procedure SetTheme(i,ter,liq,bliq,crt:integer);
+procedure SetTheme(nTheme,nTerrain,nLiquid,nLiquidBack,nCrater:integer);
 procedure SetTLBlC;
 begin
-   if(theme_terrainn<=0)then theme_map_trt :=-1 else begin if(ter <0)then theme_map_trt :=abs(ter  mod theme_terrainn) else theme_map_trt :=min2(theme_terrainn-1,ter ); theme_map_trt :=theme_terrains[theme_map_trt  ];end;
-   if(theme_bliquidn<=0)then theme_map_blqt:=-1 else begin if(bliq<0)then theme_map_blqt:=abs(bliq mod theme_bliquidn) else theme_map_blqt:=min2(theme_bliquidn-1,bliq); theme_map_blqt:=theme_bliquids[theme_map_blqt ];end;
-   if(theme_cratern <=0)then theme_map_crt :=-1 else begin if(crt <0)then theme_map_crt :=abs(crt  mod theme_cratern ) else theme_map_crt :=min2(theme_cratern -1,crt ); theme_map_crt :=theme_craters [theme_map_crt  ];end;
-   if(theme_liquidn <=0)then theme_map_lqt :=-1 else begin if(liq <0)then theme_map_lqt :=abs(liq  mod theme_liquidn ) else theme_map_lqt :=min2(theme_liquidn -1,liq ); theme_map_lqt :=theme_liquids [theme_map_lqt  ];end;
+   if(theme_terrainn<=0)then theme_map_Terrain   :=-1 else begin if(nTerrain   <0)then theme_map_Terrain   :=abs(nTerrain    mod theme_terrainn) else theme_map_Terrain   :=min2i(theme_terrainn-1,nTerrain   ); theme_map_Terrain   :=theme_terrains[theme_map_Terrain   ];end;
+   if(theme_bliquidn<=0)then theme_map_LiquidBack:=-1 else begin if(nLiquidBack<0)then theme_map_LiquidBack:=abs(nLiquidBack mod theme_bliquidn) else theme_map_LiquidBack:=min2i(theme_bliquidn-1,nLiquidBack); theme_map_LiquidBack:=theme_bliquids[theme_map_LiquidBack];end;
+   if(theme_cratern <=0)then theme_map_Crater    :=-1 else begin if(nCrater    <0)then theme_map_Crater    :=abs(nCrater     mod theme_cratern ) else theme_map_Crater    :=min2i(theme_cratern -1,nCrater    ); theme_map_Crater    :=theme_craters [theme_map_Crater    ];end;
+   if(theme_liquidn <=0)then theme_map_Liquid    :=-1 else begin if(nLiquid    <0)then theme_map_Liquid    :=abs(nLiquid     mod theme_liquidn ) else theme_map_Liquid    :=min2i(theme_liquidn -1,nLiquid    ); theme_map_Liquid    :=theme_liquids [theme_map_Liquid    ];end;
 end;
 begin
-   if(i<0)or(i>=theme_n)then i:=abs(i) mod theme_n;
-   theme_i:=i;
-   case i of
+   if(nTheme<0)or(nTheme>=theme_n)then nTheme:=abs(nTheme) mod theme_n;
+   theme_i:=nTheme;
+   case nTheme of
    0: begin  // TECH BASE
          SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1_3,21,22,26,27,29,31,32');
          SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'17,18'      );
@@ -545,10 +545,10 @@ begin
 
       end;
    end;
-   theme_map_trt :=theme_terrains[0];
-   theme_map_blqt:=theme_bliquids[0];
-   theme_map_crt :=theme_craters [0];
-   theme_map_lqt :=theme_liquids [0];
+   theme_map_Terrain :=theme_terrains[0];
+   theme_map_LiquidBack:=theme_bliquids[0];
+   theme_map_Crater :=theme_craters [0];
+   theme_map_Liquid :=theme_liquids [0];
 end;
 
 

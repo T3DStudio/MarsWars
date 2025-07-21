@@ -1,5 +1,11 @@
 
 type
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   COMMON
+//
+
 TSob  = set of byte;
 PTSob = ^TSob;
 
@@ -18,7 +24,7 @@ PTStringList = ^TStringList;
 //
 
 TMWTexture = record
-   surf:pSDL_Surface;
+   surf :pSDL_Surface;
    w,h,
    hw,hh:integer;
 end;
@@ -70,7 +76,6 @@ TVisPrim = record
    text_rd,
    text_ld  : string6;
 end;
-//PTVisPrim = ^TVisPrim;
 
 TVisSpr = record
    sprite   : PTMWTexture;
@@ -136,13 +141,36 @@ end;
 PTSoundSet = ^TSoundSet;
 
 ////////////////////////////////////////////////////////////////////////////////
+//
+//   OTHER
+//
 
 TReplayPos = record
    rp_fpos : int64;
    rp_gtick: cardinal;
 end;
 
+TMenuItem = record
+   mi_x0,
+   mi_y0,
+   mi_x1,
+   mi_y1,
+   mi_xc,
+   mi_yc   :integer;
+   mi_state:byte;
+end;
+
+TSaveLoadItem = record
+   data_p:pointer;
+   data_s:cardinal;
+end;
+
 {$ENDIF}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   GAME
+//
 
 TDamageMod = array[0..MaxDamageModFactors] of record
   dm_factor : integer;  // 100 = x1
@@ -195,7 +223,7 @@ TMissile = record
 end;
 
 TWUDataTime  = array[1..MaxUnits] of cardinal;
-TWCPDataTime = array[1..MaxCPoints] of byte;
+TWCPDataTime = array[1..LastKeyPoint] of byte;
 
 TUWeapon = record
   aw_type,
@@ -646,7 +674,7 @@ end;
 PTUnit = ^TUnit;
 PPTUnit = ^PTUnit;
 
-TCTPoint = record
+TKeyPoint = record
    cpx ,cpy ,
    cpsolidr,cpCaptureR,cpNoBuildR,
    cp_ToCenterD,
@@ -665,7 +693,7 @@ TCTPoint = record
    cpunitsp_pstate,
    cpUnitsPlayer     : array[0..MaxPlayers] of longint;
 end;
-PTCTPoint = ^TCTPoint;
+PTCTPoint = ^TKeyPoint;
 
 TDoodad = record
    x,y,r :integer;

@@ -106,7 +106,7 @@ begin
              begin
                 pains:=_painc;
 
-                buff[ub_Pain]:=max2(pain_time,a_rld);
+                buff[ub_Pain]:=max2i(pain_time,a_rld);
 
                 with player^ do
                  if(_urace=r_hell)then
@@ -193,7 +193,7 @@ begin
        vsni:=avsni;
        vsnt:=avsnt;
        if(bhits>0)then
-        if(not iscomplete)then hits:=mm3(1,bhits,puid^._mhits-1);
+        if(not iscomplete)then hits:=mm3i(1,bhits,puid^._mhits-1);
        if(select)then
        begin
           sel:=true;
@@ -242,7 +242,7 @@ begin
           if(vx<>x)or(vy<>y)then
            if(shortcollision)
            then dir:=_DIR360(dir-(                  dir_diff(dir,point_dir(vx,vy,x,y))   div 2 ))
-           else dir:=_DIR360(dir-( min2(90,max2(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
+           else dir:=_DIR360(dir-( min2i(90,max2i(-90,dir_diff(dir,point_dir(vx,vy,x,y)))) div 2 ));
 
          if(tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)and(uo_tar=0)then
          begin
@@ -331,7 +331,7 @@ begin
        begin
           ss:=speed;
 
-          if(buff[ub_Slow]>0)then ss:=max2(2,ss div 2);
+          if(buff[ub_Slow]>0)then ss:=max2i(2,ss div 2);
 
           mdist:=point_dist_int(x,y,mv_x,mv_y);
           if(mdist<=speed)then
@@ -762,8 +762,8 @@ procedure unit_capture_point(pu:PTUnit);
 var i :byte;
 begin
    with pu^ do
-    for i:=1 to MaxCPoints do
-     with g_cpoints[i] do
+    for i:=0 to LastKeyPoint do
+     with g_KeyPoints[i] do
       if(cpCaptureR>0)then
        if(point_dist_int(x,y,cpx,cpy)<=cpCaptureR)then
        begin
@@ -808,7 +808,7 @@ begin
 
       u_royal_cd:=NOTSET;
       u_royal_d :=NOTSET;
-      if(g_mode=gm_royale)then
+      if(map_scenario=mc_royale)then
       begin
          u_royal_cd:=point_dist_int(x,y,map_hmw,map_hmw);
          u_royal_d :=g_royal_r-u_royal_cd;
@@ -827,7 +827,7 @@ begin
 
       pushout      := solid and unit_canMove(pu) and (a_rld<=0);
       attack_target:= unit_canAttack(pu,false);
-      aicode       := (state=ps_comp);//and(sel);
+      aicode       := (state=ps_ai);//and(sel);
       fteleport_tar:= (not IsUnitRange(uo_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
       puo:=nil;
@@ -903,7 +903,7 @@ uab_Teleport      : swtarget:=true;
 
       {$IFNDEF DEBUG1}
       aiu_code(pu);
-      if(aicode){and(playeri=HPlayer)}then ai_code(pu);
+      if(aicode){and(playeri=LocalPlayer)}then ai_code(pu);
       {$ENDIF}
 
       if(buff[ub_Damaged]>0)then GameLogUnitAttacked(pu);
@@ -1205,7 +1205,7 @@ begin
          td :=point_dist_int(x,y,tu^.x,tu^.y);
          if(tu^.solid)
          then tdm:=td-(_r+tu^.uid^._r)
-         else tdm:=td- min2(_r,tu^.uid^._r);
+         else tdm:=td- min2i(_r,tu^.uid^._r);
 
          if(tdm<melee_r)then
          begin
@@ -1370,7 +1370,7 @@ begin
         if(tu^.vsnt[i]>0)
         or(    vsnt[i]>0)then
         begin
-                vsnt[i]:=max2(vsnt[i],tu^.vsnt[i]);
+                vsnt[i]:=max2i(vsnt[i],tu^.vsnt[i]);
             tu^.vsnt[i]:=vsnt[i];
         end;
    end;
@@ -1494,7 +1494,7 @@ wmove_noneed    : if(not attackinmove)then
             if(ServerSide)and(not _ukbuilding)then
               if((aw_max_range<0)and(aw_type=wpt_directdmg))
               or(aw_type=wpt_heal)
-              or((playeri=0)and(g_mode=gm_invasion))
+              or((playeri=0)and(map_scenario=mc_invasion))
               then _unit_exp(pu,aw_rld*2)
               else _unit_exp(pu,aw_rld  );
             if(not attackinmove)then
@@ -1574,10 +1574,10 @@ wpt_suicide    : if(ServerSide)then unit_kill(pu,false,true,true,false,true);
               case aw_type of
 wpt_resurect   : begin
                     _StartResurrection(pu,tu,false);
-                    if((aw_reqf and wpr_reload)>0)then rld:=max2(0,aw_count*fr_fps1);
+                    if((aw_reqf and wpr_reload)>0)then rld:=max2i(0,aw_count*fr_fps1);
                  end;
 wpt_heal       : begin
-                    tu^.hits:=mm3(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
+                    tu^.hits:=mm3i(1,tu^.hits+aw_count+upgradd,tu^.uid^._mhits);
                     tu^.buff[ub_Heal]:=aw_rld;
                  end;
               end;
@@ -1614,8 +1614,8 @@ begin
       begin
          _unit_uo_tar(pu);
 
-         uo_x:=mm3(1,uo_x,map_mw);
-         uo_y:=mm3(1,uo_y,map_mw);
+         uo_x:=mm3i(1,uo_x,map_Size);
+         uo_y:=mm3i(1,uo_y,map_Size);
 
          mv_x:=uo_x;
          mv_y:=uo_y;
@@ -1671,7 +1671,7 @@ uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
           if(unit_canMove(pu))then
             if(mp_x<>mv_x)or(mp_y<>mv_y)then
             begin
-               if(not uid^._slowturn)and(player^.state<>ps_comp)then
+               if(not uid^._slowturn)and(player^.state<>ps_ai)then
                  if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
                mp_x:=mv_x;
                mp_y:=mv_y;
@@ -1951,7 +1951,7 @@ begin
                unit_move(pu);
                unit_prod(pu);
 
-               if(player^.state=ps_comp)then ai_scout_pick(pu);
+               if(player^.state=ps_ai)then ai_scout_pick(pu);
             end;
 
             transportu:=nil;
