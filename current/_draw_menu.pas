@@ -338,19 +338,22 @@ mi_caption_Settings : d_MenuItemPanel(tar,i,3);
    /////////////////////////////////////////////////////////////////////////////
    // Captions
    d_menuItemText2L(tar,mi_caption_Campaings,str_menu_Campaings,
-                                             str_menu_Tutorials,255);
+                                             str_menu_Tutorials  ,255);
 
-   d_menuItemText1(tar,mi_caption_Scirmish  ,str_menu_Scirmish ,255);
+   if(rpls_state=rpls_read)
+then d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Playback   ,255)
+else d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Scirmish   ,255);
 
    if(g_started)
-then d_menuItemText1(tar,mi_caption_SaveLoad,str_menu_SaveLoad ,255)
-else d_menuItemText1(tar,mi_caption_SaveLoad,str_menu_LoadGame ,255);
+then d_menuItemText1(tar,mi_caption_SaveLoad,str_menu_SaveLoad   ,255)
+else d_menuItemText1(tar,mi_caption_SaveLoad,str_menu_LoadGame   ,255);
 
-   d_menuItemText1(tar,mi_caption_Replays   ,str_menu_Replays  ,255);
-   d_menuItemText1(tar,mi_caption_Settings  ,str_menu_Settings ,255);
+   d_menuItemText1(tar,mi_caption_Replays   ,str_menu_Replays    ,255);
+   d_menuItemText1(tar,mi_caption_Settings  ,str_menu_Settings   ,255);
 
+   /////////////////////////////////////////////////////////////////////////////
    // Main buttons
-   d_MenuItemText2L(tar,mi_Campaings        ,str_menu_Campaings,
+   d_MenuItemText2L(tar,mi_Campaings        ,str_menu_Campaings  ,
                                              str_menu_Tutorials  ,0);
 
    d_menuItemText1(tar,mi_Scirmish          ,str_menu_Scirmish   ,0);
@@ -362,8 +365,11 @@ else d_menuItemText1(tar,mi_SaveLoad        ,str_menu_LoadGame   ,0);
    d_menuItemText1(tar,mi_Replays           ,str_menu_Replays    ,0);
    d_menuItemText1(tar,mi_Settings          ,str_menu_Settings   ,0);
 
+   if(rpls_state=rpls_read)
+then d_menuItemText1(tar,mi_Break           ,str_menu_PlaybackStop,0)
+else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
+
    d_menuItemText1(tar,mi_Back              ,str_menu_Back       ,0);
-   d_menuItemText1(tar,mi_Break             ,str_menu_Break      ,0);
    d_menuItemText1(tar,mi_Exit              ,str_menu_Exit       ,0);
    d_menuItemText1(tar,mi_Start             ,str_menu_Start      ,0);
    d_menuItemText1(tar,mi_Surrender         ,str_menu_Surrender  ,0);
@@ -508,9 +514,17 @@ else d_menuItemText1(tar,mi_SaveLoad        ,str_menu_LoadGame   ,0);
    d_menuItemText2(tar,mi_Game_DefeatedObs   ,str_GO_DefeatedObs,b2cc[g_DefeatedObs]        ,0);
    d_menuItemText1(tar,mi_Game_Random        ,str_GO_Random     ,0);
 
-   // SCIRMISH GAME
+   // SCIRMISH MULTIPLAYER
    d_MenuItemCaption(tar,mi_MP_Panel,str_Caption_Multiplayer);
 
+
+   // SCIRMISH REPLAY
+   d_MenuItemCaption(tar,mi_ReplayInfo_Panel,str_FileInfo);
+
+   if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then
+   d_MenuItemInfo   (tar,mi_ReplayInfo_Panel,rpls_list[rpls_list_sel]);
+
+   //mi_ReplayInfo_Panel
 
     {
 
@@ -558,11 +572,11 @@ end;
 
 procedure D_Menu;
 begin
-   if(vid_menu_redraw)then
+   if(menu_redraw)then
    begin
       d_updmenu(r_menu);
       vid_MakeBigMenu;
-      vid_menu_redraw:=false;
+      menu_redraw:=false;
    end;
 
    draw_sdlsurface(r_screen,r_menusc_x,r_menusc_y,r_menusc);

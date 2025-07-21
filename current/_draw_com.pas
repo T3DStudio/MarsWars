@@ -140,7 +140,7 @@ begin
    characterColor(tar,x-3,y-3,sym,color);
 end;
 
-procedure map_MinimapPlayerStarts;
+procedure map_MinimapPlayerStarts(tar:pSDL_Surface);
 var i  :byte;
     x,y:integer;
     c  :cardinal;
@@ -149,27 +149,24 @@ begin
    begin
       if(map_scenario in [mc_invasion,mc_KotH])and(i=0)then continue;
 
-      //if(g_AISlots=0)then
-      // if(g_players[i].state=ps_none)then continue;
-
       x:=round(map_psx[i]*map_mmcx);
       y:=round(map_psy[i]*map_mmcx);
 
       c:=PlayerGetColor(i);
 
-      map_minimap_cpoint(r_minimap,x,y,trunc(base_1r*map_mmcx),i2s(i)[1],c);//char_start
+      map_minimap_cpoint(tar,x,y,trunc(base_1r*map_mmcx),i2s(i)[1],c);//char_start
    end;
 end;
 
-procedure map_MinimapCPoints;
+procedure map_MinimapCPoints(tar:pSDL_Surface);
 var i  :byte;
 begin
    for i:=0 to LastKeyPoint do
     with g_KeyPoints[i] do
      if(cpCaptureR>0)then
       if((i=0)and(map_scenario=mc_KotH))or(cpenergy<=0)
-      then map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_cp ,c_purple)
-      else map_minimap_cpoint(r_minimap,cpmx,cpmy,cpmr,char_gen,c_white );
+      then map_minimap_cpoint(tar,cpmx,cpmy,cpmr,char_cp ,c_purple)
+      else map_minimap_cpoint(tar,cpmx,cpmy,cpmr,char_gen,c_white );
 end;
 
 procedure map_RedrawMenuMinimap;
@@ -177,10 +174,10 @@ begin
    sdl_FillRect(r_minimap,nil,0);
    map_MinimapUpdateBackground;
    draw_sdlsurface(r_minimap,0,0,r_bminimap);
-   if(g_FixedPositions)then map_MinimapPlayerStarts;
-   map_MinimapCPoints;
    draw_sdlsurface(r_mminimap,0,0,r_minimap);
-   vid_menu_redraw:=vid_menu_redraw or MainMenu;
+   if(g_FixedPositions)then map_MinimapPlayerStarts(r_mminimap);
+   map_MinimapCPoints(r_mminimap);
+   menu_redraw:=menu_redraw or MainMenu;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);

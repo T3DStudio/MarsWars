@@ -359,7 +359,7 @@ begin
 end;
 procedure menu_TopCaption(mi:byte);
 begin
-   setItem(mi,menu_hw-menu_BigButtonhW,menu_underLogoY,menu_hw+menu_BigButtonhW,menu_underLogoY+menu_CaptionH,true);
+   setItem(mi,menu_hw-menu_CaptionhW,menu_underLogoY,menu_hw+menu_CaptionhW,menu_underLogoY+menu_CaptionH,true);
 end;
 begin
    FillChar(menu_items,SizeOf(Menu_items),0);
@@ -564,18 +564,20 @@ gt_scirmish: begin
                 menu_items[mi_Game_Random        ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
 
                 // MULTIPLAYER BLOCK
+                with menu_items[mi_Players_Panel] do
+                begin
+                   tx0:=mi_x0;
+                   tx1:=mi_x1;
+                   ty0:=mi_y1+menu_BaseW;
+                end;
                 if(rpls_state=rpls_read)then
                 begin
+                   setItem(mi_ReplayInfo_Panel   ,tx0,ty0,tx1,menu_items[mi_Game_Panel].mi_y1,true);
+
 
                 end
                 else
                 begin
-                   with menu_items[mi_Players_Panel] do
-                   begin
-                      tx0:=mi_x0;
-                      tx1:=mi_x1;
-                      ty0:=mi_y1+menu_BaseW;
-                   end;
                    setItem(mi_MP_Panel           ,tx0,ty0,tx1,menu_items[mi_Game_Panel].mi_y1,true);
                    tx0+=menu_BasehW;
                    tx1-=menu_BasehW;
@@ -665,7 +667,7 @@ begin
          else
            if(abs(menu_ihintly[p]-mouse_y)<abs(menu_ihintly[menu_ihintpi]-mouse_y))
            then menu_ihintpi:=p;
-      vid_menu_redraw:=true;
+      menu_redraw:=true;
    end;
 
    if(ks_mleft=1)or(ks_mright=1) then   //right or left click
@@ -674,7 +676,7 @@ begin
 
       menu_item:=menu_MouseXY2Item;
 
-      vid_menu_redraw:=true;
+      menu_redraw:=true;
       menu_rebuild   :=true;
 
       if(menu_item>0)then SoundPlayUI(snd_click);
@@ -880,7 +882,7 @@ mi_Map_Seed            : GameSetOption(nmid_lobby_MSeed      ,false,false);
 mi_Map_Size            : GameSetOption(nmid_lobby_MSize      ,false,false);
 mi_Map_Obstacles       : GameSetOption(nmid_lobby_MObs       ,false,false);
 
-mi_Game_AISlots        : GameSetOption(nmid_lobby_GAISlots     ,false,false);
+mi_Game_AISlots        : GameSetOption(nmid_lobby_GAISlots   ,false,false);
       {
       91 : ScrollByte(@net_cl_Quality,false,0,9);
 
@@ -915,7 +917,7 @@ mi_Map_Seed       : menu_mseed       :=StringApplyInput(menu_mseed      ,CharSet
       100: net_chat_str  :=StringApplyInput(net_chat_str  ,CharSetCommon,255    ,@changed);    }
       end;
 
-      vid_menu_redraw:=changed;
+      menu_redraw:=changed;
    end;
 
    // rebuild menu
@@ -923,7 +925,7 @@ mi_Map_Seed       : menu_mseed       :=StringApplyInput(menu_mseed      ,CharSet
    begin
       g_RebuildMenu;
       menu_rebuild   :=false;
-      vid_menu_redraw:=true;
+      menu_redraw:=true;
 
       if(menu_items[menu_item].mi_state<2)then menu_item:=0;
    end;

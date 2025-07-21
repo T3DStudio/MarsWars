@@ -136,7 +136,7 @@ begin
        or(unit_canAttack(pu,false))
        or(unit_sAbility(pu,true)=0)
        or(unit_pAbility(pu,0,0,0,true)=0)then exit;
-      if(_UnitHaveRPoint(uidi))then exit;
+      if(UnitHaveRPoint(uidi))then exit;
    end;
    CheckBOrders:=false;
 end;
@@ -673,7 +673,7 @@ sdlk_tab: begin
 
                 case k of
              sdlk_0..sdlk_9 :  begin
-                                  ko:=_event^.key.keysym.sym-sdlk_0;
+                                  ko:=sys_EVENT^.key.keysym.sym-sdlk_0;
                                   if(ko<MaxUnitGroups)then
                                    if(ks_ctrl>0)
                                    then units_Grouping(false,LocalPlayer,ko)//PlayerSendOrder(ko,0,0,0,0,uo_setorder,LocalPlayer)
@@ -722,19 +722,19 @@ begin
    if(k_chart>k_chrtt)then
     if(length(k_keyboard_string)<255)then k_keyboard_string+=k_char;
 
-   while (SDL_PollEvent(_event)>0) do
-    case (_event^.type_) of
+   while (SDL_PollEvent(sys_EVENT)>0) do
+    case (sys_EVENT^.type_) of
       SDL_MOUSEMOTION    : begin
                               if(m_DragCamMove)and(MainMenu=false)and(G_Started)then
                               begin
-                                 ui_cam_x-=_event^.motion.x-mouse_x;
-                                 ui_cam_y-=_event^.motion.y-mouse_y;
+                                 ui_cam_x-=sys_EVENT^.motion.x-mouse_x;
+                                 ui_cam_y-=sys_EVENT^.motion.y-mouse_y;
                                  CameraBounds;
                               end;
-                              mouse_x:=_event^.motion.x;
-                              mouse_y:=_event^.motion.y;
+                              mouse_x:=sys_EVENT^.motion.x;
+                              mouse_y:=sys_EVENT^.motion.y;
                            end;
-      SDL_MOUSEBUTTONUP  : case (_event^.button.button) of
+      SDL_MOUSEBUTTONUP  : case (sys_EVENT^.button.button) of
                             SDL_BUTTON_LEFT   : ks_mleft  :=-1;
                             SDL_BUTTON_RIGHT  : ks_mright :=-1;
                             SDL_BUTTON_MIDDLE : begin
@@ -743,7 +743,7 @@ begin
                                                 end
                            else
                            end;
-      SDL_MOUSEBUTTONDOWN: case (_event^.button.button) of
+      SDL_MOUSEBUTTONDOWN: case (sys_EVENT^.button.button) of
                             SDL_BUTTON_LEFT      : if(ks_mleft =0)then ks_mleft   :=1;
                             SDL_BUTTON_RIGHT     : if(ks_mright=0)then ks_mright  :=1;
                             SDL_BUTTON_MIDDLE    : begin
@@ -752,23 +752,23 @@ begin
                                                    end;
                             SDL_BUTTON_WHEELDOWN : if(MainMenu)then
                                                    begin
-                                                      vid_menu_redraw:=true;
+                                                      menu_redraw:=true;
                                                       case menu_item of
                                                       98: if not(G_Started)then
                                                           ScrollInt(@camp_list_scroll, 1,0,LastMission     -menu_BaseListH);
-                                                      36: ScrollInt(@svld_list_scroll, 1,0,svld_list_size-1-menu_BaseListH);
-                                                      41: ScrollInt(@rpls_list_scroll, 1,0,rpls_list_size-1-menu_BaseListH);
+                                                      mi_SaveLoad_list: ScrollInt(@svld_list_scroll, 1,0,svld_list_size-1-menu_BaseListH);
+                                                      mi_Replays_list : ScrollInt(@rpls_list_scroll, 1,0,rpls_list_size-1-menu_BaseListH);
                                                       end;
                                                    end
                                                    else tmpmid-=1;
                             SDL_BUTTON_WHEELUP   : if(MainMenu)then
                                                    begin
-                                                      vid_menu_redraw:=true;
+                                                      menu_redraw:=true;
                                                       case menu_item of
                                                       98: if not(G_Started)then
                                                           ScrollInt(@camp_list_scroll,-1,0,LastMission     -menu_BaseListH);
-                                                      36: ScrollInt(@svld_list_scroll,-1,0,svld_list_size-1-menu_BaseListH);
-                                                      41: ScrollInt(@rpls_list_scroll,-1,0,rpls_list_size-1-menu_BaseListH);
+                                                      mi_SaveLoad_list: ScrollInt(@svld_list_scroll,-1,0,svld_list_size-1-menu_BaseListH);
+                                                      mi_Replays_list : ScrollInt(@rpls_list_scroll,-1,0,rpls_list_size-1-menu_BaseListH);
                                                       end;
                                                    end
                                                    else tmpmid+=1;
@@ -776,17 +776,17 @@ begin
                            end;
       SDL_QUITEV         : GameCycle:=false;
       SDL_VIDEORESIZE    : begin
-                           vid_vw:=max2i(vid_minw,_event^.resize.w);menu_ResolutionWi:=vid_vw;
-                           vid_vh:=max2i(vid_minh,_event^.resize.h);menu_ResolutionWi:=vid_vh;
+                           vid_vw:=max2i(vid_minw,sys_EVENT^.resize.w);menu_ResolutionWi:=vid_vw;
+                           vid_vh:=max2i(vid_minh,sys_EVENT^.resize.h);menu_ResolutionWi:=vid_vh;
 
                            vid_MakeScreen;
                            theme_map_pTerrain:=255;
                            gfx_MapMakeTerrain;
-                           vid_menu_redraw:=true;
+                           menu_rebuild:=true;
                            end;
       SDL_KEYUP          : begin
                               k_chart:=-1;
-                              case (_event^.key.keysym.sym) of
+                              case (sys_EVENT^.key.keysym.sym) of
                                 sdlk_up     : ks_up   :=-1;
                                 sdlk_down   : ks_down :=-1;
                                 sdlk_left   : ks_left :=-1;
@@ -802,10 +802,10 @@ begin
                            end;
       SDL_KEYDOWN        : begin
                               k_chart  :=2;
-                              k_char   :=Widechar(_event^.key.keysym.unicode);
+                              k_char   :=Widechar(sys_EVENT^.key.keysym.unicode);
                               k_keyboard_string+=k_char;
 
-                              case (_event^.key.keysym.sym) of
+                              case (sys_EVENT^.key.keysym.sym) of
                                 sdlk_up     : if(ks_up   =0)then ks_up   :=1;
                                 sdlk_down   : if(ks_down =0)then ks_down :=1;
                                 sdlk_left   : if(ks_left =0)then ks_left :=1;
@@ -821,7 +821,7 @@ begin
                                 SDLK_KP_ENTER,
                                 sdlk_return : input_key_return;
                               else
-                                if(not MainMenu)and(G_Started)and(ingame_chat=0)then _hotkeys(_event^.key.keysym.sym);
+                                if(not MainMenu)and(G_Started)and(ingame_chat=0)then _hotkeys(sys_EVENT^.key.keysym.sym);
                               end;
                            end;
     else

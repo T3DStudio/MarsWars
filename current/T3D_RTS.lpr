@@ -67,17 +67,6 @@ uses SysUtils, SDL, SDL_Net,crt
 
 {$R *.res}
 
-{procedure _test;
-var i:byte;
-begin
-   for i:=0 to 255 do
-   with _uids[i] do
-   if(_r>0)then
-   begin
-      writeln(_r,' ',(_r/12):4:4,' ',un_txt_name);
-   end;
-end; }
-
 begin
    InitGame;
    {$IFDEF _FULLGAME}
@@ -99,8 +88,8 @@ begin
       CodeGame;
       if(r_draw)then DrawGame;
       {$ELSE}
-      while(SDL_PollEvent(_EVENT)>0)do
-        case (_EVENT^.type_) of
+      while(SDL_PollEvent(sys_EVENT)>0)do
+        case(sys_EVENT^.type_)of
         SDL_QUITEV  : break;
         end;
       CodeGame;

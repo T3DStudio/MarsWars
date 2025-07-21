@@ -811,43 +811,84 @@ procedure lng_eng;
 var t: shortstring;
     i:byte;
 begin
-   str_Caption_Map        := 'MAP';
-   str_Caption_Players    := 'PLAYERS';
-   str_Caption_Multiplayer:= 'MULTIPLAYER';
+   str_Caption_Map               := 'MAP';
+   str_Caption_Players           := 'PLAYERS';
+   str_Caption_Multiplayer       := 'MULTIPLAYER';
+   str_Caption_GOptions          := 'GAME OPTIONS';
 
-   str_MObjectives       := 'OBJECTIVES';
+   str_MObjectives               := 'OBJECTIVES';
 
-   str_menu_Tutorials    := 'TUTORIALS';
-   str_menu_Campaings    := 'CAMPAIGNS';
-   str_menu_Scirmish     := 'SKIRMISH';
-   str_menu_SaveLoad     := 'SAVE/LOAD';
-   str_menu_LoadGame     := 'LOAD GAME';
-   str_menu_Replays      := 'REPLAYS';
-   str_menu_Settings     := 'SETTINGS';
+   str_menu_Tutorials            := 'TUTORIALS';
+   str_menu_Campaings            := 'CAMPAIGNS';
+   str_menu_Scirmish             := 'SKIRMISH';
+   str_menu_Playback             := 'REPLAY PLAYBACK';
+   str_menu_SaveLoad             := 'SAVE/LOAD';
+   str_menu_LoadGame             := 'LOAD GAME';
+   str_menu_Replays              := 'REPLAYS';
+   str_menu_Settings             := 'SETTINGS';
 
-   str_menu_Start        := 'START';
-   str_menu_Surrender    := 'SURRENDER';
-   str_menu_Break        := 'BREAK MISSION';
-   str_menu_Exit         := 'EXIT';
-   str_menu_Back         := 'BACK';
+   str_menu_Start                := 'START';
+   str_menu_Surrender            := 'SURRENDER';
+   str_menu_Break                := 'BREAK MISSION';
+   str_menu_PlaybackStop         := 'STOP PLAYBACK';
+   str_menu_Exit                 := 'EXIT';
+   str_menu_Back                 := 'BACK';
 
-   str_menu_SetGame      := 'GAME';
-   str_menu_SetReplay    := 'GAME RECORDING';
-   str_menu_SetVideo     := 'VIDEO';
-   str_menu_SetSound     := 'SOUND';
+   str_menu_SetGame              := 'GAME';
+   str_menu_SetReplay            := 'RECORDING';
+   str_menu_SetVideo             := 'VIDEO';
+   str_menu_SetSound             := 'SOUND';
 
-   str_SR_RecordGames    := 'Record games';
-   str_SR_Quality        := 'File size/quality';
-   str_SR_ReplayPrefix   := 'Replay prefix';
+   str_SR_RecordGames            := 'Record games';
+   str_SR_Quality                := 'File size/quality';
+   str_SR_ReplayPrefix           := 'Replay prefix';
 
+   str_SG_ShowAPM                := 'Show APM';
+   str_SG_ColoredShadow          := 'Colored shadows';
    str_SG_ScrollSpeed            := 'Scroll speed';
    str_SG_MouseScroll            := 'Mouse scroll';
    str_SG_PlayerName             := 'Player name';
-   str_SG_LanguageL[true]        := 'RUS';
+   str_SG_Language               := 'UI language';
+   str_SG_LanguageL[true ]       := 'RUS';
    str_SG_LanguageL[false]       := 'ENG';
    str_SG_RightClickAct          := 'Right-click action';
    str_SG_RightClickActL[true ]  := tc_lime  +'move'  +tc_default;
    str_SG_RightClickActL[false]  := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
+   str_SG_ControlPanelPos        := 'Control panel position';
+   str_SG_ControlPanelPosL[0]    := tc_lime  +'left'  +tc_default;
+   str_SG_ControlPanelPosL[1]    := tc_orange+'right' +tc_default;
+   str_SG_ControlPanelPosL[2]    := tc_yellow+'top'   +tc_default;
+   str_SG_ControlPanelPosL[3]    := tc_aqua  +'bottom'+tc_default;
+   str_SG_HealthBars             := 'Health bars';
+   str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
+   str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
+   str_SG_HealthBarsL[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
+   str_SG_PlayersColor           := 'Players color';
+   str_SG_PlayersColorL[0]       := tc_white +'default'+tc_default;
+   str_SG_PlayersColorL[1]       := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[2]       := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[3]       := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[4]       := tc_purple+'teams'  +tc_default;
+   str_SG_PlayersColorL[5]       := tc_white +'own '   +tc_purple+'teams'+tc_default;
+
+   str_SV_Windowed               := 'Windowed';
+   str_SV_ResolutionApply        := 'Apply resolution';
+   str_SV_ResolutionW            := 'Resolution (width)';
+   str_SV_ResolutionH            := 'Resolution (height)';
+   str_SV_MenuScale              := 'Menu scaling';
+   str_SV_MenuScaleSmooth        := 'Smooth scaled menu';
+   str_SV_ShowFPS                := 'Show FPS';
+
+   str_SS_MusicVolume            := 'Music volume';
+   str_SS_SoundVolume            := 'Sound volume';
+   str_SS_NextTrack              := 'Play next track';
+   str_SS_ReloadMusic            := 'Load new playlist';
+   str_SS_MusicListSize          := 'Music playlist size';
+
+   str_GO_AISlots                := 'Fill empty slots';
+   str_GO_FixedStarts            := 'Fixed player starts';
+   str_GO_DefeatedObs            := 'Observer mode after lose';
+   str_GO_Random                 := 'Random skirmish';
 
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
@@ -878,20 +919,22 @@ begin
    str_map_GeneratorsL[4]        := '20 min';
    str_map_GeneratorsL[5]        := 'infinity';
 
-   str_SV_Windowed       := 'Windowed';
-   str_SV_ResolutionApply:= 'Apply resolution';
-   str_SV_ResolutionW    := 'Resolution (width)';
-   str_SV_ResolutionH    := 'Resolution (height)';
-   str_SV_MenuScale      := 'Menu scaling';
-   str_SV_MenuScaleSmooth:= 'Smooth scaled menu';
-   str_SV_ShowFPS        := 'Show FPS';
+   str_FileError_NExists         := 'File not'+tc_nl3+'exists!';
+   str_FileError_Open            := 'Can`t open'+tc_nl3+'file!';
+   str_FileError_WData           := 'Wrong file'+tc_nl3+'data!';
+   str_FileError_WVer            := 'Wrong version!';
 
-   str_Players           := 'Players';
-   str_SS_MusicVolume    := 'Music volume';
-   str_SS_SoundVolume    := 'Sound volume';
-   str_race[r_random]    := tc_white +'RANDOM'+tc_default;
-   str_race[r_hell  ]    := tc_orange+'HELL'  +tc_default;
-   str_race[r_uac   ]    := tc_lime  +'UAC'   +tc_default;
+   str_PT_Player                 := 'PLAYER';
+   str_PT_State                  := 'STATUS';
+   str_PT_Race                   := 'RACE';
+   str_PT_Team                   := 'TEAM';
+   str_PT_Color                  := 'COLOR';
+   str_PT_Ping                   := 'PING+';
+
+   str_race[r_random]            := tc_white +'RANDOM'+tc_default;
+   str_race[r_hell  ]            := tc_orange+'HELL'  +tc_default;
+   str_race[r_uac   ]            := tc_lime  +'UAC'   +tc_default;
+
    str_observer          := 'OBSERVER';
    str_win               := 'VICTORY!';
    str_lose              := 'DEFEAT!';
@@ -901,48 +944,43 @@ begin
    str_repend            := 'Replay ended!';
    str_reperror          := 'Read file error!';
 
-   str_svld_errors_file  := 'File not'+tc_nl3+'exists!';
-   str_svld_errors_open  := 'Can`t open'+tc_nl3+'file!';
-   str_svld_errors_wdata := 'Wrong file'+tc_nl3+'data!';
-   str_svld_errors_wver  := 'Wrong version!';
+   str_Players           := 'Players';
+
    str_time              := 'Time: ';
    str_menu              := 'Menu';
-   str_PlayerDefeat      := ' was terminated!';
+
    str_inv_time          := 'Wave #';
    str_inv_ml            := 'Monsters limit: ';
    str_ReplayPlay        := 'Play';
 
    str_Camp_Difficulty   := 'Difficulty';
    str_WaitForServer     := 'Awaiting server...';
-   str_Caption_GOptions  := 'GAME OPTIONS';
+
    str_server            := 'SERVER';
    str_client            := 'CLIENT';
    str_menu_chat         := 'CHAT(ALL PLAYERS)';
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
 
-   str_GO_Random           := 'Random skirmish';
-   str_GO_AISlots           := 'Fill empty slots';
 
-   str_PlayerLeft             := ' left the game';
-   str_PlayerSurrender  := ' surrenders!';
-
+   str_PlayerDefeat      := ' was terminated!';
+   str_PlayerLeft        := ' left the game';
+   str_PlayerSurrender   := ' surrenders!';
 
 
-   str_SG_Language       := 'UI language';
    str_requirements      := 'Requirements: ';
    str_req               := 'Req.: ';
    str_orders            := 'Unit groups: ';
    str_all               := 'All';
    str_uprod             := tc_lime+'Produced by: '   +tc_default;
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
-   str_SG_ColoredShadow  := 'Colored shadows';
+
    str_kothtime          := 'Center capture time left: ';
    str_kothtime_act      := 'Time left until center area is active: ';
    str_kothwinner        := ' is King of the Hill!';
-   str_GO_DefeatedObs     := 'Observer mode after lose';
 
-   str_SG_ShowAPM        := 'Show APM';
+
+
    str_ability           := 'Special ability: ';
    str_transformation    := 'transformation to ';
    str_upgradeslvl       := 'Upgrades: ';
@@ -950,20 +988,13 @@ begin
    str_except            := 'except';
    str_splashresist      := 'Immune to splash damage';
    str_TargetLimit       := 'target limit';
-   str_SS_NextTrack      := 'Play next track';
-   str_SS_ReloadMusic    := 'Load new playlist';
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
-   str_SS_MusicListSize     := 'Music playlist size';
+
    str_menu_controls     := '- use the left and right mouse buttons to manipulate the menu items -';
    str_RecordingStart    := 'Start recording: ';
    str_RecordingStop     := 'Stop recording: ';
-   str_PT_Player          := 'PLAYER';
-   str_PT_State           := 'STATUS';
-   str_PT_Race            := 'RACE';
-   str_PT_Team            := 'TEAM';
-   str_PT_Color           := 'COLOR';
-   str_PT_Ping            := 'PING+';
+
 
    str_builder           := 'Builder';
    str_barrack           := 'Unit production';
@@ -1030,27 +1061,6 @@ begin
    str_attr_detector     := tc_purple+'detector'    ;
    str_attr_transport    := tc_gray  +'transport'   ;
 
-   str_SG_ControlPanelPos          := 'Control panel position';
-   str_SG_ControlPanelPosL[0]      := tc_lime  +'left'  +tc_default;
-   str_SG_ControlPanelPosL[1]      := tc_orange+'right' +tc_default;
-   str_SG_ControlPanelPosL[2]      := tc_yellow+'top'   +tc_default;
-   str_SG_ControlPanelPosL[3]      := tc_aqua  +'bottom'+tc_default;
-
-   str_SG_HealthBars             := 'Health bars';
-   str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
-   str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
-   str_SG_HealthBarsL[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
-
-   str_SG_PlayersColor            := 'Players color';
-   str_SG_PlayersColorL[0]        := tc_white +'default'+tc_default;
-   str_SG_PlayersColorL[1]        := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_SG_PlayersColorL[2]        := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_SG_PlayersColorL[3]        := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
-   str_SG_PlayersColorL[4]        := tc_purple+'teams'  +tc_default;
-   str_SG_PlayersColorL[5]        := tc_white +'own '   +tc_purple+'teams'+tc_default;
-
-   str_GO_FixedStarts           := 'Fixed player starts';
-
    str_ReplayQualityL[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
    str_ReplayQualityL[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
    str_ReplayQualityL[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
@@ -1090,9 +1100,9 @@ begin
    str_npnu              := 'Units update rate';
    str_connecting        := 'Connecting...';
    str_portblocked       := 'Port is blocked!';
-   str_sver              := 'Wrong version!';
-   str_sfull             := 'Server full!';
-   str_sgst              := 'Game started!';
+   str_msg_WrongVersion              := 'Wrong version!';
+   str_msg_ServerFull             := 'Server full!';
+   str_msg_GameStarted              := 'Game started!';
 
    str_hint_t[0]         := 'Buildings';
    str_hint_t[1]         := 'Units';
@@ -1443,25 +1453,27 @@ procedure lng_rus;
 var t: shortstring;
     i: byte;
 begin
-  str_Caption_Map        := 'ÊÀĞÒÀ';
-  str_Caption_Players    := 'ÈÃĞÎÊÈ';
-  str_Caption_Multiplayer:= 'ÑÅÒÅÂÀß ÈÃĞÀ';
-  str_Caption_GOptions   := 'ÏÀĞÀÌÅÒĞÛ ÈÃĞÛ';
-  str_MObjectives        := 'ÇÀÄÀ×È';
+  str_Caption_Map               := 'ÊÀĞÒÀ';
+  str_Caption_Players           := 'ÈÃĞÎÊÈ';
+  str_Caption_Multiplayer       := 'ÑÅÒÅÂÀß ÈÃĞÀ';
+  str_Caption_GOptions          := 'ÏÀĞÀÌÅÒĞÛ ÈÃĞÛ';
+  str_MObjectives               := 'ÇÀÄÀ×È';
 
-  str_menu_Tutorials    := 'ÎÁÓ×ÅÍÈÅ';
-  str_menu_Campaings    := 'ÊÀÌÏÀÍÈÈ';
-  str_menu_Scirmish     := 'ÑÕÂÀÒÊÀ';
-  str_menu_SaveLoad     := 'ÑÎÕĞ./ÇÀÃĞ.';
-  str_menu_LoadGame     := 'ÇÀÃĞÓÇÈÒÜ ÈÃĞÓ';
-  str_menu_Replays      := 'ÇÀÏÈÑÈ';
-  str_menu_Settings     := 'ÍÀÑÒĞÎÉÊÈ';
+  str_menu_Tutorials            := 'ÎÁÓ×ÅÍÈÅ';
+  str_menu_Campaings            := 'ÊÀÌÏÀÍÈÈ';
+  str_menu_Scirmish             := 'ÑÕÂÀÒÊÀ';
+  str_menu_Playback             := 'ÏĞÎÑÌÎÒĞ ÇÀÏÈÑÈ';
+  str_menu_SaveLoad             := 'ÑÎÕĞ./ÇÀÃĞ.';
+  str_menu_LoadGame             := 'ÇÀÃĞÓÇÈÒÜ ÈÃĞÓ';
+  str_menu_Replays              := 'ÇÀÏÈÑÈ';
+  str_menu_Settings             := 'ÍÀÑÒĞÎÉÊÈ';
 
-  str_menu_Start        := 'ÍÀ×ÀÒÜ';
-  str_menu_Surrender    := 'ÑÄÀÒÜÑß';
-  str_menu_Break        := 'ÏĞÅĞÂÀÒÜ ÌÈÑÑÈŞ';
-  str_menu_Exit         := 'ÂÛÕÎÄ';
-  str_menu_Back         := 'ÍÀÇÀÄ';
+  str_menu_Start                := 'ÍÀ×ÀÒÜ';
+  str_menu_Surrender            := 'ÑÄÀÒÜÑß';
+  str_menu_Break                := 'ÏĞÅĞÂÀÒÜ ÌÈÑÑÈŞ';
+  str_menu_PlaybackStop         := 'ÏĞÅĞÂÀÒÜ';
+  str_menu_Exit                 := 'ÂÛÕÎÄ';
+  str_menu_Back                 := 'ÍÀÇÀÄ';
 
   str_menu_SetGame      := 'ÈÃĞÀ';
   str_menu_SetReplay    := 'ÇÀÏÈÑÜ ÈÃĞÛ';
@@ -1528,10 +1540,10 @@ begin
   str_repend            := 'Êîíåö çàïèñè!';
   str_reperror          := 'Îøèáêà ïğè ÷òåíèè ôàéëà!';
 
-  str_svld_errors_file  := 'Ôàéë íå'+tc_nl3+'ñóùåñòâóåò!';
-  str_svld_errors_open  := 'Íåïîëó÷èëîñü'+tc_nl3+'îòêğûòü ôàéë!';
-  str_svld_errors_wdata := 'Íåïğàâèëüíûå'+tc_nl3+'äàííûå ôàéëà!';
-  str_svld_errors_wver  := 'Íåïğàâèëüíàÿ'+tc_nl3+'âåğñèÿ ôàéëà!';
+  str_FileError_NExists  := 'Ôàéë íå'+tc_nl3+'ñóùåñòâóåò!';
+  str_FileError_Open  := 'Íåïîëó÷èëîñü'+tc_nl3+'îòêğûòü ôàéë!';
+  str_FileError_WData := 'Íåïğàâèëüíûå'+tc_nl3+'äàííûå ôàéëà!';
+  str_FileError_WVer  := 'Íåïğàâèëüíàÿ'+tc_nl3+'âåğñèÿ ôàéëà!';
   str_time              := 'Âğåìÿ: ';
   str_menu              := 'Ìåíş';
   str_PlayerDefeat        := ' óíè÷òîæåí!';
@@ -1688,9 +1700,9 @@ begin
   str_npnu              := 'Îáíîâëåíèå şíèòîâ: ';
   str_connecting        := 'Ñîåäèíåíèå...';
   str_portblocked       := 'Ïîğò çàíÿò!';
-  str_sver              := 'Äğóãàÿ âåğñèÿ!';
-  str_sfull             := 'Íåò ìåñò!';
-  str_sgst              := 'Èãğà íà÷àëàñü!';
+  str_msg_WrongVersion              := 'Äğóãàÿ âåğñèÿ!';
+  str_msg_ServerFull             := 'Íåò ìåñò!';
+  str_msg_GameStarted              := 'Èãğà íà÷àëàñü!';
 
   str_hint_t[0]         := 'Çäàíèÿ';
   str_hint_t[1]         := 'Şíèòû';

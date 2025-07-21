@@ -14,7 +14,7 @@ begin
    fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
    if(not FileExists(fn))then
    begin
-      rpls_str_info:=str_svld_errors_file;
+      rpls_str_info:=str_FileError_NExists;
       exit;
    end;
 
@@ -24,13 +24,13 @@ begin
    {$I+}
    if(ioresult<>0)then
    begin
-      rpls_str_info:=str_svld_errors_open;
+      rpls_str_info:=str_FileError_Open;
       exit;
    end;
    if(FileSize(f)<rpls_file_head_size)then
    begin
       close(f);
-      rpls_str_info:=str_svld_errors_wdata;
+      rpls_str_info:=str_FileError_WData;
       exit;
    end;
 
@@ -38,12 +38,12 @@ begin
    {$I-}
    BlockRead(f,vbyte1,SizeOf(g_version));
    if(vbyte1<>g_version)
-   then rpls_str_info:=str_svld_errors_wver
+   then rpls_str_info:=str_FileError_WVer
    else
-     if(not FileReadBaseGameInfo(f,@rpls_str_info))then rpls_str_info:=str_svld_errors_wdata;
+     if(not FileReadBaseGameInfo(f,@rpls_str_info))then rpls_str_info:=str_FileError_WData;
 
    {$I+}
-   if(IOResult<>0)then rpls_str_info:=str_svld_errors_wdata;
+   if(IOResult<>0)then rpls_str_info:=str_FileError_WData;
    close(f);
 end;
 
@@ -286,7 +286,7 @@ begin
    begin
       rpls_state   :=rpls_none;
       g_started    :=false;
-      rpls_str_info:=str_svld_errors_file;
+      rpls_str_info:=str_FileError_NExists;
       exit;
    end;
 
@@ -299,7 +299,7 @@ begin
    begin
       replay_Abort;
       g_started    :=false;
-      rpls_str_info:=str_svld_errors_open;
+      rpls_str_info:=str_FileError_Open;
    end
    else
    begin
@@ -309,7 +309,7 @@ begin
       begin
          replay_Abort;
          g_started    :=false;
-         rpls_str_info:=str_svld_errors_wdata;
+         rpls_str_info:=str_FileError_WData;
          exit;
       end;
 
@@ -322,7 +322,7 @@ begin
       begin
          replay_Abort;
          g_started    :=false;
-         rpls_str_info:=str_svld_errors_wver;
+         rpls_str_info:=str_FileError_WVer;
       end
       else
       begin
@@ -338,7 +338,7 @@ begin
          if(ioresult<>0)then
          begin
             replay_Abort;
-            rpls_str_info:=str_svld_errors_wver;
+            rpls_str_info:=str_FileError_WVer;
             GameDefaultAll;
             exit;
          end;
@@ -351,7 +351,7 @@ begin
          begin
             replay_Abort;
             g_started:=false;
-            rpls_str_info:=str_svld_errors_wver;
+            rpls_str_info:=str_FileError_WVer;
             GameDefaultAll;
             exit;
          end;
@@ -365,7 +365,7 @@ begin
             or(team >MaxPlayers)then
             begin
                replay_Abort;
-               rpls_str_info:=str_svld_errors_wver;
+               rpls_str_info:=str_FileError_WVer;
                GameDefaultAll;
                exit;
             end;
@@ -431,7 +431,7 @@ begin
          readln;
       end; }
 
-      if((i and %10000000)>0)then _rudata_log(rpls_player,true);
+      if((i and %10000000)>0)then rudata_log(rpls_player,true);
       if((i and %01000000)>0)then
       begin
          {$I-}
@@ -440,7 +440,7 @@ begin
          {$I+}
       end;
 
-      if(G_Status=gs_running)then _rclinet_gframe(rpls_player,true,rpls_step>1);
+      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_step>1);
 
       if(rpls_step>1)then effects_sprites(false,false);
       rpls_step-=1;

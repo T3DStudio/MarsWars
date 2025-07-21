@@ -360,7 +360,7 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
       if(ptarget=ThisPlayer)then
       begin
          net_chat_shlm:=min2i(net_chat_shlm+chat_LastMsgTime,chat_LastMsgTimeMax);
-         vid_menu_redraw:=true;
+         menu_redraw:=true;
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer(ThisPlayer);
 
@@ -608,7 +608,7 @@ begin
      if(state=ps_human)then
      begin
         c+=1;
-        if(ready)or(p=LocalPlayer)then r+=1;
+        if(ready){$IFDEF _FULLGAME}or(p=LocalPlayer){$ENDIF}then r+=1;
      end;
    PlayersReadyStatus:=(r=c)and(c>0);
 end;
@@ -682,7 +682,9 @@ begin
          end;
          {$ENDIF}
       end;
+      {$IFDEF _FULLGAME}
       if(p=LocalPlayer)then PlayerGetStatus:=str_ps_h;
+      {$ENDIF}
    end;
 end;
 
@@ -1040,10 +1042,10 @@ begin
      {$ENDIF}
 end;
 
-function _UnitHaveRPoint(uid:byte):boolean;
+function UnitHaveRPoint(uid:byte):boolean;
 begin
    with g_uids[uid] do
-   _UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
+   UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
 end;
 
 function UnitF1Select(pu:PTUnit):boolean;
@@ -1057,7 +1059,6 @@ begin
       or(IsUnitRange(transport,nil))then exit;
 
       if(not _isbuilder)then exit;
-
    end;
    UnitF1Select:=true;
 end;
@@ -1096,7 +1097,6 @@ begin
    if(team<=MaxPlayers)then
    G_status:=gs_win_team0+team;
    GameLogEndGame(team);
-   writeln('GameSetStatusWinnerTeam');
 end;
 
 function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal):boolean;

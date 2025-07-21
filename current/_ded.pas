@@ -10,7 +10,7 @@ begin
    end
    else
    begin
-      LocalPlayer:=0;
+      //LocalPlayer:=0;
       PlayersSetDefault;
    end;
 

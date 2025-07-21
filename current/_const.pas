@@ -253,13 +253,13 @@ nmid_lobby_info           = 3;
 nmid_connect              = 4;
 nmid_client_info          = 5;
 nmid_log_chat             = 6;
-nmid_chatclupd            = 7;
+nmid_LogUpdate            = 7;
 nmid_snapshot             = 8;
 nmid_pause                = 9;
-nmid_server_full          = 10;
-nmid_wrong_ver            = 11;
-nmid_game_started         = 12;
-nmid_notconnected         = 13;
+nmid_ServerFull          = 10;
+nmid_WrongVersion            = 11;
+nmid_GameStarted         = 12;
+nmid_NotConnected         = 13;
 nmid_order                = 14;
 nmid_player_leave         = 15;
 nmid_map_mark             = 16;
@@ -324,24 +324,24 @@ uo_corder              = 2;
 //
 
 co_empty               = -32000;
-co_rcamove             = -101;
-co_rcmove              = -100;
-co_destroy             = -111;
-co_stand               = -90;
-co_move                = -91;
-co_patrol              = -92;
-co_astand              = -93;
-co_amove               = -94;
-co_apatrol             = -95;
-co_pability            = -79;
-co_sability            = -80;
-co_supgrade            = -81;
-co_cupgrade            = -82;
-co_suprod              = -83;
-co_cuprod              = -84;
-co_pcancle             = -85;
-co_mmark               = -86;
-co_rebuild             = -87;
+co_rcamove             = -400;
+co_rcmove              = -401;
+co_destroy             = -402;
+co_stand               = -403;
+co_move                = -404;
+co_patrol              = -405;
+co_astand              = -406;
+co_amove               = -407;
+co_apatrol             = -408;
+co_sability            = -409;
+co_pability            = -410;
+co_rebuild             = -411;
+co_supgrade            = -412;
+co_cupgrade            = -413;
+co_suprod              = -414;
+co_cuprod              = -415;
+co_pcancle             = -416;
+co_mmark               = -417;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1406,7 +1406,7 @@ mi_SaveLoad_save       = 93;
 mi_SaveLoad_load       = 94;
 mi_SaveLoad_delete     = 95;
 
-// SCIRMISH PLAYERS BLOCK
+//// SCIRMISH PLAYERS BLOCK
 mi_Players_Panel       = 100;
 mi_Players_NameC       = 101;
 mi_Players_StateC      = 102;
@@ -1451,7 +1451,7 @@ mi_Players_Ping4       = 154;
 mi_Players_Ping5       = 155;
 mi_Players_Ping6       = 156;
 
-// SCIRMISH MAP BLOCK
+//// SCIRMISH MAP BLOCK
 mi_Map_Panel           = 160;
 mi_Map_Map             = 161;
 mi_Map_Scenario        = 162;
@@ -1463,14 +1463,14 @@ mi_Map_Symmetry        = 167;
 mi_Map_Theme           = 168;
 mi_Map_Random          = 169;
 
-// SCIRMISH GAME BLOCK
+//// SCIRMISH GAME BLOCK
 mi_Game_Panel          = 170;
 mi_Game_FixedPositions = 171;
 mi_Game_AISlots        = 172;
 mi_Game_DefeatedObs    = 173;
 mi_Game_Random         = 174;
 
-// SCIRMISH MULTIPLAYER BLOCK
+//// SCIRMISH MULTIPLAYER BLOCK
 mi_MP_Panel            = 180;
 mi_MP_ServerStart      = 181;
 mi_MP_ServerStop       = 182;
@@ -1482,6 +1482,8 @@ mi_MP_ClientQuality    = 187;
 mi_MP_ClientLANSearch  = 188;
 mi_MP_Chat             = 189;
 
+//// SCIRMISH REPLAY INFO
+mi_ReplayInfo_Panel    = 190;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1497,6 +1499,7 @@ menu_SmallW            =(menu_BaseW div 4)*3;
 menu_ListLineH         =(menu_BaseW div 3)*2;
 menu_ListLinehH        = menu_ListLineH div 2;
 
+menu_CaptionhW         = menu_BaseW*3;
 menu_BigButtonW        = menu_BaseW*4;
 menu_BigButtonhW       = menu_BigButtonW div 2;
 menu_BigButtonH        = menu_BaseW;

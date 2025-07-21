@@ -2,7 +2,7 @@
 var
 
 GameCycle         : boolean = false;
-_EVENT            : pSDL_EVENT;
+sys_EVENT         : pSDL_EVENT;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -58,7 +58,7 @@ g_random_p        : byte    = 0;
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 
-LocalPlayer           : byte = 1; // 'this' player
+
 
 _playerAPM        : array[0..MaxPlayers] of TAPMCounter;
 
@@ -143,6 +143,8 @@ _warpten          : boolean = true;
 
 {$IFDEF _FULLGAME}
 
+LocalPlayer       : byte = 1; // 'this' player
+
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 tmpmid            : byte = MID_Imp;
@@ -183,14 +185,13 @@ ingame_chat       : byte = 0;
 vid_windowed      : boolean = true;
 r_draw            : boolean = true;
 
-vid_menu_redraw   : boolean  = true;
-
 MainMenu          : boolean = true;
 menu_page         : byte = 0;
 menu_settings     : byte = mi_settings_Game;
 menu_item         : integer;
 menu_items        : array[byte] of TMenuItem;
 menu_rebuild      : boolean = true;
+menu_redraw       : boolean  = true;
 
 menu_ResolutionWi,
 menu_ResolutionHi : integer;
@@ -781,6 +782,7 @@ str_map_ScenarioL         : array[0..mc_count] of shortstring;
 str_menu_Campaings,
 str_menu_Tutorials,
 str_menu_Scirmish,
+str_menu_Playback,
 str_menu_SaveLoad,
 str_menu_LoadGame,
 str_menu_Replays,
@@ -789,6 +791,7 @@ str_menu_Settings,
 str_menu_Start,
 str_menu_Surrender,
 str_menu_Break,
+str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
 
@@ -946,9 +949,9 @@ str_pause,
 str_observer,
 str_win,
 str_lose,
-str_sver,
-str_sfull,
-str_sgst,
+str_msg_WrongVersion,
+str_msg_ServerFull,
+str_msg_GameStarted,
 str_udpport,
 str_connecting,
 str_portblocked,
@@ -965,10 +968,10 @@ str_SV_MenuScaleSmooth,
 str_SV_ShowFPS,
 str_SG_ShowAPM,
 str_map_Random,
-str_svld_errors_file,
-str_svld_errors_open,
-str_svld_errors_wdata,
-str_svld_errors_wver,
+str_FileError_NExists,
+str_FileError_Open,
+str_FileError_WData,
+str_FileError_WVer,
 str_PT_Player,
 str_PT_State,
 str_PT_Race,

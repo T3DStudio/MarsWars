@@ -71,9 +71,11 @@ begin
    g_players[p0].team:=PlayerValidateTeam(p0,t1);
    g_players[p1].team:=PlayerValidateTeam(p1,t0);
 
+   {$IFDEF _FULLGAME}
    if(LocalPlayer=p1)then LocalPlayer:=p0
    else
      if(LocalPlayer=p0)then LocalPlayer:=p1;
+   {$ENDIF}
 end;
 
 procedure PlayerSetState(p,newstate:byte);
@@ -144,11 +146,11 @@ begin
    PlayerColors[6]:=c_blue;
 
    {$ELSE}
-   LocalPlayer:=0;
+   {LocalPlayer:=0;
    with g_players[LocalPlayer] do
    begin
       name :='SERVER';
-   end;
+   end; }
    {$ENDIF}
 end;
 
@@ -197,7 +199,7 @@ begin
    {$IFDEF _FULLGAME}
    uncappedFPS:=false;
 
-   vid_menu_redraw  := true;
+   menu_redraw  := true;
 
    ui_cam_x:=-ui_CtrlPanelW;
    ui_cam_y:=0;
@@ -693,7 +695,7 @@ begin
    then map_generators:=random(map_MaxGenerators)+1
    else map_generators:=0;
 
-   for p:=LocalPlayer+1 to MaxPlayers do
+   for p:=1 to MaxPlayers do
      with g_players[p] do
        if(state<>ps_human)then
        begin
@@ -722,48 +724,34 @@ begin
    Map_premap;
 end;
 
-procedure PlayerExecuteOrder(pl:byte);
+procedure PlayerExecuteOrder(tPlayer:byte);
 var
-_su,_eu: integer;
 pu,
 tar_u : PTUnit;
+u,
 tar_d : integer;
 tar_ex: boolean;
 begin
-   with g_players[pl] do
+   with g_players[tPlayer] do
    if(o_id>0)and(army>0)then
    begin
-      if(pl<>LocalPlayer)then   // ded serverside counter
-      PlayerAPMInc(pl);
+      {
+      if(tPlayer<>LocalPlayer)then   // ded serverside counter
+      PlayerAPMInc(tPlayer);}
 
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,byte(o_x1),unit_start_build(o_x0,o_y0,byte(o_x1),pl),nil);
+uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_unit,byte(o_x1),unit_start_build(o_x0,o_y0,byte(o_x1),tPlayer),nil);
       else
-         _su :=1;
-         _eu:=MaxUnits+1;
-         if(o_id=uo_corder)then
-          case o_x0 of
-          co_destroy,
-          co_cupgrade,
-          co_cuprod,
-          co_pcancle  : begin   // reverse unit loop
-                           _su :=MaxUnits;
-                           _eu:=0;
-                        end;
-          co_supgrade : if(n_smiths  <=0)then begin PlayerSetProdError(pl,lmt_argt_upgr,o_y0,ureq_smiths  ,nil);o_id:=0;end;
-          co_suprod   : if(n_barracks<=0)then begin PlayerSetProdError(pl,lmt_argt_unit,o_y0,ureq_barracks,nil);o_id:=0;end;
-          end;
-
          tar_d :=tar_d.MaxValue;
          tar_u :=nil;
          tar_ex:=false;
 
-         while(_su<>_eu)do
+         for u:=1 to MaxUnits do
          begin
-            pu:=g_punits[_su];
+            pu:=g_punits[u];
             with pu^ do
             with uid^ do
-             if(hits>0)and(not IsUnitRange(transport,nil))and(pl=playeri)then
+             if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transport,nil))then
              begin
                 if(o_id=uo_corder)then
                   case o_x0 of
@@ -776,33 +764,25 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                                    UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade(pu,o_y0,false,true)=0,true,false);
                                    UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit   (pu,o_y0,false,true)=0,true,false);
                                 end;
-                  {co_supgrade : if(s_smiths  <=0)or(sel)then if(unit_ProdStartUpgrade(pu,o_y0))then begin PlayerClearProdError(player);break;end;// start  upgr
-                  co_cupgrade : if(s_smiths  <=0)or(sel)then if(unit_ProdStopUpgrade (pu,o_y0,false))then break;                                       // cancle upgr
-                  co_suprod   : if(s_barracks<=0)or(sel)then if(unit_ProdStartUnit(pu,o_y0      ))then begin PlayerClearProdError(player);break;end;// start  training
-                  co_cuprod   : if(s_barracks<=0)or(sel)then if(unit_ProdStopUnit(pu,o_y0,false))then break;                                       // cancle training
-                  co_pcancle  : if(sel)then
-                                begin
-                                if(unit_ProdStopUnit(pu,255,false))then break;
-                                if(unit_ProdStopUpgrade (pu,255,false))then break;
-                                end; }
                   end;
 
                 if(sel)then
                 begin
                    case o_id of
                uo_corder     : case o_x0 of
+                               // TO ONE
                                co_sability,
-                               co_pability: if(_ability=o_a0)then
-                                              if(uo_id<>ua_psability)or(s_all=1)then
-                                                case o_x0 of
-                                                co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
-                                                co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
-                                                end;
-                               co_rebuild : if(_rebuild_uid=o_a0)then
-                                              UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
+                               co_pability : if(_ability=o_a0)then
+                                               if(uo_id<>ua_psability)or(s_all=1)then
+                                                 case o_x0 of
+                                                 co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
+                                                 co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
+                                                 end;
+                               co_rebuild  : if(_rebuild_uid=o_a0)then
+                                               UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
 
-                               co_destroy : unit_kill(pu,false,false,true,false,true);
-
+                               // TO ALL
+                               co_destroy  : unit_kill(tar_u,false,false,true,false,true);
                                co_rcamove,
                                co_rcmove   : begin     // right click
                                                 uo_tar:=0;
@@ -827,26 +807,22 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(pl,lmt_argt_unit,by
                    end;
                 end;
              end;
-
-            if(_su>_eu)
-            then _su-=1
-            else _su+=1;
          end;
 
          if(o_id=uo_corder)and(tar_u<>nil)then
            case o_x0 of
-         co_supgrade: PlayerSetProdError(pl,lmt_argt_upgr,o_y0,unit_ProdStartUpgrade(tar_u,o_y0      ,false),tar_u);
-         co_cupgrade: PlayerSetProdError(pl,lmt_argt_upgr,o_y0,unit_ProdStopUpgrade (tar_u,o_y0,false,false),tar_u);
-         co_suprod  : PlayerSetProdError(pl,lmt_argt_upgr,o_y0,unit_ProdStartUnit   (tar_u,o_y0      ,false),tar_u);
-         co_cuprod  : PlayerSetProdError(pl,lmt_argt_upgr,o_y0,unit_ProdStopUnit    (tar_u,o_y0,false,false),tar_u);
+         co_supgrade: PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStartUpgrade(tar_u,o_y0      ,false),tar_u);
+         co_cupgrade: PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUpgrade (tar_u,o_y0,false,false),tar_u);
+         co_suprod  : PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStartUnit   (tar_u,o_y0      ,false),tar_u);
+         co_cuprod  : PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUnit    (tar_u,o_y0,false,false),tar_u);
 
          co_pcancle :
-                   if(PlayerSetProdError(pl,lmt_argt_upgr,o_y0,unit_ProdStopUpgrade (tar_u,o_y0,false,false),tar_u))then
-                      PlayerSetProdError(pl,lmt_argt_upgr,o_y0,unit_ProdStopUnit    (tar_u,o_y0,false,false),tar_u);
+                   if(PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUpgrade (tar_u,o_y0,false,false),tar_u))then
+                      PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUnit    (tar_u,o_y0,false,false),tar_u);
 
-         co_sability: PlayerSetProdError(pl,lmt_argt_abil,o_a0,unit_sability(tar_u               ,false),tar_u);
-         co_pability: PlayerSetProdError(pl,lmt_argt_abil,o_a0,unit_pability(tar_u,o_y0,o_x1,o_y1,false),tar_u);
-         co_rebuild : PlayerSetProdError(pl,lmt_argt_unit,o_a0,unit_rebuild (tar_u               ,false),tar_u);
+         co_sability: PlayerSetProdError(tPlayer,lmt_argt_abil,o_a0,unit_sability(tar_u               ,false),tar_u);
+         co_pability: PlayerSetProdError(tPlayer,lmt_argt_abil,o_a0,unit_pability(tar_u,o_y0,o_x1,o_y1,false),tar_u);
+         co_rebuild : PlayerSetProdError(tPlayer,lmt_argt_unit,o_a0,unit_rebuild (tar_u               ,false),tar_u);
            end;
       end;
 
@@ -892,18 +868,18 @@ begin
     with g_players[p] do
      if(state>ps_none)then
      begin
-        if(state=ps_human)and(p<>LocalPlayer)and(net_status=ns_server)then
+        if(state=ps_human)and(net_status=ns_server){$IFDEF _FULLGAME}and(p<>LocalPlayer){$ENDIF}then
         begin
            if(ttl<ClientTTL)then
            begin
               ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
+              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
            end
            else
              if(G_Started=false)then
              begin
                 PlayerSetState(p,PS_None);
-                {$IFDEF _FULLGAME}vid_menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
+                {$IFDEF _FULLGAME}menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;
         if(net_logsend_pause>0)then net_logsend_pause-=1;
@@ -1047,19 +1023,21 @@ begin
 
    if(0<player)and(player<=MaxPlayers)then
      with g_players[player] do
+       {$IFDEF _FULLGAME}
        if(player=LocalPlayer)and(net_status=ns_client)then
        begin
-          {$IFDEF _FULLGAME}
+
           PlayerTeamChange:=true;
           if(check)then exit;
 
           if(map_scenario in mc_fixed_teams)
           then HumanTeamRoll(@PlayerTeam)
           else ScrollByte(@PlayerTeam,forward,0,MaxPlayers);
-          {$ENDIF}
+
        end
        else
-         if(state=ps_ai)or(player=LocalPlayer)then
+       {$ENDIF}
+         if(state=ps_ai){$IFDEF _FULLGAME}or(player=LocalPlayer){$ENDIF}then
          begin
             if(map_scenario in mc_fixed_teams)then
               if(state=ps_ai)then exit;
@@ -1094,18 +1072,20 @@ begin
    if(0<player)and(player<=MaxPlayers)then
      with g_players[player] do
       if(team>0)then
+       {$IFDEF _FULLGAME}
        if(player=LocalPlayer)and(net_status=ns_client)then
        begin
-          {$IFDEF _FULLGAME}
+
           PlayerRaceChange:=true;
           if(check)then exit;
 
           PlayerRace+=1;
           if(PlayerRace>r_cnt)then PlayerRace:=0;
-          {$ENDIF}
+
        end
        else
-         if(state=ps_ai)or(player=LocalPlayer)then
+       {$ENDIF}
+         if(state=ps_ai){$IFDEF _FULLGAME}or(player=LocalPlayer){$ENDIF}then
          begin
             PlayerRaceChange:=true;
             if(check)then exit;

@@ -15,7 +15,7 @@ begin
 
    if(not FileExists(fn))then
    begin
-      svld_str_info:=str_svld_errors_file;
+      svld_str_info:=str_FileError_NExists;
       exit;
    end;
    assign(f,fn);
@@ -24,13 +24,13 @@ begin
    {$I+}
    if(ioresult<>0)then
    begin
-      svld_str_info:=str_svld_errors_open;
+      svld_str_info:=str_FileError_Open;
       close(f);
       exit;
    end;
    if(FileSize(f)<>svld_file_size)then
    begin
-      svld_str_info:=str_svld_errors_wdata;
+      svld_str_info:=str_FileError_WData;
       close(f);
       exit;
    end;
@@ -51,12 +51,12 @@ begin
 
                        if(vint<0)
                        or(LastMission<vint)
-                       then svld_str_info:=str_svld_errors_wver
+                       then svld_str_info:=str_FileError_WVer
                        else
                        begin
                           BlockRead(f,vbyte1,sizeof(cmp_skill));
                           if(CMPMaxSkills<vbyte1)
-                          then svld_str_info:=str_svld_errors_wver
+                          then svld_str_info:=str_FileError_WVer
                           else svld_str_info:=str_camp_MissionName[vint]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
 
                           BlockRead(f,vbyte1,sizeof(cmp_data_b1));
@@ -74,14 +74,14 @@ begin
                        BlockRead(f,vbyte1,sizeof(cmp_data_b3));
                        BlockRead(f,vcard ,sizeof(cmp_data_c1));
 
-                       if(not FileReadBaseGameInfo(f,@svld_str_info))then svld_str_info:=str_svld_errors_wdata;
+                       if(not FileReadBaseGameInfo(f,@svld_str_info))then svld_str_info:=str_FileError_WData;
                     end;
-      else svld_str_info:=str_svld_errors_wver;
+      else svld_str_info:=str_FileError_WVer;
       end;
    end
-   else svld_str_info:=str_svld_errors_wver;
+   else svld_str_info:=str_FileError_WVer;
    {$I+}
-   if(IOResult<>0)then svld_str_info:=str_svld_errors_wdata;
+   if(IOResult<>0)then svld_str_info:=str_FileError_WData;
 
    close(f);
 end;
@@ -293,7 +293,7 @@ begin
          if(ioresult<>0)then
          begin
             GameDefaultAll;
-            svld_str_info:=str_svld_errors_open;
+            svld_str_info:=str_FileError_Open;
             exit;
          end;
 

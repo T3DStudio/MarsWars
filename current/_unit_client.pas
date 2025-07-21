@@ -237,7 +237,7 @@ begin
       _wudata_prod(pu,rpl);
 
       if(sel or not rpl)then
-        if(_UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
+        if(UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
           if(IsUnitRange(uo_tar,nil))
           then _wudata_int(-uo_tar,rpl)
           else
@@ -908,7 +908,7 @@ begin
    if(b and %10000000)>0 then byte2s[1]:='1';
 end;
 
-procedure  _rudata_log(p:byte;rpl:boolean);
+procedure  rudata_log(p:byte;rpl:boolean);
 var s,b,
 mtype,
 argt,
@@ -951,7 +951,7 @@ begin
       if(rpl=false)then
       begin
          net_log_n:=_rudata_card(rpl,net_log_n);
-         vid_menu_redraw:=true;
+         menu_redraw:=true;
       end;
    end;
 end;
@@ -1074,7 +1074,7 @@ begin
       _rudata_prod(uu,rpl);
 
       if(sel or not rpl)then
-        if(_UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
+        if(UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
         begin
            uo_x:=_rudata_int(rpl,0);
            if(IsUnitRange(-uo_x,@tu))then
@@ -1259,7 +1259,7 @@ begin
    end;
 end;
 
-procedure _rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
+procedure rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
 var
 wstep  : cardinal;
 wstepb0,

@@ -91,7 +91,7 @@ begin
    Map_randommap;
    GameDefaultAll;
 
-   NEW(_event);
+   NEW(sys_EVENT);
 
    GameCycle:=true;
 

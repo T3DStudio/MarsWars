@@ -933,7 +933,7 @@ begin
       r_uipanel:=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
       r_panel  :=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
 
-      vlineColor(r_panel,ui_ButtonW1 ,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
+      vlineColor(r_panel,ui_ButtonW1,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
       vlineColor(r_panel,ui_ButtonW2,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
    end
    else
