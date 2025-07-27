@@ -28,7 +28,7 @@ begin
       with t do
       begin
          surf:=gfx_LoadSDLSurface(str+i2s(i),false,false);
-         if(surf=r_empty)then break;
+         if(surf=spt_empty)then break;
          w   :=surf^.w;
          h   :=surf^.h;
          hw  :=surf^.w div 2;

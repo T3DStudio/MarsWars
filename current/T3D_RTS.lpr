@@ -68,7 +68,8 @@ uses SysUtils, SDL, SDL_Net,crt
 {$R *.res}
 
 begin
-   InitGame;
+   GameInit;
+
    {$IFDEF _FULLGAME}
    if(TestMode=2)then
    begin
@@ -84,15 +85,16 @@ begin
       fr_FPSSecondD:=SDL_GetTicks;
 
       {$IFDEF _FULLGAME}
-      InputGame;
-      CodeGame;
-      if(r_draw)then DrawGame;
+      GameInput;
+      GameMain;
+      if(vid_draw)then
+      GameDraw;
       {$ELSE}
       while(SDL_PollEvent(sys_EVENT)>0)do
         case(sys_EVENT^.type_)of
         SDL_QUITEV  : break;
         end;
-      CodeGame;
+      GameMain;
       {$ENDIF}
 
       fr_FPSSecondU:=SDL_GetTicks-fr_FPSSecondD;

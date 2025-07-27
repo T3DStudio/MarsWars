@@ -298,7 +298,7 @@ begin
        _AddToInt(@vsni[team],vistime);
 
        if(revealed)then
-        for t:=0 to MaxPlayers do
+        for t:=0 to LastPlayer do
         begin
            _AddToInt(@vsnt[t],fr_fps1);
            _AddToInt(@vsni[t],fr_fps1);
@@ -309,7 +309,7 @@ procedure unit_UpdateVision(pu:PTUnit);
 var t:byte;
 begin
    with pu^ do
-    for t:=0 to MaxPlayers do
+    for t:=0 to LastPlayer do
     begin
        if(vsnt[t]>0)then _AddToInt(@vsnt[t],vistime);
        if(vsni[t]>0)then _AddToInt(@vsni[t],vistime);
@@ -496,7 +496,7 @@ begin
         unit_clear_order(pu,true);
         uo_x:=x0;
         uo_y:=y0;
-        for i:=0 to MaxPlayers do _addtoint(@vsnt[i],fr_fps2);
+        for i:=0 to LastPlayer do _addtoint(@vsnt[i],fr_fps2);
         rld:=mstrike_reload;
         unit_UACStrike_missile(pu);
         buff[ub_Cast]:=fr_fps1;
@@ -632,7 +632,7 @@ begin
        if(speed<=0)or(not iscomplete)then
         if(not IsUnitRange(transport,nil))then
         begin
-           if(UnitObsTeamVis<=MaxPlayers)then
+           if(UnitObsTeamVis<=LastPlayer)then
              if(vsnt[UnitObsTeamVis]<=0)then continue;
 
            o:=tr+_r;
@@ -647,7 +647,7 @@ begin
        if(not IsUnitRange(transport,nil))then
         if(uo_id=ua_psability)then
         begin
-           if(UnitObsTeamVis<=MaxPlayers)then
+           if(UnitObsTeamVis<=LastPlayer)then
              if(vsnt[UnitObsTeamVis]<=0)then continue;
 
            case _ability of
@@ -789,7 +789,7 @@ var u:integer;
 begin
    CheckInBuildArea:=0;
 
-   if(pl<=MaxPlayers)then
+   if(pl<=LastPlayer)then
     with g_players[pl] do
      if(e_builders<=0)then
      begin
@@ -844,7 +844,7 @@ begin
    else m_brushc:=c_gray;
    }
    obstacles:=true;
-   if(playern<=MaxPlayers)then
+   if(playern<=LastPlayer)then
    begin
       obstacles:=true;
 
@@ -1560,7 +1560,7 @@ begin
       or(uid_e[_uid]>=a_units[_uid])
       then
       else
-        if(uprod_r[i]=1){$IFDEF DEBUG0}or(_warpten){$ENDIF}then
+        if(uprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
         begin
            barrack_spawn(pu,uprod_u[i],upgr[upgr_mult_product]);
            unit_ProdStopUnitLine(pu,255,i,false);
@@ -1585,7 +1585,7 @@ begin
       or(upgr[_uid]>=a_upgrs[_uid])
       then
       else
-        if(pprod_r[i]=1){$IFDEF DEBUG0}or(_warpten){$ENDIF}then
+        if(pprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
         begin
            upgr[_uid]+=1;
            unit_ProdStopUpgradeLine(pu,255,i,false);
@@ -1675,7 +1675,7 @@ begin
       for i:=0 to MaxUnitBuffs do
        if(0<buff[i])and(buff[i]<_ub_infinity)then buff[i]-=1;
 
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
       begin
          if(0<vsnt[i])and(vsnt[i]<_ub_infinity)then vsnt[i]-=1;
          if(0<vsni[i])and(vsni[i]<_ub_infinity)then vsni[i]-=1;

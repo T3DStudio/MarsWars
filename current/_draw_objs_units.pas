@@ -1,18 +1,18 @@
 
 procedure _unit_minimap(pu:PTUnit);
 begin
-   if(ui_blink_timer1=0)and(MainMenu=false)and(r_draw)then
+   if(ui_blink_timer1=0)and(MainMenu=false)and(vid_draw)then
     with pu^  do
     with uid^ do
     begin
        if(uid^._ukbuilding)
-       then filledCircleColor(r_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum))
-       else pixelColor       (r_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
+       then filledCircleColor(ui_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum))
+       else pixelColor       (ui_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
 
        with player^ do
         if(team=g_players[UIPlayer].team)then
-         if(_ability=uab_UACScan)and(rld>radar_vision_time)and(r_minimap_scan_blink)then
-          filledCircleColor(r_minimap,trunc(uo_x*map_mmcx),
+         if(_ability=uab_UACScan)and(rld>radar_vision_time)and(ui_mm_ScanBlink)then
+          filledCircleColor(ui_minimap,trunc(uo_x*map_mmcx),
                                       trunc(uo_y*map_mmcx),
                                       trunc(srange*map_mmcx),ShadowColor(PlayerGetColor(pnum)));
     end;
@@ -50,7 +50,7 @@ end;
 procedure _fog_sr(x,y,r:integer);
 var iy,i:integer;
 procedure _sf(tx,ty:integer);
-begin if(0<=tx)and(0<=ty)and(tx<=vid_fog_vfw)and(ty<=vid_fog_vfh)then vid_fog_grid[tx,ty]:=2;end;
+begin if(0<=tx)and(0<=ty)and(tx<=ui_fog_vfw)and(ty<=ui_fog_vfh)then ui_fog_grid[tx,ty]:=2;end;
 begin
    if(r<0    )then r:=0;
    if(r>MFogM)then r:=MFogM;
@@ -69,8 +69,8 @@ end;
 
 function _fog_cscr(x,y,r:integer):boolean;
 begin
-   _fog_cscr:=((vid_fog_sx-r)<=x)and(x<=(vid_fog_ex+r))
-           and((vid_fog_sy-r)<=y)and(y<=(vid_fog_ey+r));
+   _fog_cscr:=((ui_fog_sx-r)<=x)and(x<=(ui_fog_ex+r))
+           and((ui_fog_sy-r)<=y)and(y<=(ui_fog_ey+r));
 end;
 
 procedure unit_FogXY(pu:PTUnit);
@@ -101,18 +101,18 @@ begin
    with pu^     do
    with uid^    do
    with player^ do
-    if(rpls_fog=false)
+    if(ui_fog=false)
     then _unit_fogrev:=true
     else
       case UnitVisionRange(pu) of
     1:begin
-         //if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,_fr);
+         //if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-ui_fog_sx,fy-ui_fog_sy,_fr);
          _unit_fogrev:=true;
       end;
     2:begin
-         if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-vid_fog_sx,fy-vid_fog_sy,fsr);
+         if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
          _unit_fogrev:=true;
-         if(_ability=uab_UACScan)and(rld>radar_vision_time)then _fog_sr((uo_x div fog_cw)-vid_fog_sx,(uo_y div fog_cw)-vid_fog_sy,fsr);
+         if(_ability=uab_UACScan)and(rld>radar_vision_time)then _fog_sr((uo_x div fog_cw)-ui_fog_sx,(uo_y div fog_cw)-ui_fog_sy,fsr);
       end;
       end;
 end;
@@ -164,25 +164,25 @@ procedure ui_IncOrderCounter(x,y:integer;i,uidi:byte);
 var d:integer;
 begin
    if(i>MaxUnitGroups)then exit;
-   if(ui_orders_n[i]=0)then
+   if(ui_groups_n[i]=0)then
    begin
-      ui_orders_x[i]:=x;
-      ui_orders_y[i]:=y;
-      ui_orders_d[i]:=point_dist_int(x,y,ui_cam_x+vid_cam_hw,ui_cam_y+vid_cam_hh);
+      ui_groups_x[i]:=x;
+      ui_groups_y[i]:=y;
+      ui_groups_d[i]:=point_dist_int(x,y,ui_cam_x+ui_cam_hw,ui_cam_y+ui_cam_hh);
    end
    else
    begin
-      d:=point_dist_int(x,y,ui_cam_x+vid_cam_hw,ui_cam_y+vid_cam_hh);
-      if(d<ui_orders_d[i])then
+      d:=point_dist_int(x,y,ui_cam_x+ui_cam_hw,ui_cam_y+ui_cam_hh);
+      if(d<ui_groups_d[i])then
       begin
-         ui_orders_x[i]:=x;
-         ui_orders_y[i]:=y;
-         ui_orders_d[i]:=d;
+         ui_groups_x[i]:=x;
+         ui_groups_y[i]:=y;
+         ui_groups_d[i]:=d;
       end;
    end;
-   ui_orders_n[i]+=1;
+   ui_groups_n[i]+=1;
    with g_uids[uidi] do
-     ui_orders_uids[i,_ukbuilding]+=[uidi];
+     ui_groups_uids[i,_ukbuilding]+=[uidi];
 end;
 
 procedure ui_counters(pu:PTUnit);
@@ -224,7 +224,7 @@ begin
                  ui_bprod_possible+=ups_builder;
                  if(0<m_brush)and(m_brush<=255)then
                    if(m_brush in ups_builder)then
-                     if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[r_blink2_colorb]);
+                     if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
               end;
 
             for i:=0 to MaxUnitLevel do
@@ -234,7 +234,7 @@ begin
          end;
          if(sel)and(UnitHaveRPoint(pu^.uidi))and(uo_x>0)then
          begin
-            UnitsInfoAddLine(x,y,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+            UnitsInfoAddLine(x,y,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
             SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
          end;
       end;
@@ -243,27 +243,27 @@ begin
       begin
          if(sel)and(speed>0)and(rpls_state<rpls_read)and(net_status<>ns_client)then
            if(uo_id=ua_move)or(uo_id=ua_amove)then
-             if(uo_bx>0)then UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+             if(uo_bx>0)then UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
 
          if(uo_id=ua_psability)then
            case _ability of
 uab_RebuildInPoint: begin
-                    SpriteListAddEffect(uo_x,uo_y,0,0,_uid2spr(_rebuild_uid,270,0),128);
-                    if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+                    SpriteListAddEffect(uo_x,uo_y,0,0,uid2spr(_rebuild_uid,270,0),128);
+                    if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
                     case m_brush of
                     1..255,
-                    co_pability   : UnitsInfoAddCircle(uo_x,uo_y,g_uids[_rebuild_uid]._r,r_blink2_color_BY);
+                    co_pability   : UnitsInfoAddCircle(uo_x,uo_y,g_uids[_rebuild_uid]._r,ui_blink2_color_BY);
                     end;
                     end;
 uab_CCFly         : begin
-                    SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,_uid2spr(uidi,270,0),128);
-                    if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[r_blink2_colorb]);
+                    SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,uid2spr(uidi,270,0),128);
+                    if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[ui_blink2_colorb]);
                     case m_brush of
                     1..255,
-                    co_pability   : UnitsInfoAddCircle(uo_x,uo_y+fly_hz,_r,r_blink2_color_BY);
+                    co_pability   : UnitsInfoAddCircle(uo_x,uo_y+fly_hz,_r,ui_blink2_color_BY);
                     end;
                     end;
-           else     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[r_blink2_colorb]);
+           else     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
            end;
       end;
 
@@ -279,10 +279,10 @@ uab_CCFly         : begin
 
             if(uo_id<>ua_psability)or(s_all=1)then
             begin
-            if(ui_ability(pu,false))then UnitOrderSetNearestTarget(pu,vid_cam_cx,vid_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,unit_sability(pu       ,true)=0,false,true);
+            if(ui_ability(pu,false))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,unit_sability(pu       ,true)=0,false,true);
             if(ui_ability(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x   ,mouse_y   ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,unit_pability(pu,-1,0,0,true)=0,false,true);
             end;
-            if(ui_rebuild (pu     ))then UnitOrderSetNearestTarget(pu,vid_cam_cx,vid_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds ,unit_rebuild(pu        ,true)=0,true ,true);
+            if(ui_rebuild (pu     ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds ,unit_rebuild(pu        ,true)=0,true ,true);
          end;
       end
       else
@@ -428,7 +428,7 @@ begin
    r_AlphaGlows:=0;
    if(amplitudo=0)then exit;
    amplitudoH:=amplitudo div 2;
-   t:=(g_step+shift) mod amplitudo;
+   t:=(g_tick+shift) mod amplitudo;
    if(t>amplitudoH)
    then r_AlphaGlows:=amplitudo-t
    else r_AlphaGlows:=t;
@@ -472,7 +472,7 @@ begin
 
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin
-            if((unum mod vid_blink_period2)=ui_blink_timer2)
+            if((unum mod ui_blink_period2)=ui_blink_timer2)
             then _unit_level_string(pu);
 
             depth:=_unit_SpriteDepth(pu);
@@ -494,7 +494,7 @@ begin
 
             if(buff[ub_ArchFire]>0)then
              with spr_h_p6 do
-              if(sn>0)then SpriteListAddUnit(vx-_randomr(_missile_r),vy-_randomr(_missile_r),depth+1,0,0,0,@sl[(G_Step div 4) mod cardinal(sn)],255);
+              if(sn>0)then SpriteListAddUnit(vx-_randomr(_missile_r),vy-_randomr(_missile_r),depth+1,0,0,0,@sl[(g_tick div 4) mod cardinal(sn)],255);
 
             if(uidi=UID_UACDron)and(not iscomplete)
             then SpriteListAddEffect(vx,vy,sd_liquid+y,0,@spr_UTurret.sl[0],255);
@@ -590,13 +590,13 @@ begin
    FillChar(ui_uprod_uid_time ,SizeOf(ui_uprod_uid_time ),0);
    FillChar(ui_uprod_uid_max  ,SizeOf(ui_uprod_uid_max  ),0);
    FillChar(ui_pprod_max      ,SizeOf(ui_pprod_max      ),0);
-   FillChar(ui_orders_uids    ,SizeOf(ui_orders_uids    ),0);
+   FillChar(ui_groups_uids    ,SizeOf(ui_groups_uids    ),0);
    FillChar(ui_pprod_time     ,SizeOf(ui_pprod_time     ),0);
    FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
-   FillChar(ui_orders_n       ,SizeOf(ui_orders_n       ),0);
-   FillChar(ui_orders_d       ,SizeOf(ui_orders_d       ),0);
-   FillChar(ui_orders_x       ,SizeOf(ui_orders_x       ),0);
-   FillChar(ui_orders_y       ,SizeOf(ui_orders_y       ),0);
+   FillChar(ui_groups_n       ,SizeOf(ui_groups_n       ),0);
+   FillChar(ui_groups_d       ,SizeOf(ui_groups_d       ),0);
+   FillChar(ui_groups_x       ,SizeOf(ui_groups_x       ),0);
+   FillChar(ui_groups_y       ,SizeOf(ui_groups_y       ),0);
    ui_uprod_max      :=0;
    ui_uprod_cur      :=0;
    ui_uprod_first    :=0;

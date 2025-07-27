@@ -145,6 +145,23 @@ PTSoundSet = ^TSoundSet;
 //   OTHER
 //
 
+TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_Controls);
+
+TTabControlContent = (tcc_none=0,tcc_controls,tcc_observer,tcc_replay);
+
+TInputKeyType = (ikt_keyboard=0,ikt_mouseb,ikt_mousew);
+
+TTabBTNClickType = (pct_Left=0,pct_Right,pct_DLeft);
+
+TInputKey = record
+   ik_type  : TInputKeyType;
+   ik_value : cardinal;
+   ik_timer_twice,
+   ik_timer_pressed
+            : integer;
+   ik_depend: byte;
+end;
+
 TReplayPos = record
    rp_fpos : int64;
    rp_gtick: cardinal;
@@ -534,7 +551,7 @@ o_x1,o_y1  : integer;
    ai_skill: byte;
    ai_flags: cardinal;
    ai_alarms
-           : array[0..MaxPlayers] of TAIAlarm;
+           : array[0..LastPlayer] of TAIAlarm;
    ai_attack_timer,
    ai_scout_timer
            : integer;
@@ -576,9 +593,9 @@ o_x1,o_y1  : integer;
            : integer;
 end;
 PTPlayer = ^TPlayer;
-TPList = array[0..MaxPlayers] of TPLayer;
+TPList = array[0..LastPlayer] of TPLayer;
 
-TUnitVisionData = array[0..MaxPlayers] of integer;
+TUnitVisionData = array[0..LastPlayer] of integer;
 
 TUnit = record
    hits     : longint;
@@ -691,7 +708,7 @@ TKeyPoint = record
    cpunitst_pstate,
    cpUnitsTeam,
    cpunitsp_pstate,
-   cpUnitsPlayer     : array[0..MaxPlayers] of longint;
+   cpUnitsPlayer     : array[0..LastPlayer] of longint;
 end;
 PTCTPoint = ^TKeyPoint;
 

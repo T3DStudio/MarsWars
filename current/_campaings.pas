@@ -34,7 +34,7 @@ end;
 procedure cmp_ClearPStarts;
 var i:byte;
 begin
-   for i:=0 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
       map_psx[i]:=-5000;
       map_psy[i]:=-5000;
@@ -55,7 +55,7 @@ var p:byte;
 dstep,
 ddir :integer;
 begin
-   if(pnum<1)or(pnum>MaxPlayers)then exit;
+   if(pnum<1)or(pnum>LastPlayer)then exit;
 
    dstep:=round(360/pnum);
    ddir :=cd;
@@ -66,7 +66,7 @@ begin
       map_psy[pstart]:=cy+round(cr*sin(ddir*DEGTORAD));
       ddir  +=dstep;
       pstart+=1;
-      if(pstart>MaxPlayers)then break;
+      if(pstart>LastPlayer)then break;
    end;
 end;
 procedure cmp_SetPlayer(p,r,t:byte);
@@ -122,7 +122,7 @@ begin
    end;
 
    Map_premap(true);
-   MoveCamToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
+   ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
 end;
 
 procedure cmp_MissionCode;

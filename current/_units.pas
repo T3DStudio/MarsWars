@@ -1366,7 +1366,7 @@ begin
       end;
       _AddToInt(@vsnt[tu^.player^.team],a_rld+1);
       _AddToInt(@vsnt[tu^.player^.team],vistime);
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
         if(tu^.vsnt[i]>0)
         or(    vsnt[i]>0)then
         begin
@@ -1516,9 +1516,9 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not IsUnitRange(tu^.transport,nil))then
-              if((G_Step mod fr_fpsd3)=0)then effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
+              if((g_tick mod fr_fpsd3)=0)then effect_add(tu^.vx-_randomr(tu^.uid^._missile_r),tu^.vy-_randomr(tu^.uid^._missile_r),_SpriteDepth(tu^.vy+1,tu^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
-              if((G_Step mod fr_fps1)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
+              if((g_tick mod fr_fps1)=0)then SoundPlayUnit(aw_snd_target,tu,@targetvis);
           end;
          {$ENDIF}
 
@@ -1912,7 +1912,7 @@ begin
            hits+=_bstep*upgr[upgr_fast_build];
         end;
 
-        if(hits>=_mhits){$IFDEF DEBUG0}or(_warpten){$ENDIF}then
+        if(hits>=_mhits){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
         begin
            hits:=_mhits;
            iscomplete :=true;

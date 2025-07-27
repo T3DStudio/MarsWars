@@ -160,7 +160,7 @@ begin
    ax:=mm3i(1,ax,map_Size);
    ay:=mm3i(1,ay,map_Size);
    with pplayer^ do
-    for a:=0 to MaxPlayers do
+    for a:=0 to LastPlayer do
      with ai_alarms[a] do
       if(alimit<=0)then
       begin
@@ -205,7 +205,7 @@ begin
       if(map_Symmetry)then ai_PlayerSetAlarm(@g_players[p],map_Size-map_psx[p],map_Size-map_psy[p],1,base_1r,true,pf_get_area(map_Size-map_psx[p],map_Size-map_psy[p]));
    end
    else
-      for i:=1 to MaxPlayers do
+      for i:=1 to LastPlayer do
        if(i<>p)then
         if(g_players[i].state>ps_none)then
          if(g_players[i].team<>g_players[p].team)then
@@ -496,7 +496,7 @@ begin
    with player^ do
    begin
       // get initial alarm point
-      for i:=0 to MaxPlayers do
+      for i:=0 to LastPlayer do
        with ai_alarms[i] do
         if(aia_enemy_limit>0)then
          if(ukfly)
@@ -540,7 +540,7 @@ begin
                    or _isbarrack)
                    then continue;
 
-            koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_step>=g_step_koth_pause);
+            koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_tick>=g_step_koth_pause);
 
             if(not koth_point)then
               if((cpunitst_pstate[team]>=ul3)and(d> cpCaptureR))
@@ -1040,7 +1040,7 @@ begin
       ai_scout_u_new_w:=0;
 
      if(map_scenario=mc_royale)then
-      for a:=0 to MaxPlayers do
+      for a:=0 to LastPlayer do
        with ai_alarms[a] do
         if(aia_enemy_limit>0)then
          if(_CheckRoyalBattlePoint(aia_x,aia_y,base_1r))then aia_enemy_limit:=0;

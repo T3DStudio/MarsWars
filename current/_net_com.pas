@@ -185,15 +185,15 @@ function net_LastinPort:word    ;begin net_LastinPort:=net_buffer^.address.port;
 
 {$IFDEF _FULLGAME}
 
-procedure net_sv_sport;
+procedure menu_GetServerPort;
 begin
-   net_port:=s2w(net_sv_StrPort);
-   net_sv_StrPort:=w2s(net_port);
+   net_port:=s2w(menu_ServerPort);
+   menu_ServerPort:=w2s(net_port);
 end;
 
 function ip2c(s:shortstring;isip:pboolean):cardinal;
 {$IFNDEF FULLGAME}
-const chars_digits           : set of Char = ['0'..'9'];
+const chars_digits : set of Char = ['0'..'9'];
 {$ENDIF}
 var i,l,
      bn:byte;
@@ -226,43 +226,43 @@ begin
     +'.'+b2s((c and $FF000000) shr 24);
 end;
 
-procedure net_cl_saddr;
+procedure menu_GetClientAddress;
 var
 addr_str,
 port_str: shortstring;
 pstr    : PChar;
     p   : byte;
   ipc   : cardinal;
- isip   : boolean;
+ isIP   : boolean;
 ipstruct: TIPaddress;
 begin
    addr_str:='';
    port_str:='';
-   p    :=pos(':',net_cl_StrAddr);
+   p    :=pos(':',menu_ClientAddress);
    if(p>0)then
    begin
-      addr_str:=copy(net_cl_StrAddr,1,p-1);
-      delete(net_cl_StrAddr,1,p);
-      port_str:=net_cl_StrAddr;
+      addr_str:=copy(menu_ClientAddress,1,p-1);
+      delete(menu_ClientAddress,1,p);
+      port_str:=menu_ClientAddress;
    end
    else
    begin
-      addr_str:=net_cl_StrAddr;
+      addr_str:=menu_ClientAddress;
       port_str:='10666';
    end;
 
    net_cl_svport:=swap(s2w(port_str));
    port_str:=w2s(swap(net_cl_svport));
 
-   ipc:=ip2c(addr_str,@isip);
-   if(isip)then
+   ipc:=ip2c(addr_str,@isIP);
+   if(isIP)then
    begin
       net_cl_svip  :=ipc;
-      net_cl_StrAddr:=c2ip(net_cl_svip)+':'+port_str;
+      menu_ClientAddress:=c2ip(net_cl_svip)+':'+port_str;
    end
    else
    begin
-      net_cl_StrAddr:=addr_str+':'+port_str;
+      menu_ClientAddress:=addr_str+':'+port_str;
       addr_str+=#0;
       pstr:=@addr_str[1];
       if(SDLNet_ResolveHost(ipstruct,pstr,net_cl_svport)=0)
@@ -335,7 +335,7 @@ begin
    if(net_status=ns_client)and(targets>0)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_log_chat);
+      net_writebyte(nmid_LogMessage);
       net_writebyte(targets);
       net_writestring(msg);
       net_send(net_cl_svip,net_cl_svport);
@@ -357,7 +357,7 @@ begin
    if(net_status=ns_client)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_player_leave);
+      net_writebyte(nmid_PlayerLeave);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;
@@ -366,7 +366,7 @@ begin
    if(net_status=ns_client)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_player_surrender);
+      net_writebyte(nmid_PlayerSurrender);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;

@@ -98,7 +98,7 @@ begin
    WaveTime+=4*g_inv_wave_n;
 end;
 
-procedure GameModeInvasion;
+procedure Scenario_Invasion;
 const
 max_wave_time_s = 150;
 max_wave_time_t = fr_fps1*max_wave_time_s;

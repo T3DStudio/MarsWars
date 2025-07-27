@@ -67,7 +67,7 @@ var t,s:integer;
       b:byte;
 begin
    _wudata_log:=false;
-   if(p<=MaxPlayers)then
+   if(p<=LastPlayer)then
     with g_players[p] do
     begin
        s:=0;
@@ -208,10 +208,10 @@ begin
       then wudelay:=fr_fpsd2
       else wudelay:=fr_fpsd4;
 
-      if(wudtick^>G_Step)
+      if(wudtick^>g_tick)
       then wb:=true
       else
-        if((G_Step-wudtick^)>=wudelay)
+        if((g_tick-wudtick^)>=wudelay)
         then wb:=true;
 
       if(rpl)
@@ -228,7 +228,7 @@ begin
 
       if(not wb)then exit;
 
-      wudtick^:=G_Step;
+      wudtick^:=g_tick;
 
       if(iscomplete)then
         if(_ability in client_rld_abils)
@@ -306,7 +306,7 @@ end;
 procedure _wpdata_upgr(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
-   for p:=1 to MaxPlayers do
+   for p:=1 to LastPlayer do
     if(GetBBit(@g_player_astatus,p))then
      with g_players[p] do
      begin
@@ -350,8 +350,8 @@ wdcptime: pbyte;
 begin
    b:=0;
    if(rpl)
-   then wdcptime:=@rpls_cpoints_t[cpi]
-   else wdcptime:= @net_cpoints_t[cpi];
+   then wdcptime:=@rpls_kpoints_t[cpi]
+   else wdcptime:= @net_kpoints_t[cpi];
 
    wdcptime^:=(wdcptime^+1) mod 2;
 
@@ -395,9 +395,9 @@ wstepb1: boolean;
 i,
  _PNU  : integer;
 begin
-   _wudata_card(G_Step,rpl);
+   _wudata_card(g_tick,rpl);
 
-   wstep:=G_Step shr 1;
+   wstep:=g_tick shr 1;
 
    wstepb0:=(wstep mod fr_fpsd2)=0;
    if(rpl)
@@ -691,7 +691,7 @@ begin
            begin
               if(iscomplete=false)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
-              if(not rpl)and(sel)then UpdateLastSelectedUnit(unum);
+              if(not rpl)and(sel)then ui_UpdateLastSelectedUnit(unum);
            end;
         end;
 
@@ -760,7 +760,7 @@ begin
                 if(playeri=UIPlayer)then
                  with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
-               if(not rpl)and(pu^.sel=false)and(sel)and(playeri=UIPlayer)then UpdateLastSelectedUnit(unum);
+               if(not rpl)and(pu^.sel=false)and(sel)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
@@ -948,10 +948,10 @@ begin
 
          s-=1;
       end;
-      if(rpl=false)then
+      if(not rpl)then
       begin
          net_log_n:=_rudata_card(rpl,net_log_n);
-         menu_redraw:=true;
+         menu_update:=true;
       end;
    end;
 end;
@@ -1189,7 +1189,7 @@ end;
 procedure _rpdata_upgr(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
-   for p:=1 to MaxPlayers do
+   for p:=1 to LastPlayer do
     if(GetBBit(@g_player_astatus,p))then
      with g_players[p] do
      begin
@@ -1216,7 +1216,7 @@ procedure _rclient_cl_units;
 var i:byte;
 begin
    g_cl_units:=0;
-   for i:=1 to MaxPlayers do
+   for i:=1 to LastPlayer do
     if((g_player_astatus and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
 end;
 
@@ -1243,7 +1243,7 @@ begin
          p:=(b and %00011100) shr 2;
          CPoint_ChangeOwner(cpi,p);
          cpTimerOwnerPlayer:=(b and %11100000) shr 5;
-         if(cpTimerOwnerPlayer<=MaxPlayers)
+         if(cpTimerOwnerPlayer<=LastPlayer)
          then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team;
 
          case t of
@@ -1268,9 +1268,9 @@ i,
 _PNU,
 _N_U   : integer;
 begin
-   G_Step:=_rudata_card(rpl,G_Step);
+   g_tick:=_rudata_card(rpl,g_tick);
 
-   wstep:=G_Step shr 1;
+   wstep:=g_tick shr 1;
 
    wstepb0:=(wstep mod fr_fpsd2)=0;
    if(rpl)
@@ -1327,7 +1327,7 @@ mc_royale   : g_royal_r:=_rudata_int(rpl,0);
       begin
          _rpdata_upgr(rpl);
          g_player_rstatus:=_rudata_byte(rpl,0);
-         for i:=0 to MaxPlayers do
+         for i:=0 to LastPlayer do
           with g_players[i] do
            revealed:=GetBBit(@g_player_rstatus,i);
       end;

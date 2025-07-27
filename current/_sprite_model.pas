@@ -387,9 +387,9 @@ sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits,nil);
    end;
 end;
 
-function _uid2spr(_uid:byte;dir:integer;level:byte):PTMWTexture;
+function uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;
 begin
-   with g_uids[_uid] do _uid2spr:=_sm2s(un_smodel[level],sms_stand,dir,0,nil);
+   with g_uids[auid] do uid2spr:=_sm2s(un_smodel[level],sms_stand,dir,0,nil);
 end;
 
 

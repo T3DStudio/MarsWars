@@ -97,8 +97,8 @@ begin
    map_Size      := mm3i(map_MinSize,map_Size,map_MaxSize);
 
    map_mmcx    := (ui_CtrlPanelW-2)/map_Size;
-   map_mmvw    := trunc(vid_cam_w*map_mmcx)+1;
-   map_mmvh    := trunc(vid_cam_h*map_mmcx)+1;
+   map_mmvw    := trunc(ui_cam_w*map_mmcx)+1;
+   map_mmvh    := trunc(ui_cam_h*map_mmcx)+1;
    {$ENDIF}
 end;
 
@@ -119,7 +119,7 @@ begin
        exit;
     end;
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     if(point_dist_int(x,y,map_psx[p],map_psy[p])<m)then
     begin
        _PlayerStartHere:=true;
@@ -155,11 +155,11 @@ begin
 end;
 
 procedure map_Starts_Circle(cx,cy,sdir,r:integer);
-const dstep =360 div MaxPlayers;
+const dstep =360 div LastPlayer;
 var i:byte;
 begin
    sdir :=abs(sdir mod 360);
-   for i:=1 to MaxPlayers do
+   for i:=1 to LastPlayer do
    begin
       sdir+=dstep;
       map_psx[i]:=cx+trunc(r*cos(sdir*degtorad));
@@ -174,7 +174,7 @@ begin
    bb1:=map_Size-(bb0*2);
    dst:=(map_Size div 5)+base_1r;
 
-   for i:=1 to MaxPlayers do
+   for i:=1 to LastPlayer do
    begin
       if(map_Symmetry)and(i>3)then break;
       c:=0;
@@ -205,8 +205,8 @@ var
 x,y:byte;
   i:integer;
 begin
-   for x:=1 to MaxPlayers do
-   for y:=1 to MaxPlayers do
+   for x:=1 to LastPlayer do
+   for y:=1 to LastPlayer do
      if(random(2)=0)and(x<>y)then
      begin
         if(teamShuffle)and(g_players[x].team<>g_players[y].team)then continue;
@@ -287,7 +287,7 @@ end;
 procedure map_Starts;
 var ix,iy,i,u,c:integer;
 begin
-   for i:=0 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
       map_psx[i]:=-5000;
       map_psy[i]:=-5000;

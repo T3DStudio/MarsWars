@@ -37,8 +37,8 @@ begin
    or(g_type=gt_campaing)
    {$ENDIF}then exit;
 
-   if(p0>MaxPlayers)
-   or(p1>MaxPlayers)
+   if(p0>LastPlayer)
+   or(p1>LastPlayer)
    or(p0=0)
    or(p1=0)then exit;
 
@@ -105,7 +105,7 @@ procedure PlayersSetDefault;
 var p:byte;
 begin
    FillChar(g_players,SizeOf(TPList),0);
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
     begin
        ai_skill :=player_default_ai_level;
@@ -159,7 +159,7 @@ var u:integer;
 begin
    randomize;
 
-   G_Step         :=0;
+   g_tick         :=0;
    G_Status       :=0;
    g_player_astatus:=255;
 
@@ -193,27 +193,27 @@ begin
 
    Map_premap;
    {$IFDEF DEBUG0}
-   _warpten:=false;
+   test_InstaProd:=false;
    {$ENDIF}
 
    {$IFDEF _FULLGAME}
    uncappedFPS:=false;
 
-   menu_redraw  := true;
+   menu_update:=true;
 
    ui_cam_x:=-ui_CtrlPanelW;
    ui_cam_y:=0;
-   CameraBounds;
+   ui_Camera_Bounds;
 
    ui_blink_timer1:=0;
    ui_blink_timer2:=0;
-   vid_vsls:=0;
+   vid_ScreenSpritesS:=0;
 
    ui_tab :=0;
    ui_UnitSelectedNU:=0;
    ui_UnitSelectedPU:=0;
 
-   FillChar(g_effects ,SizeOf(g_effects ),0);
+   FillChar(g_effects,SizeOf(g_effects),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
 
    ingame_chat :=0;
@@ -226,9 +226,9 @@ begin
    ui_umark_t:=0;
 
    mouse_select_x0:=-1;
-   m_brush:=-32000;
+   m_brush:=co_empty;
 
-   rpls_fog   :=true;
+   ui_fog   :=true;
 
    svld_str_fname:='';
 
@@ -244,6 +244,61 @@ end;
 {$IFDEF _FULLGAME}
 {$include _replays.pas}
 {$ENDIF}
+
+{
+function menu_surrender(check:boolean):boolean;
+begin
+   menu_surrender:=false;
+
+   if(g_DefeatedObs)and(not g_players[LocalPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)then
+   begin
+      menu_surrender:=true;
+
+      if(check)then exit;
+
+      case net_status  of
+      ns_server,
+      ns_none   : begin
+                     GameLogPlayerSurrender(LocalPlayer);
+                     PlayerKill(LocalPlayer,true);
+                  end;
+      ns_client : net_surrender;// send surrender command, toggle menu
+      end;
+      ToggleMenu(true);
+   end;
+end;
+}
+
+function PlayerSurrender(pid:byte;check:boolean):boolean;
+begin
+   PlayerSurrender:=false;
+
+   if(not g_started)
+   or(pid>=LastPlayer)
+   or(rpls_state=rpls_read)
+   or(not g_DefeatedObs)then exit;
+
+   with g_players[pid] do
+     if(state<>ps_none)
+     or(armylimit<=0)
+     or(army<=0)
+     or(team=0)
+     or(observer)then exit;
+
+   PlayerSurrender:=true;
+   if(check)then exit;
+
+   {$IFDEF _FULLGAME}
+   if(net_status=ns_client)then
+   begin
+      net_surrender;
+      exit;
+   end;
+   {$ENDIF}
+
+   GameLogPlayerSurrender(pid);
+   PlayerKill(pid,true);
+end;
 
 procedure GameCreateStartBase(x,y:integer;uidF,uidA,pl,c:byte;AdvancedBase:boolean);
 var  i,n,uid:byte;
@@ -291,7 +346,7 @@ var p:byte;
 begin
    g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
    with g_players[p] do
    begin
       team:=PlayerValidateTeam(p,team);
@@ -320,7 +375,7 @@ begin
       end;
    end;
 
-   for p:=1 to MaxPlayers do
+   for p:=1 to LastPlayer do
     with g_players[p] do
      if(state<>ps_none)then
      begin
@@ -333,7 +388,7 @@ begin
      end;
 
    {$IFDEF _FULLGAME}
-   MoveCamToPoint(map_psx[LocalPlayer] , map_psy[LocalPlayer]);
+   ui_Camera_MoveToPoint(map_psx[LocalPlayer] , map_psy[LocalPlayer]);
    if(g_players[LocalPlayer].team=0)then
    begin
       ui_tab:=3;
@@ -344,32 +399,50 @@ end;
 
 
 {$IFDEF _FULLGAME}
-procedure GameStart;
+function GameStart(check:boolean):boolean;
 begin
-   menu_item:=0;
-   if(not G_Started)then
-     if(PlayersReadyStatus)then
-     begin
-        case g_type of
-        gt_campaing: cmp_StartMission;
-        gt_scirmish: GameStartSkirmish;
-        else exit;
-        end;
-        MainMenu :=false;
-        G_Started:=true;
-        UIPlayer :=LocalPlayer;
-        ui_blink_timer1:=1;
-     end;
+   GameStart:=false;
+   if(G_Started)
+   or(not PlayersReadyStatus)
+   or(net_status=ns_client)then exit;
+
+   case g_type of
+   gt_campaing,
+   gt_scirmish:;
+   else exit;
+   end;
+
+   GameStart:=true;
+
+   if(check)then exit;
+
+   case g_type of
+   gt_campaing: cmp_StartMission;
+   gt_scirmish: GameStartSkirmish;
+   else exit;
+   end;
+
+   MainMenu :=false;
+   G_Started:=true;
+   UIPlayer :=LocalPlayer;
+   ui_blink_timer1:=1;
+   menu_ItemSelected:=0;
 end;
 
-procedure GameBreak;
+function GameBreak(check:boolean):boolean;
 begin
-   menu_item:=0;
-   if(G_Started)then
-   begin
-      G_Started:=false;
-      GameDefaultAll;
-   end;
+   GameBreak:=false;
+
+   if(not G_Started)
+   or(net_status=ns_client)then exit;
+
+   GameBreak:=true;
+
+   if(check)then exit;
+
+   menu_ItemSelected:=0;
+   G_Started:=false;
+   GameDefaultAll;
 end;
 
 function CheckSimpleClick(o_x0,o_y0,o_x1,o_y1:integer):boolean;
@@ -377,25 +450,25 @@ begin
    CheckSimpleClick:=point_dist_rint(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
-function UIAllowSelecting(playern:byte):boolean;
+function ui_GameControlsEnabled:boolean;
 begin
-   UIAllowSelecting:=false;
-   with g_players[playern] do
-     if(UIPlayer<>playern)
+   ui_GameControlsEnabled:=false;
+   with g_players[LocalPlayer] do
+     if(UIPlayer<>LocalPlayer)
      or(observer)
-     or(army=0)
+     or(army<=0)
      or(rpls_state=rpls_read)then exit;
    if(g_status<>gs_running)then exit;
-   UIAllowSelecting:=true;
+   ui_GameControlsEnabled:=true;
 end;
 
-procedure units_SelectRect(add:boolean;playern:byte;x0,y0,x1,y1:integer;fuid:byte);
+procedure units_SelectRect(add:boolean;x0,y0,x1,y1:integer;fuid:byte);
 var u ,
 usel_max:integer;
 wassel,
 SelectBuildings:boolean;
 begin
-   if(not UIAllowSelecting(playern))then exit;
+   if(not ui_GameControlsEnabled)then exit;
 
    if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
    if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
@@ -404,12 +477,12 @@ begin
 
    SelectBuildings:=true;
    if(add)
-   then SelectBuildings:=(g_players[playern].ucl_cs[false]=0)
+   then SelectBuildings:=(g_players[LocalPlayer].ucl_cs[false]=0)
    else
      if(fuid=255)then
        for u:=1 to MaxUnits do
         with g_punits[u]^ do
-         if(hits>0)and(playern=playeri)and(not IsUnitRange(transport,nil))then
+         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
           with uid^ do
            if(not _ukbuilding)then
              if((x0-_r)<=vx)and(vx<=(x1+_r))
@@ -421,7 +494,7 @@ begin
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
-       if(hits>0)and(playern=playeri)and(not IsUnitRange(transport,nil))then
+       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
        begin
           wassel:=sel;
 
@@ -438,50 +511,51 @@ begin
             if(sel)then
             begin
                unit_counters_inc_select(g_punits[u]);
-               UpdateLastSelectedUnit(unum);
+               ui_UpdateLastSelectedUnit(unum);
             end
             else unit_counters_dec_select(g_punits[u]);
           if(sel)and(usel_max>0)then usel_max-=1;
        end;
 end;
-procedure units_SelectGroup(add:boolean;playern,fgroup:byte);
+procedure units_SelectGroup(add:boolean;fgroup:byte);
 var u:integer;
 wassel:boolean;
 begin
-   if(not UIAllowSelecting(playern))then exit;
+   if(not ui_GameControlsEnabled)
+   or(fgroup=0)then exit;
 
    for u:=1 to MaxUnits do
-    with g_punits[u]^ do
-     if(hits>0)and(playern=playeri)and(not IsUnitRange(transport,nil))then
-     begin
-        wassel:=sel;
+     with g_punits[u]^ do
+       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+       begin
+          wassel:=sel;
 
-        if(not add)then sel:=false;
-        if(not add)or(not wassel and add)then
-          case fgroup of
-          0..
-          MaxUnitGroups: sel:=group=fgroup;
-          254          : sel:=UnitF1Select(g_punits[u]);
-          255          : sel:=UnitF2Select(g_punits[u]);
-          end;
+          if(not add)then sel:=false;
+          if(not add)or(not wassel and add)then
+            case fgroup of
+            1..
+            MaxUnitGroups: sel:=group=fgroup;
+            //254          : sel:=UnitF1Select(g_punits[u]);
+            255          : sel:=UnitF2Select(g_punits[u]);
+            end;
 
-        if(wassel<>sel)then
-          if(sel)
-          then unit_counters_inc_select(g_punits[u])
-          else unit_counters_dec_select(g_punits[u]);
+          if(wassel<>sel)then
+            if(sel)
+            then unit_counters_inc_select(g_punits[u])
+            else unit_counters_dec_select(g_punits[u]);
 
-        if(sel)then UpdateLastSelectedUnit(unum);
-     end;
+          if(sel)then ui_UpdateLastSelectedUnit(unum);
+       end;
 end;
-procedure units_Grouping(add:boolean;playern,fgroup:byte);
+procedure units_Grouping(add:boolean;fgroup:byte);
 var u:integer;
 begin
-   if(not UIAllowSelecting(playern))then exit;
+   if(not ui_GameControlsEnabled)then exit;
 
    if(fgroup<=MaxUnitGroups)then
      for u:=1 to MaxUnits do
        with g_punits[u]^ do
-         if(hits>0)and(playern=playeri)and(not IsUnitRange(transport,nil))then
+         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
            case add of
            false: if(sel)
                   then group:=fgroup
@@ -695,7 +769,7 @@ begin
    then map_generators:=random(map_MaxGenerators)+1
    else map_generators:=0;
 
-   for p:=1 to MaxPlayers do
+   for p:=1 to LastPlayer do
      with g_players[p] do
        if(state<>ps_human)then
        begin
@@ -712,7 +786,7 @@ begin
        end;
 
    {$IFDEF _FULLGAME}
-   PlayersSwap(random(MaxPlayers)+1,LocalPlayer);
+   PlayersSwap(random(LastPlayer)+1,LocalPlayer);
    {$ENDIF}
 
    if(random(3)=0)
@@ -830,20 +904,20 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
    end;
 end;
 
-procedure GameDefaultEndConditions;
+procedure Scenario_DefaultEndConditions;
 var p,wteam_last,wteams_n: byte;
-teams_army: array[0..MaxPlayers] of integer;
+teams_army: array[0..LastPlayer] of integer;
 begin
-   if(net_status>ns_none)and(G_Step<fr_fps1)then exit;
+   if(net_status>ns_none)and(g_tick<fr_fps1)then exit;
 
    wteam_last:=255;
    wteams_n  :=0;
    FillChar(teams_army,SizeOf(teams_army),0);
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
      with g_players[p] do
        teams_army[team]+=army;
 
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
      if(teams_army[p]>0)then
      begin
         wteam_last:=p;
@@ -853,10 +927,10 @@ begin
    if(wteams_n=1)then GameSetStatusWinnerTeam(wteam_last);
 end;
 
-procedure DefaultDefeatConditions;
+procedure Scenario_DefaultDefeatConditions;
 var i:byte;
 begin
-   for i:=1 to MaxPlayers do
+   for i:=1 to LastPlayer do
      if(g_players[i].army>0)then exit;
    GameSetStatusWinnerTeam(0);
 end;
@@ -864,7 +938,7 @@ end;
 procedure PlayersCycle;
 var p:byte;
 begin
-   for p:=0 to MaxPlayers do
+   for p:=0 to LastPlayer do
     with g_players[p] do
      if(state>ps_none)then
      begin
@@ -873,13 +947,13 @@ begin
            if(ttl<ClientTTL)then
            begin
               ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
+              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
            end
            else
              if(G_Started=false)then
              begin
                 PlayerSetState(p,PS_None);
-                {$IFDEF _FULLGAME}menu_redraw{$ELSE}screen_redraw{$ENDIF}:=true;
+                {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;
         if(net_logsend_pause>0)then net_logsend_pause-=1;
@@ -918,7 +992,7 @@ begin
         end;
      end;
 
-   for p:=0 to MaxPlayers do PlayerAPMUpdate(p);
+   for p:=0 to LastPlayer do PlayerAPMUpdate(p);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -950,7 +1024,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=MaxPlayers)then
+   if(0<player)and(player<=LastPlayer)then
      with g_players[player] do
        if(state=ps_ai)then
        begin
@@ -977,7 +1051,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=MaxPlayers)then
+   if(0<player)and(player<=LastPlayer)then
      with g_players[player] do
        if(state<>ps_human)then
        begin
@@ -1014,14 +1088,14 @@ begin
       then pvar^:=PlayerGetFixedTeams(map_scenario,player)
       else pvar^:=0;
    end
-   else ScrollByte(pvar,forward,0,MaxPlayers);
+   else ScrollByte(pvar,forward,0,LastPlayer);
 end;
 begin
    PlayerTeamChange:=false;
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=MaxPlayers)then
+   if(0<player)and(player<=LastPlayer)then
      with g_players[player] do
        {$IFDEF _FULLGAME}
        if(player=LocalPlayer)and(net_status=ns_client)then
@@ -1032,7 +1106,7 @@ begin
 
           if(map_scenario in mc_fixed_teams)
           then HumanTeamRoll(@PlayerTeam)
-          else ScrollByte(@PlayerTeam,forward,0,MaxPlayers);
+          else ScrollByte(@PlayerTeam,forward,0,LastPlayer);
 
        end
        else
@@ -1058,7 +1132,7 @@ begin
             end;
             {$ENDIF}
             if(state=ps_ai)
-            then ScrollByte(@team,forward,1,MaxPlayers)
+            then ScrollByte(@team,forward,1,LastPlayer)
             else HumanTeamRoll(@team);
          end;
 end;
@@ -1069,7 +1143,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=MaxPlayers)then
+   if(0<player)and(player<=LastPlayer)then
      with g_players[player] do
       if(team>0)then
        {$IFDEF _FULLGAME}
@@ -1189,27 +1263,10 @@ end;
 
 {$include _net_game.pas}
 
-procedure CodeGame;
+procedure GameMain;
 begin
    {$IFDEF _FULLGAME}
-   ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod vid_blink_period1;
-   ui_blink_timer2+=1;ui_blink_timer2:=ui_blink_timer2 mod vid_blink_period2;
-
-   if(ui_blink_timer1=0)then
-   begin
-      r_blink3+=1;
-      r_blink3:=r_blink3 mod 4;
-   end;
    if(net_error_timer>0)then net_error_timer-=1;
-
-   r_blink1_colorb  :=ui_blink_timer1>vid_blink_periodh;
-   r_blink2_colorb  :=ui_blink_timer2>vid_blink_period1;
-
-   r_blink1_color_BG:=ui_blink_color1[r_blink1_colorb];
-   r_blink1_color_BY:=ui_blink_color2[r_blink1_colorb];
-   r_blink2_color_BG:=ui_blink_color1[r_blink2_colorb];
-   r_blink2_color_BY:=ui_blink_color2[r_blink2_colorb];
-
    SoundControl;
 
    if(net_status=ns_client)then net_Client;
@@ -1229,29 +1286,29 @@ begin
 
       if(ServerSide)then
       begin
-         G_Step+=1;
+         g_tick+=1;
 
          UpdatePlayersStatus;
 
-         GameModeCPointsCode;
+         Scenario_KeyPointsCode;
          {$IFDEF _FULLGAME}
          if(g_type=gt_scirmish)then
          begin
          {$ENDIF}
-            GameModeCPointsEndConditions;
+            Scenario_KeyPointsEndConditions;
             case map_scenario of
             mc_invasion  : begin
-                           GameModeInvasion;
-                           DefaultDefeatConditions;
+                           Scenario_Invasion;
+                           Scenario_DefaultDefeatConditions;
                            end;
             mc_royale    : begin
                               if(g_cycle_order=0)then
                                 if(g_royal_r>0)then g_royal_r-=1;
-                              GameDefaultEndConditions;
+                              Scenario_DefaultEndConditions;
                            end;
             mc_capture,
-            mc_KotH      : DefaultDefeatConditions;
-            else           GameDefaultEndConditions;
+            mc_KotH      : Scenario_DefaultDefeatConditions;
+            else           Scenario_DefaultEndConditions;
             end;
          {$IFDEF _FULLGAME}
          end

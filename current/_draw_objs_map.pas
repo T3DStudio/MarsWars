@@ -75,7 +75,7 @@ co_pability    : if(ui_uibtn_pabilityu<>nil)then
           DID_LiquidR2,
           DID_LiquidR3,
           DID_LiquidR4 : if(theme_liquid_animt<2)
-                         then sprite:=@spr_liquid[((G_Step div theme_liquid_animm) mod LiquidAnim)+1,animn]
+                         then sprite:=@spr_liquid[((g_tick div theme_liquid_animm) mod LiquidAnim)+1,animn]
                          else sprite:=@spr_liquid[1                                                 ,animn];
           DID_Other    : DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
           DID_SRock    : DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
@@ -86,7 +86,7 @@ co_pability    : if(ui_uibtn_pabilityu<>nil)then
         begin
            SpriteListAddDoodad(x,y,depth,shadowz,sprite,255,ox,oy);
            if(back_sprite<>nil)then SpriteListAddDoodad(x,y,sd_liquid_back,-32000,back_sprite,255,ox,oy);
-           if(ro>0)then UnitsInfoAddCircle(x,y,ro,r_blink2_color_BY);
+           if(ro>0)then UnitsInfoAddCircle(x,y,ro,ui_blink2_color_BY);
         end;
      end;
 end;

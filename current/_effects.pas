@@ -140,11 +140,11 @@ begin
 end;
 
 begin
-   if(MainMenu)or(G_Status>gs_running)or(r_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
+   if(MainMenu)or(G_Status>gs_running)or(vid_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
 
    if not MapPointInScreenP(ex,ey,true)then exit;
 
-   for e:=1 to vid_mvs do
+   for e:=1 to vid_MaxScreenSprites do
    with g_effects[e] do
    if(anim_last_i_t=0)then
    begin
@@ -278,7 +278,7 @@ var ei,
    spr:PTMWTexture;
 anim_stat:byte;
 begin
-   for ei:=1 to vid_mvs do
+   for ei:=1 to vid_MaxScreenSprites do
     with g_effects[ei] do
      if(anim_last_i_t<>0)then
      with g_eids[eid] do

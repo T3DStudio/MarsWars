@@ -1,3 +1,11 @@
+
+procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);
+begin
+   SDL_FillRect(vid_screen,nil,0);
+   stringColor(vid_screen,(vid_vw div 2)-(length(load_str^)*font_w div 2), vid_vh div 2,@(load_str^[1]),color);
+   SDL_FLIP(vid_screen);
+end;
+
 function ShadowColor(c:cardinal):cardinal;
 begin
    ShadowColor:=128 +
@@ -10,21 +18,21 @@ procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
    with sur^ do
    begin
-      r_RECT^.x:=x;
-      r_RECT^.y:=y;
-      r_RECT^.w:=sur^.w;
-      r_RECT^.h:=sur^.h;
-      SDL_BLITSURFACE(surf,nil,tar,r_RECT);
+      vid_RECT^.x:=x;
+      vid_RECT^.y:=y;
+      vid_RECT^.w:=sur^.w;
+      vid_RECT^.h:=sur^.h;
+      SDL_BLITSURFACE(surf,nil,tar,vid_RECT);
    end;
 end;
 
 procedure draw_sdlsurface(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
 begin
-   r_RECT^.x:=x;
-   r_RECT^.y:=y;
-   r_RECT^.w:=sur^.w;
-   r_RECT^.h:=sur^.h;
-   SDL_BLITSURFACE(sur,nil,tar,r_RECT);
+   vid_RECT^.x:=x;
+   vid_RECT^.y:=y;
+   vid_RECT^.w:=sur^.w;
+   vid_RECT^.h:=sur^.h;
+   SDL_BLITSURFACE(sur,nil,tar,vid_RECT);
 end;
 
 
@@ -90,7 +98,7 @@ begin
          else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
          end;
 
-         draw_mwtexture(sur,ix,y,@font_ca[charc]);
+         draw_mwtexture(sur,ix,y,@font_1[charc]);
 
          chars+= 1;
          ix   += font_w;
@@ -123,13 +131,13 @@ begin
     with map_dds[d] do
      if(t in sd)then
       if(mmr>0)
-      then FilledcircleColor(r_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor       (r_bminimap,mmx,mmy,    mmc);
+      then FilledcircleColor(ui_bminimap,mmx,mmy,mmr,mmc)
+      else pixelColor       (ui_bminimap,mmx,mmy,    mmc);
 end;
 
 procedure map_MinimapUpdateBackground;
 begin
-   sdl_FillRect(r_bminimap,nil,0);
+   sdl_FillRect(ui_bminimap,nil,0);
    map_MinimapBackgroundObj(dids_liquids);
    map_MinimapBackgroundObj([DID_other,DID_srock,DID_brock]);
 end;
@@ -145,7 +153,7 @@ var i  :byte;
     x,y:integer;
     c  :cardinal;
 begin
-   for i:=0 to MaxPlayers do
+   for i:=0 to LastPlayer do
    begin
       if(map_scenario in [mc_invasion,mc_KotH])and(i=0)then continue;
 
@@ -171,13 +179,13 @@ end;
 
 procedure map_RedrawMenuMinimap;
 begin
-   sdl_FillRect(r_minimap,nil,0);
+   sdl_FillRect(ui_minimap,nil,0);
    map_MinimapUpdateBackground;
-   draw_sdlsurface(r_minimap,0,0,r_bminimap);
-   draw_sdlsurface(r_mminimap,0,0,r_minimap);
-   if(g_FixedPositions)then map_MinimapPlayerStarts(r_mminimap);
-   map_MinimapCPoints(r_mminimap);
-   menu_redraw:=menu_redraw or MainMenu;
+   draw_sdlsurface(ui_minimap,0,0,ui_bminimap);
+   draw_sdlsurface(ui_mminimap,0,0,ui_minimap);
+   if(g_FixedPositions)then map_MinimapPlayerStarts(ui_mminimap);
+   map_MinimapCPoints(ui_mminimap);
+   menu_update:=menu_update or MainMenu;
 end;
 
 procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);

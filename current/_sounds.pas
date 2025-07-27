@@ -211,7 +211,7 @@ end;
 procedure GameMusicReLoad;
 begin
    StopSoundSource(sss_music);
-   LoadingScreen(@str_loading_msc,c_aqua);
+   vid_LoadingScreen(@str_loading_msc,c_aqua);
    SoundSetUnLoad(snd_music_game);
 
    snd_music_game:=MusicSetLoad('music\game\',snd_musicListSize);
@@ -390,7 +390,7 @@ begin
    SoundPlayUnit:=false;
    if(ss=nil)
    or(MainMenu)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(visdata<>nil)then
    begin
@@ -407,7 +407,7 @@ end;
 procedure SoundPlayUI(ss:PTSoundSet);
 begin
    if(ss=nil)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    SoundPlay(ss,sss_ui,true);
 end;
@@ -416,7 +416,7 @@ procedure SoundPlayAnoncer(ss:PTSoundSet;checkpause,stopother:boolean);
 begin
    if(ss=nil)
    or(MainMenu)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(checkpause)and(snd_anoncer_last=ss)and(snd_anoncer_ticks>0)then exit;
 
@@ -431,7 +431,7 @@ procedure SoundPlayMMapAlarm(ss:PTSoundSet;checkpause:boolean);
 begin
    if(ss=nil)
    or(MainMenu)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(checkpause)and(snd_mmap_last=ss)and(snd_mmap_ticks>0)then exit;
 
@@ -445,7 +445,7 @@ procedure SoundPlayUnitCommand(ss:PTSoundSet);
 begin
    if(ss=nil)
    or(MainMenu)
-   or(r_draw=false)then exit;
+   or(vid_draw=false)then exit;
 
    if(snd_command_last=ss)and(snd_command_ticks>0)then exit;
 
@@ -487,17 +487,17 @@ begin
    with g_players[playern] do
     with log_l[log_i] do
      case mtype of
-0..MaxPlayers         : if(mtype<>playern)
+0..LastPlayer         : if(mtype<>playern)
                         or((rpls_state>=rpls_read)and(LocalPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
-lmt_game_end          : if(argx<=MaxPlayers)then
+lmt_game_end          : if(argx<=LastPlayer)then
                           if(argx=team)
                           then SoundPlayAnoncer(snd_victory[race],false,true)
                           else SoundPlayAnoncer(snd_defeat [race],false,true);
-lmt_player_defeated   : if(argx<=MaxPlayers)and(g_status=gs_running)
+lmt_player_defeated   : if(argx<=LastPlayer)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true,false);
 lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
@@ -607,7 +607,7 @@ begin
    // COMMON
    //
 
-   LoadingScreen(@str_loading_sfx,c_green);
+   vid_LoadingScreen(@str_loading_sfx,c_green);
 
    snd_click                :=SoundSetLoad('click'           );
    snd_chat                 :=SoundSetLoad('chat'            );

@@ -2,13 +2,13 @@
 procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
 var p:byte;
 begin
-   if(newOwnerPlayer<=MaxPlayers)then
+   if(newOwnerPlayer<=LastPlayer)then
    with g_KeyPoints[i] do
    if(cpOwnerPlayer<>newOwnerPlayer)then
    begin
       if(cpOwnerTeam>0)then
       begin
-         for p:=0 to MaxPlayers do
+         for p:=0 to LastPlayer do
           with g_players[p] do
            if(team=cpOwnerTeam)then
            begin
@@ -23,7 +23,7 @@ begin
       cpOwnerTeam  :=g_players[newOwnerPlayer].team;
       if(cpOwnerTeam>0)then
       begin
-         for p:=0 to MaxPlayers do
+         for p:=0 to LastPlayer do
           with g_players[p] do
            if(team=cpOwnerTeam)then
            begin
@@ -35,7 +35,7 @@ begin
    end;
 end;
 
-procedure GameModeCPointsCode;
+procedure Scenario_KeyPointsCode;
 var i,p,
 iOwnerTeam,
 iOwnerPlayer,
@@ -70,7 +70,7 @@ begin
        iOwnerTeam     :=cpOwnerTeam;
        iArmy :=0;
        iTeams:=0;
-       for p:=0 to MaxPlayers do
+       for p:=0 to LastPlayer do
        begin
           if(cpUnitsTeam[p]>0)then
           begin
@@ -87,7 +87,7 @@ begin
        end;
 
        if((iTeams=0)and(cpenergy>0))
-       or((i=0)and(map_scenario=mc_KotH)and(g_step<g_step_koth_pause))then
+       or((i=0)and(map_scenario=mc_KotH)and(g_tick<g_step_koth_pause))then
        begin
           iTeams:=1;
           iOwnerPlayer:=0;
@@ -120,7 +120,7 @@ begin
     end;
 end;
 
-procedure GameModeCPointsEndConditions;
+procedure Scenario_KeyPointsEndConditions;
 var i,
 wteam  ,
 wteam_n,

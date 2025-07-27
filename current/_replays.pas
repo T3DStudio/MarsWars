@@ -74,8 +74,8 @@ begin
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
-   AddItem(@G_Step              ,SizeOf(G_Step           ));
-   for p:=1 to MaxPlayers do
+   AddItem(@g_tick              ,SizeOf(g_tick           ));
+   for p:=1 to LastPlayer do
      with g_players[p] do
      begin
         AddItem(@state,SizeOf(state));
@@ -84,7 +84,7 @@ begin
         AddItem(@team ,SizeOf(team ));
      end;
 
-   for p:=1 to MaxPlayers do
+   for p:=1 to LastPlayer do
      with g_players[p] do
        AddItem(@race,SizeOf(race));
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
@@ -110,46 +110,52 @@ begin
    if(rpls_ReadPosN>0)then
      with rpls_ReadPosL[rpls_ReadPosN-1] do
      begin
-        if( g_Step<=rp_gtick)then exit;
-        if((g_Step -rp_gtick)<fr_fps2)then exit;
+        if( g_tick<=rp_gtick)then exit;
+        if((g_tick -rp_gtick)<fr_fps2)then exit;
      end;
 
    rpls_ReadPosN+=1;
    setlength(rpls_ReadPosL,rpls_ReadPosN);
    with rpls_ReadPosL[rpls_ReadPosN-1] do
    begin
-      rp_gtick:=g_Step;
+      rp_gtick:=g_tick;
       rp_fpos :=FilePos(rpls_file);
    end;
 end;
-procedure replay_SetPlayPosition(timetick:int64);
+function replay_SetPlayPosition(timetick,mindist:int64):boolean;
 var ni,i :cardinal;
     vi,vt:int64;
 begin
+   replay_SetPlayPosition:=false;
    if(rpls_ReadPosN=0)
    or(rpls_fstatus<>rpls_read)
    or(rpls_state  <>rpls_read)then exit;
 
-   ni:=0;
+   ni:=cardinal.MaxValue;
    vi:=0;
    for i:=0 to rpls_ReadPosN-1 do
      with rpls_ReadPosL[i] do
        if(rp_gtick<=timetick)then
        begin
           vt:=abs(rp_gtick-timetick);
-          if(vt<vi)or(ni=0)then
-          begin
-             ni:=i;
-             vi:=vt;
-          end;
+          if(mindist<0)or(vt<=mindist)then
+            if(vt<vi)or(ni=0)then
+            begin
+               ni:=i;
+               vi:=vt;
+            end;
        end;
+
+   if(ni=cardinal.MaxValue)then exit;
+
+   replay_SetPlayPosition:=true;
 
    with rpls_ReadPosL[ni] do
    begin
-      g_Step:=rp_gtick;
+      g_tick:=rp_gtick;
       Seek(rpls_file,rp_fpos);
    end;
-   rpls_step:=2;
+   rpls_ForwardSkip:=2;
    for i:=1 to MaxUnits do
      with g_units[i] do
      begin
@@ -230,8 +236,8 @@ procedure replay_WriteGameFrame;
 begin
    if((rpls_ticks mod 2)<>0)then exit;
 
-   _vx:=byte((ui_cam_x+vid_cam_hw) shr vxyc);
-   _vy:=byte((ui_cam_y+vid_cam_hh) shr vxyc);
+   _vx:=byte((ui_cam_x+ui_cam_hw) shr vxyc);
+   _vy:=byte((ui_cam_y+ui_cam_hh) shr vxyc);
 
    gs:=G_Status and %00111111;
    i :=gs;
@@ -347,7 +353,7 @@ begin
          or(map_Obstacles >map_MaxObstacles)
          or(map_Generators>map_MaxGenerators)
          or not(map_scenario in allmapscenarios)
-         or(rpls_player>MaxPlayers)then
+         or(rpls_player>LastPlayer)then
          begin
             replay_Abort;
             g_started:=false;
@@ -356,13 +362,13 @@ begin
             exit;
          end;
 
-         for p:=1 to MaxPlayers do
+         for p:=1 to LastPlayer do
           with g_players[p] do
             if(length(name)>MaxPlayerNameLen)
             or not(state in [ps_none,ps_human,ps_ai])
             or(race >r_cnt)
             or(mrace>r_cnt)
-            or(team >MaxPlayers)then
+            or(team >LastPlayer)then
             begin
                replay_Abort;
                rpls_str_info:=str_FileError_WVer;
@@ -384,9 +390,9 @@ begin
          rpls_plcam  :=false;
 
          map_premap;
-         MoveCamToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
+         ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
 
-         CameraBounds;
+         ui_Camera_Bounds;
          ui_tab    :=3;
          G_Started :=true;
          MainMenu     :=false;
@@ -410,14 +416,14 @@ begin
    begin
       G_Status   :=gs_replayend;
       uncappedFPS:=false;
-      rpls_step  :=0;
+      rpls_ForwardSkip  :=0;
       exit;
    end;
 
    //gs_replaypause
    gs:=G_Status;
-   if(rpls_step<=0)and(G_Status=gs_running)then rpls_step:=1;
-   while(rpls_step>0)do
+   if(rpls_ForwardSkip<=0)and(G_Status=gs_running)then rpls_ForwardSkip:=1;
+   while(rpls_ForwardSkip>0)do
    begin
       replay_SavePlayPosition;
 
@@ -440,17 +446,17 @@ begin
          {$I+}
       end;
 
-      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_step>1);
+      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_ForwardSkip>1);
 
-      if(rpls_step>1)then effects_sprites(false,false);
-      rpls_step-=1;
+      if(rpls_ForwardSkip>1)then effects_sprites(false,false);
+      rpls_ForwardSkip-=1;
    end;
 
    if(rpls_plcam)then
    begin
-      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl vxyc)-vid_cam_hw) div 2;
-      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl vxyc)-vid_cam_hh) div 2;
-      CameraBounds;
+      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl vxyc)-ui_cam_hw) div 2;
+      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl vxyc)-ui_cam_hh) div 2;
+      ui_Camera_Bounds;
    end;
 
    if(gs=gs_replaypause)then G_Status:=gs;
@@ -519,8 +525,7 @@ function replay_Play(check:boolean):boolean;
 begin
    replay_Play:=false;
 
-   if(not menu_ReplaysTab)
-   or(g_started)
+   if(g_started)
    or(rpls_list_sel<0)
    or(rpls_list_sel>=rpls_list_size)then exit;
 
@@ -537,8 +542,7 @@ var fn:shortstring;
 begin
    replay_Delete:=false;
 
-   if(not menu_ReplaysTab)
-   or(g_started)
+   if(g_started)
    or(rpls_list_sel<0)
    or(rpls_list_sel>=rpls_list_size)then exit;
 

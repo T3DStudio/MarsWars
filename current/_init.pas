@@ -6,7 +6,7 @@ begin
 
    if(SDL_Init(SDL_INIT_VIDEO)<>0)then begin WriteSDLError; exit; end;
 
-   NEW(r_RECT);
+   NEW(vid_RECT);
 
    SDL_putenv('SDL_VIDEO_WINDOW_POS');
    SDL_putenv('SDL_VIDEO_CENTERED=1');
@@ -17,7 +17,7 @@ begin
 
    gfx_InitColors;
    vid_MakeScreen;
-   LoadingScreen(@str_loading_gfx,c_yellow);
+   vid_LoadingScreen(@str_loading_gfx,c_yellow);
    gfx_LoadAll(true);
    cmp_Init;
 
@@ -55,7 +55,7 @@ end;
 {$ENDIF}
 
 
-procedure InitGame;
+procedure GameInit;
 begin
    GameCycle:=false;
 
@@ -67,6 +67,9 @@ begin
    GameObjectsInit;
 
    {$IFDEF _FULLGAME}
+
+   input_InitDefaultActionHotkeys;
+   ui_InitControlPanelBTNActions;
 
    cfg_read;
 

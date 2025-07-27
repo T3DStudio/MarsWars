@@ -158,8 +158,8 @@ begin
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
-   AddItem(@G_Step              ,SizeOf(G_Step           ));
-   for p:=1 to MaxPlayers do
+   AddItem(@g_tick              ,SizeOf(g_tick           ));
+   for p:=1 to LastPlayer do
      with g_players[p] do
      begin
         AddItem(@state,SizeOf(state));
@@ -200,6 +200,16 @@ begin
    AddItem(@theme_map_Crater    ,SizeOf(theme_map_Crater    ));
 end;
 
+function saveload_Allowed:boolean;
+begin
+   saveload_Allowed:=false;
+
+   if(net_status<>ns_none)
+   or(rpls_state=rpls_read)then exit;
+
+   saveload_Allowed:=true;
+end;
+
 function saveload_Save(check:boolean):boolean;
 var f:file;
     i:integer;
@@ -207,9 +217,8 @@ begin
    saveload_Save:=false;
 
    if(not G_Started)
-   or(net_status<>ns_none)
-   or(length(svld_str_fname)=0)
-   or(not menu_SaveLoadTab)then exit;
+   or(not saveload_Allowed)
+   or(length(svld_str_fname)=0)then exit;
 
    saveload_Save:=true;
 
@@ -230,14 +239,12 @@ begin
 
    close(f);
 
-   if(MainMenu)
-   then ToggleMenu;
+   GameBack(true,false);
 
    saveload_MakeFolderList;
 
    GameLogChat(LocalPlayer,log_to_all,str_gsaved,true);
 end;
-
 
 function saveload_Load(check:boolean):boolean;
 var f:file;
@@ -247,10 +254,8 @@ var f:file;
 begin
    saveload_Load:=false;
 
-   if(svld_list_sel<0)
-   or(svld_list_sel>=svld_list_size)
-   or(length(svld_str_fname)=0)
-   or(not menu_SaveLoadTab)then exit;
+   if(not saveload_Allowed)
+   or(length(svld_str_fname)=0)then exit;
 
    saveload_Load:=true;
 
@@ -284,11 +289,11 @@ begin
          {$I+}
 
          for u:=1 to MaxUnits do
-          with g_units[u] do
-          begin
-             player:=@g_players[playeri];
-             uid   :=@g_uids[uidi];
-          end;
+           with g_units[u] do
+           begin
+              player:=@g_players[playeri];
+              uid   :=@g_uids[uidi];
+           end;
 
          if(ioresult<>0)then
          begin
@@ -305,12 +310,11 @@ begin
          map_RedrawMenuMinimap;
          map_DoodadsDrawData;
          pf_MakeZoneGrid;
-         CameraBounds;
+         ui_Camera_Bounds;
 
          G_Started:=true;
 
-         if(MainMenu)
-         then ToggleMenu;
+         GameBack(true,false);
       end;
       close(f);
    end;
@@ -321,10 +325,8 @@ var fn:shortstring;
 begin
    saveload_Delete:=false;
 
-   if(svld_list_sel<0)
-   or(svld_list_sel>=svld_list_size)
-   or(length(svld_str_fname)=0)
-   or(not menu_SaveLoadTab)then exit;
+   if(rpls_state<>rpls_none)
+   or(length(svld_str_fname)=0)then exit;
 
    saveload_Delete:=true;
 

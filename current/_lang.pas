@@ -815,6 +815,8 @@ begin
    str_Caption_Players           := 'PLAYERS';
    str_Caption_Multiplayer       := 'MULTIPLAYER';
    str_Caption_GOptions          := 'GAME OPTIONS';
+   str_Caption_Server            := 'SERVER';
+   str_Caption_Client            := 'CLIENT';
 
    str_MObjectives               := 'OBJECTIVES';
 
@@ -890,11 +892,6 @@ begin
    str_GO_DefeatedObs            := 'Observer mode after lose';
    str_GO_Random                 := 'Random skirmish';
 
-   str_FileInfo                  := 'FILE INFO';
-   str_FileSave                  := 'Save';
-   str_FileLoad                  := 'Load';
-   str_FileDelete                := 'Delete';
-
    str_map                       := 'Map';
    str_map_Seed                  := 'Seed';
    str_map_Size                  := 'Size';
@@ -912,7 +909,7 @@ begin
    str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
 
    str_map_Generators            := 'Generators';
-   str_map_GeneratorsL[0]        := '-';
+   str_map_GeneratorsL[0]        := 'no';
    str_map_GeneratorsL[1]        := '5 min';
    str_map_GeneratorsL[2]        := '10 min';
    str_map_GeneratorsL[3]        := '15 min';
@@ -931,9 +928,14 @@ begin
    str_PT_Color                  := 'COLOR';
    str_PT_Ping                   := 'PING+';
 
-   str_race[r_random]            := tc_white +'RANDOM'+tc_default;
-   str_race[r_hell  ]            := tc_orange+'HELL'  +tc_default;
-   str_race[r_uac   ]            := tc_lime  +'UAC'   +tc_default;
+   str_race[r_random]            := tc_default+'RANDOM'+tc_default;
+   str_race[r_hell  ]            := tc_orange +'HELL'  +tc_default;
+   str_race[r_uac   ]            := tc_lime   +'UAC'   +tc_default;
+
+   str_FileInfo                  := 'FILE INFO';
+   str_FileSave                  := 'Save';
+   str_FileLoad                  := 'Load';
+   str_FileDelete                := 'Delete';
 
    str_observer          := 'OBSERVER';
    str_win               := 'VICTORY!';
@@ -953,11 +955,10 @@ begin
    str_inv_ml            := 'Monsters limit: ';
    str_ReplayPlay        := 'Play';
 
-   str_Camp_Difficulty   := 'Difficulty';
+
    str_WaitForServer     := 'Awaiting server...';
 
-   str_server            := 'SERVER';
-   str_client            := 'CLIENT';
+
    str_menu_chat         := 'CHAT(ALL PLAYERS)';
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
@@ -1083,6 +1084,7 @@ begin
    str_NetQualityL[8]          := tc_aqua  +'x9 ';
    str_NetQualityL[9]          := tc_aqua  +'x10';
 
+   str_Camp_Difficulty   := 'Difficulty';
    str_Camp_DifficultyL[0]           := tc_aqua  +'I`m too young to die'+tc_default;
    str_Camp_DifficultyL[1]           := tc_lime  +'Hey, not too rough'  +tc_default;
    str_Camp_DifficultyL[2]           := tc_yellow+'Hurt me plenty'      +tc_default;
@@ -1090,24 +1092,27 @@ begin
    str_Camp_DifficultyL[4]           := tc_red   +'Nightmare'           +tc_default;
 
 
-   str_NetReady          := 'Ready';
-   str_udpport           := 'UDP port';
-   str_svup[false]       := 'Start server';
-   str_svup[true ]       := 'Stop server';
-   str_connect[false]    := 'Connect';
-   str_connect[true ]    := 'Disconnect';
+   str_net_Ready         := 'Ready';
+   str_net_UDPPort       := 'UDP port';
+   str_net_ServerStart   := 'Start server';
+   str_net_ServerStop    := 'Stop server';
+   str_net_Connect       := 'Connect';
+   str_net_Disconnect    := 'Disconnect';
+   str_net_Quality       := 'Units update rate';
+   str_net_Address       := 'Address';
+   str_net_LANSearch     := 'Search for LAN servers';
 
-   str_npnu              := 'Units update rate';
    str_connecting        := 'Connecting...';
    str_portblocked       := 'Port is blocked!';
-   str_msg_WrongVersion              := 'Wrong version!';
-   str_msg_ServerFull             := 'Server full!';
-   str_msg_GameStarted              := 'Game started!';
 
-   str_hint_t[0]         := 'Buildings';
-   str_hint_t[1]         := 'Units';
-   str_hint_t[2]         := 'Researches';
-   str_hint_t[3]         := 'Controls';
+   str_msg_WrongVersion  := 'Wrong version!';
+   str_msg_ServerFull    := 'Server full!';
+   str_msg_GameStarted   := 'Game started!';
+
+   str_hint_Tab[0]         := 'Buildings';
+   str_hint_Tab[1]         := 'Units';
+   str_hint_Tab[2]         := 'Researches';
+   str_hint_Tab[3]         := 'Controls';
 
    str_hint_army         := 'Army: ';
    str_hint_energy       := 'Energy: ';
@@ -1257,14 +1262,44 @@ begin
    _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
    _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
 
-   str_sability := 'Specail ability';
-   str_spability:= 'Specail ability at point';
+   str_action_hint[iAct_Control_USelArmy     ]:= 'Select all battle units';
 
-   str_use_sability :='Use "'+str_sability +'" order!';
-   str_use_spability:='Use "'+str_spability+'" order!';
+   str_action_hint[iAct_Control_UAbility1       ]:= '';
+   str_action_hint[iAct_Control_UAbility2       ]:= '';
+   str_action_hint[iAct_Control_UAbility3       ]:= '';
+   str_action_hint[iAct_Control_UDestroy         ]:= 'Destroy';
 
-   _mkHStrACT(0 ,str_sability );
-   _mkHStrACT(1 ,str_spability);
+  { str_action_hint[iAct_Control_UAMove          ]:= 101;
+   str_action_hint[iAct_Control_UAStop          ]:= 102;
+   str_action_hint[iAct_Control_UAPatrol        ]:= 103;
+   str_action_hint[iAct_Control_UMove           ]:= 104;
+   str_action_hint[iAct_Control_UStop           ]:= 105;
+   str_action_hint[iAct_Control_UPatrol         ]:= 106;
+
+   str_action_hint[iAct_Replay_Fast     ]:= 110;
+   str_action_hint[iAct_Replay_Back     ]:= 111;
+   str_action_hint[iAct_Replay_Forward  ]:= 112;
+   str_action_hint[iAct_Replay_Pause    ]:= 113;
+   str_action_hint[iAct_Replay_POV      ]:= 114;
+   str_action_hint[iAct_Replay_Log      ]:= 115;
+   str_action_hint[iAct_Replay_Fog      ]:= 116;
+   str_action_hint[iAct_Replay_Player1  ]:= 117;
+   str_action_hint[iAct_Replay_Player2  ]:= 118;
+   str_action_hint[iAct_Replay_Player3  ]:= 119;
+   str_action_hint[iAct_Replay_Player4  ]:= 120;
+   str_action_hint[iAct_Replay_Player5  ]:= 121;
+   str_action_hint[iAct_Replay_Player6  ]:= 122;
+
+   str_action_hint[iAct_Observer_Fog    ]:= 125;
+   str_action_hint[iAct_Observer_Player1]:= 126;
+   str_action_hint[iAct_Observer_Player2]:= 127;
+   str_action_hint[iAct_Observer_Player3]:= 128;
+   str_action_hint[iAct_Observer_Player4]:= 129;
+   str_action_hint[iAct_Observer_Player5]:= 130;
+   str_action_hint[iAct_Observer_Player6]:= 131;  }
+
+   //_mkHStrACT(0 ,str_sability );
+   //_mkHStrACT(1 ,str_spability);
    _mkHStrACT(2 ,'Rebuild/Advance');
    t:='attack enemies';
    _mkHStrACT(3 ,'Move, '  +t);
@@ -1276,7 +1311,7 @@ begin
    _mkHStrACT(8 ,'Patrol, '+t);
    _mkHStrACT(9 ,'Cancel production');
    _mkHStrACT(10,'Select all battle units' );
-   _mkHStrACT(11,'Destroy'          );
+   _mkHStrACT(11,''          );
    _mkHStrACT(12,'Alarm mark'       );
    _mkHStrACT(13,str_SG_RightClickAct);
 
@@ -1554,8 +1589,8 @@ begin
   str_Camp_Difficulty            := 'Сложность';
   str_WaitForServer            := 'Ожидание сервера...';
 
-  str_server            := 'СЕРВЕР';
-  str_client            := 'КЛИЕНТ';
+  str_Caption_Server            := 'СЕРВЕР';
+  str_Caption_Client            := 'КЛИЕНТ';
   str_menu_chat         := 'ЧАТ(ВСЕ ИГРОКИ)';
   str_chat_all          := 'ВСЕ:';
   str_chat_allies       := 'СОЮЗНИКИ:';
@@ -1690,24 +1725,26 @@ begin
 
   str_GO_FixedStarts            := 'Фиксированные старты';
 
-  str_NetReady          := 'Готов';
-  str_udpport           := 'UDP порт';
-  str_svup[false]       := 'Включить сервер';
-  str_svup[true ]       := 'Выключить сервер';
-  str_connect[false]    := 'Подключится';
-  str_connect[true ]    := 'Отключится';
+  str_net_Ready             := 'Готов';
+  str_net_UDPPort           := 'UDP порт';
+  str_net_ServerStart       := 'Включить сервер';
+  str_net_ServerStop        := 'Выключить сервер';
+  str_net_Connect           := 'Подключится';
+  str_net_Disconnect        := 'Отключится';
+  str_net_Quality           := 'Обновление юнитов';
+  str_net_Address           := 'Адрес';
+  str_net_LANSearch         := 'Поиск серверов в LAN';
 
-  str_npnu              := 'Обновление юнитов: ';
   str_connecting        := 'Соединение...';
   str_portblocked       := 'Порт занят!';
   str_msg_WrongVersion              := 'Другая версия!';
   str_msg_ServerFull             := 'Нет мест!';
   str_msg_GameStarted              := 'Игра началась!';
 
-  str_hint_t[0]         := 'Здания';
-  str_hint_t[1]         := 'Юниты';
-  str_hint_t[2]         := 'Исследования';
-  str_hint_t[3]         := 'Запись';
+  str_hint_Tab[0]         := 'Здания';
+  str_hint_Tab[1]         := 'Юниты';
+  str_hint_Tab[2]         := 'Исследования';
+  str_hint_Tab[3]         := 'Запись';
 
   str_hint_m[0]         := 'Меню (' +tc_lime+'Esc'        +tc_default+')';
   str_hint_m[2]         := 'Пауза ('+tc_lime+'Pause/Break'+tc_default+')';
@@ -1840,14 +1877,14 @@ begin
   _mkHStrUpid(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
   _mkHStrUpid(upgr_uac_turarm     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
 
-  str_sability := 'Специальная способность';
+  {str_sability := 'Специальная способность';
   str_spability:= 'Специальная способность в точке';
 
   str_use_sability :='Используйте приказ "'+str_sability +'"!';
-  str_use_spability:='Используйте приказ "'+str_spability+'"!';
+  str_use_spability:='Используйте приказ "'+str_spability+'"!'; }
 
-  _mkHStrACT(0 ,str_sability );
-  _mkHStrACT(1 ,str_spability);
+  //_mkHStrACT(0 ,str_sability );
+  //_mkHStrACT(1 ,str_spability);
   _mkHStrACT(2 ,'Перестроить/Улучшить');
   t:='атаковать врагов';
   _mkHStrACT(3 ,'Двигаться, '       +t);

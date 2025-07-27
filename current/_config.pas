@@ -5,7 +5,7 @@ cfg_key_PlayerName      = 'player_name';
 cfg_key_SoundVolume     = 'sound_volume';
 cfg_key_MusicVolume     = 'music_volume';
 cfg_key_MusicListSize   = 'music_list_size';
-cfg_key_NetSErverAddr   = 'net_server_addr';
+cfg_key_NetServerAddr   = 'net_server_addr';
 cfg_key_NetServerPort   = 'net_server_port';
 cfg_key_NetQuality      = 'net_quality';
 cfg_key_UICamScrollSpeed= 'ui_cam_scroll_speed';
@@ -45,8 +45,8 @@ cfg_key_PlayerName      : PlayerName         := vl;
 cfg_key_SoundVolume     : snd_SoundVolume    := vlw;
 cfg_key_MusicVolume     : snd_MusicVolume    := vlw;
 cfg_key_MusicListSize   : snd_musicListSize  := vlw;
-cfg_key_NetSErverAddr   : net_cl_StrAddr     := vl;
-cfg_key_NetServerPort   : net_sv_StrPort     := vl;
+cfg_key_NetServerAddr   : menu_ClientAddress := vl;
+cfg_key_NetServerPort   : menu_ServerPort    := vl;
 cfg_key_NetQuality      : net_cl_Quality     := vlw;
 cfg_key_UICamScrollSpeed: ui_CamSpeed        := vli;
 cfg_key_UICamMouseScroll: ui_MouseScroll     :=(vl=b2c[true]);
@@ -61,8 +61,8 @@ cfg_key_VidResolutionW  : vid_vw             := vli;
 cfg_key_VidResolutionH  : vid_vh             := vli;
 cfg_key_VidWindowed     : vid_windowed       :=(vl=b2c[true]);
 cfg_key_VidShowFPS      : vid_ShowFPS        :=(vl=b2c[true]);
-cfg_key_GFixedSpawns    : g_FixedPositions  :=(vl=b2c[true]);
-cfg_key_GAISlots        : g_AISlots         := vlw;
+cfg_key_GFixedSpawns    : g_FixedPositions   :=(vl=b2c[true]);
+cfg_key_GAISlots        : g_AISlots          := vlw;
 cfg_key_MapGenerators   : map_generators     := vlw;
 cfg_key_GRecord         : rpls_Record        :=(vl=b2c[true]);
 cfg_key_GRecordQuality  : rpls_Quality       := vlw;
@@ -119,11 +119,11 @@ begin
       vid_vw:=mm3i(vid_minw,vid_vw,vid_maxw);
       vid_vh:=mm3i(vid_minh,vid_vh,vid_maxh);
 
-      if(g_AISlots     >g_MaxAISlots    )then g_AISlots    :=g_MaxAISlots;
-      if(map_generators >map_MaxGenerators  )then map_generators:=map_MaxGenerators;
+      if(g_AISlots      >g_MaxAISlots     )then g_AISlots     :=g_MaxAISlots;
+      if(map_generators >map_MaxGenerators)then map_generators:=map_MaxGenerators;
 
-      if(rpls_Quality   >rpls_MaxQuality)then rpls_Quality  :=rpls_MaxQuality;
-      if(net_cl_Quality >net_MaxQuality )then net_cl_Quality:=net_MaxQuality;
+      if(rpls_Quality   >rpls_MaxQuality  )then rpls_Quality  :=rpls_MaxQuality;
+      if(net_cl_Quality >net_MaxQuality   )then net_cl_Quality:=net_MaxQuality;
 
       if(ui_ControlPanelPos>vid_MaxControlPanelPos)then ui_ControlPanelPos:=0;
       if(ui_HealthBars     >vid_MaxHealthBars     )then ui_HealthBars     :=0;
@@ -131,8 +131,8 @@ begin
    end;
    menu_ResolutionWi:=vid_vw;
    menu_ResolutionHi:=vid_vh;
-   net_cl_saddr;
-   net_sv_sport;
+   menu_GetClientAddress;
+   menu_GetServerPort;
 end;
 
 procedure cfg_write;
@@ -145,8 +145,8 @@ begin
    writeln(f,cfg_key_SoundVolume     ,'=',snd_SoundVolume       );
    writeln(f,cfg_key_MusicVolume     ,'=',snd_MusicVolume       );
    writeln(f,cfg_key_MusicListSize   ,'=',snd_musicListSize     );
-   writeln(f,cfg_key_NetSErverAddr   ,'=',net_cl_StrAddr        );
-   writeln(f,cfg_key_NetServerPort   ,'=',net_sv_StrPort        );
+   writeln(f,cfg_key_NetServerAddr   ,'=',menu_ClientAddress    );
+   writeln(f,cfg_key_NetServerPort   ,'=',menu_ServerPort       );
    writeln(f,cfg_key_NetQuality      ,'=',net_cl_Quality        );
    writeln(f,cfg_key_UICamScrollSpeed,'=',ui_CamSpeed           );
    writeln(f,cfg_key_UICamMouseScroll,'=',b2c[ui_MouseScroll]   );

@@ -12,12 +12,12 @@ var slatemp : PTVisSpr;
 function SpriteListAdd:PTVisSpr;
 begin
    SpriteListAdd:=nil;
-   if(vid_vsls<vid_mvs)and(MainMenu=false)then
+   if(vid_ScreenSpritesS<vid_MaxScreenSprites)and(MainMenu=false)then
    begin
-      vid_vsls+=1;
-      SpriteListAdd:=vid_vsl[vid_vsls];
+      vid_ScreenSpritesS+=1;
+      SpriteListAdd:=vid_ScreenSpritesL[vid_ScreenSpritesS];
       FillChar(SpriteListAdd^,TVisSprSize,0);
-      with vid_vsl[vid_vsls]^ do
+      with vid_ScreenSpritesL[vid_ScreenSpritesS]^ do
       begin
          alpha:=255;
       end;
@@ -92,14 +92,14 @@ procedure SpriteListSort;
 var i,u:word;
     dt :PTVisSpr;
 begin
-   if(vid_vsls>1)then
-    for i:=1 to vid_vsls do
-     for u:=1 to (vid_vsls-1) do
-      if(vid_vsl[u]^.depth<vid_vsl[u+1]^.depth)then
+   if(vid_ScreenSpritesS>1)then
+    for i:=1 to vid_ScreenSpritesS do
+     for u:=1 to (vid_ScreenSpritesS-1) do
+      if(vid_ScreenSpritesL[u]^.depth<vid_ScreenSpritesL[u+1]^.depth)then
       begin
-        dt:=vid_vsl[u];
-        vid_vsl[u]:=vid_vsl[u+1];
-        vid_vsl[u+1]:=dt;
+        dt:=vid_ScreenSpritesL[u];
+        vid_ScreenSpritesL[u]:=vid_ScreenSpritesL[u+1];
+        vid_ScreenSpritesL[u+1]:=dt;
       end;
 end;
 
@@ -107,10 +107,10 @@ procedure D_SpriteList(tar:pSDL_Surface;lx,ly:integer);
 var sx,sy:integer;
 begin
    SpriteListSort;
-   while(vid_vsls>0)do
-    with vid_vsl[vid_vsls]^ do
+   while(vid_ScreenSpritesS>0)do
+    with vid_ScreenSpritesL[vid_ScreenSpritesS]^ do
     begin
-       vid_vsls-=1;
+       vid_ScreenSpritesS-=1;
 
        x-=sprite^.hw;
        y-=sprite^.hh;
@@ -155,10 +155,10 @@ function UnitsInfoNew:boolean;
 begin
    UnitsInfoNew:=false;
 
-   if(vid_prims>=vid_mvs)then exit;
+   if(vid_PrimitivesS>=vid_MaxScreenSprites)then exit;
 
-   FillChar(vid_prim[vid_prims],SizeOf(TVisPrim),0);
-   vid_prims+=1;
+   FillChar(vid_PrimitivesL[vid_PrimitivesS],SizeOf(TVisPrim),0);
+   vid_PrimitivesS+=1;
 
    UnitsInfoNew:=true;
 end;
@@ -166,7 +166,7 @@ end;
 procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind :=uinfo_line;
       x0   :=ax0;
@@ -179,7 +179,7 @@ end;
 procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind :=uinfo_rect;
       x0   :=ax0;
@@ -192,7 +192,7 @@ end;
 procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind :=uinfo_rect;
       x0   :=ax0;
@@ -210,7 +210,7 @@ end;
 procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind :=uinfo_box;
       x0   :=ax0;
@@ -223,7 +223,7 @@ end;
 procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind :=uinfo_circle;
       x0   :=ax0;
@@ -236,7 +236,7 @@ procedure UnitsInfoAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
 var tw:integer;
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind   :=uinfo_text;
       x0     :=ax0;
@@ -245,14 +245,14 @@ begin
       color  :=acolor;
 
       tw:=length(text)*font_hw;
-      x0:=mm3i(ui_cam_x+tw     ,x0,ui_cam_x+vid_cam_w-tw    );
-      y0:=mm3i(ui_cam_y+font_hw,y0,ui_cam_y+vid_cam_h-font_w);
+      x0:=mm3i(ui_cam_x+tw     ,x0,ui_cam_x+ui_cam_w-tw    );
+      y0:=mm3i(ui_cam_y+font_hw,y0,ui_cam_y+ui_cam_h-font_w);
    end;
 end;
 procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind    :=uinfo_rect;
       x0      :=ax0-aspr^.hw;
@@ -265,9 +265,9 @@ begin
          x0:=ui_cam_x;
          x1:=x0+aspr^.w;
       end;
-      if(x1>(ui_cam_x+vid_cam_w))then
+      if(x1>(ui_cam_x+ui_cam_w))then
       begin
-         x1:=(ui_cam_x+vid_cam_w);
+         x1:=(ui_cam_x+ui_cam_w);
          x0:=x1-aspr^.w;
       end;
       if(y0<ui_cam_y)then
@@ -275,9 +275,9 @@ begin
          y0:=ui_cam_y;
          y1:=y0+aspr^.h;
       end;
-      if(y1>(ui_cam_y+vid_cam_h))then
+      if(y1>(ui_cam_y+ui_cam_h))then
       begin
-         y1:=(ui_cam_y+vid_cam_h);
+         y1:=(ui_cam_y+ui_cam_h);
          y0:=y1-aspr^.h;
       end;
 
@@ -293,7 +293,7 @@ end;
 procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
    if(UnitsInfoNew)then
-   with vid_prim[vid_prims-1] do
+   with vid_PrimitivesL[vid_PrimitivesS-1] do
    begin
       kind   :=uinfo_sprite;
       x0     :=ax0-aspr^.hw;
@@ -313,10 +313,10 @@ begin
       ax0:=ui_cam_x;
       ax1:=ax0+v;
    end;
-   if(ax1>(ui_cam_x+vid_cam_w))then
+   if(ax1>(ui_cam_x+ui_cam_w))then
    begin
       v:=ax1-ax0;
-      ax1:=(ui_cam_x+vid_cam_w);
+      ax1:=(ui_cam_x+ui_cam_w);
       ax0:=ax1-v;
    end;
    if(ay0<ui_cam_y)then
@@ -325,10 +325,10 @@ begin
       ay0:=ui_cam_y;
       ay1:=ay0+v;
    end;
-   if(ay1>(ui_cam_y+vid_cam_h))then
+   if(ay1>(ui_cam_y+ui_cam_h))then
    begin
       v:=ay1-ay0;
-      ay1:=(ui_cam_y+vid_cam_h);
+      ay1:=(ui_cam_y+ui_cam_h);
       ay0:=ay1-v;
    end;
 
@@ -378,10 +378,10 @@ begin
    begin
       acolor:=PlayerGetColor(playeri);
 
-      choosen:=((ui_uhint=unum)or(ui_umark_u=unum))and(r_blink1_colorb);
+      choosen:=((m_UnitTarget=unum)or(ui_umark_u=unum))and(ui_blink1_colorb);
 
       srect :=((sel)and(playeri=UIPlayer))
-            or(ks_alt>0)
+            or(InputAction(iact_Alt))
             or(choosen);
 
       hbar  :=false;
@@ -407,14 +407,14 @@ begin
       if(speed<=0)or(not iscomplete)then
         case m_brush of
 1..255,
-co_pability   : UnitsInfoAddCircle(x,y,_r,r_blink2_color_BY);
+co_pability   : UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
         end;
 
 
-      if(srect)and(_ukbuilding)and(UIUnitDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,r_blink2_color_BG);
+      if(srect)and(_ukbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
 
       //ub_Scaned
-      case r_blink3 of
+      case ui_blink3 of
       0: if(buff[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan );
       1: if(buff[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_decay);
       2:;
@@ -445,14 +445,14 @@ procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
    case map_scenario of
-mc_royale: circleColor(tar,lx+map_hmw-ui_cam_x,ly+map_hmw-ui_cam_y,g_royal_r,ui_max_color[r_blink1_colorb]);
+mc_royale: circleColor(tar,lx+map_hmw-ui_cam_x,ly+map_hmw-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
    end;
 
 
-   while(vid_prims>0)do
-    with vid_prim[vid_prims-1] do
+   while(vid_PrimitivesS>0)do
+    with vid_PrimitivesL[vid_PrimitivesS-1] do
     begin
-       vid_prims-=1;
+       vid_PrimitivesS-=1;
 
        x0+=lx-ui_cam_x;
        y0+=ly-ui_cam_y;
@@ -507,32 +507,32 @@ var i,t,
     spr  :PTMWTexture;
 begin
    draw_sdlsurface(tar,
-   lx-ui_cam_x mod ter_w,
-   ly-ui_cam_y mod ter_h,
-   vid_terrain);
+   lx-ui_cam_x mod map_ter_w,
+   ly-ui_cam_y mod map_ter_h,
+   map_terrain);
 
    vx:=ui_cam_x-vid_ab;
    vy:=ui_cam_y-vid_ab;
 
    if(theme_decaln>0)then
-    for i:=1 to _tdecaln do
-     with _tdecals[i-1] do
+    for i:=1 to map_ter_decaln do
+     with map_ter_decalL[i-1] do
      begin
-        ix:=x-vx+vid_mwa;
-        iy:=y-vy+vid_mha;
+        ix:=x-vx+ui_mwa;
+        iy:=y-vy+ui_mha;
 
-        s:=abs(i+(iy div vid_mha)+(ix div vid_mwa)) mod theme_decaln;
+        s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decaln;
 
         t:=theme_decals[s];
         if(t<0)
         then spr:=@spr_crater[-t]
         else spr:=@theme_spr_decals[t];
 
-        ix:=ix mod vid_mwa;
-        iy:=iy mod vid_mha;
+        ix:=ix mod ui_mwa;
+        iy:=iy mod ui_mha;
 
-        if(ix<0)then ix:=vid_mwa+ix;
-        if(iy<0)then iy:=vid_mha+iy;
+        if(ix<0)then ix:=ui_mwa+ix;
+        if(iy<0)then iy:=ui_mha+iy;
 
         ix+=lx-vid_ab;
         iy+=ly-vid_ab;
@@ -586,7 +586,7 @@ begin
           begin
              for i:=1 to 8 do
              begin
-                ddir:=(i*45-integer((g_step shr 2) mod 360))*degtorad;
+                ddir:=(i*45-integer((g_tick shr 2) mod 360))*degtorad;
                 SpriteListAddEffect(
                 cpx+round(cpCaptureR*cos(ddir)),
                 cpy+round(cpCaptureR*sin(ddir)),
@@ -617,26 +617,26 @@ var cx,cy,ssx,ssy,sty:integer;
     pf:word;
     cl:cardinal; }
 begin
-   if(not vid_fog)then exit;
+   if(not ui_fog)then exit;
 
-   ssx:=lx-vid_cam_fx;
-   sty:=ly-vid_cam_fy;
+   ssx:=lx-ui_cam_fx;
+   sty:=ly-ui_cam_fy;
 
-   for cx:=0 to vid_fog_vfw do
+   for cx:=0 to ui_fog_vfw do
    begin
       ssy:=sty;
       //vlineColor(tar,ssx,0,vid_vh,c_white);
-      for cy:=0 to vid_fog_vfh do
+      for cy:=0 to ui_fog_vfh do
       begin
          //hlineColor(tar,0,vid_vw,ssy,c_white);
-         vid_fog_pgrid[cx,cy]:=vid_fog_grid[cx,cy];
-         if(rpls_fog)then
+         ui_fog_pgrid[cx,cy]:=ui_fog_grid[cx,cy];
+         if(ui_fog)then
          begin
-            if(vid_fog_grid[cx,cy]=0)then
-              draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, vid_fog_surf);
-            vid_fog_grid[cx,cy]:=0;
+            if(ui_fog_grid[cx,cy]=0)then
+              draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, ui_fog_surf);
+            ui_fog_grid[cx,cy]:=0;
          end
-         else vid_fog_grid[cx,cy]:=2;
+         else ui_fog_grid[cx,cy]:=2;
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
@@ -707,7 +707,7 @@ begin
       end;
       if(ui_msk>0)then
       begin
-         boxColor(tar,ui_CtrlPanelW,0,vid_cam_w,vid_cam_h,rgba2c(255,255,255,ui_msk));
+         boxColor(tar,ui_CtrlPanelW,0,ui_cam_w,ui_cam_h,rgba2c(255,255,255,ui_msk));
          if(vid_rtui=0)then dec(ui_msks,1);
       end;
    end;  }
@@ -717,81 +717,81 @@ procedure _draw_dbg;
 var u,ix,iy:integer;
     c:cardinal;
 begin
-   //draw_text(r_screen,750,0,i2s(mouse_map_x)+' '+i2s(mouse_map_y) , ta_right,255, c_white);
-   //draw_text(r_screen,750,0,i2s(spr_tdecsi), ta_right,255, c_white);
+   //draw_text(vid_screen,750,0,i2s(mouse_map_x)+' '+i2s(mouse_map_y) , ta_right,255, c_white);
+   //draw_text(vid_screen,750,0,i2s(spr_tdecsi), ta_right,255, c_white);
 
-   //draw_text(r_screen,750,0,b2pm[map_ffly] , ta_right,255, c_white);
+   //draw_text(vid_screen,750,0,b2pm[map_ffly] , ta_right,255, c_white);
 
   { with g_players[LocalPlayer] do
    begin
-      draw_text(r_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_left,255, c_white);
-      draw_text(r_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
+      draw_text(vid_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_left,255, c_white);
+      draw_text(vid_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
    end;       }
 
-   if(ks_shift>0) then
-   for u:=0 to MaxPlayers do
+   if(InputAction(iact_Shift)) then
+   for u:=0 to LastPlayer do
     with g_players[u] do
     begin
        ix:=170+89*u;
 
        c:=PlayerGetColor(u);
 
-       draw_text(r_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, c);
+       draw_text(vid_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, c);
 
-       draw_text(r_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
+       draw_text(vid_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
 
-       //draw_text(r_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
-       draw_text(r_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_middle,255, c);
+       //draw_text(vid_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
+       draw_text(vid_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_middle,255, c);
 
 
-       for iy:=0 to 8  do draw_text(r_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_left,255, c);
-       for iy:=0 to 11 do draw_text(r_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
+       for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_left,255, c);
+       for iy:=0 to 11 do draw_text(vid_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
     end;
 
-   if(ks_ctrl>0)then
+   if(InputAction(iact_Control))then
    for u:=1 to MaxUnits do
     with g_units[u] do
     with player^ do
     with uid^ do
      if(hits>dead_hits)or(u=ai_scout_u_cur)then
      begin
-        ix:=x-ui_cam_x+vid_mapx;
-        iy:=y-ui_cam_y+vid_mapy;
+        ix:=x-ui_cam_x+ui_mapx;
+        iy:=y-ui_cam_y+ui_mapy;
 
-        //draw_text(r_screen,ix,iy,i2s(anim), ta_left,255, PlayerGetColor(playeri));
+        //draw_text(vid_screen,ix,iy,i2s(anim), ta_left,255, PlayerGetColor(playeri));
 
         if(hits>0)then
         //if(k_shift>1)then
         begin
-           circleColor(r_screen,ix,iy,_r  ,c_gray);
-          // circleColor(r_screen,ix,iy,srange,c_white);
+           circleColor(vid_screen,ix,iy,_r  ,c_gray);
+          // circleColor(vid_screen,ix,iy,srange,c_white);
            if(sel)then
            begin
-              //lineColor(r_screen,ix,iy,vid_mapx+pf_mv_nx-ui_cam_x  ,vid_mapy+pf_mv_ny-ui_cam_y  ,c_red );
-              //lineColor(r_screen,ix,iy,vid_mapx+mv_x    -ui_cam_x+1,vid_mapy+mv_y    -ui_cam_y+1,c_lime);
+              //lineColor(vid_screen,ix,iy,ui_mapx+pf_mv_nx-ui_cam_x  ,ui_mapy+pf_mv_ny-ui_cam_y  ,c_red );
+              //lineColor(vid_screen,ix,iy,ui_mapx+mv_x    -ui_cam_x+1,ui_mapy+mv_y    -ui_cam_y+1,c_lime);
 
-              //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_x+vid_mapx;
-              //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_y+vid_mapy;
+              //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_x+ui_mapx;
+              //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_y+ui_mapy;
 
-               //rectangleColor(r_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
+               //rectangleColor(vid_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
-              lineColor(r_screen,ix+1,iy+1,uo_x+vid_mapx-ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
+              lineColor(vid_screen,ix+1,iy+1,uo_x+ui_mapx-ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
 
               if(aiu_alarm_d<32000)then
-              lineColor(r_screen,ix,iy,aiu_alarm_x+vid_mapx-ui_cam_x  ,aiu_alarm_y+vid_mapy-ui_cam_y  ,c_red );
+              lineColor(vid_screen,ix,iy,aiu_alarm_x+ui_mapx-ui_cam_x  ,aiu_alarm_y+ui_mapy-ui_cam_y  ,c_red );
            end;
 
-           draw_text(r_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
-           draw_text(r_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
-           //draw_text(r_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_left,255, PlayerGetColor(playeri));
-           draw_text(r_screen,ix,iy+20,b2s(uo_id), ta_left,255, PlayerGetColor(playeri));
-           //draw_text(r_screen,ix,iy+30,b2c[ukfly], ta_left,255, PlayerGetColor(playeri));
-           //draw_text(r_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
+           draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
+           draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
+           //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_left,255, PlayerGetColor(playeri));
+           draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_left,255, PlayerGetColor(playeri));
+           //draw_text(vid_screen,ix,iy+30,b2c[ukfly], ta_left,255, PlayerGetColor(playeri));
+           //draw_text(vid_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
-//           draw_text(r_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
+//           draw_text(vid_screen,ix,iy+40,i2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 
 
-           //draw_text(r_screen,ix,iy+20,b2pm[iscomplete], ta_left,255, PlayerGetColor(playeri));
+           //draw_text(vid_screen,ix,iy+20,b2pm[iscomplete], ta_left,255, PlayerGetColor(playeri));
 
         end;
 
@@ -801,56 +801,56 @@ begin
            if(isbuild)then
            begin
               if(alrm_x>0)then
-               lineColor(r_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
+               lineColor(vid_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
            end
            else
            begin
               if(alrm_x>0)then
-               lineColor(r_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
+               lineColor(vid_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
            end;
            if(uo_x>0)then
-            lineColor(r_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);
+            lineColor(vid_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);
         end;
 
-        draw_text(r_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, PlayerGetColor(playeri));}
+        draw_text(vid_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_left,255, PlayerGetColor(playeri));}
 
         if(transport>0)then continue;
 
         if(hits>0){and(uidi=UID_URMStation)}then
         begin
-           //draw_text(r_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop]), ta_left,255, plcolor[player]);
+           //draw_text(vid_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop]), ta_left,255, plcolor[player]);
 
-           //if(tar1>0)then lineColor(r_screen,ix,iy,g_units[tar1].x-ui_cam_x,g_units[tar1].y-ui_cam_y,c_white);
-            //lineColor(r_screen,ix+10,iy+10,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);  and(player=LocalPlayer)
+           //if(tar1>0)then lineColor(vid_screen,ix,iy,g_units[tar1].x-ui_cam_x,g_units[tar1].y-ui_cam_y,c_white);
+            //lineColor(vid_screen,ix+10,iy+10,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);  and(player=LocalPlayer)
         end;
 
-         //draw_text(r_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
+         //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
          //if(sel)then            i2s(vsnt[g_players[player].team])+#13+i2s(vsni[g_players[player].team])
          //if(alrm_r<=0)then
          //
 
         {if(hits>0)then                      +' '+i2s(utrain)
          if(k_shift>2)
-         then lineColor(r_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_black)
+         then lineColor(vid_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_black)
          else
            if(alrm_x<>0)then
 
 
-        draw_text(r_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_left,255, plcolor[player]);// }
+        draw_text(vid_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_left,255, plcolor[player]);// }
 
-        //if(sel)then  circleColor(r_screen,ix,iy,r+5,plcolor[player]);
+        //if(sel)then  circleColor(vid_screen,ix,iy,r+5,plcolor[player]);
      end;
 
-   if(ks_ctrl>0)then
+   if(InputAction(iact_Control))then
    for u:=0 to MaxMissiles do
    with g_missiles[u] do
    if(vstep>0)then
    begin
-      ix:=vx-ui_cam_x+vid_mapx;
-      iy:=vy-ui_cam_y+vid_mapy;
+      ix:=vx-ui_cam_x+ui_mapx;
+      iy:=vy-ui_cam_y+ui_mapy;
 
-      circleColor(r_screen,ix,iy,5,c_lime);
-      draw_text(r_screen,ix,iy,i2s(dir), ta_left,255, c_white);
+      circleColor(vid_screen,ix,iy,5,c_lime);
+      draw_text(vid_screen,ix,iy,i2s(dir), ta_left,255, c_white);
    end;
 
    {for u:=0 to 255 do
@@ -859,7 +859,7 @@ begin
        ix:=ordx[u]-ui_cam_x;
        iy:=ordy[u]-ui_cam_y;
 
-       draw_text(r_screen,ix,iy,i2s(u), ta_left,255, c_white);
+       draw_text(vid_screen,ix,iy,i2s(u), ta_left,255, c_white);
     end; }
 end;
 
@@ -873,10 +873,10 @@ begin
       for i:=1 to sn do
        with sl[i-1] do
        begin
-          draw_sdlsurface(r_screen,x,0,surf);
+          draw_sdlsurface(vid_screen,x,0,surf);
           x+=w;
        end;
-      draw_text(r_screen,0,48,i2s(sn), ta_left,255, c_white);
+      draw_text(vid_screen,0,48,i2s(sn), ta_left,255, c_white);
    end;
 end;
 

@@ -98,11 +98,13 @@ r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
 
-MaxPlayers             = 6; //0-6
+MaxPlayers             = 7;
+
+LastPlayer             = MaxPlayers-1; //0-6
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-LastKeyPoint           = MaxPlayers*2-1;
+LastKeyPoint           = LastPlayer*2-1;
 
 map_MaxSize            = 8000;
 map_MinSize            = 2000;
@@ -210,7 +212,7 @@ lmt_invalid_tar        = 42;
 lmt_player_chat        = 255;
 
 lmts_menu_chat         = [
-                          0..MaxPlayers,
+                          0..LastPlayer,
                           lmt_game_message,
                           lmt_game_end,
                           lmt_player_defeated,
@@ -251,8 +253,8 @@ ns_client              = 2;
 
 nmid_lobby_info           = 3;
 nmid_connect              = 4;
-nmid_client_info          = 5;
-nmid_log_chat             = 6;
+nmid_ClientData          = 5;
+nmid_LogMessage             = 6;
 nmid_LogUpdate            = 7;
 nmid_snapshot             = 8;
 nmid_pause                = 9;
@@ -261,9 +263,9 @@ nmid_WrongVersion            = 11;
 nmid_GameStarted         = 12;
 nmid_NotConnected         = 13;
 nmid_order                = 14;
-nmid_player_leave         = 15;
+nmid_PlayerLeave         = 15;
 nmid_map_mark             = 16;
-nmid_player_surrender     = 17;
+nmid_PlayerSurrender     = 17;
 nmid_lobby_PPosSwap       = 18;
 nmid_lobby_PAIUp          = 19;
 nmid_lobby_PAIToggle      = 20;
@@ -652,7 +654,7 @@ mh_homing              = 2;
 //  UNITS
 //
 
-MaxUnits               = MaxPlayers*MaxPlayerUnits+MaxPlayerUnits;
+MaxUnits               = LastPlayer*MaxPlayerUnits+MaxPlayerUnits;
 MaxUnitWeapons         = 3;  //0-3
 MaxUnitLevel           = 3;  //0-3
 MaxMissiles            = MaxUnits;
@@ -992,6 +994,174 @@ snd_musicListSizeMax   = 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+//  INPUT
+//
+
+iAct_mlb               = 1;
+iAct_mrb               = 2;
+iAct_mmb               = 3;
+
+iAct_mwu               = 4;
+iAct_mwd               = 5;
+
+iAct_left              = 6;
+iAct_right             = 7;
+iAct_up                = 8;
+iAct_down              = 9;
+
+iAct_esc               = 10;
+iAct_return            = 11;
+iAct_control           = 12;
+iAct_alt               = 13;
+iAct_shift             = 14;
+iAct_backspace         = 15;
+
+iAct_ScreenShot        = 16;
+iAct_Tab               = 17;
+iAct_Pause             = 18;
+iAct_LastEvent         = 19;
+
+iAct_USetGroup0        = 20;
+iAct_USetGroup1        = 21;
+iAct_USetGroup2        = 22;
+iAct_USetGroup3        = 23;
+iAct_USetGroup4        = 24;
+iAct_USetGroup5        = 25;
+iAct_USetGroup6        = 26;
+iAct_USetGroup7        = 27;
+iAct_USetGroup8        = 28;
+iAct_USetGroup9        = 29;
+
+iAct_UAddGroup0        = 30;
+iAct_UAddGroup1        = 31;
+iAct_UAddGroup2        = 32;
+iAct_UAddGroup3        = 33;
+iAct_UAddGroup4        = 34;
+iAct_UAddGroup5        = 35;
+iAct_UAddGroup6        = 36;
+iAct_UAddGroup7        = 37;
+iAct_UAddGroup8        = 38;
+iAct_UAddGroup9        = 39;
+
+iAct_USelGroup0        = 40;
+iAct_USelGroup1        = 41;
+iAct_USelGroup2        = 42;
+iAct_USelGroup3        = 43;
+iAct_USelGroup4        = 44;
+iAct_USelGroup5        = 45;
+iAct_USelGroup6        = 46;
+iAct_USelGroup7        = 47;
+iAct_USelGroup8        = 48;
+iAct_USelGroup9        = 49;
+
+iAct_UASlGroup0        = 50;
+iAct_UASlGroup1        = 51;
+iAct_UASlGroup2        = 52;
+iAct_UASlGroup3        = 53;
+iAct_UASlGroup4        = 54;
+iAct_UASlGroup5        = 55;
+iAct_UASlGroup6        = 56;
+iAct_UASlGroup7        = 57;
+iAct_UASlGroup8        = 58;
+iAct_UASlGroup9        = 59;
+
+iAct_Control_UAbility1 = 60;
+iAct_Control_UAbility2 = 61;
+iAct_Control_UAbility3 = 62;
+iAct_Control_UAMove    = 63;
+iAct_Control_UAStop    = 64;
+iAct_Control_UAPatrol  = 65;
+iAct_Control_UMove     = 66;
+iAct_Control_UStop     = 67;
+iAct_Control_UPatrol   = 68;
+iAct_Control_UProdCancel=69;
+iAct_Control_UDestroy  = 70;
+iAct_Control_USelArmy  = 71;
+
+iAct_Replay_Fast       = 110;
+iAct_Replay_Back2      = 111;
+iAct_Replay_Back10     = 112;
+iAct_Replay_Back60     = 113;
+iAct_Replay_Forward2   = 114;
+iAct_Replay_Forward10  = 115;
+iAct_Replay_Forward60  = 116;
+iAct_Replay_Pause      = 117;
+iAct_Replay_POV        = 118;
+iAct_Replay_Log        = 119;
+iAct_Replay_Fog        = 120;
+iAct_Replay_Player0    = 121;
+iAct_Replay_Player1    = 122;
+iAct_Replay_Player2    = 123;
+iAct_Replay_Player3    = 124;
+iAct_Replay_Player4    = 125;
+iAct_Replay_Player5    = 126;
+iAct_Replay_Player6    = 127;
+
+iAct_Observer_Fog      = 130;
+iAct_Observer_Player0  = 131;
+iAct_Observer_Player1  = 132;
+iAct_Observer_Player2  = 133;
+iAct_Observer_Player3  = 134;
+iAct_Observer_Player4  = 135;
+iAct_Observer_Player5  = 136;
+iAct_Observer_Player6  = 137;
+
+iAct_SProd1            = 141;
+iAct_SProd2            = 142;
+iAct_SProd3            = 143;
+iAct_SProd4            = 144;
+iAct_SProd5            = 145;
+iAct_SProd6            = 146;
+iAct_SProd7            = 147;
+iAct_SProd8            = 148;
+iAct_SProd9            = 149;
+iAct_SProd10           = 150;
+iAct_SProd11           = 151;
+iAct_SProd12           = 152;
+iAct_SProd13           = 153;
+iAct_SProd14           = 154;
+iAct_SProd15           = 155;
+iAct_SProd16           = 156;
+iAct_SProd17           = 157;
+iAct_SProd18           = 158;
+iAct_SProd19           = 159;
+iAct_SProd20           = 160;
+iAct_SProd21           = 161;
+iAct_SProd22           = 162;
+iAct_SProd23           = 163;
+iAct_SProd24           = 164;
+
+iAct_InGameChat        = 200;
+iAct_InGameChatAll     = 201;
+iAct_InGameChatAllies  = 202;
+
+iAct_test_FastTime     = 210;
+iAct_test_InstaProd    = 211;
+iAct_test_ToggleAI     = 212;
+iAct_test_iddqd        = 213;
+iAct_test_FogToggle    = 214;
+iAct_test_DrawToggle   = 215;
+iAct_test_NullUpgrades = 216;
+iAct_test_BePlayer0    = 217;
+iAct_test_BePlayer1    = 218;
+iAct_test_BePlayer2    = 219;
+iAct_test_BePlayer3    = 220;
+iAct_test_BePlayer4    = 221;
+iAct_test_BePlayer5    = 222;
+iAct_test_BePlayer6    = 223;
+iAct_test_BePlayer7    = 224;
+iAct_test_debug0       = 225;
+iAct_test_debug1       = 226;
+
+
+k_LastCharStuckDealy   = fr_fps1 div 3;
+kt_TwiceDelay          = fr_fps1 div 4;
+
+CharSetCommon          : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
+CharSetDigits          : set of Char = ['0'..'9'];
+
+////////////////////////////////////////////////////////////////////////////////
+//
 //  HOTKEYS
 //
 
@@ -1074,7 +1244,7 @@ str_ps_sv              : char = '@';
 char_gen               : char = '*';
 char_cp                : char = '=';
 
-ChatLen2               = 200;
+
 dead_time              = -dead_hits;
 char_detect            = #7;
 char_advanced          = #10;
@@ -1223,12 +1393,6 @@ txt_line_h3            = font_w+5;
 
 chat_all               = 255;
 chat_allies            = 254;
-{chat_1                 = 1;
-chat_2                 = 2;
-chat_3                 = 3;
-chat_4                 = 4;
-chat_5                 = 5;
-chat_6                 = 6;}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1244,13 +1408,18 @@ vid_maxw               = 1920;
 vid_maxh               = 1080;
 
 vid_ab                 = 128;
-vid_mvs                = 1000; // max vis sprites;
-vid_blink_persecond    = 6;
-vid_blink_period1      = fr_fps1  div vid_blink_persecond;
-vid_blink_periodh      = vid_blink_period1 div 2;
-vid_blink_period2      = vid_blink_period1*2;
+vid_MaxScreenSprites   = 1000; // max vis sprites;
 
-ui_alarm_time          = vid_blink_period2;
+tab_Buildings          = 0;
+tab_Units              = 1;
+tab_Upgrades           = 2;
+tab_Controls           = 3;
+
+ui_blink_persecond     = 6;
+ui_blink_period1       = fr_fps1  div ui_blink_persecond;
+ui_blink_periodh       = ui_blink_period1 div 2;
+ui_blink_period2       = ui_blink_period1*2;
+ui_alarm_time          = ui_blink_period2;
 
 {$IFDEF UNITDATA}
 vid_BWd                = 26;
@@ -1259,8 +1428,10 @@ vid_BWd                = 26;
 ui_ButtonW1            = 48;
 ui_ButtonW2            = ui_ButtonW1*2;
 ui_ButtonWh            = ui_ButtonW1 div 2;
-ui_CtrlPanelW          = ui_ButtonW1*3;
-ui_CtrlPanelBH         = 13;
+ui_CtrlPanelBW         = 3;
+ui_CtrlPanelBH         = ui_CtrlPanelBW+10;
+ui_CtrlPanelBL         = ui_CtrlPanelBH-1;
+ui_CtrlPanelW          = ui_ButtonW1*ui_CtrlPanelBW;
 ui_CtrlPanelH          = ui_ButtonW1*ui_CtrlPanelBH;
 ui_TabButtonW          = ui_CtrlPanelW div 4;
 
@@ -1273,7 +1444,7 @@ ui_max_alarms          = 12;
 
 ui_bottomsy            = ui_ButtonW1*4;
 ui_hwp                 = ui_CtrlPanelW div 2;
-ui_ButtonsNum          = 23;
+ui_ButtonsNum          = (ui_CtrlPanelBH-ui_CtrlPanelBW-2)*ui_CtrlPanelBW-1;
 
 
 menu_ihintn            = 3;
@@ -1340,7 +1511,7 @@ fog_vfhm               = (vid_maxh div fog_cw)+2;
 //
 
 mi_Back                = 1;
-mi_Break                = 2;
+mi_Break               = 2;
 mi_Exit                = 3;
 
 mi_Start               = 10;
@@ -1472,15 +1643,15 @@ mi_Game_Random         = 174;
 
 //// SCIRMISH MULTIPLAYER BLOCK
 mi_MP_Panel            = 180;
-mi_MP_ServerStart      = 181;
-mi_MP_ServerStop       = 182;
-mi_MP_ServerPort       = 183;
-mi_MP_ClientConnect    = 184;
-mi_MP_ClientDisconnect = 185;
-mi_MP_ClientAddress    = 186;
-mi_MP_ClientQuality    = 187;
-mi_MP_ClientLANSearch  = 188;
-mi_MP_Chat             = 189;
+mi_MP_ServerToggle     = 181;
+mi_MP_ServerPort       = 182;
+mi_MP_Connect          = 183;
+mi_MP_Disconnect       = 184;
+mi_MP_ClientAddress    = 185;
+mi_MP_ClientQuality    = 186;
+mi_MP_ClientLANSearch  = 187;
+mi_MP_Chat             = 188;
+mi_MP_Status           = 189;
 
 //// SCIRMISH REPLAY INFO
 mi_ReplayInfo_Panel    = 190;
@@ -1518,7 +1689,7 @@ menu_BarStepX          = font_3hw;
 
 menu_BaseListH         = 16;
 menu_ListLineWChars    = 40;
-menu_ListW             = menu_ListLineWChars*font_w+2*font_w;
+menu_ListW             = menu_ListLineWChars*font_w+font_w;
 //menu_SaveLoadInfoWChars= ((menu_w-menu_border2-menu_border2-menu_ListW-menu_BasehW)-2*font_w) div font_w;
 
 menu_PlayersNameW      = font_3w+MaxPlayerNameLen*font_w;
@@ -1590,15 +1761,7 @@ sep_sdot               = '. ';
 sep_sdots              = '; ';
 sep_wdash              = tc_white+'-';
 
-////////////////////////////////////////////////////////////////////////////////
-//
-//  INPUT
-//
-
-k_chrtt                = fr_fps1 div 3;
-CharSetCommon          : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
-CharSetDigits          : set of Char = ['0'..'9'];
-CharSetAddress         : set of Char = ['0'..'9','.',':'];
+MaxChatStringLength    = 200;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

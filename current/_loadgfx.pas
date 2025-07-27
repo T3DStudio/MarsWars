@@ -17,7 +17,7 @@ begin
       s:=str_screenshot+i2s(i)+'.bmp';
    until not FileExists(s);
    s:=s+#0;
-   sdl_saveBMP(r_screen,@s[1]);
+   sdl_saveBMP(vid_screen,@s[1]);
 end;
 
 
@@ -120,7 +120,7 @@ end;
 function gfx_LoadSDLSurfaceEXT(fn:shortstring):pSDL_SURFACE;
 var tmp:pSDL_SURFACE;
 begin
-   gfx_LoadSDLSurfaceEXT:=r_empty;
+   gfx_LoadSDLSurfaceEXT:=spt_empty;
    if(not FileExists(fn))then exit;
 
    fn:=fn+#0;
@@ -141,7 +141,7 @@ begin
    for i:=0 to fextn do
    begin
       gfx_LoadSDLSurface:=gfx_LoadSDLSurfaceEXT(str_f_grp+fn+fexts[i]);
-      if(gfx_LoadSDLSurface<>r_empty)then
+      if(gfx_LoadSDLSurface<>spt_empty)then
       begin
          if(transparent)then SDL_SetColorKey(gfx_LoadSDLSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(gfx_LoadSDLSurface,0,0));
          break;
@@ -153,7 +153,7 @@ end;
 
 procedure gfx_FreeSDLSurface(sf:PSDL_Surface);
 begin
-   if(sf<>nil)and(sf<>r_empty)then
+   if(sf<>nil)and(sf<>spt_empty)then
    begin
       sdl_FreeSurface(sf);
       sf:=nil;
@@ -197,7 +197,7 @@ begin
       setlength(sl,sn);
 
       gfx_LoadMWTexture(@t,name,firstload,false);
-      if(t.surf<>r_empty)then
+      if(t.surf<>spt_empty)then
       begin
          sn+=1;
          setlength(sl,sn);
@@ -209,7 +209,7 @@ begin
       while true do
       begin
          gfx_LoadMWTexture(@t,name+i2s(sn),firstload,false);
-         if(t.surf=r_empty)then break;
+         if(t.surf=spt_empty)then break;
 
          sn+=1;
          setlength(sl,sn);
@@ -290,7 +290,7 @@ begin
 
    if(theme_map_Liquid<0)or(theme_map_Liquid>=theme_spr_liquidn)then
    begin
-      ts                :=r_dterrain;
+      ts                :=map_dterrain;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
       theme_liquid_animm:=fr_fpsd2;
@@ -345,7 +345,7 @@ begin
    theme_map_pLiquidBack:=theme_map_LiquidBack;
 
    if(theme_map_LiquidBack<0)or(theme_map_LiquidBack>=theme_spr_terrainn)
-   then ts := r_dterrain
+   then ts := map_dterrain
    else ts := theme_spr_terrains[theme_map_LiquidBack].surf;
 
    for i:=1 to LiquidRs do
@@ -371,7 +371,7 @@ begin
    theme_map_pCrater:=theme_map_Crater;
 
    if(theme_map_Crater<0)or(theme_map_Crater>=theme_spr_terrainn)
-   then ts := r_dterrain
+   then ts := map_dterrain
    else ts := theme_spr_terrains[theme_map_Crater].surf;
 
    for i:=1 to crater_ri do
@@ -397,35 +397,35 @@ begin
    if(theme_map_pTerrain=theme_map_Terrain)and(theme_map_pTerrain>0)then exit;
    theme_map_pTerrain:=theme_map_Terrain;
 
-   if(vid_terrain<>nil) then
+   if(map_terrain<>nil) then
    begin
-      sdl_freesurface(vid_terrain);
-      vid_terrain:=nil;
+      sdl_freesurface(map_terrain);
+      map_terrain:=nil;
    end;
 
    if(theme_map_Terrain<0)or(theme_map_Terrain>=theme_spr_terrainn)then
    begin
-      ter_w:=1;
-      ter_h:=1;
-      vid_terrain:=r_dterrain;
-      SDl_FillRect(vid_terrain,nil,c_black);
+      map_ter_w:=1;
+      map_ter_h:=1;
+      map_terrain:=map_dterrain;
+      SDl_FillRect(map_terrain,nil,c_black);
    end
    else
    begin
       ter_s:=theme_spr_terrains[theme_map_Terrain].surf;
 
-      ter_w:=ter_s^.w;
-      ter_h:=ter_s^.h;
-      w:=vid_cam_w+(ter_w shl 1);
-      h:=vid_cam_h+(ter_h shl 1);
-      vid_terrain:=gfx_CreateSDLSurface(w,h);
+      map_ter_w:=ter_s^.w;
+      map_ter_h:=ter_s^.h;
+      w:=ui_cam_w+(map_ter_w shl 1);
+      h:=ui_cam_h+(map_ter_h shl 1);
+      map_terrain:=gfx_CreateSDLSurface(w,h);
       x:=0;
       while (x<w) do
       begin
          y:=0;
          while (y<w) do
          begin
-            draw_sdlsurface(vid_terrain,x,y,ter_s);
+            draw_sdlsurface(map_terrain,x,y,ter_s);
             y+=ter_s^.h;
          end;
          x+=ter_s^.w;
@@ -485,18 +485,18 @@ begin
    for i:=0 to 255 do
    begin
       c:=chr(i);
-      with font_ca[c] do
+      with font_1[c] do
       begin
          surf:=gfx_CreateSDLSurface(font_w,font_w);
          SDL_FillRect(surf,nil,0);
          SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
       end;
 
-      r_RECT^.x:=ord(i)*font_w;
-      r_RECT^.y:=0;
-      r_RECT^.w:=font_w;
-      r_RECT^.h:=font_w;
-      SDL_BLITSURFACE(fspr,r_RECT,font_ca[c].surf,nil);
+      vid_RECT^.x:=ord(i)*font_w;
+      vid_RECT^.y:=0;
+      vid_RECT^.w:=font_w;
+      vid_RECT^.h:=font_w;
+      SDL_BLITSURFACE(fspr,vid_RECT,font_1[c].surf,nil);
    end;
    gfx_FreeSDLSurface(fspr);
 end;
@@ -506,17 +506,17 @@ end;
 procedure gfx_LoadAll(firstload:boolean);
 var x,r:integer;
 begin
-   r_empty   :=gfx_CreateSDLSurface(1,1);
-   SDL_SetColorKey(r_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(r_empty,0,0));
+   spt_empty   :=gfx_CreateSDLSurface(1,1);
+   SDL_SetColorKey(spt_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(spt_empty,0,0));
 
-   r_minimap :=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
-   r_mminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
-   r_bminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
+   ui_minimap :=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
+   ui_mminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
+   ui_bminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
 
-   for x:=1 to vid_mvs do new(vid_vsl[x]);
+   for x:=1 to vid_MaxScreenSprites do new(vid_ScreenSpritesL[x]);
 
-   vid_prims:=0;
-   setlength(vid_prim,vid_mvs);
+   vid_PrimitivesS:=0;
+   setlength(vid_PrimitivesL,vid_MaxScreenSprites);
 
    with spr_dummy do
    begin
@@ -524,7 +524,7 @@ begin
       w   :=1;
       hh  :=1;
       hw  :=1;
-      surf:=r_empty;
+      surf:=spt_empty;
    end;
    pspr_dummy:=@spr_dummy;
 
@@ -540,14 +540,14 @@ begin
 
    gfx_LoadFont;
 
-   vid_fog_surf := gfx_CreateSDLSurface(fog_cr*2,fog_cr*2);
-   boxColor(vid_fog_surf,0,0,vid_fog_surf^.w,vid_fog_surf^.h,c_purple);
-   filledcircleColor(vid_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
-   SDL_SetColorKey(vid_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(vid_fog_surf,0,0));
-   for x:=0 to vid_fog_surf^.w-1 do
-   for r:=0 to vid_fog_surf^.h-1 do
+   ui_fog_surf := gfx_CreateSDLSurface(fog_cr*2,fog_cr*2);
+   boxColor(ui_fog_surf,0,0,ui_fog_surf^.w,ui_fog_surf^.h,c_purple);
+   filledcircleColor(ui_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
+   SDL_SetColorKey(ui_fog_surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(ui_fog_surf,0,0));
+   for x:=0 to ui_fog_surf^.w-1 do
+   for r:=0 to ui_fog_surf^.h-1 do
      if((x+r)mod 4)=0 then
-       pixelColor(vid_fog_surf,x,r,c_purple);
+       pixelColor(ui_fog_surf,x,r,c_purple);
 
    with spr_cp_out do
    begin
@@ -563,7 +563,7 @@ begin
    spr_mlogo:= gfx_LoadSDLSurface('mlogo'   ,false,true);
 
 
-   r_menu:=gfx_CreateSDLSurface(menu_w, menu_h);
+   menu_Surface:=gfx_CreateSDLSurface(menu_w, menu_h);
 
    spr_b_action   := gfx_LoadButton('b_action' ,ui_ButtonW1);
    spr_b_paction  := gfx_LoadButton('b_paction',ui_ButtonW1);
@@ -786,8 +786,8 @@ begin
       with un_btn do
       begin
          case _urace of
-         r_hell: surf:= gfx_LoadButtonFS(_uid2spr(u,315,0)^.surf,ui_ButtonW1 );
-         r_uac : surf:= gfx_LoadButtonFS(_uid2spr(u,225,0)^.surf,ui_ButtonW1 );
+         r_hell: surf:= gfx_LoadButtonFS(uid2spr(u,315,0)^.surf,ui_ButtonW1 );
+         r_uac : surf:= gfx_LoadButtonFS(uid2spr(u,225,0)^.surf,ui_ButtonW1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -795,8 +795,8 @@ begin
       with un_sbtn do
       begin
          case _urace of
-         r_hell: surf:= gfx_LoadButtonFS(_uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1 );
-         r_uac : surf:= gfx_LoadButtonFS(_uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1 );
+         r_hell: surf:= gfx_LoadButtonFS(uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1 );
+         r_uac : surf:= gfx_LoadButtonFS(uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -834,21 +834,21 @@ end;
 procedure map_MakeDecals;
 var i,ix,iy,rn:integer;
 begin
-   _tdecaln:=(vid_cam_w*vid_cam_h) div 19000;
-   setlength(_tdecals,_tdecaln);
+   map_ter_decaln:=(ui_cam_w*ui_cam_h) div 19000;
+   setlength(map_ter_decalL,map_ter_decaln);
 
-   vid_mwa:= vid_cam_w+vid_ab*2;
-   vid_mha:= vid_cam_h+vid_ab*2;
+   ui_mwa:= ui_cam_w+vid_ab*2;
+   ui_mha:= ui_cam_h+vid_ab*2;
 
-   ix:=longint(map_seed) mod vid_mwa;
-   iy:=(g_random_i*5+ix)  mod vid_mha;
+   ix:=longint(map_seed) mod ui_mwa;
+   iy:=(g_random_i*5+ix)  mod ui_mha;
    rn:=ix*iy;
-   for i:=1 to _tdecaln do
-    with _tdecals[i-1] do
+   for i:=1 to map_ter_decaln do
+    with map_ter_decalL[i-1] do
     begin
        rn+=17;
-       ix:=_randomx(ix+rn       ,vid_mwa);
-       iy:=_randomx(iy+sqr(ix*i),vid_mha);
+       ix:=_randomx(ix+rn       ,ui_mwa);
+       iy:=_randomx(iy+sqr(ix*i),ui_mha);
        x :=ix;
        y :=iy;
     end;
@@ -856,19 +856,19 @@ end;
 
 procedure vid_CommonVars;
 begin
-   vid_vmb_x1   := vid_vw-vid_vmb_x0;
-   vid_vmb_y1   := vid_vh-vid_vmb_y0;
+   ui_vmb_x1   := vid_vw-ui_vmb_x0;
+   ui_vmb_y1   := vid_vh-ui_vmb_y0;
 
-   ui_textx     := vid_mapx+font_hw;
-   ui_texty     := vid_mapy+font_hw;
-   ui_hinty1    := vid_mapy+vid_cam_h-txt_line_h1*10;
-   ui_hinty2    := vid_mapy+vid_cam_h-txt_line_h1*8;
-   ui_hinty3    := vid_mapy+vid_cam_h-txt_line_h1*5;
-   ui_hinty4    := vid_mapy+vid_cam_h-txt_line_h1*2;
+   ui_textx     := ui_mapx+font_hw;
+   ui_texty     := ui_mapy+font_hw;
+   ui_hinty1    := ui_mapy+ui_cam_h-txt_line_h1*10;
+   ui_hinty2    := ui_mapy+ui_cam_h-txt_line_h1*8;
+   ui_hinty3    := ui_mapy+ui_cam_h-txt_line_h1*5;
+   ui_hinty4    := ui_mapy+ui_cam_h-txt_line_h1*2;
    ui_chaty     := ui_hinty1-font_3hw;
    ui_logy      := ui_chaty-font_3hw;
-   ui_oicox     := vid_mapx+vid_cam_w-font_hw;
-   ui_uiuphx    := vid_mapx+(vid_cam_w div 2);
+   ui_oicox     := ui_mapx+ui_cam_w-font_hw;
+   ui_uiuphx    := ui_mapx+(ui_cam_w div 2);
    ui_uiuphy    := ui_texty+font_6hw;
    ui_uiplayery := ui_uiuphy+font_3hw;
    ui_game_log_height:=(ui_hinty1-font_5w) div font_3hw;
@@ -877,21 +877,20 @@ begin
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
-   ui_fpsx      := vid_mapx+vid_cam_w-(font_w*font_3hw);
+   ui_fpsx      := ui_mapx+ui_cam_w-(font_w*font_3hw);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+txt_line_h3;
 
 
-   ui_menu_btnsy:= ui_CtrlPanelBH-1;
-   ui_ingamecl  :=(vid_cam_w-font_w) div font_w;
+   ui_ingamecl  :=(ui_cam_w-font_w) div font_w;
 
-   vid_fog_vfw  :=(vid_cam_w div fog_cw)+2;
-   vid_fog_vfh  :=(vid_cam_h div fog_cw)+2;
+   ui_fog_vfw  :=(ui_cam_w div fog_cw)+2;
+   ui_fog_vfh  :=(ui_cam_h div fog_cw)+2;
 
-   map_mmvw     := round(vid_cam_w*map_mmcx);
-   map_mmvh     := round(vid_cam_h*map_mmcx);
-   CameraBounds;
+   map_mmvw     := round(ui_cam_w*map_mmcx);
+   map_mmvh     := round(ui_cam_h*map_mmcx);
+   ui_Camera_Bounds;
 
    map_MakeDecals;
 end;
@@ -901,71 +900,71 @@ var i,y:integer;
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
    if(ui_ControlPanelPos<2)
-   then lineColor(r_panel,x0,y0,x1,y1,color)
-   else lineColor(r_panel,y0,x0,y1,x1,color);
+   then lineColor(ui_panel,x0,y0,x1,y1,color)
+   else lineColor(ui_panel,y0,x0,y1,x1,color);
 end;
 procedure prect(x0,y0,x1,y1:integer;color:cardinal);
 begin
    if(ui_ControlPanelPos<2)
-   then rectangleColor(r_panel,x0,y0,x1,y1,color)
-   else rectangleColor(r_panel,y0,x0,y1,x1,color);
+   then rectangleColor(ui_panel,x0,y0,x1,y1,color)
+   else rectangleColor(ui_panel,y0,x0,y1,x1,color);
 end;
 begin
-   gfx_FreeSDLSurface(r_uipanel );
-   gfx_FreeSDLSurface(r_panel   );
-   gfx_FreeSDLSurface(r_dterrain);
+   gfx_FreeSDLSurface(ui_uipanel );
+   gfx_FreeSDLSurface(ui_panel   );
+   gfx_FreeSDLSurface(map_dterrain);
 
    if(ui_ControlPanelPos<2)then // left-right
    begin
-      vid_cam_w:=vid_vw-ui_CtrlPanelW;
-      vid_cam_h:=vid_vh;
+      ui_cam_w:=vid_vw-ui_CtrlPanelW;
+      ui_cam_h:=vid_vh;
 
       if(ui_ControlPanelPos=0)
-      then vid_mapx:=ui_CtrlPanelW
-      else vid_mapx:=0;
-      vid_mapy:=0;
+      then ui_mapx:=ui_CtrlPanelW
+      else ui_mapx:=0;
+      ui_mapy:=0;
 
       if(ui_ControlPanelPos=0)
-      then vid_panelx:=0
-      else vid_panelx:=vid_cam_w-1;
-      vid_panely:=0;
+      then ui_panelx:=0
+      else ui_panelx:=ui_cam_w-1;
+      ui_panely:=0;
 
-      r_uipanel:=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
-      r_panel  :=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
+      ui_uipanel:=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
+      ui_panel  :=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
 
-      vlineColor(r_panel,ui_ButtonW1,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
-      vlineColor(r_panel,ui_ButtonW2,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
+      vlineColor(ui_panel,ui_ButtonW1,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
+      vlineColor(ui_panel,ui_ButtonW2,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
    end
    else
    begin
-      vid_cam_w:=vid_vw;
-      vid_cam_h:=vid_vh-ui_CtrlPanelW;
+      ui_cam_w:=vid_vw;
+      ui_cam_h:=vid_vh-ui_CtrlPanelW;
 
-      vid_mapx:=0;
+      ui_mapx:=0;
       if(ui_ControlPanelPos=2)
-      then vid_mapy:=ui_CtrlPanelW-1
-      else vid_mapy:=0;
+      then ui_mapy:=ui_CtrlPanelW-1
+      else ui_mapy:=0;
 
-      vid_panelx:=0;
+      ui_panelx:=0;
       if(ui_ControlPanelPos=2)
-      then vid_panely:=0
-      else vid_panely:=vid_cam_h-1;
+      then ui_panely:=0
+      else ui_panely:=ui_cam_h-1;
 
-      r_uipanel:=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
-      r_panel  :=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
+      ui_uipanel:=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
+      ui_panel  :=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
 
-      hlineColor(r_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW1 ,c_white);
-      hlineColor(r_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW2,c_white);
+      hlineColor(ui_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW1 ,c_white);
+      hlineColor(ui_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW2,c_white);
    end;
 
-   vid_cam_hw:=vid_cam_w div 2;
-   vid_cam_hh:=vid_cam_h div 2;
+   ui_cam_hw:=ui_cam_w div 2;
+   ui_cam_hh:=ui_cam_h div 2;
 
-   rectangleColor(r_panel,0,0,r_panel^.w-1,r_panel^.h-1,c_white);
+   rectangleColor(ui_panel,0,0,ui_panel^.w-1,ui_panel^.h-1,c_white);
    pline(0,ui_CtrlPanelW,ui_CtrlPanelW,ui_CtrlPanelW,c_white);
 
-   //pline(0,ui_CtrlPanelW+ui_h3bw,r_panel^.w,ui_CtrlPanelW+ui_h3bw,c_white);
-   pline(0,ui_CtrlPanelW+ui_ButtonW1 ,r_panel^.w,ui_CtrlPanelW+ui_ButtonW1 ,c_white);
+   //pline(0,ui_CtrlPanelW+ui_h3bw,ui_panel^.w,ui_CtrlPanelW+ui_h3bw,c_white);
+   pline(0,ui_CtrlPanelW+ui_ButtonW1 ,ui_panel^.w,ui_CtrlPanelW+ui_ButtonW1 ,c_white);
 
    for y:=0 to 3 do
    pline(y*ui_TabButtonW,ui_CtrlPanelW,y*ui_TabButtonW,ui_CtrlPanelW+ui_ButtonW1,c_white);
@@ -979,22 +978,22 @@ begin
       y+=ui_ButtonW1;
    end;
 
-   draw_sdlsurface(r_uipanel,0,0,r_panel);
+   draw_sdlsurface(ui_uipanel,0,0,ui_panel);
 
-   r_dterrain:=gfx_CreateSDLSurface(vid_cam_w,vid_cam_h);
+   map_dterrain:=gfx_CreateSDLSurface(ui_cam_w,ui_cam_h);
 
    vid_CommonVars;
 end;
 
 procedure vid_MakeScreen;
 begin
-   if(r_screen<>nil)then sdl_freesurface(r_screen);
+   if(vid_screen<>nil)then sdl_freesurface(vid_screen);
 
    if(vid_windowed)
-   then r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags)
-   else r_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, r_vflags + SDL_FULLSCREEN);
+   then vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, vid_vflags)
+   else vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, vid_vflags + SDL_FULLSCREEN);
 
-   if(r_screen=nil)then begin WriteSDLError; exit; end;
+   if(vid_screen=nil)then begin WriteSDLError; exit; end;
 
    vid_RemakeScreenSurfaces;
 end;

@@ -191,7 +191,7 @@ begin
          if(d>base_1rh)and(tu<>nil)then exit;
 
        damage:=adddmg;
-       if(player<=MaxPlayers)and(tu<>nil)then
+       if(player<=LastPlayer)and(tu<>nil)then
         with g_players[player] do
          if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
 
@@ -253,7 +253,7 @@ begin
 
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
-        if(player<=MaxPlayers)and(tu<>nil)then
+        if(player<=LastPlayer)and(tu<>nil)then
           with g_players[player] do
             case mid of
           MID_SSShot,

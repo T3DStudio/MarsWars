@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_players[LocalPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)
+   if(not g_players[LocalPlayer].observer)and(not Game_IsEnded)and(rpls_state<rpls_read)
    then UIPlayer:=LocalPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -21,8 +21,8 @@ procedure d_AddObjSprites(noanim:boolean);
 begin
  doodads_sprites(noanim);
     unit_sprites(noanim);
- effects_sprites(noanim,r_draw);
- if(not r_draw)then exit;
+ effects_sprites(noanim,vid_draw);
+ if(not vid_draw)then exit;
 missiles_sprites;
  cpoints_sprites;
 end;
@@ -33,24 +33,41 @@ begin
 
    D_AddObjSprites(G_Status>gs_running);
 
-   D_terrain   (r_screen,vid_mapx,vid_mapy);
-   D_SpriteList(r_screen,vid_mapx,vid_mapy);
-   D_Fog       (r_screen,vid_mapx,vid_mapy);
-   D_UnitsInfo (r_screen,vid_mapx,vid_mapy);
-   D_ui        (r_screen,vid_mapx,vid_mapy,UIPlayer);
+   D_terrain   (vid_screen,ui_mapx,ui_mapy);
+   D_SpriteList(vid_screen,ui_mapx,ui_mapy);
+   D_Fog       (vid_screen,ui_mapx,ui_mapy);
+   D_UnitsInfo (vid_screen,ui_mapx,ui_mapy);
+   D_ui        (vid_screen,ui_mapx,ui_mapy,UIPlayer);
 
-   draw_sdlsurface(r_screen,vid_panelx,vid_panely,r_uipanel);
+   draw_sdlsurface(vid_screen,ui_panelx,ui_panely,ui_uipanel);
 
-   d_uimouse(r_screen);
+   d_UIMouseBaseBrush(vid_screen);
 
    if(TestMode>1)and(net_status=0)then _draw_dbg;
 end;
 
 
-procedure DrawGame;
+procedure GameDraw;
 var i,n:integer;
 begin
-   sdl_FillRect(r_screen,nil,0);
+   ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod ui_blink_period1;
+   ui_blink_timer2+=1;ui_blink_timer2:=ui_blink_timer2 mod ui_blink_period2;
+
+   if(ui_blink_timer1=0)then
+   begin
+      ui_blink3+=1;
+      ui_blink3:=ui_blink3 mod 4;
+   end;
+
+   ui_blink1_colorb  :=ui_blink_timer1>ui_blink_periodh;
+   ui_blink2_colorb  :=ui_blink_timer2>ui_blink_period1;
+
+   ui_blink1_color_BG:=ui_blink_color1[ui_blink1_colorb];
+   ui_blink1_color_BY:=ui_blink_color2[ui_blink1_colorb];
+   ui_blink2_color_BG:=ui_blink_color1[ui_blink2_colorb];
+   ui_blink2_color_BY:=ui_blink_color2[ui_blink2_colorb];
+
+   sdl_FillRect(vid_screen,nil,0);
 
    if(MainMenu)
    then d_Menu
@@ -62,15 +79,15 @@ begin
    begin
    n:=0;
    with g_players[UIPlayer] do
-    for i:=0 to MaxPlayers do
+    for i:=0 to LastPlayer do
      with ai_alarms[i] do
       if(aia_enemy_limit>0)then n+=1;
 
-   draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-10,
+   draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    ' '+b2c[ui_uibtn_sabilityu=nil]+
    ' '+b2c[ui_uibtn_pabilityu=nil]+
-   //' '+b2c[fog_check(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
+   //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
    ' '+i2s(i)+' '+i2s(n)
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
@@ -81,18 +98,18 @@ begin
    ,
    ta_right,255, c_white);
 
-   draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-20,
+   draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-20,
        i2s(mouse_map_x)+
    ' '+i2s(mouse_map_y),
    ta_right,255, c_white);
 
-   draw_text(r_screen,vid_cam_w+vid_mapx,vid_cam_h-30,
+   draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-30,
        i2s(rpls_state)+
    ' '+i2s(rpls_fstatus),
    ta_right,255, c_white);
    end;
 
-   sdl_flip(r_screen);
+   sdl_flip(vid_screen);
 end;
 
 
