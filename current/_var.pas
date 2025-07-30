@@ -64,7 +64,7 @@ map_psx           : array[0..LastPlayer] of integer;
 map_psy           : array[0..LastPlayer] of integer;
 map_dds           : array[0..MaxDoodads] of TDoodad;
 map_ddn           : integer = 0;
-map_dcell         : array[0..dcn,0..dcn] of TDCell;
+map_ObstaclesGrid         : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TDCell;
 map_pf_lastZone   : word = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ ms_eid_bio_death_uids
 _RX2Y             : array[0..MFogM,0..MFogM] of integer;
 
 TestMode          : byte = 0;
-uncappedFPS       : boolean = false;
+sys_uncappedFPS       : boolean = false;
 
 LocalPlayer       : byte = 1; // 'this' player
 PlayerName        : shortstring = 'DoomPlayer';
@@ -387,8 +387,7 @@ map_mmcx          : single;
 map_mmvw,
 map_mmvh          : integer;
 
-map_terrain,
-map_dterrain      : pSDL_SURFACE;
+map_terrain       : pSDL_SURFACE;
 
 map_ter_w,
 map_ter_h         : integer;
@@ -448,12 +447,12 @@ svld_file_size    : cardinal = 0;
 
 rpls_Record       : boolean = true;
 rpls_RecordTryPause:integer = 0;
-rpls_fstatus      : byte = 0;    // file status (none,write,read)
+rpls_fstate      : byte = 0;    // file status (none,write,read)
 rpls_pnu          : integer = 0; // quality
 rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info     : shortstring = '';
-rpls_state        : byte = rpls_none;
+rpls_pstate        : byte = rpls_none;
 rpls_list         : TStringList;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
@@ -465,7 +464,7 @@ rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
 rpls_showlog      : boolean = false;
-rpls_plcam        : boolean = false;
+rpls_POVRecorder        : boolean = false;
 rpls_ticks        : byte = 0;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_head_itemn   : integer = 0;
@@ -602,7 +601,9 @@ theme_clr_liquids : array of cardinal; // minimap color
 //
 
 
-spt_empty         : pSDL_SURFACE;
+theme_DefSprite,
+
+spr_empty         : pSDL_SURFACE;
 font_1            : array[char] of TMWTexture;
 
 spr_liquidb       : array[1..LiquidRs ] of TMWTexture;
@@ -835,10 +836,10 @@ str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
 
-str_menu_SetGame,
-str_menu_SetReplay,
-str_menu_SetVideo,
-str_menu_SetSound,
+str_S_Game,
+str_S_Replay,
+str_S_Video,
+str_S_Sound,
 
 str_SR_RecordGames,
 
@@ -941,9 +942,9 @@ str_GO_DefeatedObs,
 str_net_Ready,
 str_GO_FixedStarts,
 str_map_Scenario,
-str_PlayerLeft,
-str_PlayerSurrender,
-str_PlayerDefeat   : shortstring;
+str_gmsg_PlayerLeft,
+str_gmsg_PlayerSurrender,
+str_gmsg_PlayerDefeat   : shortstring;
 str_map_GeneratorsL   : array[0..map_MaxGenerators] of shortstring;
 str_SG_PlayersColorL       : array[0..vid_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL         : array[0..2] of shortstring;
@@ -953,7 +954,7 @@ str_SG_ColoredShadow,
 str_SG_HealthBars,
 str_SG_PlayersColor,
 str_all,
-str_orders,
+str_UnitGroups,
 str_requirements,
 str_req,
 str_uprod,
@@ -967,13 +968,13 @@ str_chat_allies,
 str_Caption_Server,
 str_Caption_Client,
 str_Caption_GOptions,
-str_WaitForServer,
-str_gsunknown,
+str_gstat_WaitForServer,
+str_gstat_Unknown,
 str_Camp_Difficulty,
-str_repend,
-str_reperror,
+str_gstat_ReplayEnd,
+str_gstat_ReplayError,
 str_SR_ReplayPrefix,
-str_ReplayPlay,
+str_FilePlay,
 str_inv_ml,
 str_inv_time,
 str_menu,
@@ -986,17 +987,18 @@ str_map,
 str_FileSave,
 str_FileLoad,
 str_FileDelete,
-str_gsaved,
-str_pause,
+str_gmsg_GameSaved,
+str_gmsg_GameLoaded,
+str_gstat_Pauseed,
 str_observer,
-str_win,
-str_lose,
+str_gstat_Win,
+str_gstat_Lose,
 str_msg_WrongVersion,
 str_msg_ServerFull,
 str_msg_GameStarted,
 str_net_UDPPort,
-str_connecting,
-str_portblocked,
+str_gmsg_Connecting,
+str_gmsg_PortBlocked,
 str_SR_Quality,
 str_net_Quality,
 str_net_Address,
@@ -1025,7 +1027,7 @@ str_cmp_unk,
 str_cmp_Date,
 str_cmp_Location,
 str_cmp_Area,
-str_MObjectives,
+str_Caption_Objectives,
 str_Caption_Multiplayer,
 str_Caption_Map,
 str_Caption_Players      : shortstring;
@@ -1036,9 +1038,6 @@ str_hint_Tab        : array[0..3] of shortstring;
 str_hint_army     : shortstring;
 str_hint_energy   : shortstring;
 str_hint_m        : array[0..2 ] of shortstring;
-str_hint_a,
-str_hint_r,
-str_hint_o        : array[0..max_HotKeys] of shortstring;
 str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
 str_action_hint   : array[byte] of shortstring;

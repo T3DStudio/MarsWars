@@ -237,7 +237,7 @@ begin
          r:=0;
          o:=1;
       end;
-      for i:=1 to o do effect_add(vx-_randomr(r),vy-_randomr(r),_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
+      for i:=1 to o do effect_add(vx-g_randomr(r),vy-g_randomr(r),_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
 
       if(mfe=uf_ground)and(ms_eid_decal>0)then effect_add(vx,vy,sd_liquid+vy,ms_eid_decal);
 

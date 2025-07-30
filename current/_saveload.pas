@@ -194,10 +194,6 @@ begin
    AddItem(@ui_alarms           ,SizeOf(ui_alarms        ));
    AddItem(@PlayerColors        ,SizeOf(PlayerColors     ));
    AddItem(@m_brush             ,SizeOf(m_brush          ));
-   AddItem(@theme_map_Liquid    ,SizeOf(theme_map_Liquid    ));
-   AddItem(@theme_map_LiquidBack,SizeOf(theme_map_LiquidBack));
-   AddItem(@theme_map_Terrain   ,SizeOf(theme_map_Terrain   ));
-   AddItem(@theme_map_Crater    ,SizeOf(theme_map_Crater    ));
 end;
 
 function saveload_Allowed:boolean;
@@ -205,7 +201,7 @@ begin
    saveload_Allowed:=false;
 
    if(net_status<>ns_none)
-   or(rpls_state=rpls_read)then exit;
+   or(rpls_pstate=rpls_read)then exit;
 
    saveload_Allowed:=true;
 end;
@@ -243,7 +239,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLogChat(LocalPlayer,log_to_all,str_gsaved,true);
+   GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameSaved,true);
 end;
 
 function saveload_Load(check:boolean):boolean;
@@ -303,7 +299,10 @@ begin
          end;
 
          map_vars;
-         if(g_type=gt_campaing)then SetThemeCampaing(cmp_sel);
+         case g_type of
+         gt_campaing: SetThemeCampaing(cmp_sel);
+         gt_scirmish: map_seed2theme;
+         end;
 
          map_MakeThemeSprites;
          map_RefreshDoodadsCells;
@@ -315,6 +314,8 @@ begin
          G_Started:=true;
 
          GameBack(true,false);
+
+         GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameLoaded,true);
       end;
       close(f);
    end;
@@ -325,7 +326,7 @@ var fn:shortstring;
 begin
    saveload_Delete:=false;
 
-   if(rpls_state<>rpls_none)
+   if(rpls_pstate<>rpls_none)
    or(length(svld_str_fname)=0)then exit;
 
    saveload_Delete:=true;

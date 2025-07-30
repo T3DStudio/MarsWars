@@ -20,8 +20,8 @@ begin
       if(sn<=0)then exit;
 
       if(mkind=smt_fapc)
-      then dd:=_DIR360(dir+12) div 23  // 0..15
-      else dd:=_DIR360(dir+23) div 45; // 0..7
+      then dd:=dir_MOD360(dir+12) div 23  // 0..15
+      else dd:=dir_MOD360(dir+23) div 45; // 0..7
 
       if(sk=0)
       then i:=0
@@ -323,8 +323,8 @@ begin
 
       if(not _ukbuilding)then
       begin
-      if(buff[ub_Pain  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
-      if(buff[ub_Cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
+      if(buffs[ub_Pain  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
+      if(buffs[ub_Cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
       end;
 
       if(a_rld>0)and(a_weap_cl<=MaxUnitWeapons)then //and(0<a_tar)and(a_tar<=MaxUnits)

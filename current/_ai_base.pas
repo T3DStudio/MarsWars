@@ -340,11 +340,11 @@ end;
 procedure ai_CollectDIDSquare(square:plongint;tx,ty,tr:integer);
 var dx,dy,u,dist,dm:integer;
 begin
-   dx:=tx div dcw;
-   dy:=ty div dcw;
+   dx:=tx div MapObstaclesGridW;
+   dy:=ty div MapObstaclesGridW;
 
-   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-    with map_dcell[dx,dy] do
+   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
+    with map_ObstaclesGrid[dx,dy] do
      if(n>0)then
       for u:=0 to n-1 do
        with l[u]^ do
@@ -687,7 +687,7 @@ begin
            else
              if(CheckUnitTeamVision(team,tu,ai_anyDetectors>0))
              or(upgr[upgr_fog_vision]>0)then  // enemy in vision
-               if(tu^.buff[ub_invuln]<=0)then
+               if(tu^.buffs[ub_invuln]<=0)then
                begin
                   ai_SetCurrentAlarm(tu,0,0,ud,0);
 
@@ -698,9 +698,9 @@ begin
                     if(ai_generator_d<100)
                     or(ai_cpoint_d<100)
                     or(tu^.a_rld>0)then
-                      if (tu^.buff[ub_Invis]>0)
-                      and(tu^.vsni[team]<=0)
-                      and(tu^.buff[ub_Scaned]<=0)
+                      if (tu^.buffs[ub_Invis]>0)
+                      and(tu^.TeamDetection[team]<=0)
+                      and(tu^.buffs[ub_Scaned]<=0)
                       and(tu^.uid^._attack>0)
                       then aiu_need_detect:=ud-srange-hits;
                end;
@@ -778,7 +778,7 @@ begin
                      //// active detection
                      // hell eye target
                      if(tu^.aiu_need_detect<ai_need_heye_d)then
-                      if(tu^.buff[ub_Detect]<=0)and(tu^.buff[ub_HVision]<=0)then
+                      if(tu^.buffs[ub_Detect]<=0)and(tu^.buffs[ub_HVision]<=0)then
                       begin
                          ai_need_heye_u:=tu;
                          ai_need_heye_d:=tu^.aiu_need_detect;
@@ -788,8 +788,8 @@ begin
                      and(tu^.aiu_limitaround_enemy>tu^.aiu_limitaround_ally)
                      and(not tu^.uid^._ukbuilding)
                      and(IsUnitRange(tu^.a_tar,nil))
-                     and(tu^.buff[ub_Invuln ]<=0)
-                     and(tu^.buff[ub_Damaged]>0)then
+                     and(tu^.buffs[ub_Invuln ]<=0)
+                     and(tu^.buffs[ub_Damaged]>0)then
                       if(ai_invuln_tar_u=nil)
                       then ai_invuln_tar_u:=tu
                       else
@@ -821,7 +821,7 @@ begin
 
                // repair/heal target
                if(pfcheck)or(ud<=srange)then
-                if(tu^.iscomplete)and(tu^.hits<tu^.uid^._mhits)and(tu^.buff[ub_Heal]<=0)then
+                if(tu^.iscomplete)and(tu^.hits<tu^.uid^._mhits)and(tu^.buffs[ub_Heal]<=0)then
                  if(tu^.uid^._ukmech)
                  then _setNearestTarget(@ai_mrepair_u,@ai_mrepair_d,ud)
                  else _setNearestTarget(@ai_urepair_u,@ai_urepair_d,ud);
@@ -830,7 +830,7 @@ begin
              if(CheckUnitTeamVision(team,tu,false))
              or(upgr[upgr_fog_vision]>0)then  // enemy in vision
              begin
-                if(tu^.buff[ub_invuln]<=0)then
+                if(tu^.buffs[ub_invuln]<=0)then
                 begin
                    // enemy
                    _setNearestTarget(@ai_enemy_u,@ai_enemy_d,ud);
@@ -871,7 +871,7 @@ begin
                begin
                   // invisible enemy unit
                   if(tu^.a_rld>0)or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)then
-                    if(tu^.buff[ub_Invis]>0)and(tu^.vsni[team]<=0)and(tu^.buff[ub_Scaned]<=0)then
+                    if(tu^.buffs[ub_Invis]>0)and(tu^.TeamDetection[team]<=0)and(tu^.buffs[ub_Scaned]<=0)then
                       _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
                end;
 
@@ -971,7 +971,7 @@ begin
 
             // detection near
             if(ud<=srange)then
-             if(tu^.buff[ub_Detect]>0)
+             if(tu^.buffs[ub_Detect]>0)
              or(tu^.uid^._ability=uab_HellVision)
              or(tu^.uid^._ability=uab_UACScan   )then ai_detect_near+=1;
 

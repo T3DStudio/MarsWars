@@ -96,6 +96,7 @@ begin
    input_SetAction(iAct_Control_UMove    ,ikt_keyboard,0           ,SDLK_Z           );
    input_SetAction(iAct_Control_UStop    ,ikt_keyboard,0           ,SDLK_X           );
    input_SetAction(iAct_Control_UPatrol  ,ikt_keyboard,0           ,SDLK_C           );
+   input_SetAction(iAct_Control_UProdCncl,ikt_keyboard,iAct_control,SDLK_C           );
    input_SetAction(iAct_Control_UDestroy ,ikt_keyboard,0           ,SDLK_DELETE      );
    input_SetAction(iAct_Control_USelArmy ,ikt_keyboard,0           ,SDLK_F1          );
 
@@ -123,7 +124,6 @@ begin
    input_SetAction(iAct_SProd22          ,ikt_keyboard,iAct_control,SDLK_V           );
    input_SetAction(iAct_SProd23          ,ikt_keyboard,iAct_control,SDLK_B           );
    input_SetAction(iAct_SProd24          ,ikt_keyboard,iAct_control,SDLK_N           );
-   // iAct_CProd1-iAct_CProd24 no keyboard activation
 
    input_SetAction(iAct_InGameChat       ,ikt_keyboard,0           ,sdlk_return);
    input_SetAction(iAct_InGameChatAll    ,ikt_keyboard,iAct_Control,sdlk_return);
@@ -187,7 +187,7 @@ begin
    ui_panel_CtrlActs[tcc_controls,6 ]:=iAct_Control_UMove;
    ui_panel_CtrlActs[tcc_controls,7 ]:=iAct_Control_UStop;
    ui_panel_CtrlActs[tcc_controls,8 ]:=iAct_Control_UPatrol;
-   ui_panel_CtrlActs[tcc_controls,9 ]:=iAct_Control_UProdCancel;
+   ui_panel_CtrlActs[tcc_controls,9 ]:=iAct_Control_UProdCncl;
    ui_panel_CtrlActs[tcc_controls,10]:=iAct_Control_UDestroy;
    ui_panel_CtrlActs[tcc_controls,11]:=iAct_Control_USelArmy;
 
@@ -202,7 +202,7 @@ begin
    ui_panel_CtrlActs[tcc_replay  ,9 ]:=iAct_Replay_POV;
    ui_panel_CtrlActs[tcc_replay  ,10]:=iAct_Replay_Log;
    ui_panel_CtrlActs[tcc_replay  ,11]:=iAct_Replay_Fog;
-   ui_panel_CtrlActs[tcc_replay  ,12]:=iAct_Replay_Player0;
+   ui_panel_CtrlActs[tcc_replay  ,12]:=iAct_Replay_PlayerAll;
    ui_panel_CtrlActs[tcc_replay  ,13]:=iAct_Replay_Player1;
    ui_panel_CtrlActs[tcc_replay  ,14]:=iAct_Replay_Player2;
    ui_panel_CtrlActs[tcc_replay  ,15]:=iAct_Replay_Player3;
@@ -211,7 +211,7 @@ begin
    ui_panel_CtrlActs[tcc_replay  ,18]:=iAct_Replay_Player6;
 
    ui_panel_CtrlActs[tcc_observer,0 ]:=iAct_Observer_Fog;
-   ui_panel_CtrlActs[tcc_observer,3 ]:=iAct_Observer_Player0;
+   ui_panel_CtrlActs[tcc_observer,3 ]:=iAct_Observer_PlayerAll;
    ui_panel_CtrlActs[tcc_observer,4 ]:=iAct_Observer_Player1;
    ui_panel_CtrlActs[tcc_observer,5 ]:=iAct_Observer_Player2;
    ui_panel_CtrlActs[tcc_observer,6 ]:=iAct_Observer_Player3;
@@ -285,22 +285,34 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure GameTogglePause;
+function GameTogglePause(check:boolean):boolean;
 begin
-   if(net_status=ns_client)
-   then net_pause
-   else
-     if(net_status=ns_server) then
-       if(G_Status=gs_running)then
-       begin
-          G_Status:=LocalPlayer;
-          GameLogChat(LocalPlayer,255,str_PlayerPaused,false);
-       end
-       else
-       begin
-          G_Status:=gs_running;
-          GameLogChat(LocalPlayer,255,str_PlayerResumed,false);
-       end;
+   GameTogglePause:=false;
+
+   case net_status of
+   ns_client  : begin
+                   GameTogglePause:=true;
+                   if(check)then exit;
+                   net_pause;
+                end;
+   ns_server  : case G_Status of
+                gs_running  : begin
+                                 GameTogglePause:=true;
+                                 if(check)then exit;
+
+                                 G_Status:=LocalPlayer;
+                                 GameLogChat(LocalPlayer,255,str_PlayerPaused,false);
+                              end;
+                gs_paused1..
+                gs_paused6  : begin
+                                 GameTogglePause:=true;
+                                 if(check)then exit;
+
+                                 G_Status:=gs_running;
+                                 GameLogChat(LocalPlayer,255,str_PlayerResumed,false);
+                              end;
+                end;
+   end;
 end;
 
 procedure MapMarker(x,y:integer);
@@ -439,10 +451,10 @@ begin
    end;
 end;
 
-procedure PlayerSendOrder(ox0,oy0,ox1,oy1,oa0:integer;oid,pl:byte);
+procedure PlayerSendOrder(ox0,oy0,ox1,oy1,oa0:integer;oid,playerN:byte);
 var u:integer;
 begin
-   if(G_Status=gs_running)and(rpls_state<rpls_read)then
+   if(G_Status=gs_running)and(rpls_pstate<rpls_read)then
    begin
       if(net_status=ns_client)then
       begin
@@ -456,7 +468,7 @@ begin
          net_writebyte(oid);
 
          with g_players[LocalPlayer] do
-           net_writebyte(byte(s_all));
+           net_writeint(s_all);
          for u:=1 to MaxUnits do
            with g_punits[u]^ do
              if(hits>0)and(sel)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
@@ -465,7 +477,7 @@ begin
          net_send(net_cl_svip,net_cl_svport);
       end
       else
-        with g_players[pl] do
+        with g_players[playerN] do
         begin
            o_x0:=ox0;
            o_y0:=oy0;
@@ -475,9 +487,7 @@ begin
            o_id:=oid;
         end;
 
-      case oid of
-      uo_corder : ui_ClientCommandEffect(ox0,oy0,ox1,oy1);
-      end;
+      if(oid=uo_corder)then ui_ClientCommandEffect(ox0,oy0,ox1,oy1);
    end;
 end;
 
@@ -528,6 +538,21 @@ begin
            end;
            break;
        end;
+end;
+function mouse_BrushTarget(tx,ty,mbrush:integer):integer;
+var u:integer;
+begin
+   mouse_BrushTarget:=0;
+
+   if(PointInCam(tx,ty))then
+    for u:=1 to MaxUnits do
+     with g_punits[u]^ do
+      if(hits>0)and(not isUnitRange(transport,nil))then
+      begin
+         case mbrush of
+         co_empty  :;
+         end;
+      end;
 end;
 
 procedure mouse_BrushCheck(logErrors:boolean);
@@ -618,8 +643,12 @@ co_empty    :
    m_brush:=co_empty;
 end;
 
-procedure ui_ExecAction(action:byte;click_type:TTabBTNClickType);
+procedure ui_ExecAction(action:byte;click_type:TTabBTNClickType;clickSound:pboolean);
 var u:integer;
+procedure clickSoundON;
+begin
+   if(clickSound<>nil)then clickSound^:=true;
+end;
 begin
    with g_players[LocalPlayer] do
      case action of
@@ -629,28 +658,30 @@ iAct_SProd24           : if(ui_GameControlsEnabled)then
                             u:=action-iAct_SProd1;
                             if(0<=u)and(u<=ui_ButtonsNum)then
                               case ui_tab of
-                              tab_buildings: if(click_type=pct_left)then m_brush:=ui_panel_uids[race,ui_tab,u];
+                              tab_buildings: if(click_type=pct_left)then begin m_brush:=ui_panel_uids[race,ui_tab,u];clickSoundON;end;
                               tab_units    : case click_type of
-                                             pct_left   : PlayerSendOrder(co_suprod  ,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);
-                                             pct_right  : PlayerSendOrder(co_cuprod  ,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);
+                                             pct_left   : begin PlayerSendOrder(co_suprod  ,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
+                                             pct_right  : begin PlayerSendOrder(co_cuprod  ,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
                                              end;
                               tab_upgrades : case click_type of
-                                             pct_left   : PlayerSendOrder(co_supgrade,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);
-                                             pct_right  : PlayerSendOrder(co_cupgrade,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);
+                                             pct_left   : begin PlayerSendOrder(co_supgrade,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
+                                             pct_right  : begin PlayerSendOrder(co_cupgrade,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
                                              end;
                               end;
                          end;
 iAct_Control_USelArmy  : if(ui_groups_n[MaxUnitGroups]>0)then
                            case click_type of
-                           pct_left : units_SelectGroup(false,255);
-                           pct_Dleft: ui_Camera_MoveToGroup(MaxUnitGroups) ;
+                           pct_left : begin units_SelectGroup(false,255);        clickSoundON;end;
+                           pct_Dleft: begin ui_Camera_MoveToGroup(MaxUnitGroups);clickSoundON;end;
                            end;
      else
 
      if(click_type=pct_left)then
      begin
         case action of
-        iAct_Replay_Fast       : uncappedFPS:=not uncappedFPS;
+        iAct_Pause             : GameTogglePause(false);
+
+        iAct_Replay_Fast       : sys_uncappedFPS:=not sys_uncappedFPS;
         iAct_Replay_Pause      : if (G_Status<>gs_replayend)
                                  and(G_Status<>gs_replayerror)then
                                  begin
@@ -659,31 +690,31 @@ iAct_Control_USelArmy  : if(ui_groups_n[MaxUnitGroups]>0)then
                                     else G_Status:=gs_running;
                                     rpls_ForwardSkip:=0;
                                  end;
-        iAct_Replay_Back2      :        replay_SetPlayPosition(g_tick-(fr_fps1*2 )+1,-1     );
-        iAct_Replay_Back10     :        replay_SetPlayPosition(g_tick-(fr_fps1*10)+1,-1     );
-        iAct_Replay_Back60     :        replay_SetPlayPosition(g_tick-(fr_fps1*60)+1,-1     );
-        iAct_Replay_Forward2   : if(not replay_SetPlayPosition(g_tick+(fr_fps1*2 )+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*2;
-        iAct_Replay_Forward10  : if(not replay_SetPlayPosition(g_tick+(fr_fps1*10)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*10;
-        iAct_Replay_Forward60  : if(not replay_SetPlayPosition(g_tick+(fr_fps1*60)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*60;
-        iAct_Replay_POV        : rpls_plcam  :=not rpls_plcam;
+        iAct_Replay_Back2      :        replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     );
+        iAct_Replay_Back10     :        replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     );
+        iAct_Replay_Back60     :        replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     );
+        iAct_Replay_Forward2   : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*2;
+        iAct_Replay_Forward10  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*10;
+        iAct_Replay_Forward60  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*60;
+        iAct_Replay_POV        : rpls_POVRecorder  :=not rpls_POVRecorder;
         iAct_Replay_Log        : rpls_showlog:=not rpls_showlog;
         iAct_Observer_Fog,
         iAct_Replay_Fog        : ui_fog      :=not ui_fog;
-        iAct_Replay_Player0,
+        iAct_Replay_PlayerAll,
         iAct_Replay_Player1,
         iAct_Replay_Player2,
         iAct_Replay_Player3,
         iAct_Replay_Player4,
         iAct_Replay_Player5,
-        iAct_Replay_Player6    : UIPlayer:=action-iAct_Replay_Player0;
+        iAct_Replay_Player6    : UIPlayer:=action-iAct_Replay_PlayerAll;
 
-        iAct_Observer_Player0,
+        iAct_Observer_PlayerAll,
         iAct_Observer_Player1,
         iAct_Observer_Player2,
         iAct_Observer_Player3,
         iAct_Observer_Player4,
         iAct_Observer_Player5,
-        iAct_Observer_Player6  : UIPlayer:=action-iAct_Observer_Player0;
+        iAct_Observer_Player6  : UIPlayer:=action-iAct_Observer_PlayerAll;
         end;
 
         if(ui_GameControlsEnabled)then
@@ -705,7 +736,7 @@ iAct_Control_UAPatrol   : m_brush :=co_apatrol;
 iAct_Control_UMove      : m_brush :=co_move;
 iAct_Control_UStop      : PlayerSendOrder(co_stand   ,0,0,0,0, uo_corder  ,LocalPlayer);
 iAct_Control_UPatrol    : m_brush :=co_patrol;
-iAct_Control_UProdCancel: if(s_barracks>0)
+iAct_Control_UProdCncl: if(s_barracks>0)
                           or(s_smiths  >0)
                           then PlayerSendOrder(co_pcancle ,0,0,0,0, uo_corder  ,LocalPlayer)
                           else
@@ -727,22 +758,29 @@ iAct_Control_UDestroy   : PlayerSendOrder(co_destroy,0,0,0,0 ,uo_corder  ,LocalP
    mouse_BrushCheck(true);
 end;
 
-procedure ui_ControlPanel_click(click_type:TTabBTNClickType);
+procedure ui_ControlPanel_click(click_type:TTabBTNClickType;clickSound:pboolean);
+procedure clickSoundON;
+begin
+   if(clickSound<>nil)then clickSound^:=true;
+end;
 begin
    case m_btnN of
 0..ui_ButtonsNum
       : case ui_tab of
         tab_Buildings,
         tab_Units,
-        tab_Upgrades : ui_ExecAction(iAct_SProd1+m_BtnN,click_type);
-        tab_Controls : ui_ExecAction(ui_panel_CtrlActs[ui_ControlTabType,m_BtnN],click_type);
+        tab_Upgrades : ui_ExecAction(iAct_SProd1+m_BtnN                         ,click_type,clickSound);
+        tab_Controls : ui_ExecAction(ui_panel_CtrlActs[ui_ControlTabType,m_BtnN],click_type,clickSound);
         end;
-24    : if(click_type=pct_left)then GameOpenMenu;
+24    : if(click_type=pct_left)then
+        begin
+           GameOpenMenu;
+           clickSoundON;
+        end;
 26    : if(click_type=pct_left)then
-          if(net_status<>ns_none)then GameTogglePause;
-   else exit;
+          if(GameTogglePause(false))then clickSoundON;
+   else
    end;
-   SoundPlayUI(snd_click);
 end;
 
 procedure WindowEvents;
@@ -812,7 +850,9 @@ end;
 
 procedure GameControlsMouse;
 var u,bx,by:integer;
+clickSound:boolean;
 begin
+   clickSound:=false;
    mouse_map_x:=mouse_x+ui_cam_x-ui_mapx;
    mouse_map_y:=mouse_y+ui_cam_y-ui_mapy;
    if(ui_ControlPanelPos<2)then  // vertical
@@ -834,17 +874,17 @@ begin
        else
          if(by=ui_CtrlPanelBW)
          then m_focus:=mf_Tabs
-         else m_focus:=mf_controls;
+         else m_focus:=mf_CtrlPanel;
    case m_focus of
    mf_Map,
-   mf_MiniMap : m_btnN:=-1;
-   mf_Tabs    : if(ui_ControlPanelPos<2)
-                then begin u:=mouse_x-ui_panelx;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end
-                else begin u:=mouse_y-ui_panely;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end;
-   mf_controls: begin
-                by-=4;
-                m_btnN:=(by*ui_CtrlPanelBW)+(bx mod ui_CtrlPanelBW);
-                end;
+   mf_MiniMap  : m_btnN:=-1;
+   mf_Tabs     : if(ui_ControlPanelPos<2)
+                 then begin u:=mouse_x-ui_panelx;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end
+                 else begin u:=mouse_y-ui_panely;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end;
+   mf_CtrlPanel: begin
+                 by-=4;
+                 m_btnN:=(by*ui_CtrlPanelBW)+(bx mod ui_CtrlPanelBW);
+                 end;
    end;
 
    mouse_BrushCheck(false);
@@ -888,10 +928,14 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
                   co_patrol,
                   co_apatrol : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTarget);
                   co_mmark   : MapMarker (trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx));
-                  else         if(not rpls_plcam)then m_mmap_move:=true;
+                  else         if(not rpls_POVRecorder)then m_mmap_move:=true;
                   end;
-     mf_tabs    : if(0<=m_btnN)and(m_btnN<4)then ui_tab:=byte(m_btnN);
-     mf_controls: ui_ControlPanel_click(pct_left);     // panel
+     mf_tabs    : if(0<=m_btnN)and(m_btnN<4)then
+                  begin
+                     ui_tab:=byte(m_btnN);
+                     clickSound:=true;
+                  end;
+     mf_CtrlPanel: ui_ControlPanel_click(pct_left,@clickSound);     // panel
      end;
 
    if(InputActionReleased(iact_MLB))then  // LMB up
@@ -901,7 +945,7 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
       if(mouse_select_x0>-1)then //select
       begin
          units_SelectRect(InputAction(iact_Shift),mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y,255);
-         if(G_Status=gs_running)and(rpls_state<rpls_read)then
+         if(G_Status=gs_running)and(rpls_pstate<rpls_read)then
            if(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then ui_SicpleClick;
 
          mouse_select_x0:=-1;
@@ -927,20 +971,22 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
      then m_brush:=co_empty
      else
        case m_focus of
-       mf_map     : ui_command(mouse_map_x,mouse_map_y,m_UnitTarget);
-       mf_minimap : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx), trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTarget);
-       mf_controls: ui_ControlPanel_click(pct_right);     // panel
+       mf_map      : ui_command(mouse_map_x,mouse_map_y,m_UnitTarget);
+       mf_minimap  : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx), trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTarget);
+       mf_CtrlPanel: ui_ControlPanel_click(pct_right,@clickSound);     // panel
        end;
 
    if(InputActionPressed(iact_MMB))then          // MMB down
      case m_focus of
-     mf_map     : m_DragCamMove:=true;
-     mf_minimap : ;
-     mf_controls: ;
+     mf_map      : m_DragCamMove:=true;
+     mf_minimap  : ;
+     mf_CtrlPanel: ;
      end;
 
    if(InputActionReleased(iact_MMB))then          // MMB up
      m_DragCamMove:=false;
+
+   if(clickSound)then SoundPlayUI(snd_click);
 end;
 
 procedure GameControlsCameraMove;
@@ -974,9 +1020,12 @@ begin
 end;
 
 procedure GameControlsKeyboard;
-var act,k:byte;
+var
+act,k:byte;
+clickSound:boolean;
 begin
-   if(not m_DragCamMove)and(not rpls_plcam)then GameControlsCameraMove;
+   clickSound:=false;
+   if(not m_DragCamMove)and(not rpls_POVRecorder)then GameControlsCameraMove;
 
    // Chat
    if(InputActionPressed(iAct_InGameChat))then
@@ -1023,72 +1072,80 @@ begin
      else GameOpenMenu;
 
      // pause
-   if(InputActionPressed(iAct_Pause))then GameTogglePause;
+   if(InputActionPressed(iAct_Pause))then ui_ExecAction(iAct_Pause,pct_left,@clickSound);
 
    // tab
    if(InputActionPressed(iAct_Tab  ))then
    begin
       ui_tab+=1;
       ui_tab:=ui_tab mod 4;
+      clickSound:=true;
    end;
 
    // other ngame actions
-   if(ingame_chat>0)or(g_status<>gs_running)then exit;
-
-   // Test mode
-   if(TestMode>0)and(net_status=ns_none)then
+   if(ingame_chat=0)and(g_status=gs_running)then
    begin
-      if(InputActionPressed(iAct_test_FastTime    ))then uncappedFPS:=not uncappedFPS;
-      {$IFDEF DEBUG0}
-      if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
-      {$ENDIF}
-      if(InputActionPressed(iAct_test_ToggleAI    ))then with g_players[LocalPlayer] do if(state=ps_human     )then state:=ps_ai         else state:=ps_human;
-      if(InputActionPressed(iAct_test_iddqd       ))then with g_players[LocalPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
-      if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog:=not ui_fog;
-      if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
-      if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(LocalPlayer);
-      if(InputActionPressed(iAct_test_BePlayer0   ))then LocalPlayer:=0;
-      if(InputActionPressed(iAct_test_BePlayer1   ))then LocalPlayer:=1;
-      if(InputActionPressed(iAct_test_BePlayer2   ))then LocalPlayer:=2;
-      if(InputActionPressed(iAct_test_BePlayer3   ))then LocalPlayer:=3;
-      if(InputActionPressed(iAct_test_BePlayer4   ))then LocalPlayer:=4;
-      if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
-      if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
-      if(InputActionPressed(iAct_test_BePlayer7   ))then ;//PlayerClient:=7;
-      if(InputActionPressed(iAct_test_debug0      ))then writeln(GameBack(false,true));
-      if(InputActionPressed(iAct_test_debug1      ))then ;
+      // Test mode
+      if(TestMode>0)and(net_status=ns_none)then
+      begin
+         if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
+         {$IFDEF DEBUG0}
+         if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
+         {$ENDIF}
+         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_players[LocalPlayer] do if(state=ps_human     )then state:=ps_ai         else state:=ps_human;
+         if(InputActionPressed(iAct_test_iddqd       ))then with g_players[LocalPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
+         if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog:=not ui_fog;
+         if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
+         if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(LocalPlayer);
+         if(InputActionPressed(iAct_test_BePlayer0   ))then LocalPlayer:=0;
+         if(InputActionPressed(iAct_test_BePlayer1   ))then LocalPlayer:=1;
+         if(InputActionPressed(iAct_test_BePlayer2   ))then LocalPlayer:=2;
+         if(InputActionPressed(iAct_test_BePlayer3   ))then LocalPlayer:=3;
+         if(InputActionPressed(iAct_test_BePlayer4   ))then LocalPlayer:=4;
+         if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
+         if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
+         if(InputActionPressed(iAct_test_BePlayer7   ))then ;//PlayerClient:=7;
+         if(InputActionPressed(iAct_test_debug0      ))then writeln(GameBack(false,true));
+         if(InputActionPressed(iAct_test_debug1      ))then ;
+      end;
+
+      // To last event
+      if(InputActionPressed(iAct_LastEvent))then
+      begin
+         ui_Camera_ToLastEvent;
+         clickSound:=true;
+      end;
+
+      // Groups
+      for k:=iAct_USetGroup0 to iAct_USetGroup9 do if(InputActionPressed(k))then units_Grouping   (false,k-iAct_USetGroup0);
+      for k:=iAct_UAddGroup0 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_Grouping   (true ,k-iAct_UAddGroup0);
+      for k:=iAct_UASlGroup0 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup0);
+      for k:=iAct_USelGroup0 to iAct_USelGroup9 do
+        if(InputActionDPressed(k))and(k<>iAct_USelGroup0)
+        then ui_Camera_MoveToGroup(k-iAct_USelGroup0)
+        else
+          if(InputActionPressed(k))
+          then units_SelectGroup(false,k-iAct_USelGroup0);
+
+      // Controls tab actions
+      for k:=0 to ui_ButtonsNum do
+      begin
+         act:=ui_panel_CtrlActs[ui_ControlTabType,k];
+         if(InputActionPressed(act))then
+           ui_ExecAction(act,pct_left,@clickSound);
+      end;
+
+      // Production hotkeys
+      case ui_tab of
+      tab_buildings,
+      tab_units,
+      tab_upgrades : for k:=0 to ui_ButtonsNum do
+                       if(InputActionPressed(iAct_SProd1+k))then
+                         ui_ExecAction(iAct_SProd1+k,pct_left,@clickSound);
+      end;
    end;
 
-   // To last event
-   if(InputActionPressed(iAct_LastEvent))then ui_Camera_ToLastEvent;
-
-   // Groups
-   for k:=iAct_USetGroup0 to iAct_USetGroup9 do if(InputActionPressed(k))then units_Grouping   (false,k-iAct_USetGroup0);
-   for k:=iAct_UAddGroup0 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_Grouping   (true ,k-iAct_UAddGroup0);
-   for k:=iAct_UASlGroup0 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup0);
-   for k:=iAct_USelGroup0 to iAct_USelGroup9 do
-     if(InputActionDPressed(k))and(k<>iAct_USelGroup0)
-     then ui_Camera_MoveToGroup(k-iAct_USelGroup0)
-     else
-       if(InputActionPressed(k))
-       then units_SelectGroup(false,k-iAct_USelGroup0);
-
-
-   // Controls tab actions
-   for k:=0 to ui_ButtonsNum do
-   begin
-      act:=ui_panel_CtrlActs[ui_ControlTabType,k];
-      if(InputActionPressed(act))then
-        ui_ExecAction(act,pct_left);
-   end;
-
-   case ui_tab of
-   tab_buildings,
-   tab_units,
-   tab_upgrades : for k:=0 to ui_ButtonsNum do
-                    if(InputActionPressed(iAct_SProd1+k))then
-                      ui_ExecAction(iAct_SProd1+k,pct_left);
-   end;
+   if(clickSound)then SoundPlayUI(snd_click);
 end;
 
 

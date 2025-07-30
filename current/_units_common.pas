@@ -191,8 +191,8 @@ begin
           if((aw_reqf and wpr_move)=0)then exit;
 
        if(not _ukbuilding)then
-         if(buff[ub_Pain]>0)
-         or(buff[ub_Cast]>0)then exit;
+         if(buffs[ub_Pain]>0)
+         or(buffs[ub_Cast]>0)then exit;
 
        unit_canMove:=true;
     end;
@@ -210,8 +210,8 @@ begin
       if(check_buffs)then
       begin
          if(not _ukbuilding)then
-           if(buff[ub_Pain]>0)
-           or(buff[ub_Cast]>0)then exit;
+           if(buffs[ub_Pain]>0)
+           or(buffs[ub_Cast]>0)then exit;
       end;
 
       case _attack of
@@ -291,17 +291,17 @@ begin
     begin
        if(reset)then
        begin
-          FillChar(vsnt,SizeOf(vsnt),0);
-          FillChar(vsni,SizeOf(vsni),0);
+          FillChar(TeamVision,SizeOf(TeamVision),0);
+          FillChar(TeamDetection,SizeOf(TeamDetection),0);
        end;
-       _AddToInt(@vsnt[team],vistime);
-       _AddToInt(@vsni[team],vistime);
+       AddToInt(@TeamVision[team],MinVisionTime);
+       AddToInt(@TeamDetection[team],MinVisionTime);
 
        if(revealed)then
         for t:=0 to LastPlayer do
         begin
-           _AddToInt(@vsnt[t],fr_fps1);
-           _AddToInt(@vsni[t],fr_fps1);
+           AddToInt(@TeamVision[t],fr_fps1);
+           AddToInt(@TeamDetection[t],fr_fps1);
         end;
     end;
 end;
@@ -311,8 +311,8 @@ begin
    with pu^ do
     for t:=0 to LastPlayer do
     begin
-       if(vsnt[t]>0)then _AddToInt(@vsnt[t],vistime);
-       if(vsni[t]>0)then _AddToInt(@vsni[t],vistime);
+       if(TeamVision[t]>0)then AddToInt(@TeamVision[t],MinVisionTime);
+       if(TeamDetection[t]>0)then AddToInt(@TeamDetection[t],MinVisionTime);
     end;
 end;
 
@@ -368,7 +368,7 @@ begin
       {$IFDEF _FULLGAME}
       effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
-      buff[ub_Teleport]:=fr_fps1;
+      buffs[ub_Teleport]:=fr_fps1;
       unit_SetXY(pu,tx,ty,mvxy_strict);
       unit_clear_order(pu,false);
       unit_clear_tar(unum);
@@ -425,7 +425,7 @@ begin
        uo_x:=x0;
        uo_y:=y0;
        rld :=radar_reload;
-       buff[ub_Cast]:=fr_fps1;
+       buffs[ub_Cast]:=fr_fps1;
 
        {$IFDEF _FULLGAME}
        if(ServerSide)and(player^.team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
@@ -458,13 +458,13 @@ begin
    with player^ do
    begin
       if(team<>tu^.player^.team)
-      or(tu^.buff[ub_Invuln]>0)then exit;
+      or(tu^.buffs[ub_Invuln]>0)then exit;
 
       unit_ability_HInvuln:=0;
 
       if(check)then exit;
 
-      tu^.buff[ub_Invuln]:=invuln_time;
+      tu^.buffs[ub_Invuln]:=invuln_time;
       pu^.rld:=haltar_reload;
       {$IFDEF _FULLGAME}
       effect_LevelUp(tu,EID_Invuln,nil);
@@ -496,10 +496,10 @@ begin
         unit_clear_order(pu,true);
         uo_x:=x0;
         uo_y:=y0;
-        for i:=0 to LastPlayer do _addtoint(@vsnt[i],fr_fps2);
+        for i:=0 to LastPlayer do AddToInt(@TeamVision[i],fr_fps2);
         rld:=mstrike_reload;
         unit_UACStrike_missile(pu);
-        buff[ub_Cast]:=fr_fps1;
+        buffs[ub_Cast]:=fr_fps1;
      end;
 end;
 
@@ -599,10 +599,10 @@ begin
    if(check_obstacles)then
    begin
       tr-=bld_dec_mr;
-      dx:=tx div dcw;
-      dy:=ty div dcw;
-      if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-       with map_dcell[dx,dy] do
+      dx:=tx div MapObstaclesGridW;
+      dy:=ty div MapObstaclesGridW;
+      if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
+       with map_ObstaclesGrid[dx,dy] do
         if(n>0)then
          for u:=0 to n-1 do
           with l[u]^ do
@@ -633,7 +633,7 @@ begin
         if(not IsUnitRange(transport,nil))then
         begin
            if(UnitObsTeamVis<=LastPlayer)then
-             if(vsnt[UnitObsTeamVis]<=0)then continue;
+             if(TeamVision[UnitObsTeamVis]<=0)then continue;
 
            o:=tr+_r;
            d:=point_dist_int(x,y,tx,ty);
@@ -648,7 +648,7 @@ begin
         if(uo_id=ua_psability)then
         begin
            if(UnitObsTeamVis<=LastPlayer)then
-             if(vsnt[UnitObsTeamVis]<=0)then continue;
+             if(TeamVision[UnitObsTeamVis]<=0)then continue;
 
            case _ability of
      uab_RebuildInPoint: begin
@@ -739,10 +739,10 @@ begin
             CheckCollisionR:=2;
             if(reveal_u<>nil)then
             begin
-               _AddToInt(@vsnt[reveal_u^.player^.team],vistime);
-               _AddToInt(@vsni[reveal_u^.player^.team],vistime);
-               _AddToInt(@reveal_u^.vsnt[player^.team],vistime);
-               _AddToInt(@reveal_u^.vsni[player^.team],vistime);
+               AddToInt(@TeamVision[reveal_u^.player^.team],MinVisionTime);
+               AddToInt(@TeamDetection[reveal_u^.player^.team],MinVisionTime);
+               AddToInt(@reveal_u^.TeamVision[player^.team],MinVisionTime);
+               AddToInt(@reveal_u^.TeamDetection[player^.team],MinVisionTime);
             end;
             exit;
          end;
@@ -768,11 +768,11 @@ begin
 
    tr-=bld_dec_mr;
 
-   dx:=tx div dcw;
-   dy:=ty div dcw;
+   dx:=tx div MapObstaclesGridW;
+   dy:=ty div MapObstaclesGridW;
 
-   if(0<=dx)and(dx<=dcn)and(0<=dy)and(dy<=dcn)then
-    with map_dcell[dx,dy] do
+   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
+    with map_ObstaclesGrid[dx,dy] do
      if(n>0)then
       for u:=0 to n-1 do
        with l[u]^ do
@@ -876,7 +876,7 @@ begin
       or(not iscomplete)then exit;
 
       unit_ability_HKeepBlink:=ureq_reloading;
-      if(buff[ub_CCast]>0)
+      if(buffs[ub_CCast]>0)
       or(rld>0)then exit;
 
       unit_ability_HKeepBlink:=ureq_rupid;
@@ -898,7 +898,7 @@ begin
       end;
 
       upgr[upgr_hell_HKTeleport]-=1;
-      buff[ub_CCast]:=fr_fps1;
+      buffs[ub_CCast]:=fr_fps1;
 
       case uidi of
       UID_HKeep : unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_cube{$ENDIF});
@@ -919,7 +919,7 @@ begin
       or(not iscomplete)then exit;
 
       unit_ability_HTowerBlink:=ureq_reloading;
-      if(buff[ub_CCast]>0)
+      if(buffs[ub_CCast]>0)
       or(rld>0)then exit;
 
       unit_ability_HTowerBlink:=ureq_rupid;
@@ -945,7 +945,7 @@ begin
       end;
 
       upgr[upgr_hell_tblink]-=1;
-      buff[ub_CCast]:=fr_fpsd2;
+      buffs[ub_CCast]:=fr_fpsd2;
       unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
    end;
 end;
@@ -1084,7 +1084,7 @@ begin
 
       if(summoned)and(iscomplete)then
       begin
-         buff[ub_Summoned]:=fr_fps1;
+         buffs[ub_Summoned]:=fr_fps1;
          {$IFDEF _FULLGAME}
          effect_UnitSummon(LastCreatedUnitP,nil);
          {$ENDIF}
@@ -1152,9 +1152,9 @@ begin
             sel     := false;
             transportC:= 0;
 
-            FillChar(buff,sizeof(buff),0);
-            FillChar(vsnt,SizeOf(vsnt),0);
-            FillChar(vsni,SizeOf(vsni),0);
+            FillChar(buffs,sizeof(buffs),0);
+            FillChar(TeamVision,SizeOf(TeamVision),0);
+            FillChar(TeamDetection,SizeOf(TeamDetection),0);
 
             if(ulevel>MaxUnitLevel)
             then ulevel:=MaxUnitLevel;
@@ -1214,7 +1214,7 @@ begin
 
          if(_barrack_teleport)then
          begin
-            LastCreatedUnitP^.buff[ub_Teleport]:=fr_fps1;
+            LastCreatedUnitP^.buffs[ub_Teleport]:=fr_fps1;
             {$IFDEF _FULLGAME}
             if(SoundPlayUnit(snd_teleport,pu,nil))
             then effect_add(LastCreatedUnitP^.vx,
@@ -1647,7 +1647,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      dd:=_DIR360(dir+23) div 45;
+      dd:=dir_MOD360(dir+23) div 45;
       unit_ability_spawn(pu,x+dir_stepX[dd]*_r,y+dir_stepY[dd]*_r,auid);
    end;
 end;
@@ -1673,12 +1673,12 @@ begin
    with pu^ do
    begin
       for i:=0 to MaxUnitBuffs do
-       if(0<buff[i])and(buff[i]<_ub_infinity)then buff[i]-=1;
+       if(0<buffs[i])and(buffs[i]<ub_infinity)then buffs[i]-=1;
 
       for i:=0 to LastPlayer do
       begin
-         if(0<vsnt[i])and(vsnt[i]<_ub_infinity)then vsnt[i]-=1;
-         if(0<vsni[i])and(vsni[i]<_ub_infinity)then vsni[i]-=1;
+         if(0<TeamVision[i])and(TeamVision[i]<ub_infinity)then TeamVision[i]-=1;
+         if(0<TeamDetection[i])and(TeamDetection[i]<ub_infinity)then TeamDetection[i]-=1;
       end;
 
       if(iscomplete)then
@@ -1710,19 +1710,19 @@ begin
         else td:=ud;
 
       if(td<=(uDetector^.srange+uid^._r))then
-       if(buff[ub_Invis]<=0)then
+       if(buffs[ub_Invis]<=0)then
        begin
-          _AddToInt(@vsnt[uDetector^.player^.team],vistime);
+          AddToInt(@TeamVision[uDetector^.player^.team],MinVisionTime);
           if(scan_buff<=MaxUnitBuffs)and(player^.team<>uDetector^.player^.team)
-          then _AddToInt(@buff[scan_buff],vistime);
+          then AddToInt(@buffs[scan_buff],MinVisionTime);
        end
        else
-         if(uDetector^.buff[ub_Detect]>0)and(uDetector^.iscomplete)and(uDetector^.hits>0)then
+         if(uDetector^.buffs[ub_Detect]>0)and(uDetector^.iscomplete)and(uDetector^.hits>0)then
          begin
-            _AddToInt(@vsnt[uDetector^.player^.team],vistime);
-            _AddToInt(@vsni[uDetector^.player^.team],vistime);
+            AddToInt(@TeamVision[uDetector^.player^.team],MinVisionTime);
+            AddToInt(@TeamDetection[uDetector^.player^.team],MinVisionTime);
             if(scan_buff<=MaxUnitBuffs)and(player^.team<>uDetector^.player^.team)
-            then _AddToInt(@buff[scan_buff],vistime);
+            then AddToInt(@buffs[scan_buff],MinVisionTime);
          end;
    end;
 end;
@@ -1752,7 +1752,7 @@ begin
       if(not instant)then
       begin
          with uid^ do fastdeath:=(fastdeath)or(_fastdeath_hits>=0)or(_ukbuilding);
-         buff[ub_Pain]:=fr_fps1; // prevent fast resurrecting
+         buffs[ub_Pain]:=fr_fps1; // prevent fast resurrecting
 
          if(not suicide)then GameLogUnitAttacked(pu);
          {$IFDEF _FULLGAME}
@@ -1801,8 +1801,8 @@ begin
                 begin
                    tu^.transport:=0;
                    transportC-=tu^.uid^._transportS;
-                   tu^.x+=_randomr(uid^._r);
-                   tu^.y+=_randomr(uid^._r);
+                   tu^.x+=g_randomr(uid^._r);
+                   tu^.y+=g_randomr(uid^._r);
                    tu^.uo_x:=tu^.x;
                    tu^.uo_y:=tu^.y;
                    if(tu^.hits>apc_exp_damage)
@@ -1833,7 +1833,7 @@ begin
             if(_death_uid>0)and(_death_uidn>0)then
              for i:=1 to _death_uidn do
               if(_uid_player_limit(player,_death_uid))then
-               unit_add(x-_randomr(_missile_r),y-_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
+               unit_add(x-g_randomr(_missile_r),y-g_randomr(_missile_r),0,_death_uid,playeri,true,true,0);
          end;
       end;
    end
@@ -1901,23 +1901,23 @@ uab_CCFly         : if(level>0)then
                         if(CheckCollisionR(x,y+zfall,_r,unum,_ukbuilding,false,true,pu )>0)then
                         begin
                            level:=1;
-                           buff[ub_CCast]:=fr_fps2;
+                           buffs[ub_CCast]:=fr_fps2;
                            PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
                         end;
                     end;
       end;
 
       // DETECTION
-      if(_detector)or(buff[ub_HVision]>0)
-      then buff[ub_Detect]:=_ub_infinity
-      else buff[ub_Detect]:=0;
+      if(_detector)or(buffs[ub_HVision]>0)
+      then buffs[ub_Detect]:=ub_infinity
+      else buffs[ub_Detect]:=0;
 
       // INVIS
       case uidi of
-UID_HTotem        : buff[ub_Invis]:=b2ib[upgr[upgr_hell_totminv]>0];
-UID_Commando      : buff[ub_Invis]:=b2ib[upgr[upgr_uac_commando]>0];
-UID_Demon         : buff[ub_Invis]:=b2ib[upgr[upgr_hell_spectre]>0];
-UID_UMine         : buff[ub_Invis]:=_ub_infinity;
+UID_HTotem        : buffs[ub_Invis]:=b2ib[upgr[upgr_hell_totminv]>0];
+UID_Commando      : buffs[ub_Invis]:=b2ib[upgr[upgr_uac_commando]>0];
+UID_Demon         : buffs[ub_Invis]:=b2ib[upgr[upgr_hell_spectre]>0];
+UID_UMine         : buffs[ub_Invis]:=ub_infinity;
       end;
 
       // OTHER
@@ -1926,25 +1926,25 @@ UID_UGTurret      : level:=byte(upgr[upgr_uac_plasmt]>0);
 UID_Phantom,
 UID_LostSoul      : begin
                        tu:=nil;
-                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buff[ub_CCast]:=fr_fpsd2;
-                       if(buff[ub_pain]<=0)then
-                         if(buff[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
+                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_CCast]:=fr_fpsd2;
+                       if(buffs[ub_pain]<=0)then
+                         if(buffs[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;
                     end;
 UID_UTransport    : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+4*level;end;
 UID_APC           : begin level:=min2i(upgr[upgr_uac_transport],MaxUnitLevel);transportM:=_transportM+2*level;end;
       end;
-      if(upgr[upgr_invuln]>0)then buff[ub_Invuln]:=fr_fps1;
+      if(upgr[upgr_invuln]>0)then buffs[ub_Invuln]:=fr_fps1;
       if(playeri=0)and(map_scenario=mc_invasion)then
       begin
          ukfloater:=true;
          if(cycle_order<4 )
          or(cycle_order=11)
-         or(cycle_order=21)then buff[ub_HVision]:=_ub_infinity else buff[ub_HVision]:=0;
+         or(cycle_order=21)then buffs[ub_HVision]:=ub_infinity else buffs[ub_HVision]:=0;
          if(g_inv_wave_n>3)then
            if(cycle_order<2 )
            or(cycle_order=10)
-           or(cycle_order=20)then buff[ub_Invis]:=_ub_infinity else buff[ub_Invis]:=0;
+           or(cycle_order=20)then buffs[ub_Invis]:=ub_infinity else buffs[ub_Invis]:=0;
       end;
 
       // SRANGE

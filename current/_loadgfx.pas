@@ -120,7 +120,7 @@ end;
 function gfx_LoadSDLSurfaceEXT(fn:shortstring):pSDL_SURFACE;
 var tmp:pSDL_SURFACE;
 begin
-   gfx_LoadSDLSurfaceEXT:=spt_empty;
+   gfx_LoadSDLSurfaceEXT:=spr_empty;
    if(not FileExists(fn))then exit;
 
    fn:=fn+#0;
@@ -141,7 +141,7 @@ begin
    for i:=0 to fextn do
    begin
       gfx_LoadSDLSurface:=gfx_LoadSDLSurfaceEXT(str_f_grp+fn+fexts[i]);
-      if(gfx_LoadSDLSurface<>spt_empty)then
+      if(gfx_LoadSDLSurface<>spr_empty)then
       begin
          if(transparent)then SDL_SetColorKey(gfx_LoadSDLSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(gfx_LoadSDLSurface,0,0));
          break;
@@ -153,7 +153,7 @@ end;
 
 procedure gfx_FreeSDLSurface(sf:PSDL_Surface);
 begin
-   if(sf<>nil)and(sf<>spt_empty)then
+   if(sf<>nil)and(sf<>spr_empty)then
    begin
       sdl_FreeSurface(sf);
       sf:=nil;
@@ -197,7 +197,7 @@ begin
       setlength(sl,sn);
 
       gfx_LoadMWTexture(@t,name,firstload,false);
-      if(t.surf<>spt_empty)then
+      if(t.surf<>spr_empty)then
       begin
          sn+=1;
          setlength(sl,sn);
@@ -209,7 +209,7 @@ begin
       while true do
       begin
          gfx_LoadMWTexture(@t,name+i2s(sn),firstload,false);
-         if(t.surf=spt_empty)then break;
+         if(t.surf=spr_empty)then break;
 
          sn+=1;
          setlength(sl,sn);
@@ -281,16 +281,18 @@ begin
 end;
 
 procedure gfx_MapMakeLiquid;
-var ts : psdl_surface;
+var
+ts : psdl_surface;
 a,i,
-wsp,hsp: integer;
+wsp,
+hsp: integer;
 begin
    if(theme_map_pLiquid=theme_map_Liquid)and(theme_map_pLiquid>0)then exit;
    theme_map_pLiquid:=theme_map_Liquid;
 
    if(theme_map_Liquid<0)or(theme_map_Liquid>=theme_spr_liquidn)then
    begin
-      ts                :=map_dterrain;
+      ts                :=theme_DefSprite;
       theme_liquid_animt:=0;
       theme_liquid_color:=c_gray;
       theme_liquid_animm:=fr_fpsd2;
@@ -338,14 +340,14 @@ begin
 end;
 
 procedure gfx_MapMakeLiquidBack;
-var ts :psdl_surface;
-    i  :byte;
+var ts:psdl_surface;
+    i :byte;
 begin
    if(theme_map_pLiquidBack=theme_map_LiquidBack)and(theme_map_LiquidBack>0)then exit;
    theme_map_pLiquidBack:=theme_map_LiquidBack;
 
    if(theme_map_LiquidBack<0)or(theme_map_LiquidBack>=theme_spr_terrainn)
-   then ts := map_dterrain
+   then ts := theme_DefSprite
    else ts := theme_spr_terrains[theme_map_LiquidBack].surf;
 
    for i:=1 to LiquidRs do
@@ -364,14 +366,14 @@ begin
 end;
 
 procedure gfx_MapMakeCrater;
-var ts : psdl_surface;
-    i  : integer;
+var ts:psdl_surface;
+    i :integer;
 begin
    if(theme_map_pCrater=theme_map_Crater)and(theme_map_pCrater>0)then exit;
    theme_map_pCrater:=theme_map_Crater;
 
    if(theme_map_Crater<0)or(theme_map_Crater>=theme_spr_terrainn)
-   then ts := map_dterrain
+   then ts := theme_DefSprite
    else ts := theme_spr_terrains[theme_map_Crater].surf;
 
    for i:=1 to crater_ri do
@@ -391,8 +393,10 @@ begin
 end;
 
 procedure gfx_MapMakeTerrain;
-var x,y,w,h:integer;
-    ter_s  :pSDL_Surface;
+var
+x,y,
+w,h:integer;
+ts :pSDL_Surface;
 begin
    if(theme_map_pTerrain=theme_map_Terrain)and(theme_map_pTerrain>0)then exit;
    theme_map_pTerrain:=theme_map_Terrain;
@@ -403,33 +407,25 @@ begin
       map_terrain:=nil;
    end;
 
-   if(theme_map_Terrain<0)or(theme_map_Terrain>=theme_spr_terrainn)then
-   begin
-      map_ter_w:=1;
-      map_ter_h:=1;
-      map_terrain:=map_dterrain;
-      SDl_FillRect(map_terrain,nil,c_black);
-   end
-   else
-   begin
-      ter_s:=theme_spr_terrains[theme_map_Terrain].surf;
+   if(theme_map_Terrain<0)or(theme_map_Terrain>=theme_spr_terrainn)
+   then ts:=theme_DefSprite
+   else ts:=theme_spr_terrains[theme_map_Terrain].surf;
 
-      map_ter_w:=ter_s^.w;
-      map_ter_h:=ter_s^.h;
-      w:=ui_cam_w+(map_ter_w shl 1);
-      h:=ui_cam_h+(map_ter_h shl 1);
-      map_terrain:=gfx_CreateSDLSurface(w,h);
-      x:=0;
-      while (x<w) do
+   map_ter_w:=ts^.w;
+   map_ter_h:=ts^.h;
+   w:=ui_cam_w+(map_ter_w*2);
+   h:=ui_cam_h+(map_ter_h*2);
+   map_terrain:=gfx_CreateSDLSurface(w,h);
+   x:=0;
+   while(x<w)do
+   begin
+      y:=0;
+      while(y<w)do
       begin
-         y:=0;
-         while (y<w) do
-         begin
-            draw_sdlsurface(map_terrain,x,y,ter_s);
-            y+=ter_s^.h;
-         end;
-         x+=ter_s^.w;
+         draw_sdlsurface(map_terrain,x,y,ts);
+         y+=ts^.h;
       end;
+      x+=ts^.w;
    end;
 end;
 
@@ -506,12 +502,15 @@ end;
 procedure gfx_LoadAll(firstload:boolean);
 var x,r:integer;
 begin
-   spt_empty   :=gfx_CreateSDLSurface(1,1);
-   SDL_SetColorKey(spt_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(spt_empty,0,0));
+   spr_empty   :=gfx_CreateSDLSurface(1,1);
+   SDL_SetColorKey(spr_empty,SDL_SRCCOLORKEY+SDL_RLEACCEL,SDL_GETpixel(spr_empty,0,0));
 
    ui_minimap :=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
    ui_mminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
    ui_bminimap:=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
+
+   theme_DefSprite:=gfx_CreateSDLSurface(64,64);
+   boxColor(theme_DefSprite,0,0,theme_DefSprite^.w,theme_DefSprite^.h,c_black);
 
    for x:=1 to vid_MaxScreenSprites do new(vid_ScreenSpritesL[x]);
 
@@ -524,7 +523,7 @@ begin
       w   :=1;
       hh  :=1;
       hw  :=1;
-      surf:=spt_empty;
+      surf:=spr_empty;
    end;
    pspr_dummy:=@spr_dummy;
 
@@ -847,8 +846,8 @@ begin
     with map_ter_decalL[i-1] do
     begin
        rn+=17;
-       ix:=_randomx(ix+rn       ,ui_mwa);
-       iy:=_randomx(iy+sqr(ix*i),ui_mha);
+       ix:=g_randomx(ix+rn       ,ui_mwa);
+       iy:=g_randomx(iy+sqr(ix*i),ui_mha);
        x :=ix;
        y :=iy;
     end;
@@ -912,7 +911,6 @@ end;
 begin
    gfx_FreeSDLSurface(ui_uipanel );
    gfx_FreeSDLSurface(ui_panel   );
-   gfx_FreeSDLSurface(map_dterrain);
 
    if(ui_ControlPanelPos<2)then // left-right
    begin
@@ -979,8 +977,6 @@ begin
    end;
 
    draw_sdlsurface(ui_uipanel,0,0,ui_panel);
-
-   map_dterrain:=gfx_CreateSDLSurface(ui_cam_w,ui_cam_h);
 
    vid_CommonVars;
 end;

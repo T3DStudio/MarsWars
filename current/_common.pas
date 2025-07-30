@@ -1,11 +1,17 @@
-procedure unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolean);  forward;
-procedure unit_Bonuses(pu:PTUnit);forward;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   FORWARD Declarations
+//
+
+procedure unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolean);forward;
+procedure unit_Bonuses (pu:PTUnit);forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function unit_sability(pu:PTUnit;check:boolean):cardinal;       forward;
-function unit_pability(pu:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;       forward;
-function unit_rebuild (pu:PTUnit;check:boolean):cardinal;       forward;
-function unit_CheckTransport(uTransport,uTarget:PTUnit):boolean;  forward;
+function unit_sability (pu:PTUnit;check:boolean):cardinal;      forward;
+function unit_pability (pu:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
+function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;
+function unit_CheckTransport(uTransport,uTarget:PTUnit):boolean;forward;
 
 procedure aiu_InitVars(pu:PTUnit);forward;
 procedure aiu_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
@@ -13,7 +19,7 @@ procedure aiu_code(pu:PTUnit);forward;
 
 procedure ai_InitVars(pu:PTUnit);forward;
 procedure ai_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
-procedure ai_CollectData (pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
+procedure ai_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_scout_pick(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
@@ -29,8 +35,8 @@ function LogMes2UIAlarm:boolean; forward;
 procedure SoundLogUIPlayer(playern:byte);   forward;
 
 function menu_MouseXY2Item:byte; forward;
-function PlayerNameChangeble  :boolean;forward;
 function menu_ReadyButtonEnabled:boolean;forward;
+function PlayerNameChangeble  :boolean;forward;
 
 function PlayersSlotEnabled:boolean;forward;
 function PlayerAIToggle  (player:byte;check:boolean):boolean;forward;
@@ -97,7 +103,7 @@ begin
    fr_LastTicks   :=fr_CurrentTicks;
 
    {$IFDEF _FULLGAME}
-   if(uncappedFPS)and(not MainMenu)
+   if(sys_uncappedFPS)and(not MainMenu)
    then fr_TargetTicks :=fr_BaseTicks + fr_FrameCount
    else
    {$ENDIF}
@@ -114,21 +120,24 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//   COMMON string conversion
+//   BASIC String
 //
 
+// ... to string
 function b2s (i:byte    ):shortstring;begin str(i,b2s );end;
 function w2s (i:word    ):shortstring;begin str(i,w2s );end;
 function c2s (i:cardinal):shortstring;begin str(i,c2s );end;
 function i2s (i:integer ):shortstring;begin str(i,i2s );end;
 function li2s(i:longint ):shortstring;begin str(i,li2s);end;
 function si2s(i:single  ):shortstring;begin str(i,si2s);end;
+// string to ...
 function s2b (str:shortstring):byte    ;var t:integer;begin val(str,s2b ,t);end;
 function s2w (str:shortstring):word    ;var t:integer;begin val(str,s2w ,t);end;
 function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i ,t);end;
 function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c ,t);end;
 function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
 
+// team to char
 function t2c(l:byte):char;begin if(l=0)then t2c:='-' else t2c:=b2s(l)[1]; end;
 
 function strMX(x:byte):shortstring;
@@ -164,6 +173,198 @@ begin
    else
      if((pb^ and i)>0)then pb^:=pb^ xor i;
 end;
+
+function sign(x:integer):integer;
+begin
+   sign:=0;
+   if(x>0)then sign:= 1;
+   if(x<0)then sign:=-1;
+end;
+
+function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;
+var t:longint;
+begin
+   dx0:=abs(dx1-dx0);
+   dy0:=abs(dy1-dy0);
+   if(dx0=0)
+   then point_dist_rint:=dy0
+   else
+     if(dy0=0)
+     then point_dist_rint:=dx0
+     else
+     begin
+        if(dx0<dy0)
+        then t:=(123*dy0+51*dx0) shr 7
+        else t:=(123*dx0+51*dy0) shr 7;
+        if(t>point_dist_rint.MaxValue)or(t<0)
+        then point_dist_rint:=point_dist_rint.MaxValue
+        else point_dist_rint:=t;
+     end;
+end;
+
+function point_dist_int(dx0,dy0,dx1,dy1:longint):integer;
+var t:longint;
+begin
+   dx0:=abs(dx0-dx1);
+   dy0:=abs(dy0-dy1);
+   if(dx0=0)
+   then point_dist_int:=dy0
+   else
+     if(dy0=0)
+     then point_dist_int:=dx0
+     else
+     begin
+        t:=longint(sqr(dx0))+longint(sqr(dy0));
+        if(t<0)
+        then point_dist_int:=integer.MaxValue
+        else
+          if(t=0)
+          then point_dist_int:=0
+          else
+          begin
+             t:=round(sqrt(t));
+             if(t<point_dist_int.MaxValue)
+             then point_dist_int:=t
+             else point_dist_int:=point_dist_int.MaxValue;
+          end;
+     end;
+end;
+
+function point_dist_real(dx0,dy0,dx1,dy1:integer):single;
+begin
+   point_dist_real:=sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1)));
+end;
+
+function point_dir(x0,y0,x1,y1:integer):integer;
+var vx,vy:integer;
+    res  :single;
+begin
+   point_dir:=270;
+   vx:=x1-x0;
+   vy:=y1-y0;
+
+   if(vx=0)and(vy=0)then exit;
+
+   if(abs(vx)>abs(vy))
+   then res:=   trunc((vy/vx)*45)
+   else res:=90-trunc((vx/vy)*45);
+
+   if(vy<0)then
+   begin
+      if(res<0)then res:=res+360 else
+      if(res>0)then res:=res+180;
+   end
+   else
+     if(res<0)then res:=res+180;
+
+   if(vx<0)and(res=0)then res:=180;
+
+   point_dir:=trunc(360-res);
+end;
+
+function dir_diff(dir1,dir2:integer):integer;
+begin
+   dir_diff:=((( (dir1-dir2) mod 360) + 540) mod 360) - 180;
+end;
+
+function dir_MOD360(d:integer):integer;
+begin
+   dir_MOD360:=d mod 360;
+   if(dir_MOD360<0)then dir_MOD360:=dir_MOD360+360;
+end;
+
+function dir_turn(d1,d2,spd:integer):integer;
+var d:integer;
+begin
+   d:=dir_diff(d2,d1);
+
+   if abs(d)<=spd
+   then dir_turn:=d2
+   else dir_turn:=d1+(spd*sign(d));
+   dir_turn:=dir_MOD360(dir_turn);
+end;
+
+function AddToInt(bt:pinteger;val:integer):boolean;
+begin
+   AddToInt:=false;
+   if(bt^<val)then
+   begin
+      bt^:=val;
+      AddToInt:=true;
+   end;
+end;
+
+procedure ScrollByte(pb:pbyte;forward:boolean;min,max:byte;loop:boolean=true);
+begin
+   case forward of
+true : case loop of
+       true : if(pb^=255)or(pb^>=max)
+              then pb^:=min
+              else pb^+=1;
+       false: if(pb^<max)then pb^+=1;
+       end;
+false: case loop of
+       true : if(pb^=0  )or(pb^<=min)
+              then pb^:=max
+              else pb^-=1;
+       false: if(pb^>min)then pb^-=1;
+       end;
+   end;
+end;
+
+procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
+begin
+   if(pset^=[])then exit;
+   repeat
+     if(fwrd)
+     then pb^+=1
+     else pb^-=1
+   until pb^ in pset^
+end;
+
+procedure ScrollInt(i:pinteger;s,min,max:integer;loop:boolean=true);
+begin
+   i^+=s;
+   case loop of
+true : begin
+          if(i^>max)then i^:=min;
+          if(i^<min)then i^:=max;
+       end;
+false: begin
+          if(i^>max)then i^:=max;
+          if(i^<min)then i^:=min;
+       end;
+   end;
+end;
+
+function ipower(base,n:integer):integer;
+begin
+   ipower:=1;
+   if(n<0)or(base<=0)then exit;
+   case n of
+   0    : ipower:=1;
+   1    : ipower:=base;
+   else   ipower:=base; while(n>1)do begin ipower*=base;n-=1;end;
+   end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   COMMON
+//
+
+procedure WriteSDLError;
+var f:Text;
+begin
+   Assign(f,outlogfn);
+   if FileExists(outlogfn)
+   then Append (f)
+   else Rewrite(f);
+   writeln(f,sdl_GetError);
+   SDL_ClearError;
+   Close(f);
+end;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -371,7 +572,7 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
       end;
 
       {$IFDEF _FULLGAME}
-      if(ptarget=rpls_player)and(rpls_log_c<MaxPlayerLog)and(rpls_fstatus=rpls_write)then rpls_log_c+=1;
+      if(ptarget=rpls_player)and(rpls_log_c<MaxPlayerLog)and(rpls_fstate=rpls_write)then rpls_log_c+=1;
 
       if(net_status=ns_client)
       then ThisPlayer:=LocalPlayer
@@ -383,7 +584,7 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer(ThisPlayer);
 
-         if(rpls_state<rpls_read)and(g_type<>gt_campaing)then
+         if(rpls_pstate<rpls_read)and(g_type<>gt_campaing)then
            if((amtype=lmt_player_defeated)and(g_DefeatedObs)and(aargx=UIPlayer))
            or(amtype=lmt_game_end)then
            begin
@@ -429,12 +630,12 @@ end;
 procedure GameLogPlayerLeave(player:byte);
 begin
    if(player>LastPlayer)or(ServerSide=false)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_players[player].name+str_PlayerLeft,0,0,false);
+   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_players[player].name+str_gmsg_PlayerLeft,0,0,false);
 end;
 procedure GameLogPlayerSurrender(player:byte);
 begin
    if(player>LastPlayer)or(ServerSide=false)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,0,g_players[player].name+str_PlayerSurrender,0,0,false);
+   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,0,g_players[player].name+str_gmsg_PlayerSurrender,0,0,false);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
@@ -608,12 +809,10 @@ begin
    for i:=0 to LastPlayer do PlayerClearLog(i);
 end;
 
-////////////////////////////////////////////////////////////////////////////////
-
 function PlayerObserver(player:PTPlayer):boolean;
 begin
    with player^ do
-   PlayerObserver:=(g_DefeatedObs and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_state<rpls_read){$ENDIF})
+   PlayerObserver:=(g_DefeatedObs and(armylimit<=0){$IFDEF _FULLGAME}and(rpls_pstate<rpls_read){$ENDIF})
                  or(team=0);
 end;
 
@@ -732,115 +931,6 @@ begin
     end;
 end;
 
-function sign(x:integer):integer;
-begin
-   sign:=0;
-   if(x>0)then sign:= 1;
-   if(x<0)then sign:=-1;
-end;
-
-function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;
-var t:longint;
-begin
-   dx0:=abs(dx1-dx0);
-   dy0:=abs(dy1-dy0);
-   if(dx0=0)
-   then point_dist_rint:=dy0
-   else
-     if(dy0=0)
-     then point_dist_rint:=dx0
-     else
-     begin
-        if(dx0<dy0)
-        then t:=(123*dy0+51*dx0) shr 7
-        else t:=(123*dx0+51*dy0) shr 7;
-        if(t>point_dist_rint.MaxValue)or(t<0)
-        then point_dist_rint:=point_dist_rint.MaxValue
-        else point_dist_rint:=t;
-     end;
-end;
-
-function point_dist_int(dx0,dy0,dx1,dy1:longint):integer;
-var t:longint;
-begin
-   dx0:=abs(dx0-dx1);
-   dy0:=abs(dy0-dy1);
-   if(dx0=0)
-   then point_dist_int:=dy0
-   else
-     if(dy0=0)
-     then point_dist_int:=dx0
-     else
-     begin
-        t:=longint(sqr(dx0))+longint(sqr(dy0));
-        if(t<0)
-        then point_dist_int:=integer.MaxValue
-        else
-          if(t=0)
-          then point_dist_int:=0
-          else
-          begin
-             t:=round(sqrt(t));
-             if(t<point_dist_int.MaxValue)
-             then point_dist_int:=t
-             else point_dist_int:=point_dist_int.MaxValue;
-          end;
-     end;
-end;
-
-function point_dist_real(dx0,dy0,dx1,dy1:integer):single;
-begin
-   point_dist_real:=sqrt(sqr(abs(dx0-dx1))+sqr(abs(dy0-dy1)));
-end;
-
-function point_dir(x0,y0,x1,y1:integer):integer;
-var vx,vy:integer;
-    res  :single;
-begin
-   point_dir:=270;
-   vx:=x1-x0;
-   vy:=y1-y0;
-
-   if(vx=0)and(vy=0)then exit;
-
-   if(abs(vx)>abs(vy))
-   then res:=   trunc((vy/vx)*45)
-   else res:=90-trunc((vx/vy)*45);
-
-   if(vy<0)then
-   begin
-      if(res<0)then res:=res+360 else
-      if(res>0)then res:=res+180;
-   end
-   else
-     if(res<0)then res:=res+180;
-
-   if(vx<0)and(res=0)then res:=180;
-
-   point_dir:=trunc(360-res);
-end;
-
-function dir_diff(dir1,dir2:integer):integer;
-begin
-   dir_diff:=((( (dir1-dir2) mod 360) + 540) mod 360) - 180;
-end;
-
-function _DIR360(d:integer):integer;
-begin
-   _DIR360:=d mod 360;
-   if(_DIR360<0)then _DIR360:=_DIR360+360;
-end;
-
-function dir_turn(d1,d2,spd:integer):integer;
-var d:integer;
-begin
-   d:=dir_diff(d2,d1);
-
-   if abs(d)<=spd
-   then dir_turn:=d2
-   else dir_turn:=d1+(spd*sign(d));
-   dir_turn:=_DIR360(dir_turn);
-end;
 
 function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin
@@ -852,15 +942,7 @@ begin
    end;
 end;
 
-function _AddToInt(bt:pinteger;val:integer):boolean;
-begin
-   _AddToInt:=false;
-   if(bt^<val)then
-   begin
-      bt^:=val;
-      _AddToInt:=true;
-   end;
-end;
+
 
 function _CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
@@ -869,64 +951,62 @@ begin
    else _CheckRoyalBattlePoint:=false;
 end;
 
-function _random(m:integer):integer;
+////////////////////////////////////////////////////////////////////////////////
+//
+//   RANDOM
+//
+
+function g_random(m:integer):integer;
 const a = 4;
       t : array[byte] of byte = (
-   //   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
-      0  ,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,  74,   21,
-      211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,  95, 110,  85,   48,
-      212, 140, 211, 249,  22,  79, 200,  50,  28, 188,  52, 140, 202, 120,  68,  145,
-      62 ,  70, 184, 190,  91, 197, 152, 224, 149, 104,  25, 178, 252, 182, 202,  182,
-      141, 197,   4,  81, 181, 242, 145,  42,  39, 227, 156, 198, 225, 193, 219,   93,
-      122, 175, 249,   0, 175, 143,  70, 239,  46, 246, 163,  53, 163, 109, 168,  135,
-      2  , 235,  25,  92,  20, 145, 138,  77,  69, 166,  78, 176, 173, 212, 166,  113,
-      94 , 161,  41,  50, 239,  49, 111, 164,  70,  60,   2,  37, 171,  75, 136,  156,
-      11 ,  56,  42, 146, 138, 229,  73, 146,  77,  61,  98, 196, 135, 106,  63,  197,
-      195,  86,  96, 203, 113, 101, 170, 247, 181, 113,  80, 250, 108,   7, 255,  237,
-      129, 226,  79, 107, 112, 166, 103, 241,  24, 223, 239, 120, 198,  58,  60,   82,
-      128,   3, 184,  66, 143, 224, 145, 224,  81, 206, 163,  45,  63,  90, 168,  114,
-      59 ,  33, 159,  95,  28, 139, 123,  98, 125, 196,  15,  70, 194, 253,  54,   14,
-      109, 226,  71,  17, 161,  93, 186,  87, 244, 138,  20,  52, 123, 251,  26,   36,
-      17 ,  46,  52, 231, 232,  76,  31, 221,  84,  37, 216, 165, 212, 106, 197,  242,
-      98 ,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136, 120, 163, 236,  249
-      );
+//0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
+0  ,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,  74,   21,
+211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,  95, 110,  85,   48,
+212, 140, 211, 249,  22,  79, 200,  50,  28, 188,  52, 140, 202, 120,  68,  145,
+62 ,  70, 184, 190,  91, 197, 152, 224, 149, 104,  25, 178, 252, 182, 202,  182,
+141, 197,   4,  81, 181, 242, 145,  42,  39, 227, 156, 198, 225, 193, 219,   93,
+122, 175, 249,   0, 175, 143,  70, 239,  46, 246, 163,  53, 163, 109, 168,  135,
+2  , 235,  25,  92,  20, 145, 138,  77,  69, 166,  78, 176, 173, 212, 166,  113,
+94 , 161,  41,  50, 239,  49, 111, 164,  70,  60,   2,  37, 171,  75, 136,  156,
+11 ,  56,  42, 146, 138, 229,  73, 146,  77,  61,  98, 196, 135, 106,  63,  197,
+195,  86,  96, 203, 113, 101, 170, 247, 181, 113,  80, 250, 108,   7, 255,  237,
+129, 226,  79, 107, 112, 166, 103, 241,  24, 223, 239, 120, 198,  58,  60,   82,
+128,   3, 184,  66, 143, 224, 145, 224,  81, 206, 163,  45,  63,  90, 168,  114,
+59 ,  33, 159,  95,  28, 139, 123,  98, 125, 196,  15,  70, 194, 253,  54,   14,
+109, 226,  71,  17, 161,  93, 186,  87, 244, 138,  20,  52, 123, 251,  26,   36,
+17 ,  46,  52, 231, 232,  76,  31, 221,  84,  37, 216, 165, 212, 106, 197,  242,
+98 ,  43,  39, 175, 254, 145, 190,  84, 118, 222, 187, 136, 120, 163, 236,  249
+);
 begin
    g_random_p+=1;
    g_random_i:=g_random_i*a+t[g_random_p];
    if(m=0)
-   then _random:=0
-   else _random:=abs(integer(g_random_i) mod m);
+   then g_random:=0
+   else g_random:=abs(integer(g_random_i) mod m);
 end;
 
-function _randomx(x,m:integer):integer;
+function g_randomx(x,m:integer):integer;
 begin
    if(m=0)
-   then _randomx:=0
+   then g_randomx:=0
    else
    begin
       g_random_i+=word(x);
-      _randomx:=_random(m);
+      g_randomx:=g_random(m);
    end;
 end;
 
-function _randomr(r:integer):integer;
+function g_randomr(r:integer):integer;
 begin
    if(r=0)
-   then _randomr:=0
-   else _randomr:=_random(r)-_random(r);
+   then g_randomr:=0
+   else g_randomr:=g_random(r)-g_random(r);
 end;
 
-procedure WriteSDLError;
-var f:Text;
-begin
-   Assign(f,outlogfn);
-   if FileExists(outlogfn)
-   then Append (f)
-   else Rewrite(f);
-   writeln(f,sdl_GetError);
-   SDL_ClearError;
-   Close(f);
-end;
+////////////////////////////////////////////////////////////////////////////////
+//
+//   UID/UPID Checks
+//
 
 function _uid_player_limit(pl:PTPlayer;uid:byte):boolean;
 begin
@@ -967,17 +1047,6 @@ true  : begin
         end;
 false : setr(ureq_barracks    ,n_barracks<=0);
       end;
-   end;
-end;
-
-function ipower(base,n:integer):integer;
-begin
-   ipower:=1;
-   if(n<0)or(base<=0)then exit;
-   case n of
-   0    : ipower:=1;
-   1    : ipower:=base;
-   else   ipower:=base; while(n>1)do begin ipower*=base;n-=1;end;
    end;
 end;
 
@@ -1026,6 +1095,11 @@ begin
       setr(ureq_smiths , n_smiths<=0                           );
    end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   OTHER
+//
 
 function _Hi2Si(h,mh:integer;s:single):shortint;
 begin
@@ -1098,7 +1172,8 @@ end;
 
 procedure GameSetStatusWinnerTeam(team:byte);
 begin
-   if(team<=LastPlayer)then
+   if(team>LastPlayer)then exit;
+
    G_status:=gs_win_team0+team;
    GameLogEndGame(team);
 end;
@@ -1125,9 +1200,9 @@ end;
 function CheckUnitTeamVision(POVTeam:byte;tu:PTUnit;SkipInvisCheck:boolean):boolean;
 begin
    with tu^ do
-     if(buff[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
-     then CheckUnitTeamVision:=(vsnt[POVTeam]>0)
-     else CheckUnitTeamVision:=(vsnt[POVTeam]>0)and(vsni[POVTeam]>0);
+     if(buffs[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
+     then CheckUnitTeamVision:=(TeamVision[POVTeam]>0)
+     else CheckUnitTeamVision:=(TeamVision[POVTeam]>0)and(TeamDetection[POVTeam]>0);
 end;
 
 procedure UnitOrderSetNearestTarget(taru:PTUnit;cx,cy:integer;ptaru:PPTunit;pdist:pinteger;pCanExec:pboolean;CanExec,noReload:boolean;closest:boolean);
@@ -1202,48 +1277,7 @@ begin
    ui_rebuild:=true;
 end;
 
-procedure ScrollByte(pb:pbyte;forward:boolean;min,max:byte;loop:boolean=true);
-begin
-   case forward of
-true : case loop of
-       true : if(pb^=255)or(pb^>=max)
-              then pb^:=min
-              else pb^+=1;
-       false: if(pb^<max)then pb^+=1;
-       end;
-false: case loop of
-       true : if(pb^=0  )or(pb^<=min)
-              then pb^:=max
-              else pb^-=1;
-       false: if(pb^>min)then pb^-=1;
-       end;
-   end;
-end;
 
-procedure ScrollByteSet(pb:pbyte;fwrd:boolean;pset:PTSoB);
-begin
-   if(pset^=[])then exit;
-   repeat
-     if(fwrd)
-     then pb^+=1
-     else pb^-=1
-   until pb^ in pset^
-end;
-
-procedure ScrollInt(i:pinteger;s,min,max:integer;loop:boolean=true);
-begin
-   i^+=s;
-   case loop of
-true : begin
-          if(i^>max)then i^:=min;
-          if(i^<min)then i^:=max;
-       end;
-false: begin
-          if(i^>max)then i^:=max;
-          if(i^<min)then i^:=min;
-       end;
-   end;
-end;
 
 {$IFDEF _FULLGAME}
 
@@ -1325,9 +1359,6 @@ end;
 //   INPUT
 //
 
-type
-TInputState = (tis_NPressed,tis_NReleased,tis_Pressed,tis_DPressed,tis_Released);
-
 function InputAction(iact:byte):boolean;
 begin
    InputAction:=input_actions[iact].ik_timer_pressed>0;
@@ -1360,46 +1391,47 @@ function PlayerGetColor(player:byte):cardinal;
 begin
    PlayerGetColor:=c_white;
    if(player<=LastPlayer)then
-    case ui_PlayersColor of
-   1,
-   2,
-   3: if(player=UIPlayer)then
-         case ui_PlayersColor of
-         1: PlayerGetColor:=c_lime;
-         2,
-         3: PlayerGetColor:=c_white;
-         end
-      else
-        if(g_players[UIPlayer].team=g_players[player].team)then
+     case ui_PlayersColor of
+     1,
+     2,
+     3: if(player=UIPlayer)then
           case ui_PlayersColor of
-          1,
-          2: PlayerGetColor:=c_yellow;
-          3: PlayerGetColor:=c_aqua;
+          1: PlayerGetColor:=c_lime;
+          2,
+          3: PlayerGetColor:=c_white;
           end
-        else PlayerGetColor:=c_red;
-   4: PlayerGetColor:=PlayerColors[g_players[player].team];
-   5: if(player=UIPlayer)
-      then PlayerGetColor:=c_white
-      else PlayerGetColor:=PlayerColors[g_players[player].team];
-    else PlayerGetColor:=PlayerColors[player];
-    end;
+        else
+          if(g_players[UIPlayer].team<>g_players[player].team)
+          then PlayerGetColor:=c_red
+          else
+            case ui_PlayersColor of
+            1,
+            2: PlayerGetColor:=c_yellow;
+            3: PlayerGetColor:=c_aqua;
+            end;
+     4: PlayerGetColor:=PlayerColors[g_players[player].team];
+     5: if(player=UIPlayer)
+        then PlayerGetColor:=c_white
+        else PlayerGetColor:=PlayerColors[g_players[player].team];
+     else    PlayerGetColor:=PlayerColors[player];
+     end;
 end;
 
-function GetCPColor(cp:byte):cardinal;
-function PlayerForCPColor(p:byte):byte;
+function GetKeyPointColor(cp:byte):cardinal;
+function PlayerForKeyPointColor(p:byte):byte;
 begin
-   PlayerForCPColor:=p;
+   PlayerForKeyPointColor:=p;
    if(0<p)and(p<=LastPlayer)and(UIPlayer>0)then
-     if(g_players[UIPlayer].team=g_players[p].team)then PlayerForCPColor:=UIPlayer;
+     if(g_players[UIPlayer].team=g_players[p].team)then PlayerForKeyPointColor:=UIPlayer;
 end;
 begin
-   GetCPColor:=c_black;
+   GetKeyPointColor:=c_black;
    if(cp>LastKeyPoint)then exit;
    with g_KeyPoints[cp] do
-    if(cpCaptureR>0)then
-     if(cpTimer>0)and(ui_blink3=0)
-     then GetCPColor:=PlayerGetColor(PlayerForCPColor(cpTimerOwnerPlayer))
-     else GetCPColor:=PlayerGetColor(PlayerForCPColor(cpOwnerPlayer     ))
+     if(cpCaptureR>0)then
+       if(cpTimer>0)and(ui_blink3=0)
+       then GetKeyPointColor:=PlayerGetColor(PlayerForKeyPointColor(cpTimerOwnerPlayer))
+       else GetKeyPointColor:=PlayerGetColor(PlayerForKeyPointColor(cpOwnerPlayer     ))
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal;VisPlayer:byte):boolean;
@@ -1410,29 +1442,29 @@ begin
    if(G_status>gs_running)then
    begin
       GameGetStatus:=true;
-      if(pstr<>nil)then pstr^:=str_gsunknown;
+      if(pstr<>nil)then pstr^:=str_gstat_Unknown;
       if(pcol<>nil)then pcol^:=c_gray;
 
       if(pstr<>nil)and(pcol<>nil)then
       case G_status of
 1..LastPlayer : begin
-                   pstr^:=str_pause;
+                   pstr^:=str_gstat_Pauseed;
                    pcol^:=PlayerGetColor(G_status);
                 end;
 gs_replayerror: begin
-                   pstr^:=str_reperror;
+                   pstr^:=str_gstat_ReplayError;
                    pcol^:=c_white;
                 end;
 gs_replayend  : begin
-                   pstr^:=str_repend;
+                   pstr^:=str_gstat_ReplayEnd;
                    pcol^:=c_white;
                 end;
 gs_waitserver : begin
-                   pstr^:=str_WaitForServer;
+                   pstr^:=str_gstat_WaitForServer;
                    pcol^:=PlayerGetColor(net_cl_Hoster);
                 end;
 gs_replaypause: begin
-                   pstr^:=str_pause;
+                   pstr^:=str_gstat_Pauseed;
                    pcol^:=c_white;
                 end;
       else
@@ -1446,12 +1478,12 @@ gs_replaypause: begin
               t:=G_status-gs_win_team0;
               if(t=g_players[VisPlayer].team)then
               begin
-                 pstr^:=str_win;
+                 pstr^:=str_gstat_Win;
                  pcol^:=c_lime;
               end
               else
               begin
-                 pstr^:=str_lose;
+                 pstr^:=str_gstat_Lose;
                  pcol^:=c_red;
               end;
            end;
@@ -1490,6 +1522,7 @@ begin
       if(check)then exit;
 
       MainMenu   :=false;
+      menu_update:=true;
       menu_ItemSelected  :=0;
       if(net_status=ns_none)and(g_Status<=LastPlayer)then
         if(MainMenu)
@@ -1518,7 +1551,7 @@ end;
 function ui_ControlTabType:TTabControlContent;
 begin
    ui_ControlTabType:=tcc_none;
-   if(rpls_state>=rpls_read)
+   if(rpls_pstate>=rpls_read)
    then ui_ControlTabType:=tcc_replay
    else
      if((g_players[LocalPlayer].observer)or(Game_IsEnded))and(g_type<>gt_campaing)
@@ -1582,7 +1615,7 @@ begin
    if(not ui_fog)then exit;
 
    if(UIPlayer=0)then
-     if(rpls_state>=rpls_read)or(g_players[LocalPlayer].observer)or(Game_IsEnded)then exit;
+     if(rpls_pstate>=rpls_read)or(g_players[LocalPlayer].observer)or(Game_IsEnded)then exit;
 
    if(tu<>nil)then
      if(tu^.player^.team=g_players[UIPlayer].team)then exit;
@@ -1598,13 +1631,13 @@ begin
      if(RectInCam(vx,vy,_r,_r,0))then
      begin
         if(UIPlayer=0)then
-          if(rpls_state=rpls_read)or(g_players[LocalPlayer].observer)or(Game_IsEnded)then
+          if(rpls_pstate=rpls_read)or(g_players[LocalPlayer].observer)or(Game_IsEnded)then
           begin
              CheckUnitUIVisionScreen:=true;
              exit;
           end;
 
-        CheckUnitUIVisionScreen:=(vsnt[g_players[UIPlayer].team]>0)or(not ui_fog);
+        CheckUnitUIVisionScreen:=(TeamVision[g_players[UIPlayer].team]>0)or(not ui_fog);
      end;
 end;
 
@@ -1739,12 +1772,12 @@ lmt_cant_build       : begin
 lmt_player_chat,
 lmt_game_message,
 lmt_player_surrender,
-lmt_player_leave     : ParseLogMessage:=str;//if(argx<=LastPlayer)then ParseLogMessage:=g_players[argx].name+str_PlayerLeft;
+lmt_player_leave     : ParseLogMessage:=str;//if(argx<=LastPlayer)then ParseLogMessage:=g_players[argx].name+str_gmsg_PlayerLeft;
 lmt_game_end         : if(argx<=LastPlayer)then
                         if(argx=g_players[UIPlayer].team)
-                        then ParseLogMessage:=str_win
-                        else ParseLogMessage:=str_lose;
-lmt_player_defeated  : if(argx<=LastPlayer)then ParseLogMessage:=g_players[argx].name+str_PlayerDefeat;
+                        then ParseLogMessage:=str_gstat_Win
+                        else ParseLogMessage:=str_gstat_Lose;
+lmt_player_defeated  : if(argx<=LastPlayer)then ParseLogMessage:=g_players[argx].name+str_gmsg_PlayerDefeat;
 lmt_upgrade_complete : begin
                        with g_upids[argx] do ParseLogMessage:=str_upgrade_complete+' ('+_up_name+')';
                        mcolor^:=c_yellow;

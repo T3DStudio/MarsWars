@@ -73,12 +73,12 @@ gt_scirmish            = 1;
 gt_campaing            = 2;
 
 gs_running             = 0;  //
-{gs_paused1            = 1; 1..MaxPlayers
- gs_paused2            = 2;
- gs_paused3            = 3;
- gs_paused4            = 4;
- gs_paused5            = 5;
- gs_paused6            = 6;}
+gs_paused1             = 1; //1..MaxPlayers
+gs_paused2             = 2;
+gs_paused3             = 3;
+gs_paused4             = 4;
+gs_paused5             = 5;
+gs_paused6             = 6;
 gs_replayend           = 10;
 gs_replayerror         = 11;
 gs_waitserver          = 12;
@@ -511,8 +511,8 @@ ub_Scaned              = 13;
 ub_Decay               = 14;
 ub_ArchFire            = 15;
 
-_ub_infinity           = NOTSET;
-b2ib                   : array[false..true] of smallint = (0,_ub_infinity);
+ub_infinity            = NOTSET;
+b2ib                   : array[false..true] of smallint = (0,ub_infinity);
 
 
 
@@ -527,9 +527,9 @@ MaxDoodads             = 800;
 ddc_div                = 1000000;
 ddc_cf                 = (map_MaxSize*map_MaxSize) div ddc_div; // 36
 
-// doodads cell
-dcw                    = 200;
-dcn                    = map_MaxSize div dcw;
+// Obstacles grid
+MapObstaclesGridW      = 200;
+MapObstaclesGridN      = map_MaxSize div MapObstaclesGridW;
 
 DID_LiquidR1           = 1;
 DID_LiquidR2           = 2;
@@ -577,7 +577,7 @@ upgr_hell_tblink       = 21; // teleport towers
 upgr_uac_attack        = 31; // distance attack               // t1
 upgr_uac_uarmor        = 32; // base armor
 upgr_uac_barmor        = 33; // base b armor
-upgr_uac_melee         = 34; // repair/health upgr
+upgr_uac_tools         = 34; // repair/health upgr
 upgr_uac_mspeed        = 35; // infantry speed
 upgr_uac_ssgup         = 36; // expansive bullets
 upgr_uac_buildr        = 37; // main sr
@@ -934,7 +934,7 @@ base_6r                = base_1r*6;
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1;
 order_period           = fr_fpsd2+1;
-vistime                = fr_fps2;
+MinVisionTime          = fr_fps2;
 
 detection_time_sec     = 8;
 
@@ -1074,7 +1074,7 @@ iAct_Control_UAPatrol  = 65;
 iAct_Control_UMove     = 66;
 iAct_Control_UStop     = 67;
 iAct_Control_UPatrol   = 68;
-iAct_Control_UProdCancel=69;
+iAct_Control_UProdCncl=69;
 iAct_Control_UDestroy  = 70;
 iAct_Control_USelArmy  = 71;
 
@@ -1089,7 +1089,7 @@ iAct_Replay_Pause      = 117;
 iAct_Replay_POV        = 118;
 iAct_Replay_Log        = 119;
 iAct_Replay_Fog        = 120;
-iAct_Replay_Player0    = 121;
+iAct_Replay_PlayerAll  = 121;
 iAct_Replay_Player1    = 122;
 iAct_Replay_Player2    = 123;
 iAct_Replay_Player3    = 124;
@@ -1098,7 +1098,7 @@ iAct_Replay_Player5    = 126;
 iAct_Replay_Player6    = 127;
 
 iAct_Observer_Fog      = 130;
-iAct_Observer_Player0  = 131;
+iAct_Observer_PlayerAll= 131;
 iAct_Observer_Player1  = 132;
 iAct_Observer_Player2  = 133;
 iAct_Observer_Player3  = 134;
@@ -1165,79 +1165,7 @@ CharSetDigits          : set of Char = ['0'..'9'];
 //  HOTKEYS
 //
 
-max_HotKeys  = 26;
-HotKeysBase1 : array[0..max_HotKeys] of cardinal   = (SDLK_R , SDLK_T , SDLK_Y ,
-                                                      SDLK_F , SDLK_G , SDLK_H ,
-                                                      SDLK_V , SDLK_B , SDLK_N ,
-
-                                                      SDLK_U , SDLK_I , SDLK_O ,
-                                                      SDLK_J , SDLK_K , SDLK_L ,
-                                                      SDLK_R , SDLK_T , SDLK_Y ,
-
-                                                      SDLK_F , SDLK_G , SDLK_H ,
-                                                      SDLK_V , SDLK_B , SDLK_N ,
-                                                      SDLK_R , SDLK_T , SDLK_Y );
-
-HotKeysBase2 : array[0..max_HotKeys] of cardinal   = (0      , 0      , 0      ,
-                                                      0      , 0      , 0      ,
-                                                      0      , 0      , 0      ,
-
-                                                      0      , 0      , 0      ,
-                                                      0      , 0      , 0      ,
-                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
-
-                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
-                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LCtrl,
-                                                      SDLK_LCtrl, SDLK_LCtrl, SDLK_LAlt);
-
-HotKeysAction1 : array[0..max_HotKeys] of cardinal = (SDLK_Q    , SDLK_W    , SDLK_E ,
-                                                      SDLK_A    , SDLK_S    , SDLK_D ,
-                                                      SDLK_Z    , SDLK_X    , SDLK_C ,
-
-                                                      SDLK_C    , SDLK_F2   , SDLK_Delete,
-                                                      SDLK_F5   , SDLK_SPACE, 0,
-                                                      0         , 0         , 0,
-
-                                                      0,0,0,
-                                                      0,0,0,
-                                                      0,0,0);
-HotKeysAction2: array[0..max_HotKeys] of cardinal  = (0          , 0         , 0 ,
-                                                      0          , 0         , 0 ,
-                                                      0          , 0         , 0 ,
-
-                                                      SDLK_LCtrl , 0         , 0,
-                                                      0          , SDLK_LCtrl, 0,
-                                                      0          , 0         , 0,
-
-                                                      0,0,0,
-                                                      0,0,0,
-                                                      0,0,0);
-
-HotKeysReplay : array[0..max_HotKeys] of cardinal  = (SDLK_Q , SDLK_W , SDLK_E ,
-                                                      SDLK_A , SDLK_S , SDLK_D ,
-                                                      SDLK_Z , 0      , SDLK_0 ,
-
-                                                      SDLK_1 , SDLK_2 , SDLK_3 ,
-                                                      SDLK_4 , SDLK_5 , SDLK_6 ,
-                                                      0,0,0,
-
-                                                      0,0,0,
-                                                      0,0,0,
-                                                      0,0,0);
-HotKeysObserv : array[0..max_HotKeys] of cardinal  = (SDLK_Q , SDLK_W , SDLK_0 ,
-                                                      SDLK_1 , SDLK_2 , SDLK_3 ,
-                                                      SDLK_4 , SDLK_5 , SDLK_6 ,
-
-                                                      0,0,0,
-                                                      0,0,0,
-                                                      0,0,0,
-
-                                                      0,0,0,
-                                                      0,0,0,
-                                                      0,0,0);
-
-
-_buffst                : array[false..true] of smallint = (0,_ub_infinity);
+_buffst                : array[false..true] of smallint = (0,ub_infinity);
 
 str_ps_sv              : char = '@';
 

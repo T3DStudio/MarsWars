@@ -1,4 +1,9 @@
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  COMMON TOOLS
+//
+
 function RemoveSpecChars(str:shortstring):shortstring;
 var i:byte;
 begin
@@ -27,40 +32,49 @@ begin
   else i2sSign:='+'+i2s(i);
 end;
 
-function l2s(limit,base:longint):shortstring; // limit 2 string
+function limit2s(limit,base:longint):shortstring; // limit 2 string
 var fr:integer;
 begin
    fr:=limit mod base;
    case fr of
-   0  : l2s:=i2s(limit div base);
-   50 : l2s:=i2s(limit div base)+'.5';
-   25 : l2s:=i2s(limit div base)+'.25';
-   75 : l2s:=i2s(limit div base)+'.75';
-   else l2s:=i2s(limit div base)+'.'+i2s(fr);
+   0  : limit2s:=i2s(limit div base);
+   50 : limit2s:=i2s(limit div base)+'.5';
+   25 : limit2s:=i2s(limit div base)+'.25';
+   75 : limit2s:=i2s(limit div base)+'.75';
+   else limit2s:=i2s(limit div base)+'.'+i2s(fr);
    end;
 end;
 
-function GetKeyName(k:cardinal):shortstring;
+function str_InputKeyName(key:cardinal;key_type:TInputKeyType):shortstring;
 begin
-   case k of
-SDL_BUTTON_left     : GetKeyName:='Mouse left button';
-SDL_BUTTON_right    : GetKeyName:='Mouse right button';
-SDL_BUTTON_middle   : GetKeyName:='Mouse middle button';
-SDL_BUTTON_WHEELUP  : GetKeyName:='Mouse wheel up';
-SDL_BUTTON_WHEELDOWN: GetKeyName:='Mouse wheel down';
-SDLK_LCtrl,
-SDLK_RCtrl          : GetKeyName:='Ctrl';
-SDLK_LAlt,
-SDLK_RAlt           : GetKeyName:='Alt';
-SDLK_LShift,
-SDLK_RShift         : GetKeyName:='Shift';
-   else GetKeyName  :=UpperCase(SDL_GetKeyName(k));
-   end
+   case key_type of
+   ikt_keyboard: case key of
+                 SDLK_LCtrl,
+                 SDLK_RCtrl          : str_InputKeyName:='Ctrl';
+                 SDLK_LAlt,
+                 SDLK_RAlt           : str_InputKeyName:='Alt';
+                 SDLK_LShift,
+                 SDLK_RShift         : str_InputKeyName:='Shift';
+                 else                  str_InputKeyName:=UpperCase(SDL_GetKeyName(key));
+                 end;
+   ikt_mouseb  : case key of
+                 SDL_BUTTON_left     : str_InputKeyName:='Mouse left button';
+                 SDL_BUTTON_right    : str_InputKeyName:='Mouse right button';
+                 SDL_BUTTON_middle   : str_InputKeyName:='Mouse middle button';
+                 else                  str_InputKeyName:='Mouse button #'+c2s(key);
+                 end;
+   ikt_mousew  : case key of
+                 SDL_BUTTON_WHEELUP  : str_InputKeyName:='Mouse wheel up';
+                 SDL_BUTTON_WHEELDOWN: str_InputKeyName:='Mouse wheel down';
+                 else                  str_InputKeyName:='Mouse wheel #'+c2s(key);
+                 end;
+   else str_InputKeyName:='Unknown key_type';
+   end;
 end;
 
 
 
-function HotKeyBase2Str(ucl:byte):shortstring;  // hotkey units&upgrades tab
+{function HotKeyBase2Str(ucl:byte):shortstring;  // hotkey units&upgrades tab
 begin
    HotKeyBase2Str:='';
    if(ucl<=max_HotKeys)then
@@ -95,48 +109,28 @@ begin
    if(ucl<=max_HotKeys)then
     if(HotKeysObserv[ucl]>0)then
      HotKeyObserver2Str:=tc_lime+GetKeyName(HotKeysObserv [ucl])+tc_default;
-end;
+end; }
 
-
-procedure _mkHStrACT(ucl:byte;hint:shortstring);
-var hk:shortstring;
+function str_ActionHotKey(action:byte):shortstring;
 begin
-   if(ucl<=max_HotKeys)then
+  str_ActionHotKey:='';
+   with input_actions[action] do
    begin
-      hk:=HotKeyAction2Str(ucl);
-      if(length(hk)>0)
-      then str_hint_a[ucl]:=hint+' ('+hk+')'
-      else str_hint_a[ucl]:=hint;
+      if(ik_depend>0)then
+        str_ActionHotKey:=str_ActionHotKey(ik_depend)+'+';
+
+      str_ActionHotKey+=tc_lime+str_InputKeyName(ik_value,ik_type)+tc_default;
    end;
 end;
 
-procedure _mkHStrRPL(ucl:byte;hint:shortstring;noHK:boolean);
-var hk:shortstring;
+function str_ProductionHotKey(uid:byte):shortstring;
 begin
-   if(ucl<=max_HotKeys)then
-   begin
-      if(noHK)
-      then hk:=''
-      else hk:=HotKeyReplay2Str(ucl);
-      if(length(hk)>0)
-      then str_hint_r[ucl]:=hint+' ('+hk+')'
-      else str_hint_r[ucl]:=hint;
-   end;
+   if(uid<=ui_ButtonsNum)
+   then str_ProductionHotKey:=str_ActionHotKey(iAct_SProd1+uid)
+   else str_ProductionHotKey:='';
 end;
-procedure _mkHStrOBS(ucl:byte;hint:shortstring;noHK:boolean);
-var hk:shortstring;
-begin
-   if(ucl<=max_HotKeys)then
-   begin
-      if(noHK)
-      then hk:=''
-      else hk:=HotKeyObserver2Str(ucl);
-      if(length(hk)>0)
-      then str_hint_o[ucl]:=hint+' ('+hk+')'
-      else str_hint_o[ucl]:=hint;
-   end;
-end;
-procedure _mkHStrUid(uid:byte;NAME,DESCR:shortstring);
+
+procedure str_SetUnitBaseHint(uid:byte;NAME,DESCR:shortstring);
 begin
    with g_uids[uid] do
    begin
@@ -145,7 +139,7 @@ begin
    end;
 end;
 
-procedure _mkHStrUpid(upid:byte;NAME,DESCR:shortstring);
+procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
 begin
    with g_upids[upid] do
    begin
@@ -155,6 +149,16 @@ begin
        if(_up_descr[length(_up_descr)]<>'.')then _up_descr+='.';
    end;
 end;
+
+procedure str_MakeActionHint(action:byte;hint:shortstring);
+var hk:shortstring;
+begin
+   hk:=str_ActionHotKey(action);
+   if(length(hk)>0)
+   then str_action_hint[action]:=hint+' ('+hk+')'
+   else str_action_hint[action]:=hint;
+end;
+
 
 procedure STRADD(s:pshortstring;ad,sep:shortstring);
 begin
@@ -226,12 +230,12 @@ begin
       if(level>0)then
         if(not _ukbuilding)
         or(_ukbuilding and (_isbarrack or _issmith))then STRADD(@str_UnitAttributes,str_attr_level+b2s(level+1),sep_comma);
-      if(buff[ub_Detect]>0)or(_detector)
+      if(buffs[ub_Detect]>0)or(_detector)
       then STRADD(@str_UnitAttributes,str_attr_detector,sep_comma);
-      if(buff[ub_Invuln]>0)
+      if(buffs[ub_Invuln]>0)
       then STRADD(@str_UnitAttributes,str_attr_invuln,sep_comma)
       else
-        if(buff[ub_Pain]>0)
+        if(buffs[ub_Pain]>0)
         then STRADD(@str_UnitAttributes,str_attr_stuned,sep_comma);
 
       str_UnitAttributes:='['+str_UnitAttributes+tc_default+']';
@@ -273,7 +277,7 @@ begin
    for i:=0 to MaxDamageModFactors do
     with g_DamageMods[dmod][i] do
      if(dm_factor<>100)and(dm_flags>0)then
-      STRADD(@str_DamageHint,'x'+l2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
+      STRADD(@str_DamageHint,'x'+limit2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
 end;
 
 function str_ReqNum2s(basename:shortstring;reqn:byte):shortstring;
@@ -600,7 +604,7 @@ var HK,
 begin
   with g_upids[upid] do
   begin
-     HK  :=HotKeyBase2Str(_up_btni);
+     HK  :=str_ProductionHotKey(_up_btni);
      ENRG:='';
      TIME:='';
      INFO:='';
@@ -610,7 +614,7 @@ begin
      else
        if(curlvl>_up_max)and(curlvl<255)then curlvl:=_up_max;
 
-     HK:=HotKeyBase2Str(_up_btni);
+     HK:=str_ProductionHotKey(_up_btni);
      if(_up_renerg>0)then
        if(curlvl<255)
        then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
@@ -664,10 +668,10 @@ begin
       end
       else
       begin
-         HK:=HotKeyBase2Str(_ucl);
+         HK:=str_ProductionHotKey(_ucl);
          if(_renergy>0)then ENRG:=tc_aqua +i2s(_renergy)+tc_default;
          if(_btime  >0)then TIME:=tc_white+i2s(_btime  )+tc_default;
-         LMT:=tc_orange+l2s(_limituse,MinUnitLimit)+tc_default;
+         LMT:=tc_orange+limit2s(_limituse,MinUnitLimit)+tc_default;
 
          PROD:=FindSourceProd(uid);
          if(_ruid1>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
@@ -807,6 +811,11 @@ begin
                   str_Center0(area    ,14);
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAIN
+//
+
 procedure lng_eng;
 var t: shortstring;
     i:byte;
@@ -817,8 +826,7 @@ begin
    str_Caption_GOptions          := 'GAME OPTIONS';
    str_Caption_Server            := 'SERVER';
    str_Caption_Client            := 'CLIENT';
-
-   str_MObjectives               := 'OBJECTIVES';
+   str_Caption_Objectives        := 'OBJECTIVES';
 
    str_menu_Tutorials            := 'TUTORIALS';
    str_menu_Campaings            := 'CAMPAIGNS';
@@ -836,10 +844,13 @@ begin
    str_menu_Exit                 := 'EXIT';
    str_menu_Back                 := 'BACK';
 
-   str_menu_SetGame              := 'GAME';
-   str_menu_SetReplay            := 'RECORDING';
-   str_menu_SetVideo             := 'VIDEO';
-   str_menu_SetSound             := 'SOUND';
+   str_menu_chat                 := 'CHAT(ALL PLAYERS)';
+   str_menu_controls             := '- use the left and right mouse buttons to manipulate the menu items -';
+
+   str_S_Game                    := 'GAME';
+   str_S_Replay                  := 'RECORDING';
+   str_S_Video                   := 'VIDEO';
+   str_S_Sound                   := 'SOUND';
 
    str_SR_RecordGames            := 'Record games';
    str_SR_Quality                := 'File size/quality';
@@ -873,10 +884,10 @@ begin
    str_SG_PlayersColorL[4]       := tc_purple+'teams'  +tc_default;
    str_SG_PlayersColorL[5]       := tc_white +'own '   +tc_purple+'teams'+tc_default;
 
-   str_SV_Windowed               := 'Windowed';
-   str_SV_ResolutionApply        := 'Apply resolution';
    str_SV_ResolutionW            := 'Resolution (width)';
    str_SV_ResolutionH            := 'Resolution (height)';
+   str_SV_ResolutionApply        := 'Apply resolution';
+   str_SV_Windowed               := 'Windowed';
    str_SV_MenuScale              := 'Menu scaling';
    str_SV_MenuScaleSmooth        := 'Smooth scaled menu';
    str_SV_ShowFPS                := 'Show FPS';
@@ -898,7 +909,6 @@ begin
    str_map_Obstacles             := 'Obstacles';
    str_map_Symmetry              := 'Symmetric';
    str_map_Random                := 'Random map';
-
    str_map_Scenario              := 'Scenario';
    str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Skirmish'    +tc_default;
    str_map_ScenarioL[mc_3x3     ]:= tc_orange+'3x3'         +tc_default;
@@ -907,7 +917,6 @@ begin
    str_map_ScenarioL[mc_invasion]:= tc_blue  +'Invasion'    +tc_default;
    str_map_ScenarioL[mc_KotH    ]:= tc_purple+'KotH'        +tc_default;
    str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
-
    str_map_Generators            := 'Generators';
    str_map_GeneratorsL[0]        := 'no';
    str_map_GeneratorsL[1]        := '5 min';
@@ -932,54 +941,57 @@ begin
    str_race[r_hell  ]            := tc_orange +'HELL'  +tc_default;
    str_race[r_uac   ]            := tc_lime   +'UAC'   +tc_default;
 
+   str_observer                  := 'OBSERVER';
+
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
    str_FileLoad                  := 'Load';
+   str_FilePlay                  := 'Play';
    str_FileDelete                := 'Delete';
 
-   str_observer          := 'OBSERVER';
-   str_win               := 'VICTORY!';
-   str_lose              := 'DEFEAT!';
-   str_gsunknown         := 'Unknown status!';
-   str_pause             := 'Pause';
-   str_gsaved            := 'Game saved';
-   str_repend            := 'Replay ended!';
-   str_reperror          := 'Read file error!';
+   str_gstat_Win                 := 'VICTORY!';
+   str_gstat_Lose                := 'DEFEAT!';
+   str_gstat_Pauseed             := 'Paused by ';
+   str_gstat_ReplayEnd           := 'Replay ended!';
+   str_gstat_ReplayError         := 'Read file error!';
+   str_gstat_WaitForServer       := 'Awaiting server...';
+   str_gstat_Unknown             := 'Unknown status!';
+
+   str_gmsg_GameSaved            := 'Game saved';
+   str_gmsg_GameLoaded           := 'Game loaded';
+   str_gmsg_PlayerDefeat         := ' was terminated!';
+   str_gmsg_PlayerLeft           := ' left the game';
+   str_gmsg_PlayerSurrender      := ' surrenders!';
+   str_gmsg_Connecting           := 'Connecting...';
+   str_gmsg_PortBlocked          := 'Port is blocked!';
+
+   str_msg_WrongVersion  := 'Wrong version!';
+   str_msg_ServerFull    := 'Server full!';
+   str_msg_GameStarted   := 'Game started!';
+
 
    str_Players           := 'Players';
+   str_all               := 'All';
 
    str_time              := 'Time: ';
    str_menu              := 'Menu';
 
    str_inv_time          := 'Wave #';
    str_inv_ml            := 'Monsters limit: ';
-   str_ReplayPlay        := 'Play';
 
-
-   str_WaitForServer     := 'Awaiting server...';
-
-
-   str_menu_chat         := 'CHAT(ALL PLAYERS)';
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
 
-
-   str_PlayerDefeat      := ' was terminated!';
-   str_PlayerLeft        := ' left the game';
-   str_PlayerSurrender   := ' surrenders!';
-
-
    str_requirements      := 'Requirements: ';
    str_req               := 'Req.: ';
-   str_orders            := 'Unit groups: ';
-   str_all               := 'All';
+   str_UnitGroups            := 'Unit groups: ';
+
    str_uprod             := tc_lime+'Produced by: '   +tc_default;
    str_bprod             := tc_lime+'Constructed by: '+tc_default;
 
    str_kothtime          := 'Center capture time left: ';
    str_kothtime_act      := 'Time left until center area is active: ';
    str_kothwinner        := ' is King of the Hill!';
-
 
 
    str_ability           := 'Special ability: ';
@@ -992,7 +1004,7 @@ begin
    str_PlayerPaused      := 'player paused the game';
    str_PlayerResumed     := 'player has resumed the game';
 
-   str_menu_controls     := '- use the left and right mouse buttons to manipulate the menu items -';
+
    str_RecordingStart    := 'Start recording: ';
    str_RecordingStop     := 'Stop recording: ';
 
@@ -1102,13 +1114,6 @@ begin
    str_net_Address       := 'Address';
    str_net_LANSearch     := 'Search for LAN servers';
 
-   str_connecting        := 'Connecting...';
-   str_portblocked       := 'Port is blocked!';
-
-   str_msg_WrongVersion  := 'Wrong version!';
-   str_msg_ServerFull    := 'Server full!';
-   str_msg_GameStarted   := 'Game started!';
-
    str_hint_Tab[0]         := 'Buildings';
    str_hint_Tab[1]         := 'Units';
    str_hint_Tab[2]         := 'Researches';
@@ -1136,212 +1141,173 @@ begin
    str_ability_name[uab_Unload          ]:='Unload';
    str_ability_reloading:='The ability is on cooldown!' ;
 
-   _mkHStrUid(UID_HKeep          ,'Hell Keep'                   ,'');
-   _mkHStrUid(UID_HAKeep         ,'Great Hell Keep'             ,'');
-   _mkHStrUid(UID_HGate          ,'Demon`s Gate'                ,'');
-   _mkHStrUid(UID_HSymbol1       ,'Unholy Symbol level 1'       ,'');
-   _mkHStrUid(UID_HSymbol2       ,'Unholy Symbol level 2'       ,'');
-   _mkHStrUid(UID_HSymbol3       ,'Unholy Symbol level 3'       ,'');
-   _mkHStrUid(UID_HSymbol4       ,'Unholy Symbol level 4'       ,'');
-   _mkHStrUid(UID_HPools         ,'Infernal Pools'              ,'');
-   _mkHStrUid(UID_HTeleport      ,'Teleport'                    ,'Base teleportation cooldown is '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[limit of teleported unit]');
-   _mkHStrUid(UID_HPentagram     ,'Pentagram of Death'          ,'');
-   _mkHStrUid(UID_HMonastery     ,'Monastery of Despair'        ,'');
-   _mkHStrUid(UID_HFortress      ,'Castle of Damned'            ,'');
-   _mkHStrUid(UID_HTower         ,'Guard Tower'                 ,'Basic defensive structure'        );
-   _mkHStrUid(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
-   _mkHStrUid(UID_HAltar         ,'Altar of Pain'               ,'The duration of the "'+str_ability_name[uab_HInvulnerability]+'" effect is '+i2s(invuln_time_sec)+' sec., the ability reload time is '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' sec');
-   _mkHStrUid(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
-   _mkHStrUid(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
-   _mkHStrUid(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
-   _mkHStrUid(UID_HEyeNest       ,'Evil Eye Nest'               ,'Detection structure. Reload time of the ability is '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' sec'   );
+   str_SetUnitBaseHint(UID_HKeep          ,'Hell Keep'                   ,'');
+   str_SetUnitBaseHint(UID_HAKeep         ,'Great Hell Keep'             ,'');
+   str_SetUnitBaseHint(UID_HGate          ,'Demon`s Gate'                ,'');
+   str_SetUnitBaseHint(UID_HSymbol1       ,'Unholy Symbol level 1'       ,'');
+   str_SetUnitBaseHint(UID_HSymbol2       ,'Unholy Symbol level 2'       ,'');
+   str_SetUnitBaseHint(UID_HSymbol3       ,'Unholy Symbol level 3'       ,'');
+   str_SetUnitBaseHint(UID_HSymbol4       ,'Unholy Symbol level 4'       ,'');
+   str_SetUnitBaseHint(UID_HPools         ,'Infernal Pools'              ,'');
+   str_SetUnitBaseHint(UID_HTeleport      ,'Teleport'                    ,'Base teleportation cooldown is '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[limit of teleported unit]');
+   str_SetUnitBaseHint(UID_HPentagram     ,'Pentagram of Death'          ,'');
+   str_SetUnitBaseHint(UID_HMonastery     ,'Monastery of Despair'        ,'');
+   str_SetUnitBaseHint(UID_HFortress      ,'Castle of Damned'            ,'');
+   str_SetUnitBaseHint(UID_HTower         ,'Guard Tower'                 ,'Basic defensive structure'        );
+   str_SetUnitBaseHint(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
+   str_SetUnitBaseHint(UID_HAltar         ,'Altar of Pain'               ,'The duration of the "'+str_ability_name[uab_HInvulnerability]+'" effect is '+i2s(invuln_time_sec)+' sec., the ability reload time is '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' sec');
+   str_SetUnitBaseHint(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
+   str_SetUnitBaseHint(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
+   str_SetUnitBaseHint(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
+   str_SetUnitBaseHint(UID_HEyeNest       ,'Evil Eye Nest'               ,'Detection structure. Reload time of the ability is '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' sec'   );
 
-   _mkHStrUid(UID_LostSoul       ,'Lost Soul'                   ,'');
-   _mkHStrUid(UID_Phantom        ,'Phantom'                     ,'');
-   _mkHStrUid(UID_Imp            ,'Imp'                         ,'');
-   _mkHStrUid(UID_Demon          ,'Pinky Demon'                 ,'');
-   _mkHStrUid(UID_Cacodemon      ,'Cacodemon'                   ,'');
-   _mkHStrUid(UID_Knight         ,'Hell Knight'                 ,'');
-   _mkHStrUid(UID_Baron          ,'Baron of Hell'               ,'');
-   _mkHStrUid(UID_Cyberdemon     ,'Cyberdemon'                  ,'');
-   _mkHStrUid(UID_Mastermind     ,'Spider Mastermind'           ,'');
-   _mkHStrUid(UID_Pain           ,'Pain Elemental'              ,'');
-   _mkHStrUid(UID_Revenant       ,'Revenant'                    ,'');
-   _mkHStrUid(UID_Mancubus       ,'Mancubus'                    ,'');
-   _mkHStrUid(UID_Arachnotron    ,'Arachnotron'                 ,'');
-   _mkHStrUid(UID_Archvile       ,'Arch-Vile'                   ,'');
-   _mkHStrUid(UID_ZMedic         ,'Zombie Medic'                ,'');
-   _mkHStrUid(UID_ZEngineer      ,'Zombie Engineer'             ,'');
-   _mkHStrUid(UID_ZSergant       ,'Zombie Shotguner'            ,'');
-   _mkHStrUid(UID_ZSSergant      ,'Zombie SuperShotguner'       ,'');
-   _mkHStrUid(UID_ZCommando      ,'Zombie Commando'             ,'');
-   _mkHStrUid(UID_ZAntiaircrafter,'Zombie Antiaircrafter'       ,'');
-   _mkHStrUid(UID_ZSiegeMarine   ,'Zombie Siege Marine'         ,'');
-   _mkHStrUid(UID_ZFPlasmagunner ,'Zombie Plasmaguner'          ,'');
-   _mkHStrUid(UID_ZBFGMarine     ,'Zombie BFG Marine'           ,'');
-
-
-   _mkHStrUpid(upgr_hell_t1attack  ,'Hell Firepower'                ,'Increase the damage of ranged attacks for T1 units and defensive structures');
-   _mkHStrUpid(upgr_hell_uarmor    ,'Combat Flesh'                  ,'Increase the armor of all Hell units'                                   );
-   _mkHStrUpid(upgr_hell_barmor    ,'Stone Walls'                   ,'Increase the armor of all Hell buildings'                               );
-   _mkHStrUpid(upgr_hell_mattack   ,'Claws and Teeth'               ,'Increase the damage of melee attacks'                                   );
-   _mkHStrUpid(upgr_hell_regen     ,'Flesh Regeneration'            ,'Health regeneration for all Hell units'                                 );
-   _mkHStrUpid(upgr_hell_pains     ,'Pain Threshold'                ,'Hell units can take more hits before being stunned by pain'             );
-   _mkHStrUpid(upgr_hell_towers    ,'Demonic Spirits'               ,'Increase the range of defensive structures'                             );
-   _mkHStrUpid(upgr_hell_HKTeleport,'Hell Keep Blink Charge'        ,'Charge for Hell Keep`s ability'                                         );
-   _mkHStrUpid(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor');
-   _mkHStrUpid(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s range of vision'                                   );
-
-   _mkHStrUpid(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demon becomes invisible'                                  );
-   _mkHStrUpid(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
-   _mkHStrUpid(upgr_hell_phantoms  ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
-   _mkHStrUpid(upgr_hell_t2attack  ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
-   _mkHStrUpid(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Reduced cooldown on Teleport ability'                           );
-   _mkHStrUpid(upgr_hell_rteleport ,'Recall'                        ,'The Teleport can recall units'                                  );
-   _mkHStrUpid(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
-   _mkHStrUpid(upgr_hell_totminv   ,'Totem of Horror Invisibility'  ,'Totem of Horror becomes invisible'                              );
-   _mkHStrUpid(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell buildings'                     );
-   _mkHStrUpid(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
-   _mkHStrUpid(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability'                    );
+   str_SetUnitBaseHint(UID_LostSoul       ,'Lost Soul'                   ,'');
+   str_SetUnitBaseHint(UID_Phantom        ,'Phantom'                     ,'');
+   str_SetUnitBaseHint(UID_Imp            ,'Imp'                         ,'');
+   str_SetUnitBaseHint(UID_Demon          ,'Pinky Demon'                 ,'');
+   str_SetUnitBaseHint(UID_Cacodemon      ,'Cacodemon'                   ,'');
+   str_SetUnitBaseHint(UID_Knight         ,'Hell Knight'                 ,'');
+   str_SetUnitBaseHint(UID_Baron          ,'Baron of Hell'               ,'');
+   str_SetUnitBaseHint(UID_Cyberdemon     ,'Cyberdemon'                  ,'');
+   str_SetUnitBaseHint(UID_Mastermind     ,'Spider Mastermind'           ,'');
+   str_SetUnitBaseHint(UID_Pain           ,'Pain Elemental'              ,'');
+   str_SetUnitBaseHint(UID_Revenant       ,'Revenant'                    ,'');
+   str_SetUnitBaseHint(UID_Mancubus       ,'Mancubus'                    ,'');
+   str_SetUnitBaseHint(UID_Arachnotron    ,'Arachnotron'                 ,'');
+   str_SetUnitBaseHint(UID_Archvile       ,'Arch-Vile'                   ,'');
+   str_SetUnitBaseHint(UID_ZMedic         ,'Zombie Medic'                ,'');
+   str_SetUnitBaseHint(UID_ZEngineer      ,'Zombie Engineer'             ,'');
+   str_SetUnitBaseHint(UID_ZSergant       ,'Zombie Shotguner'            ,'');
+   str_SetUnitBaseHint(UID_ZSSergant      ,'Zombie SuperShotguner'       ,'');
+   str_SetUnitBaseHint(UID_ZCommando      ,'Zombie Commando'             ,'');
+   str_SetUnitBaseHint(UID_ZAntiaircrafter,'Zombie Antiaircrafter'       ,'');
+   str_SetUnitBaseHint(UID_ZSiegeMarine   ,'Zombie Siege Marine'         ,'');
+   str_SetUnitBaseHint(UID_ZFPlasmagunner ,'Zombie Plasmaguner'          ,'');
+   str_SetUnitBaseHint(UID_ZBFGMarine     ,'Zombie BFG Marine'           ,'');
 
 
-   _mkHStrUid(UID_UCommandCenter   ,'Command Center'                ,''      );
-   _mkHStrUid(UID_UACommandCenter  ,'Advanced Command Center'       ,''      );
-   _mkHStrUid(UID_UBarracks        ,'Barracks'                      ,''      );
-   _mkHStrUid(UID_UFactory         ,'Vehicle Factory'               ,''      );
-   _mkHStrUid(UID_UGenerator1      ,'Generator level 1'             ,''      );
-   _mkHStrUid(UID_UGenerator2      ,'Generator level 2'             ,''      );
-   _mkHStrUid(UID_UGenerator3      ,'Generator level 3'             ,''      );
-   _mkHStrUid(UID_UGenerator4      ,'Generator level 4'             ,''      );
-   _mkHStrUid(UID_UWeaponFactory   ,'Weapon Factory'                ,''      );
-   _mkHStrUid(UID_UGTurret         ,'Anti-ground Turret'            ,'Anti-ground defensive structure');
-   _mkHStrUid(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
-   _mkHStrUid(UID_UTechCenter      ,'Science Facility'              ,'');
-   _mkHStrUid(UID_UComputerStation ,'Computer Station'              ,'');
-   _mkHStrUid(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
-   _mkHStrUid(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
-   _mkHStrUid(UID_UMine            ,'Mine'                          ,'');
-
-   _mkHStrUid(UID_Sergant          ,'Shotguner'                     ,'');
-   _mkHStrUid(UID_SSergant         ,'SuperShotguner'                ,'');
-   _mkHStrUid(UID_Commando         ,'Commando'                      ,'');
-   _mkHStrUid(UID_Antiaircrafter   ,'Antiaircrafter'                ,'');
-   _mkHStrUid(UID_SiegeMarine      ,'Siege Marine'                  ,'');
-   _mkHStrUid(UID_FPlasmagunner    ,'Plasmaguner'                   ,'');
-   _mkHStrUid(UID_BFGMarine        ,'BFG Marine'                    ,'');
-   _mkHStrUid(UID_Engineer         ,'Engineer'                      ,'');
-   _mkHStrUid(UID_Medic            ,'Medic'                         ,'');
-   _mkHStrUid(UID_UTransport       ,'Dropship'                      ,'');
-   _mkHStrUid(UID_UACDron          ,'Drone'                         ,'');
-   _mkHStrUid(UID_Terminator       ,'Terminator'                    ,'');
-   _mkHStrUid(UID_Tank             ,'Tank'                          ,'');
-   _mkHStrUid(UID_Flyer            ,'Fighter'                       ,'');
-   _mkHStrUid(UID_APC              ,'Ground APC'                    ,'');
+   str_SetUpgrBaseHint(upgr_hell_t1attack  ,'Hell Firepower'                ,'Increase the damage of ranged attacks for T1 units and defensive structures');
+   str_SetUpgrBaseHint(upgr_hell_uarmor    ,'Combat Flesh'                  ,'Increase the armor of all Hell units'                                   );
+   str_SetUpgrBaseHint(upgr_hell_barmor    ,'Stone Walls'                   ,'Increase the armor of all Hell buildings'                               );
+   str_SetUpgrBaseHint(upgr_hell_mattack   ,'Claws and Teeth'               ,'Increase the damage of melee attacks'                                   );
+   str_SetUpgrBaseHint(upgr_hell_regen     ,'Flesh Regeneration'            ,'Health regeneration for all Hell units'                                 );
+   str_SetUpgrBaseHint(upgr_hell_pains     ,'Pain Threshold'                ,'Hell units can take more hits before being stunned by pain'             );
+   str_SetUpgrBaseHint(upgr_hell_towers    ,'Demonic Spirits'               ,'Increase the range of defensive structures'                             );
+   str_SetUpgrBaseHint(upgr_hell_HKTeleport,'Hell Keep Blink Charge'        ,'Charge for Hell Keep`s ability'                                         );
+   str_SetUpgrBaseHint(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor');
+   str_SetUpgrBaseHint(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s range of vision'                                   );
+   str_SetUpgrBaseHint(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demon becomes invisible'                                  );
+   str_SetUpgrBaseHint(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
+   str_SetUpgrBaseHint(upgr_hell_phantoms  ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
+   str_SetUpgrBaseHint(upgr_hell_t2attack  ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
+   str_SetUpgrBaseHint(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Reduced cooldown on Teleport ability'                           );
+   str_SetUpgrBaseHint(upgr_hell_rteleport ,'Recall'                        ,'The Teleport can recall units'                                  );
+   str_SetUpgrBaseHint(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
+   str_SetUpgrBaseHint(upgr_hell_totminv   ,'Totem of Horror Invisibility'  ,'Totem of Horror becomes invisible'                              );
+   str_SetUpgrBaseHint(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell buildings'                     );
+   str_SetUpgrBaseHint(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
+   str_SetUpgrBaseHint(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability'                    );
 
 
-   _mkHStrUpid(upgr_uac_attack     ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
-   _mkHStrUpid(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units'                     );
-   _mkHStrUpid(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
-   _mkHStrUpid(upgr_uac_melee      ,'Advanced Tools'                   ,'Increase repair/healing efficiency of Engineers/Medics'        );
-   _mkHStrUpid(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
-   _mkHStrUpid(upgr_uac_ssgup      ,'Expansive bullets'                ,'Attacks of Shotguner, SuperShotguner and Terminator are more likely to cause a pain state' );
-   _mkHStrUpid(upgr_uac_towers     ,'Spotlights'                       ,'Increase the range of defensive structures'                    );
-   _mkHStrUpid(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
-   _mkHStrUpid(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
-   _mkHStrUpid(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center`s range of vision'                           );
+   str_SetUnitBaseHint(UID_UCommandCenter   ,'Command Center'                ,''      );
+   str_SetUnitBaseHint(UID_UACommandCenter  ,'Advanced Command Center'       ,''      );
+   str_SetUnitBaseHint(UID_UBarracks        ,'Barracks'                      ,''      );
+   str_SetUnitBaseHint(UID_UFactory         ,'Vehicle Factory'               ,''      );
+   str_SetUnitBaseHint(UID_UGenerator1      ,'Generator level 1'             ,''      );
+   str_SetUnitBaseHint(UID_UGenerator2      ,'Generator level 2'             ,''      );
+   str_SetUnitBaseHint(UID_UGenerator3      ,'Generator level 3'             ,''      );
+   str_SetUnitBaseHint(UID_UGenerator4      ,'Generator level 4'             ,''      );
+   str_SetUnitBaseHint(UID_UWeaponFactory   ,'Weapon Factory'                ,''      );
+   str_SetUnitBaseHint(UID_UGTurret         ,'Anti-ground Turret'            ,'Anti-ground defensive structure');
+   str_SetUnitBaseHint(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
+   str_SetUnitBaseHint(UID_UTechCenter      ,'Science Facility'              ,'');
+   str_SetUnitBaseHint(UID_UComputerStation ,'Computer Station'              ,'');
+   str_SetUnitBaseHint(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
+   str_SetUnitBaseHint(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
+   str_SetUnitBaseHint(UID_UMine            ,'Mine'                          ,'');
 
-   _mkHStrUpid(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
-   _mkHStrUpid(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
-   _mkHStrUpid(upgr_uac_commando   ,'Stealth Technology'               ,'Commando becomes invisible'                 );
-   _mkHStrUpid(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'     );
-   _mkHStrUpid(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
-   _mkHStrUpid(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
-   _mkHStrUpid(upgr_uac_antiair    ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
-   _mkHStrUpid(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                       );
-   _mkHStrUpid(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
-   _mkHStrUpid(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
-   _mkHStrUpid(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
+   str_SetUnitBaseHint(UID_Sergant          ,'Shotguner'                     ,'');
+   str_SetUnitBaseHint(UID_SSergant         ,'SuperShotguner'                ,'');
+   str_SetUnitBaseHint(UID_Commando         ,'Commando'                      ,'');
+   str_SetUnitBaseHint(UID_Antiaircrafter   ,'Antiaircrafter'                ,'');
+   str_SetUnitBaseHint(UID_SiegeMarine      ,'Siege Marine'                  ,'');
+   str_SetUnitBaseHint(UID_FPlasmagunner    ,'Plasmaguner'                   ,'');
+   str_SetUnitBaseHint(UID_BFGMarine        ,'BFG Marine'                    ,'');
+   str_SetUnitBaseHint(UID_Engineer         ,'Engineer'                      ,'');
+   str_SetUnitBaseHint(UID_Medic            ,'Medic'                         ,'');
+   str_SetUnitBaseHint(UID_UTransport       ,'Dropship'                      ,'');
+   str_SetUnitBaseHint(UID_UACDron          ,'Drone'                         ,'');
+   str_SetUnitBaseHint(UID_Terminator       ,'Terminator'                    ,'');
+   str_SetUnitBaseHint(UID_Tank             ,'Tank'                          ,'');
+   str_SetUnitBaseHint(UID_Flyer            ,'Fighter'                       ,'');
+   str_SetUnitBaseHint(UID_APC              ,'Ground APC'                    ,'');
 
-   str_action_hint[iAct_Control_USelArmy     ]:= 'Select all battle units';
 
-   str_action_hint[iAct_Control_UAbility1       ]:= '';
-   str_action_hint[iAct_Control_UAbility2       ]:= '';
-   str_action_hint[iAct_Control_UAbility3       ]:= '';
-   str_action_hint[iAct_Control_UDestroy         ]:= 'Destroy';
+   str_SetUpgrBaseHint(upgr_uac_attack     ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
+   str_SetUpgrBaseHint(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units'                     );
+   str_SetUpgrBaseHint(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
+   str_SetUpgrBaseHint(upgr_uac_tools      ,'Advanced Tools'                   ,'Increase repair/healing efficiency of Engineers/Medics'        );
+   str_SetUpgrBaseHint(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
+   str_SetUpgrBaseHint(upgr_uac_ssgup      ,'Expansive bullets'                ,'Attacks of Shotguner, SuperShotguner and Terminator are more likely to cause a pain state' );
+   str_SetUpgrBaseHint(upgr_uac_towers     ,'Spotlights'                       ,'Increase the range of defensive structures'                    );
+   str_SetUpgrBaseHint(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
+   str_SetUpgrBaseHint(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
+   str_SetUpgrBaseHint(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center`s range of vision'                           );
+   str_SetUpgrBaseHint(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
+   str_SetUpgrBaseHint(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
+   str_SetUpgrBaseHint(upgr_uac_commando   ,'Stealth Technology'               ,'Commando becomes invisible'                 );
+   str_SetUpgrBaseHint(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'     );
+   str_SetUpgrBaseHint(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
+   str_SetUpgrBaseHint(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
+   str_SetUpgrBaseHint(upgr_uac_antiair    ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
+   str_SetUpgrBaseHint(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                       );
+   str_SetUpgrBaseHint(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
+   str_SetUpgrBaseHint(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
+   str_SetUpgrBaseHint(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
 
-  { str_action_hint[iAct_Control_UAMove          ]:= 101;
-   str_action_hint[iAct_Control_UAStop          ]:= 102;
-   str_action_hint[iAct_Control_UAPatrol        ]:= 103;
-   str_action_hint[iAct_Control_UMove           ]:= 104;
-   str_action_hint[iAct_Control_UStop           ]:= 105;
-   str_action_hint[iAct_Control_UPatrol         ]:= 106;
+   str_MakeActionHint(iAct_Control_USelArmy,'Select all battle units');
 
-   str_action_hint[iAct_Replay_Fast     ]:= 110;
-   str_action_hint[iAct_Replay_Back     ]:= 111;
-   str_action_hint[iAct_Replay_Forward  ]:= 112;
-   str_action_hint[iAct_Replay_Pause    ]:= 113;
-   str_action_hint[iAct_Replay_POV      ]:= 114;
-   str_action_hint[iAct_Replay_Log      ]:= 115;
-   str_action_hint[iAct_Replay_Fog      ]:= 116;
-   str_action_hint[iAct_Replay_Player1  ]:= 117;
-   str_action_hint[iAct_Replay_Player2  ]:= 118;
-   str_action_hint[iAct_Replay_Player3  ]:= 119;
-   str_action_hint[iAct_Replay_Player4  ]:= 120;
-   str_action_hint[iAct_Replay_Player5  ]:= 121;
-   str_action_hint[iAct_Replay_Player6  ]:= 122;
-
-   str_action_hint[iAct_Observer_Fog    ]:= 125;
-   str_action_hint[iAct_Observer_Player1]:= 126;
-   str_action_hint[iAct_Observer_Player2]:= 127;
-   str_action_hint[iAct_Observer_Player3]:= 128;
-   str_action_hint[iAct_Observer_Player4]:= 129;
-   str_action_hint[iAct_Observer_Player5]:= 130;
-   str_action_hint[iAct_Observer_Player6]:= 131;  }
-
-   //_mkHStrACT(0 ,str_sability );
-   //_mkHStrACT(1 ,str_spability);
-   _mkHStrACT(2 ,'Rebuild/Advance');
    t:='attack enemies';
-   _mkHStrACT(3 ,'Move, '  +t);
-   _mkHStrACT(4 ,'Stop, '  +t);
-   _mkHStrACT(5 ,'Patrol, '+t);
+   str_MakeActionHint(iAct_Control_UAMove     ,'Move, '  +t);
+   str_MakeActionHint(iAct_Control_UAStop     ,'Stop, '  +t);
+   str_MakeActionHint(iAct_Control_UAPatrol   ,'Patrol, '+t);
    t:='ignore enemies';
-   _mkHStrACT(6 ,'Move, '  +t);
-   _mkHStrACT(7 ,'Stop, '  +t);
-   _mkHStrACT(8 ,'Patrol, '+t);
-   _mkHStrACT(9 ,'Cancel production');
-   _mkHStrACT(10,'Select all battle units' );
-   _mkHStrACT(11,''          );
-   _mkHStrACT(12,'Alarm mark'       );
-   _mkHStrACT(13,str_SG_RightClickAct);
+   str_MakeActionHint(iAct_Control_UMove      ,'Move, '  +t);
+   str_MakeActionHint(iAct_Control_UStop      ,'Stop, '  +t);
+   str_MakeActionHint(iAct_Control_UPatrol    ,'Patrol, '+t);
 
-   _mkHStrRPL(0 ,'Faster game speed'    ,false);
-   _mkHStrRPL(1 ,'Left click: back 2 seconds ('                                +tc_lime+'W'+tc_default+')'+tc_nl1+
-                 'Right click: back 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'W'+tc_default+')'+tc_nl1+
-                 'Middle click: back 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'W'+tc_default+')',true);
-   _mkHStrRPL(2 ,'Left click: skip 2 seconds ('                                +tc_lime+'E'+tc_default+')'+tc_nl1+
-                 'Right click: skip 10 seconds ('+tc_lime+'Ctrl'+tc_default+'+'+tc_lime+'E'+tc_default+')'+tc_nl1+
-                 'Middle click: skip 1 minute (' +tc_lime+'Alt' +tc_default+'+'+tc_lime+'E'+tc_default+')',true);
-   _mkHStrRPL(3 ,'Pause'                ,false);
-   _mkHStrRPL(4 ,'Player-recorder POV'  ,false);
-   _mkHStrRPL(5 ,'List of game messages',false);
-   _mkHStrRPL(6 ,'Fog of war'           ,false);
-   _mkHStrRPL(8 ,'All players',false);
-   _mkHStrRPL(9 ,'Player #1'  ,false);
-   _mkHStrRPL(10,'Player #2'  ,false);
-   _mkHStrRPL(11,'Player #3'  ,false);
-   _mkHStrRPL(12,'Player #4'  ,false);
-   _mkHStrRPL(13,'Player #5'  ,false);
-   _mkHStrRPL(14,'Player #6'  ,false);
+   str_MakeActionHint(iAct_Control_UProdCncl,'Cancel production');
+   str_MakeActionHint(iAct_Control_UDestroy   ,'Destroy');
+   str_MakeActionHint(iAct_Control_USelArmy   ,'Select all battle units');
 
-   _mkHStrOBS(0 ,'Fog of war' ,false);
-   _mkHStrOBS(2 ,'All players',false);
-   _mkHStrOBS(3 ,'Player #1'  ,false);
-   _mkHStrOBS(4 ,'Player #2'  ,false);
-   _mkHStrOBS(5 ,'Player #3'  ,false);
-   _mkHStrOBS(6 ,'Player #4'  ,false);
-   _mkHStrOBS(7 ,'Player #5'  ,false);
-   _mkHStrOBS(8 ,'Player #6'  ,false);
+   str_MakeActionHint(iAct_Replay_Fast        ,'Faster game speed');
+   str_MakeActionHint(iAct_Replay_Pause       ,'Pause');
+   str_MakeActionHint(iAct_Replay_Back2       ,'Rewind 2 seconds');
+   str_MakeActionHint(iAct_Replay_Back10      ,'Rewind 10 seconds');
+   str_MakeActionHint(iAct_Replay_Back60      ,'Rewind 60 seconds');
+   str_MakeActionHint(iAct_Replay_Forward2    ,'Fast forward 2 seconds');
+   str_MakeActionHint(iAct_Replay_Forward10   ,'Fast forward 10 seconds');
+   str_MakeActionHint(iAct_Replay_Forward60   ,'Fast forward 60 seconds');
+   str_MakeActionHint(iAct_Replay_POV         ,'Player-recorder POV');
+   str_MakeActionHint(iAct_Replay_Log         ,'List of game messages');
+   str_MakeActionHint(iAct_Replay_Fog         ,'Fog of war');
+   str_MakeActionHint(iAct_Replay_PlayerAll   ,'All players');
+   str_MakeActionHint(iAct_Replay_Player1     ,'Player #1');
+   str_MakeActionHint(iAct_Replay_Player2     ,'Player #2');
+   str_MakeActionHint(iAct_Replay_Player3     ,'Player #3');
+   str_MakeActionHint(iAct_Replay_Player4     ,'Player #4');
+   str_MakeActionHint(iAct_Replay_Player5     ,'Player #5');
+   str_MakeActionHint(iAct_Replay_Player6     ,'Player #6');
+
+   str_action_hint[iAct_Observer_Fog      ]:= str_action_hint[iAct_Replay_Fog    ];
+   str_action_hint[iAct_Observer_PlayerAll]:= str_action_hint[iAct_Replay_PlayerAll];
+   str_action_hint[iAct_Observer_Player1  ]:= str_action_hint[iAct_Replay_Player1];
+   str_action_hint[iAct_Observer_Player2  ]:= str_action_hint[iAct_Replay_Player2];
+   str_action_hint[iAct_Observer_Player3  ]:= str_action_hint[iAct_Replay_Player3];
+   str_action_hint[iAct_Observer_Player4  ]:= str_action_hint[iAct_Replay_Player4];
+   str_action_hint[iAct_Observer_Player5  ]:= str_action_hint[iAct_Replay_Player5];
+
+   //_mkHStrACT(12,'Alarm mark'       );
 
    FillChar(str_menu_hint,sizeOf(str_menu_hint),0);
 
@@ -1492,7 +1458,7 @@ begin
   str_Caption_Players           := 'ИГРОКИ';
   str_Caption_Multiplayer       := 'СЕТЕВАЯ ИГРА';
   str_Caption_GOptions          := 'ПАРАМЕТРЫ ИГРЫ';
-  str_MObjectives               := 'ЗАДАЧИ';
+  str_Caption_Objectives               := 'ЗАДАЧИ';
 
   str_menu_Tutorials            := 'ОБУЧЕНИЕ';
   str_menu_Campaings            := 'КАМПАНИИ';
@@ -1510,10 +1476,10 @@ begin
   str_menu_Exit                 := 'ВЫХОД';
   str_menu_Back                 := 'НАЗАД';
 
-  str_menu_SetGame      := 'ИГРА';
-  str_menu_SetReplay    := 'ЗАПИСЬ ИГРЫ';
-  str_menu_SetVideo     := 'ГРАФИКА';
-  str_menu_SetSound     := 'ЗВУК';
+  str_S_Game      := 'ИГРА';
+  str_S_Replay    := 'ЗАПИСЬ ИГРЫ';
+  str_S_Video     := 'ГРАФИКА';
+  str_S_Sound     := 'ЗВУК';
 
   str_SR_RecordGames    := 'Записывать игры';
   str_SR_ReplayPrefix   := 'Префикс записи';
@@ -1567,13 +1533,13 @@ begin
 
   str_race[r_random]    := tc_white+'ЛЮБАЯ'  +tc_default;
   str_observer          := 'ЗРИТЕЛЬ';
-  str_pause             := 'Пауза';
-  str_win               := 'ПОБЕДА!';
-  str_lose              := 'ПОРАЖЕНИЕ!';
-  str_gsunknown         := 'Неизвестный статус!';
-  str_gsaved            := 'Игра сохранена';
-  str_repend            := 'Конец записи!';
-  str_reperror          := 'Ошибка при чтении файла!';
+  str_gstat_Pauseed             := 'Пауза';
+  str_gstat_Win               := 'ПОБЕДА!';
+  str_gstat_Lose              := 'ПОРАЖЕНИЕ!';
+  str_gstat_Unknown         := 'Неизвестный статус!';
+  str_gmsg_GameSaved            := 'Игра сохранена';
+  str_gstat_ReplayEnd            := 'Конец записи!';
+  str_gstat_ReplayError          := 'Ошибка при чтении файла!';
 
   str_FileError_NExists  := 'Файл не'+tc_nl3+'существует!';
   str_FileError_Open  := 'Неполучилось'+tc_nl3+'открыть файл!';
@@ -1581,13 +1547,13 @@ begin
   str_FileError_WVer  := 'Неправильная'+tc_nl3+'версия файла!';
   str_time              := 'Время: ';
   str_menu              := 'Меню';
-  str_PlayerDefeat        := ' уничтожен!';
+  str_gmsg_PlayerDefeat        := ' уничтожен!';
   str_inv_time          := 'Волна #';
   str_inv_ml            := 'Армия монстров: ';
-  str_ReplayPlay              := 'Проиграть';
+  str_FilePlay              := 'Проиграть';
 
   str_Camp_Difficulty            := 'Сложность';
-  str_WaitForServer            := 'Ожидание сервера...';
+  str_gstat_WaitForServer            := 'Ожидание сервера...';
 
   str_Caption_Server            := 'СЕРВЕР';
   str_Caption_Client            := 'КЛИЕНТ';
@@ -1596,15 +1562,15 @@ begin
   str_chat_allies       := 'СОЮЗНИКИ:';
   str_GO_Random           := 'Случайная схватка';
 
-  str_PlayerLeft             := ' покинул игру';
-  str_PlayerSurrender  := ' сдается!';
+  str_gmsg_PlayerLeft             := ' покинул игру';
+  str_gmsg_PlayerSurrender  := ' сдается!';
   str_GO_AISlots           := 'Заполнить пустые слоты';
 
 
 
   str_requirements      := 'Требования: ';
   str_req               := 'Треб.: ';
-  str_orders            := 'Отряды: ';
+  str_UnitGroups            := 'Отряды: ';
   str_all               := 'Все';
   str_uprod             := tc_lime+'Создается в: '+tc_default;
   str_bprod             := tc_lime+'Чем может быть построен: '     +tc_default;
@@ -1735,8 +1701,8 @@ begin
   str_net_Address           := 'Адрес';
   str_net_LANSearch         := 'Поиск серверов в LAN';
 
-  str_connecting        := 'Соединение...';
-  str_portblocked       := 'Порт занят!';
+  str_gmsg_Connecting        := 'Соединение...';
+  str_gmsg_PortBlocked       := 'Порт занят!';
   str_msg_WrongVersion              := 'Другая версия!';
   str_msg_ServerFull             := 'Нет мест!';
   str_msg_GameStarted              := 'Игра началась!';
@@ -1766,116 +1732,116 @@ begin
   str_ability_name[uab_Unload          ]:='Выгрузить';
   str_ability_reloading:='Способность перезаряжается!';
 
-  _mkHStrUid(UID_HKeep           ,'Адская Крепость'            ,'');
-  _mkHStrUid(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
-  _mkHStrUid(UID_HGate           ,'Врата Демонов'              ,'');
-  _mkHStrUid(UID_HSymbol1        ,'Нечестивый Символ ур.1'     ,'');
-  _mkHStrUid(UID_HSymbol2        ,'Нечестивый Символ ур.2'     ,'');
-  _mkHStrUid(UID_HSymbol3        ,'Нечестивый Символ ур.3'     ,'');
-  _mkHStrUid(UID_HSymbol4        ,'Нечестивый Символ ур.4'     ,'');
-  _mkHStrUid(UID_HPools          ,'Инфернальные Омуты'         ,'');
-  _mkHStrUid(UID_HTeleport       ,'Телепорт'                   ,'Базовая перезарядка телепортации - '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[лимит перемещаемого юнита]');
-  _mkHStrUid(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
-  _mkHStrUid(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
-  _mkHStrUid(UID_HFortress       ,'Замок Проклятых'            ,'');
-  _mkHStrUid(UID_HTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
-  _mkHStrUid(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
-  _mkHStrUid(UID_HAltar          ,'Алтарь Боли'                ,'Длительность эффекта "'+str_ability_name[uab_HInvulnerability]+'" - '+i2s(invuln_time_sec)+' сек., перезарядка способности - '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' сек');
-  _mkHStrUid(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
-  _mkHStrUid(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
-  _mkHStrUid(UID_HBarracks       ,'Казармы Зомби'              ,''          );
-  _mkHStrUid(UID_HEyeNest        ,'Гнездо Ока Зла'             ,'Обнаружение невидимых войск. Перезарядка способности - '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_HKeep           ,'Адская Крепость'            ,'');
+  str_SetUnitBaseHint(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
+  str_SetUnitBaseHint(UID_HGate           ,'Врата Демонов'              ,'');
+  str_SetUnitBaseHint(UID_HSymbol1        ,'Нечестивый Символ ур.1'     ,'');
+  str_SetUnitBaseHint(UID_HSymbol2        ,'Нечестивый Символ ур.2'     ,'');
+  str_SetUnitBaseHint(UID_HSymbol3        ,'Нечестивый Символ ур.3'     ,'');
+  str_SetUnitBaseHint(UID_HSymbol4        ,'Нечестивый Символ ур.4'     ,'');
+  str_SetUnitBaseHint(UID_HPools          ,'Инфернальные Омуты'         ,'');
+  str_SetUnitBaseHint(UID_HTeleport       ,'Телепорт'                   ,'Базовая перезарядка телепортации - '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[лимит перемещаемого юнита]');
+  str_SetUnitBaseHint(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
+  str_SetUnitBaseHint(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
+  str_SetUnitBaseHint(UID_HFortress       ,'Замок Проклятых'            ,'');
+  str_SetUnitBaseHint(UID_HTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
+  str_SetUnitBaseHint(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
+  str_SetUnitBaseHint(UID_HAltar          ,'Алтарь Боли'                ,'Длительность эффекта "'+str_ability_name[uab_HInvulnerability]+'" - '+i2s(invuln_time_sec)+' сек., перезарядка способности - '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
+  str_SetUnitBaseHint(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
+  str_SetUnitBaseHint(UID_HBarracks       ,'Казармы Зомби'              ,''          );
+  str_SetUnitBaseHint(UID_HEyeNest        ,'Гнездо Ока Зла'             ,'Обнаружение невидимых войск. Перезарядка способности - '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' сек');
 
-  _mkHStrUid(UID_ZMedic          ,'Зомби Медик'                ,'');
-  _mkHStrUid(UID_ZEngineer       ,'Зомби Инженер'              ,'');
-  _mkHStrUid(UID_ZSergant        ,'Зомби Сержант'              ,'');
-  _mkHStrUid(UID_ZSSergant       ,'Зомби Старший Сержант'      ,'');
-  _mkHStrUid(UID_ZCommando       ,'Зомби Коммандо'             ,'');
-  _mkHStrUid(UID_ZAntiaircrafter ,'Зомби Зенитчик'             ,'');
-  _mkHStrUid(UID_ZSiegeMarine    ,'Зомби Артиллерист'          ,'');
-  _mkHStrUid(UID_ZFPlasmagunner  ,'Зомби Плазмаганнер'         ,'');
-  _mkHStrUid(UID_ZBFGMarine      ,'Зомби Солдат с BFG'         ,'');
+  str_SetUnitBaseHint(UID_ZMedic          ,'Зомби Медик'                ,'');
+  str_SetUnitBaseHint(UID_ZEngineer       ,'Зомби Инженер'              ,'');
+  str_SetUnitBaseHint(UID_ZSergant        ,'Зомби Сержант'              ,'');
+  str_SetUnitBaseHint(UID_ZSSergant       ,'Зомби Старший Сержант'      ,'');
+  str_SetUnitBaseHint(UID_ZCommando       ,'Зомби Коммандо'             ,'');
+  str_SetUnitBaseHint(UID_ZAntiaircrafter ,'Зомби Зенитчик'             ,'');
+  str_SetUnitBaseHint(UID_ZSiegeMarine    ,'Зомби Артиллерист'          ,'');
+  str_SetUnitBaseHint(UID_ZFPlasmagunner  ,'Зомби Плазмаганнер'         ,'');
+  str_SetUnitBaseHint(UID_ZBFGMarine      ,'Зомби Солдат с BFG'         ,'');
 
-  _mkHStrUpid(upgr_hell_t1attack  ,'Адская Огневая Мощь'           ,'Увеличение урона от дальних атак всех Т1 юнитов и защитных сооружений');
-  _mkHStrUpid(upgr_hell_uarmor    ,'Боевая Плоть'                  ,'Увеличение защиты всех адских юнитов'                                 );
-  _mkHStrUpid(upgr_hell_barmor    ,'Каменные Стены'                ,'Увеличение защиты всех адских зданий'                                 );
-  _mkHStrUpid(upgr_hell_mattack   ,'Когти и зубы'                  ,'Увеличение урона от ближних атак'                                     );
-  _mkHStrUpid(upgr_hell_regen     ,'Регенерация Плоти'             ,'Восстановление здоровья всех адских юнитов'                           );
-  _mkHStrUpid(upgr_hell_pains     ,'Болевой Порог'                 ,'Адские юниты реже испытывают болевой паралич'                         );
-  _mkHStrUpid(upgr_hell_towers    ,'Демоническое Чутье'            ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
-  _mkHStrUpid(upgr_hell_HKTeleport,'Телепортация Адской Крепости'  ,'Заряд для способности Адской Крепости'                                );
-  _mkHStrUpid(upgr_hell_paina     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
-  _mkHStrUpid(upgr_hell_buildr    ,'Увеличение Области Обзора Адской Крепости',''                                       );
+  str_SetUpgrBaseHint(upgr_hell_t1attack  ,'Адская Огневая Мощь'           ,'Увеличение урона от дальних атак всех Т1 юнитов и защитных сооружений');
+  str_SetUpgrBaseHint(upgr_hell_uarmor    ,'Боевая Плоть'                  ,'Увеличение защиты всех адских юнитов'                                 );
+  str_SetUpgrBaseHint(upgr_hell_barmor    ,'Каменные Стены'                ,'Увеличение защиты всех адских зданий'                                 );
+  str_SetUpgrBaseHint(upgr_hell_mattack   ,'Когти и зубы'                  ,'Увеличение урона от ближних атак'                                     );
+  str_SetUpgrBaseHint(upgr_hell_regen     ,'Регенерация Плоти'             ,'Восстановление здоровья всех адских юнитов'                           );
+  str_SetUpgrBaseHint(upgr_hell_pains     ,'Болевой Порог'                 ,'Адские юниты реже испытывают болевой паралич'                         );
+  str_SetUpgrBaseHint(upgr_hell_towers    ,'Демоническое Чутье'            ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
+  str_SetUpgrBaseHint(upgr_hell_HKTeleport,'Телепортация Адской Крепости'  ,'Заряд для способности Адской Крепости'                                );
+  str_SetUpgrBaseHint(upgr_hell_paina     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
+  str_SetUpgrBaseHint(upgr_hell_buildr    ,'Увеличение Области Обзора Адской Крепости',''                                       );
 
-  _mkHStrUpid(upgr_hell_spectre   ,'Призраки'                      ,'Pinky Demon становиться невидимым'                                         );
-  _mkHStrUpid(upgr_hell_vision    ,'Адское Зрение'                 ,'Увеличение области обзора и атаки всех адских юнитов'                      );
-  _mkHStrUpid(upgr_hell_phantoms  ,'Фантомы'                       ,'Pain Elemental создает Фантомов вместо Lost Soul'                          );
-  _mkHStrUpid(upgr_hell_t2attack  ,'Демоническое Оружие'           ,'Увеличение урона от дальних атак всех Т2 юнитов и защитных сооружений'     );
-  _mkHStrUpid(upgr_hell_teleport  ,'Улучшение Телепорта'           ,'Уменьшение времени перезарядки Телепорта'                              );
-  _mkHStrUpid(upgr_hell_rteleport ,'Призыв'                        ,'Юнитов можно перемещать обратно в Телепорт'                            );
-  _mkHStrUpid(upgr_hell_heye      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
-  _mkHStrUpid(upgr_hell_totminv   ,'Невидимость Тотема Ужаса'      ,''                               );
-  _mkHStrUpid(upgr_hell_bldrep    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );
-  _mkHStrUpid(upgr_hell_tblink    ,'Короткая Телепортация'         ,'Заряды для способности Сторожевой Башни и Тотема Ужаса');
-  _mkHStrUpid(upgr_hell_resurrect ,'Воскрешение'                   ,'Способность ArchVile'                    );
-
-
-  _mkHStrUid(UID_UCommandCenter  ,'Командный Центр'            ,'');
-  _mkHStrUid(UID_UACommandCenter ,'Продвинутый Командный Центр','');
-  _mkHStrUid(UID_UBarracks       ,'Казармы'                    ,'');
-  _mkHStrUid(UID_UFactory        ,'Фабрика'                    ,'');
-  _mkHStrUid(UID_UGenerator1     ,'Генератор ур.1'             ,'');
-  _mkHStrUid(UID_UGenerator2     ,'Генератор ур.2'             ,'');
-  _mkHStrUid(UID_UGenerator3     ,'Генератор ур.3'             ,'');
-  _mkHStrUid(UID_UGenerator4     ,'Генератор ур.4'             ,'');
-  _mkHStrUid(UID_UWeaponFactory  ,'Завод Вооружений'           ,'');
-  _mkHStrUid(UID_UGTurret        ,'Анти-наземная Турель'       ,'Анти-наземное защитное сооружение' );
-  _mkHStrUid(UID_UATurret        ,'Анти-воздушная Турель'      ,'Анти-воздушное защитное сооружение');
-  _mkHStrUid(UID_UTechCenter     ,'Научный Центр'              ,'');
-  _mkHStrUid(UID_UComputerStation,'Компьютерная Станция'       ,'');
-  _mkHStrUid(UID_URadar          ,'Радар'                      ,'Разведует карту. Перезарядка способности - '+tc_aqua+i2s(radar_reload_sec)+tc_default+' сек');
-  _mkHStrUid(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
-  _mkHStrUid(UID_UMine           ,'Мина'                       ,'');
-
-  _mkHStrUid(UID_Sergant         ,'Сержант'                ,'');
-  _mkHStrUid(UID_SSergant        ,'Старший Сержант'        ,'');
-  _mkHStrUid(UID_Commando        ,'Коммандо'               ,'');
-  _mkHStrUid(UID_Antiaircrafter  ,'Зенитчик'               ,'');
-  _mkHStrUid(UID_SiegeMarine     ,'Артиллерист'            ,'');
-  _mkHStrUid(UID_FPlasmagunner   ,'Плазмаганнер'           ,'');
-  _mkHStrUid(UID_BFGMarine       ,'Солдат с BFG'           ,'');
-  _mkHStrUid(UID_Engineer        ,'Инженер'                ,'');
-  _mkHStrUid(UID_Medic           ,'Медик'                  ,'');
-  _mkHStrUid(UID_UACDron         ,'Дрон'                   ,'');
-  _mkHStrUid(UID_UTransport      ,'Десантный корабль'      ,'');
-  _mkHStrUid(UID_Terminator      ,'Терминатор'             ,'');
-  _mkHStrUid(UID_Tank            ,'Танк'                   ,'');
-  _mkHStrUid(UID_Flyer           ,'Истребитель'            ,'');
-  _mkHStrUid(UID_APC             ,'БТР'                    ,'');
+  str_SetUpgrBaseHint(upgr_hell_spectre   ,'Призраки'                      ,'Pinky Demon становиться невидимым'                                         );
+  str_SetUpgrBaseHint(upgr_hell_vision    ,'Адское Зрение'                 ,'Увеличение области обзора и атаки всех адских юнитов'                      );
+  str_SetUpgrBaseHint(upgr_hell_phantoms  ,'Фантомы'                       ,'Pain Elemental создает Фантомов вместо Lost Soul'                          );
+  str_SetUpgrBaseHint(upgr_hell_t2attack  ,'Демоническое Оружие'           ,'Увеличение урона от дальних атак всех Т2 юнитов и защитных сооружений'     );
+  str_SetUpgrBaseHint(upgr_hell_teleport  ,'Улучшение Телепорта'           ,'Уменьшение времени перезарядки Телепорта'                              );
+  str_SetUpgrBaseHint(upgr_hell_rteleport ,'Призыв'                        ,'Юнитов можно перемещать обратно в Телепорт'                            );
+  str_SetUpgrBaseHint(upgr_hell_heye      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
+  str_SetUpgrBaseHint(upgr_hell_totminv   ,'Невидимость Тотема Ужаса'      ,''                               );
+  str_SetUpgrBaseHint(upgr_hell_bldrep    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );
+  str_SetUpgrBaseHint(upgr_hell_tblink    ,'Короткая Телепортация'         ,'Заряды для способности Сторожевой Башни и Тотема Ужаса');
+  str_SetUpgrBaseHint(upgr_hell_resurrect ,'Воскрешение'                   ,'Способность ArchVile'                    );
 
 
-  _mkHStrUpid(upgr_uac_attack     ,'Улучшение Воружений'               ,'Увеличение урона от дальних атак всех юнитов и защитных сооружений');
-  _mkHStrUpid(upgr_uac_uarmor     ,'Улучшение Пехотной Брони'          ,'Увеличение защиты всех юнитов из Казарм'                     );
-  _mkHStrUpid(upgr_uac_barmor     ,'Бетонные Стены'                    ,'Увеличение защиты всех зданий'                               );
-  _mkHStrUpid(upgr_uac_melee      ,'Продвинутые Инструменты'           ,'Увеличение эффективности ремонта Инженера и лечения Медика'  );
-  _mkHStrUpid(upgr_uac_mspeed     ,'Легковесная Броня'                 ,'Увеличение скорости передвижения всех юнитов из Казарм'      );
-  _mkHStrUpid(upgr_uac_ssgup      ,'Разрывные Пули'                    ,'Атака Сержанта, Старшего Сержанта и Терминатора чаще вызывают pain state' );
-  _mkHStrUpid(upgr_uac_towers     ,'Прожекторы'                        ,'Увеличение радиуса обзора и атаки для защитных сооружений'      );
-  _mkHStrUpid(upgr_uac_CCFly      ,'Летные Двигатели Командного Центра','Командный Центр может летать'                                   );
-  _mkHStrUpid(upgr_uac_ccturr     ,'Турель Командного Центра'          ,'Командный Центр может атаковать'                                );
-  _mkHStrUpid(upgr_uac_buildr     ,'Увеличение Области Обзора Командного Центра',''                           );
+  str_SetUnitBaseHint(UID_UCommandCenter  ,'Командный Центр'            ,'');
+  str_SetUnitBaseHint(UID_UACommandCenter ,'Продвинутый Командный Центр','');
+  str_SetUnitBaseHint(UID_UBarracks       ,'Казармы'                    ,'');
+  str_SetUnitBaseHint(UID_UFactory        ,'Фабрика'                    ,'');
+  str_SetUnitBaseHint(UID_UGenerator1     ,'Генератор ур.1'             ,'');
+  str_SetUnitBaseHint(UID_UGenerator2     ,'Генератор ур.2'             ,'');
+  str_SetUnitBaseHint(UID_UGenerator3     ,'Генератор ур.3'             ,'');
+  str_SetUnitBaseHint(UID_UGenerator4     ,'Генератор ур.4'             ,'');
+  str_SetUnitBaseHint(UID_UWeaponFactory  ,'Завод Вооружений'           ,'');
+  str_SetUnitBaseHint(UID_UGTurret        ,'Анти-наземная Турель'       ,'Анти-наземное защитное сооружение' );
+  str_SetUnitBaseHint(UID_UATurret        ,'Анти-воздушная Турель'      ,'Анти-воздушное защитное сооружение');
+  str_SetUnitBaseHint(UID_UTechCenter     ,'Научный Центр'              ,'');
+  str_SetUnitBaseHint(UID_UComputerStation,'Компьютерная Станция'       ,'');
+  str_SetUnitBaseHint(UID_URadar          ,'Радар'                      ,'Разведует карту. Перезарядка способности - '+tc_aqua+i2s(radar_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_UMine           ,'Мина'                       ,'');
 
-  _mkHStrUpid(upgr_uac_botturret  ,'Протокол Трансформации Дрона'      ,'Дрон может превратиться в Анти-наземную Турель'    );
-  _mkHStrUpid(upgr_uac_vision     ,'Улучшенные Визоры'                 ,'Увеличение области обзора и атаки всех юнитов'  );
-  _mkHStrUpid(upgr_uac_commando   ,'Стелс-Технологии'                  ,'Коммандо становиться невидимым'                 );
-  _mkHStrUpid(upgr_uac_airsp      ,'Осколочные Снаряды'                ,'Антивоздушные снаряды наносят урон по области'  );
-  _mkHStrUpid(upgr_uac_mechspd    ,'Улучшеные Двигатели'               ,'Увеличение скорости передвижения юнитов из Фабрики'      );
-  _mkHStrUpid(upgr_uac_mecharm    ,'Улучшение Технической Брони'       ,'Увеличение защиты всех юнитов из Фабрики'                );
-  _mkHStrUpid(upgr_uac_antiair    ,'Анти-воздушное Орудие'             ,'Анти-воздушное оружие для Терминатора'                   );
-  _mkHStrUpid(upgr_uac_transport  ,'Улучшение Транспорта'              ,'Увеличение вместимости Десантного Корабля'               );
-  _mkHStrUpid(upgr_uac_radar_r    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
-  _mkHStrUpid(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
-  _mkHStrUpid(upgr_uac_turarm     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
+  str_SetUnitBaseHint(UID_Sergant         ,'Сержант'                ,'');
+  str_SetUnitBaseHint(UID_SSergant        ,'Старший Сержант'        ,'');
+  str_SetUnitBaseHint(UID_Commando        ,'Коммандо'               ,'');
+  str_SetUnitBaseHint(UID_Antiaircrafter  ,'Зенитчик'               ,'');
+  str_SetUnitBaseHint(UID_SiegeMarine     ,'Артиллерист'            ,'');
+  str_SetUnitBaseHint(UID_FPlasmagunner   ,'Плазмаганнер'           ,'');
+  str_SetUnitBaseHint(UID_BFGMarine       ,'Солдат с BFG'           ,'');
+  str_SetUnitBaseHint(UID_Engineer        ,'Инженер'                ,'');
+  str_SetUnitBaseHint(UID_Medic           ,'Медик'                  ,'');
+  str_SetUnitBaseHint(UID_UACDron         ,'Дрон'                   ,'');
+  str_SetUnitBaseHint(UID_UTransport      ,'Десантный корабль'      ,'');
+  str_SetUnitBaseHint(UID_Terminator      ,'Терминатор'             ,'');
+  str_SetUnitBaseHint(UID_Tank            ,'Танк'                   ,'');
+  str_SetUnitBaseHint(UID_Flyer           ,'Истребитель'            ,'');
+  str_SetUnitBaseHint(UID_APC             ,'БТР'                    ,'');
+
+
+  str_SetUpgrBaseHint(upgr_uac_attack     ,'Улучшение Воружений'               ,'Увеличение урона от дальних атак всех юнитов и защитных сооружений');
+  str_SetUpgrBaseHint(upgr_uac_uarmor     ,'Улучшение Пехотной Брони'          ,'Увеличение защиты всех юнитов из Казарм'                     );
+  str_SetUpgrBaseHint(upgr_uac_barmor     ,'Бетонные Стены'                    ,'Увеличение защиты всех зданий'                               );
+  str_SetUpgrBaseHint(upgr_uac_tools      ,'Продвинутые Инструменты'           ,'Увеличение эффективности ремонта Инженера и лечения Медика'  );
+  str_SetUpgrBaseHint(upgr_uac_mspeed     ,'Легковесная Броня'                 ,'Увеличение скорости передвижения всех юнитов из Казарм'      );
+  str_SetUpgrBaseHint(upgr_uac_ssgup      ,'Разрывные Пули'                    ,'Атака Сержанта, Старшего Сержанта и Терминатора чаще вызывают pain state' );
+  str_SetUpgrBaseHint(upgr_uac_towers     ,'Прожекторы'                        ,'Увеличение радиуса обзора и атаки для защитных сооружений'      );
+  str_SetUpgrBaseHint(upgr_uac_CCFly      ,'Летные Двигатели Командного Центра','Командный Центр может летать'                                   );
+  str_SetUpgrBaseHint(upgr_uac_ccturr     ,'Турель Командного Центра'          ,'Командный Центр может атаковать'                                );
+  str_SetUpgrBaseHint(upgr_uac_buildr     ,'Увеличение Области Обзора Командного Центра',''                           );
+
+  str_SetUpgrBaseHint(upgr_uac_botturret  ,'Протокол Трансформации Дрона'      ,'Дрон может превратиться в Анти-наземную Турель'    );
+  str_SetUpgrBaseHint(upgr_uac_vision     ,'Улучшенные Визоры'                 ,'Увеличение области обзора и атаки всех юнитов'  );
+  str_SetUpgrBaseHint(upgr_uac_commando   ,'Стелс-Технологии'                  ,'Коммандо становиться невидимым'                 );
+  str_SetUpgrBaseHint(upgr_uac_airsp      ,'Осколочные Снаряды'                ,'Антивоздушные снаряды наносят урон по области'  );
+  str_SetUpgrBaseHint(upgr_uac_mechspd    ,'Улучшеные Двигатели'               ,'Увеличение скорости передвижения юнитов из Фабрики'      );
+  str_SetUpgrBaseHint(upgr_uac_mecharm    ,'Улучшение Технической Брони'       ,'Увеличение защиты всех юнитов из Фабрики'                );
+  str_SetUpgrBaseHint(upgr_uac_antiair    ,'Анти-воздушное Орудие'             ,'Анти-воздушное оружие для Терминатора'                   );
+  str_SetUpgrBaseHint(upgr_uac_transport  ,'Улучшение Транспорта'              ,'Увеличение вместимости Десантного Корабля'               );
+  str_SetUpgrBaseHint(upgr_uac_radar_r    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
+  str_SetUpgrBaseHint(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
+  str_SetUpgrBaseHint(upgr_uac_turarm     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
 
   {str_sability := 'Специальная способность';
   str_spability:= 'Специальная способность в точке';
@@ -1883,7 +1849,7 @@ begin
   str_use_sability :='Используйте приказ "'+str_sability +'"!';
   str_use_spability:='Используйте приказ "'+str_spability+'"!'; }
 
-  //_mkHStrACT(0 ,str_sability );
+  {//_mkHStrACT(0 ,str_sability );
   //_mkHStrACT(1 ,str_spability);
   _mkHStrACT(2 ,'Перестроить/Улучшить');
   t:='атаковать врагов';
@@ -1926,7 +1892,7 @@ begin
   _mkHStrOBS(5 ,'Игрок #3'   ,false);
   _mkHStrOBS(6 ,'Игрок #4'   ,false);
   _mkHStrOBS(7 ,'Игрок #5'   ,false);
-  _mkHStrOBS(8 ,'Игрок #6'   ,false);
+  _mkHStrOBS(8 ,'Игрок #6'   ,false);   }
 
 
   FillChar(str_menu_hint,sizeOf(str_menu_hint),0);
@@ -2022,14 +1988,14 @@ begin
         writeln(f,un_txt_name);
         writeln(f);
 
-        writeln(f,'Hotkey: ',RemoveSpecChars(HotKeyBase2Str(_ucl)));
+        writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(_ucl)));
         writeln(f,'Categories/Attributes: ',RemoveSpecChars(str_UnitAttributes(nil,u)));
         writeln(f,'Max hits: ',_mhits);
         //if(_base_armor>0)then
         //writeln(f,'Base armor: ',_base_armor);
         if(_baseregen>0)then
         writeln(f,'Base regeneration: ',_baseregen);
-        writeln(f,'Limit used: ', l2s(_limituse,ul1));
+        writeln(f,'Limit used: ', limit2s(_limituse,ul1));
         writeln(f,'Size: ',_r);
         if(_speed>0)then
         writeln(f,'Base movement speed: ' , _speed);

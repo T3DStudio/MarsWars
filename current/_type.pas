@@ -145,7 +145,7 @@ PTSoundSet = ^TSoundSet;
 //   OTHER
 //
 
-TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_Controls);
+TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_CtrlPanel);
 
 TTabControlContent = (tcc_none=0,tcc_controls,tcc_observer,tcc_replay);
 
@@ -644,10 +644,10 @@ TUnit = record
    transportC
             : integer;
 
-   buff     : array[0..MaxUnitBuffs] of integer;
+   buffs    : array[0..MaxUnitBuffs] of integer;
 
-   vsni,
-   vsnt     : TUnitVisionData;
+   TeamDetection,
+   TeamVision     : TUnitVisionData;
 
    StayWaitForNewTarget:byte;
    ukfly,

@@ -94,7 +94,7 @@ function replay_GetProgress:single;
 begin
    replay_GetProgress:=0;
 
-   if(rpls_state=rpls_read)and(rpls_fstatus=rpls_read)and(rpls_file_size>0)then
+   if(rpls_pstate=rpls_read)and(rpls_fstate=rpls_read)and(rpls_file_size>0)then
    begin
       replay_GetProgress:=FilePos(rpls_file)/rpls_file_size;
       if(replay_GetProgress>1)then replay_GetProgress:=1;
@@ -104,8 +104,8 @@ end;
 
 procedure replay_SavePlayPosition;
 begin
-   if(rpls_fstatus<>rpls_read)
-   or(rpls_state  <>rpls_read)then exit;
+   if(rpls_fstate<>rpls_read)
+   or(rpls_pstate  <>rpls_read)then exit;
 
    if(rpls_ReadPosN>0)then
      with rpls_ReadPosL[rpls_ReadPosN-1] do
@@ -128,8 +128,8 @@ var ni,i :cardinal;
 begin
    replay_SetPlayPosition:=false;
    if(rpls_ReadPosN=0)
-   or(rpls_fstatus<>rpls_read)
-   or(rpls_state  <>rpls_read)then exit;
+   or(rpls_fstate<>rpls_read)
+   or(rpls_pstate  <>rpls_read)then exit;
 
    ni:=cardinal.MaxValue;
    vi:=0;
@@ -168,16 +168,16 @@ procedure replay_Abort;
 begin
    if(length(rpls_str_path)>0)then
    begin
-      if(rpls_state=rpls_write)
-      or(rpls_fstatus=rpls_write)then GameLogCommon(0,255,str_RecordingStop+rpls_str_path,true);
+      if(rpls_pstate=rpls_write)
+      or(rpls_fstate=rpls_write)then GameLogCommon(0,255,str_RecordingStop+rpls_str_path,true);
    end;
-   if(rpls_fstatus>rpls_none)then
+   if(rpls_fstate>rpls_none)then
    begin
       close(rpls_file);
-      rpls_fstatus:=rpls_none;
+      rpls_fstate:=rpls_none;
    end;
    rpls_str_path:='';
-   if(rpls_state>=rpls_read)then rpls_state:=rpls_none;
+   if(rpls_pstate>=rpls_read)then rpls_pstate:=rpls_none;
    rpls_ReadPosN:=0;
    setlength(rpls_ReadPosl,rpls_ReadPosN);
 end;
@@ -204,16 +204,16 @@ begin
    if(ioresult<>0)then
    begin
       replay_Abort;
-      rpls_state:=rpls_none;
+      rpls_pstate:=rpls_none;
    end
    else
    begin
-      rpls_fstatus:=rpls_write;
-      rpls_state  :=rpls_write;
+      rpls_fstate:=rpls_write;
+      rpls_pstate  :=rpls_write;
       rpls_u      :=MaxPlayerUnits+1;
       rpls_player :=LocalPlayer;
       rpls_log_c  :=0;
-      rpls_plcam  :=false;
+      rpls_POVRecorder  :=false;
       rpls_ticks  :=0;
 
       {$I-}
@@ -226,7 +226,7 @@ begin
       if(ioresult<>0)then
       begin
          replay_Abort;
-         rpls_state:=rpls_none;
+         rpls_pstate:=rpls_none;
       end;
 
       GameLogCommon(0,255,str_RecordingStart+rpls_str_path,true);
@@ -250,7 +250,7 @@ begin
       {$I-}
       BlockWrite(rpls_file,i,sizeof(i));
       {$I+}
-      if((i and %10000000)>0)then _wudata_log(rpls_player,@rpls_log_c,true);
+      if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_c,true);
       if((i and %01000000)>0)then
       begin
          rpls_vidx:=_vx;
@@ -267,7 +267,7 @@ begin
    if(ioresult<>0)then
    begin
       replay_Abort;
-      rpls_state:=rpls_none;
+      rpls_pstate:=rpls_none;
    end;
 end;
 
@@ -280,7 +280,7 @@ begin
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
    begin
-      rpls_state   :=rpls_none;
+      rpls_pstate   :=rpls_none;
       g_started    :=false;
       rpls_str_info:='';
       exit;
@@ -290,7 +290,7 @@ begin
 
    if(not FileExists(rpls_str_path))then
    begin
-      rpls_state   :=rpls_none;
+      rpls_pstate   :=rpls_none;
       g_started    :=false;
       rpls_str_info:=str_FileError_NExists;
       exit;
@@ -380,14 +380,14 @@ begin
          UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
 
-         rpls_fstatus:=rpls_read;
-         rpls_state  :=rpls_read;
+         rpls_fstate:=rpls_read;
+         rpls_pstate  :=rpls_read;
          rpls_pnu    :=0;
          rpls_ticks  :=0;
          LocalPlayer     :=rpls_player;
          UIPlayer    :=LocalPlayer;
 
-         rpls_plcam  :=false;
+         rpls_POVRecorder  :=false;
 
          map_premap;
          ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
@@ -408,14 +408,14 @@ begin
    begin
       replay_Abort;
       G_Status   :=gs_replayerror;
-      uncappedFPS:=false;
+      sys_uncappedFPS:=false;
       exit;
    end;
 
    if(eof(rpls_file))then
    begin
       G_Status   :=gs_replayend;
-      uncappedFPS:=false;
+      sys_uncappedFPS:=false;
       rpls_ForwardSkip  :=0;
       exit;
    end;
@@ -452,7 +452,7 @@ begin
       rpls_ForwardSkip-=1;
    end;
 
-   if(rpls_plcam)then
+   if(rpls_POVRecorder)then
    begin
       ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl vxyc)-ui_cam_hw) div 2;
       ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl vxyc)-ui_cam_hh) div 2;
@@ -466,23 +466,25 @@ begin
    if(rpls_RecordTryPause>0)
    then rpls_RecordTryPause-=1
    else
-     if(rpls_Record)and(g_Started)and(rpls_state=rpls_none)then
+     if(rpls_Record)then
      begin
-        rpls_state:=rpls_write;
+        if(g_Started)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
         rpls_RecordTryPause:=fr_fps2;
-     end;
+     end
+     else
+       if(rpls_pstate=rpls_write)then replay_Abort;
 
-   if(not G_Started)or(rpls_state=rpls_none)or(g_type=gt_campaing)
+   if(not G_Started)or(rpls_pstate=rpls_none)or(g_type=gt_campaing)
    then replay_Abort
    else
      if(G_Started)then
      begin
         rpls_ticks+=1;
-        case rpls_state of
-rpls_write : if(rpls_fstatus<>rpls_write)
+        case rpls_pstate of
+rpls_write : if(rpls_fstate<>rpls_write)
              then replay_WriteHead
              else replay_WriteGameFrame;
-rpls_read  : if(rpls_fstatus<>rpls_read)
+rpls_read  : if(rpls_fstate<>rpls_read)
              then replay_Readhead
              else replay_ReadGameFrame;
         else replay_Abort;
@@ -533,7 +535,7 @@ begin
    if(check)then exit;
 
    g_type    :=gt_scirmish;
-   rpls_state:=rpls_read;
+   rpls_pstate:=rpls_read;
    g_started :=true;
 end;
 

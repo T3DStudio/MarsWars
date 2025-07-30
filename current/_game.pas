@@ -197,7 +197,7 @@ begin
    {$ENDIF}
 
    {$IFDEF _FULLGAME}
-   uncappedFPS:=false;
+   sys_uncappedFPS:=false;
 
    menu_update:=true;
 
@@ -233,9 +233,9 @@ begin
    svld_str_fname:='';
 
    rpls_pnu  :=0;
-   rpls_plcam:=false;
-   //if(rpls_state>=rpls_read)then
-   rpls_state:=rpls_none;
+   rpls_POVRecorder:=false;
+   //if(rpls_pstate>=rpls_read)then
+   rpls_pstate:=rpls_none;
    {$ELSE}
    screen_redraw:=true;
    {$ENDIF}
@@ -275,7 +275,7 @@ begin
 
    if(not g_started)
    or(pid>=LastPlayer)
-   or(rpls_state=rpls_read)
+   or(rpls_pstate=rpls_read)
    or(not g_DefeatedObs)then exit;
 
    with g_players[pid] do
@@ -457,7 +457,7 @@ begin
      if(UIPlayer<>LocalPlayer)
      or(observer)
      or(army<=0)
-     or(rpls_state=rpls_read)then exit;
+     or(rpls_pstate=rpls_read)then exit;
    if(g_status<>gs_running)then exit;
    ui_GameControlsEnabled:=true;
 end;
@@ -535,7 +535,6 @@ begin
             case fgroup of
             1..
             MaxUnitGroups: sel:=group=fgroup;
-            //254          : sel:=UnitF1Select(g_punits[u]);
             255          : sel:=UnitF2Select(g_punits[u]);
             end;
 
@@ -1149,13 +1148,11 @@ begin
        {$IFDEF _FULLGAME}
        if(player=LocalPlayer)and(net_status=ns_client)then
        begin
-
           PlayerRaceChange:=true;
           if(check)then exit;
 
           PlayerRace+=1;
           if(PlayerRace>r_cnt)then PlayerRace:=0;
-
        end
        else
        {$ENDIF}
@@ -1254,7 +1251,7 @@ begin
    nmid_lobby_MObs           : begin ScrollByte(@map_Obstacles,forward,0,map_MaxObstacles); Map_premap; end;
    nmid_lobby_MSym           : begin map_Symmetry:=not map_Symmetry; Map_premap; end;
    nmid_lobby_MRandom        : begin Map_randommap; Map_premap;end;
-   nmid_lobby_GFixedPositions: begin g_FixedPositions:=not g_FixedPositions;          Map_premap;end;
+   nmid_lobby_GFixedPositions: begin g_FixedPositions:=not g_FixedPositions;           Map_premap;end;
    nmid_lobby_GAISlots       : begin ScrollByte(@g_AISlots  ,forward,0,g_MaxAISlots  );Map_premap;end;
    nmid_lobby_GDefeatedObs   : g_DefeatedObs:=not g_DefeatedObs;
    nmid_lobby_GRandomScirmish: if(forward)then MakeRandomSkirmish;

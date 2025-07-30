@@ -40,7 +40,7 @@ begin
    GameNetServer:=false;
 
    if(net_status=ns_client)
-   or(rpls_state<>rpls_none)
+   or(rpls_pstate<>rpls_none)
    or(G_Started)then exit;
 
    case start of
@@ -78,7 +78,7 @@ begin
    GameNetClient:=false;
 
    if(net_status=ns_server)
-   or(rpls_state<>rpls_none)
+   or(rpls_pstate<>rpls_none)
    or(G_Started)then exit;
 
    case connect of
@@ -93,10 +93,10 @@ begin
              menu_GetClientAddress;
              rpls_pnu:=0;
              if(net_UpSocket)
-             then GameLogChat(255,255,str_connecting,true)
+             then GameLogChat(255,255,str_gmsg_Connecting,true)
              else
              begin
-                GameLogChat(255,255,str_portblocked,true);
+                GameLogChat(255,255,str_gmsg_PortBlocked,true);
                 net_dispose;
                 net_status:=ns_none;
              end;
@@ -259,7 +259,7 @@ begin
    with menu_items[mi_SaveLoad_list] do
    menu_Item_Set(mi_SaveLoad_fname  ,mi_x0,mi_y1,mi_x1,mi_y1+menu_ListLineH,true);
 
-   if(g_started)and(rpls_state<>rpls_read)
+   if(g_started)and(rpls_pstate<>rpls_read)
    then menu_page_BottomButtons(mi_back,mi_SaveLoad_save,mi_SaveLoad_load,mi_SaveLoad_delete,0,0)
    else menu_page_BottomButtons(mi_back,                 mi_SaveLoad_load,mi_SaveLoad_delete,0,0,0);
 
@@ -318,7 +318,7 @@ begin
                        end;
    mi_settings_Record: begin
                           menu_Item_Set(mi_SR_RecordGames     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SR_RecordPrefix    ,mtx0,mty0,mtx1,mty0+menu_SmallW,rpls_state<>rpls_write);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SR_RecordPrefix    ,mtx0,mty0,mtx1,mty0+menu_SmallW,rpls_pstate<>rpls_write);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SR_RecordQuality   ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);
                        end;
    mi_settings_Video : begin
@@ -373,8 +373,6 @@ begin
    ns_client: btns[4]:=mi_MP_Disconnect;
    end;
    menu_page_BottomButtons(btns[0],btns[1],btns[2],btns[3],btns[4],0);
-
-   writeln(GameBack(false,true));
 
    // PLAYERS BLOCK
    mtx0:=menu_BaseW;
@@ -471,7 +469,7 @@ begin
       mtx1:=mi_x1;
       mty0:=mi_y1+menu_BaseW;
    end;
-   if(rpls_state=rpls_read)
+   if(rpls_pstate=rpls_read)
    then menu_Item_Set(mi_ReplayInfo_Panel,mtx0,mty0,mtx1,menu_items[mi_Game_Panel].mi_y1,true)
    else
    begin
@@ -582,6 +580,14 @@ mnx,
 mny    :integer;
 clickSound,
 changed:boolean;
+function SetSelectedItem(newItem:byte):boolean;
+begin
+   SetSelectedItem:=true;
+   if(menu_items[newItem].mi_state>0)
+   then menu_ItemSelected:=newItem
+   else SetSelectedItem:=false;
+end;
+
 begin
    mnx:=mouse_x;
    mny:=mouse_y;
@@ -812,8 +818,11 @@ mi_MP_ClientQuality    : ScrollByte(@net_cl_Quality,false,0,net_MaxQuality);
 
    if(InputActionPressed(iact_MWD))then
    begin
+      SetSelectedItem(mi_SaveLoad_list);
+      SetSelectedItem(mi_Replays_list );
+
       changed:=true;
-      case menu_ItemTarget of
+      case menu_ItemSelected of
 //98: if not(G_Started)then
 //    ScrollInt(@camp_list_scroll, 1,0,LastMission     -menu_BaseListH);
 mi_SaveLoad_list       : ScrollInt(@svld_list_scroll, 10,0,svld_list_size-menu_BaseListH,false);
@@ -825,8 +834,11 @@ mi_Replays_list        : ScrollInt(@rpls_list_scroll, 10,0,rpls_list_size-menu_B
 
    if(InputActionPressed(iact_MWU))then
    begin
+      SetSelectedItem(mi_SaveLoad_list);
+      SetSelectedItem(mi_Replays_list );
+
       changed:=true;
-      case menu_ItemTarget of
+      case menu_ItemSelected of
 //98: if not(G_Started)then
 //    ScrollInt(@camp_list_scroll, 1,0,LastMission     -menu_BaseListH);
 mi_SaveLoad_list       : ScrollInt(@svld_list_scroll,-10,0,svld_list_size-menu_BaseListH,false);
@@ -841,7 +853,8 @@ mi_Replays_list        : ScrollInt(@rpls_list_scroll,-10,0,rpls_list_size-menu_B
 ///////////////////////////////////
    if(length(k_KeyboardString)>0)then
    begin
-      //if(g_type=gt_scirmish)and(net_status<>ns_none)and(menu_ItemSelected=0)then menu_ItemSelected:=mi_MP_Chat;
+      SetSelectedItem(mi_SaveLoad_fname);
+      SetSelectedItem(mi_MP_Chat);
 
       changed:=false;
       case menu_ItemSelected of

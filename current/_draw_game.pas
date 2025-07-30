@@ -415,15 +415,15 @@ co_pability   : UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
 
       //ub_Scaned
       case ui_blink3 of
-      0: if(buff[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan );
-      1: if(buff[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_decay);
+      0: if(buffs[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan );
+      1: if(buffs[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_decay);
       2:;
       end;
 
-      pain:=(buff[ub_Pain]>0)and(_ukmech and not _ukbuilding);
+      pain:=(buffs[ub_Pain]>0)and(_ukmech and not _ukbuilding);
       buffx:=0;
-      if(buff[ub_HVision]>0)then buffx+=1;
-      if(buff[ub_Invuln ]>0)then buffx+=1;
+      if(buffs[ub_HVision]>0)then buffx+=1;
+      if(buffs[ub_Invuln ]>0)then buffx+=1;
       if(pain              )then buffx+=1;
 
       if(buffx=0)then exit;
@@ -435,8 +435,8 @@ co_pability   : UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
       then buffy:=vy
       else buffy:=vy-sel_hh-font_w;
 
-      if(buff[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
-      if(buff[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
+      if(buffs[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
+      if(buffs[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
       if(pain              )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
    end;
 end;
@@ -556,7 +556,7 @@ begin
     with g_KeyPoints[t] do
      if(cpCaptureR>0)and(RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then
      begin
-        color:=GetCPColor(t);
+        color:=GetKeyPointColor(t);
 
         if(cpenergy>0)then
         begin
@@ -801,12 +801,12 @@ begin
            if(isbuild)then
            begin
               if(alrm_x>0)then
-               lineColor(vid_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
+               lineColor(vid_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_blue);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buffs[ub_stop])
            end
            else
            begin
               if(alrm_x>0)then
-               lineColor(vid_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop])
+               lineColor(vid_screen,ix,iy,alrm_x-ui_cam_x,alrm_y-ui_cam_y,c_red);  //i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buffs[ub_stop])
            end;
            if(uo_x>0)then
             lineColor(vid_screen,ix,iy,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);
@@ -818,14 +818,14 @@ begin
 
         if(hits>0){and(uidi=UID_URMStation)}then
         begin
-           //draw_text(vid_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buff[ub_stop]), ta_left,255, plcolor[player]);
+           //draw_text(vid_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buffs[ub_stop]), ta_left,255, plcolor[player]);
 
            //if(tar1>0)then lineColor(vid_screen,ix,iy,g_units[tar1].x-ui_cam_x,g_units[tar1].y-ui_cam_y,c_white);
             //lineColor(vid_screen,ix+10,iy+10,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);  and(player=LocalPlayer)
         end;
 
          //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
-         //if(sel)then            i2s(vsnt[g_players[player].team])+#13+i2s(vsni[g_players[player].team])
+         //if(sel)then            i2s(TeamVision[g_players[player].team])+#13+i2s(TeamDetection[g_players[player].team])
          //if(alrm_r<=0)then
          //
 

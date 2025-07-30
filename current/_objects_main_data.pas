@@ -1223,7 +1223,7 @@ begin
    _ruid1     := UID_UWeaponFactory;
    _ruid2     := UID_UACommandCenter;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,upgr_uac_melee ,BaseRepairBonus1,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,upgr_uac_tools ,BaseRepairBonus1,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_Medic:
@@ -1241,7 +1241,7 @@ begin
    _ruid1     := UID_UWeaponFactory;
    _ruid2     := UID_UACommandCenter;
    _fastdeath_hits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,upgr_uac_melee ,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,upgr_uac_tools ,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
    _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsd2,MID_Bullet ,0,0,0,upgr_uac_attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
 end;
 UID_UACDron:
@@ -1673,7 +1673,7 @@ begin
    _setUPGR(r_uac ,upgr_uac_attack     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_uarmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_barmor     ,60 ,0,35,5   ,600 ,0,800 ,0            ,0                   ,false);
-   _setUPGR(r_uac ,upgr_uac_melee      ,60 ,0,30,2   ,600 ,0,400 ,0            ,0                   ,false);
+   _setUPGR(r_uac ,upgr_uac_tools      ,60 ,0,30,2   ,600 ,0,400 ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_mspeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_ssgup      ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   ,false);
    _setUPGR(r_uac ,upgr_uac_buildr     ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                   ,false);

@@ -40,7 +40,7 @@ UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
       if(uid^._ukbuilding)and(iscomplete=false)
       then _unit_SpriteDepth:=sd_build+vy
       else
-        if(hits>0)or(buff[ub_Resurect]>0)
+        if(hits>0)or(buffs[ub_Resurect]>0)
         then _unit_SpriteDepth:=_SpriteDepth(vy,ukfly or (zfall>0))
         else _unit_SpriteDepth:=_SpriteDepth(vy,ukfly);
     end;
@@ -241,7 +241,7 @@ begin
 
       if(uo_x>0)and((uo_x<>x)or(uo_y<>y))then
       begin
-         if(sel)and(speed>0)and(rpls_state<rpls_read)and(net_status<>ns_client)then
+         if(sel)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
            if(uo_id=ua_move)or(uo_id=ua_amove)then
              if(uo_bx>0)then UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
 
@@ -359,7 +359,7 @@ begin
    begin
       // buffs and level
       lvlstr_b:='';
-      if(buff[ub_Detect  ]>0)then lvlstr_b+=char_detect;
+      if(buffs[ub_Detect  ]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
       if(not _ukbuilding)or(_isbarrack)or(_issmith)then
@@ -454,7 +454,7 @@ begin
          _unit_minimap(pu);
 
          if(_ability=uab_HKeepBlink)then
-          if(buff[ub_CCast]>0)then exit;
+          if(buffs[ub_CCast]>0)then exit;
 
          wanim:=false;
          if(G_Status=gs_running)then
@@ -483,18 +483,18 @@ begin
 
             UnitsInfoAddUnit(pu,un_smodel[level]);
 
-            if(buff[ub_Invis ]>0 )then alpha:=128;
+            if(buffs[ub_Invis ]>0 )then alpha:=128;
 
-            if(buff[ub_Invuln]>fr_fpsd6)
+            if(buffs[ub_Invuln]>fr_fpsd6)
             then ColorAura:=c_awhite;
 
             if(un_eid_summon_spr[level]<>nil)then
-             if(buff[ub_Summoned]>0)then
-              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buff[ub_Summoned]*4,255));
+             if(buffs[ub_Summoned]>0)then
+              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buffs[ub_Summoned]*4,255));
 
-            if(buff[ub_ArchFire]>0)then
+            if(buffs[ub_ArchFire]>0)then
              with spr_h_p6 do
-              if(sn>0)then SpriteListAddUnit(vx-_randomr(_missile_r),vy-_randomr(_missile_r),depth+1,0,0,0,@sl[(g_tick div 4) mod cardinal(sn)],255);
+              if(sn>0)then SpriteListAddUnit(vx-g_randomr(_missile_r),vy-g_randomr(_missile_r),depth+1,0,0,0,@sl[(g_tick div 4) mod cardinal(sn)],255);
 
             if(uidi=UID_UACDron)and(not iscomplete)
             then SpriteListAddEffect(vx,vy,sd_liquid+y,0,@spr_UTurret.sl[0],255);
@@ -538,12 +538,12 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
                  end
                  else alphab:=255;
 
-                 if(buff[ub_Invis]>0)then alphab:=alphab shr 1;
+                 if(buffs[ub_Invis]>0)then alphab:=alphab shr 1;
 
                  SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_liquid+un_eid_bcrater_y+y,0,_EID2Spr(un_eid_bcrater),alphab);
               end
               else
-                if(buff[ub_Invis]>0)then alpha:=alpha shr 1;
+                if(buffs[ub_Invis]>0)then alpha:=alpha shr 1;
 
             if(ui_ColoredShadow)
             then ColorShadow:=ShadowColor(PlayerGetColor(playeri))

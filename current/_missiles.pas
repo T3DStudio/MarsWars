@@ -209,8 +209,8 @@ begin
 
           if(tu<>nil)then
           begin
-             x-=sign(tu^.x-vx)*_random(tu^.uid^._missile_r);
-             y-=sign(tu^.y-vy)*_random(tu^.uid^._missile_r);
+             x-=sign(tu^.x-vx)*g_random(tu^.uid^._missile_r);
+             y-=sign(tu^.y-vy)*g_random(tu^.uid^._missile_r);
           end;
 
           if(tar<=0)or(mid_base_splashr>0)
@@ -304,7 +304,7 @@ begin
       tu:=nil;
       if(IsUnitRange(tar,@tu))then
        if(homing>mh_none)then
-        if(tu^.buff[ub_teleport]>0)
+        if(tu^.buffs[ub_teleport]>0)
         then homing:=mh_none
         else
           if(tu^.x<>tu^.vx)

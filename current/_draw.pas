@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_players[LocalPlayer].observer)and(not Game_IsEnded)and(rpls_state<rpls_read)
+   if(not g_players[LocalPlayer].observer)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
    then UIPlayer:=LocalPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -37,7 +37,7 @@ begin
    D_SpriteList(vid_screen,ui_mapx,ui_mapy);
    D_Fog       (vid_screen,ui_mapx,ui_mapy);
    D_UnitsInfo (vid_screen,ui_mapx,ui_mapy);
-   D_ui        (vid_screen,ui_mapx,ui_mapy,UIPlayer);
+   D_ui        (vid_screen,ui_mapx,ui_mapy);
 
    draw_sdlsurface(vid_screen,ui_panelx,ui_panely,ui_uipanel);
 
@@ -104,8 +104,8 @@ begin
    ta_right,255, c_white);
 
    draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-30,
-       i2s(rpls_state)+
-   ' '+i2s(rpls_fstatus),
+       i2s(rpls_pstate)+
+   ' '+i2s(rpls_fstate),
    ta_right,255, c_white);
    end;
 

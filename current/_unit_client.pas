@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-procedure _wudata_string(s:shortstring;rpl:boolean);
+procedure wudata_string(s:shortstring;rpl:boolean);
 var sl,x:byte;
        c:char;
 begin
@@ -26,47 +26,47 @@ begin
    end;
 end;
 
-procedure _wudata_byte(bt:byte;rpl:boolean);
+procedure wudata_byte(bt:byte;rpl:boolean);
 begin
    if(rpl=false)
    then net_writebyte(bt)
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
-procedure _wudata_word(bt:word;rpl:boolean);
+procedure wudata_word(bt:word;rpl:boolean);
 begin
    if(rpl=false)
    then net_writeword(bt)
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
-procedure _wudata_sint(bt:shortint;rpl:boolean);
+procedure wudata_sint(bt:shortint;rpl:boolean);
 begin
    if(rpl=false)
    then net_writesint(bt)
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
-procedure _wudata_int(bt:integer;rpl:boolean);
+procedure wudata_int(bt:integer;rpl:boolean);
 begin
    if(rpl=false)
    then net_writeint(bt)
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
-procedure _wudata_card(bt:cardinal;rpl:boolean);
+procedure wudata_card(bt:cardinal;rpl:boolean);
 begin
    if(rpl=false)
    then net_writecard(bt)
    else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
 end;
 
-function _wudata_log(p:byte;clog_n:pcardinal;rpl:boolean):boolean;
+function wudata_log(p:byte;clog_n:pcardinal;rpl:boolean):boolean;
 var t,s:integer;
       i:cardinal;
       b:byte;
 begin
-   _wudata_log:=false;
+   wudata_log:=false;
    if(p<=LastPlayer)then
     with g_players[p] do
     begin
@@ -99,24 +99,24 @@ begin
             then i:=MaxPlayerLog
             else i-=1;
 
-          _wudata_byte(byte(s),rpl);
+          wudata_byte(byte(s),rpl);
           while(s>0)do
           begin
              with log_l[i] do
              begin
-                _wudata_byte  (mtype,rpl);
+                wudata_byte  (mtype,rpl);
                 b:=argt and %00000011;
                 if(argx       >0)then b:=b or %00000100;
                 if(length(str)>0)then b:=b or %00001000;
                 if(xi         >0)then b:=b or %00010000;
-                _wudata_byte  (b,rpl);
+                wudata_byte  (b,rpl);
 
-                if((b and %00000100)>0)then _wudata_byte  (argx ,rpl);
-                if((b and %00001000)>0)then _wudata_string(str  ,rpl);
+                if((b and %00000100)>0)then wudata_byte  (argx ,rpl);
+                if((b and %00001000)>0)then wudata_string(str  ,rpl);
                 if((b and %00010000)>0)then
                 begin
-                   _wudata_byte(byte(xi shr 5),rpl);
-                   _wudata_byte(byte(yi shr 5),rpl);
+                   wudata_byte(byte(xi shr 5),rpl);
+                   wudata_byte(byte(yi shr 5),rpl);
                 end;
              end;
 
@@ -125,17 +125,17 @@ begin
              else i+=1;
              s-=1;
           end;
-          if(rpl=false)then _wudata_card(clog_n^,rpl);
-          _wudata_log:=true;
+          if(rpl=false)then wudata_card(clog_n^,rpl);
+          wudata_log:=true;
           exit;
        end;
     end;
-    _wudata_byte(0,rpl);
+    wudata_byte(0,rpl);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure _wudata_bstat(pu:PTUnit;rpl:boolean);
+procedure wudata_bstat(pu:PTUnit;rpl:boolean);
 var _bts1,
     _bts2:byte;
 begin
@@ -145,26 +145,26 @@ begin
       _bts1:=0;
       _bts2:=0;
 
-      SetBBit(@_bts2,0, buff[ub_Resurect    ]>0);
-      SetBBit(@_bts2,1, buff[ub_Summoned    ]>0);
-      SetBBit(@_bts2,2, buff[ub_Invuln      ]>0);
-      SetBBit(@_bts2,3, buff[ub_Teleport    ]>0);
-      SetBBit(@_bts2,4, buff[ub_HVision     ]>0);
-      SetBBit(@_bts2,5, buff[ub_Cast        ]>0);
-      SetBBit(@_bts2,6, buff[ub_Scaned      ]>0);
-      SetBBit(@_bts2,7, buff[ub_Decay       ]>0);
+      SetBBit(@_bts2,0, buffs[ub_Resurect    ]>0);
+      SetBBit(@_bts2,1, buffs[ub_Summoned    ]>0);
+      SetBBit(@_bts2,2, buffs[ub_Invuln      ]>0);
+      SetBBit(@_bts2,3, buffs[ub_Teleport    ]>0);
+      SetBBit(@_bts2,4, buffs[ub_HVision     ]>0);
+      SetBBit(@_bts2,5, buffs[ub_Cast        ]>0);
+      SetBBit(@_bts2,6, buffs[ub_Scaned      ]>0);
+      //SetBBit(@_bts2,7, buffs[ub_Decay       ]>0);
 
       SetBBit(@_bts1,0, iscomplete             );
       SetBBit(@_bts1,1, transport>0            );
       SetBBit(@_bts1,2, (level and %01)      >0);
       SetBBit(@_bts1,3, (level and %10)      >0);
-      SetBBit(@_bts1,4, buff[ub_Pain        ]>0);
+      SetBBit(@_bts1,4, buffs[ub_Pain        ]>0);
       SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
       SetBBit(@_bts1,6, sel                    );
       SetBBit(@_bts1,7, _bts2>0                );
 
-      _wudata_byte(_bts1,rpl);
-      if(_bts2>0)then _wudata_byte(_bts2,rpl);
+      wudata_byte(_bts1,rpl);
+      if(_bts2>0)then wudata_byte(_bts2,rpl);
    end;
 end;
 
@@ -173,7 +173,7 @@ begin
    if(r^<=0)
    then _wudata_rld:=0
    else _wudata_rld:=mm3i(1,(r^ div fr_fps1)+1,255);
-   _wudata_byte(_wudata_rld,rpl);
+   wudata_byte(_wudata_rld,rpl);
 end;
 
 procedure _wudata_prod(pu:PTUnit;rpl:boolean);
@@ -185,8 +185,8 @@ begin
    for i:=0 to MaxUnitLevel do
    begin
       if(i>level)then break;
-      if(_isbarrack)then if(_wudata_rld(@uprod_r[i],rpl)>0)then _wudata_byte(uprod_u[i],rpl);
-      if(_issmith  )then if(_wudata_rld(@pprod_r[i],rpl)>0)then _wudata_byte(pprod_u[i],rpl);
+      if(_isbarrack)then if(_wudata_rld(@uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
+      if(_issmith  )then if(_wudata_rld(@pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
    end;
 end;
 
@@ -224,7 +224,7 @@ begin
 
       if(wb)then b:=b or %10000000;
 
-      _wudata_byte(b,rpl);
+      wudata_byte(b,rpl);
 
       if(not wb)then exit;
 
@@ -239,16 +239,16 @@ begin
       if(sel or not rpl)then
         if(UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
           if(IsUnitRange(uo_tar,nil))
-          then _wudata_int(-uo_tar,rpl)
+          then wudata_int(-uo_tar,rpl)
           else
           begin
-             _wudata_int(uo_x,rpl);
-             _wudata_int(uo_y,rpl);
+             wudata_int(uo_x,rpl);
+             wudata_int(uo_y,rpl);
           end;
    end;
 end;
 
-procedure _wudata_main(pu:PTUnit;rpl:boolean;POVPlayer:byte);
+procedure wudata_Unit(pu:PTUnit;rpl:boolean;POVPlayer:byte);
 var sh :shortint;
     wt :word;
 begin
@@ -259,24 +259,24 @@ begin
       then sh:=_Hi2Si(hits,_mhits,_shcf)
       else sh:=-128;
 
-      _wudata_sint(sh,rpl);
+      wudata_sint(sh,rpl);
       if(sh>-127)then
       begin
-         _wudata_byte (uidi,rpl);
-         _wudata_bstat(pu,rpl);
+         wudata_byte (uidi,rpl);
+         wudata_bstat(pu,rpl);
 
          if(transport>0)
-         then _wudata_int(transport,rpl)
+         then wudata_int(transport,rpl)
          else
            if(sh>0)then
            begin
-              _wudata_int(vx ,rpl);
-              _wudata_int(vy ,rpl);
+              wudata_int(vx ,rpl);
+              wudata_int(vy ,rpl);
            end
            else
            begin
-              _wudata_byte(byte(vx shr 5),rpl);
-              _wudata_byte(byte(vy shr 5),rpl);
+              wudata_byte(byte(vx shr 5),rpl);
+              wudata_byte(byte(vy shr 5),rpl);
            end;
 
          if(sh>0)then
@@ -286,15 +286,15 @@ begin
                wt:=0;
                if(IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
                wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
-               _wudata_word(wt,rpl);
+               wudata_word(wt,rpl);
             end;
 
-            if(buff[ub_Cast]>0)then
+            if(buffs[ub_Cast]>0)then
              if(_ability in client_cast_abils)then
               if(_wudata_rld(@rld,rpl)>0)then
               begin
-                 _wudata_byte(byte(uo_x shr 5),rpl);
-                 _wudata_byte(byte(uo_y shr 5),rpl);
+                 wudata_byte(byte(uo_x shr 5),rpl);
+                 wudata_byte(byte(uo_y shr 5),rpl);
               end;
 
             if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then _wudata_OwnerUData(pu,rpl);
@@ -321,13 +321,13 @@ begin
              end;
           1: begin
                 bv:=bv or (upgr[n] shl 4);
-                _wudata_byte(bv,rpl);
+                wudata_byte(bv,rpl);
                 bp:=0;
                 bv:=0;
              end;
           end;
 
-        if(bp=1)then _wudata_byte(bv,rpl);
+        if(bp=1)then wudata_byte(bv,rpl);
      end;
 end;
 
@@ -357,7 +357,7 @@ begin
 
    with g_KeyPoints[cpi] do
     if(cpCaptureR<=0)
-    then _wudata_byte(0,rpl)
+    then wudata_byte(0,rpl)
     else
     begin
        b:=b or (cpOwnerPlayer      shl 2) and %00011100;
@@ -365,16 +365,16 @@ begin
 
        case wdcptime^ of
 0       : begin
-             _wudata_byte(b or %00000010,rpl);
+             wudata_byte(b or %00000010,rpl);
              if(cpOwnerPlayer<>cpTimerOwnerPlayer)
              then _wudata_rld(@cpTimer,rpl);
           end;
 1       : if(cpLifeTime<=0)
-          then _wudata_byte(b or %00000001,rpl)
+          then wudata_byte(b or %00000001,rpl)
           else
           begin
-             _wudata_byte(b or %00000011,rpl);
-             _wudata_byte((cpLifeTime div fr_fps1) div 5,rpl);
+             wudata_byte(b or %00000011,rpl);
+             wudata_byte((cpLifeTime div fr_fps1) div 5,rpl);
           end;
        end;
     end;
@@ -395,7 +395,7 @@ wstepb1: boolean;
 i,
  _PNU  : integer;
 begin
-   _wudata_card(g_tick,rpl);
+   wudata_card(g_tick,rpl);
 
    wstep:=g_tick shr 1;
 
@@ -417,10 +417,10 @@ begin
    if(wstepb1)then
      case map_scenario of
 mc_invasion : begin
-              _wudata_byte(g_inv_wave_n     ,rpl);
-              _wudata_int (g_inv_wave_t_next,rpl);
+              wudata_byte(g_inv_wave_n     ,rpl);
+              wudata_int (g_inv_wave_t_next,rpl);
               end;
-mc_royale   : _wudata_int(g_royal_r,rpl);
+mc_royale   : wudata_int(g_royal_r,rpl);
      end;
 
    if(rpl)then
@@ -439,26 +439,26 @@ mc_royale   : _wudata_int(g_royal_r,rpl);
 
    if(g_player_astatus>0)and(g_players[POVPlayer].observer)then SetBBit(@g_player_astatus,7,true);
 
-   _wudata_byte(g_player_astatus,rpl);
+   wudata_byte(g_player_astatus,rpl);
    if(g_player_astatus>0)then
    begin
-      _wudata_byte(_PNU,rpl);
+      wudata_byte(_PNU,rpl);
       _PNU:=min2i(g_cl_units,_PNU*4);
 
       if(wstepb0)then
       begin
          _wpdata_upgr(rpl);
-         _wudata_byte(g_player_rstatus,rpl);
+         wudata_byte(g_player_rstatus,rpl);
       end;
 
-      _wudata_int(_N_U^,rpl);
+      wudata_int(_N_U^,rpl);
       for i:=1 to _PNU do
       begin
          repeat
             _N_U^+=1;
             if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
          until ( g_player_astatus and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
-         _wudata_main(@g_units[_N_U^],rpl,POVPlayer);
+         wudata_Unit(@g_units[_N_U^],rpl,POVPlayer);
       end;
    end;
 end;
@@ -623,7 +623,7 @@ UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S
 UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_S,snd_cube    );
          else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport);
          end;
-         buff[ub_CCast]:=fr_fps1;
+         buffs[ub_CCast]:=fr_fps1;
          exit;
       end // default teleport effects
       else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
@@ -683,9 +683,9 @@ begin
         if(hits>0)then
         begin
            _unit_CalcForR(uu);
-           if(buff[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
-           if(buff[ub_Teleport]>0)then cleffect_teleport  (uu,            @vis);
-           if(buff[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
+           if(buffs[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
+           if(buffs[ub_Teleport]>0)then cleffect_teleport  (uu,            @vis);
+           if(buffs[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
 
            if(playeri=UIPlayer)then
            begin
@@ -713,7 +713,7 @@ begin
           begin
              if(hits>ndead_hits)and(transport=0)then
              begin
-                if(buff[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
+                if(buffs[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
                 with uid^ do
                   if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
@@ -749,12 +749,12 @@ begin
             if(hits>0)then
             begin
                case(speed>0)of
-               false: if(buff[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(uu,pu);
-               true : if(pu^.buff[ub_Teleport]<=0)and(buff[ub_Teleport]>0)then cleffect_teleport(uu,pu);
+               false: if(buffs[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(uu,pu);
+               true : if(pu^.buffs[ub_Teleport]<=0)and(buffs[ub_Teleport]>0)then cleffect_teleport(uu,pu);
                end;
-               if(pu^.buff[ub_Summoned]<=0)and(buff[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
-               if(pu^.buff[ub_HVision ]<=0)and(buff[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
-               if(pu^.buff[ub_Pain    ]<=0)and(buff[ub_Pain    ]>0)then   effect_UnitPain  (uu,            @vis);
+               if(pu^.buffs[ub_Summoned]<=0)and(buffs[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
+               if(pu^.buffs[ub_HVision ]<=0)and(buffs[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
+               if(pu^.buffs[ub_Pain    ]<=0)and(buffs[ub_Pain    ]>0)then   effect_UnitPain  (uu,            @vis);
 
                if(pu^.iscomplete)and(not iscomplete)then
                 if(playeri=UIPlayer)then
@@ -765,7 +765,7 @@ begin
 
                if(iscomplete)then
                begin
-                  if(pu^.buff[ub_Cast]<=0)and(buff[ub_Cast]>0)then
+                  if(pu^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
                    case uid^._ability of
                0:;
                uab_UACStrike   : unit_UACStrike_missile(uu);
@@ -779,7 +779,7 @@ begin
                   begin
                      if(pu^.level<level)then effect_LevelUp(uu,0,@vis);
 
-                     if(pu^.buff[ub_Invuln]<=0)and(buff[ub_Invuln]>0)then effect_LevelUp(uu,EID_Invuln,@vis);
+                     if(pu^.buffs[ub_Invuln]<=0)and(buffs[ub_Invuln]>0)then effect_LevelUp(uu,EID_Invuln,@vis);
                   end;
                end;
             end;
@@ -791,7 +791,7 @@ begin
                vy:=y;
             end
             else
-              if(pu^.hits>0)and(hits<=0)and(buff[ub_Resurect]=0)then  // death
+              if(pu^.hits>0)and(hits<=0)and(buffs[ub_Resurect]=0)then  // death
               begin
                  with uid^ do
                    if(_ukbuilding)and(_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
@@ -823,7 +823,7 @@ begin
                   vstp:=UnitStepTicks;
                   dir :=point_dir(mp_x,mp_y,x,y);
                end;
-               if(speed<=0)or(buff[ub_Teleport]>0)then
+               if(speed<=0)or(buffs[ub_Teleport]>0)then
                begin
                   missiles_clear_tar(unum,true);
                   _unit_clear_a_tar(unum);
@@ -974,7 +974,7 @@ begin
       if(GetBBit(@_bts1,1))then transport:=1 else transport:=0;
       if(GetBBit(@_bts1,2))then level+=%01;
       if(GetBBit(@_bts1,3))then level+=%10;
-      buff[ub_Pain]:=_buffst[GetBBit(@_bts1,4)];
+      buffs[ub_Pain]:=_buffst[GetBBit(@_bts1,4)];
       if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
       if(rpl)then
         sel:=GetBBit(@_bts1,6);
@@ -984,32 +984,32 @@ begin
 
       if(_bts2>0)then
       begin
-         buff[ub_Resurect]:=_buffst[GetBBit(@_bts2,0)];
-         if(GetBBit(@_bts2,1))and(buff[ub_Summoned]<=0)
-         then buff[ub_Summoned]:=fr_fps1;
-         buff[ub_Invuln  ]:=_buffst[GetBBit(@_bts2,2)];
-         buff[ub_Teleport]:=_buffst[GetBBit(@_bts2,3)];
-         buff[ub_HVision ]:=_buffst[GetBBit(@_bts2,4)];
-         buff[ub_Cast    ]:=_buffst[GetBBit(@_bts2,5)];
-         buff[ub_Scaned  ]:=_buffst[GetBBit(@_bts2,6)];
-         buff[ub_Decay   ]:=_buffst[GetBBit(@_bts2,7)];
+         buffs[ub_Resurect]:=_buffst[GetBBit(@_bts2,0)];
+         if(GetBBit(@_bts2,1))and(buffs[ub_Summoned]<=0)
+         then buffs[ub_Summoned]:=fr_fps1;
+         buffs[ub_Invuln  ]:=_buffst[GetBBit(@_bts2,2)];
+         buffs[ub_Teleport]:=_buffst[GetBBit(@_bts2,3)];
+         buffs[ub_HVision ]:=_buffst[GetBBit(@_bts2,4)];
+         buffs[ub_Cast    ]:=_buffst[GetBBit(@_bts2,5)];
+         buffs[ub_Scaned  ]:=_buffst[GetBBit(@_bts2,6)];
+         //buffs[ub_Decay   ]:=_buffst[GetBBit(@_bts2,7)];
       end
       else
       begin
-         buff[ub_Resurect]:=0;
-         //buff[ub_Summoned]:=0;
-         buff[ub_Invuln  ]:=0;
-         buff[ub_Teleport]:=0;
-         buff[ub_HVision ]:=0;
-         buff[ub_Cast    ]:=0;
-         buff[ub_Scaned  ]:=0;
-         buff[ub_Decay   ]:=0;
+         buffs[ub_Resurect]:=0;
+         //buffs[ub_Summoned]:=0;
+         buffs[ub_Invuln  ]:=0;
+         buffs[ub_Teleport]:=0;
+         buffs[ub_HVision ]:=0;
+         buffs[ub_Cast    ]:=0;
+         buffs[ub_Scaned  ]:=0;
+         //buffs[ub_Decay   ]:=0;
       end;
 
       if(not rpl)and(not g_players[POVPlayer].observer)then
        with g_players[POVPlayer] do
         if(team>0)then
-          _AddToInt(@vsnt[team],vistime);
+          AddToInt(@TeamVision[team],MinVisionTime);
    end;
 end;
 
@@ -1126,7 +1126,7 @@ begin
          begin
             _unit_apUID(uu);
             unit_SetDefaults(uu,false);
-            FillChar(buff,SizeOf(buff),0);
+            FillChar(buffs,SizeOf(buffs),0);
          end;
          hits:=_Si2Hi(sh,uid^._mhits,uid^._shcf);
          _rudata_bstat(uu,POVPlayer,rpl);
@@ -1157,7 +1157,7 @@ begin
                a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
-            if(buff[ub_Cast]>0)then
+            if(buffs[ub_Cast]>0)then
              if(uid^._ability in client_cast_abils)then
               if(_rudata_rld(@rld,rpl)>0)then
               begin

@@ -488,7 +488,7 @@ begin
     with log_l[log_i] do
      case mtype of
 0..LastPlayer         : if(mtype<>playern)
-                        or((rpls_state>=rpls_read)and(LocalPlayer=0))then SoundPlayUI(snd_chat);
+                        or((rpls_pstate>=rpls_read)and(LocalPlayer=0))then SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
 lmt_player_chat,

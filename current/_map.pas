@@ -23,9 +23,9 @@ end;
 procedure map_RefreshDoodadsCells;
 var dx0,dy0,dx1,dy1,d,dy:integer;
 begin
-   for dx0:=0 to dcn do
-   for dy0:=0 to dcn do
-   with map_dcell[dx0,dy0] do
+   for dx0:=0 to MapObstaclesGridN do
+   for dy0:=0 to MapObstaclesGridN do
+   with map_ObstaclesGrid[dx0,dy0] do
    begin
       n:=0;
       setlength(l,n);
@@ -35,15 +35,15 @@ begin
     with map_dds[d] do
      if(t>0)then
      begin
-        dx0:=(x-r-dcw) div dcw;
-        dy0:=(y-r-dcw) div dcw;
-        dx1:=(x+r+dcw) div dcw;
-        dy1:=(y+r+dcw) div dcw;
+        dx0:=(x-r-MapObstaclesGridW) div MapObstaclesGridW;
+        dy0:=(y-r-MapObstaclesGridW) div MapObstaclesGridW;
+        dx1:=(x+r+MapObstaclesGridW) div MapObstaclesGridW;
+        dy1:=(y+r+MapObstaclesGridW) div MapObstaclesGridW;
         while(dx0<=dx1)do
         begin
            for dy:=dy0 to dy1 do
-            if(0<=dx0)and(dx0<=dcn)and(0<=dy)and(dy<=dcn)then
-             with map_dcell[dx0,dy] do
+            if(0<=dx0)and(dx0<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
+             with map_ObstaclesGrid[dx0,dy] do
              begin
                 n+=1;
                 setlength(l,n);
@@ -94,7 +94,7 @@ begin
    map_hmw     := map_Size div 2;
    {$IFDEF _FULLGAME}
    if(g_type<>gt_campaing)then
-   map_Size      := mm3i(map_MinSize,map_Size,map_MaxSize);
+   map_Size    := mm3i(map_MinSize,map_Size,map_MaxSize);
 
    map_mmcx    := (ui_CtrlPanelW-2)/map_Size;
    map_mmvw    := trunc(ui_cam_w*map_mmcx)+1;
@@ -181,8 +181,8 @@ begin
       u:=dst;
       while true do
       begin
-         ix:=bb0+_random(bb1);
-         iy:=bb0+_random(bb1);
+         ix:=bb0+g_random(bb1);
+         iy:=bb0+g_random(bb1);
          c+=1;
          if(c>500 )then u-=1;
 
@@ -268,8 +268,8 @@ begin
       c:=0;
       while(c<1000)do
       begin
-         ix:=u+_random(b);
-         iy:=u+_random(b);
+         ix:=u+g_random(b);
+         iy:=u+g_random(b);
 
          if (not _PlayerStartHere(ix,iy,base_1rh,map_Symmetry))
          and(not _CPointHere(ix,iy,base_1rh,map_Symmetry))then
@@ -544,9 +544,9 @@ var i,ix,iy,lqs,rks,ddc,cnt,ir:integer;
 begin
    map_ddn:=0;
    FillChar(map_dds,SizeOf(map_dds),0);
-   for ix:=0 to dcn do
-   for iy:=0 to dcn do
-   with map_dcell[ix,iy] do
+   for ix:=0 to MapObstaclesGridN do
+   for iy:=0 to MapObstaclesGridN do
+   with map_ObstaclesGrid[ix,iy] do
    begin
       n:=0;
       setlength(l,n);
@@ -578,8 +578,8 @@ begin
       cnt:=0;
       while true do
       begin
-         ix:=_randomx(ix,map_Size);
-         iy:=_randomx(iy,map_Size); //+ix*cnt
+         ix:=g_randomx(ix,map_Size);
+         iy:=g_randomx(iy,map_Size); //+ix*cnt
 
          if(_PickDoodad(@ix,@iy,@lqs,@rks,ir))then break;
 

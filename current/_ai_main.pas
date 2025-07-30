@@ -153,8 +153,8 @@ begin
           ddir:=-1;
           if(aiu_alarm_d<NOTSET)then
            case race of
-           r_hell: ddir:=point_dir(x,y,ai_alarm_x,ai_alarm_y)+_randomr(45);
-           r_uac : ddir:=point_dir(ai_alarm_x,ai_alarm_y,x,y)+_randomr(45);
+           r_hell: ddir:=point_dir(x,y,ai_alarm_x,ai_alarm_y)+g_randomr(45);
+           r_uac : ddir:=point_dir(ai_alarm_x,ai_alarm_y,x,y)+g_randomr(45);
            end;
           l:=srange-g_uids[aiucl_detect[race]]._r;
        end;
@@ -201,7 +201,7 @@ begin
             ai_towers_needy:=ai_alarm_y;
          end;
        if(ai_towers_needx>-1)
-       then ddir:=point_dir(x,y,ai_towers_needx,ai_towers_needy)+_randomr(45)
+       then ddir:=point_dir(x,y,ai_towers_needx,ai_towers_needy)+g_randomr(45)
        else ddir:=-1;
        l:=ai_towers_needl;
     end;
@@ -277,7 +277,7 @@ begin
            or(bt=aiucl_main0A[race])
            or(bt=aiucl_main1 [race])
            or(bt=aiucl_main1A[race])
-           then ddir:=point_dir(x,y,map_hmw,map_hmw)-_randomr(100);
+           then ddir:=point_dir(x,y,map_hmw,map_hmw)-g_randomr(100);
       end;
       rdir:=ddir*degtorad;
       if(l<0)
@@ -603,7 +603,7 @@ r_uac : begin
         MakeUpgr(upgr_uac_uarmor     ,i);
         MakeUpgr(upgr_uac_mecharm    ,i);
         MakeUpgr(upgr_uac_barmor     ,i);
-        MakeUpgr(upgr_uac_melee      ,i);
+        MakeUpgr(upgr_uac_tools      ,i);
         MakeUpgr(upgr_uac_mechspd    ,i);
         MakeUpgr(upgr_uac_vision     ,i);
         end;
@@ -692,14 +692,14 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(base_1rh<ai_enemy_d)and(ai_enemy_d<base_3r)and(buff[ub_Damaged]<=0)and(a_rld<=0)then
+      if(base_1rh<ai_enemy_d)and(ai_enemy_d<base_3r)and(buffs[ub_Damaged]<=0)and(a_rld<=0)then
        if(ai_towers_near>1)then
         case uidi of
 UID_UGTurret      : if(ai_towers_near_air=0)then exit;
 UID_UATurret      : if(ai_towers_near_grd=0)then exit;
         end;
 
-     if(ai_enemy_d>base_2r)and(buff[ub_Damaged]<=0)and(a_rld<=0)and(uid_e[uidi]>1)then
+     if(ai_enemy_d>base_2r)and(buffs[ub_Damaged]<=0)and(a_rld<=0)and(uid_e[uidi]>1)then
       case uidi of
 UID_HTower        : if((uid_e[uidi]-uid_e[UID_HTotem])>1)then exit;
 UID_HTotem        : if((uid_e[uidi]-uid_e[UID_HTower])>1)then exit;
@@ -887,16 +887,16 @@ begin
         if(ow<0)then
         begin
            if(ox=x)
-           then uo_x:=ox+_randomr(-ow)
-           else uo_x:=ox+(sign(ox-x)*_random(-ow));
+           then uo_x:=ox+g_randomr(-ow)
+           else uo_x:=ox+(sign(ox-x)*g_random(-ow));
            if(oy=y)
-           then uo_x:=oy+_randomr(-ow)
-           else uo_y:=oy+(sign(oy-y)*_random(-ow));
+           then uo_x:=oy+g_randomr(-ow)
+           else uo_y:=oy+(sign(oy-y)*g_random(-ow));
         end
         else
         begin
-           uo_x:=ox-_randomr(ow);
-           uo_y:=oy-_randomr(ow);
+           uo_x:=ox-g_randomr(ow);
+           uo_y:=oy-g_randomr(ow);
         end;
       uo_tar:=0;
    end;
@@ -919,8 +919,8 @@ begin
    with pu^  do
     if(x=ax)and(y=ay)then
     begin
-       uo_x:=x-_random(2);
-       uo_y:=y-_random(2);
+       uo_x:=x-g_random(2);
+       uo_y:=y-g_random(2);
     end
     else
       if(min2i(x,abs(map_Size-x))<srange)
@@ -1305,7 +1305,7 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
       {if(sel)then
       begin
          if(tar_d<NOTSET)then
-         UnitsInfoAddLine(x+_randomr(2),y+_randomr(2),tar_x+_randomr(2),tar_y+_randomr(2),c_aqua);
+         UnitsInfoAddLine(x+g_randomr(2),y+g_randomr(2),tar_x+g_randomr(2),tar_y+g_randomr(2),c_aqua);
          UnitsInfoAddText((x+tar_x)div 2,(y+tar_y)div 2,i2s(tar_d),c_white);
       end; }
 
@@ -1438,7 +1438,7 @@ begin
         then unit_sability(pu,false)
         else
           if(not ai_cpoint_koth)or(ai_cpoint_d>base_1r)then
-           if(aiu_limitaround_enemy>aiu_limitaround_ally)and(buff[ub_Damaged]>0)then
+           if(aiu_limitaround_enemy>aiu_limitaround_ally)and(buffs[ub_Damaged]>0)then
             if(hits<uid^._hmhits)or(aiu_limitaround_enemy>ul15)then unit_sability(pu,false);
    end;
 end;
@@ -1455,21 +1455,21 @@ begin
            if(map_scenario=mc_royale)
            then w:=g_royal_r div 2
            else w:=map_hmw;
-           if(unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w),false)=0)then exit;
+           if(unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false)=0)then exit;
         end;
 
       case map_scenario of
 mc_KotH  : if(ai_choosen)and(base_1r<ai_cpoint_d)and(ai_cpoint_d<NOTSET)and(ai_cpoint_koth)then
            begin
               w:=base_1r;
-              unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+_random(w),ai_cpoint_cp^.cpx+_random(w),false);
+              unit_ability_HKeepBlink(pu,ai_cpoint_cp^.cpx+g_random(w),ai_cpoint_cp^.cpx+g_random(w),false);
               exit;
            end;
 mc_royale: if(ai_choosen)
            or(u_royal_d<base_2r)then
            begin
               w:=min2i(g_royal_r div 4,base_2r);
-              unit_ability_HKeepBlink(pu,map_hmw+_random(w),map_hmw+_random(w),false);
+              unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false);
               exit;
            end;
       end;
@@ -1496,7 +1496,7 @@ begin
    if(u_royal_d>base_1r)then
    begin
       if(unum=ai_scout_u_cur)and(ai_enemy_build_u<>nil)then
-       if(ai_enemy_build_d<srange)and(ai_enemy_build_u^.speed=0)and(buff[ub_Damaged]<=0)then exit;
+       if(ai_enemy_build_d<srange)and(ai_enemy_build_u^.speed=0)and(buffs[ub_Damaged]<=0)then exit;
 
       if(ai_checkCPNear(25))then exit;
    end;
@@ -1632,11 +1632,11 @@ uab_UACScan          : begin
                             if(unit_ability_UACScan(pu,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,false)=0)then
                             begin
                                ai_detection_pause:=fr_fps1;
-                               ai_enemy_inv_u^.buff[ub_Scaned]:=fr_fps1;
+                               ai_enemy_inv_u^.buffs[ub_Scaned]:=fr_fps1;
                             end;
                           if(ai_alarm_d=NOTSET)and(map_scenario<>mc_invasion)then
                            if(ai_choosen)or(ai_ReadyForAttack)then
-                            if(unit_ability_UACScan(pu,_random(map_Size),_random(map_Size),false)=0)then ai_detection_pause:=fr_fps1;
+                            if(unit_ability_UACScan(pu,g_random(map_Size),g_random(map_Size),false)=0)then ai_detection_pause:=fr_fps1;
                        end;
 uab_HellVision       : if(ai_need_heye_u<>nil)then
                          if(unit_ability_HellVision(pu,ai_need_heye_u^.unum,false)=0)then ai_detection_pause:=fr_fps1;
@@ -1658,7 +1658,7 @@ uab_HellVision       : if(ai_need_heye_u<>nil)then
          if(ai_abase_d<NOTSET)then
          UnitsInfoAddLine(x,y,ai_abase_u^.x,ai_abase_u^.y,c_orange);
 
-         UnitsInfoAddLine(x+_randomr(2),y+_randomr(2),uo_x+_randomr(2),uo_y+_randomr(2),c_white);
+         UnitsInfoAddLine(x+g_randomr(2),y+g_randomr(2),uo_x+g_randomr(2),uo_y+g_randomr(2),c_white);
            }
          {writeln(ai_generator_d);
          if(ai_generator_d<NOTSET)then

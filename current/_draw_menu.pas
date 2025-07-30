@@ -273,7 +273,7 @@ mi_caption_Settings : d_MenuItemPanel(tar,i,3);
    d_menuItemText2L(tar,mi_caption_Campaings,str_menu_Campaings,
                                              str_menu_Tutorials  ,255);
 
-   if(rpls_state=rpls_read)
+   if(rpls_pstate=rpls_read)
 then d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Playback   ,255)
 else d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Scirmish   ,255);
 
@@ -298,7 +298,7 @@ else d_menuItemText1(tar,mi_SaveLoad        ,str_menu_LoadGame   ,0);
    d_menuItemText1(tar,mi_Replays           ,str_menu_Replays    ,0);
    d_menuItemText1(tar,mi_Settings          ,str_menu_Settings   ,0);
 
-   if(rpls_state=rpls_read)
+   if(rpls_pstate=rpls_read)
 then d_menuItemText1(tar,mi_Break           ,str_menu_PlaybackStop,0)
 else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
 
@@ -308,10 +308,10 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_menuItemText1(tar,mi_Surrender         ,str_menu_Surrender  ,0);
 
    // SETTINGS LIST
-   d_menuItemText1(tar,mi_settings_Game     ,str_menu_SetGame    ,menu_SettingsPage);
-   d_menuItemText1(tar,mi_settings_Record   ,str_menu_SetReplay  ,menu_SettingsPage);
-   d_menuItemText1(tar,mi_settings_Video    ,str_menu_SetVideo   ,menu_SettingsPage);
-   d_menuItemText1(tar,mi_settings_Sound    ,str_menu_SetSound   ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Game     ,str_S_Game    ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Record   ,str_S_Replay  ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Video    ,str_S_Video   ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Sound    ,str_S_Sound   ,menu_SettingsPage);
 
    // SETTINGS  GAME
 
@@ -368,7 +368,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemCaption(tar,mi_Replays_info,str_FileInfo );
    d_MenuItemInfo   (tar,mi_Replays_info,rpls_str_info);
 
-   d_menuItemText1(tar,mi_Replays_play       ,str_ReplayPlay,0);
+   d_menuItemText1(tar,mi_Replays_play       ,str_FilePlay,0);
    d_menuItemText1(tar,mi_Replays_delete     ,str_FileDelete,0);
 
    // SCIRMISH PLAYERS
@@ -549,9 +549,9 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
 
    // replays
    draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_left  ,255, c_white);
-   draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_state], ta_right ,255, mic( menu_ReplayStatusToggleEnabled ,rpls_state>rpls_none));
+   draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_pstate], ta_right ,255, mic( menu_ReplayStatusToggleEnabled ,rpls_pstate>rpls_none));
 
-   if(rpls_state>rpls_none)and(g_cl_units>0)then
+   if(rpls_pstate>rpls_none)and(g_cl_units>0)then
    draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
 
 
