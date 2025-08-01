@@ -380,10 +380,10 @@ begin
    mty0:=menu_underCaptionY;
    menu_Item_Set(mi_Players_Panel,mtx0,mty0,mtx1,mty0+menu_ListLineH*9,true);
 
-   mty0+=menu_ListLineH;
+   mty0+=menu_ListLineH-2;
    mtx0:=menu_items[mi_Players_Panel].mi_x0;
-   menu_Item_Set(mi_Players_NameC ,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersNameW;
    menu_Item_Set(mi_Players_StateC,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_ListLineH,false);mtx0+=menu_PlayersStateW;
+   menu_Item_Set(mi_Players_NameC ,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersNameW;
    menu_Item_Set(mi_Players_RaceC ,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersRaceW;
    menu_Item_Set(mi_Players_TeamC ,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersTeamW;
    menu_Item_Set(mi_Players_ColorC,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false);
@@ -392,20 +392,20 @@ begin
    menu_Item_Set(mi_Players_PingC ,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false);
 
    mty0+=menu_ListLineH+menu_ListLinehH;
-   for p:=0 to LastPlayer-1 do
+   for p:=0 to LastPlayer do
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
-      menu_Item_Set(mi_Players_Name1 +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,PlayersSlotEnabled);mtx0+=menu_PlayersNameW;
-      menu_Item_Set(mi_Players_State1+p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_ListLineH,PlayerAIToggle  (p+1,true     ));mtx0+=menu_PlayersStateW;
-      menu_Item_Set(mi_Players_Race1 +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_ListLineH,PlayerRaceChange(p+1,true     ));mtx0+=menu_PlayersRaceW;
-      menu_Item_Set(mi_Players_Team1 +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_ListLineH,PlayerTeamChange(p+1,true,true));mtx0+=menu_PlayersTeamW;
-      menu_Item_Set(mi_Players_Ping1 +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,true);
-      mty0+=menu_ListLineH;
+      menu_Item_Set(mi_Players_State0+p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle  (p,true     ));mtx0+=menu_PlayersStateW;
+      menu_Item_Set(mi_Players_Name0 +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSlotEnabled           );mtx0+=menu_PlayersNameW;
+      menu_Item_Set(mi_Players_Race0 +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll(p,true     ));mtx0+=menu_PlayersRaceW;
+      menu_Item_Set(mi_Players_Team0 +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll(p,true,true));mtx0+=menu_PlayersTeamW;
+      menu_Item_Set(mi_Players_Ping0 +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true);
+      mty0+=menu_PListLineH;
    end;
    mtx0:=menu_items[mi_Players_Panel].mi_x0;
 
-   if(menu_ReadyButtonEnabled)then
-   menu_Item_Set(mi_Players_Ready,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,true);
+   //if(menu_ReadyButtonEnabled)then
+   //  menu_Item_Set(mi_Players_Ready,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,true);
 
    // MAP BLOCK
    mtx0:=menu_items[mi_Players_Panel].mi_x1+menu_BaseW;
@@ -730,14 +730,15 @@ mi_Replays_play        : replay_Play  (false);
 mi_Replays_delete      : replay_Delete(false);
 
 // SCIRMISH PLAYERS
-mi_Players_Name1..
-mi_Players_Name6       : PlayerAILevelLoop(menu_ItemSelected-mi_Players_Name1 +1);
-mi_Players_State1..
-mi_Players_State6      : PlayerAIToggle   (menu_ItemSelected-mi_Players_State1+1,false);
-mi_Players_Race1..
-mi_Players_Race6       : PlayerRaceChange (menu_ItemSelected-mi_Players_Race1 +1,false);
-mi_Players_Team1..
-mi_Players_Team6       : PlayerTeamChange (menu_ItemSelected-mi_Players_Team1 +1,true ,false);
+mi_Players_State0..
+mi_Players_State7      : PlayerAIToggle     (menu_ItemSelected-mi_Players_State0,false);
+mi_Players_Name0..
+mi_Players_Name7       : if(not PlayersSwap      (menu_ItemSelected-mi_Players_Name0,LocalPlayer))
+                         then PlayerAILevelScroll(menu_ItemSelected-mi_Players_Name0,true ,false);
+mi_Players_Race0..
+mi_Players_Race7       : PlayerRaceScroll   (menu_ItemSelected-mi_Players_Race0 ,false);
+mi_Players_Team0..
+mi_Players_Team7       : PlayerTeamScroll   (menu_ItemSelected-mi_Players_Team0 ,true ,false);
 mi_Players_Ready       : PlayerReady:=not PlayerReady;
 
 // SCIRMISH MAP
@@ -792,10 +793,10 @@ mi_SS_MusicVolume      : begin
                          snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
                          SoundSourceUpdateGainAll;
                          end;
-mi_Players_Name1..
-mi_Players_Name6       : PlayersSwap(menu_ItemSelected-mi_Players_Name1 +1,LocalPlayer);
-mi_Players_Team1..
-mi_Players_Team6       : PlayerTeamChange(menu_ItemSelected-mi_Players_Team1+1,false,false);
+mi_Players_Name0..
+mi_Players_Name7       : PlayerAILevelScroll(menu_ItemSelected-mi_Players_Name0,false,false);
+mi_Players_Team0..
+mi_Players_Team7       : PlayerTeamScroll   (menu_ItemSelected-mi_Players_Team0,false,false);
 
 mi_Map_Scenario        : GameSetOption(nmid_lobby_MScenario  ,false,false);
 mi_Map_Generators      : GameSetOption(nmid_lobby_MGenerators,false,false);

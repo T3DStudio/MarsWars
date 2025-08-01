@@ -1,24 +1,24 @@
 
 {$IFDEF _FULLGAME}
-function _unit_CalcShadowZ(pu:PTUnit):integer;
+function unit_CalcShadowZ(pu:PTUnit):integer;
 begin
    with pu^  do
     with uid^ do
-     if(_ukbuilding=false)
-     then _unit_CalcShadowZ:=fly_height[ukfly]
+     if(not _ukbuilding)
+     then unit_CalcShadowZ:=fly_height[ukfly]
      else
-       if(speed<=0)or(iscomplete=false)
-       then _unit_CalcShadowZ:=-fly_hz   // no shadow
-       else _unit_CalcShadowZ:=0;
+       if(speed<=0)or(not iscomplete)
+       then unit_CalcShadowZ:=-fly_hz   // no shadow
+       else unit_CalcShadowZ:=0;
 end;
 
-procedure _unit_CalcForR(pu:PTUnit);
+procedure unit_CalcFogR(pu:PTUnit);
 begin
    with pu^ do fsr:=mm3i(1,srange div fog_cw,MFogM);
 end;
 {$ENDIF}
 
-procedure _unit_apUID(pu:PTUnit);
+procedure unit_ApplyUID(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -41,9 +41,9 @@ begin
          {$IFDEF _FULLGAME}
          mmr   := trunc(_r*map_mmcx)+1;
          animw := _animw;
-         shadow:= _unit_CalcShadowZ(pu);
+         shadow:= unit_CalcShadowZ(pu);
 
-         _unit_CalcForR(pu);
+         unit_CalcFogR(pu);
          {$ENDIF}
          hits:=_mhits;
       end;

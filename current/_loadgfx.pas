@@ -20,6 +20,13 @@ begin
    sdl_saveBMP(vid_screen,@s[1]);
 end;
 
+function gfx_ShadowColor(c:cardinal):cardinal;
+begin
+   gfx_ShadowColor:=128 +
+   (((c and $FF000000) shr 25) shl 24) +
+   (((c and $00FF0000) shr 17) shl 16) +
+   (((c and $0000FF00) shr  9) shl 8 );
+end;
 
 function gfx_rgba2c(r,g,b,a:byte):cardinal;
 begin
@@ -41,6 +48,7 @@ begin
    c_aaqua   :=gfx_rgba2c(0  ,255,255,42 );
    c_aqua    :=gfx_rgba2c(0  ,255,255,255);
    c_purple  :=gfx_rgba2c(255,0  ,255,255);
+   c_violet  :=gfx_rgba2c(147,100,255,255);
    c_green   :=gfx_rgba2c(0  ,150,0  ,255);
    c_agreen  :=gfx_rgba2c(0  ,150,0  ,42 );
    c_dblue   :=gfx_rgba2c(100,100,192,255);
@@ -583,10 +591,9 @@ begin
    spr_b_rlog     := gfx_LoadButton('b_log'    ,ui_ButtonW1);
    spr_b_rstop    := gfx_LoadButton('b_rstop'  ,ui_ButtonW1);
    spr_b_rvis     := gfx_LoadButton('b_rvis'   ,ui_ButtonW1);
-   spr_b_rclck    := gfx_LoadButton('b_rclick' ,ui_ButtonW1);
    spr_b_mmark    := gfx_LoadButton('b_mmark'  ,ui_ButtonW1);
 
-   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadButton('tabs'+b2s(x),ui_TabButtonW);
+   for x:=0 to 3 do spr_tabs[x]:=gfx_LoadButton('tabs'+b2s(x),ui_TabButtonW-8);
 
    spr_cursor     := gfx_LoadSDLSurface('cursor'   ,true ,true);
 

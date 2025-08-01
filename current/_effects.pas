@@ -1,7 +1,7 @@
 
 procedure initEffects;
 var x:byte;
-procedure _setEID(sm:PTMWSModel;sms:byte);
+procedure setEID(sm:PTMWSModel;sms:byte);
 begin
    with g_eids[x] do
    begin
@@ -18,73 +18,73 @@ begin
       anim_smstate:=sms_death;
       smodel:=spr_pdmodel;
       case x of
-        UID_Pain          : _setEID(@spr_pain          ,sms_death);
-        UID_Phantom       : _setEID(@spr_Phantom       ,sms_death);
-        UID_LostSoul      : _setEID(@spr_lostsoul      ,sms_death);
+        UID_Pain          : setEID(@spr_pain          ,sms_death);
+        UID_Phantom       : setEID(@spr_Phantom       ,sms_death);
+        UID_LostSoul      : setEID(@spr_lostsoul      ,sms_death);
 
-        MID_BPlasma       : _setEID(@spr_u_p0          ,sms_death);
+        MID_BPlasma       : setEID(@spr_u_p0          ,sms_death);
         MID_SShot,
         MID_SSShot,
         MID_Bullet,
         MID_SChaingun,
-        MID_Chaingun      : _setEID(@spr_u_p1          ,sms_death);
-        MID_BFG           : _setEID(@spr_u_p2          ,sms_death);
-        MID_Flyer         : _setEID(@spr_u_p3          ,sms_death);
+        MID_Chaingun      : setEID(@spr_u_p1          ,sms_death);
+        MID_BFG           : setEID(@spr_u_p2          ,sms_death);
+        MID_Flyer         : setEID(@spr_u_p3          ,sms_death);
 
-        MID_Imp           : _setEID(@spr_h_p0          ,sms_death);
-        MID_Cacodemon     : _setEID(@spr_h_p1          ,sms_death);
-        MID_Baron         : _setEID(@spr_h_p2          ,sms_death);
+        MID_Imp           : setEID(@spr_h_p0          ,sms_death);
+        MID_Cacodemon     : setEID(@spr_h_p1          ,sms_death);
+        MID_Baron         : setEID(@spr_h_p2          ,sms_death);
         MID_URocketS,
         MID_URocket,
-        MID_Revenant      : _setEID(@spr_h_p4          ,sms_death);
-        MID_YPlasma       : _setEID(@spr_h_p7          ,sms_death);
+        MID_Revenant      : setEID(@spr_h_p4          ,sms_death);
+        MID_YPlasma       : setEID(@spr_h_p7          ,sms_death);
 
-        EID_BFG           : _setEID(@spr_eff_bfg       ,sms_death);
+        EID_BFG           : setEID(@spr_eff_bfg       ,sms_death);
 
         MID_HRocket,
         MID_Granade,
         MID_Tank,
         MID_Mancubus,
-        EID_Exp           : _setEID(@spr_eff_exp        ,sms_death);
-        EID_Exp2          : _setEID(@spr_eff_exp2       ,sms_death);
+        EID_Exp           : setEID(@spr_eff_exp        ,sms_death);
+        EID_Exp2          : setEID(@spr_eff_exp2       ,sms_death);
 
-        EID_Blood         : _setEID(@spr_blood          ,sms_death);
+        EID_Blood         : setEID(@spr_blood          ,sms_death);
 
         MID_ArchFire,
-        EID_ArchFire      : _setEID(@spr_h_p6           ,sms_death);
+        EID_ArchFire      : setEID(@spr_h_p6           ,sms_death);
 
         EID_HLevelUp      : begin
-                            _setEID(@spr_eff_tel        ,sms_death);
+                            setEID(@spr_eff_tel        ,sms_death);
                             smask :=c_ared;
                             end;
         EID_ULevelUp      : begin
-                            _setEID(@spr_eff_gtel       ,sms_death);
+                            setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_aaqua;
                             end;
         EID_HVision       : begin
-                            _setEID(@spr_eff_gtel       ,sms_death);
+                            setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_alime;
                             end;
         EID_Invuln        : begin
-                            _setEID(@spr_eff_gtel       ,sms_death);
+                            setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_awhite;
                             end;
-        EID_Teleport      : _setEID(@spr_eff_tel        ,sms_death);
-        EID_Gavno         : _setEID(@spr_eff_g          ,sms_death);
+        EID_Teleport      : setEID(@spr_eff_tel        ,sms_death);
+        EID_Gavno         : setEID(@spr_eff_g          ,sms_death);
         MID_Mine,
         MID_Blizzard,
-        EID_BExp          : _setEID(@spr_eff_eb         ,sms_death);
-        EID_BBExp         : _setEID(@spr_eff_ebb        ,sms_death);
+        EID_BExp          : setEID(@spr_eff_eb         ,sms_death);
+        EID_BBExp         : setEID(@spr_eff_ebb        ,sms_death);
         EID_HKeep_H,
-        EID_HKeep_S       : _setEID(@spr_HKeep          ,sms_walk );
+        EID_HKeep_S       : setEID(@spr_HKeep          ,sms_walk );
         EID_HAKeep_H,
-        EID_HAKeep_s      : _setEID(@spr_HAKeep         ,sms_walk );
-        EID_db_h0         : _setEID(@spr_db_h0          ,sms_death);
-        EID_db_h1         : _setEID(@spr_db_h1          ,sms_death);
-        EID_db_u0         : _setEID(@spr_db_u0          ,sms_death);
-        EID_db_u1         : _setEID(@spr_db_u1          ,sms_death);
-        UID_UGTurret      : _setEID(@spr_UTurret        ,sms_build);
-        UID_UATurret      : _setEID(@spr_URTurret       ,sms_build);
+        EID_HAKeep_s      : setEID(@spr_HAKeep         ,sms_walk );
+        EID_db_h0         : setEID(@spr_db_h0          ,sms_death);
+        EID_db_h1         : setEID(@spr_db_h1          ,sms_death);
+        EID_db_u0         : setEID(@spr_db_u0          ,sms_death);
+        EID_db_u1         : setEID(@spr_db_u1          ,sms_death);
+        UID_UGTurret      : setEID(@spr_UTurret        ,sms_build);
+        UID_UATurret      : setEID(@spr_URTurret       ,sms_build);
       end;
    end;
 end;
@@ -100,7 +100,7 @@ end;
 procedure effect_add(ex,ey,ed:integer;ee:byte);
 var e:integer;
 
-procedure _setEff(ans,si,ei,it:integer;revanim:boolean;az:integer);
+procedure setEff(ans,si,ei,it:integer;revanim:boolean;az:integer);
 var sc:integer;
     sm:PTMWSModel;
 begin
@@ -140,7 +140,7 @@ begin
 end;
 
 begin
-   if(MainMenu)or(G_Status>gs_running)or(vid_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
+   if(MainMenu)or(G_Status<>gs_running)or(vid_draw=false)or(ee=0)or(g_eids[ee].smodel=nil)then exit;
 
    if not MapPointInScreenP(ex,ey,true)then exit;
 
@@ -151,64 +151,64 @@ begin
       case ee of
 //                       anin  frst  last,
 //                       step  frame
-UID_Pain          : _setEff(9 ,0 ,32 ,-1       ,false,0 );
+UID_Pain          : setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_Phantom,
-UID_LostSoul      : _setEff(7 ,0 ,23 ,-1       ,false,0 );
+UID_LostSoul      : setEff(7 ,0 ,23 ,-1       ,false,0 );
 
-MID_BPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_BPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,
 MID_SSShot,
 MID_Bullet,
 MID_SChaingun,
-MID_Chaingun      : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
-MID_BFG           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
-MID_Flyer         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Chaingun      : setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_BFG           : setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Flyer         : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
-MID_Imp           : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
-MID_Cacodemon     : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
-MID_Baron,//         : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Imp           : setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Cacodemon     : setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Baron,//         : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_URocketS,
 MID_URocket,
-MID_Revenant      : _setEff(7 ,0 , 8 ,-1       ,false,0 );
-MID_YPlasma       : _setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Revenant      : setEff(7 ,0 , 8 ,-1       ,false,0 );
+MID_YPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
-EID_BFG           : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
+EID_BFG           : setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 MID_HRocket,
 MID_Granade,
 MID_Tank,
 MID_Mancubus,
-EID_Exp           : _setEff(7 ,0 ,-1 ,-1       ,true ,0 );
-EID_Exp2          : _setEff(7 ,0 ,-1 ,-1       ,true ,0 );
+EID_Exp           : setEff(7 ,0 ,-1 ,-1       ,true ,0 );
+EID_Exp2          : setEff(7 ,0 ,-1 ,-1       ,true ,0 );
 
-EID_Blood         : _setEff(6 ,0 ,-1 ,-1       ,true ,15);
+EID_Blood         : setEff(6 ,0 ,-1 ,-1       ,true ,15);
 
 MID_ArchFire,
-EID_ArchFire      : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
+EID_ArchFire      : setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_HLevelUp,
 EID_ULevelUp,
 EID_HVision,
 EID_Invuln,
-EID_Teleport      : _setEff(10,0 ,-1 ,-1       ,true ,0 );
-EID_Gavno         : _setEff(7 ,0 ,-1 ,dead_time,true ,0 );
+EID_Teleport      : setEff(10,0 ,-1 ,-1       ,true ,0 );
+EID_Gavno         : setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
 MID_Mine,
-EID_BExp          : _setEff(5 ,0 ,-1 ,-1       ,true ,0 );
+EID_BExp          : setEff(5 ,0 ,-1 ,-1       ,true ,0 );
 MID_Blizzard,
-EID_BBExp         : _setEff(6 ,0 ,-1 ,-1       ,true ,0 );
+EID_BBExp         : setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_HKeep_H,
 EID_HKeep_S,
 EID_HAKeep_H,
-EID_HAKeep_S      : _setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
+EID_HAKeep_S      : setEff(0 ,3 ,3  ,fr_fps1   ,false,0 );
 
 UID_UGTurret,
 UID_UATurret,
 EID_db_h0,
 EID_db_h1,
 EID_db_u0,
-EID_db_u1         : _setEff(0 ,0 ,0  ,dead_time,false,0 );
+EID_db_u1         : setEff(0 ,0 ,0  ,dead_time,false,0 );
       else exit;
       end;
 
@@ -237,7 +237,7 @@ begin
          r:=0;
          o:=1;
       end;
-      for i:=1 to o do effect_add(vx-g_randomr(r),vy-g_randomr(r),_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
+      for i:=1 to o do effect_add(vx-g_randomr(r),vy-g_randomr(r),draw_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
 
       if(mfe=uf_ground)and(ms_eid_decal>0)then effect_add(vx,vy,sd_liquid+vy,ms_eid_decal);
 
@@ -253,14 +253,14 @@ var  m:integer;
    spr:PTMWTexture;
 begin
    for m:=0 to MaxMissiles do
-   with g_missiles[m] do
-   if(MapPointInScreenP(vx,vy,true))then
-   with g_mids[mid] do
-   if(vstep>0)then
-   begin
-      spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
-      SpriteListAddEffect(vx,vy,_SpriteDepth(vy,mfs)+100,0,spr,255);
-   end;
+     with g_missiles[m] do
+       if(MapPointInScreenP(vx,vy,true))then
+         with g_mids[mid] do
+           if(vstep>0)then
+           begin
+              spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
+              SpriteListAddEffect(vx,vy,draw_SpriteDepth(vy,mfs)+100,0,spr,255);
+           end;
 end;
 
 
@@ -268,8 +268,8 @@ procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte
 begin
    if MapPointInScreenP(vx,vy,true)
    or MapPointInScreenP(tx,ty,true) then SoundPlayUnit(snd,nil,nil);
-   effect_add(vx,vy,_SpriteDepth(vy+1,ukfly),eidstart);
-   effect_add(tx,ty,_SpriteDepth(ty+1,ukfly),eidend  );
+   effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),eidstart);
+   effect_add(tx,ty,draw_SpriteDepth(ty+1,ukfly),eidend  );
 end;
 
 procedure effects_sprites(noanim,draw:boolean);
@@ -296,7 +296,7 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
          else alpha:=min2i(255,anim_last_i_t);
          end;
 
-        if(noanim=false)then
+        if(not noanim)then
         begin
            if(anim_i<>anim_last_i)then
            begin

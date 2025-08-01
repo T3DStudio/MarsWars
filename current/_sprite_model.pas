@@ -343,11 +343,11 @@ begin
    end
 end;
 
-function _unit2spr(u:PTUnit):PTMWTexture;
+function unit_GetSprite(u:PTUnit):PTMWTexture;
 var ak:byte;
 smodel:PTMWSModel;
 begin
-   _unit2spr:=@spr_dummy;
+   unit_GetSprite:=@spr_dummy;
 
    with u^   do
    with uid^ do
@@ -366,22 +366,22 @@ sms_walk:    if(animw>0)then
                    anim+=animw;
                    if(anim<0)then anim:=0;
                 end;
-                _unit2spr:=_sm2s(smodel,ak,dir,anim div 100,nil)
+                unit_GetSprite:=_sm2s(smodel,ak,dir,anim div 100,nil)
              end
-             else _unit2spr:=_sm2s(smodel,ak,dir,0,nil);
+             else unit_GetSprite:=_sm2s(smodel,ak,dir,0,nil);
 sms_dattack,
 sms_mattack: if(a_weap<=MaxUnitWeapons)
-             then _unit2spr:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a),nil)
-             else _unit2spr:=_sm2s(smodel,ak,dir,0                                      ,nil);
+             then unit_GetSprite:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a),nil)
+             else unit_GetSprite:=_sm2s(smodel,ak,dir,0                                      ,nil);
 sms_death:   begin
                 anim:=abs(hits);
                 if(_animd>0)
-                then _unit2spr:=_sm2s(smodel,ak,dir,anim div _animd,nil)
-                else _unit2spr:=_sm2s(smodel,ak,dir,0              ,nil);
+                then unit_GetSprite:=_sm2s(smodel,ak,dir,anim div _animd,nil)
+                else unit_GetSprite:=_sm2s(smodel,ak,dir,0              ,nil);
              end;
-sms_build:   _unit2spr:=_sm2s(smodel,ak,dir,(hits*3) div _mhits,nil);
+sms_build:   unit_GetSprite:=_sm2s(smodel,ak,dir,(hits*3) div _mhits,nil);
          else
-             _unit2spr:=_sm2s(smodel,ak,dir,0,nil); //stand,pain,cast
+             unit_GetSprite:=_sm2s(smodel,ak,dir,0,nil); //stand,pain,cast
          end;
       end;
    end;

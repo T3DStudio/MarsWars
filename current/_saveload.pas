@@ -159,13 +159,14 @@ begin
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
    AddItem(@g_tick              ,SizeOf(g_tick           ));
-   for p:=1 to LastPlayer do
+   for p:=0 to LastPlayer do
      with g_players[p] do
      begin
-        AddItem(@state,SizeOf(state));
-        AddItem(@name ,SizeOf(name ));
-        AddItem(@mrace,SizeOf(mrace));
-        AddItem(@team ,SizeOf(team ));
+        AddItem(@state   ,SizeOf(state   ));
+        AddItem(@name    ,SizeOf(name    ));
+        AddItem(@mrace   ,SizeOf(mrace   ));
+        AddItem(@team    ,SizeOf(team    ));
+        AddItem(@observer,SizeOf(observer));
      end;
 
    // other
@@ -176,9 +177,6 @@ begin
    AddItem(@g_effects           ,SizeOf(g_effects        ));
    AddItem(@g_random_i          ,SizeOf(g_random_i       ));
    AddItem(@g_random_p          ,SizeOf(g_random_p       ));
-   AddItem(@g_inv_wave_n        ,SizeOf(g_inv_wave_n     ));
-   AddItem(@g_inv_wave_t_next   ,SizeOf(g_inv_wave_t_next));
-   AddItem(@g_inv_wave_t_curr   ,SizeOf(g_inv_wave_t_curr));
    AddItem(@g_KeyPoints         ,SizeOf(g_KeyPoints      ));
    AddItem(@g_royal_r           ,SizeOf(g_royal_r        ));
    AddItem(@g_status            ,SizeOf(g_status         ));
@@ -192,7 +190,7 @@ begin
    AddItem(@ui_blink_timer1     ,SizeOf(ui_blink_timer1  ));
    AddItem(@ui_blink_timer2     ,SizeOf(ui_blink_timer2  ));
    AddItem(@ui_alarms           ,SizeOf(ui_alarms        ));
-   AddItem(@PlayerColors        ,SizeOf(PlayerColors     ));
+   AddItem(@PlayerColorsDefault ,SizeOf(PlayerColorsDefault));
    AddItem(@m_brush             ,SizeOf(m_brush          ));
 end;
 
@@ -279,9 +277,9 @@ begin
 
          {$I-}
          if(svld_itemn>1)then
-          for u:=1 to svld_itemn-1 do
-           with svld_items[u] do
-            BlockRead(f,byte(data_p^),data_s);
+           for u:=1 to svld_itemn-1 do
+             with svld_items[u] do
+               BlockRead(f,byte(data_p^),data_s);
          {$I+}
 
          for u:=1 to MaxUnits do

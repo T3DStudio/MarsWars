@@ -28,6 +28,7 @@ fr_fpsd8               = fr_fps1 div 8;
 fr_fps1d2              = fr_fpsd2*3;   //1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
+fr_fps4                = fr_fps1*4;
 fr_fps5                = fr_fps1*6;
 fr_fps6                = fr_fps1*6;
 fr_fps8                = fr_fps1*8;
@@ -51,34 +52,34 @@ map_MaxGenerators      = 5;  // 0-5  max neutrall generators options
 //  BASE
 //
 
-ps_none                = 0;  // player state
+ps_None                = 0;  // player state
 ps_human               = 1;
-ps_ai                  = 2;
+ps_AI                  = 2;
 
 mc_scirmish            = 0;  // map scenario
-mc_3x3                 = 1;
-mc_2x2x2               = 2;
+mc_4x4                 = 1;
+mc_2x2x2x2               = 2;
 mc_capture             = 3;
-mc_invasion            = 4;
-mc_KotH                = 5;
-mc_royale              = 6;
+mc_KotH                = 4;
+mc_royale              = 5;
 
-mc_fixed_teams         : set of byte = [mc_3x3,mc_2x2x2,mc_invasion];
+mc_fixed_teams         : set of byte = [mc_4x4,mc_2x2x2x2];
 
-allmapscenarios        : set of byte = [mc_scirmish,mc_3x3,mc_2x2x2,mc_capture,mc_invasion,mc_KotH,mc_royale];
-mc_count               = 6;
+allmapscenarios        : set of byte = [mc_scirmish,mc_4x4,mc_2x2x2x2,mc_capture,mc_KotH,mc_royale];
+mc_count               = 5;
 
 gt_none                = 0;   // game type
 gt_scirmish            = 1;
 gt_campaing            = 2;
 
-gs_running             = 0;  //
-gs_paused1             = 1; //1..MaxPlayers
+gs_paused0             = 0;
+gs_paused1             = 1;
 gs_paused2             = 2;
 gs_paused3             = 3;
 gs_paused4             = 4;
 gs_paused5             = 5;
 gs_paused6             = 6;
+gs_paused7             = 7;
 gs_replayend           = 10;
 gs_replayerror         = 11;
 gs_waitserver          = 12;
@@ -90,24 +91,24 @@ gs_win_team3           = 23;
 gs_win_team4           = 24;
 gs_win_team5           = 25;
 gs_win_team6           = 26;
-{
-}
+gs_win_team7           = 27;
+gs_running             = 63;
 
 r_cnt                  = 2;  // race num 0-r_cnt
 r_random               = 0;
 r_hell                 = 1;
 r_uac                  = 2;
 
-MaxPlayers             = 7;
+MaxPlayers             = 8;
 
-LastPlayer             = MaxPlayers-1; //0-6
+LastPlayer             = MaxPlayers-1; //0-7
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 LastKeyPoint           = LastPlayer*2-1;
 
 map_MaxSize            = 8000;
-map_MinSize            = 2000;
+map_MinSize            = 2500;
 map_SizeMenuStep       = 250;
 
 map_MaxObstacles       = 7;
@@ -151,7 +152,7 @@ str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_ps_c               : array[0..2] of char = (' ','P','C');
 str_ps_t               : char = '?';
-str_ps_h               : char = '<';
+str_ps_h               : char = '>';
 str_ps_comp            : shortstring = 'AI';
 str_ps_none            : shortstring = '--';
 b2c                    : array[false..true] of char = ('-','+');
@@ -202,8 +203,8 @@ lmt_ability_needS      = 32;
 lmt_ability_needSP     = 33;
 lmt_ability_reload     = 34;
 lmt_ability_cantland   = 35;
-lmt_cpoint_captured    = 36;
-lmt_cpoint_lost        = 37;
+lmt_kpoint_captured    = 36;
+lmt_kpoint_lost        = 37;
 lmt_ngen_exh           = 38;
 lmt_ngen_captured      = 39;
 lmt_ngen_lost          = 40;
@@ -1090,21 +1091,25 @@ iAct_Replay_POV        = 118;
 iAct_Replay_Log        = 119;
 iAct_Replay_Fog        = 120;
 iAct_Replay_PlayerAll  = 121;
-iAct_Replay_Player1    = 122;
-iAct_Replay_Player2    = 123;
-iAct_Replay_Player3    = 124;
-iAct_Replay_Player4    = 125;
-iAct_Replay_Player5    = 126;
-iAct_Replay_Player6    = 127;
+iAct_Replay_Player0    = 122;
+iAct_Replay_Player1    = 123;
+iAct_Replay_Player2    = 124;
+iAct_Replay_Player3    = 125;
+iAct_Replay_Player4    = 126;
+iAct_Replay_Player5    = 127;
+iAct_Replay_Player6    = 128;
+iAct_Replay_Player7    = 129;
 
 iAct_Observer_Fog      = 130;
 iAct_Observer_PlayerAll= 131;
-iAct_Observer_Player1  = 132;
-iAct_Observer_Player2  = 133;
-iAct_Observer_Player3  = 134;
-iAct_Observer_Player4  = 135;
-iAct_Observer_Player5  = 136;
-iAct_Observer_Player6  = 137;
+iAct_Observer_Player0  = 132;
+iAct_Observer_Player1  = 133;
+iAct_Observer_Player2  = 134;
+iAct_Observer_Player3  = 135;
+iAct_Observer_Player4  = 136;
+iAct_Observer_Player5  = 137;
+iAct_Observer_Player6  = 138;
+iAct_Observer_Player7  = 139;
 
 iAct_SProd1            = 141;
 iAct_SProd2            = 142;
@@ -1169,8 +1174,9 @@ _buffst                : array[false..true] of smallint = (0,ub_infinity);
 
 str_ps_sv              : char = '@';
 
-char_gen               : char = '*';
-char_cp                : char = '=';
+char_gen               : char = '+';
+char_kp                : char = '#';
+char_koth              : char = '=';
 
 
 dead_time              = -dead_hits;
@@ -1515,40 +1521,50 @@ mi_Players_ColorC      = 105;
 mi_Players_PingC       = 106;
 mi_Players_Ready       = 107;
 
+mi_Players_Name0       = 110;
 mi_Players_Name1       = 111;
 mi_Players_Name2       = 112;
 mi_Players_Name3       = 113;
 mi_Players_Name4       = 114;
 mi_Players_Name5       = 115;
 mi_Players_Name6       = 116;
+mi_Players_Name7       = 117;
 
+mi_Players_State0      = 120;
 mi_Players_State1      = 121;
 mi_Players_State2      = 122;
 mi_Players_State3      = 123;
 mi_Players_State4      = 124;
 mi_Players_State5      = 125;
 mi_Players_State6      = 126;
+mi_Players_State7      = 127;
 
+mi_Players_Race0       = 130;
 mi_Players_Race1       = 131;
 mi_Players_Race2       = 132;
 mi_Players_Race3       = 133;
 mi_Players_Race4       = 134;
 mi_Players_Race5       = 135;
 mi_Players_Race6       = 136;
+mi_Players_Race7       = 137;
 
+mi_Players_Team0       = 140;
 mi_Players_Team1       = 141;
 mi_Players_Team2       = 142;
 mi_Players_Team3       = 143;
 mi_Players_Team4       = 144;
 mi_Players_Team5       = 145;
 mi_Players_Team6       = 146;
+mi_Players_Team7       = 147;
 
+mi_Players_Ping0       = 150;
 mi_Players_Ping1       = 151;
 mi_Players_Ping2       = 152;
 mi_Players_Ping3       = 153;
 mi_Players_Ping4       = 154;
 mi_Players_Ping5       = 155;
 mi_Players_Ping6       = 156;
+mi_Players_Ping7       = 157;
 
 //// SCIRMISH MAP BLOCK
 mi_Map_Panel           = 160;
@@ -1596,6 +1612,7 @@ menu_BaseW             = 28;
 menu_BasehW            = menu_BaseW div 2;
 menu_SmallW            =(menu_BaseW div 4)*3;
 menu_ListLineH         =(menu_BaseW div 3)*2;
+menu_PListLineH        = menu_ListLineH-2;
 menu_ListLinehH        = menu_ListLineH div 2;
 
 menu_CaptionhW         = menu_BaseW*3;
@@ -1663,8 +1680,9 @@ tc_player0             = #0;
 tc_player2             = #2;
 tc_player3             = #3;
 tc_player4             = #4;
-tc_player5             = #5;}
-tc_player6             = #6;
+tc_player5             = #5;
+tc_player6             = #6;}
+tc_player7             = #7;
 tc_nl1                 = #11;
 tc_nl2                 = #12;
 tc_nl3                 = #13;
@@ -1724,6 +1742,8 @@ str_GameStatus           : shortstring = 'Game status: ';
 str_GameOptions          : shortstring = 'Game options:';
 str_MapOptions           : shortstring = 'Map options:';
 
+str_map_GeneratorsL      : array[0..5       ] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
+str_map_ScenarioL        : array[0..mc_count] of shortstring = ('Skirmish','4x4','2x2x2x2','Key points','Assault','Royal Battle');
 str_map_Scenario         : shortstring = 'Scenario';
 str_map_Generators       : shortstring = 'Generators';
 str_map_Seed             : shortstring = 'Seed';
@@ -1733,20 +1753,17 @@ str_map_Symmetry         : shortstring = 'Symmetry';
 str_game_AISlots         : shortstring = 'Fill empty slots:         ';
 str_game_FixedPositions  : shortstring = 'Fixed player starts:      ';
 str_game_DefeatedObs     : shortstring = 'Observer mode after lose: ';
-str_PlayerName           : shortstring = 'Player name';
-str_PlayerPaused         : shortstring = 'player paused the game';
-str_PlayerResumed        : shortstring = 'player has resumed the game';
-str_PlayerLeft           : shortstring = ' left the game';
-str_PlayerSurrender      : shortstring = ' surrenders!';
+str_gmsg_PlayerPaused    : shortstring = 'player paused the game';
+str_gmsg_PlayerResumed   : shortstring = 'player has resumed the game';
+str_gmsg_PlayerLeft      : shortstring = ' left the game';
+str_gmsg_PlayerSurrender : shortstring = ' surrenders!';
 
-str_map_GeneratorsL         : array[0..5] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
-
-str_plstat               : shortstring = 'State';
+str_Player               : shortstring = 'Player';
+str_PlayerState          : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
 
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
-str_map_ScenarioL        : array[0..mc_count    ] of shortstring = ('Skirmish','3x3','2x2x2','Key points','Invasion','Assault','Royal Battle');
 str_observer             : shortstring = 'OBSERVER';
 
 {$ENDIF}

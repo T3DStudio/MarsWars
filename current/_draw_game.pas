@@ -166,140 +166,140 @@ end;
 procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind :=uinfo_line;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-   end;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind :=uinfo_line;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+     end;
 end;
 procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind :=uinfo_rect;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-   end;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind :=uinfo_rect;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+     end;
 end;
 procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind :=uinfo_rect;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-      text_lt :=slt;
-      text_lt2:=slt2;
-      text_rt :=srt;
-      text_rd :=srd;
-      text_ld :=sld;
-   end;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind :=uinfo_rect;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+        text_lt :=slt;
+        text_lt2:=slt2;
+        text_rt :=srt;
+        text_rd :=srd;
+        text_ld :=sld;
+     end;
 end;
 procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind :=uinfo_box;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ax1;
-      y1   :=ay1;
-      color:=acolor;
-   end;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind :=uinfo_box;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ax1;
+        y1   :=ay1;
+        color:=acolor;
+     end;
 end;
 procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind :=uinfo_circle;
-      x0   :=ax0;
-      y0   :=ay0;
-      x1   :=ar;
-      color:=acolor;
-   end;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind :=uinfo_circle;
+        x0   :=ax0;
+        y0   :=ay0;
+        x1   :=ar;
+        color:=acolor;
+     end;
 end;
 procedure UnitsInfoAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
 var tw:integer;
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind   :=uinfo_text;
-      x0     :=ax0;
-      y0     :=ay0;
-      text_lt:=text;
-      color  :=acolor;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind   :=uinfo_text;
+        x0     :=ax0;
+        y0     :=ay0;
+        text_lt:=text;
+        color  :=acolor;
 
-      tw:=length(text)*font_hw;
-      x0:=mm3i(ui_cam_x+tw     ,x0,ui_cam_x+ui_cam_w-tw    );
-      y0:=mm3i(ui_cam_y+font_hw,y0,ui_cam_y+ui_cam_h-font_w);
-   end;
+        tw:=length(text)*font_hw;
+        x0:=mm3i(ui_cam_x+tw     ,x0,ui_cam_x+ui_cam_w-tw    );
+        y0:=mm3i(ui_cam_y+font_hw,y0,ui_cam_y+ui_cam_h-font_w);
+     end;
 end;
 procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind    :=uinfo_rect;
-      x0      :=ax0-aspr^.hw;
-      y0      :=ay0-aspr^.hh;
-      x1      :=x0+aspr^.w;
-      y1      :=y0+aspr^.h;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind    :=uinfo_rect;
+        x0      :=ax0-aspr^.hw;
+        y0      :=ay0-aspr^.hh;
+        x1      :=x0+aspr^.w;
+        y1      :=y0+aspr^.h;
 
-      if(x0<ui_cam_x)then
-      begin
-         x0:=ui_cam_x;
-         x1:=x0+aspr^.w;
-      end;
-      if(x1>(ui_cam_x+ui_cam_w))then
-      begin
-         x1:=(ui_cam_x+ui_cam_w);
-         x0:=x1-aspr^.w;
-      end;
-      if(y0<ui_cam_y)then
-      begin
-         y0:=ui_cam_y;
-         y1:=y0+aspr^.h;
-      end;
-      if(y1>(ui_cam_y+ui_cam_h))then
-      begin
-         y1:=(ui_cam_y+ui_cam_h);
-         y0:=y1-aspr^.h;
-      end;
+        if(x0<ui_cam_x)then
+        begin
+           x0:=ui_cam_x;
+           x1:=x0+aspr^.w;
+        end;
+        if(x1>(ui_cam_x+ui_cam_w))then
+        begin
+           x1:=(ui_cam_x+ui_cam_w);
+           x0:=x1-aspr^.w;
+        end;
+        if(y0<ui_cam_y)then
+        begin
+           y0:=ui_cam_y;
+           y1:=y0+aspr^.h;
+        end;
+        if(y1>(ui_cam_y+ui_cam_h))then
+        begin
+           y1:=(ui_cam_y+ui_cam_h);
+           y0:=y1-aspr^.h;
+        end;
 
-      sprite  :=aspr;
-      color   :=acolor;
-      text_lt :=slt;
-      text_lt2:=slt2;
-      text_rt :=srt;
-      text_rd :=srd;
-      text_ld :=sld;
-   end;
+        sprite  :=aspr;
+        color   :=acolor;
+        text_lt :=slt;
+        text_lt2:=slt2;
+        text_rt :=srt;
+        text_rd :=srd;
+        text_ld :=sld;
+     end;
 end;
 procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
    if(UnitsInfoNew)then
-   with vid_PrimitivesL[vid_PrimitivesS-1] do
-   begin
-      kind   :=uinfo_sprite;
-      x0     :=ax0-aspr^.hw;
-      y0     :=ay0-aspr^.hh;
-      sprite :=aspr;
-   end;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        kind   :=uinfo_sprite;
+        x0     :=ax0-aspr^.hw;
+        y0     :=ay0-aspr^.hh;
+        sprite :=aspr;
+     end;
 end;
 
 procedure UnitsInfoProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
@@ -376,7 +376,7 @@ begin
    with uid^  do
    with usmodel^ do
    begin
-      acolor:=PlayerGetColor(playeri);
+      acolor:=PlayerGetColor(playeri,false);
 
       choosen:=((m_UnitTarget=unum)or(ui_umark_u=unum))and(ui_blink1_colorb);
 
@@ -437,7 +437,7 @@ co_pability   : UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
 
       if(buffs[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
       if(buffs[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
-      if(pain              )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
+      if(pain               )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
    end;
 end;
 
@@ -544,30 +544,32 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  CPoints
+//  Key Points
 //
 
-procedure cpoints_sprites;
+procedure keyPoints_sprites;
 var t,i:integer;
    ddir:single;
-  color:cardinal;
+ccolor,
+scolor:cardinal;
 begin
    for t:=0 to LastKeyPoint do
     with g_KeyPoints[t] do
      if(cpCaptureR>0)and(RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then
      begin
-        color:=GetKeyPointColor(t);
+        ccolor:=GetKeyPointColor(t,false);
+        scolor:=GetKeyPointColor(t,true );
 
         if(cpenergy>0)then
         begin
-           SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,0,@spr_cp_gen,255);
+           SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,scolor,@spr_cp_gen,255);
            for i:=1 to 6 do
            begin
               ddir:=(i*60)*degtorad;
               SpriteListAddEffect(
               cpx+round(cpCaptureR*cos(ddir)),
               cpy+round(cpCaptureR*sin(ddir)),
-              sd_fly+cpy,ShadowColor(color),@spr_cp_koth,255);
+              sd_fly+cpy,0,@spr_cp_koth,255);
            end;
         end
         else
@@ -579,7 +581,7 @@ begin
                 SpriteListAddEffect(
                 cpx+round(cpCaptureR*cos(ddir)),
                 cpy+round(cpCaptureR*sin(ddir)),
-                sd_fly+cpy,ShadowColor(color),@spr_cp_koth,255);
+                sd_fly+cpy,scolor,@spr_cp_koth,255);
              end;
           end
           else
@@ -590,14 +592,14 @@ begin
                 SpriteListAddEffect(
                 cpx+round(cpCaptureR*cos(ddir)),
                 cpy+round(cpCaptureR*sin(ddir)),
-                sd_fly+cpy,ShadowColor(color),@spr_cp_koth,255);
+                sd_fly+cpy,scolor,@spr_cp_koth,255);
              end;
-             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,ShadowColor(color),@spr_cp_out,255);
+             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,scolor,@spr_cp_out,255);
           end;
 
         if(MapPointInScreenP(cpx,cpy,true))then
         begin
-           if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),color  );
+           if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),ccolor );
            if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
         end;
      end;
@@ -728,25 +730,25 @@ begin
       draw_text(vid_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_left,255, c_white);
    end;       }
 
-   if(InputAction(iact_Shift)) then
-   for u:=0 to LastPlayer do
-    with g_players[u] do
-    begin
-       ix:=170+89*u;
+   if(InputAction(iact_Shift))then
+     for u:=0 to LastPlayer do
+      with g_players[u] do
+      begin
+         ix:=170+89*u;
 
-       c:=PlayerGetColor(u);
+         c:=PlayerGetColor(u,false);
 
-       draw_text(vid_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, c);
+         draw_text(vid_screen,ix,80,b2s(ucl_cs[false]), ta_middle,255, c);
 
-       draw_text(vid_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
+         draw_text(vid_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_middle,255, c);
 
-       //draw_text(vid_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
-       draw_text(vid_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_middle,255, c);
+         //draw_text(vid_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_middle,255, c);
+         draw_text(vid_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_middle,255, c);
 
 
-       for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_left,255, c);
-       for iy:=0 to 11 do draw_text(vid_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
-    end;
+         for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_left,255, c);
+         for iy:=0 to 11 do draw_text(vid_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_left,255, c);
+      end;
 
    if(InputAction(iact_Control))then
    for u:=1 to MaxUnits do
@@ -781,10 +783,10 @@ begin
               lineColor(vid_screen,ix,iy,aiu_alarm_x+ui_mapx-ui_cam_x  ,aiu_alarm_y+ui_mapy-ui_cam_y  ,c_red );
            end;
 
-           draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri));
-           draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri));
+           draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_left,255, PlayerGetColor(playeri,false));
+           draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_left,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_left,255, PlayerGetColor(playeri));
-           draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_left,255, PlayerGetColor(playeri));
+           draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_left,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+30,b2c[ukfly], ta_left,255, PlayerGetColor(playeri));
            //draw_text(vid_screen,ix,iy+40,li2s(_level_armor), ta_left,255, PlayerGetColor(playeri));
 

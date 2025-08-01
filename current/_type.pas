@@ -482,6 +482,7 @@ TPlayer = record
 
    observer,
    revealed,
+   defeated,
    ready   : boolean;
 
    o_id    : byte;
@@ -710,7 +711,7 @@ TKeyPoint = record
    cpunitsp_pstate,
    cpUnitsPlayer     : array[0..LastPlayer] of longint;
 end;
-PTCTPoint = ^TKeyPoint;
+pTKeyPoint = ^TKeyPoint;
 
 TDoodad = record
    x,y,r :integer;

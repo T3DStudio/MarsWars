@@ -1,32 +1,36 @@
 
-procedure _unit_minimap(pu:PTUnit);
+procedure unit_DrawMiniMap(pu:PTUnit);
 begin
-   if(ui_blink_timer1=0)and(MainMenu=false)and(vid_draw)then
-    with pu^  do
-    with uid^ do
-    begin
-       if(uid^._ukbuilding)
-       then filledCircleColor(ui_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum))
-       else pixelColor       (ui_minimap,mmx,mmy,    PlayerGetColor(player^.pnum));
+   if(ui_blink_timer1=0)and(not MainMenu)and(vid_draw)then
+     with pu^  do
+     with uid^ do
+     begin
+        if(uid^._ukbuilding)
+        then filledCircleColor(ui_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum,false))
+        else pixelColor       (ui_minimap,mmx,mmy,    PlayerGetColor(player^.pnum,false));
 
-       with player^ do
-        if(team=g_players[UIPlayer].team)then
-         if(_ability=uab_UACScan)and(rld>radar_vision_time)and(ui_mm_ScanBlink)then
-          filledCircleColor(ui_minimap,trunc(uo_x*map_mmcx),
-                                      trunc(uo_y*map_mmcx),
-                                      trunc(srange*map_mmcx),ShadowColor(PlayerGetColor(pnum)));
-    end;
+        with player^ do
+        begin
+           if(UIPlayer<=LastPlayer)then
+             if(team<>g_players[UIPlayer].team)then exit;
+
+           if(_ability=uab_UACScan)and(rld>radar_vision_time)and(ui_mm_ScanBlink)then
+             filledCircleColor(ui_minimap,trunc(uo_x  *map_mmcx),
+                                          trunc(uo_y  *map_mmcx),
+                                          trunc(srange*map_mmcx),PlayerGetColor(pnum,true));
+        end;
+     end;
 end;
 
 
-function _SpriteDepth(y:integer;f:boolean):integer;
+function draw_SpriteDepth(y:integer;f:boolean):integer;
 begin
-   _SpriteDepth:=map_flydepths[f]+y;
+   draw_SpriteDepth:=map_flydepths[f]+y;
 end;
 
-function _unit_SpriteDepth(pu:PTUnit):integer;
+function unit_SpriteDepth(pu:PTUnit):integer;
 begin
-   _unit_SpriteDepth:=0;
+   unit_SpriteDepth:=0;
    with pu^ do
     case uidi of
 UID_UPortal,
@@ -34,46 +38,48 @@ UID_HTeleport,
 UID_HPentagram,
 UID_HSymbol1,
 UID_HSymbol2,
+UID_HSymbol3,
+UID_HSymbol4,
 UID_HAltar,
-UID_UMine     : _unit_SpriteDepth:=sd_tcraters+vy;
+UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
     else
       if(uid^._ukbuilding)and(iscomplete=false)
-      then _unit_SpriteDepth:=sd_build+vy
+      then unit_SpriteDepth:=sd_build+vy
       else
         if(hits>0)or(buffs[ub_Resurect]>0)
-        then _unit_SpriteDepth:=_SpriteDepth(vy,ukfly or (zfall>0))
-        else _unit_SpriteDepth:=_SpriteDepth(vy,ukfly);
+        then unit_SpriteDepth:=draw_SpriteDepth(vy,ukfly or (zfall>0))
+        else unit_SpriteDepth:=draw_SpriteDepth(vy,ukfly);
     end;
 end;
 
 
-procedure _fog_sr(x,y,r:integer);
+procedure fog_RevealScreenCircle(x,y,r:integer);
 var iy,i:integer;
-procedure _sf(tx,ty:integer);
+procedure setFOGPoint(tx,ty:integer);
 begin if(0<=tx)and(0<=ty)and(tx<=ui_fog_vfw)and(ty<=ui_fog_vfh)then ui_fog_grid[tx,ty]:=2;end;
 begin
    if(r<0    )then r:=0;
    if(r>MFogM)then r:=MFogM;
    for i:=0 to r do
-    for iy:=0 to _RX2Y[r,i] do
-    begin
-       _sf(x-i,y-iy);
-       _sf(x-i,y+iy);
-       if(i>0)then
-       begin
-          _sf(x+i,y-iy);
-          _sf(x+i,y+iy);
-       end;
-    end;
+     for iy:=0 to _RX2Y[r,i] do
+     begin
+        setFOGPoint(x-i,y-iy);
+        setFOGPoint(x-i,y+iy);
+        if(i>0)then
+        begin
+           setFOGPoint(x+i,y-iy);
+           setFOGPoint(x+i,y+iy);
+        end;
+     end;
 end;
 
-function _fog_cscr(x,y,r:integer):boolean;
+function fog_IfInScreen(x,y,r:integer):boolean;
 begin
-   _fog_cscr:=((ui_fog_sx-r)<=x)and(x<=(ui_fog_ex+r))
-           and((ui_fog_sy-r)<=y)and(y<=(ui_fog_ey+r));
+   fog_IfInScreen:=((ui_fog_sx-r)<=x)and(x<=(ui_fog_ex+r))
+                and((ui_fog_sy-r)<=y)and(y<=(ui_fog_ey+r));
 end;
 
-procedure unit_FogXY(pu:PTUnit);
+procedure unit_UpdateFogXY(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -82,39 +88,45 @@ begin
    end;
 end;
 
-function UnitVisionRange(pu:PTUnit):byte;
+function unit_FogReveal(pu:PTUnit):boolean;
 begin
-   UnitVisionRange:=0;
-   if(CheckUnitUIVision(pu))
-   then UnitVisionRange:=2
+   unit_FogReveal:=false;
+   if(not ui_fog)
+   then unit_FogReveal:=true
    else
-     with pu^ do
-      if(CheckUnitTeamVision(g_players[UIPlayer].team,pu,false))then
-       if(player^.team=g_players[UIPlayer].team)
-       then UnitVisionRange:=2
-       else UnitVisionRange:=1;
-end;
-
-function _unit_fogrev(pu:PTUnit):boolean;
-begin
-   _unit_fogrev:=false;
+     with pu^     do
+     with uid^    do
+     with player^ do
+       if(ui_CheckUnitFullFogReveal(pu))then
+       begin
+          if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
+          if(_ability=uab_UACScan)and(rld>radar_vision_time)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,
+                                                                                        (uo_y div fog_cw)-ui_fog_sy,fsr);
+          unit_FogReveal:=true
+       end
+       else
+         if(UIplayer>LastPlayer)
+         then unit_FogReveal:=true
+         else
+           if(TeamVision[g_players[UIplayer].team]>0)then unit_FogReveal:=true;
+  { unit_FogReveal:=false;
    with pu^     do
    with uid^    do
    with player^ do
     if(ui_fog=false)
-    then _unit_fogrev:=true
+    then unit_FogReveal:=true
     else
-      case UnitVisionRange(pu) of
+      case unit_FogReveal(pu) of
     1:begin
-         //if(_fog_cscr(fx,fy,_fr))then _fog_sr(fx-ui_fog_sx,fy-ui_fog_sy,_fr);
-         _unit_fogrev:=true;
+         //if(fog_IfInScreen(fx,fy,_fr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,_fr);
+         unit_FogReveal:=true;
       end;
     2:begin
-         if(_fog_cscr(fx,fy,fsr))then _fog_sr(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
-         _unit_fogrev:=true;
-         if(_ability=uab_UACScan)and(rld>radar_vision_time)then _fog_sr((uo_x div fog_cw)-ui_fog_sx,(uo_y div fog_cw)-ui_fog_sy,fsr);
+         if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
+         unit_FogReveal:=true;
+         if(_ability=uab_UACScan)and(rld>radar_vision_time)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,(uo_y div fog_cw)-ui_fog_sy,fsr);
       end;
-      end;
+      end;}
 end;
 
 
@@ -207,7 +219,6 @@ begin
 end;
 begin
    with pu^ do
-   if(playeri=UIPlayer)then
    with uid^ do
    with player^ do
    begin
@@ -280,7 +291,7 @@ uab_CCFly         : begin
             if(uo_id<>ua_psability)or(s_all=1)then
             begin
             if(ui_ability(pu,false))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,unit_sability(pu       ,true)=0,false,true);
-            if(ui_ability(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x   ,mouse_y   ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,unit_pability(pu,-1,0,0,true)=0,false,true);
+            if(ui_ability(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x  ,mouse_y  ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,unit_pability(pu,-1,0,0,true)=0,false,true);
             end;
             if(ui_rebuild (pu     ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds ,unit_rebuild(pu        ,true)=0,true ,true);
          end;
@@ -312,35 +323,32 @@ uab_CCFly         : begin
    end;
 end;
 
-procedure _unit_foot_effects(pu:PTUnit);
-
+procedure unit_FootEffect(pu:PTUnit);
 begin
    with pu^ do
-   begin
-      with uid^ do
-      if(un_foot_anim>0)then
-      begin
-         animf-=1;
-         if(animf<=0)then
-         begin
-            SoundPlayUnit(un_eid_snd_foot,nil,nil);
-            animf:=un_foot_anim;
-         end;
-      end;
-   end;
+   with uid^ do
+     if(un_foot_anim>0)then
+     begin
+        animf-=1;
+        if(animf<=0)then
+        begin
+           SoundPlayUnit(un_eid_snd_foot,nil,nil);
+           animf:=un_foot_anim;
+        end;
+     end;
 end;
 
-function _EID2Spr(eid:byte):PTMWTexture;
+function EID2Spr(eid:byte):PTMWTexture;
 begin
-   _EID2Spr:=@spr_dummy;
+   EID2Spr:=@spr_dummy;
 
    with g_eids[eid] do
     if(smodel<>nil)then
      if(smodel^.sn>0)then
-      _EID2Spr:=@smodel^.sl[0];
+      EID2Spr:=@smodel^.sl[0];
 end;
 
-procedure _unit_level_string(pu:PTUnit);
+procedure unit_UpdateStatusStrings(pu:PTUnit);
 var i,
 al,wl,sl:integer;
    atset:TSoB;
@@ -422,19 +430,19 @@ begin
    end;
 end;
 
-function r_AlphaGlows(amplitudo:byte;shift:cardinal):byte;
+function gfx_AlphaGlows(amplitudo:byte;shift:cardinal):byte;
 var amplitudoH,t:cardinal;
 begin
-   r_AlphaGlows:=0;
+   gfx_AlphaGlows:=0;
    if(amplitudo=0)then exit;
    amplitudoH:=amplitudo div 2;
    t:=(g_tick+shift) mod amplitudo;
    if(t>amplitudoH)
-   then r_AlphaGlows:=amplitudo-t
-   else r_AlphaGlows:=t;
+   then gfx_AlphaGlows:=amplitudo-t
+   else gfx_AlphaGlows:=t;
 end;
 
-procedure _unit_alive_sprite(pu:PTUnit;noanim:boolean);
+procedure unit_SpriteAlive(pu:PTUnit;noanim:boolean);
 const _btnas: array[0..MaxUnitLevel] of integer = (0,ui_ButtonWh,ui_ButtonW1,ui_ButtonW1+ui_ButtonWh);
 var spr : PTMWTexture;
 depth,
@@ -447,25 +455,25 @@ begin
    with uid^    do
    with player^ do
    begin
-      ui_counters(pu);
+      if(playeri=UIPlayer)then ui_counters(pu);
 
-      if(_unit_fogrev(pu))then
+      if(unit_FogReveal(pu))then
       begin
-         _unit_minimap(pu);
+         unit_DrawMiniMap(pu);
 
          if(_ability=uab_HKeepBlink)then
-          if(buffs[ub_CCast]>0)then exit;
+           if(buffs[ub_CCast]>0)then exit;
 
          wanim:=false;
          if(G_Status=gs_running)then
-          if(unit_canMove(pu))then
-           wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
+           if(unit_canMove(pu))then
+             wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
 
-         spr:=_unit2spr(pu);
+         spr:=unit_GetSprite(pu);
 
          if(spr=pspr_dummy)then exit;
 
-         depth:=_unit_CalcShadowZ(pu)-shadow;
+         depth:=unit_CalcShadowZ(pu)-shadow;
          t:=sign(depth);
          if(depth<-1)then t*=2;
          shadow+=t;
@@ -473,13 +481,13 @@ begin
          if(RectInCam(vx,vy,spr^.hw,spr^.hh,shadow))then
          begin
             if((unum mod ui_blink_period2)=ui_blink_timer2)
-            then _unit_level_string(pu);
+            then unit_UpdateStatusStrings(pu);
 
-            depth:=_unit_SpriteDepth(pu);
+            depth:=unit_SpriteDepth(pu);
             alpha:=255;
             ColorAura :=0;
 
-            if(wanim)then _unit_foot_effects(pu);
+            if(wanim)then unit_FootEffect(pu);
 
             UnitsInfoAddUnit(pu,un_smodel[level]);
 
@@ -489,36 +497,36 @@ begin
             then ColorAura:=c_awhite;
 
             if(un_eid_summon_spr[level]<>nil)then
-             if(buffs[ub_Summoned]>0)then
-              SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buffs[ub_Summoned]*4,255));
+              if(buffs[ub_Summoned]>0)then
+                SpriteListAddUnit(vx,vy,depth+1,0,0,ColorAura,un_eid_summon_spr[level],mm3i(0,buffs[ub_Summoned]*4,255));
 
             if(buffs[ub_ArchFire]>0)then
-             with spr_h_p6 do
-              if(sn>0)then SpriteListAddUnit(vx-g_randomr(_missile_r),vy-g_randomr(_missile_r),depth+1,0,0,0,@sl[(g_tick div 4) mod cardinal(sn)],255);
+              with spr_h_p6 do
+                if(sn>0)then SpriteListAddUnit(vx-g_randomr(_missile_r),vy-g_randomr(_missile_r),depth+1,0,0,0,@sl[(g_tick div 4) mod cardinal(sn)],255);
 
             if(uidi=UID_UACDron)and(not iscomplete)
             then SpriteListAddEffect(vx,vy,sd_liquid+y,0,@spr_UTurret.sl[0],255);
 
             if(_ukbuilding)then
-             if(iscomplete)then
-             begin
-                if(a_rld<=0)and(noanim=false)then
-                 if(uidi in [UID_UGTurret,UID_UATurret])then
+              if(iscomplete)then
+              begin
+                 if(a_rld<=0)and(noanim=false)then
+                   if(uidi in [UID_UGTurret,UID_UATurret])then
+                   begin
+                      dir+=_animw;
+                      dir:=dir mod 360;
+                   end;
+
+                 if(playeri=UIPlayer)then
                  begin
-                    dir+=_animw;
-                    dir:=dir mod 360;
+                    for t:=0 to MaxUnitLevel do
+                    begin
+                       if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
+                       if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
+                    end;
                  end;
 
-                if(playeri=UIPlayer)then
-                begin
-                   for t:=0 to MaxUnitLevel do
-                   begin
-                      if(_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]]. un_btn,i2s(it2s(uprod_r[t])),'','','','');
-                      if(_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]]._up_btn,i2s(it2s(pprod_r[t])),'','','','');
-                   end;
-                end;
-
-                case uidi of
+                 case uidi of
 UID_UGTurret      : if(upgr[upgr_uac_turarm]>0)then
                      if(level=0)
                      then SpriteListAddUnit(vx  ,vy   ,depth,0,0,0,@spr_b4_a,alpha)
@@ -526,27 +534,27 @@ UID_UGTurret      : if(upgr[upgr_uac_turarm]>0)then
 UID_UATurret      : if(upgr[upgr_uac_turarm]>0)then SpriteListAddUnit(vx  ,vy   ,depth,0,0,0,@spr_b9_a,alpha);
 UID_UACommandCenter,
 UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65,depth,0,0,0,@spr_ptur,alpha);
-                end;
-             end
-             else
-              if(un_eid_bcrater>0)and(un_build_amode>0)then
-              begin
-                 if(un_build_amode>1)then
-                 begin
-                    alpha:=r_AlphaGlows(255,cardinal(unum));
-                    alphab:=255-alpha;
-                 end
-                 else alphab:=255;
-
-                 if(buffs[ub_Invis]>0)then alphab:=alphab shr 1;
-
-                 SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_liquid+un_eid_bcrater_y+y,0,_EID2Spr(un_eid_bcrater),alphab);
+                 end;
               end
               else
-                if(buffs[ub_Invis]>0)then alpha:=alpha shr 1;
+                if(un_eid_bcrater>0)and(un_build_amode>0)then
+                begin
+                   if(un_build_amode>1)then
+                   begin
+                      alpha:=gfx_AlphaGlows(255,cardinal(unum));
+                      alphab:=255-alpha;
+                   end
+                   else alphab:=255;
+
+                   if(buffs[ub_Invis]>0)then alphab:=alphab shr 1;
+
+                   SpriteListAddEffect(vx,vy+un_eid_bcrater_y,sd_liquid+un_eid_bcrater_y+y,0,EID2Spr(un_eid_bcrater),alphab);
+                end
+                else
+                  if(buffs[ub_Invis]>0)then alpha:=alpha shr 1;
 
             if(ui_ColoredShadow)
-            then ColorShadow:=ShadowColor(PlayerGetColor(playeri))
+            then ColorShadow:=PlayerGetColor(playeri,true)
             else ColorShadow:=c_ablack;
 
             SpriteListAddUnit(vx,vy,depth,shadow,ColorShadow,ColorAura,spr,alpha);
@@ -555,24 +563,24 @@ UID_UCommandCenter: if(upgr[upgr_uac_ccturr]>0)then SpriteListAddUnit(vx+3,vy-65
    end;
 end;
 
-procedure _unit_dead_sprite(pu:PTUnit);
+procedure unit_SpriteDead(pu:PTUnit);
 var spr:PTMWTexture;
 begin
    with pu^ do
    with uid^ do
    with player^ do
-    if(hits>dead_hits)then
-    begin
-       if(hits<fdead_hits)then exit;
+     if(hits>dead_hits)then
+     begin
+        if(hits<fdead_hits)then exit;
 
-       spr:=_unit2spr(pu);
+        spr:=unit_GetSprite(pu);
 
-       if(spr=pspr_dummy)then exit;
+        if(spr=pspr_dummy)then exit;
 
-       if(_unit_fogrev(pu))then
-        if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-         SpriteListAddDoodad(vx,vy,_unit_SpriteDepth(pu),-32000,spr,mm3i(0,abs(hits-fdead_hits)*4,255),0,0);
-    end;
+        if(unit_FogReveal(pu))then
+          if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
+            SpriteListAddDoodad(vx,vy,unit_SpriteDepth(pu),-32000,spr,mm3i(0,abs(hits-fdead_hits)*4,255),0,0);
+     end;
 end;
 
 procedure unit_sprites(noanim:boolean);
@@ -626,8 +634,8 @@ begin
        end
        else
          if(hits<=0)
-         then _unit_dead_sprite(pu)
-         else _unit_alive_sprite(pu,noanim);
+         then unit_SpriteDead(pu)
+         else unit_SpriteAlive(pu,noanim);
    end;
 end;
 

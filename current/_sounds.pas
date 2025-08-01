@@ -398,7 +398,7 @@ begin
    end
    else
      if(pu<>nil)then
-       if(not CheckUnitUIVisionScreen(pu))then exit;
+       if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
    SoundPlay(ss,sss_world,true);
    SoundPlayUnit:=true;
@@ -484,11 +484,11 @@ end;
 
 procedure SoundLogUIPlayer(playern:byte);
 begin
-   with g_players[playern] do
-    with log_l[log_i] do
-     case mtype of
-0..LastPlayer         : if(mtype<>playern)
-                        or((rpls_pstate>=rpls_read)and(LocalPlayer=0))then SoundPlayUI(snd_chat);
+   if(playern<=LastPlayer)then
+     with g_players[playern] do
+       with log_l[log_i] do
+         case mtype of
+0..LastPlayer         : if(mtype<>playern)then SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
 lmt_player_chat,
@@ -507,7 +507,7 @@ lmt_unit_ready        : with g_uids[argx] do
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control,
 lmt_ngen_captured,
-lmt_cpoint_captured   : SoundPlayAnoncer(snd_capture,true,false);
+lmt_kpoint_captured   : SoundPlayAnoncer(snd_capture,true,false);
 lmt_invalid_tar,
 lmt_ability_cantland,
 lmt_ability_reload,
@@ -524,12 +524,12 @@ lmt_req_common,
 lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
 lmt_ngen_exh,
 lmt_ngen_lost,
-lmt_cpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
+lmt_kpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
 lmt_map_mark,
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_unit_attacked     : with g_uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
-     end;
+         end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -592,10 +592,10 @@ begin
    alListenerfv(AL_ORIENTATION,@SLOri);
 
    for r:=0 to sss_count-1 do
-    case r of
-    sss_music: SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_mvolume1);
-    else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
-    end;
+     case r of
+     sss_music: SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_mvolume1);
+     else       SoundSourceSetInit(@SoundSources[r],sss_sssize[r],@snd_svolume1);
+     end;
 
    GameMusicReLoad;
    snd_music_menu:=MusicSetLoad('music\menu\',snd_musicListSize);

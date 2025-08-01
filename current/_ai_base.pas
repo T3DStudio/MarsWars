@@ -65,21 +65,21 @@ ai_nearest_builder_u,
 ai_ZombieTarget_u,
 ai_base_u         : PTUnit;
 ai_generator_cp,
-ai_cpoint_cp      : PTCTPoint;
+ai_kpoint_kp      : pTKeyPoint;
 
 //ai_ReadyForAttack,
 ai_PhantomWantZombieMe,
 ai_advanced_bld,
 ai_teleport_use,
 ai_choosen,
-ai_cpoint_koth    : boolean;
+ai_kpoint_koth    : boolean;
 
 ai_anyDetectors,
 
 ai_generator_d,
-ai_cpoint_d,
-ai_cpoint_n,
-ai_cpoint_r,
+ai_kpoint_d,
+ai_kpoint_n,
+ai_kpoint_r,
 ai_alarm_d,
 ai_alarm_x,
 ai_alarm_y,
@@ -160,21 +160,21 @@ begin
    ax:=mm3i(1,ax,map_Size);
    ay:=mm3i(1,ay,map_Size);
    with pplayer^ do
-    for a:=0 to LastPlayer do
-     with ai_alarms[a] do
-      if(alimit<=0)then
-      begin
-         if(aia_enemy_limit>0)then
-          if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then aia_enemy_limit:=0
-      end
-      else
-        if(aia_enemy_limit<=0)
-        then afree:=a
-        else
-        begin
-           if(not aia_enemy_base)then anobase:=a;
-           if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then exit;
-        end;
+     for a:=0 to LastPlayer do
+       with ai_alarms[a] do
+         if(alimit<=0)then
+         begin
+            if(aia_enemy_limit>0)then
+              if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then aia_enemy_limit:=0
+         end
+         else
+           if(aia_enemy_limit<=0)
+           then afree:=a
+           else
+           begin
+              if(not aia_enemy_base)then anobase:=a;
+              if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then exit;
+           end;
 
    if(alimit>0)then
    begin
@@ -205,11 +205,11 @@ begin
       if(map_Symmetry)then ai_PlayerSetAlarm(@g_players[p],map_Size-map_psx[p],map_Size-map_psy[p],1,base_1r,true,pf_get_area(map_Size-map_psx[p],map_Size-map_psy[p]));
    end
    else
-      for i:=1 to LastPlayer do
-       if(i<>p)then
-        if(g_players[i].state>ps_none)then
-         if(g_players[i].team<>g_players[p].team)then
-          ai_PlayerSetAlarm(@g_players[p],map_psx[i],map_psy[i],1,base_1r,true,pf_get_area(map_psx[i],map_psy[i]));
+      for i:=0 to LastPlayer do
+        if(i<>p)then
+          if(g_players[i].state>ps_None)then
+            if(g_players[i].team<>g_players[p].team)then
+              ai_PlayerSetAlarm(@g_players[p],map_psx[i],map_psy[i],1,base_1r,true,pf_get_area(map_psx[i],map_psy[i]));
 end;
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
@@ -313,7 +313,7 @@ end;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;
 begin
    ai_HighPriorityTarget:=false;
-   if(player^.state=ps_ai)then
+   if(player^.state=ps_AI)then
      if(player^.ai_flags and aif_army_smart_prio)>0 then
        ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^._genergy>0);
 end;
@@ -406,14 +406,14 @@ var i,d   :integer;
 koth_point:boolean;
 begin
    with pu^ do
-    with uid^ do
-     with player^ do
-     begin
-        ai_advanced_bld    :=(ai_flags and aif_base_advance )>0;
-        ai_teleport_use    :=(ai_flags and aif_army_teleport)>0;
-        ai_choosen         :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
-        ai_anydetectors    := uid_e[UID_HEyeNest]+uid_e[UID_URadar];
-     end;
+   with uid^ do
+   with player^ do
+   begin
+      ai_advanced_bld    :=(ai_flags and aif_base_advance )>0;
+      ai_teleport_use    :=(ai_flags and aif_army_teleport)>0;
+      ai_choosen         :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
+      ai_anydetectors    := uid_e[UID_HEyeNest]+uid_e[UID_URadar];
+   end;
 
    ai_limitaround_own      := 0;
    ai_limitaround_enemy_fly:= 0;
@@ -465,10 +465,10 @@ begin
    ai_urepair_d      := NOTSET;
 
    // cpoints
-   ai_cpoint_cp      := nil;
-   ai_cpoint_d       := NOTSET;
-   ai_cpoint_r       := 0;
-   ai_cpoint_n       := 0;
+   ai_kpoint_kp      := nil;
+   ai_kpoint_d       := NOTSET;
+   ai_kpoint_r       := 0;
+   ai_kpoint_n       := 0;
 
    ai_generator_cp   := nil;
    ai_generator_d    := NOTSET;
@@ -484,12 +484,12 @@ begin
    ai_nearest_builder_square:=longint.MaxValue;
    ai_nearest_builder_d     := NOTSET;
    with pu^ do
-    if(uid^._isbuilder)and(not ukfly)and(iscomplete)then
-    begin
-       ai_nearest_builder_u     :=pu;
-       ai_nearest_builder_square:=0;
-       ai_nearest_builder_d     :=0;
-    end;
+     if(uid^._isbuilder)and(not ukfly)and(iscomplete)then
+     begin
+        ai_nearest_builder_u     :=pu;
+        ai_nearest_builder_square:=0;
+        ai_nearest_builder_d     :=0;
+     end;
 
    with pu^ do
    with uid^ do
@@ -505,19 +505,19 @@ begin
          or(uid^._isbarrack)then ai_SetCurrentAlarm(nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y),aia_zone);
 
       // nearest point/generator
-      ai_cpoint_koth:=false;
+      ai_kpoint_koth:=false;
       for i:=0 to LastKeyPoint do
        with g_KeyPoints[i] do
          if(cpCaptureR>0)then
          begin
-            if(cpOwnerTeam=team)then
+            if(cpOwnerPlayer=playeri)then
             begin
                if(cpenergy>0)then
                begin
                   ai_enrg_pot+=cpenergy;
                   ai_enrg_cur+=cpenergy;
                end
-               else ai_cpoint_n+=1;
+               else ai_kpoint_n+=1;
             end;
 
             if(map_scenario=mc_royale)then
@@ -530,7 +530,10 @@ begin
 
             if(transportM>0)and(_attack<>atm_bunker)then
               if(pf_IfObstacleZone(cpzone))
-              or(cpOwnerTeam=team)then continue;
+              or(cpOwnerPlayer=playeri)then continue;
+
+            if(cpOwnerPlayer<>playeri)then
+              if(team=cpTimerOwnerTeam)and(cpTimerOwnerPlayer<>playeri)then continue;
 
             d:=point_dist_int(cpx,cpy,x,y);
 
@@ -555,12 +558,12 @@ begin
                end;
             end
             else
-              if(d<ai_cpoint_d)then
+              if(d<ai_kpoint_d)then
               begin
-                 ai_cpoint_d   :=d;
-                 ai_cpoint_r   :=cpCaptureR;
-                 ai_cpoint_cp  :=@g_KeyPoints[i];
-                 ai_cpoint_koth:=koth_point;
+                 ai_kpoint_d   :=d;
+                 ai_kpoint_r   :=cpCaptureR;
+                 ai_kpoint_kp  :=@g_KeyPoints[i];
+                 ai_kpoint_koth:=koth_point;
               end;
 
             if(d<cpCaptureR)then break;
@@ -696,7 +699,7 @@ begin
 
                   if(ud<srange)then
                     if(ai_generator_d<100)
-                    or(ai_cpoint_d<100)
+                    or(ai_kpoint_d<100)
                     or(tu^.a_rld>0)then
                       if (tu^.buffs[ub_Invis]>0)
                       and(tu^.TeamDetection[team]<=0)
@@ -804,7 +807,6 @@ begin
                and(tu^.uidi<>UID_HEyeNest )
                and(tu^.aiu_alarm_d<base_1rh)then
                  if((tu^.aiu_limitaround_enemy-tu^.aiu_limitaround_ally)>=0)
-                 or(map_scenario=mc_invasion)
                  then _setNearestTarget(@ai_abase_u,@ai_abase_d,ud);
 
                // teleporter beacon
@@ -1022,7 +1024,7 @@ begin
    with g_players[playeri] do
    begin
       if(IsUnitRange(ai_scout_u_cur,@tu))
-      then ai_scout_u_cur_w:=_unitWeaponPriority(tu,wtp_Scout,false)
+      then ai_scout_u_cur_w:=GetWeaponPriority(tu,wtp_Scout,false)
       else
       begin
          ai_scout_u_cur_w:=0;
@@ -1043,7 +1045,7 @@ begin
       for a:=0 to LastPlayer do
        with ai_alarms[a] do
         if(aia_enemy_limit>0)then
-         if(_CheckRoyalBattlePoint(aia_x,aia_y,base_1r))then aia_enemy_limit:=0;
+         if(g_CheckRoyalBattlePoint(aia_x,aia_y,base_1r))then aia_enemy_limit:=0;
 
       if(ai_detection_pause>0)then ai_detection_pause-=1;
 
@@ -1076,7 +1078,6 @@ var w:integer;
 begin
    if(map_scenario=mc_KotH    )
    or(map_scenario=mc_capture )
-   or(map_scenario=mc_invasion)
    or(map_scenario=mc_royale  )then exit;
 
    with pu^ do
@@ -1092,7 +1093,7 @@ begin
       if(IsUnitRange(transport,nil))then exit;
    end;
 
-   w:=_unitWeaponPriority(pu,wtp_Scout,false);
+   w:=GetWeaponPriority(pu,wtp_Scout,false);
    if(w>0)then
     with pu^.player^ do
      if(w>ai_scout_u_new_w)then

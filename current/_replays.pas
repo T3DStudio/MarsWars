@@ -75,16 +75,17 @@ begin
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
    AddItem(@g_tick              ,SizeOf(g_tick           ));
-   for p:=1 to LastPlayer do
+   for p:=0 to LastPlayer do
      with g_players[p] do
      begin
-        AddItem(@state,SizeOf(state));
-        AddItem(@name ,SizeOf(name ));
-        AddItem(@mrace,SizeOf(mrace));
-        AddItem(@team ,SizeOf(team ));
+        AddItem(@state   ,SizeOf(state   ));
+        AddItem(@name    ,SizeOf(name    ));
+        AddItem(@mrace   ,SizeOf(mrace   ));
+        AddItem(@team    ,SizeOf(team    ));
+        AddItem(@observer,SizeOf(observer));
      end;
 
-   for p:=1 to LastPlayer do
+   for p:=0 to LastPlayer do
      with g_players[p] do
        AddItem(@race,SizeOf(race));
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
@@ -208,19 +209,19 @@ begin
    end
    else
    begin
-      rpls_fstate:=rpls_write;
-      rpls_pstate  :=rpls_write;
-      rpls_u      :=MaxPlayerUnits+1;
+      rpls_fstate :=rpls_write;
+      rpls_pstate :=rpls_write;
+      rpls_u      :=1;
       rpls_player :=LocalPlayer;
       rpls_log_c  :=0;
-      rpls_POVRecorder  :=false;
+      rpls_POVRecorder:=false;
       rpls_ticks  :=0;
 
       {$I-}
       if(rpls_head_itemn>0)then
-       for p:=0 to rpls_head_itemn-1 do
-        with rpls_head_items[p] do
-         BlockWrite(rpls_file,data_p^,data_s);
+        for p:=0 to rpls_head_itemn-1 do
+          with rpls_head_items[p] do
+            BlockWrite(rpls_file,data_p^,data_s);
       {$I+}
 
       if(ioresult<>0)then
@@ -261,7 +262,7 @@ begin
          {$I+}
       end;
 
-      if(gs=gs_running)then _wclinet_gframe(rpls_player,true);
+      if(gs=gs_running)then wclinet_gframe(rpls_player,true);
    end;
 
    if(ioresult<>0)then
@@ -290,7 +291,7 @@ begin
 
    if(not FileExists(rpls_str_path))then
    begin
-      rpls_pstate   :=rpls_none;
+      rpls_pstate  :=rpls_none;
       g_started    :=false;
       rpls_str_info:=str_FileError_NExists;
       exit;
@@ -362,10 +363,10 @@ begin
             exit;
          end;
 
-         for p:=1 to LastPlayer do
+         for p:=0 to LastPlayer do
           with g_players[p] do
             if(length(name)>MaxPlayerNameLen)
-            or not(state in [ps_none,ps_human,ps_ai])
+            or not(state in [ps_None,ps_human,ps_AI])
             or(race >r_cnt)
             or(mrace>r_cnt)
             or(team >LastPlayer)then
@@ -381,11 +382,11 @@ begin
          if(UnitStepTicks=0)then UnitStepTicks:=1;
 
          rpls_fstate:=rpls_read;
-         rpls_pstate  :=rpls_read;
-         rpls_pnu    :=0;
-         rpls_ticks  :=0;
-         LocalPlayer     :=rpls_player;
-         UIPlayer    :=LocalPlayer;
+         rpls_pstate:=rpls_read;
+         rpls_pnu   :=0;
+         rpls_ticks :=0;
+         LocalPlayer:=rpls_player;
+         UIPlayer   :=LocalPlayer;
 
          rpls_POVRecorder  :=false;
 
@@ -393,9 +394,9 @@ begin
          ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
 
          ui_Camera_Bounds;
-         ui_tab    :=3;
+         ui_tab    :=tab_controls;
          G_Started :=true;
-         MainMenu     :=false;
+         MainMenu  :=false;
          ServerSide:=false;
       end;
    end;
@@ -415,8 +416,8 @@ begin
    if(eof(rpls_file))then
    begin
       G_Status   :=gs_replayend;
-      sys_uncappedFPS:=false;
-      rpls_ForwardSkip  :=0;
+      sys_uncappedFPS :=false;
+      rpls_ForwardSkip:=0;
       exit;
    end;
 
@@ -534,9 +535,9 @@ begin
    replay_Play:=true;
    if(check)then exit;
 
-   g_type    :=gt_scirmish;
+   g_type     :=gt_scirmish;
    rpls_pstate:=rpls_read;
-   g_started :=true;
+   g_started  :=true;
 end;
 
 function replay_Delete(check:boolean):boolean;

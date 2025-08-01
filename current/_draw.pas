@@ -24,12 +24,13 @@ begin
  effects_sprites(noanim,vid_draw);
  if(not vid_draw)then exit;
 missiles_sprites;
- cpoints_sprites;
+keyPoints_sprites;
 end;
 
 procedure d_Game;
 begin
    d_UpdateUIPlayer(0);
+   PlayersUpdateColorSchema(UIPlayer);
 
    D_AddObjSprites(G_Status>gs_running);
 
@@ -78,10 +79,11 @@ begin
    if(TestMode>1)then
    begin
    n:=0;
-   with g_players[UIPlayer] do
-    for i:=0 to LastPlayer do
-     with ai_alarms[i] do
-      if(aia_enemy_limit>0)then n+=1;
+   if(UIPlayer<=LastPlayer)then
+    with g_players[UIPlayer] do
+     for i:=0 to LastPlayer do
+      with ai_alarms[i] do
+       if(aia_enemy_limit>0)then n+=1;
 
    draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+

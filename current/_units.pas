@@ -45,7 +45,7 @@ begin
               buffs[ub_Resurect]:=0;
               buffs[ub_Summoned]:=fr_fps1;
               {$IFDEF _FULLGAME}
-              _unit_CalcForR(pu);
+              unit_CalcFogR(pu);
               effect_UnitSummon(pu,nil);
               {$ENDIF}
            end;
@@ -60,7 +60,6 @@ begin
    if(buffs[ub_Invuln]<=0)and(hits>0)then
    with uid^ do
    begin
-
       armor:=0;
 
       if(iscomplete)and(not IgnoreArmor)then
@@ -109,8 +108,8 @@ begin
                 buffs[ub_Pain]:=max2i(pain_time,a_rld);
 
                 with player^ do
-                 if(_urace=r_hell)then
-                  if(upgr[upgr_hell_pains]>0)then pains+=_painc_upgr_step*upgr[upgr_hell_pains];
+                  if(_urace=r_hell)then
+                    if(upgr[upgr_hell_pains]>0)then pains+=_painc_upgr_step*upgr[upgr_hell_pains];
                 if(level>0)then pains+=level*2;
 
                 {$IFDEF _FULLGAME}
@@ -123,10 +122,10 @@ begin
 end;
 
 function unit_morph(pu:PTUnit;ouid:byte;obld:boolean;bhits:integer;ulevel:byte;check:boolean):cardinal;
-var puid: PTUID;
-    avsni,
-    avsnt: TUnitVisionData;
-   select: boolean;
+var puid   : PTUID;
+aTeamDetection,
+aTeamVision: TUnitVisionData;
+aselect     : boolean;
 begin
    unit_morph:=0;
    with pu^     do
@@ -139,9 +138,9 @@ begin
       end;
 
       puid  :=@g_uids[ouid];
-      avsni :=TeamDetection;
-      avsnt :=TeamVision;
-      select:=sel;
+      aTeamDetection:=TeamDetection;
+      aTeamVision   :=TeamVision;
+      aselect:=sel;
 
       if(a_units[ouid]<=0)then
       begin
@@ -154,11 +153,11 @@ begin
          exit;
       end;
       if(not obld)or(puid^._ukbuilding)then
-       if(menergy<=0)then
-       begin
-          unit_morph:=ureq_energy;
-          exit;
-       end;
+        if(menergy<=0)then
+        begin
+           unit_morph:=ureq_energy;
+           exit;
+        end;
       if(not obld)then
       begin
          if(ukfly)or(transportC>0)then
@@ -188,18 +187,14 @@ begin
 
    if(bhits<0)then bhits:=puid^._mhits div abs(bhits);
    if(LastCreatedUnitP<>nil)then
-    with LastCreatedUnitP^ do
-    begin
-       TeamDetection:=avsni;
-       TeamVision:=avsnt;
-       if(bhits>0)then
-        if(not iscomplete)then hits:=mm3i(1,bhits,puid^._mhits-1);
-       if(select)then
-       begin
-          sel:=true;
-          unit_counters_inc_select(LastCreatedUnitP);
-       end;
-    end;
+     with LastCreatedUnitP^ do
+     begin
+        TeamDetection:=aTeamDetection;
+        TeamVision:=aTeamVision;
+        if(bhits>0)then
+          if(not iscomplete)then hits:=mm3i(1,bhits,puid^._mhits-1);
+        if(aselect)then unit_select(LastCreatedUnitP);
+     end;
 end;
 
 procedure unit_push(pu,tu:PTUnit;uds:single);
@@ -208,6 +203,7 @@ var t:single;
 shortcollision,
 dirturn:boolean;
 begin
+   // pu from tu
    with pu^ do
    with uid^ do
    begin
@@ -257,7 +253,7 @@ begin
    end;
 end;
 
-procedure unit_dpush(pu:PTUnit;td:PTDoodad);
+procedure unit_PushFromObstacle(pu:PTUnit;td:PTDoodad);
 var t,uds:single;
       ud :integer;
 begin
@@ -317,7 +313,7 @@ begin
      if(n>0)then
       for i:=0 to n-1 do
        with l[i]^ do
-        if(r>0)and(t>0)then unit_dpush(pu,l[i]);
+        if(r>0)and(t>0)then unit_PushFromObstacle(pu,l[i]);
 end;
 
 procedure unit_move(pu:PTUnit);
@@ -495,22 +491,22 @@ wpt_heal     : if(pTarget^.hits<=0)
 
       // requirements to target
 
-      if((aw_tarf and wtr_owner_p  )=0)and(pTarget^.playeri      =playeri  )then exit;
-      if((aw_tarf and wtr_owner_a  )=0)and(pTarget^.player^.team =team     )then exit;
-      if((aw_tarf and wtr_owner_e  )=0)and(pTarget^.player^.team<>team     )then exit;
+      if((aw_tarf and wtr_owner_p  )=0)and(pTarget^.playeri      =playeri       )then exit;
+      if((aw_tarf and wtr_owner_a  )=0)and(pTarget^.player^.team =team          )then exit;
+      if((aw_tarf and wtr_owner_e  )=0)and(pTarget^.player^.team<>team          )then exit;
 
       if((aw_tarf and wtr_hits_h   )=0)and((0<pTarget^.hits)
                                        and(pTarget^.hits< pTarget^.uid^._mhits ))then exit;
-      if((aw_tarf and wtr_hits_d   )=0)and(pTarget^.hits<=0                )then exit;
+      if((aw_tarf and wtr_hits_d   )=0)and(pTarget^.hits<=0                     )then exit;
       if((aw_tarf and wtr_hits_a   )=0)and(pTarget^.hits =pTarget^.uid^._mhits  )then exit;
 
-      if((aw_tarf and wtr_complete )=0)and(pTarget^.iscomplete             )then exit;
-      if((aw_tarf and wtr_ncomplete)=0)and(pTarget^.iscomplete =false      )then exit;
+      if((aw_tarf and wtr_complete )=0)and(pTarget^.iscomplete                  )then exit;
+      if((aw_tarf and wtr_ncomplete)=0)and(pTarget^.iscomplete =false           )then exit;
 
       if(not pTarget^.uid^._ukbuilding  )then
       begin
-      if((aw_tarf and wtr_stun     )=0)and(pTarget^.buffs[ub_Pain]> 0       )then exit;
-      if((aw_tarf and wtr_nostun   )=0)and(pTarget^.buffs[ub_Pain]<=0       )then exit;
+      if((aw_tarf and wtr_stun     )=0)and(pTarget^.buffs[ub_Pain]> 0           )then exit;
+      if((aw_tarf and wtr_nostun   )=0)and(pTarget^.buffs[ub_Pain]<=0           )then exit;
       end;
 
       if(not CheckUnitBaseFlags(pTarget,aw_tarf))then exit;
@@ -581,19 +577,19 @@ begin
    end;
 end;
 
-function _unitWeaponPriority(tu:PTUnit;priorset:byte;highprio:boolean):integer;
+function GetWeaponPriority(pTarget:PTUnit;priorset:byte;highprio:boolean):integer;
 var i:integer;
 procedure incPrio(add:boolean);
 begin
    if(add)
-   then _unitWeaponPriority+=i;
+   then GetWeaponPriority+=i;
    i:=i div 2;
 end;
 begin
    i:=8192;
-   _unitWeaponPriority:=0;
+   GetWeaponPriority:=0;
 
-   with tu^  do
+   with pTarget^  do
    with uid^ do
    case priorset of
 wtp_building         : begin
@@ -649,15 +645,15 @@ wtp_UnitLight        : begin
                        incPrio(not iscomplete    );
                        end;
 wtp_limit            : incPrio(not _ukbuilding   );
-wtp_limitaround      : _unitWeaponPriority+=tu^.aiu_limitaround_ally div ul1;
+wtp_limitaround      : GetWeaponPriority+=pTarget^.aiu_limitaround_ally div ul1;
 wtp_Scout            : begin
                        incPrio(_limituse<ul3);
                        incPrio(ukfly or ukfloater);
                        incPrio(transportM<=0);
-                       _unitWeaponPriority+=speed;
+                       GetWeaponPriority+=speed;
                        end;
    end;
-   with tu^  do
+   with pTarget^  do
    with uid^ do
    incPrio((uidi<>UID_LostSoul)and(uidi<>UID_Phantom));
    incPrio(highprio);
@@ -682,10 +678,10 @@ begin
       else
        with _a_weap[tw] do
         if(tw<t_weap^)
-        then n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu))
+        then n_prio:=GetWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu))
         else
         begin
-           n_prio:=_unitWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
+           n_prio:=GetWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
 
            case aw_tarprior of
            //wtp_heal      : if(tu<>pu)then n_prio+=1;
@@ -760,7 +756,7 @@ UID_HKeep     : if(ud<srange)
    end;
 end;
 
-procedure unit_capture_point(pu:PTUnit);
+procedure unit_CaptureKPoint(pu:PTUnit);
 var i :byte;
 begin
    with pu^ do
@@ -829,7 +825,7 @@ begin
 
       pushout      := solid and unit_canMove(pu) and (a_rld<=0);
       attack_target:= unit_canAttack(pu,false);
-      aicode       := (state=ps_ai);//and(sel);
+      aicode       := (state=ps_AI);//and(sel);
       fteleport_tar:= (not IsUnitRange(uo_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
       puo:=nil;
@@ -946,7 +942,7 @@ begin
       end
       else udetect:=true;
 
-      if(udetect=false)and(ftarget=false)then exit;  // in apc & client side
+      if(not udetect)and(not ftarget)then exit;  // in apc & client side
 
       if(ftarget)and(ServerSide)then unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
@@ -1009,27 +1005,27 @@ begin
    end;
 end;
 
-function unit_ability_RevTeleport(pu:PTUnit;tar,tard:integer;check:boolean):cardinal;
+function unit_ability_Recall(pu:PTUnit;tar,tard:integer;check:boolean):cardinal;
 var tu:PTUnit;
 begin
    // pu - teleporter
 
    with pu^ do
    begin
-      unit_ability_RevTeleport:=ureq_unknown;
+      unit_ability_Recall:=ureq_unknown;
       if(not iscomplete)
       or(hits<=0)then exit;
 
-      unit_ability_RevTeleport:=ureq_reloading;
+      unit_ability_Recall:=ureq_reloading;
       if(rld>0)then exit;
    end;
 
-   unit_ability_RevTeleport:=ureq_rupid;
+   unit_ability_Recall:=ureq_rupid;
    with pu^.player^ do
      if(upgr[upgr_hell_rteleport]<=0)
      then exit;
 
-   unit_ability_RevTeleport:=ureq_invalidtar;
+   unit_ability_Recall:=ureq_invalidtar;
    if(not IsUnitRange(tar,@tu))then exit;
    with tu^ do
    with uid^ do
@@ -1049,7 +1045,7 @@ begin
       or(tard<0     )then tard:=point_dist_int(x,y,tu^.x,tu^.y);
       if(tard>base_1r)then
       begin
-         unit_ability_RevTeleport:=0;
+         unit_ability_Recall:=0;
 
          if(check)then exit;
 
@@ -1062,7 +1058,7 @@ begin
    end;
 end;
 
-function _ability_teleport(pu,tu:PTUnit;td:integer):boolean;
+function unit_ability_teleport(pu,tu:PTUnit;td:integer):boolean;
 var tt:PTUnit;
     tr:integer;
 begin
@@ -1070,7 +1066,7 @@ begin
    // tu - teleporter
    // td = dist2(pu,tu)
    if(td=NOTSET)then td:=point_dist_int(pu^.x,pu^.y,tu^.x,tu^.y);
-   _ability_teleport:=false;
+   unit_ability_teleport:=false;
    with pu^  do
     with uid^ do
       if(not _ukbuilding)and(iscomplete)and(ukfly=false)and(tu^.hits>0)and(tu^.iscomplete)then
@@ -1096,58 +1092,58 @@ begin
               else unit_teleport(pu,tu^.uo_x                      ,tu^.uo_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
 
               teleport_CalcReload(tu,_limituse);
-              _ability_teleport:=true;
+              unit_ability_teleport:=true;
            end;
         end;
 end;
 
-function _unit_load(pu,tu:PTUnit):boolean;
+function unit_Load(pu,tu:PTUnit):boolean;
 begin
    //pu - transport
    //tu - target
-   _unit_load:=false;
+   unit_Load:=false;
    if(unit_CheckTransport(pu,tu))then
-   with pu^ do
+     with pu^ do
+     begin
+        transportC+=tu^.uid^._transportS;
+        tu^.transport:=unum;
+        tu^.a_tar:=0;
+        if(uo_tar=tu^.unum)then     uo_tar:=0;
+        if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
+        unit_UnSelect(tu);
+        {$IFDEF _FULLGAME}
+        SoundPlayUnit(snd_transport,pu,nil);
+        {$ENDIF}
+        unit_Load:=true;
+     end;
+end;
+function unit_UnLoad(pu,tu:PTUnit):boolean;
+begin
+   //pu - transport
+   //tu - target
+   unit_UnLoad:=false;
+   if(pu=nil)then
+     if(not IsUnitRange(tu^.transport,@pu))then exit;
+   with tu^ do
+   if(transport=pu^.unum)and(pu^.buffs[ub_CCast]<=0)then
    begin
-      transportC+=tu^.uid^._transportS;
-      tu^.transport:=unum;
-      tu^.a_tar:=0;
-      if(uo_tar=tu^.unum)then     uo_tar:=0;
-      if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
-      unit_UnSelect(tu);
+      pu^.buffs[ub_CCast]:=fr_fpsd4;
+      pu^.transportC-=uid^._transportS;
+      transport:=0;
+      x    :=pu^.x-g_randomr(pu^.uid^._r);
+      y    :=pu^.y-g_randomr(pu^.uid^._r);
+      uo_x :=x;
+      uo_y :=y;
       {$IFDEF _FULLGAME}
       SoundPlayUnit(snd_transport,pu,nil);
       {$ENDIF}
-      _unit_load:=true;
+      unit_UnLoad:=true;
    end;
-end;
-function _unit_unload(pu,tu:PTUnit):boolean;
-begin
-   //pu - transport
-   //tu - target
-   _unit_unload:=false;
-   if(pu=nil)then
-    if(not IsUnitRange(tu^.transport,@pu))then exit;
-   with tu^ do
-    if(transport=pu^.unum)and(pu^.buffs[ub_CCast]<=0)then
-    begin
-       pu^.buffs[ub_CCast]:=fr_fpsd4;
-       pu^.transportC-=uid^._transportS;
-       transport:=0;
-       x    :=pu^.x-g_randomr(pu^.uid^._r);
-       y    :=pu^.y-g_randomr(pu^.uid^._r);
-       uo_x :=x;
-       uo_y :=y;
-       {$IFDEF _FULLGAME}
-       SoundPlayUnit(snd_transport,pu,nil);
-       {$ENDIF}
-       _unit_unload:=true;
-    end;
    with pu^ do
-    if(transportC=0)then uo_id:=ua_amove;
+     if(transportC=0)then uo_id:=ua_amove;
 end;
 
-procedure _unit_InTransportCode(pu,ptransport:PTUnit);
+procedure unit_InTransportCode(pu,ptransport:PTUnit);
 var tu:PTUnit;
 begin
    // pu - unit inside
@@ -1167,7 +1163,7 @@ begin
       begin
          if(ptransport^.uo_id=ua_unload)or(ptransport^.transportC>ptransport^.transportM)then
           if(not ptransport^.ukfly)or(not pf_IfObstacleZone(ptransport^.pfzone))then
-           if(_unit_unload(ptransport,pu))then exit;
+           if(unit_UnLoad(ptransport,pu))then exit;
 
          if(ptransport^.uo_id=ua_move )
          or(ptransport^.uo_id=ua_hold )
@@ -1183,7 +1179,7 @@ begin
 end;
 
 // target units
-procedure _unit_uo_tar(pu:PTUnit);
+procedure unit_uo_tar(pu:PTUnit);
 var tu: PTUnit;
      a,
      w: byte;
@@ -1211,8 +1207,8 @@ begin
 
          if(tdm<melee_r)then
          begin
-            if(_unit_load(pu,tu))then exit;
-            if(_unit_load(tu,pu))then exit;
+            if(unit_Load(pu,tu))then exit;
+            if(unit_Load(tu,pu))then exit;
          end;
 
          case _ability of
@@ -1220,7 +1216,7 @@ uab_Teleport     : if(tu^.player^.team<>player^.team )then begin uo_tar:=0;exit;
          end;
 
          case tu^.uid^._ability of
-uab_Teleport     : if(_ability_teleport(pu,tu,td))then exit;//team
+uab_Teleport     : if(unit_ability_teleport(pu,tu,td))then exit;//team
          end;
 
          w:=unit_target2weapon(pu,tu,td,255,@a);
@@ -1249,7 +1245,7 @@ uab_Teleport     : if(_ability_teleport(pu,tu,td))then exit;//team
       end;
 end;
 
-function _TryZombification(pu,tu:PTUnit):boolean;
+function unit_TryZombification(pPhantom,pTarget:PTUnit):boolean;
 var _h:single;
     _l,
     _o:byte;
@@ -1261,43 +1257,43 @@ var _h:single;
     _s:integer;
     {$ENDIF}
 begin
-   _TryZombification:=false;
+   unit_TryZombification:=false;
 
-   //pu - zombificator
-   //tu - target
+   //pPhantom - zombificator
+   //pTarget - target
 
-   if(tu^.uid^._zombie_uid=0)then exit;
-   _zuid:=@g_uids[tu^.uid^._zombie_uid];
+   if(pTarget^.uid^._zombie_uid=0)then exit;
+   _zuid:=@g_uids[pTarget^.uid^._zombie_uid];
 
-   with pu^ do
+   with pPhantom^ do
    with uid^ do
    with player^ do
    begin
       if((armylimit-_limituse+_zuid^._limituse+uprodl)>MaxPlayerLimit)then exit;
       if((menergy-_genergy+_zuid^._genergy)<=0)then exit;
-      if(tu^.uid^._isbuilder)and(e_builders>=PlayerMaxBuilders)then exit;
+      if(pTarget^.uid^._isbuilder)and(e_builders>=PlayerMaxBuilders)then exit;
    end;
 
-   if(tu^.iscomplete=false)
-   or(tu^.uid^._zombie_uid =0)
-   or(tu^.uid^._zombie_hits<tu^.hits)
-   or(tu^.hits<=fdead_hits          )then exit;
+   if(not pTarget^.iscomplete)
+   or(pTarget^.uid^._zombie_uid =0)
+   or(pTarget^.uid^._zombie_hits<pTarget^.hits)
+   or(pTarget^.hits<=fdead_hits          )then exit;
 
    if(ServerSide)then
    begin
-      _h:=tu^.hits/tu^.uid^._mhits;
-      _d:=tu^.dir;
-      _o:=pu^.group;
-      _f:=tu^.ukfly;
-      _z:=tu^.zfall;
-      _l:=tu^.level;
+      _h:=pTarget^.hits/pTarget^.uid^._mhits;
+      _d:=pTarget^.dir;
+      _o:=pPhantom^.group;
+      _f:=pTarget^.ukfly;
+      _z:=pTarget^.zfall;
+      _l:=pTarget^.level;
       {$IFDEF _FULLGAME}
-      _s:=tu^.shadow;
+      _s:=pTarget^.shadow;
       {$ENDIF}
 
-      unit_kill(pu,true,true,false,false,true);
-      unit_add(tu^.x,tu^.y,pu^.unum,tu^.uid^._zombie_uid,pu^.playeri,true,true,_l);
-      unit_kill(tu,true,true,false,false,true);
+      unit_kill(pPhantom,true,true,false,false,true);
+      unit_add(pTarget^.x,pTarget^.y,pPhantom^.unum,pTarget^.uid^._zombie_uid,pPhantom^.playeri,true,true,_l);
+      unit_kill(pTarget,true,true,false,false,true);
 
       if(LastCreatedUnit>0)then
       with LastCreatedUnitP^ do
@@ -1317,10 +1313,10 @@ begin
          end;
       end;
    end;
-   _TryZombification:=true;
+   unit_TryZombification:=true;
 end;
 
-procedure _unit_exp(pu:PTUnit;exp:cardinal);
+procedure unit_AddExp(pu:PTUnit;exp:cardinal);
 begin
    with pu^ do
    if(level<MaxUnitLevel)then
@@ -1482,8 +1478,8 @@ wmove_noneed    : if(not attackinmove)then
       with _a_weap[a_weap] do
       begin
          {$IFDEF _FULLGAME}
-         targetvis  :=CheckUnitUIVisionScreen(pTarget);
-         attackervis:=CheckUnitUIVisionScreen(pAttacker);
+         targetvis  :=ui_CheckUnitUIPlayerVision(pTarget  ,true);
+         attackervis:=ui_CheckUnitUIPlayerVision(pAttacker,true);
          {$ENDIF}
 
          if(a_rld<=0)then
@@ -1496,9 +1492,8 @@ wmove_noneed    : if(not attackinmove)then
             if(ServerSide)and(not _ukbuilding)then
               if((aw_max_range<0)and(aw_type=wpt_directdmg))
               or(aw_type=wpt_heal)
-              or((playeri=0)and(map_scenario=mc_invasion))
-              then _unit_exp(pAttacker,aw_rld*2)
-              else _unit_exp(pAttacker,aw_rld  );
+              then unit_AddExp(pAttacker,aw_rld*2)
+              else unit_AddExp(pAttacker,aw_rld  );
             if(not attackinmove)then
             begin
                if(x<>pTarget^.x)
@@ -1518,7 +1513,7 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not IsUnitRange(pTarget^.transport,nil))then
-              if((g_tick mod fr_fpsd3)=0)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^._missile_r),pTarget^.vy-g_randomr(pTarget^.uid^._missile_r),_SpriteDepth(pTarget^.vy+1,pTarget^.ukfly),aw_eid_target);
+              if((g_tick mod fr_fpsd3)=0)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^._missile_r),pTarget^.vy-g_randomr(pTarget^.uid^._missile_r),draw_SpriteDepth(pTarget^.vy+1,pTarget^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((g_tick mod fr_fps1)=0)then SoundPlayUnit(aw_snd_target,pTarget,@targetvis);
           end;
@@ -1535,7 +1530,7 @@ wmove_noneed    : if(not attackinmove)then
              if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
              begin
                 if(not IsUnitRange(pTarget^.transport,nil))then
-                effect_add(pTarget^.vx-g_randomr(pTarget^.uid^._missile_r),pTarget^.vy-g_randomr(pTarget^.uid^._missile_r),_SpriteDepth(pTarget^.vy+1,pTarget^.ukfly),aw_eid_target);
+                effect_add(pTarget^.vx-g_randomr(pTarget^.uid^._missile_r),pTarget^.vy-g_randomr(pTarget^.uid^._missile_r),draw_SpriteDepth(pTarget^.vy+1,pTarget^.ukfly),aw_eid_target);
 
                 SoundPlayUnit(aw_snd_target,pTarget,@targetvis);
              end;
@@ -1565,7 +1560,7 @@ wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
                     unit_damage(pTarget,damage,1,playeri,false);
                  end;
 wpt_directdmgZ : if(not fakemissile)and(aw_count>0)then
-                  if(not _TryZombification(pAttacker,pTarget))then
+                  if(not unit_TryZombification(pAttacker,pTarget))then
                   begin
                      damage:=ApplyDamageMod(pTarget,aw_dmod,aw_count+upgradd);
                      unit_damage(pTarget,damage,1,playeri,false);
@@ -1596,10 +1591,10 @@ begin
     if(hits<=0)then exit;
 
    apctu:=nil;
-   if(IsUnitRange(pu^.transport,@apctu))then _unit_InTransportCode(pu,apctu);
+   if(IsUnitRange(pu^.transport,@apctu))then unit_InTransportCode(pu,apctu);
 
    with pu^ do
-   if(ServerSide=false)then
+   if(not ServerSide)then
    begin
       unit_attack(pu);
 
@@ -1614,7 +1609,7 @@ begin
    begin
       if(apctu=nil)then
       begin
-         _unit_uo_tar(pu);
+         unit_uo_tar(pu);
 
          uo_x:=mm3i(1,uo_x,map_Size);
          uo_y:=mm3i(1,uo_y,map_Size);
@@ -1673,7 +1668,7 @@ uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
           if(unit_canMove(pu))then
             if(mp_x<>mv_x)or(mp_y<>mv_y)then
             begin
-               if(not uid^._slowturn)and(player^.state<>ps_ai)then
+               if(not uid^._slowturn)and(player^.state<>ps_AI)then
                  if(x<>mv_x)or(y<>mv_y)then dir:=point_dir(x,y,mv_x,mv_y);
                mp_x:=mv_x;
                mp_y:=mv_y;
@@ -1841,7 +1836,7 @@ begin
    with uid^ do
    with player^ do
    case _ability of
-   uab_Teleport        : unit_pability:=unit_ability_RevTeleport(pu,taru,NOTSET,false);
+   uab_Teleport        : unit_pability:=unit_ability_Recall(pu,taru,NOTSET,false);
    uab_UACScan         : unit_pability:=unit_ability_UACScan    (pu,tarx,tary  ,false);
    uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pu,tarx,tary  ,false);
    uab_HTowerBlink     : unit_pability:=unit_ability_HTowerBlink(pu,tarx,tary  ,false);
@@ -1953,7 +1948,7 @@ begin
                unit_move(pu);
                unit_prod(pu);
 
-               if(player^.state=ps_ai)then ai_scout_pick(pu);
+               if(player^.state=ps_AI)then ai_scout_pick(pu);
             end;
 
             transportu:=nil;
@@ -1964,7 +1959,7 @@ begin
 
             if(ServerSide)then
               if(not IsUnitRange(transport,nil))then
-                unit_capture_point(pu);
+                unit_CaptureKPoint(pu);
          end
          else unit_death(pu);
 
@@ -1972,7 +1967,7 @@ begin
       end;
    end;
 
-   _missileCycle;
+   missile_Cycle;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

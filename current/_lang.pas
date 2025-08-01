@@ -197,7 +197,7 @@ begin
          uidi:=auid;
          playeri:=0;
          player :=@g_players[playeri];
-         _unit_apUID(pu);
+         unit_ApplyUID(pu);
          hits:=-32000;
       end;
    end;
@@ -911,10 +911,9 @@ begin
    str_map_Random                := 'Random map';
    str_map_Scenario              := 'Scenario';
    str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Skirmish'    +tc_default;
-   str_map_ScenarioL[mc_3x3     ]:= tc_orange+'3x3'         +tc_default;
-   str_map_ScenarioL[mc_2x2x2   ]:= tc_yellow+'2x2x2'       +tc_default;
-   str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Key points'  +tc_default;
-   str_map_ScenarioL[mc_invasion]:= tc_blue  +'Invasion'    +tc_default;
+   str_map_ScenarioL[mc_4x4     ]:= tc_yellow+'4x4'         +tc_default;
+   str_map_ScenarioL[mc_2x2x2x2 ]:= tc_orange+'2x2x2x2'     +tc_default;
+   str_map_ScenarioL[mc_capture ]:= tc_purple+'Key points'  +tc_default;
    str_map_ScenarioL[mc_KotH    ]:= tc_purple+'KotH'        +tc_default;
    str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
    str_map_Generators            := 'Generators';
@@ -964,6 +963,8 @@ begin
    str_gmsg_PlayerSurrender      := ' surrenders!';
    str_gmsg_Connecting           := 'Connecting...';
    str_gmsg_PortBlocked          := 'Port is blocked!';
+   str_gmsg_PlayerPaused         := 'player paused the game';
+   str_gmsg_PlayerResumed        := 'player has resumed the game';
 
    str_msg_WrongVersion  := 'Wrong version!';
    str_msg_ServerFull    := 'Server full!';
@@ -975,9 +976,6 @@ begin
 
    str_time              := 'Time: ';
    str_menu              := 'Menu';
-
-   str_inv_time          := 'Wave #';
-   str_inv_ml            := 'Monsters limit: ';
 
    str_chat_all          := 'ALL:';
    str_chat_allies       := 'ALLIES:';
@@ -1001,8 +999,7 @@ begin
    str_except            := 'except';
    str_splashresist      := 'Immune to splash damage';
    str_TargetLimit       := 'target limit';
-   str_PlayerPaused      := 'player paused the game';
-   str_PlayerResumed     := 'player has resumed the game';
+
 
 
    str_RecordingStart    := 'Start recording: ';
@@ -1292,20 +1289,25 @@ begin
    str_MakeActionHint(iAct_Replay_Log         ,'List of game messages');
    str_MakeActionHint(iAct_Replay_Fog         ,'Fog of war');
    str_MakeActionHint(iAct_Replay_PlayerAll   ,'All players');
-   str_MakeActionHint(iAct_Replay_Player1     ,'Player #1');
-   str_MakeActionHint(iAct_Replay_Player2     ,'Player #2');
-   str_MakeActionHint(iAct_Replay_Player3     ,'Player #3');
-   str_MakeActionHint(iAct_Replay_Player4     ,'Player #4');
-   str_MakeActionHint(iAct_Replay_Player5     ,'Player #5');
-   str_MakeActionHint(iAct_Replay_Player6     ,'Player #6');
+   str_MakeActionHint(iAct_Replay_Player0     ,'Player #1');
+   str_MakeActionHint(iAct_Replay_Player1     ,'Player #2');
+   str_MakeActionHint(iAct_Replay_Player2     ,'Player #3');
+   str_MakeActionHint(iAct_Replay_Player3     ,'Player #4');
+   str_MakeActionHint(iAct_Replay_Player4     ,'Player #5');
+   str_MakeActionHint(iAct_Replay_Player5     ,'Player #6');
+   str_MakeActionHint(iAct_Replay_Player6     ,'Player #7');
+   str_MakeActionHint(iAct_Replay_Player7     ,'Player #8');
 
    str_action_hint[iAct_Observer_Fog      ]:= str_action_hint[iAct_Replay_Fog    ];
    str_action_hint[iAct_Observer_PlayerAll]:= str_action_hint[iAct_Replay_PlayerAll];
+   str_action_hint[iAct_Observer_Player0  ]:= str_action_hint[iAct_Replay_Player0];
    str_action_hint[iAct_Observer_Player1  ]:= str_action_hint[iAct_Replay_Player1];
    str_action_hint[iAct_Observer_Player2  ]:= str_action_hint[iAct_Replay_Player2];
    str_action_hint[iAct_Observer_Player3  ]:= str_action_hint[iAct_Replay_Player3];
    str_action_hint[iAct_Observer_Player4  ]:= str_action_hint[iAct_Replay_Player4];
    str_action_hint[iAct_Observer_Player5  ]:= str_action_hint[iAct_Replay_Player5];
+   str_action_hint[iAct_Observer_Player6  ]:= str_action_hint[iAct_Replay_Player6];
+   str_action_hint[iAct_Observer_Player7  ]:= str_action_hint[iAct_Replay_Player7];
 
    //_mkHStrACT(12,'Alarm mark'       );
 
@@ -1499,10 +1501,9 @@ begin
 
   str_map_Scenario              := 'Сценарий';
   str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Схватка'          +tc_default;
-  str_map_ScenarioL[mc_3x3     ]:= tc_orange+'3x3'              +tc_default;
-  str_map_ScenarioL[mc_2x2x2   ]:= tc_yellow+'2x2x2'            +tc_default;
+  str_map_ScenarioL[mc_4x4     ]:= tc_orange+'3x3'              +tc_default;
+  str_map_ScenarioL[mc_2x2x2x2   ]:= tc_yellow+'2x2x2'            +tc_default;
   str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Захват точек'     +tc_default;
-  str_map_ScenarioL[mc_invasion]:= tc_blue  +'Вторжение'        +tc_default;
   str_map_ScenarioL[mc_KotH    ]:= tc_purple+'Царь горы'        +tc_default;
   str_map_ScenarioL[mc_royale  ]:= tc_red   +'Королевская битва'+tc_default;
 
@@ -1548,8 +1549,6 @@ begin
   str_time              := 'Время: ';
   str_menu              := 'Меню';
   str_gmsg_PlayerDefeat        := ' уничтожен!';
-  str_inv_time          := 'Волна #';
-  str_inv_ml            := 'Армия монстров: ';
   str_FilePlay              := 'Проиграть';
 
   str_Camp_Difficulty            := 'Сложность';
@@ -1592,8 +1591,8 @@ begin
   str_TargetLimit       := 'лимит цели';
   str_SS_NextTrack         := 'Следующий трек';
   str_SS_ReloadMusic       := 'Загрузить новый плейлист';
-  str_PlayerPaused      := 'игрок приостановил игру';
-  str_PlayerResumed     := 'игрок возобновил игру';
+  str_gmsg_PlayerPaused      := 'игрок приостановил игру';
+  str_gmsg_PlayerResumed     := 'игрок возобновил игру';
   str_SS_MusicListSize     := 'Размер плейлиста';
   str_menu_controls     := '- используйте левую и правую кнопки мыши для управления пунктами меню -';
   str_RecordingStart    := 'Начало записи: ';

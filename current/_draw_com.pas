@@ -6,14 +6,6 @@ begin
    SDL_FLIP(vid_screen);
 end;
 
-function ShadowColor(c:cardinal):cardinal;
-begin
-   ShadowColor:=128 +
-   (((c and $FF000000) shr 25) shl 24) +
-   (((c and $00FF0000) shr 17) shl 16) +
-   (((c and $0000FF00) shr  9) shl 8 );
-end;
-
 procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
 begin
    with sur^ do
@@ -35,6 +27,18 @@ begin
    SDL_BLITSURFACE(sur,nil,tar,vid_RECT);
 end;
 
+procedure draw_rectw(tar:pSDL_Surface;x0,y0,x1,y1,border,borderSkip:integer;color:cardinal);
+begin
+   while(border<>0)do
+   begin
+      if(abs(border)>borderSkip)then
+        rectangleColor(tar,x0-border,y0-border,
+                           x1+border,y1+border,color);
+      if(border>0)
+      then border-=1
+      else border+=1;
+   end;
+end;
 
 procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
 var strLen,
@@ -53,7 +57,7 @@ begin
    begin
       chars:=0;
       for i:=1 to strLen do
-       if not(str[i] in [tc_player0..tc_player6,tc_purple..tc_default])then chars+=1;
+        if not(str[i] in [tc_player0..tc_player7,tc_purple..tc_default])then chars+=1;
 
       case alignment of
       ta_middle: ix:=x-((chars*font_w) shr 1);
@@ -74,7 +78,7 @@ begin
 
       case charc of
       tc_player0..
-      tc_player6  : begin color:=PlayerGetColor(ord(charc));if(i<strLen)then continue;end;
+      tc_player7  : begin color:=PlayerGetColor(ord(charc),false);if(i<strLen)then continue;end;
       tc_nl1..
       tc_nl3      : ;
       tc_purple   : begin color:=c_purple ;if(i<strLen)then continue;end;
@@ -142,49 +146,61 @@ begin
    map_MinimapBackgroundObj([DID_other,DID_srock,DID_brock]);
 end;
 
-procedure map_minimap_cpoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
+procedure map_minimap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
 begin
    circleColor   (tar,x  ,y  ,r  ,color);
    characterColor(tar,x-3,y-3,sym,color);
 end;
 
 procedure map_MinimapPlayerStarts(tar:pSDL_Surface);
-var i  :byte;
-    x,y:integer;
-    c  :cardinal;
+var p    :byte;
+    x,y  :integer;
+    color:cardinal;
+    pc   :char;
 begin
-   for i:=0 to LastPlayer do
+   for p:=0 to LastPlayer do
    begin
-      if(map_scenario in [mc_invasion,mc_KotH])and(i=0)then continue;
+      if(g_FixedPositions)then
+      begin
+         if(g_players[p].state=ps_none)and(g_AISlots=0)then continue;
+         color:=PlayerGetColor(p,false);
+         pc:=i2s(p+1)[1];
+      end
+      else
+      begin
+         pc:='?';
+         color:=c_white;
+      end;
 
-      x:=round(map_psx[i]*map_mmcx);
-      y:=round(map_psy[i]*map_mmcx);
+      x:=round(map_psx[p]*map_mmcx);
+      y:=round(map_psy[p]*map_mmcx);
 
-      c:=PlayerGetColor(i);
-
-      map_minimap_cpoint(tar,x,y,trunc(base_1r*map_mmcx),i2s(i)[1],c);//char_start
+      map_minimap_KeyPoint(tar,x,y,trunc(base_1r*map_mmcx),pc,color);
    end;
 end;
 
-procedure map_MinimapCPoints(tar:pSDL_Surface);
+procedure map_MinimapKeyPoints(tar:pSDL_Surface);
 var i  :byte;
 begin
    for i:=0 to LastKeyPoint do
     with g_KeyPoints[i] do
      if(cpCaptureR>0)then
-      if((i=0)and(map_scenario=mc_KotH))or(cpenergy<=0)
-      then map_minimap_cpoint(tar,cpmx,cpmy,cpmr,char_cp ,c_purple)
-      else map_minimap_cpoint(tar,cpmx,cpmy,cpmr,char_gen,c_white );
+      if((i=0)and(map_scenario=mc_KotH))
+      then map_minimap_KeyPoint(tar,cpmx,cpmy,cpmr,char_koth,c_white)
+      else
+        if(cpenergy<=0)
+        then map_minimap_KeyPoint(tar,cpmx,cpmy,cpmr,char_kp ,c_white)
+        else map_minimap_KeyPoint(tar,cpmx,cpmy,cpmr,char_gen,c_white);
 end;
 
 procedure map_RedrawMenuMinimap;
 begin
    sdl_FillRect(ui_minimap,nil,0);
    map_MinimapUpdateBackground;
-   draw_sdlsurface(ui_minimap,0,0,ui_bminimap);
+   draw_sdlsurface(ui_minimap ,0,0,ui_bminimap);
    draw_sdlsurface(ui_mminimap,0,0,ui_minimap);
-   if(g_FixedPositions)then map_MinimapPlayerStarts(ui_mminimap);
-   map_MinimapCPoints(ui_mminimap);
+   map_MinimapPlayerStarts(ui_mminimap);
+   map_MinimapKeyPoints   (ui_mminimap);
    menu_update:=menu_update or MainMenu;
 end;
 
@@ -270,9 +286,10 @@ begin
    // true  - need announcer sound
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
-   with g_players[UIPlayer] do
-    with log_l[log_i] do
-     case mtype of
+   if(UIPlayer<=LastPlayer)then
+     with g_players[UIPlayer] do
+       with log_l[log_i] do
+         case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
 lmt_unit_ready       : if(g_uids[argx]._ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
@@ -287,7 +304,7 @@ lmt_unit_attacked    : begin
 
                        LogMes2UIAlarm:=not PointInCam(xi,yi);
                        end;
-     end;
+         end;
 end;
 
 

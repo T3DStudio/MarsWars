@@ -1,19 +1,19 @@
 
-function _xasurf(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
+function gfx_FlipSurface(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
     c:cardinal;
 begin
-   _xasurf:=gfx_CreateSDLSurface(s^.w,s^.h);
+   gfx_FlipSurface:=gfx_CreateSDLSurface(s^.w,s^.h);
    for x:=1 to s^.w do
-    for y:=1 to s^.h do
-    begin
-       if(xa)then sx:=s^.w-x else sx:=x-1;
-       if(ya)then sy:=s^.h-y else sy:=y-1;
-       c:=SDL_GETpixel(s,x-1,y-1);
+   for y:=1 to s^.h do
+   begin
+      if(xa)then sx:=s^.w-x else sx:=x-1;
+      if(ya)then sy:=s^.h-y else sy:=y-1;
+      c:=SDL_GETpixel(s,x-1,y-1);
 
-       SDL_SETpixel(_xasurf,sx,sy,c);
-    end;
-   if(trans)then SDL_SetColorKey(_xasurf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(_xasurf,0,0));
+      SDL_SETpixel(gfx_FlipSurface,sx,sy,c);
+   end;
+   if(trans)then SDL_SetColorKey(gfx_FlipSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(gfx_FlipSurface,0,0));
 end;
 
 procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
@@ -38,7 +38,7 @@ begin
 
       with t do
       begin
-         surf:=_xasurf(surf,true,false,false);
+         surf:=gfx_FlipSurface(surf,true,false,false);
       end;
       next;
 

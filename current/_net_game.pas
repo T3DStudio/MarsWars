@@ -1,16 +1,16 @@
 
 function net_NewPlayer(sip:cardinal;sp:word):byte;
-var i:byte;
+var p:byte;
 begin
-   net_NewPlayer:=0;
-   for i:=1 to LastPlayer do
+   net_NewPlayer:=255;
+   for p:=0 to LastPlayer do
      {$IFDEF _FULLGAME}
-     if(i<>LocalPlayer)then
+     if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_players[i] do
-         if(state=PS_None)then
+       with g_players[p] do
+         if(state=ps_None)then
          begin
-            net_NewPlayer:=i;
+            net_NewPlayer:=p;
             nip          :=sip;
             nport        :=sp;
             state        :=ps_human;
@@ -23,23 +23,23 @@ begin
 end;
 
 function net_GetPlayer(aip:cardinal;ap:word;MakeNew:boolean):byte;
-var i:byte;
+var p:byte;
 begin
-   net_GetPlayer:=0;
-   for i:=1 to LastPlayer do
+   net_GetPlayer:=255;
+   for p:=0 to LastPlayer do
      {$IFDEF _FULLGAME}
-     if(i<>LocalPlayer)then
+     if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_players[i] do
+       with g_players[p] do
          if(state=ps_human)and(nip=aip)and(nport=ap)then
          begin
-            net_GetPlayer:=i;
+            net_GetPlayer:=p;
             if(ttl>=fr_fps1)then {$IFNDEF _FULLGAME}screen_redraw{$ELSE}menu_update{$ENDIF}:=true;
             ttl:=0;
             break;
          end;
 
-   if(net_GetPlayer=0)and(G_Started=false)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
+   if(net_GetPlayer=255)and(not G_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
 end;
 
 procedure net_SvReadPlayerData(pid:byte);
@@ -57,14 +57,6 @@ begin
       if(map_scenario in mc_fixed_teams)and(i<>0)and(team<>0)
       then i:=PlayerValidateTeam(map_scenario,pid);
 
-      if(i<>team)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
-      team:=i;
-
-      i    :=race;
-      race :=net_readbyte;
-      mrace:=race;
-      if(i<>mrace)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
-
       i    :=byte(ready);
       ready:=net_readbool;
       if((i>0)<>ready)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
@@ -77,16 +69,18 @@ begin
 end;
 
 procedure net_WriteGameData(pid:byte);
-var i:byte;
+var p:byte;
 begin
    net_writebyte(nmid_lobby_info);
    net_writebool(G_Started);
 
-   for i:=0 to LastPlayer do
-    with g_players[i] do
+   for p:=0 to LastPlayer do
+    with g_players[p] do
     begin
        net_writestring(name );
-       net_writebyte  (team );
+       if(observer)
+       then net_writebyte(255 )
+       else net_writebyte(team);
        net_writebyte  (mrace);
        net_writebyte  (state);
        net_writebool  (ready);
@@ -95,7 +89,7 @@ begin
        net_writebyte  (race );
     end;
 
-   net_writebyte(pid         );
+   net_writebyte(pid);
    net_writebyte({$IFDEF _FULLGAME}LocalPlayer{$ELSE}255{$ENDIF});
 
    net_writebyte(map_scenario  );
@@ -110,10 +104,10 @@ begin
    net_writebool(g_DefeatedObs   );
 
    if(G_Started)and(not g_FixedPositions)then
-     for i:=1 to LastPlayer do
+     for p:=0 to LastPlayer do
      begin
-        net_writeint(map_psx[i]);
-        net_writeint(map_psy[i]);
+        net_writeint(map_psx[p]);
+        net_writeint(map_psy[p]);
      end;
 end;
 
@@ -154,7 +148,7 @@ begin
             continue;
          end;
          pid:=net_GetPlayer(net_LastinIP,net_LastinPort,true);
-         if(pid=0)then
+         if(pid=255)then
          begin
             net_clearbuffer;
             if(g_started)
@@ -173,7 +167,7 @@ begin
       else   // other net mess
       begin
          pid:=net_GetPlayer(net_LastinIP,net_LastinPort,false);
-         if(pid>0)then
+         if(pid<=LastPlayer)then
          begin
             case mid of
 nmid_LogMessage      : begin
@@ -183,9 +177,9 @@ nmid_LogMessage      : begin
                        end;
 nmid_PlayerLeave     : begin
                           GameLogPlayerLeave(pid);
-                          if(G_Started=false)
-                          then PlayerSetState(pid,ps_none)
-                          else PlayerKill(pid,true);
+                          if(not G_Started)
+                          then PlayerSetState(pid,ps_None)
+                          else PlayerKill    (pid,true);
                           {$IFNDEF _FULLGAME}
                           screen_redraw:=true;
                           {$ENDIF}
@@ -236,13 +230,13 @@ nmid_pause       : begin
                       if(G_Status<>gs_running)and(G_Status<=LastPlayer)then
                       begin
                          G_Status:=gs_running;
-                         GameLogChat(pid,255,str_PlayerResumed,false);
+                         GameLogChat(pid,255,str_gmsg_PlayerResumed,false);
                       end
                       else
                         if(G_Status=gs_running)then
                         begin
                            G_Status:=pid;
-                           GameLogChat(pid,255,str_PlayerPaused,false);
+                           GameLogChat(pid,255,str_gmsg_PlayerPaused,false);
                         end;
                      {$IFNDEF _FULLGAME}
                      screen_redraw:=true;
@@ -267,8 +261,8 @@ nmid_pause       : begin
                                             case mid of
                                             nmid_lobby_PAIUp    : screen_redraw:=screen_redraw or PlayerAILevelLoop(i);
                                             nmid_lobby_PAIToggle: screen_redraw:=screen_redraw or PlayerAIToggle   (i,false);
-                                            nmid_lobby_PRace    : screen_redraw:=screen_redraw or PlayerRaceChange (i,false);
-                                            nmid_lobby_PTeam    : screen_redraw:=screen_redraw or PlayerTeamChange (i,net_readbool,false);
+                                            nmid_lobby_PRace    : screen_redraw:=screen_redraw or PlayerRaceChange (i,pid,false);
+                                            nmid_lobby_PTeam    : screen_redraw:=screen_redraw or PlayerTeamChange (i,pid,net_readbool,false);
                                             end;
                                          end;
                  nmid_lobby_MSeed      : begin
@@ -307,7 +301,7 @@ nmid_pause       : begin
 
    net_period_step:=(net_period mod NetTickN)=0;
 
-   for i:=1 to LastPlayer do
+   for i:=0 to LastPlayer do
      {$IFDEF _FULLGAME}
      if(i<>LocalPlayer)then
      {$ENDIF}
@@ -320,7 +314,7 @@ nmid_pause       : begin
                net_writebyte(nmid_snapshot);
                net_writebyte(G_Status);
                if(G_Status=gs_running)
-               then _wclinet_gframe(i,false);
+               then wclinet_gframe(i,false);
                net_send(nip,nport);
             end;
 
@@ -350,7 +344,7 @@ procedure net_ClReadMapData(StartGame:boolean);
 var
 redraw_menu,
 new_map     : boolean;
-i           : byte;
+p           : byte;
 function nrByte(pv:pbyte    ):boolean;var v:byte    ;begin v:=pv^;pv^:=net_readbyte;nrByte:=(v<>pv^);end;
 function nrWord(pv:pword    ):boolean;var v:word    ;begin v:=pv^;pv^:=net_readword;nrWord:=(v<>pv^);end;
 function nrInt (pv:pinteger ):boolean;var v:integer ;begin v:=pv^;pv^:=net_readint ;nrInt :=(v<>pv^);end;
@@ -375,10 +369,10 @@ begin
    if(redraw_menu)then menu_update:=true;
 
    if(StartGame)and(not g_FixedPositions)then
-     for i:=1 to LastPlayer do
+     for p:=0 to LastPlayer do
      begin
-        map_psx[i]:=net_readint;
-        map_psy[i]:=net_readint;
+        map_psx[p]:=net_readint;
+        map_psy[p]:=net_readint;
      end;
 end;
 
@@ -396,6 +390,8 @@ begin
       i      :=team;
       team   :=net_readbyte;
       if(i<>team)then menu_update:=true;
+      observer:=(team>LastPlayer);
+      if(observer)then team:=0;
 
       i      :=mrace;
       mrace  :=net_readbyte;
@@ -482,10 +478,10 @@ nmid_lobby_info  : begin
                             MainMenu  :=false;
                             ServerSide:=false;
                             ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
-                            if(g_players[LocalPlayer].team=0)then
+                            if(g_players[LocalPlayer].observer)then
                             begin
-                               ui_tab  :=3;
-                               UIPlayer:=0;
+                               ui_tab  :=tab_controls;
+                               UIPlayer:=255;
                             end;
                          end
                          else
@@ -524,8 +520,6 @@ nmid_lobby_info  : begin
          net_writebyte  (nmid_connect);
          net_writebyte  (g_version);
          net_writestring(PlayerName );
-         net_writebyte  (PlayerTeam );
-         net_writebyte  (PlayerRace );
          net_writebool  (PlayerReady);
          net_writebyte  (Quality2Units[net_cl_Quality]);
          net_writecard  (net_log_n  );

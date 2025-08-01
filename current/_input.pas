@@ -158,20 +158,24 @@ begin
    input_SetAction(iAct_Replay_POV       ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_Replay_Log       ,ikt_keyboard,0           ,SDLK_T           );
    input_SetAction(iAct_Replay_Fog       ,ikt_keyboard,0           ,SDLK_Y           );
-   input_SetAction(iAct_Replay_Player1   ,ikt_keyboard,0           ,SDLK_1           );
-   input_SetAction(iAct_Replay_Player2   ,ikt_keyboard,0           ,SDLK_2           );
-   input_SetAction(iAct_Replay_Player3   ,ikt_keyboard,0           ,SDLK_3           );
-   input_SetAction(iAct_Replay_Player4   ,ikt_keyboard,0           ,SDLK_4           );
-   input_SetAction(iAct_Replay_Player5   ,ikt_keyboard,0           ,SDLK_5           );
-   input_SetAction(iAct_Replay_Player6   ,ikt_keyboard,0           ,SDLK_6           );
+   input_SetAction(iAct_Replay_Player0   ,ikt_keyboard,0           ,SDLK_1           );
+   input_SetAction(iAct_Replay_Player1   ,ikt_keyboard,0           ,SDLK_2           );
+   input_SetAction(iAct_Replay_Player2   ,ikt_keyboard,0           ,SDLK_3           );
+   input_SetAction(iAct_Replay_Player3   ,ikt_keyboard,0           ,SDLK_4           );
+   input_SetAction(iAct_Replay_Player4   ,ikt_keyboard,0           ,SDLK_5           );
+   input_SetAction(iAct_Replay_Player5   ,ikt_keyboard,0           ,SDLK_6           );
+   input_SetAction(iAct_Replay_Player6   ,ikt_keyboard,0           ,SDLK_7           );
+   input_SetAction(iAct_Replay_Player7   ,ikt_keyboard,0           ,SDLK_8           );
 
    input_SetAction(iAct_Observer_Fog     ,ikt_keyboard,0           ,SDLK_Q           );
-   input_SetAction(iAct_Observer_Player1 ,ikt_keyboard,0           ,SDLK_1           );
-   input_SetAction(iAct_Observer_Player2 ,ikt_keyboard,0           ,SDLK_2           );
-   input_SetAction(iAct_Observer_Player3 ,ikt_keyboard,0           ,SDLK_3           );
-   input_SetAction(iAct_Observer_Player4 ,ikt_keyboard,0           ,SDLK_4           );
-   input_SetAction(iAct_Observer_Player5 ,ikt_keyboard,0           ,SDLK_5           );
-   input_SetAction(iAct_Observer_Player6 ,ikt_keyboard,0           ,SDLK_6           );
+   input_SetAction(iAct_Observer_Player0 ,ikt_keyboard,0           ,SDLK_1           );
+   input_SetAction(iAct_Observer_Player1 ,ikt_keyboard,0           ,SDLK_2           );
+   input_SetAction(iAct_Observer_Player2 ,ikt_keyboard,0           ,SDLK_3           );
+   input_SetAction(iAct_Observer_Player3 ,ikt_keyboard,0           ,SDLK_4           );
+   input_SetAction(iAct_Observer_Player4 ,ikt_keyboard,0           ,SDLK_5           );
+   input_SetAction(iAct_Observer_Player5 ,ikt_keyboard,0           ,SDLK_6           );
+   input_SetAction(iAct_Observer_Player6 ,ikt_keyboard,0           ,SDLK_7           );
+   input_SetAction(iAct_Observer_Player7 ,ikt_keyboard,0           ,SDLK_8           );
 end;
 
 procedure ui_InitControlPanelBTNActions;
@@ -203,21 +207,25 @@ begin
    ui_panel_CtrlActs[tcc_replay  ,10]:=iAct_Replay_Log;
    ui_panel_CtrlActs[tcc_replay  ,11]:=iAct_Replay_Fog;
    ui_panel_CtrlActs[tcc_replay  ,12]:=iAct_Replay_PlayerAll;
-   ui_panel_CtrlActs[tcc_replay  ,13]:=iAct_Replay_Player1;
-   ui_panel_CtrlActs[tcc_replay  ,14]:=iAct_Replay_Player2;
-   ui_panel_CtrlActs[tcc_replay  ,15]:=iAct_Replay_Player3;
-   ui_panel_CtrlActs[tcc_replay  ,16]:=iAct_Replay_Player4;
-   ui_panel_CtrlActs[tcc_replay  ,17]:=iAct_Replay_Player5;
-   ui_panel_CtrlActs[tcc_replay  ,18]:=iAct_Replay_Player6;
+   ui_panel_CtrlActs[tcc_replay  ,13]:=iAct_Replay_Player0;
+   ui_panel_CtrlActs[tcc_replay  ,14]:=iAct_Replay_Player1;
+   ui_panel_CtrlActs[tcc_replay  ,15]:=iAct_Replay_Player2;
+   ui_panel_CtrlActs[tcc_replay  ,16]:=iAct_Replay_Player3;
+   ui_panel_CtrlActs[tcc_replay  ,17]:=iAct_Replay_Player4;
+   ui_panel_CtrlActs[tcc_replay  ,18]:=iAct_Replay_Player5;
+   ui_panel_CtrlActs[tcc_replay  ,19]:=iAct_Replay_Player6;
+   ui_panel_CtrlActs[tcc_replay  ,20]:=iAct_Replay_Player7;
 
    ui_panel_CtrlActs[tcc_observer,0 ]:=iAct_Observer_Fog;
    ui_panel_CtrlActs[tcc_observer,3 ]:=iAct_Observer_PlayerAll;
-   ui_panel_CtrlActs[tcc_observer,4 ]:=iAct_Observer_Player1;
-   ui_panel_CtrlActs[tcc_observer,5 ]:=iAct_Observer_Player2;
-   ui_panel_CtrlActs[tcc_observer,6 ]:=iAct_Observer_Player3;
-   ui_panel_CtrlActs[tcc_observer,7 ]:=iAct_Observer_Player4;
-   ui_panel_CtrlActs[tcc_observer,8 ]:=iAct_Observer_Player5;
-   ui_panel_CtrlActs[tcc_observer,9 ]:=iAct_Observer_Player6;
+   ui_panel_CtrlActs[tcc_observer,4 ]:=iAct_Observer_Player0;
+   ui_panel_CtrlActs[tcc_observer,5 ]:=iAct_Observer_Player1;
+   ui_panel_CtrlActs[tcc_observer,6 ]:=iAct_Observer_Player2;
+   ui_panel_CtrlActs[tcc_observer,7 ]:=iAct_Observer_Player3;
+   ui_panel_CtrlActs[tcc_observer,8 ]:=iAct_Observer_Player4;
+   ui_panel_CtrlActs[tcc_observer,9 ]:=iAct_Observer_Player5;
+   ui_panel_CtrlActs[tcc_observer,10]:=iAct_Observer_Player6;
+   ui_panel_CtrlActs[tcc_observer,11]:=iAct_Observer_Player7;
 end;
 
 procedure inputAction_KeyProc(kvalue:cardinal;ktype:TInputKeyType;down:boolean);
@@ -285,36 +293,6 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function GameTogglePause(check:boolean):boolean;
-begin
-   GameTogglePause:=false;
-
-   case net_status of
-   ns_client  : begin
-                   GameTogglePause:=true;
-                   if(check)then exit;
-                   net_pause;
-                end;
-   ns_server  : case G_Status of
-                gs_running  : begin
-                                 GameTogglePause:=true;
-                                 if(check)then exit;
-
-                                 G_Status:=LocalPlayer;
-                                 GameLogChat(LocalPlayer,255,str_PlayerPaused,false);
-                              end;
-                gs_paused1..
-                gs_paused6  : begin
-                                 GameTogglePause:=true;
-                                 if(check)then exit;
-
-                                 G_Status:=gs_running;
-                                 GameLogChat(LocalPlayer,255,str_PlayerResumed,false);
-                              end;
-                end;
-   end;
-end;
-
 procedure MapMarker(x,y:integer);
 begin
    if(net_status=ns_client)
@@ -353,10 +331,10 @@ begin
    with uid^ do
    begin
       if(iscomplete)then
-       if(speed>0)
-       or(unit_canAttack(pu,false))
-       or(unit_sAbility(pu,true)=0)
-       or(unit_pAbility(pu,0,0,0,true)=0)then exit;
+        if(speed>0)
+        or(unit_canAttack(pu,false))
+        or(unit_sAbility(pu,true)=0)
+        or(unit_pAbility(pu,0,0,0,true)=0)then exit;
       if(UnitHaveRPoint(uidi))then exit;
    end;
    CheckBOrders:=false;
@@ -513,7 +491,7 @@ begin
       4 - own, unum
       5 - any
    }
-   sc:=0;
+   {sc:=0;
    with g_players[UIPlayer] do
    begin
       sc+=ucl_cs[false];
@@ -537,7 +515,7 @@ begin
            else _whoInPoint:=i;
            end;
            break;
-       end;
+       end;  }
 end;
 function mouse_BrushTarget(tx,ty,mbrush:integer):integer;
 var u:integer;
@@ -627,17 +605,17 @@ end;
 procedure ui_command(x,y,target:integer);
 begin
    case m_brush of
-co_move     : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // move
-co_amove    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // attack
+co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // move
+co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // attack
 co_pability: if(ui_uibtn_pabilityu<>nil)then
-              PlayerSendOrder(m_brush   ,target,x,y,ui_uibtn_pabilityu^.uid^._ability,
+             PlayerSendOrder(m_brush   ,target,x,y,ui_uibtn_pabilityu^.uid^._ability,
                                                       uo_corder,LocalPlayer);
 co_patrol,
-co_apatrol  : PlayerSendOrder(m_brush   ,0     ,x,y,0,uo_corder,LocalPlayer);
-co_empty    :
-         if(m_RightClickAct)// rclick
-         then PlayerSendOrder(co_rcmove ,target,x,y,0,uo_corder,LocalPlayer)
-         else PlayerSendOrder(co_rcamove,target,x,y,0,uo_corder,LocalPlayer);
+co_apatrol : PlayerSendOrder(m_brush   ,0     ,x,y,0,uo_corder,LocalPlayer);
+co_empty   :
+        if(m_RightClickAct)// rclick
+        then PlayerSendOrder(co_rcmove ,target,x,y,0,uo_corder,LocalPlayer)
+        else PlayerSendOrder(co_rcamove,target,x,y,0,uo_corder,LocalPlayer);
    end;
 
    m_brush:=co_empty;
@@ -679,7 +657,7 @@ iAct_Control_USelArmy  : if(ui_groups_n[MaxUnitGroups]>0)then
      if(click_type=pct_left)then
      begin
         case action of
-        iAct_Pause             : GameTogglePause(false);
+        iAct_Pause             : GamePauseToggle(false);
 
         iAct_Replay_Fast       : sys_uncappedFPS:=not sys_uncappedFPS;
         iAct_Replay_Pause      : if (G_Status<>gs_replayend)
@@ -696,25 +674,17 @@ iAct_Control_USelArmy  : if(ui_groups_n[MaxUnitGroups]>0)then
         iAct_Replay_Forward2   : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*2;
         iAct_Replay_Forward10  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*10;
         iAct_Replay_Forward60  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*60;
-        iAct_Replay_POV        : rpls_POVRecorder  :=not rpls_POVRecorder;
+        iAct_Replay_POV        : rpls_POVRecorder:=not rpls_POVRecorder;
         iAct_Replay_Log        : rpls_showlog:=not rpls_showlog;
         iAct_Observer_Fog,
-        iAct_Replay_Fog        : ui_fog      :=not ui_fog;
-        iAct_Replay_PlayerAll,
-        iAct_Replay_Player1,
-        iAct_Replay_Player2,
-        iAct_Replay_Player3,
-        iAct_Replay_Player4,
-        iAct_Replay_Player5,
-        iAct_Replay_Player6    : UIPlayer:=action-iAct_Replay_PlayerAll;
+        iAct_Replay_Fog        : ui_fog  :=not ui_fog;
+        iAct_Replay_PlayerAll  : UIPlayer:=255;
+        iAct_Replay_Player0..
+        iAct_Replay_Player7    : UIPlayer:=action-iAct_Replay_Player0;
 
-        iAct_Observer_PlayerAll,
-        iAct_Observer_Player1,
-        iAct_Observer_Player2,
-        iAct_Observer_Player3,
-        iAct_Observer_Player4,
-        iAct_Observer_Player5,
-        iAct_Observer_Player6  : UIPlayer:=action-iAct_Observer_PlayerAll;
+        iAct_Observer_PlayerAll: UIPlayer:=255;
+        iAct_Observer_Player0..
+        iAct_Observer_Player7  : UIPlayer:=action-iAct_Observer_Player0;
         end;
 
         if(ui_GameControlsEnabled)then
@@ -736,7 +706,7 @@ iAct_Control_UAPatrol   : m_brush :=co_apatrol;
 iAct_Control_UMove      : m_brush :=co_move;
 iAct_Control_UStop      : PlayerSendOrder(co_stand   ,0,0,0,0, uo_corder  ,LocalPlayer);
 iAct_Control_UPatrol    : m_brush :=co_patrol;
-iAct_Control_UProdCncl: if(s_barracks>0)
+iAct_Control_UProdCncl  : if(s_barracks>0)
                           or(s_smiths  >0)
                           then PlayerSendOrder(co_pcancle ,0,0,0,0, uo_corder  ,LocalPlayer)
                           else
@@ -778,7 +748,7 @@ begin
            clickSoundON;
         end;
 26    : if(click_type=pct_left)then
-          if(GameTogglePause(false))then clickSoundON;
+          if(GamePauseToggle(false))then clickSoundON;
    else
    end;
 end;
@@ -1092,7 +1062,7 @@ begin
          {$IFDEF DEBUG0}
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
          {$ENDIF}
-         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_players[LocalPlayer] do if(state=ps_human     )then state:=ps_ai         else state:=ps_human;
+         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_players[LocalPlayer] do if(state=ps_human     )then state:=ps_AI         else state:=ps_human;
          if(InputActionPressed(iAct_test_iddqd       ))then with g_players[LocalPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog:=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;

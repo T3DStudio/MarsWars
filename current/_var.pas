@@ -18,14 +18,6 @@ g_FixedPositions  : boolean  = false;
 g_AISlots         : byte     = player_default_ai_level;
 g_DefeatedObs     : boolean  = true;
 
-g_player_astatus  : byte     = 0;
-g_player_rstatus  : byte     = 0;
-g_cl_units        : integer  = 0;
-
-g_inv_limit       : longint  = 0;
-g_inv_wave_n      : byte     = 0;
-g_inv_wave_t_next : integer  = 0;
-g_inv_wave_t_curr : integer  = 0;
 g_royal_r         : integer  = 0;
 g_KeyPoints       : array[0..LastKeyPoint] of TKeyPoint;
 
@@ -159,10 +151,14 @@ sys_uncappedFPS       : boolean = false;
 
 LocalPlayer       : byte = 1; // 'this' player
 PlayerName        : shortstring = 'DoomPlayer';
-PlayerTeam        : byte = 1;
 PlayerReady       : boolean = false;
-PlayerRace        : byte = 0;
-PlayerColors      : array[0..LastPlayer] of cardinal;
+
+PlayerColorsDefault,
+PlayerColorsCurrent,
+PlayerColorsShadow : array[0..LastPlayer] of cardinal;
+PlayerColorDefaultCurrent: cardinal = 0;
+PlayerColorDefaultShadow : cardinal = 0;
+
 
 ingame_chat       : byte = 0;
 
@@ -532,6 +528,7 @@ c_gray,
 c_dgray,
 c_ablack,
 c_purple,
+c_violet,
 c_black           : cardinal;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -782,7 +779,6 @@ spr_b_rfast,
 spr_b_rskip,
 spr_b_rback,
 spr_b_rfog,
-spr_b_rclck,
 spr_b_rlog,
 spr_b_rstop,
 spr_b_rvis,
@@ -888,8 +884,8 @@ str_menu_controls,
 str_RecordingStart,
 str_RecordingStop,
 str_SS_ReloadMusic,
-str_PlayerPaused,
-str_PlayerResumed,
+str_gmsg_PlayerPaused,
+str_gmsg_PlayerResumed,
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,
@@ -975,8 +971,6 @@ str_gstat_ReplayEnd,
 str_gstat_ReplayError,
 str_SR_ReplayPrefix,
 str_FilePlay,
-str_inv_ml,
-str_inv_time,
 str_menu,
 str_time,
 str_kothtime,

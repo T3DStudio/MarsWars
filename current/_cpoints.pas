@@ -1,122 +1,126 @@
 
-procedure CPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
-var p:byte;
+procedure KeyPoints_Clear;
+var i:byte;
 begin
-   if(newOwnerPlayer<=LastPlayer)then
+   FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
+   for i:=0 to LastKeyPoint do
+     with g_KeyPoints[i] do
+     begin
+        cpOwnerPlayer     :=255;
+        cpOwnerTeam       :=255;
+        cpTimerOwnerTeam  :=255;
+        cpTimerOwnerPlayer:=255;
+     end;
+end;
+
+procedure KeyPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
+begin
    with g_KeyPoints[i] do
-   if(cpOwnerPlayer<>newOwnerPlayer)then
-   begin
-      if(cpOwnerTeam>0)then
-      begin
-         for p:=0 to LastPlayer do
-          with g_players[p] do
-           if(team=cpOwnerTeam)then
+     if(cpOwnerPlayer<>newOwnerPlayer)then
+     begin
+        if(cpOwnerPlayer<=LastPlayer)then
+        begin
+           with g_players[cpOwnerPlayer] do
            begin
               cenergy-=cpenergy;
               menergy-=cpenergy;
            end;
-         if(cpOwnerPlayer<>0)and(log)then
-           GameLogCPointLost(cpOwnerPlayer,i,cpOwnerTeam);
-      end;
+           if(log)then GameLogKeyPointLost(cpOwnerPlayer,i);
+        end;
 
-      cpOwnerPlayer:=newOwnerPlayer;
-      cpOwnerTeam  :=g_players[newOwnerPlayer].team;
-      if(cpOwnerTeam>0)then
-      begin
-         for p:=0 to LastPlayer do
-          with g_players[p] do
-           if(team=cpOwnerTeam)then
+        cpOwnerPlayer:=newOwnerPlayer;
+        if(cpOwnerPlayer<=LastPlayer)
+        then cpOwnerTeam:=g_players[newOwnerPlayer].team
+        else cpOwnerTeam:=cpOwnerPlayer;
+
+        if(cpOwnerPlayer<=LastPlayer)then
+        begin
+           with g_players[cpOwnerPlayer] do
            begin
               cenergy+=cpenergy;
               menergy+=cpenergy;
            end;
-         if(log)then GameLogCPointCaptured(cpOwnerPlayer,i,cpOwnerTeam);
-      end;
-   end;
+           if(log)then GameLogKeyPointCaptured(cpOwnerPlayer,i);
+        end;
+     end;
 end;
 
 procedure Scenario_KeyPointsCode;
-var i,p,
-iOwnerTeam,
+var
+i,p,
 iOwnerPlayer,
-iArmy,iTeams :integer;
+iPlayers: integer;
 begin
    for i:=0 to LastKeyPoint do
-    with g_KeyPoints[i] do
-    if(cpCaptureR>0)then
-    begin
-       p:=0;
-       if(map_scenario=mc_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
-       if(cplifetime>0)and(cpOwnerTeam>0)then
+     with g_KeyPoints[i] do
+       if(cpCaptureR>0)then
        begin
-          cplifetime-=1;
-          if(cplifetime=0)then p:=1;
-       end;
-
-       if(p>0)then
-       begin
-          GameLogNGenExh(cpOwnerPlayer,i,cpOwnerTeam);
-          CPoint_ChangeOwner(i,0,false);
-          cpCaptureR:=-cpCaptureR;
-          {$IFDEF _FULLGAME}
-          effect_CPExplode(cpx,cpy);
-          {$ENDIF}
-          continue;
-       end;
-
-       cpunitsp_pstate:=cpUnitsPlayer;
-       cpunitst_pstate:=cpUnitsTeam;
-       iOwnerPlayer   :=cpOwnerPlayer;
-       iOwnerTeam     :=cpOwnerTeam;
-       iArmy :=0;
-       iTeams:=0;
-       for p:=0 to LastPlayer do
-       begin
-          if(cpUnitsTeam[p]>0)then
+          p:=0;
+          if(map_scenario=mc_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
+          if(cplifetime>0)and(cpOwnerPlayer<=LastPlayer)then
           begin
-             iTeams+=1;
-             iOwnerTeam:=p;
+             cplifetime-=1;
+             if(cplifetime=0)then p:=1;
           end;
-          if(cpUnitsPlayer[p]>iArmy)or(iArmy=0)then
-          begin
-             iArmy:=cpUnitsPlayer[p];
-             iOwnerPlayer:=p;
-          end;
-          cpUnitsPlayer[p]:=0;
-          cpUnitsTeam  [p]:=0;
-       end;
 
-       if((iTeams=0)and(cpenergy>0))
+          if(p>0)then // life expired
+          begin
+             GameLogNGenExh(cpOwnerPlayer,i);
+             KeyPoint_ChangeOwner(i,255,false);
+             cpCaptureR:=-cpCaptureR;
+             {$IFDEF _FULLGAME}
+             effect_KPointExplode(cpx,cpy);
+             {$ENDIF}
+             continue;
+          end;
+
+          cpunitsp_pstate:=cpUnitsPlayer;
+          cpunitst_pstate:=cpUnitsTeam;
+          iOwnerPlayer   :=cpOwnerPlayer;
+          iPlayers:=0;
+          for p:=0 to LastPlayer do
+          begin
+             if(cpUnitsPlayer[p]>0)then
+             begin
+                iPlayers+=1;
+                iOwnerPlayer:=p;
+             end;
+             cpUnitsPlayer[p]:=0;
+             cpUnitsTeam  [p]:=0;
+          end;
+
+       if((iPlayers=0)and(cpenergy>0))
        or((i=0)and(map_scenario=mc_KotH)and(g_tick<g_step_koth_pause))then
        begin
-          iTeams:=1;
-          iOwnerPlayer:=0;
-          iOwnerTeam  :=g_players[iOwnerPlayer].team;
+          iPlayers:=1;
+          iOwnerPlayer:=255;
        end;
 
-       if(iTeams=0)
+       if(iPlayers=0)
        then cpTimer:=0
        else
-         if(iTeams=1)then
-          if(cpOwnerTeam=iOwnerTeam)
-          then cpTimer:=0
-          else
-          begin
-             cpTimerOwnerPlayer:=iOwnerPlayer;
-             if(cpTimerOwnerTeam<>iOwnerTeam)then
-             begin
-                cpTimerOwnerTeam:=iOwnerTeam;
-                if(i=0)and(map_scenario=mc_KotH)then GameLogKotHControl;
-                cpTimer:=0;
-             end;
-             if(cpTimer<cpCaptureTime)
-             then cpTimer+=1
-             else
-             begin
-                cpTimer:=0;
-                CPoint_ChangeOwner(i,iOwnerPlayer);
-             end;
-          end;
+         if(iPlayers=1)then
+           if(cpOwnerPlayer=iOwnerPlayer)
+           then cpTimer:=0
+           else
+           begin
+              if(cpTimerOwnerPlayer<>iOwnerPlayer)then
+              begin
+                 cpTimerOwnerPlayer:=iOwnerPlayer;
+                 if(cpTimerOwnerPlayer<=LastPlayer)
+                 then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team
+                 else cpTimerOwnerTeam:=255;
+                 if(i=0)and(map_scenario=mc_KotH)then GameLogKotHControl;
+                 cpTimer:=0;
+              end;
+              if(cpTimer<cpCaptureTime)
+              then cpTimer+=1
+              else
+              begin
+                 cpTimer:=0;
+                 KeyPoint_ChangeOwner(i,iOwnerPlayer);
+              end;
+           end;
     end;
 end;
 
@@ -124,21 +128,21 @@ procedure Scenario_KeyPointsEndConditions;
 var i,
 wteam  ,
 wteam_n,
-cp_captured_n :integer;
+kp_captured_n :integer;
 begin
    // VICTORY CONDITIONS
-   wteam        :=0;
+   wteam        :=255;
    wteam_n      :=0;
-   cp_captured_n:=0;
+   kp_captured_n:=0;
 
    for i:=0 to LastKeyPoint do
     with g_KeyPoints[i] do
      if(cpCaptureR>0)and(cpenergy<=0)then
      begin
-        cp_captured_n+=1;
-        if(cpOwnerTeam>0)then
+        kp_captured_n+=1;
+        if(cpOwnerTeam<=LastPlayer)then
         begin
-           if(wteam=0)
+           if(wteam=255)
            or(wteam<>cpOwnerTeam)
            then wteam_n:=0;
            wteam  :=cpOwnerTeam;
@@ -146,6 +150,6 @@ begin
         end;
      end;
 
-   if(cp_captured_n>0)and(wteam_n=cp_captured_n)then GameSetStatusWinnerTeam(wteam);
+   if(kp_captured_n>0)and(wteam_n=kp_captured_n)and(wteam<=LastPlayer)then GameSetStatusWinnerTeam(wteam);
 end;
 

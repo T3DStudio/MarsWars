@@ -1,16 +1,14 @@
 
 
 function DoodadAnimationTime(base:integer):integer;
-const fr_h3fps = fr_fps1 div 3;
-      fr_4fps  = fr_fps1*4;
 begin
    case base of
-   -1 : DoodadAnimationTime:=random(fr_h3fps)+fr_h3fps;
+   -1 : DoodadAnimationTime:=random(fr_fpsd3)+fr_fpsd3;
    -2 : DoodadAnimationTime:=random(fr_fps2 )+1;
-   -3 : DoodadAnimationTime:=random(fr_fps1  )+1;
+   -3 : DoodadAnimationTime:=random(fr_fps1 )+1;
    -4 : DoodadAnimationTime:=random(fr_fps2 )+1;
    -5 : DoodadAnimationTime:=random(fr_fps3 )+1;
-   -6 : DoodadAnimationTime:=random(fr_4fps )+1;
+   -6 : DoodadAnimationTime:=random(fr_fps4 )+1;
    else if(base>0)
         then DoodadAnimationTime:=base
         else DoodadAnimationTime:=-100;
@@ -58,7 +56,7 @@ begin
      begin
         ro:=0;
         with g_players[LocalPlayer] do
-         case m_brush of
+          case m_brush of
 1..255         : ro:=r-bld_dec_mr;
 co_pability    : if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^._ability of
@@ -67,7 +65,7 @@ co_pability    : if(ui_uibtn_pabilityu<>nil)then
                   uab_HKeepBlink,
                   uab_CCFly         : ro:=r-bld_dec_mr;
                   end;
-         end;
+          end;
 
         if(not noanim)or(sprite=pspr_dummy)then
           case t of

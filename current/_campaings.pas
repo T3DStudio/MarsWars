@@ -101,11 +101,11 @@ begin
         map_Symmetry:=false;
         map_vars;
 
-        LocalPlayer :=1;
-        UIPlayer:=1;
+        LocalPlayer :=0;
+        UIPlayer:=0;
 
         cmp_SetPlayer(LocalPlayer,r_hell,ps_human);
-        cmp_SetPlayer(4      ,r_uac ,ps_ai);
+        cmp_SetPlayer(4      ,r_uac ,ps_AI);
 
         cmp_ClearPStarts;
         cmp_SetPStart(1,map_Size div 4,map_Size div 3);

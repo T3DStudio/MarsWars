@@ -271,65 +271,6 @@ begin
    end;
 end;
 
-
-
-{function ip2c(s:shortstring):cardinal;
-var i,l,r:byte;
-    e:array[0..3] of byte = (0,0,0,0);
-begin
-   r:=0;
-   l:=length(s);
-   if(l>0)then
-    for i:=1 to l do
-     if(s[i]='.')then
-     begin
-        r += 1;
-        if(r>3)then break;
-     end
-     else e[r]:=s2b(b2s(e[r])+s[i]);
-   ip2c:=cardinal((@e)^);
-end;
-
-function c2ip(c:cardinal):string;
-begin
-   c2ip:=b2s (c and $000000FF)
-    +'.'+b2s((c and $0000FF00) shr 8 )
-    +'.'+b2s((c and $00FF0000) shr 16)
-    +'.'+b2s((c and $FF000000) shr 24);
-end;
-
-procedure net_cl_saddr;
-var sp,sip:shortstring;
-      i,sl:byte;
-begin
-   sl:=length(net_cl_svstr);
-
-   i:=pos(':',net_cl_svstr);
-   if(i=1)then
-   begin
-      sip:='';
-      sp :=net_cl_svstr;
-      delete(sp,1,i);
-   end
-   else
-    if(i=sl)or(i=0) then
-    begin
-       sip:=net_cl_svstr;
-       if(i=sl)then delete(sip,sl,1);
-       sp:='0';
-    end
-    else
-    begin
-       sip:=copy(net_cl_svstr,1,i-1);
-       sp :=copy(net_cl_svstr,i+1,sl-i);
-    end;
-
-   net_cl_svip   :=ip2c(sip);
-   net_cl_svport :=swap(s2w(sp));
-
-   net_cl_svstr:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
-end; }
-
 procedure net_send_chat(targets:byte;msg:shortstring);
 begin
    if(net_status=ns_client)and(targets>0)then

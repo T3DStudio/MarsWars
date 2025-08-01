@@ -67,12 +67,7 @@ begin
      if(mi_state>0)then
      begin
         boxColor(tar,mi_x0,mi_y0,mi_x1,mi_y1,c_black);
-        while(border>0)do
-        begin
-           rectangleColor(tar,mi_x0-border,mi_y0-border,
-                              mi_x1+border,mi_y1+border,c_ltgray);
-           border-=1;
-        end;
+        draw_rectw(tar,mi_x0,mi_y0,mi_x1,mi_y1,border,-1,c_ltgray);
      end;
 end;
 
@@ -374,8 +369,8 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    // SCIRMISH PLAYERS
    d_MenuItemCaption(tar,mi_Players_Panel,str_Caption_Players);
 
-   d_MenuItemTextC(tar,mi_Players_NameC ,ta_left  ,str_PT_Player,c_ltgray);
-   d_MenuItemTextC(tar,mi_Players_StateC,ta_middle,str_PT_State ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_StateC,ta_left  ,str_PT_State ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_NameC ,ta_middle,str_PT_Player,c_ltgray);
    d_MenuItemTextC(tar,mi_Players_RaceC ,ta_middle,str_PT_Race  ,c_ltgray);
    d_MenuItemTextC(tar,mi_Players_TeamC ,ta_middle,str_PT_Team  ,c_ltgray);
    d_MenuItemTextC(tar,mi_Players_ColorC,ta_middle,str_PT_Color ,c_ltgray);
@@ -383,22 +378,29 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
 
    d_MenuItemText (tar,mi_Players_Ready ,ta_left  ,str_net_Ready+b2cc[PlayerReady],0);
 
-   for i:=0 to LastPlayer-1 do
-     with g_players[i+1] do
-       if(state<>ps_none)then
+   for p:=0 to LastPlayer do
+     with g_players[p] do
+       if(state<>ps_None)then
        begin
-          p:=i+1;
-          d_MenuItemTextC(tar,mi_Players_Name1 +i,ta_left  ,name               ,mic(menu_items[mi_Players_Name1 +i].mi_state>1,p=LocalPlayer));
-          d_MenuItemTextC(tar,mi_Players_State1+i,ta_middle,PlayerGetStatus(p) ,mic(menu_items[mi_Players_State1+i].mi_state>1,p=LocalPlayer));
+          d_MenuItemTextC(tar,mi_Players_Name0 +p,ta_left  ,name               ,mic(menu_items[mi_Players_Name0 +p].mi_state>1,p=LocalPlayer));
+          d_MenuItemTextC(tar,mi_Players_State0+p,ta_middle,PlayerStatusChar(p),mic(menu_items[mi_Players_State0+p].mi_state>1,p=LocalPlayer));
 
-     if(team=0)
-     then d_MenuItemTextC(tar,mi_Players_Race1+i ,ta_middle,str_observer       ,c_gray)
-     else d_MenuItemTextC(tar,mi_Players_Race1+i ,ta_middle,str_race[mrace]    ,mic(menu_items[mi_Players_Race1 +i].mi_state>1,false    ));
+          if(observer)then
+          begin
+          d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_observer       ,c_gray);
+          d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,'-'                ,mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ));
+          end
+          else
+          begin
+          d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_race[mrace]    ,mic(menu_items[mi_Players_Race0 +p].mi_state>1,false        ));
+          if(map_scenario in mc_fixed_teams)
+     then d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,
+                                     b2s(PlayerGetFixedTeams(map_scenario,p)+1),mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ))
+     else d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,b2s(team+1)        ,mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ));
+          end;
 
-          d_MenuItemTextC(tar,mi_Players_Team1+i ,ta_middle,t2c(team)          ,mic(menu_items[mi_Players_Team1 +i].mi_state>1,false    ));
-
-          if(not GetBBit(@g_player_astatus,p))and(G_Started)then
-            with menu_items[mi_Players_Name1+i] do
+          if(defeated)and(G_Started)then
+            with menu_items[mi_Players_Name0+p] do
               if(mi_state>0)then
                 hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
        end
@@ -406,20 +408,20 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
        begin
           if(g_AISlots>0)then
           begin
-             d_MenuItemTextC(tar,mi_Players_Name1+i,ta_left  ,str_ps_comp+' '+b2s(g_AISlots)            ,c_gray);
-             d_MenuItemTextC(tar,mi_Players_Race1+i,ta_middle,str_race[r_random]                        ,c_gray);
-             d_MenuItemTextC(tar,mi_Players_Team1+i,ta_middle,b2s(PlayerGetFixedTeams(map_scenario,i+1)),c_gray);
+             d_MenuItemTextC(tar,mi_Players_Name0+p,ta_left  ,str_ps_comp+' '+b2s(g_AISlots)            ,c_gray);
+             d_MenuItemTextC(tar,mi_Players_Race0+p,ta_middle,str_race[r_random]                        ,c_gray);
+             d_MenuItemTextC(tar,mi_Players_Team0+p,ta_middle,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
           end;
           if(not g_started)then
-            d_MenuItemTextC(tar,mi_Players_State1+i,ta_middle,'+',c_lime);
+            d_MenuItemTextC(tar,mi_Players_State0+p,ta_middle,'+',c_lime);
        end;
 
-   for i:=0 to LastPlayer-1 do
-     with menu_items[mi_Players_Ping1+i] do
+   for p:=0 to LastPlayer do
+     with menu_items[mi_Players_Ping0+p] do
        if(mi_state>0)then
          if(net_status=ns_none)
          then boxColor(tar,mi_x0+font_hw,mi_y0+font_hw,
-                           mi_x1-font_hw,mi_y1-font_hw,PlayerGetColor(i+1))
+                           mi_x1-font_hw,mi_y1-font_hw,PlayerGetColor(p,false))
          else ;
 
    // SCIRMISH MAP
@@ -593,6 +595,8 @@ procedure D_Menu;
 begin
    if(menu_redraw)then
    begin
+      PlayersUpdateColorSchema(LocalPlayer);
+
       d_updmenu(menu_Surface);
       vid_MakeBigMenu;
       menu_redraw:=false;

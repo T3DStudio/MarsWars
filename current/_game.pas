@@ -1,22 +1,22 @@
 
-procedure PlayerSetSkirmishTech(p:byte);
+procedure PlayerSetSkirmishTech(playerN:byte);
 begin
-   with g_players[p] do
+   with g_players[playerN] do
    begin
-      PlayerSetAllowedUnits(p,[ UID_HKeep         ..UID_HBarracks,
-                                UID_LostSoul      ..UID_ZBFGMarine,
-                                UID_UCommandCenter..UID_UComputerStation,
-                                UID_Engineer      ..UID_Flyer  ],
-                                MaxUnits,true);
+      PlayerSetAllowedUnits(playerN,[ UID_HKeep         ..UID_HBarracks,
+                                      UID_LostSoul      ..UID_ZBFGMarine,
+                                      UID_UCommandCenter..UID_UComputerStation,
+                                      UID_Engineer      ..UID_Flyer  ],
+                                      MaxUnits,true);
 
-      PlayerSetAllowedUnits(p,[ UID_LostSoul, UID_Phantom ],20,false);
+      PlayerSetAllowedUnits(playerN,[ UID_LostSoul, UID_Phantom ],20,false);
 
       if(map_generators>0)then
-      PlayerSetAllowedUnits(p,[ UID_HSymbol1   ,UID_HSymbol2   ,
-                                UID_UGenerator1,UID_UGenerator2],0,false);
+      PlayerSetAllowedUnits(playerN,[ UID_HSymbol1..UID_HSymbol4,
+                                      UID_UGenerator1..UID_UGenerator4],0,false);
 
 
-      PlayerSetAllowedUpgrades(p,[0..255],255,true); //
+      PlayerSetAllowedUpgrades(playerN,[0..255],255,true); //
 
       a_rebuild:=[1..255];
       a_ability:=[1..255];
@@ -39,10 +39,9 @@ begin
 
    if(p0>LastPlayer)
    or(p1>LastPlayer)
-   or(p0=0)
-   or(p1=0)then exit;
+   then exit;
 
-   if(g_players[p0].state=ps_human)
+   if(g_players[p0].state<>ps_none)
    or(p1=p0)then exit;
 
    PlayersSwap:=true;
@@ -68,6 +67,9 @@ begin
    g_players[p0].pnum:=p0;
    g_players[p1].pnum:=p1;
 
+   g_players[p0].observer:=t1>LastPlayer;
+   g_players[p1].observer:=t0>LastPlayer;
+
    g_players[p0].team:=PlayerValidateTeam(p0,t1);
    g_players[p1].team:=PlayerValidateTeam(p1,t0);
 
@@ -78,27 +80,27 @@ begin
    {$ENDIF}
 end;
 
-procedure PlayerSetState(p,newstate:byte);
+procedure PlayerSetState(playerN,newState:byte);
 begin
-   with g_players[p] do
+   with g_players[playerN] do
    begin
-      case newstate of
-PS_None: begin ready:=false;name :=str_ps_none;       ttl:=0;end;
-ps_ai: begin ready:=true; name :=ai_name(ai_skill); ttl:=0;end;
+      case newState of
+ps_None : begin ready:=false;name :=str_ps_none;       ttl:=0;end;
+ps_AI   : begin ready:=true; name :=ai_name(ai_skill); ttl:=0;observer:=false;end;
 ps_human: begin ready:=false;name :='';                ttl:=0;end;
       end;
-      team:=PlayerValidateTeam(p,team);
-      state:=newstate;
+      team:=PlayerValidateTeam(playerN,team);
+      state:=newState;
    end;
 end;
 
-procedure PlayerKill(pl:byte;instant:boolean);
+procedure PlayerKill(playerN:byte;instant:boolean);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
-    with g_punits[u]^ do
-     if(playeri=pl)then
-      unit_kill(g_punits[u],instant,true,false,true,true);
+     with g_punits[u]^ do
+       if(playeri=playerN)then
+         unit_kill(g_punits[u],instant,true,false,true,true);
 end;
 
 procedure PlayersSetDefault;
@@ -106,51 +108,49 @@ var p:byte;
 begin
    FillChar(g_players,SizeOf(TPList),0);
    for p:=0 to LastPlayer do
-    with g_players[p] do
-    begin
-       ai_skill :=player_default_ai_level;
-       race     :=r_random;
-       team     :=p;
-       ready    :=false;
-       pnum     :=p;
-       PlayerSetState(p,ps_none);
-       PlayerSetSkirmishTech(p);
-       PlayerClearLog(p);
-       log_EnergyCheck:=0;
-   end;
-
-   with g_players[0] do
-   begin
-      race     :=r_hell;
-      state    :=ps_ai;
-      PlayerSetAllowedUnits   (0,[],0,true);
-      PlayerSetAllowedUpgrades(0,[],0,true);
-   end;
+     with g_players[p] do
+     begin
+        ai_skill :=player_default_ai_level;
+        race     :=r_random;
+        team     :=p;
+        ready    :=false;
+        pnum     :=p;
+        PlayerSetState(p,ps_None);
+        PlayerSetSkirmishTech(p);
+        PlayerClearLog(p);
+        log_EnergyCheck:=0;
+    end;
 
    FillChar(_playerAPM,SizeOf(_playerAPM),0);
 
    {$IFDEF _FULLGAME}
-   LocalPlayer:=1;
+   LocalPlayer:=0;
    with g_players[LocalPlayer] do
    begin
       state:=ps_human;
       name :=PlayerName;
    end;
 
-   PlayerColors[0]:=c_ltgray;
-   PlayerColors[1]:=c_red;
-   PlayerColors[2]:=c_orange;
-   PlayerColors[3]:=c_yellow;
-   PlayerColors[4]:=c_lime;
-   PlayerColors[5]:=c_aqua;
-   PlayerColors[6]:=c_blue;
+   PlayerColorDefaultCurrent:=c_ltgray;
+   PlayerColorDefaultShadow :=gfx_ShadowColor(PlayerColorDefaultCurrent);
 
-   {$ELSE}
-   {LocalPlayer:=0;
-   with g_players[LocalPlayer] do
-   begin
-      name :='SERVER';
-   end; }
+   PlayerColorsDefault[0]:=c_red;
+   PlayerColorsDefault[1]:=c_orange;
+   PlayerColorsDefault[2]:=c_yellow;
+   PlayerColorsDefault[3]:=c_lime;
+   PlayerColorsDefault[4]:=c_aqua;
+   PlayerColorsDefault[5]:=c_blue;
+   PlayerColorsDefault[6]:=c_violet;
+   PlayerColorsDefault[7]:=c_purple;
+
+   PlayerColorsCurrent[0]:=c_red;
+   PlayerColorsCurrent[1]:=c_orange;
+   PlayerColorsCurrent[2]:=c_yellow;
+   PlayerColorsCurrent[3]:=c_lime;
+   PlayerColorsCurrent[4]:=c_aqua;
+   PlayerColorsCurrent[5]:=c_blue;
+   PlayerColorsCurrent[6]:=c_violet;
+   PlayerColorsCurrent[7]:=c_purple;
    {$ENDIF}
 end;
 
@@ -160,36 +160,31 @@ begin
    randomize;
 
    g_tick         :=0;
-   G_Status       :=0;
-   g_player_astatus:=255;
+   G_Status       :=gs_running;
 
    ServerSide     :=true;
 
-   FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
-   FillChar(g_missiles,SizeOf(g_missiles),0);
-   FillChar(g_units   ,SizeOf(g_units   ),0);
-
+   KeyPoints_Clear;
+   FillChar(g_missiles ,SizeOf(g_missiles ),0);
+   FillChar(g_units    ,SizeOf(g_units    ),0);
    for u:=0 to MaxUnits do
-   with g_units[u] do
-   begin
-      hits  :=dead_hits;
-      player:=@g_players[playeri];
-      uid   :=@g_units  [uidi   ];
-   end;
+     with g_units[u] do
+     begin
+        hits  :=dead_hits;
+        player:=@g_players[playeri];
+        uid   :=@g_units  [uidi   ];
+     end;
    LastCreatedUnit :=0;
    LastCreatedUnitP:=@g_units[LastCreatedUnit];
 
    PlayersSetDefault;
 
-   UnitStepTicks    := 8;
+   UnitStepTicks := 8;
 
-   g_inv_wave_n     := 0;
-   g_inv_wave_t_next:= 0;
-   g_inv_wave_t_curr:= 0;
-   g_royal_r        := 0;
+   g_royal_r     := 0;
 
-   g_cycle_order     := 0;
-   g_cycle_regen     := 0;
+   g_cycle_order := 0;
+   g_cycle_regen := 0;
 
    Map_premap;
    {$IFDEF DEBUG0}
@@ -201,25 +196,25 @@ begin
 
    menu_update:=true;
 
+   vid_ScreenSpritesS:=0;
+
    ui_cam_x:=-ui_CtrlPanelW;
    ui_cam_y:=0;
    ui_Camera_Bounds;
 
    ui_blink_timer1:=0;
    ui_blink_timer2:=0;
-   vid_ScreenSpritesS:=0;
-
    ui_tab :=0;
    ui_UnitSelectedNU:=0;
    ui_UnitSelectedPU:=0;
 
-   FillChar(g_effects,SizeOf(g_effects),0);
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
+   FillChar(g_effects,SizeOf(g_effects),0);
 
    ingame_chat :=0;
    net_chat_str:='';
    net_cl_svttl:=0;
-   net_cl_Hoster:=255;
+   net_cl_Hoster  :=255;
    net_error_timer:=0;
 
    ui_umark_u:=0;
@@ -234,7 +229,6 @@ begin
 
    rpls_pnu  :=0;
    rpls_POVRecorder:=false;
-   //if(rpls_pstate>=rpls_read)then
    rpls_pstate:=rpls_none;
    {$ELSE}
    screen_redraw:=true;
@@ -245,44 +239,22 @@ end;
 {$include _replays.pas}
 {$ENDIF}
 
-{
-function menu_surrender(check:boolean):boolean;
-begin
-   menu_surrender:=false;
-
-   if(g_DefeatedObs)and(not g_players[LocalPlayer].observer)and(not GameCheckEndStatus)and(rpls_state<rpls_read)then
-   begin
-      menu_surrender:=true;
-
-      if(check)then exit;
-
-      case net_status  of
-      ns_server,
-      ns_none   : begin
-                     GameLogPlayerSurrender(LocalPlayer);
-                     PlayerKill(LocalPlayer,true);
-                  end;
-      ns_client : net_surrender;// send surrender command, toggle menu
-      end;
-      ToggleMenu(true);
-   end;
-end;
-}
-
 function PlayerSurrender(pid:byte;check:boolean):boolean;
 begin
    PlayerSurrender:=false;
 
    if(not g_started)
-   or(pid>=LastPlayer)
+   or(pid>LastPlayer)
+   {$IFDEF _FULLGAME}
    or(rpls_pstate=rpls_read)
+   {$ENDIF}
    or(not g_DefeatedObs)then exit;
 
    with g_players[pid] do
-     if(state<>ps_none)
+     if(state<>ps_None)
      or(armylimit<=0)
      or(army<=0)
-     or(team=0)
+     or(defeated)
      or(observer)then exit;
 
    PlayerSurrender:=true;
@@ -347,63 +319,88 @@ begin
    g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
 
    for p:=0 to LastPlayer do
-   with g_players[p] do
-   begin
-      team:=PlayerValidateTeam(p,team);
+     with g_players[p] do
+       if(observer)then
+       begin
+          team:=0;
+          race:=r_hell;
+       end
+       else
+       begin
+          team:=PlayerValidateTeam(p,team);
 
-      if(p=0)then
-      begin
-         race    :=r_hell;
-         ai_skill:=g_MaxAISlots;
-         PlayerSetState(p,ps_ai);
-         PlayerSetCurrentUpgrades(p,[1..255],15,true,true);
-         ai_PlayerSetSkirmishSettings(p);
-      end
-      else
-      begin
-         if(state=ps_none)then
-           if(g_AISlots>0)then
-           begin
-              ai_skill:=g_AISlots;
-              race    :=r_random;
-              PlayerSetState(p,ps_ai);
-           end;
+          if(state=ps_None)then
+            if(g_AISlots>0)then
+            begin
+               ai_skill:=g_AISlots;
+               race    :=r_random;
+               PlayerSetState(p,ps_AI);
+            end;
 
-         if(race=r_random)then race:=1+random(r_cnt);
+          if(race=r_random)then race:=1+random(r_cnt);
 
-         if(state=ps_human)then ai_skill:=player_default_ai_level;//g_AISlots
-      end;
-   end;
+          if(state=ps_human)then ai_skill:=player_default_ai_level;//g_AISlots
+       end;
 
-   for p:=1 to LastPlayer do
-    with g_players[p] do
-     if(state<>ps_none)then
-     begin
-        PlayerSetSkirmishTech(p);
-        ai_PlayerSetSkirmishSettings(p);
-        if(team>0)then
-           if(map_generators>0)
-           then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,1,true )
-           else GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,0,false);
-     end;
+   for p:=0 to LastPlayer do
+     with g_players[p] do
+       if(state<>ps_None)then
+       begin
+          PlayerSetSkirmishTech(p);
+          ai_PlayerSetSkirmishSettings(p);
+          if(not observer)then
+             if(map_generators>0)
+             then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,1,true )
+             else GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,0,false);
+       end;
 
    {$IFDEF _FULLGAME}
    ui_Camera_MoveToPoint(map_psx[LocalPlayer] , map_psy[LocalPlayer]);
-   if(g_players[LocalPlayer].team=0)then
+   if(g_players[LocalPlayer].observer)then
    begin
-      ui_tab:=3;
-      UIPlayer:=0;
+      ui_tab  :=tab_controls;
+      UIPlayer:=255;
    end;
    {$ENDIF}
 end;
 
 
 {$IFDEF _FULLGAME}
+function GamePauseToggle(check:boolean):boolean;
+begin
+   GamePauseToggle:=false;
+
+   case net_status of
+   ns_client  : begin
+                   GamePauseToggle:=true;
+                   if(check)then exit;
+                   net_pause;
+                end;
+   ns_server  : case G_Status of
+                gs_running  : begin
+                                 GamePauseToggle:=true;
+                                 if(check)then exit;
+
+                                 G_Status:=LocalPlayer;
+                                 GameLogChat(LocalPlayer,255,str_gmsg_PlayerPaused,false);
+                              end;
+                gs_paused1..
+                gs_paused6  : begin
+                                 GamePauseToggle:=true;
+                                 if(check)then exit;
+
+                                 G_Status:=gs_running;
+                                 GameLogChat(LocalPlayer,255,str_gmsg_PlayerResumed,false);
+                              end;
+                end;
+   end;
+end;
+
 function GameStart(check:boolean):boolean;
 begin
    GameStart:=false;
    if(G_Started)
-   or(not PlayersReadyStatus)
+   or(not PlayersAllReady)
    or(net_status=ns_client)then exit;
 
    case g_type of
@@ -456,7 +453,7 @@ begin
    with g_players[LocalPlayer] do
      if(UIPlayer<>LocalPlayer)
      or(observer)
-     or(army<=0)
+     or(defeated)
      or(rpls_pstate=rpls_read)then exit;
    if(g_status<>gs_running)then exit;
    ui_GameControlsEnabled:=true;
@@ -768,24 +765,24 @@ begin
    then map_generators:=random(map_MaxGenerators)+1
    else map_generators:=0;
 
-   for p:=1 to LastPlayer do
+   for p:=0 to LastPlayer do
      with g_players[p] do
        if(state<>ps_human)then
        begin
           race :=random(r_cnt+1);
           mrace:=race;
 
-          team:=1+random(4);
+          team:=random(6);
 
           ai_skill:=random(6)+2;
 
           if(random(2)=0)
-          then PlayerSetState(p,ps_none)
-          else PlayerSetState(p,ps_ai);
+          then PlayerSetState(p,ps_None)
+          else PlayerSetState(p,ps_AI);
        end;
 
    {$IFDEF _FULLGAME}
-   PlayersSwap(random(LastPlayer)+1,LocalPlayer);
+   PlayersSwap(random(MaxPlayers),LocalPlayer);
    {$ENDIF}
 
    if(random(3)=0)
@@ -808,9 +805,6 @@ begin
    with g_players[tPlayer] do
    if(o_id>0)and(army>0)then
    begin
-      {
-      if(tPlayer<>LocalPlayer)then   // ded serverside counter
-      PlayerAPMInc(tPlayer);}
 
       case o_id of
 uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_unit,byte(o_x1),unit_start_build(o_x0,o_y0,byte(o_x1),tPlayer),nil);
@@ -855,7 +849,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
                                                UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
 
                                // TO ALL
-                               co_destroy  : unit_kill(tar_u,false,false,true,false,true);
+                               co_destroy  : unit_kill(pu,false,false,true,false,true);
                                co_rcamove,
                                co_rcmove   : begin     // right click
                                                 uo_tar:=0;
@@ -927,11 +921,11 @@ begin
 end;
 
 procedure Scenario_DefaultDefeatConditions;
-var i:byte;
+var p:byte;
 begin
-   for i:=1 to LastPlayer do
-     if(g_players[i].army>0)then exit;
-   GameSetStatusWinnerTeam(0);
+   for p:=0 to LastPlayer do
+     if(g_players[p].army>0)then exit;
+   GameSetStatusWinnerTeam(255);
 end;
 
 procedure PlayersCycle;
@@ -939,7 +933,7 @@ var p:byte;
 begin
    for p:=0 to LastPlayer do
     with g_players[p] do
-     if(state>ps_none)then
+     if(state>ps_None)then
      begin
         if(state=ps_human)and(net_status=ns_server){$IFDEF _FULLGAME}and(p<>LocalPlayer){$ENDIF}then
         begin
@@ -951,26 +945,24 @@ begin
            else
              if(G_Started=false)then
              begin
-                PlayerSetState(p,PS_None);
+                PlayerSetState(p,ps_None);
                 {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
              end;
         end;
         if(net_logsend_pause>0)then net_logsend_pause-=1;
 
-        if(G_Started)and(G_Status=gs_running)then
+        if(G_Started)and(G_Status=gs_running)and(not observer)and(not defeated)then
         begin
            if(build_cd>0)then build_cd-=1;
 
            if(ServerSide)then
            begin
               revealed:=false;
-              if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
-                if(map_scenario<>mc_invasion)
-                or(p>0)then revealed:=true;
+              if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then revealed:=true;
 
               PlayerExecuteOrder(p);
 
-              if(state=ps_ai)
+              if(state=ps_AI)
               then ai_player_code(p)
               else
                 if(log_EnergyCheck>0)
@@ -1017,41 +1009,43 @@ begin
    GameOptionsChangeable:=true;
 end;
 
-function PlayerAILevelLoop(player:byte):boolean;
+function PlayerAILevelScroll(PlayerTarget:byte;forward,check:boolean):boolean;
 begin
-   PlayerAILevelLoop:=false;
+   PlayerAILevelScroll:=false;
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=LastPlayer)then
-     with g_players[player] do
-       if(state=ps_ai)then
+   if(PlayerTarget<=LastPlayer)then
+     with g_players[PlayerTarget] do
+       if(state=ps_AI)then
        begin
-          PlayerAILevelLoop:=true;
+          PlayerAILevelScroll:=true;
+
+          if(check)then exit;
+
           {$IFDEF _FULLGAME}
           if(net_status=ns_client)then
           begin
              net_clearbuffer;
              net_writebyte(nmid_lobby_PAIUp);
-             net_writebyte(player);
+             net_writebyte(PlayerTarget);
              net_send(net_cl_svip,net_cl_svport);
              exit;
           end;
           {$ENDIF}
-          ai_skill+=1;
-          if(ai_skill>g_MaxAISlots)then ai_skill:=1;
+          ScrollByte(@ai_skill,forward,1,g_MaxAISlots);
           name:=ai_name(ai_skill);
        end;
 end;
 
-function PlayerAIToggle(player:byte;check:boolean):boolean;
+function PlayerAIToggle(PlayerTarget:byte;check:boolean):boolean;
 begin
    PlayerAIToggle:=false;
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=LastPlayer)then
-     with g_players[player] do
+   if(PlayerTarget<=LastPlayer)then
+     with g_players[PlayerTarget] do
        if(state<>ps_human)then
        begin
           PlayerAIToggle:=true;
@@ -1062,120 +1056,101 @@ begin
           begin
              net_clearbuffer;
              net_writebyte(nmid_lobby_PAIToggle);
-             net_writebyte(player);
+             net_writebyte(PlayerTarget);
              net_send(net_cl_svip,net_cl_svport);
              exit;
           end;
           {$ENDIF}
 
-          if(state<>ps_none)
-          then PlayerSetState(player,PS_None)
-          else
+          if(state<>ps_None)
+          then PlayerSetState(PlayerTarget,ps_None)
+          else PlayerSetState(PlayerTarget,ps_AI  );
+
+          {$IFDEF _FULLGAME}
+          map_RedrawMenuMinimap;
+          {$ENDIF}
+       end;
+end;
+
+function PlayerTeamScroll(PlayerTarget{$IFNDEF _FULLGAME},PlayerRequestor{$ENDIF}:byte;forward,check:boolean):boolean;
+begin
+   PlayerTeamScroll:=false;
+
+   if(not GameOptionsChangeable)then exit;
+
+   if(PlayerTarget<=LastPlayer)then
+     with g_players[PlayerTarget] do
+       if(state=ps_AI)or(PlayerTarget={$IFDEF _FULLGAME}LocalPlayer{$ELSE}PlayerRequestor{$ENDIF})then
+       begin
+          if(map_scenario in mc_fixed_teams)and(state=ps_AI)then exit;
+
+          PlayerTeamScroll:=true;
+
+          if(check)then exit;
+
+          {$IFDEF _FULLGAME}
+          if(net_status=ns_client)then
           begin
-             PlayerSetState(player,ps_ai);
-             if(team=0)then team:=player;
+             net_clearbuffer;
+             net_writebyte(nmid_lobby_PTeam);
+             net_writebyte(PlayerTarget);
+             net_writebool(forward);
+             net_send(net_cl_svip,net_cl_svport);
+             exit;
+          end;
+          {$ENDIF}
+
+          case (map_scenario in mc_fixed_teams) of
+          true : observer:=not observer;
+          false: if(state=ps_AI)
+                 then ScrollByte(@team,forward,0,LastPlayer)
+                 else
+                   if(observer)then
+                   begin
+                      observer:=false;
+                      ScrollByte(@team,forward,0,LastPlayer);
+                   end
+                   else
+                   begin
+                      case forward of
+                      true : if(team=LastPlayer)then observer:=true;
+                      false: if(team=0         )then observer:=true;
+                      end;
+                      if(not observer)then ScrollByte(@team,forward,0,LastPlayer);
+                   end;
           end;
        end;
 end;
 
-function PlayerTeamChange(player:byte;forward,check:boolean):boolean;
-procedure HumanTeamRoll(pvar:pbyte);
+function PlayerRaceScroll(PlayerTarget{$IFNDEF _FULLGAME},PlayerRequestor{$ENDIF}:byte;check:boolean):boolean;
 begin
-   if(map_scenario in mc_fixed_teams)then
-   begin
-      if(pvar^=0)
-      then pvar^:=PlayerGetFixedTeams(map_scenario,player)
-      else pvar^:=0;
-   end
-   else ScrollByte(pvar,forward,0,LastPlayer);
-end;
-begin
-   PlayerTeamChange:=false;
+   PlayerRaceScroll:=false;
 
    if(not GameOptionsChangeable)then exit;
 
-   if(0<player)and(player<=LastPlayer)then
-     with g_players[player] do
-       {$IFDEF _FULLGAME}
-       if(player=LocalPlayer)and(net_status=ns_client)then
-       begin
+   if(PlayerTarget<=LastPlayer)then
+     with g_players[PlayerTarget] do
+      if(not observer)then
+        if(state=ps_AI)or(PlayerTarget={$IFDEF _FULLGAME}LocalPlayer{$ELSE}PlayerRequestor{$ENDIF})then  // check on server side PlayerTarget requestor
+        begin
+           PlayerRaceScroll:=true;
+           if(check)then exit;
 
-          PlayerTeamChange:=true;
-          if(check)then exit;
+           {$IFDEF _FULLGAME}
+           if(net_status=ns_client)then
+           begin
+              net_clearbuffer;
+              net_writebyte(nmid_lobby_PRace);
+              net_writebyte(PlayerTarget);
+              net_send(net_cl_svip,net_cl_svport);
+              exit;
+           end;
+           {$ENDIF}
 
-          if(map_scenario in mc_fixed_teams)
-          then HumanTeamRoll(@PlayerTeam)
-          else ScrollByte(@PlayerTeam,forward,0,LastPlayer);
-
-       end
-       else
-       {$ENDIF}
-         if(state=ps_ai){$IFDEF _FULLGAME}or(player=LocalPlayer){$ENDIF}then
-         begin
-            if(map_scenario in mc_fixed_teams)then
-              if(state=ps_ai)then exit;
-
-            PlayerTeamChange:=true;
-
-            if(check)then exit;
-
-            {$IFDEF _FULLGAME}
-            if(net_status=ns_client)then
-            begin
-               net_clearbuffer;
-               net_writebyte(nmid_lobby_PTeam);
-               net_writebyte(player);
-               net_writebool(forward);
-               net_send(net_cl_svip,net_cl_svport);
-               exit;
-            end;
-            {$ENDIF}
-            if(state=ps_ai)
-            then ScrollByte(@team,forward,1,LastPlayer)
-            else HumanTeamRoll(@team);
-         end;
-end;
-
-function PlayerRaceChange(player:byte;check:boolean):boolean;
-begin
-   PlayerRaceChange:=false;
-
-   if(not GameOptionsChangeable)then exit;
-
-   if(0<player)and(player<=LastPlayer)then
-     with g_players[player] do
-      if(team>0)then
-       {$IFDEF _FULLGAME}
-       if(player=LocalPlayer)and(net_status=ns_client)then
-       begin
-          PlayerRaceChange:=true;
-          if(check)then exit;
-
-          PlayerRace+=1;
-          if(PlayerRace>r_cnt)then PlayerRace:=0;
-       end
-       else
-       {$ENDIF}
-         if(state=ps_ai){$IFDEF _FULLGAME}or(player=LocalPlayer){$ENDIF}then
-         begin
-            PlayerRaceChange:=true;
-            if(check)then exit;
-
-            {$IFDEF _FULLGAME}
-            if(net_status=ns_client)then
-            begin
-               net_clearbuffer;
-               net_writebyte(nmid_lobby_PRace);
-               net_writebyte(player);
-               net_send(net_cl_svip,net_cl_svport);
-               exit;
-            end;
-            {$ENDIF}
-
-            race+=1;
-            if(race>r_cnt)then race:=0;
-            mrace:=race;
-         end;
+           race+=1;
+           if(race>r_cnt)then race:=r_random;
+           mrace:=race;
+        end;
 end;
 
 function GameMapSetSeed(newSeed:cardinal;check:boolean):boolean;
@@ -1240,7 +1215,7 @@ begin
    case param_type of
    nmid_lobby_MScenario      : begin ScrollByteSet(@map_scenario,forward,@allmapscenarios);PlayersValidateTeam;Map_premap;end;
    nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,map_MaxGenerators);Map_premap;end;
-   nmid_lobby_MSeed          : if(not forward)then begin map_RandomSeed;Map_premap;end;
+   nmid_lobby_MSeed          : if(not forward)then begin Map_RandomSeed;Map_premap;end;
    nmid_lobby_MSize          : begin
                                   case forward of
                                   true : ScrollInt(@map_Size, map_SizeMenuStep,map_MinSize,map_MaxSize);
@@ -1251,8 +1226,18 @@ begin
    nmid_lobby_MObs           : begin ScrollByte(@map_Obstacles,forward,0,map_MaxObstacles); Map_premap; end;
    nmid_lobby_MSym           : begin map_Symmetry:=not map_Symmetry; Map_premap; end;
    nmid_lobby_MRandom        : begin Map_randommap; Map_premap;end;
-   nmid_lobby_GFixedPositions: begin g_FixedPositions:=not g_FixedPositions;           Map_premap;end;
-   nmid_lobby_GAISlots       : begin ScrollByte(@g_AISlots  ,forward,0,g_MaxAISlots  );Map_premap;end;
+   nmid_lobby_GFixedPositions: begin
+                                  g_FixedPositions:=not g_FixedPositions;
+                                  {$IFDEF _FULLGAME}
+                                  map_RedrawMenuMinimap;
+                                  {$ENDIF}
+                               end;
+   nmid_lobby_GAISlots       : begin
+                                  ScrollByte(@g_AISlots  ,forward,0,g_MaxAISlots  );
+                                  {$IFDEF _FULLGAME}
+                                  map_RedrawMenuMinimap;
+                                  {$ENDIF}
+                               end;
    nmid_lobby_GDefeatedObs   : g_DefeatedObs:=not g_DefeatedObs;
    nmid_lobby_GRandomScirmish: if(forward)then MakeRandomSkirmish;
    end;
@@ -1285,8 +1270,6 @@ begin
       begin
          g_tick+=1;
 
-         UpdatePlayersStatus;
-
          Scenario_KeyPointsCode;
          {$IFDEF _FULLGAME}
          if(g_type=gt_scirmish)then
@@ -1294,10 +1277,6 @@ begin
          {$ENDIF}
             Scenario_KeyPointsEndConditions;
             case map_scenario of
-            mc_invasion  : begin
-                           Scenario_Invasion;
-                           Scenario_DefaultDefeatConditions;
-                           end;
             mc_royale    : begin
                               if(g_cycle_order=0)then
                                 if(g_royal_r>0)then g_royal_r-=1;

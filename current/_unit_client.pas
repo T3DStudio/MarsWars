@@ -68,129 +68,128 @@ var t,s:integer;
 begin
    wudata_log:=false;
    if(p<=LastPlayer)then
-    with g_players[p] do
-    begin
-       s:=0;
+     with g_players[p] do
+     begin
+        s:=0;
 
-       i:=log_i;
-       if(not rpl)then
-       begin
-          if(log_n<clog_n^)then
-            if(log_n=0)
-            then clog_n^:=0
-            else clog_n^:=log_n-1;
-          if(log_n>clog_n^)then
-          begin
-             s:=min3i(log_n,log_n-clog_n^,MaxPlayerLog);
-             clog_n^:=log_n;
-          end;
-       end
-       else
-       begin
-          s:=min2i(clog_n^,MaxPlayerLog);
-          clog_n^:=0;
-       end;
+        i:=log_i;
+        if(not rpl)then
+        begin
+           if(log_n<clog_n^)then
+             if(log_n=0)
+             then clog_n^:=0
+             else clog_n^:=log_n-1;
+           if(log_n>clog_n^)then
+           begin
+              s:=min3i(log_n,log_n-clog_n^,MaxPlayerLog);
+              clog_n^:=log_n;
+           end;
+        end
+        else
+        begin
+           s:=min2i(clog_n^,MaxPlayerLog);
+           clog_n^:=0;
+        end;
 
-       if(s>0)then
-       begin
-          if(s>1)then
-           for t:=1 to s-1 do
-            if(i=0)
-            then i:=MaxPlayerLog
-            else i-=1;
+        if(s>0)then
+        begin
+           if(s>1)then
+             for t:=1 to s-1 do
+               if(i=0)
+               then i:=MaxPlayerLog
+               else i-=1;
 
-          wudata_byte(byte(s),rpl);
-          while(s>0)do
-          begin
-             with log_l[i] do
-             begin
-                wudata_byte  (mtype,rpl);
-                b:=argt and %00000011;
-                if(argx       >0)then b:=b or %00000100;
-                if(length(str)>0)then b:=b or %00001000;
-                if(xi         >0)then b:=b or %00010000;
-                wudata_byte  (b,rpl);
+           wudata_byte(byte(s),rpl);
+           while(s>0)do
+           begin
+              with log_l[i] do
+              begin
+                 wudata_byte  (mtype,rpl);
+                 b:=argt and %00000011;
+                 if(argx       >0)then b:=b or %00000100;
+                 if(length(str)>0)then b:=b or %00001000;
+                 if(xi         >0)then b:=b or %00010000;
+                 wudata_byte  (b,rpl);
 
-                if((b and %00000100)>0)then wudata_byte  (argx ,rpl);
-                if((b and %00001000)>0)then wudata_string(str  ,rpl);
-                if((b and %00010000)>0)then
-                begin
-                   wudata_byte(byte(xi shr 5),rpl);
-                   wudata_byte(byte(yi shr 5),rpl);
-                end;
-             end;
+                 if((b and %00000100)>0)then wudata_byte  (argx ,rpl);
+                 if((b and %00001000)>0)then wudata_string(str  ,rpl);
+                 if((b and %00010000)>0)then
+                 begin
+                    wudata_byte(byte(xi shr 5),rpl);
+                    wudata_byte(byte(yi shr 5),rpl);
+                 end;
+              end;
 
-             if(i=MaxPlayerLog)
-             then i:=0
-             else i+=1;
-             s-=1;
-          end;
-          if(rpl=false)then wudata_card(clog_n^,rpl);
-          wudata_log:=true;
-          exit;
-       end;
-    end;
-    wudata_byte(0,rpl);
+              if(i=MaxPlayerLog)
+              then i:=0
+              else i+=1;
+              s-=1;
+           end;
+           if(not rpl)then wudata_card(clog_n^,rpl);
+           wudata_log:=true;
+           exit;
+        end;
+     end;
+   wudata_byte(0,rpl);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure wudata_bstat(pu:PTUnit;rpl:boolean);
-var _bts1,
-    _bts2:byte;
+var byte1,
+    byte2:byte;
 begin
    with pu^ do
    with uid^ do
    begin
-      _bts1:=0;
-      _bts2:=0;
+      byte1:=0;
+      byte2:=0;
 
-      SetBBit(@_bts2,0, buffs[ub_Resurect    ]>0);
-      SetBBit(@_bts2,1, buffs[ub_Summoned    ]>0);
-      SetBBit(@_bts2,2, buffs[ub_Invuln      ]>0);
-      SetBBit(@_bts2,3, buffs[ub_Teleport    ]>0);
-      SetBBit(@_bts2,4, buffs[ub_HVision     ]>0);
-      SetBBit(@_bts2,5, buffs[ub_Cast        ]>0);
-      SetBBit(@_bts2,6, buffs[ub_Scaned      ]>0);
-      //SetBBit(@_bts2,7, buffs[ub_Decay       ]>0);
+      SetBBit(@byte2,0, buffs[ub_Resurect    ]>0);
+      SetBBit(@byte2,1, buffs[ub_Summoned    ]>0);
+      SetBBit(@byte2,2, buffs[ub_Invuln      ]>0);
+      SetBBit(@byte2,3, buffs[ub_Teleport    ]>0);
+      SetBBit(@byte2,4, buffs[ub_HVision     ]>0);
+      SetBBit(@byte2,5, buffs[ub_Cast        ]>0);
+      SetBBit(@byte2,6, buffs[ub_Scaned      ]>0);
 
-      SetBBit(@_bts1,0, iscomplete             );
-      SetBBit(@_bts1,1, transport>0            );
-      SetBBit(@_bts1,2, (level and %01)      >0);
-      SetBBit(@_bts1,3, (level and %10)      >0);
-      SetBBit(@_bts1,4, buffs[ub_Pain        ]>0);
-      SetBBit(@_bts1,5,(a_tar_cl>0)and(a_rld>0));
-      SetBBit(@_bts1,6, sel                    );
-      SetBBit(@_bts1,7, _bts2>0                );
+      SetBBit(@byte1,0, iscomplete             );
+      SetBBit(@byte1,1, transport>0            );
+      SetBBit(@byte1,2, (level and %01)      >0);
+      SetBBit(@byte1,3, (level and %10)      >0);
+      SetBBit(@byte1,4, buffs[ub_Pain        ]>0);
+      SetBBit(@byte1,5,(a_tar_cl>0)and(a_rld>0));
+      SetBBit(@byte1,6, sel                    );
+      SetBBit(@byte1,7, byte2>0                );
 
-      wudata_byte(_bts1,rpl);
-      if(_bts2>0)then wudata_byte(_bts2,rpl);
+      wudata_byte(byte1,rpl);
+      if(byte2>0)then wudata_byte(byte2,rpl);
    end;
 end;
 
-function _wudata_rld(r:pinteger;rpl:boolean):byte;
+function wudata_reload(r:pinteger;rpl:boolean):byte;
 begin
    if(r^<=0)
-   then _wudata_rld:=0
-   else _wudata_rld:=mm3i(1,(r^ div fr_fps1)+1,255);
-   wudata_byte(_wudata_rld,rpl);
+   then wudata_reload:=0
+   else wudata_reload:=mm3i(1,(r^ div fr_fps1)+1,255);
+   wudata_byte(wudata_reload,rpl);
 end;
 
-procedure _wudata_prod(pu:PTUnit;rpl:boolean);
+procedure wudata_prod(pu:PTUnit;rpl:boolean);
 var i: byte;
 begin
    with pu^ do
    with uid^ do
-   if(_ukbuilding)and(iscomplete)then
-   for i:=0 to MaxUnitLevel do
-   begin
-      if(i>level)then break;
-      if(_isbarrack)then if(_wudata_rld(@uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
-      if(_issmith  )then if(_wudata_rld(@pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
-   end;
+     if(_ukbuilding)and(iscomplete)then
+       for i:=0 to MaxUnitLevel do
+       begin
+          if(i>level)then break;
+          if(_isbarrack)then if(wudata_reload(@uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
+          if(_issmith  )then if(wudata_reload(@pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
+       end;
 end;
 
-procedure _wudata_OwnerUData(pu:PTUnit;rpl:boolean);
+procedure wudata_OwnerUData(pu:PTUnit;rpl:boolean);
 var wudtick : pcardinal;
     wudelay : cardinal;
     wb      : boolean;
@@ -232,9 +231,9 @@ begin
 
       if(iscomplete)then
         if(_ability in client_rld_abils)
-        or(uidi     in client_rld_uids )then _wudata_rld(@rld,rpl);
+        or(uidi     in client_rld_uids )then wudata_reload(@rld,rpl);
 
-      _wudata_prod(pu,rpl);
+      wudata_prod(pu,rpl);
 
       if(sel or not rpl)then
         if(UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
@@ -249,18 +248,19 @@ begin
 end;
 
 procedure wudata_Unit(pu:PTUnit;rpl:boolean;POVPlayer:byte);
-var sh :shortint;
-    wt :word;
+var
+hits_si: shortint;
+wt     : word;
 begin
    with pu^ do
    with uid^ do
    begin
       if(CheckUnitTeamVision(g_players[POVPlayer].team,pu,true))or(rpl)or(g_players[POVPlayer].observer)
-      then sh:=_Hi2Si(hits,_mhits,_shcf)
-      else sh:=-128;
+      then hits_si:=hits_li2si(hits,_mhits,_shcf)
+      else hits_si:=-128;
 
-      wudata_sint(sh,rpl);
-      if(sh>-127)then
+      wudata_sint(hits_si,rpl);
+      if(hits_si>-127)then
       begin
          wudata_byte (uidi,rpl);
          wudata_bstat(pu,rpl);
@@ -268,7 +268,7 @@ begin
          if(transport>0)
          then wudata_int(transport,rpl)
          else
-           if(sh>0)then
+           if(hits_si>0)then
            begin
               wudata_int(vx ,rpl);
               wudata_int(vy ,rpl);
@@ -279,7 +279,7 @@ begin
               wudata_byte(byte(vy shr 5),rpl);
            end;
 
-         if(sh>0)then
+         if(hits_si>0)then
          begin
             if(a_tar_cl>0)and(a_rld>0)then
             begin
@@ -291,44 +291,44 @@ begin
 
             if(buffs[ub_Cast]>0)then
              if(_ability in client_cast_abils)then
-              if(_wudata_rld(@rld,rpl)>0)then
+              if(wudata_reload(@rld,rpl)>0)then
               begin
                  wudata_byte(byte(uo_x shr 5),rpl);
                  wudata_byte(byte(uo_y shr 5),rpl);
               end;
 
-            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then _wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
 end;
 
-procedure _wpdata_upgr(rpl:boolean);
+procedure wpdata_Upgrades(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
-   for p:=1 to LastPlayer do
-    if(GetBBit(@g_player_astatus,p))then
+   for p:=0 to LastPlayer do
      with g_players[p] do
-     begin
-        bp:=0;
+       if(not observer)and(not defeated)then
+       begin
+          bp:=0;
 
-        for n:=0 to 255 do
-         if(race=g_upids[n]._up_race)then
-          case bp of
-          0: begin
-                bv:=upgr[n];
-                bp:=1;
-             end;
-          1: begin
-                bv:=bv or (upgr[n] shl 4);
-                wudata_byte(bv,rpl);
-                bp:=0;
-                bv:=0;
-             end;
-          end;
+          for n:=0 to 255 do
+            if(race=g_upids[n]._up_race)then
+              case bp of
+                0: begin
+                      bv:=upgr[n];
+                      bp:=1;
+                   end;
+                1: begin
+                      bv:=bv or (upgr[n] shl 4);
+                      wudata_byte(bv,rpl);
+                      bp:=0;
+                      bv:=0;
+                   end;
+                end;
 
-        if(bp=1)then wudata_byte(bv,rpl);
-     end;
+            if(bp=1)then wudata_byte(bv,rpl);
+       end;
 end;
 
 {function b2bs(b:byte):shortstring;
@@ -344,7 +344,7 @@ begin
    if((b and %00000001)>0)then b2bs[8]:='1';
 end; }
 
-procedure _wclinet_cpoint(cpi:byte;rpl:boolean);
+procedure wclinet_KeyPoint(cpi:byte;rpl:boolean);
 var    b: byte;
 wdcptime: pbyte;
 begin
@@ -356,18 +356,18 @@ begin
    wdcptime^:=(wdcptime^+1) mod 2;
 
    with g_KeyPoints[cpi] do
-    if(cpCaptureR<=0)
-    then wudata_byte(0,rpl)
-    else
-    begin
-       b:=b or (cpOwnerPlayer      shl 2) and %00011100;
-       b:=b or (cpTimerOwnerPlayer shl 5) and %11100000;
+     if(cpCaptureR<=0)
+     then wudata_byte(0,rpl)
+     else
+     begin
+        b:=b or (cpOwnerPlayer      shl 2) and %00011100;  // ???????????????
+        b:=b or (cpTimerOwnerPlayer shl 5) and %11100000;
 
-       case wdcptime^ of
+        case wdcptime^ of
 0       : begin
              wudata_byte(b or %00000010,rpl);
              if(cpOwnerPlayer<>cpTimerOwnerPlayer)
-             then _wudata_rld(@cpTimer,rpl);
+             then wudata_reload(@cpTimer,rpl);
           end;
 1       : if(cpLifeTime<=0)
           then wudata_byte(b or %00000001,rpl)
@@ -376,89 +376,104 @@ begin
              wudata_byte(b or %00000011,rpl);
              wudata_byte((cpLifeTime div fr_fps1) div 5,rpl);
           end;
-       end;
-    end;
+        end;
+     end;
 end;
 
-{function _dbg:cardinal;
-begin
-   _dbg:=G_Step-G_Step_dbg;
-   G_Step_dbg:=G_Step;
-end;}
-
-procedure _wclinet_gframe(POVPlayer:byte;rpl:boolean);
+procedure wclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
-wstep  : cardinal;
-wstepb0,
-wstepb1: boolean;
- _N_U  : pinteger;
+wtick      : cardinal;
+wtickb0,
+wtickb1    : boolean;
+lastPUnit  : pinteger;
+bs_alive,
+bs_observer,
+bs_defeated,
+bs_revealed : byte;
 i,
- _PNU  : integer;
+units_ingame,
+units_now   : integer;
 begin
    wudata_card(g_tick,rpl);
 
-   wstep:=g_tick shr 1;
+   wtick:=g_tick shr 1;
 
-   wstepb0:=(wstep mod fr_fpsd2)=0;
+   wtickb0:=(wtick mod fr_fpsd2)=0;
    if(rpl)
-   then wstepb1:=(wstep mod fr_fps1 )=0  // every 2 second
-   else wstepb1:=wstepb0;                // every second
+   then wtickb1:=(wtick mod fr_fps1 )=0  // every 2 second
+   else wtickb1:=wtickb0;                // every second
 
-   if(not rpl)and(wstepb1)then
-    with g_players[POVPlayer] do _wudata_rld(@build_cd,rpl);
+   if(not rpl)and(wtickb1)then
+     with g_players[POVPlayer] do wudata_reload(@build_cd,rpl);
 
-   if(wstepb0)then
+   if(wtickb0)then
      if(map_scenario=mc_capture)
      or(map_scenario=mc_KotH)
      or(map_generators>0)then
-      for i:=1 to LastKeyPoint do
-       _wclinet_cpoint(i,rpl);
+       for i:=0 to LastKeyPoint do
+         wclinet_KeyPoint(i,rpl);
 
-   if(wstepb1)then
+   if(wtickb1)then
      case map_scenario of
-mc_invasion : begin
-              wudata_byte(g_inv_wave_n     ,rpl);
-              wudata_int (g_inv_wave_t_next,rpl);
-              end;
 mc_royale   : wudata_int(g_royal_r,rpl);
      end;
 
    if(rpl)then
    begin
-      _PNU:=Quality2Units[rpls_Quality];
-      _N_U:=@rpls_u;
+      units_now:=Quality2Units[rpls_Quality];
+      lastPUnit:=@rpls_u;
    end
    else
    begin
-      _PNU:= g_players[POVPlayer].PNU;
-      _N_U:=@g_players[POVPlayer].n_u;
+      units_now:= g_players[POVPlayer].PNU;
+      lastPUnit:=@g_players[POVPlayer].n_u;
    end;
 
-   if(not rpl)
-   then UpdatePlayersStatus;
+   bs_alive:=0;
+   bs_observer:=0;
+   bs_defeated:=0;
+   bs_revealed:=0;
+   units_ingame:=0;
+   for i:=0 to LastPlayer do
+     with g_players[i] do
+       if(state>ps_None)then
+       begin
+          if(observer)then SetBBit(@bs_observer,i,true);
+          if(defeated)then SetBBit(@bs_defeated,i,true);
+          if(revealed)then SetBBit(@bs_revealed,i,true);
+          if(not defeated)and(not observer)then
+          begin
+             SetBBit(@bs_alive,i,true);
+             units_ingame+=MaxPlayerUnits;
+          end;
+       end;
 
-   if(g_player_astatus>0)and(g_players[POVPlayer].observer)then SetBBit(@g_player_astatus,7,true);
+   wudata_byte(bs_observer,rpl);
+   wudata_byte(bs_defeated,rpl);
 
-   wudata_byte(g_player_astatus,rpl);
-   if(g_player_astatus>0)then
+   if(bs_alive>0)then
    begin
-      wudata_byte(_PNU,rpl);
-      _PNU:=min2i(g_cl_units,_PNU*4);
+      if(units_now>255)then units_now:=255;
+      wudata_byte(byte(units_now),rpl);
 
-      if(wstepb0)then
+      if(units_now=0)then exit;
+
+      units_now:=min2i(units_ingame,units_now*4);
+
+      if(wtickb0)then
       begin
-         _wpdata_upgr(rpl);
-         wudata_byte(g_player_rstatus,rpl);
+         wpdata_Upgrades(rpl);
+         wudata_byte(bs_revealed,rpl);
       end;
 
-      wudata_int(_N_U^,rpl);
-      for i:=1 to _PNU do
+      wudata_int(lastPUnit^,rpl);
+      for i:=1 to units_now do
       begin
          repeat
-            _N_U^+=1;
-            if (_N_U^<1)or(_N_U^>MaxUnits)then _N_U^:=1;
-         until ( g_player_astatus and (1 shl ((_N_U^-1) div MaxPlayerUnits)) ) > 0 ;
-         wudata_Unit(@g_units[_N_U^],rpl,POVPlayer);
+            lastPUnit^+=1;
+            if (lastPUnit^<1)or(lastPUnit^>MaxUnits)then lastPUnit^:=1;
+         until ( bs_alive and (1 shl ((lastPUnit^-1) div MaxPlayerUnits)) ) > 0 ;
+         wudata_Unit(@g_units[lastPUnit^],rpl,POVPlayer);
       end;
    end;
 end;
@@ -467,7 +482,7 @@ end;
 
 {$IFDEF _FULLGAME}
 
-procedure _ucInc(pu:PTUnit;rpl:boolean);
+procedure client_UnitCountersInc(pu:PTUnit;rpl:boolean);
 var i,_puid:byte;
     p:pinteger;
 ptransport:PTUnit;
@@ -490,7 +505,7 @@ begin
       if(hits>0)and(ptransport=nil)then
       begin
          if(sel)and(rpl)then unit_counters_inc_select(pu);
-         if(iscomplete=false)
+         if(not iscomplete)
          then cenergy-=_renergy
          else
          begin
@@ -536,7 +551,7 @@ begin
    end;
 end;
 
-procedure _ucDec(pu:PTUnit;rpl:boolean);
+procedure client_UnitCountersDec(pu:PTUnit;rpl:boolean);
 var i,_puid:byte;
 ptransport:PTUnit;
 begin
@@ -558,7 +573,7 @@ begin
       if(hits>0)and(ptransport=nil)then
       begin
          if(sel)and(rpl)then unit_counters_dec_select(pu);
-         if(iscomplete=false)
+         if(not iscomplete)
          then cenergy+=_renergy
          else
          begin
@@ -600,13 +615,13 @@ begin
 end;
 
 
-procedure cleffect_UnitSummon(uu:PTUnit;vis:pboolean);
+procedure cleffect_UnitSummon(uu:PTUnit;pUIVision:pboolean);
 begin
    with uu^ do
    begin
       vx:=x;
       vy:=y;
-      effect_UnitSummon(uu,vis);
+      effect_UnitSummon(uu,pUIVision);
    end;
 end;
 
@@ -630,7 +645,7 @@ UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_
    end;
 end;
 
-procedure _unit_clear_a_tar(tar:integer);
+procedure unit_clear_a_tar(tar:integer);
 var u:integer;
 begin
    for u:=1 to MaxUnits do
@@ -638,7 +653,7 @@ begin
        if(a_tar=tar)then a_tar:=0;
 end;
 
-procedure _netSetUcl(uu:PTUnit;rpl:boolean);
+procedure client_ChangeUnitState(uu:PTUnit;rpl:boolean);
 var pu,tu:PTUnit;
    vis:boolean;
 begin
@@ -647,33 +662,33 @@ begin
    pu:=@g_units[0];
 
    if(not rpl)then
-    if(pu^.uidi<>uu^.uidi)then
-    begin
-       unit_UnSelect(pu);
-       uu^.group:=0;
-       uu^.sel:=false;
-    end
-    else
-      if(uu^.hits<=0)
-      or(uu^.transport>0)then
-      begin
-         unit_UnSelect(uu);
-         uu^.group:=0;
-      end;
+     if(pu^.uidi<>uu^.uidi)then
+     begin
+        unit_UnSelect(pu);
+        uu^.group:=0;
+        uu^.sel:=false;
+     end
+     else
+       if(uu^.hits<=0)
+       or(uu^.transport>0)then
+       begin
+          unit_UnSelect(uu);
+          uu^.group:=0;
+       end;
 
    with uu^ do
-    with player^ do
+   with player^ do
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
         unit_SetDefaults(uu,true);
-        unit_reveal (uu,true);
+        unit_reveal     (uu,true);
         vx:=x;
         vy:=y;
-        vis:=CheckUnitUIVisionScreen(uu);
+        vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
         if(IsUnitRange(transport,@tu))then
         begin
-           _unit_InTransportCode(uu,tu);
+           unit_InTransportCode(uu,tu);
            vx:=x;
            vy:=y;
         end;
@@ -682,23 +697,23 @@ begin
 
         if(hits>0)then
         begin
-           _unit_CalcForR(uu);
+           unit_CalcFogR(uu);
            if(buffs[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
            if(buffs[ub_Teleport]>0)then cleffect_teleport  (uu,            @vis);
            if(buffs[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
 
            if(playeri=UIPlayer)then
            begin
-              if(iscomplete=false)then
+              if(not iscomplete)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
               if(not rpl)and(sel)then ui_UpdateLastSelectedUnit(unum);
            end;
         end;
 
         missiles_clear_tar(unum,true);
-        _unit_clear_a_tar(unum);
+        unit_clear_a_tar(unum);
 
-        _ucInc(uu,rpl);
+        client_UnitCountersInc(uu,rpl);
      end
      else
        if(pu^.hits>dead_hits)and(hits<=dead_hits)then // remove unit
@@ -707,7 +722,7 @@ begin
 
           vx:=x;
           vy:=y;
-          vis:=CheckUnitUIVisionScreen(uu);
+          vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
           if(pu^.hits>0)and(vis)then
           begin
@@ -724,9 +739,9 @@ begin
           if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           missiles_clear_tar(unum,true);
-          _unit_clear_a_tar(unum);
+          unit_clear_a_tar(unum);
 
-          _ucDec(pu,rpl);
+          client_UnitCountersDec(pu,rpl);
        end
        else
          if(pu^.hits>dead_hits)and(hits>dead_hits)then
@@ -736,15 +751,15 @@ begin
                vx:=x;
                vy:=y;
                missiles_clear_tar(unum,true);
-               _unit_clear_a_tar(unum);
+               unit_clear_a_tar(unum);
             end;
-            vis:=CheckUnitUIVisionScreen(uu);
+            vis:=ui_CheckUnitUIPlayerVision(uu,true);
 
             unit_Bonuses(pu);
-            _ucDec(pu,rpl);
+            client_UnitCountersDec(pu,rpl);
 
             unit_Bonuses(uu);
-            _ucInc(uu,rpl);
+            client_UnitCountersInc(uu,rpl);
 
             if(hits>0)then
             begin
@@ -757,8 +772,8 @@ begin
                if(pu^.buffs[ub_Pain    ]<=0)and(buffs[ub_Pain    ]>0)then   effect_UnitPain  (uu,            @vis);
 
                if(pu^.iscomplete)and(not iscomplete)then
-                if(playeri=UIPlayer)then
-                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
+                 if(playeri=UIPlayer)then
+                   with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
                if(not rpl)and(pu^.sel=false)and(sel)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
@@ -767,12 +782,15 @@ begin
                begin
                   if(pu^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
                    case uid^._ability of
-               0:;
-               uab_UACStrike   : unit_UACStrike_missile(uu);
-               uab_UACScan     : if(team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
-               uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
-                                 then ability_unit_spawn(pu,UID_Phantom )
-                                 else ability_unit_spawn(pu,UID_LostSoul);
+                   0:;
+                   uab_UACStrike   : unit_UACStrike_missile(uu);
+                   uab_UACScan     : if(UIPlayer>LastPlayer)
+                                     then SoundPlayUnit(snd_radar,nil,nil)
+                                     else
+                                       if(team=g_players[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+                   uab_SpawnLost   : if(upgr[upgr_hell_phantoms]>0)
+                                     then ability_unit_spawn(pu,UID_Phantom )
+                                     else ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
                   if(uid^._ukbuilding=false)then
@@ -786,7 +804,7 @@ begin
 
             if(pu^.hits<=0)and(hits>0)then  //resurrected
             begin
-               _unit_CalcForR(uu);
+               unit_CalcFogR(uu);
                vx:=x;
                vy:=y;
             end
@@ -798,15 +816,15 @@ begin
                  effect_UnitDeath(uu,hits<=fdead_hits,@vis);
 
                  with uid^ do
-                  if(_death_missile>0)
-                  then missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
+                   if(_death_missile>0)
+                   then missile_add(x,y,x,y,0,_death_missile,playeri,ukfly,ukfly,false,0,_death_missile_dmod);
 
                  if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;
 
             if(not IsUnitRange(pu^.transport,nil))then
-             if(IsUnitRange(transport,@tu))then _unit_InTransportCode(uu,tu);
+             if(IsUnitRange(transport,@tu))then unit_InTransportCode(uu,tu);
 
             if(speed>0)then
             begin
@@ -816,7 +834,7 @@ begin
 
             if(pu^.x<>x)or(pu^.y<>y)then
             begin
-               unit_update_xy(uu);
+               unit_UpdateXY(uu);
 
                if(speed>0)then
                begin
@@ -826,7 +844,7 @@ begin
                if(speed<=0)or(buffs[ub_Teleport]>0)then
                begin
                   missiles_clear_tar(unum,true);
-                  _unit_clear_a_tar(unum);
+                  unit_clear_a_tar(unum);
                end;
             end;
          end;
@@ -836,16 +854,16 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-function _rudata_string(rpl:boolean):shortstring;
+function rudata_string(rpl:boolean):shortstring;
 var sl,x:byte;
        c:char;
 begin
-   if(rpl=false)
-   then _rudata_string:=net_readstring
+   if(not rpl)
+   then rudata_string:=net_readstring
    else
    begin
       sl:=0;
-      _rudata_string:='';
+      rudata_string:='';
       {$I-}
       BlockRead(rpls_file,sl,SizeOf(sl));
       {$I+}
@@ -855,44 +873,44 @@ begin
          {$I-}
          BlockRead(rpls_file,c,SizeOf(c));
          {$I+}
-         _rudata_string:=_rudata_string+c;
+         rudata_string:=rudata_string+c;
       end;
    end;
 end;
 
-function _rudata_byte(rpl:boolean;def:byte):byte;
+function rudata_byte(rpl:boolean;def:byte):byte;
 begin
-   if(rpl=false)
-   then _rudata_byte:=net_readbyte
-   else begin {$I-} BlockRead(rpls_file,_rudata_byte,SizeOf(_rudata_byte));{$I+}if(ioresult<>0)then _rudata_byte:=def;  end;
+   if(not rpl)
+   then rudata_byte:=net_readbyte
+   else begin {$I-} BlockRead(rpls_file,rudata_byte,SizeOf(rudata_byte));{$I+}if(ioresult<>0)then rudata_byte:=def;  end;
 end;
 
-function _rudata_word(rpl:boolean;def:word):word;
+function rudata_word(rpl:boolean;def:word):word;
 begin
-   if(rpl=false)
-   then _rudata_word:=net_readword
-   else begin {$I-} BlockRead(rpls_file,_rudata_word,SizeOf(_rudata_word));{$I+}if(ioresult<>0)then _rudata_word:=def;  end;
+   if(not rpl)
+   then rudata_word:=net_readword
+   else begin {$I-} BlockRead(rpls_file,rudata_word,SizeOf(rudata_word));{$I+}if(ioresult<>0)then rudata_word:=def;  end;
 end;
 
-function _rudata_sint(rpl:boolean;def:shortint):shortint;
+function rudata_sint(rpl:boolean;def:shortint):shortint;
 begin
-   if(rpl=false)
-   then _rudata_sint:=net_readsint
-   else begin {$I-} BlockRead(rpls_file,_rudata_sint,SizeOf(_rudata_sint));{$I+}if(ioresult<>0)then _rudata_sint:=def;  end;
+   if(not rpl)
+   then rudata_sint:=net_readsint
+   else begin {$I-} BlockRead(rpls_file,rudata_sint,SizeOf(rudata_sint));{$I+}if(ioresult<>0)then rudata_sint:=def;  end;
 end;
 
-function _rudata_int(rpl:boolean;def:integer):integer;
+function rudata_int(rpl:boolean;def:integer):integer;
 begin
-   if(rpl=false)
-   then _rudata_int:=net_readint
-   else begin {$I-} BlockRead(rpls_file,_rudata_int ,SizeOf(_rudata_int ));{$I+}if(ioresult<>0)then _rudata_int :=def;  end;
+   if(not rpl)
+   then rudata_int:=net_readint
+   else begin {$I-} BlockRead(rpls_file,rudata_int ,SizeOf(rudata_int ));{$I+}if(ioresult<>0)then rudata_int :=def;  end;
 end;
 
-function _rudata_card(rpl:boolean;def:cardinal):cardinal;
+function rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
-   if(rpl=false)
-   then _rudata_card:=net_readcard
-   else begin {$I-} BlockRead(rpls_file,_rudata_card,SizeOf(_rudata_card));{$I+}if(ioresult<>0)then _rudata_card:=def;  end;
+   if(not rpl)
+   then rudata_card:=net_readcard
+   else begin {$I-} BlockRead(rpls_file,rudata_card,SizeOf(rudata_card));{$I+}if(ioresult<>0)then rudata_card:=def;  end;
 end;
 
 function byte2s(b:byte):shortstring;
@@ -916,16 +934,13 @@ argx,
 x,y    :byte;
     str:shortstring;
 begin
-   s:=_rudata_byte(rpl,0);
+   s:=rudata_byte(rpl,0);
    if(s>0)then
    begin
-      //writeln('----- ',s,': ');
-      //if(s>10)then readln;
       while(s>0)do
       begin
-         mtype:=_rudata_byte(rpl,0);
-         b    :=_rudata_byte(rpl,0);
-         //writeln(' mtype:',mtype,' b:',byte2s(b));
+         mtype:=rudata_byte(rpl,0);
+         b    :=rudata_byte(rpl,0);
 
          argt:=0;
          argx:=0;
@@ -934,12 +949,12 @@ begin
          y   :=255;
 
          argt:=b and %00000011;
-         if((  b and %00000100)>0)then argx:=_rudata_byte(rpl,0);
-         if((  b and %00001000)>0)then str :=_rudata_string(rpl);
+         if((  b and %00000100)>0)then argx:=rudata_byte(rpl,0);
+         if((  b and %00001000)>0)then str :=rudata_string(rpl);
          if((  b and %00010000)>0)then
          begin
-            x:=_rudata_byte(rpl,0);
-            y:=_rudata_byte(rpl,0);
+            x:=rudata_byte(rpl,0);
+            y:=rudata_byte(rpl,0);
          end;
 
          if(x=255)
@@ -950,7 +965,7 @@ begin
       end;
       if(not rpl)then
       begin
-         net_log_n:=_rudata_card(rpl,net_log_n);
+         net_log_n:=rudata_card(rpl,net_log_n);
          menu_update:=true;
       end;
    end;
@@ -959,90 +974,86 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 
-procedure _rudata_bstat(uu:PTUnit;POVPlayer:byte;rpl:boolean);
-var _bts1,
-    _bts2:byte;
+procedure rudata_bstat(uu:PTUnit;POVPlayer:byte;rpl:boolean);
+var byte1,
+    byte2:byte;
 begin
    with uu^ do
    begin
       a_weap:=255;
       level:=0;
 
-      _bts1:=_rudata_byte(rpl,0);
+      byte1:=rudata_byte(rpl,0);
 
-      iscomplete:=GetBBit(@_bts1,0);
-      if(GetBBit(@_bts1,1))then transport:=1 else transport:=0;
-      if(GetBBit(@_bts1,2))then level+=%01;
-      if(GetBBit(@_bts1,3))then level+=%10;
-      buffs[ub_Pain]:=_buffst[GetBBit(@_bts1,4)];
-      if(GetBBit(@_bts1,5))then a_tar:=-1 else a_tar:=0;
+      iscomplete:=GetBBit(@byte1,0);
+      if(GetBBit(@byte1,1))then transport:=1 else transport:=0;
+      if(GetBBit(@byte1,2))then level+=%01;
+      if(GetBBit(@byte1,3))then level+=%10;
+      buffs[ub_Pain]:=_buffst[GetBBit(@byte1,4)];
+      if(GetBBit(@byte1,5))then a_tar:=-1 else a_tar:=0;
       if(rpl)then
-        sel:=GetBBit(@_bts1,6);
-      if(GetBBit(@_bts1,7))
-      then _bts2:=_rudata_byte(rpl,0)
-      else _bts2:=0;
+        sel:=GetBBit(@byte1,6);
+      if(GetBBit(@byte1,7))
+      then byte2:=rudata_byte(rpl,0)
+      else byte2:=0;
 
-      if(_bts2>0)then
+      if(byte2>0)then
       begin
-         buffs[ub_Resurect]:=_buffst[GetBBit(@_bts2,0)];
-         if(GetBBit(@_bts2,1))and(buffs[ub_Summoned]<=0)
+         buffs[ub_Resurect]:=_buffst[GetBBit(@byte2,0)];
+         if(GetBBit(@byte2,1))and(buffs[ub_Summoned]<=0)
          then buffs[ub_Summoned]:=fr_fps1;
-         buffs[ub_Invuln  ]:=_buffst[GetBBit(@_bts2,2)];
-         buffs[ub_Teleport]:=_buffst[GetBBit(@_bts2,3)];
-         buffs[ub_HVision ]:=_buffst[GetBBit(@_bts2,4)];
-         buffs[ub_Cast    ]:=_buffst[GetBBit(@_bts2,5)];
-         buffs[ub_Scaned  ]:=_buffst[GetBBit(@_bts2,6)];
-         //buffs[ub_Decay   ]:=_buffst[GetBBit(@_bts2,7)];
+         buffs[ub_Invuln  ]:=_buffst[GetBBit(@byte2,2)];
+         buffs[ub_Teleport]:=_buffst[GetBBit(@byte2,3)];
+         buffs[ub_HVision ]:=_buffst[GetBBit(@byte2,4)];
+         buffs[ub_Cast    ]:=_buffst[GetBBit(@byte2,5)];
+         buffs[ub_Scaned  ]:=_buffst[GetBBit(@byte2,6)];
       end
       else
       begin
          buffs[ub_Resurect]:=0;
-         //buffs[ub_Summoned]:=0;
          buffs[ub_Invuln  ]:=0;
          buffs[ub_Teleport]:=0;
          buffs[ub_HVision ]:=0;
          buffs[ub_Cast    ]:=0;
          buffs[ub_Scaned  ]:=0;
-         //buffs[ub_Decay   ]:=0;
       end;
 
       if(not rpl)and(not g_players[POVPlayer].observer)then
-       with g_players[POVPlayer] do
-        if(team>0)then
+        with g_players[POVPlayer] do
           AddToInt(@TeamVision[team],MinVisionTime);
    end;
 end;
 
-function _rudata_rld(r:pinteger;rpl:boolean):byte;
+function rudata_reload(r:pinteger;rpl:boolean):byte;
 begin
-   _rudata_rld  :=_rudata_byte(rpl,0);
-   if(_rudata_rld=0)
+   rudata_reload  :=rudata_byte(rpl,0);
+   if(rudata_reload=0)
    then r^:=0
-   else r^:=_rudata_rld*fr_fps1-1;
+   else r^:=rudata_reload*fr_fps1-1;
 end;
 
-procedure _rudata_prod(uu:PTUnit;rpl:boolean);
+procedure rudata_prod(uu:PTUnit;rpl:boolean);
 var i: byte;
 begin
    with uu^ do
    with uid^ do
-   if(_ukbuilding)and(iscomplete)then
-   for i:=0 to MaxUnitLevel do
-    if(i<=level)then
-    begin
-       if(_isbarrack)then if(_rudata_rld(@uprod_r[i],rpl)>0)then uprod_u[i]:=_rudata_byte(rpl,0);
-       if(_issmith  )then if(_rudata_rld(@pprod_r[i],rpl)>0)then pprod_u[i]:=_rudata_byte(rpl,0);
-    end
-    else
-    begin
-       uprod_r[i]:=0;
-       uprod_u[i]:=0;
-       pprod_r[i]:=0;
-       pprod_u[i]:=0;
-    end;
+     if(_ukbuilding)and(iscomplete)then
+       for i:=0 to MaxUnitLevel do
+         if(i<=level)then
+         begin
+            if(_isbarrack)then if(rudata_reload(@uprod_r[i],rpl)>0)then uprod_u[i]:=rudata_byte(rpl,0);
+            if(_issmith  )then if(rudata_reload(@pprod_r[i],rpl)>0)then pprod_u[i]:=rudata_byte(rpl,0);
+         end
+         else
+         begin
+            uprod_r[i]:=0;
+            uprod_u[i]:=0;
+            pprod_r[i]:=0;
+            pprod_u[i]:=0;
+         end;
 end;
 
-procedure _rudata_OwnerUData(uu:PTUnit;rpl:boolean);
+procedure rudata_OwnerUData(uu:PTUnit;rpl:boolean);
 var puo,
     b : byte;
     tu: PTUnit;
@@ -1050,7 +1061,7 @@ begin
    with uu^  do
    with uid^ do
    begin
-      b:=_rudata_byte(rpl,0);
+      b:=rudata_byte(rpl,0);
 
       if(rpl)then group:=b and %00001111;
 
@@ -1068,15 +1079,15 @@ begin
       if((b and %10000000)=0)then exit;
 
       if(iscomplete)then
-       if(_ability in client_rld_abils)
-       or(uidi     in client_rld_uids )then _rudata_rld(@rld,rpl);
+        if(_ability in client_rld_abils)
+        or(uidi     in client_rld_uids )then rudata_reload(@rld,rpl);
 
-      _rudata_prod(uu,rpl);
+      rudata_prod(uu,rpl);
 
       if(sel or not rpl)then
         if(UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
         begin
-           uo_x:=_rudata_int(rpl,0);
+           uo_x:=rudata_int(rpl,0);
            if(IsUnitRange(-uo_x,@tu))then
            begin
               uo_tar:=-uo_x;
@@ -1086,13 +1097,13 @@ begin
            else
            begin
               uo_tar:=0;
-              uo_y  :=_rudata_int(rpl,0);
+              uo_y  :=rudata_int(rpl,0);
            end;
         end;
    end;
 end;
 
-procedure _rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;SkipRead:boolean);
+procedure rudata_main(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;SkipRead:boolean);
 var sh: shortint;
     i : byte;
     wt: word;
@@ -1112,7 +1123,7 @@ begin
       playeri:=(unum-1) div MaxPlayerUnits;
       player :=@g_players[playeri];
       if(not DEAD)
-      then sh:=_rudata_sint(rpl,-128)
+      then sh:=rudata_sint(rpl,-128)
       else
         if(hits<dead_hits)
         then sh:=-128
@@ -1121,51 +1132,51 @@ begin
       if(sh>-127)then
       begin
          i   :=uidi;
-         uidi:=_rudata_byte(rpl,0);
+         uidi:=rudata_byte(rpl,0);
          if(i<>uidi)then
          begin
-            _unit_apUID(uu);
+            unit_ApplyUID(uu);
             unit_SetDefaults(uu,false);
             FillChar(buffs,SizeOf(buffs),0);
          end;
-         hits:=_Si2Hi(sh,uid^._mhits,uid^._shcf);
-         _rudata_bstat(uu,POVPlayer,rpl);
+         hits:=hits_si2li(sh,uid^._mhits,uid^._shcf);
+         rudata_bstat(uu,POVPlayer,rpl);
 
          if(transport>0)then
          begin
-            transport:=_rudata_int(rpl,0);
+            transport:=rudata_int(rpl,0);
             if(IsUnitRange(transport,nil)=false)then transport:=0;
          end
          else
            if(sh>0)then
            begin
-              x:=_rudata_int(rpl,x);
-              y:=_rudata_int(rpl,y);
+              x:=rudata_int(rpl,x);
+              y:=rudata_int(rpl,y);
            end
            else
            begin
-              x:=integer(_rudata_byte(rpl,0) shl 5)+(x mod 32);
-              y:=integer(_rudata_byte(rpl,0) shl 5)+(y mod 32);
+              x:=integer(rudata_byte(rpl,0) shl 5)+(x mod 32);
+              y:=integer(rudata_byte(rpl,0) shl 5)+(y mod 32);
            end;
 
          if(sh>0)then
          begin
             if(a_tar=-1)then
             begin
-               wt    :=_rudata_word(rpl,0);
+               wt    :=rudata_word(rpl,0);
                a_tar :=integer(wt and %0000001111111111);
                a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
             if(buffs[ub_Cast]>0)then
              if(uid^._ability in client_cast_abils)then
-              if(_rudata_rld(@rld,rpl)>0)then
+              if(rudata_reload(@rld,rpl)>0)then
               begin
-                 uo_x:=integer(_rudata_byte(rpl,0) shl 5);
-                 uo_y:=integer(_rudata_byte(rpl,0) shl 5);
+                 uo_x:=integer(rudata_byte(rpl,0) shl 5);
+                 uo_y:=integer(rudata_byte(rpl,0) shl 5);
               end;
 
-            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then _rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)or(g_players[POVPlayer].observer)then rudata_OwnerUData(uu,rpl);
          end;
       end
       else
@@ -1180,80 +1191,73 @@ begin
       ou^.y :=uu^.y;
       ou^.vx:=uu^.x;
       ou^.vy:=uu^.y;
-      unit_update_xy(ou);
+      unit_UpdateXY(ou);
    end
-   else _netSetUcl(uu,rpl);
+   else client_ChangeUnitState(uu,rpl);
 end;
 
 
-procedure _rpdata_upgr(rpl:boolean);
+procedure rpdata_Upgrades(rpl:boolean);
 var p,n,bp,bv:byte;
 begin
-   for p:=1 to LastPlayer do
-    if(GetBBit(@g_player_astatus,p))then
+   for p:=0 to LastPlayer do
      with g_players[p] do
-     begin
-        bp:=0;
+       if(not observer)and(not defeated)then
+       begin
+          bp:=0;
 
-        for n:=0 to 255 do
-        with g_upids[n] do
-         if(race=_up_race)then
-         case bp of
-         0: begin
-               bv:=_rudata_byte(rpl,0);
-               upgr[n]:=min2i(_up_max,bv and %00001111);
-               bp:=1;
-            end;
-         1: begin
-               upgr[n]:=min2i(_up_max,bv shr 4);
-               bp:=0;
-            end;
-         end;
-     end;
+          for n:=0 to 255 do
+            with g_upids[n] do
+              if(race=_up_race)then
+              case bp of
+              0: begin
+                    bv:=rudata_byte(rpl,0);
+                    upgr[n]:=min2i(_up_max,bv and %00001111);
+                    bp:=1;
+                 end;
+              1: begin
+                    upgr[n]:=min2i(_up_max,bv shr 4);
+                    bp:=0;
+                 end;
+              end;
+       end;
 end;
 
-procedure _rclient_cl_units;
-var i:byte;
-begin
-   g_cl_units:=0;
-   for i:=1 to LastPlayer do
-    if((g_player_astatus and (1 shl i))>0)then g_cl_units+=MaxPlayerUnits;
-end;
-
-procedure _rclinet_cpoint(cpi:byte;rpl,no_effect:boolean);
+procedure rclinet_KeyPoint(kpi:byte;rpl,no_effect:boolean);
 var b,t,p:byte;
 begin
-   with g_KeyPoints[cpi] do
+   with g_KeyPoints[kpi] do
    begin
-      b:=_rudata_byte(rpl,0);
+      b:=rudata_byte(rpl,0);
       t:=b and %00000011;
       if(t=0)then
       begin
          if(cpCaptureR>0)then
          begin
-            CPoint_ChangeOwner(cpi,0);
+            KeyPoint_ChangeOwner(kpi,255);
             cpCaptureR:=-cpCaptureR;
-            if(not no_effect)
-            then effect_CPExplode(cpx,cpy);
+            if(not no_effect)then
+              effect_KPointExplode(cpx,cpy);
          end;
       end
       else
       begin
          if(cpCaptureR<0)then cpCaptureR:=-cpCaptureR;
          p:=(b and %00011100) shr 2;
-         CPoint_ChangeOwner(cpi,p);
+         KeyPoint_ChangeOwner(kpi,p);
          cpTimerOwnerPlayer:=(b and %11100000) shr 5;
          if(cpTimerOwnerPlayer<=LastPlayer)
-         then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team;
+         then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team
+         else cpTimerOwnerTeam:=255;
 
          case t of
 %00000001 : ;
 %00000010 : begin
                if(cpOwnerPlayer<>cpTimerOwnerPlayer)
-               then _rudata_rld(@cpTimer,rpl)
+               then rudata_reload(@cpTimer,rpl)
                else cpTimer:=0;
             end;
-%00000011 : cpLifeTime:=(_rudata_byte(rpl,0)*fr_fps1)*5;
+%00000011 : cpLifeTime:=(rudata_byte(rpl,0)*fr_fps1)*5;
          end;
       end;
    end;
@@ -1261,90 +1265,99 @@ end;
 
 procedure rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
 var
-wstep  : cardinal;
-wstepb0,
-wstepb1: boolean;
+wtick  : cardinal;
+wtickb0,
+wtickb1: boolean;
+bs_alive,
+bs     : byte;
 i,
-_PNU,
-_N_U   : integer;
+units_ingame,
+units_now,
+lastUnit   : integer;
 begin
-   g_tick:=_rudata_card(rpl,g_tick);
+   g_tick:=rudata_card(rpl,g_tick);
 
-   wstep:=g_tick shr 1;
+   wtick:=g_tick shr 1;
 
-   wstepb0:=(wstep mod fr_fpsd2)=0;
+   wtickb0:=(wtick mod fr_fpsd2)=0;
    if(rpl)
-   then wstepb1:=(wstep mod fr_fps1)=0
-   else wstepb1:=wstepb0;
+   then wtickb1:=(wtick mod fr_fps1)=0
+   else wtickb1:=wtickb0;
 
-   if(rpl=false)and(wstepb1)then
-    with g_players[POVPlayer] do
-     _rudata_rld(@build_cd,rpl);
+   if(not rpl)and(wtickb1)then
+     with g_players[POVPlayer] do
+       rudata_reload(@build_cd,rpl);
 
-   if(wstepb0)then
+   if(wtickb0)then
      if(map_scenario=mc_capture)
      or(map_scenario=mc_KotH)
      or(map_generators>0)then
-      for i:=1 to LastKeyPoint do
-       _rclinet_cpoint(i,rpl,fast_skip);
+       for i:=0 to LastKeyPoint do
+         rclinet_KeyPoint(i,rpl,fast_skip);
 
-   if(wstepb1)then
+   if(wtickb1)then
      case map_scenario of
-mc_invasion : begin
-              g_inv_wave_n     :=_rudata_byte(rpl,0);
-              g_inv_wave_t_next:=_rudata_int (rpl,0);
-              end;
-mc_royale   : g_royal_r:=_rudata_int(rpl,0);
+mc_royale   : g_royal_r:=rudata_int(rpl,0);
      end;
 
-   if(map_scenario=mc_invasion)then i:=byte(GetBBit(@g_player_astatus,0));
+   bs:=rudata_byte(rpl,0);
+   for i:=0 to LastPlayer do
+     with g_players[i] do
+       if(state>ps_None)then
+         observer:=GetBBit(@bs,i);
+   bs:=rudata_byte(rpl,0);
+   for i:=0 to LastPlayer do
+     with g_players[i] do
+       if(state>ps_None)then
+         defeated:=GetBBit(@bs,i);
+   bs_alive:=0;
+   units_ingame:=0;
+   for i:=0 to LastPlayer do
+     with g_players[i] do
+       if(state>ps_None)and(not observer)and(not defeated)then
+       begin
+          SetBBit(@bs_alive,i,true);
+          units_ingame+=MaxPlayerUnits;
+       end;
 
-   g_player_astatus:=_rudata_byte(rpl,0);
-   if(g_player_astatus>0)then
+   if(bs_alive>0)then
    begin
-      if(map_scenario=mc_invasion)then
-        if(i=0)and(i<>byte(GetBBit(@g_player_astatus,0)) )then SoundPlayUnit(snd_teleport,nil,nil);
+      units_now:=rudata_byte(rpl,0)*4;
 
-      g_players[POVPlayer].observer:=GetBBit(@g_player_astatus,7);
+      if(units_now<=0)then exit;
 
-      _PNU:=_rudata_byte(rpl,0)*4;
+      if(units_now>units_ingame)then units_now:=units_ingame;
 
-      if(_PNU<=0)then exit;
-
-      _rclient_cl_units;
-
-      if(_PNU>g_cl_units)then _PNU:=g_cl_units;
-
-      if(_PNU<>rpls_pnu)then
+      if(units_now<>rpls_pnu)then
       begin
-         rpls_pnu:=_PNU;
+         rpls_pnu:=units_now;
          if(rpls_pnu<=0)then rpls_pnu:=1;
-         UnitStepTicks:=round(g_cl_units/rpls_pnu*NetTickN)+1;
+         UnitStepTicks:=round(units_ingame/rpls_pnu*NetTickN)+1;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 
-      if(wstepb0)then
+      if(wtickb0)then
       begin
-         _rpdata_upgr(rpl);
-         g_player_rstatus:=_rudata_byte(rpl,0);
+         rpdata_Upgrades(rpl);
+         bs:=rudata_byte(rpl,0);
          for i:=0 to LastPlayer do
-          with g_players[i] do
-           revealed:=GetBBit(@g_player_rstatus,i);
+           with g_players[i] do
+             revealed:=GetBBit(@bs,i);
       end;
 
-      _N_U:=_rudata_int(rpl,0);
-      for i:=1 to _PNU do
+      lastUnit:=rudata_int(rpl,0);
+      for i:=1 to units_now do
       begin
          while(true)do
          begin
-           _N_U+=1;
-           if(_N_U<1)or(_N_U>MaxUnits)then _N_U:=1;
-           g_units[_N_U].unum:=_N_U;
-           if( g_player_astatus and (1 shl ((_N_U-1) div MaxPlayerUnits)) ) > 0
+           lastUnit+=1;
+           if(lastUnit<1)or(lastUnit>MaxUnits)then lastUnit:=1;
+           g_units[lastUnit].unum:=lastUnit;
+           if( bs_alive and (1 shl ((lastUnit-1) div MaxPlayerUnits)) ) > 0
            then break
-           else _rudata_main(@g_units[_N_U],rpl,true,POVPlayer,fast_skip);
+           else rudata_main(@g_units[lastUnit],rpl,true,POVPlayer,fast_skip);
          end;
-         _rudata_main(@g_units[_N_U],rpl,false,POVPlayer,fast_skip);
+         rudata_main(@g_units[lastUnit],rpl,false,POVPlayer,fast_skip);
       end;
    end;
 end;

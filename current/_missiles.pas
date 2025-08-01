@@ -192,8 +192,8 @@ begin
 
        damage:=adddmg;
        if(player<=LastPlayer)and(tu<>nil)then
-        with g_players[player] do
-         if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
+         with g_players[player] do
+           if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
 
        with g_mids[mid] do
        begin
@@ -226,7 +226,7 @@ begin
     end;
 end;
 
-procedure _missle_damage(m:integer);
+procedure missle_damage(m:integer);
 var tu: PTUnit;
 teams : boolean;
 ud,rdamage: integer;
@@ -276,7 +276,7 @@ begin
           if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^._splashresist)and(not tu^.uid^._ukmech)then // splash damage
           begin
              {$IFDEF _FULLGAME}
-             if(ms_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
+             if(ms_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
              {$ENDIF}
 
              mtars-=1;
@@ -290,7 +290,7 @@ begin
      end;
 end;
 
-procedure _missileCycle;
+procedure missile_Cycle;
 const  mb_s0 = fr_fps1 div 5;
        mb_s1 = fr_fps1-mb_s0;
 var m,u:integer;
@@ -351,12 +351,12 @@ mh_homing   : begin
       begin
          if(damage>0)and(mid_base_splashr>=0)then
           if IsUnitRange(tar,nil)and(mtars=1)
-          then _missle_damage(m)
+          then missle_damage(m)
           else
             for u:=1 to MaxUnits do
             begin
                tar:=u;
-               _missle_damage(m);
+               missle_damage(m);
                if(mtars<=0)then break;
             end;
 
@@ -368,7 +368,7 @@ mh_homing   : begin
       else
         if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
          if((vstep mod ms_eid_fly_st)=0)then
-           if(MapPointInScreenP(vx,vy,true))then effect_add(vx,vy,_SpriteDepth(vy,mfs),ms_eid_fly);
+           if(MapPointInScreenP(vx,vy,true))then effect_add(vx,vy,draw_SpriteDepth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;
