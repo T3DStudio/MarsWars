@@ -39,9 +39,9 @@ begin
    if(cp<>nil)then
     with cp^ do
     begin
-       if(d<(cpNoBuildR+NoBuildRArea))then exit;
+       if(d<(kpNoBuildR+NoBuildRArea))then exit;
 
-       if(d<=cpCaptureR)then exit;
+       if(d<=kpCaptureR)then exit;
     end;
    ai_checkKPNear:=false;
 end;
@@ -260,7 +260,7 @@ begin
         8:BuildTower (ai_towers_need,ai_towers_need_type);
         end;
 
-      {if(sel)then
+      {if(isselected)then
       begin
          writeln(ai_need_energy,' ',ai_maxcount_energy,' ',ai_detect_need,' ',bt);
          writeln(ai_unitp_need,' ',ai_upgrp_need);
@@ -277,7 +277,7 @@ begin
            or(bt=aiucl_main0A[race])
            or(bt=aiucl_main1 [race])
            or(bt=aiucl_main1A[race])
-           then ddir:=point_dir(x,y,map_hmw,map_hmw)-g_randomr(100);
+           then ddir:=point_dir(x,y,map_hSize,map_hSize)-g_randomr(100);
       end;
       rdir:=ddir*degtorad;
       if(l<0)
@@ -331,7 +331,7 @@ begin
    CheckAIRTarget:=true;
    if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.pfzone)then exit;
    if(ai_generator_d<NOTSET)then
-    if(ai_generator_cp^.cpzone<>pu^.pfzone)then exit;
+    if(ai_generator_cp^.kpzone<>pu^.pfzone)then exit;
    CheckAIRTarget:=false;
 end;
 
@@ -756,7 +756,7 @@ begin
       if(map_generators>0)or((ai_tech2_cur>0)and ai_advanced_bld)then prods+=2;
       if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3i(1,prods div 4        ,ai_maxcount_upgrps);
       if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3i(1,prods-ai_upgrp_need,ai_maxcount_unitps);
-      //if(sel)then writeln(ai_enrg_pot,' ',ai_maxcount_energy,' ',ai_unitp_need,' ',ai_maxcount_unitps);
+      //if(isselected)then writeln(ai_enrg_pot,' ',ai_maxcount_energy,' ',ai_unitp_need,' ',ai_maxcount_unitps);
       if(ai_enrg_pot>=ai_maxcount_energy)and(ai_unitp_need<ai_maxcount_unitps)then ai_unitp_need:=ai_maxcount_unitps;
 
       if(ai_enemy_inv_u<>nil)
@@ -792,8 +792,8 @@ begin
          if(ai_kpoint_d<base_2r)and(ai_kpoint_koth)then
          begin
             ai_towers_need     :=ai_maxcount_towers;
-            ai_towers_needx    :=ai_kpoint_kp^.cpx;
-            ai_towers_needy    :=ai_kpoint_kp^.cpy;
+            ai_towers_needx    :=ai_kpoint_kp^.kpx;
+            ai_towers_needy    :=ai_kpoint_kp^.kpy;
             ai_towers_need_type:=0;
             ai_towers_needl    :=-1;
          end
@@ -801,8 +801,8 @@ begin
          if(ai_kpoint_d<srange)then
          begin
             ai_towers_need     :=3;
-            ai_towers_needx    :=ai_kpoint_kp^.cpx;
-            ai_towers_needy    :=ai_kpoint_kp^.cpy;
+            ai_towers_needx    :=ai_kpoint_kp^.kpx;
+            ai_towers_needy    :=ai_kpoint_kp^.kpy;
             ai_towers_need_type:=0;
             ai_towers_needl    :=-1;
          end
@@ -997,12 +997,12 @@ begin
     with pkp^ do
       if(ai_builders_count>0)
       or(ai_unitp_cur>0)
-      or(cpenergy<=0)then
-        if(kpd<cpCaptureR)then
+      or(kpEnergy<=0)then
+        if(kpd<kpCaptureR)then
         begin
-           if(cpzone<>pu^.pfzone)and(not ai_kpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
+           if(kpzone<>pu^.pfzone)and(not ai_kpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
            then ai_RunTo(pu,0,0,0,0,pu)
-           else ai_RunTo(pu,0,cpx,cpy,cpCaptureR div 2,nil);
+           else ai_RunTo(pu,0,kpx,kpy,kpCaptureR div 2,nil);
            au_SetBusyGroup(pu);
            IfInsideKPoint:=true;
         end;
@@ -1161,39 +1161,28 @@ UID_Cyberdemon : if(srange<ai_enemy_build_d)and(ai_enemy_build_d<base_1rh)then
         end;
    end
    else
-     if(_attack=atm_bunker)then
-     begin
-        if(smartmicro)then
-          if(transportC=0)
-          or(ai_enemy_d<150)then
-          begin
-             ai_RunFrom(pu,ai_enemy_u^.x,ai_enemy_u^.y);
-             SpecialMicro:=true;
-          end;
-     end
-     else
-     begin
-        if(transportC>0)then
-          if(tar_d<200)
-          or(ai_kpoint_d   <200)
-          or(ai_generator_d<200)
-          or(ai_alarm_d    <200)
-          or(ai_enemy_d    <200)then uo_id:=ua_unload;
+   begin
+      if(transportC>0)then
+        if(tar_d<200)
+        or(ai_kpoint_d   <200)
+        or(ai_generator_d<200)
+        or(ai_alarm_d    <200)
+        or(ai_enemy_d    <200)then uo_id:=ua_unload;
 
-        if(transportC<=0)then
+      if(transportC<=0)then
+      begin
+         if(ai_enemy_d<srange)
+         then ai_RunFrom(pu,ai_enemy_u^.x,ai_enemy_u^.y)
+         else ai_BaseIdle(pu,srange);
+         SpecialMicro:=true;
+      end
+      else
+        if(pf_IfObstacleZone(tar_z))then
         begin
-           if(ai_enemy_d<srange)
-           then ai_RunFrom(pu,ai_enemy_u^.x,ai_enemy_u^.y)
-           else ai_BaseIdle(pu,srange);
+           ai_RunTo(pu,tar_d,tar_x,tar_y,base_1r,nil);
            SpecialMicro:=true;
-        end
-        else
-          if(pf_IfObstacleZone(tar_z))then
-          begin
-             ai_RunTo(pu,tar_d,tar_x,tar_y,base_1r,nil);
-             SpecialMicro:=true;
-         end;
-     end;
+       end;
+   end;
 end;
 procedure TeleportUsing;
 begin
@@ -1235,7 +1224,7 @@ begin
       {#########   royale battle: escape from death circle  ###########}
       if(map_scenario=mc_royale)and(u_royal_d<100)then
       begin
-         ai_RunTo(pu,0,map_hmw,map_hmw,0,nil);
+         ai_RunTo(pu,0,map_hSize,map_hSize,0,nil);
          au_SetBusyGroup(pu);
          if(u_royal_d<50)then
          begin
@@ -1249,7 +1238,7 @@ begin
       if(CheckScout)then exit;
 
       {#########   already inside the point      ###########}
-      if(transportM<=0)or(_attack=atm_bunker)then
+      if(transportM<=0)then
         if IfInsideKPoint(ai_kpoint_kp   ,ai_kpoint_d   )
         or IfInsideKPoint(ai_generator_cp,ai_generator_d)then exit;
 
@@ -1283,15 +1272,15 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
                                                    ai_abase_u^.aiu_alarm_y),false,false,2);
 
       if(ai_kpoint_d<NOTSET)then
-        with ai_kpoint_kp^ do SetNearestTarget(nil,cpx,cpy,ai_kpoint_d,cpzone,ai_kpoint_d>base_3r,(ai_kpoint_d>base_3r)and(not ai_kpoint_koth),byte(ai_kpoint_koth or(map_scenario=mc_capture)));
+        with ai_kpoint_kp^ do SetNearestTarget(nil,kpx,kpy,ai_kpoint_d,kpzone,ai_kpoint_d>base_3r,(ai_kpoint_d>base_3r)and(not ai_kpoint_koth),byte(ai_kpoint_koth or(map_scenario=mc_capture)));
 
       if(ai_generator_d<NOTSET)then
         with ai_generator_cp^ do
           if((cycle_order mod 5)=0)
-          then SetNearestTarget(nil,cpx,cpy,ai_generator_d,cpzone,false,false,1)
-          else SetNearestTarget(nil,cpx,cpy,ai_generator_d,cpzone,ai_generator_d>base_3r,ai_generator_d>base_3r,0);
+          then SetNearestTarget(nil,kpx,kpy,ai_generator_d,kpzone,false,false,1)
+          else SetNearestTarget(nil,kpx,kpy,ai_generator_d,kpzone,ai_generator_d>base_3r,ai_generator_d>base_3r,0);
 
-      {if(sel)then
+      {if(isselected)then
       begin
          if(tar_d<NOTSET)then
          UnitsInfoAddLine(x+g_randomr(2),y+g_randomr(2),tar_x+g_randomr(2),tar_y+g_randomr(2),c_aqua);
@@ -1379,18 +1368,18 @@ begin
       if(ukfly)then
       begin
          if(u_royal_d<base_2r)
-         then ai_RunTo(pu,0,map_hmw,map_hmw,0,nil)
+         then ai_RunTo(pu,0,map_hSize,map_hSize,0,nil)
          else
            if(ai_choosen)and(map_scenario=mc_royale)then
            begin
-              ai_RunTo(pu,u_royal_cd,map_hmw,map_hmw,base_1r,nil);
+              ai_RunTo(pu,u_royal_cd,map_hSize,map_hSize,base_1r,nil);
               if(u_royal_cd<min2i(g_royal_r div 7,base_2r))
               then unit_sability(pu,false);
            end
            else
              if(ai_choosen)and(ai_kpoint_koth)then
              begin
-                ai_RunTo(pu,ai_kpoint_d,ai_kpoint_kp^.cpx,ai_kpoint_kp^.cpy,base_1r,nil);
+                ai_RunTo(pu,ai_kpoint_d,ai_kpoint_kp^.kpx,ai_kpoint_kp^.kpy,base_1r,nil);
                 if(ai_kpoint_d<ai_kpoint_r)
                 then unit_sability(pu,false);
              end
@@ -1443,22 +1432,22 @@ begin
         begin
            if(map_scenario=mc_royale)
            then w:=g_royal_r div 2
-           else w:=map_hmw;
-           if(unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false)=0)then exit;
+           else w:=map_hSize;
+           if(unit_ability_HKeepBlink(pu,map_hSize+g_random(w),map_hSize+g_random(w),false)=0)then exit;
         end;
 
       case map_scenario of
 mc_KotH  : if(ai_choosen)and(base_1r<ai_kpoint_d)and(ai_kpoint_d<NOTSET)and(ai_kpoint_koth)then
            begin
               w:=base_1r;
-              unit_ability_HKeepBlink(pu,ai_kpoint_kp^.cpx+g_random(w),ai_kpoint_kp^.cpx+g_random(w),false);
+              unit_ability_HKeepBlink(pu,ai_kpoint_kp^.kpx+g_random(w),ai_kpoint_kp^.kpx+g_random(w),false);
               exit;
            end;
 mc_royale: if(ai_choosen)
            or(u_royal_d<base_2r)then
            begin
               w:=min2i(g_royal_r div 4,base_2r);
-              unit_ability_HKeepBlink(pu,map_hmw+g_random(w),map_hmw+g_random(w),false);
+              unit_ability_HKeepBlink(pu,map_hSize+g_random(w),map_hSize+g_random(w),false);
               exit;
            end;
       end;
@@ -1515,22 +1504,22 @@ begin
 
       if(ai_kpoint_d<NOTSET)then
         with ai_kpoint_kp^ do
-          if(cpNoBuildR<cpCaptureR)then
-            if(ai_kpoint_d<=cpCaptureR)
+          if(kpNoBuildR<kpCaptureR)then
+            if(ai_kpoint_d<=kpCaptureR)
             then exit
-            else SetBlinkTarget(cpx,cpy,ai_kpoint_d,cpzone);
+            else SetBlinkTarget(kpx,kpy,ai_kpoint_d,kpzone);
 
       if(ai_generator_d<NOTSET)then
         with ai_generator_cp^ do
-          if(cpNoBuildR<cpCaptureR)then
-            if(ai_generator_d<=cpCaptureR)
+          if(kpNoBuildR<kpCaptureR)then
+            if(ai_generator_d<=kpCaptureR)
             then exit
-            else SetBlinkTarget(cpx,cpy,ai_generator_d,cpzone);
+            else SetBlinkTarget(kpx,kpy,ai_generator_d,kpzone);
 
       if(srange<ai_alarm_d)and(ai_alarm_d<NOTSET)then
         SetBlinkTarget(ai_alarm_x,ai_alarm_y,ai_alarm_d,ai_alarm_zone);
 
-      if(map_scenario=mc_royale)then SetBlinkTarget(map_hmw,map_hmw,0,pf_get_area(map_hmw,map_hmw));
+      if(map_scenario=mc_royale)then SetBlinkTarget(map_hSize,map_hSize,0,pf_get_area(map_hSize,map_hSize));
 
       if(bd=NOTSET)then exit;
 
@@ -1549,7 +1538,7 @@ begin
       aiu_alarm_x:=ai_alarm_x;
       aiu_alarm_y:=ai_alarm_y;
    end;
-   //if(pu^.sel)then writeln(ai_inprogress_auid);
+   //if(pu^.isselected)then writeln(ai_inprogress_auid);
 end;
 
 procedure ai_code(pu:PTUnit);
@@ -1635,7 +1624,7 @@ uab_HellVision       : if(ai_need_heye_u<>nil)then
 
       ai_UnitBehaviour(pu,(player^.ai_flags and aif_army_smart_micro)>0);
 
-      if(sel)then
+      if(isselected)then
       begin
 
          {if(ai_teleporterR_u<>nil)then

@@ -70,7 +70,7 @@ begin
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
    AddItem(@map_Size            ,SizeOf(map_Size         ));
-   AddItem(@map_Obstacles       ,SizeOf(map_Obstacles    ));
+   AddItem(@map_ObstaclesF       ,SizeOf(map_ObstaclesF    ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
@@ -178,7 +178,7 @@ begin
       rpls_fstate:=rpls_none;
    end;
    rpls_str_path:='';
-   if(rpls_pstate>=rpls_read)then rpls_pstate:=rpls_none;
+   rpls_pstate:=rpls_none;
    rpls_ReadPosN:=0;
    setlength(rpls_ReadPosl,rpls_ReadPosN);
 end;
@@ -351,7 +351,7 @@ begin
          end;
 
          if(map_Size<map_MinSize)or(map_Size>map_MaxSize)
-         or(map_Obstacles >map_MaxObstacles)
+         or(map_ObstaclesF >map_MaxObstacles)
          or(map_Generators>map_MaxGenerators)
          or not(map_scenario in allmapscenarios)
          or(rpls_player>LastPlayer)then
@@ -391,7 +391,7 @@ begin
          rpls_POVRecorder  :=false;
 
          map_premap;
-         ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
+         ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
 
          ui_Camera_Bounds;
          ui_tab    :=tab_controls;
@@ -534,6 +534,8 @@ begin
 
    replay_Play:=true;
    if(check)then exit;
+
+   GameBack(true,false);
 
    g_type     :=gt_scirmish;
    rpls_pstate:=rpls_read;

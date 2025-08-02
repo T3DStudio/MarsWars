@@ -140,7 +140,7 @@ begin
       puid  :=@g_uids[ouid];
       aTeamDetection:=TeamDetection;
       aTeamVision   :=TeamVision;
-      aselect:=sel;
+      aselect:=isselected;
 
       if(a_units[ouid]<=0)then
       begin
@@ -253,20 +253,20 @@ begin
    end;
 end;
 
-procedure unit_PushFromObstacle(pu:PTUnit;td:PTDoodad);
+procedure unit_PushFromObstacle(pu:PTUnit;td:PTObstacle);
 var t,uds:single;
       ud :integer;
 begin
    with pu^ do
    with uid^ do
    begin
-      t  :=point_dist_real(x,y,td^.x,td^.y);
-      uds:=t-(_r+td^.r);
+      t  :=point_dist_real(x,y,td^.o_x,td^.o_y);
+      uds:=t-(_r+td^.o_r);
       ud :=round(uds);
 
       if(uds<0)then
       begin
-         if((td^.x=x)and(td^.y=y))then
+         if((td^.o_x=x)and(td^.o_y=y))then
          begin
             case g_random(4) of
             0: unit_SetXY(pu,x-ud,y   ,mvxy_none);
@@ -275,8 +275,8 @@ begin
             3: unit_SetXY(pu,x   ,y+ud,mvxy_none);
             end;
          end
-         else unit_SetXY(pu,x+round(ud*(td^.x-x)/t)+g_randomr(2),
-                            y+round(ud*(td^.y-y)/t)+g_randomr(2),mvxy_none);
+         else unit_SetXY(pu,x+round(ud*(td^.o_x-x)/t)+g_randomr(2),
+                            y+round(ud*(td^.o_y-y)/t)+g_randomr(2),mvxy_none);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -285,7 +285,7 @@ begin
 
          if(uo_id=ua_psability)then exit;
 
-         ud:=point_dist_rint(uo_x,uo_y,td^.x,td^.y)-_r-td^.r;
+         ud:=point_dist_rint(uo_x,uo_y,td^.o_x,td^.o_y)-_r-td^.o_r;
          if(ud<=0)then
          begin
             uo_x:=x;
@@ -310,10 +310,10 @@ begin
 
    if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
     with map_ObstaclesGrid[dx,dy] do
-     if(n>0)then
-      for i:=0 to n-1 do
-       with l[i]^ do
-        if(r>0)and(t>0)then unit_PushFromObstacle(pu,l[i]);
+     if(oc_n>0)then
+      for i:=0 to oc_n-1 do
+       with oc_l[i]^ do
+        if(o_r>0)and(o_type>0)then unit_PushFromObstacle(pu,oc_l[i]);
 end;
 
 procedure unit_move(pu:PTUnit);
@@ -762,11 +762,11 @@ begin
    with pu^ do
     for i:=0 to LastKeyPoint do
      with g_KeyPoints[i] do
-      if(cpCaptureR>0)then
-       if(point_dist_int(x,y,cpx,cpy)<=cpCaptureR)then
+      if(kpCaptureR>0)then
+       if(point_dist_int(x,y,kpx,kpy)<=kpCaptureR)then
        begin
-          cpUnitsPlayer[playeri     ]+=uid^._limituse;
-          cpUnitsTeam  [player^.team]+=uid^._limituse;
+          kpUnitsPlayer[playeri     ]+=uid^._limituse;
+          kpUnitsTeam  [player^.team]+=uid^._limituse;
        end;
 end;
 
@@ -808,7 +808,7 @@ begin
       u_royal_d :=NOTSET;
       if(map_scenario=mc_royale)then
       begin
-         u_royal_cd:=point_dist_int(x,y,map_hmw,map_hmw);
+         u_royal_cd:=point_dist_int(x,y,map_hSize,map_hSize);
          u_royal_d :=g_royal_r-u_royal_cd;
          if(u_royal_d<_missile_r)then
          begin
@@ -825,7 +825,7 @@ begin
 
       pushout      := solid and unit_canMove(pu) and (a_rld<=0);
       attack_target:= unit_canAttack(pu,false);
-      aicode       := (state=ps_AI);//and(sel);
+      aicode       := (state=ps_AI);//and(isselected);
       fteleport_tar:= (not IsUnitRange(uo_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
       puo:=nil;
@@ -836,7 +836,7 @@ uab_Teleport      : swtarget:=true;
         end;
 
       aiu_InitVars(pu);
-      if(aicode){or(sel)}then
+      if(aicode){or(isselected)}then
       begin
          ai_InitVars(pu);
          ai_CollectData(pu,pu,0,nil);
@@ -863,7 +863,7 @@ uab_Teleport      : swtarget:=true;
             if(attack_target)then unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
 
             aiu_CollectData(pu,tu,ud,tu_transport);
-            if(aicode){or(sel)}then ai_CollectData(pu,tu,ud,tu_transport);
+            if(aicode){or(isselected)}then ai_CollectData(pu,tu,ud,tu_transport);
 
             if(tu^.hits>0)and(tu_transport=nil)then
             begin
@@ -1755,25 +1755,25 @@ begin
    end;
 end;
 
-function unit_sability(pu:PTUnit;check:boolean):cardinal;
+function unit_sability(pCaster:PTUnit;check:boolean):cardinal;
 begin
    unit_sability:=ureq_unknown;
 
-   if(not ui_ability(pu,false)) then exit;
+   if(not ui_ability(pCaster,false)) then exit;
 
-   unit_sability:=unit_AbilityBasicChecks(pu);
+   unit_sability:=unit_AbilityBasicChecks(pCaster);
    if(unit_sability>0)then exit;
 
-   with pu^ do
+   with pCaster^ do
    with uid^ do
    with player^ do
    case _ability of
-   uab_RebuildInPoint  : unit_sability:=unit_rebuild(pu,true);
+   uab_RebuildInPoint  : unit_sability:=unit_rebuild(pCaster,true);
    uab_SpawnLost       : if(buffs[ub_Cast]>0)
                          or(buffs[ub_CCast]>0)then unit_sability:=ureq_reloading;
    uab_CCFly           : if(zfall<>0)
                          or(buffs[ub_CCast]>0)then unit_sability:=ureq_reloading;
-   uab_ToUACDron       : unit_sability:=unit_morph(pu,uid_UACDron,false,g_uids[uid_UACDron]._hmhits,0,true);
+   uab_ToUACDron       : unit_sability:=unit_morph(pCaster,uid_UACDron,false,g_uids[uid_UACDron]._hmhits,0,true);
    uab_Unload          : if(transportC=0)
                          or(transportM=0)then unit_sability:=ureq_unknown;
    else  unit_sability:=ureq_unknown;
@@ -1781,42 +1781,43 @@ begin
 
    if(check)or(unit_sability>0)then exit;
 
-   with pu^ do
+   with pCaster^ do
    with uid^ do
    with player^ do
    case _ability of
-   uab_RebuildInPoint  : unit_rebuild(pu,false);
+   uab_RebuildInPoint  : unit_rebuild(pCaster,false);
    uab_SpawnLost       : begin
                             buffs[ub_Cast ]:=fr_fpsd2;
                             buffs[ub_CCast]:=fr_fps2;
                             if(upgr[upgr_hell_phantoms]>0)
-                            then ability_unit_spawn(pu,UID_Phantom )
-                            else ability_unit_spawn(pu,UID_LostSoul);
+                            then ability_unit_spawn(pCaster,UID_Phantom )
+                            else ability_unit_spawn(pCaster,UID_LostSoul);
                          end;
    uab_CCFly           : if(level>0)
                          then level:=0
                          else level:=1;
-   uab_ToUACDron       : unit_morph(pu,uid_UACDron,false,g_uids[uid_UACDron]._hmhits,0,false);
+   uab_ToUACDron       : unit_morph(pCaster,uid_UACDron,false,g_uids[uid_UACDron]._hmhits,0,false);
    uab_Unload          : uo_id:=ua_unload;
    end;
 end;
 
-function unit_pability(pu:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;
+function unit_pability(pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;
 begin
    unit_pability:=ureq_unknown;
 
-   if(not ui_ability(pu,true )) then exit;
+   if(not ui_ability(pCaster,true )) then exit;
 
-   unit_pability:=unit_AbilityBasicChecks(pu);
+   unit_pability:=unit_AbilityBasicChecks(pCaster);
    if(unit_pability>0)then exit;
 
-   with pu^ do
+   with pCaster^ do
    with uid^ do
    with player^ do
    case _ability of
-   uab_Teleport        : ;
-   uab_UACScan         : unit_pability:=unit_ability_UACScan    (pu,tarx,tary  ,true);
-   uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pu,tarx,tary  ,true);
+   uab_Teleport        : if(upgr[upgr_hell_rteleport]<=0)then
+                           unit_pability:=ureq_rupid;
+   uab_UACScan         : unit_pability:=unit_ability_UACScan    (pCaster,tarx,tary  ,true);
+   uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pCaster,tarx,tary  ,true);
    uab_HTowerBlink     : ;
    uab_HKeepBlink      :;
    uab_RebuildInPoint  :;
@@ -1832,28 +1833,28 @@ begin
 
    if(check)or(unit_pability>0)then exit;
 
-   with pu^ do
+   with pCaster^ do
    with uid^ do
    with player^ do
    case _ability of
-   uab_Teleport        : unit_pability:=unit_ability_Recall(pu,taru,NOTSET,false);
-   uab_UACScan         : unit_pability:=unit_ability_UACScan    (pu,tarx,tary  ,false);
-   uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pu,tarx,tary  ,false);
-   uab_HTowerBlink     : unit_pability:=unit_ability_HTowerBlink(pu,tarx,tary  ,false);
-   uab_HKeepBlink      : unit_pability:=unit_ability_HKeepBlink (pu,tarx,tary  ,false);
-   uab_HInvulnerability: unit_pability:=unit_ability_HInvuln    (pu,taru       ,false);
-   uab_HellVision      : unit_pability:=unit_ability_HellVision (pu,taru       ,false);
+   uab_Teleport        : unit_pability:=unit_ability_Recall     (pCaster,taru,NOTSET,false);
+   uab_UACScan         : unit_pability:=unit_ability_UACScan    (pCaster,tarx,tary  ,false);
+   uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pCaster,tarx,tary  ,false);
+   uab_HTowerBlink     : unit_pability:=unit_ability_HTowerBlink(pCaster,tarx,tary  ,false);
+   uab_HKeepBlink      : unit_pability:=unit_ability_HKeepBlink (pCaster,tarx,tary  ,false);
+   uab_HInvulnerability: unit_pability:=unit_ability_HInvuln    (pCaster,taru       ,false);
+   uab_HellVision      : unit_pability:=unit_ability_HellVision (pCaster,taru       ,false);
    uab_CCFly           : if(speed>0)
-                         then unit_SetDefaultUO(pu,ua_psability,0,tarx,tary-fly_hz,-1,-1,true ,false)
+                         then unit_SetDefaultUO(pCaster,ua_psability,0,tarx,tary-fly_hz,-1,-1,true ,false)
                          else
                          begin
-                            unit_pability:=unit_sability(pu,false);
+                            unit_pability:=unit_sability(pCaster,false);
                             if(unit_pability=0)then
-                            unit_SetDefaultUO(pu,ua_psability,0,tarx,tary-fly_hz,-1,-1,true,true);
+                            unit_SetDefaultUO(pCaster,ua_psability,0,tarx,tary-fly_hz,-1,-1,true,true);
                          end;
    uab_SpawnLost,
    uab_RebuildInPoint,
-   uab_Unload          : unit_SetDefaultUO(pu,ua_psability,0,tarx,tary,-1,-1,true,false);
+   uab_Unload          : unit_SetDefaultUO(pCaster,ua_psability,0,tarx,tary,-1,-1,true,false);
    end;
 end;
 
@@ -1922,8 +1923,8 @@ end;
 
 procedure GameObjectsCode;
 var u : integer;
-    pu,
-    transportu: PTUnit;
+pu,
+transportu: PTUnit;
 begin
    for u:=1 to MaxUnits do
    begin
@@ -1938,7 +1939,7 @@ begin
 
          if(hits>0)then
          begin
-            unit_Bonuses (pu);
+            unit_Bonuses(pu);
             unit_order(pu);
 
             if(hits<=0)then continue;

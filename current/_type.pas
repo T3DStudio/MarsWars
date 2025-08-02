@@ -345,8 +345,8 @@ TUID = record
    _ability,
    _ability_rupgr,
    _ability_rupgrl,
-   _ability_ruid,
-   _attack      : byte;
+   _ability_ruid: byte;
+   _attack      : boolean;
    _barrack_teleport,
    _slowturn,
    _ukbuilding,
@@ -655,7 +655,7 @@ TUnit = record
    ukfloater,
    iscomplete,
    solid,
-   sel      : boolean;
+   isselected      : boolean;
 
    aiu_FiledSquareNear,
    aiu_limitaround_ally,
@@ -693,43 +693,51 @@ PTUnit = ^TUnit;
 PPTUnit = ^PTUnit;
 
 TKeyPoint = record
-   cpx ,cpy ,
-   cpsolidr,cpCaptureR,cpNoBuildR,
-   cp_ToCenterD,
-   cpmx,cpmy,cpmr,
-   cpenergy,
-   cpCaptureTime,
-   cpTimer      : integer;
-   cplifetime   : cardinal;
-   cpTimerOwnerTeam,
-   cpTimerOwnerPlayer,
-   cpOwnerPlayer,
-   cpOwnerTeam  : byte;
-   cpzone       : word;
-   cpunitst_pstate,
-   cpUnitsTeam,
-   cpunitsp_pstate,
-   cpUnitsPlayer     : array[0..LastPlayer] of longint;
+   kpx ,kpy ,
+   kpSolidr,kpCaptureR,kpNoBuildR,
+   kpToCenterD,
+   kpmmx,kpmmy,kpmmr,
+   kpEnergy,
+   kpCaptureTime,
+   kpTimer      : integer;
+   kplifetime   : cardinal;
+   kpTimerOwnerTeam,
+   kpTimerOwnerPlayer,
+   kpOwnerPlayer,
+   kpOwnerTeam  : byte;
+   kpzone       : word;
+   kpunitst_pstate,
+   kpUnitsTeam,
+   kpunitsp_pstate,
+   kpUnitsPlayer     : array[0..LastPlayer] of longint;
 end;
 pTKeyPoint = ^TKeyPoint;
 
-TDoodad = record
-   x,y,r :integer;
-   t     :byte;
+TObstacle = record
+   o_x,
+   o_y,
+   o_r    : integer;
+   o_type : byte;
 
    {$IFDEF _FULLGAME}
-   animn,animt,
-   depth,shadowz,ox,oy,
-   mmx,mmy,mmr :integer;
-   mmc         :cardinal;
-   sprite,
-   back_sprite :PTMWTexture;
+   o_animn,
+   o_animt,
+   o_SpriteDepth,
+   o_ShadowZ,
+   o_OffsetX,
+   o_OffsetY,
+   o_mmx,
+   o_mmy,
+   o_mmr  : integer;
+   o_mmc  : cardinal;
+   o_FrontSprite,
+   o_BackSprite : PTMWTexture;
    {$ENDIF}
 end;
-PTDoodad = ^TDoodad;
-TDCell = record
-   n:integer;
-   l:array of PTDoodad;
+PTObstacle = ^TObstacle;
+TObstacleCell = record
+   oc_n:integer;
+   oc_l:array of PTObstacle;
 end;
 
 

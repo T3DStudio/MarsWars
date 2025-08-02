@@ -131,12 +131,12 @@ end;
 procedure map_MinimapBackgroundObj(sd:TSob);
 var d:integer;
 begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t in sd)then
-      if(mmr>0)
-      then FilledcircleColor(ui_bminimap,mmx,mmy,mmr,mmc)
-      else pixelColor       (ui_bminimap,mmx,mmy,    mmc);
+   for d:=1 to MaxObstacles do
+    with map_ObstaclesL[d] do
+     if(o_type in sd)then
+      if(o_mmr>0)
+      then FilledcircleColor(ui_bminimap,o_mmx,o_mmy,o_mmr,o_mmc)
+      else pixelColor       (ui_bminimap,o_mmx,o_mmy,    o_mmc);
 end;
 
 procedure map_MinimapUpdateBackground;
@@ -158,25 +158,26 @@ var p    :byte;
     color:cardinal;
     pc   :char;
 begin
-   for p:=0 to LastPlayer do
-   begin
-      if(g_FixedPositions)then
-      begin
-         if(g_players[p].state=ps_none)and(g_AISlots=0)then continue;
-         color:=PlayerGetColor(p,false);
-         pc:=i2s(p+1)[1];
-      end
-      else
-      begin
-         pc:='?';
-         color:=c_white;
-      end;
+   if(map_MaxPlayers>0)then
+     for p:=0 to map_MaxPlayers-1 do
+     begin
+        if(g_FixedPositions)then
+        begin
+           if(g_players[p].state=ps_none)and(g_AISlots=0)then continue;
+           color:=PlayerGetColor(p,false);
+           pc:=i2s(p+1)[1];
+        end
+        else
+        begin
+           pc:='?';
+           color:=c_white;
+        end;
 
-      x:=round(map_psx[p]*map_mmcx);
-      y:=round(map_psy[p]*map_mmcx);
+        x:=round(map_PlayerStartX[p]*map_mmcx);
+        y:=round(map_PlayerStartY[p]*map_mmcx);
 
-      map_minimap_KeyPoint(tar,x,y,trunc(base_1r*map_mmcx),pc,color);
-   end;
+        map_minimap_KeyPoint(tar,x,y,trunc(base_1r*map_mmcx),pc,color);
+     end;
 end;
 
 procedure map_MinimapKeyPoints(tar:pSDL_Surface);
@@ -184,13 +185,13 @@ var i  :byte;
 begin
    for i:=0 to LastKeyPoint do
     with g_KeyPoints[i] do
-     if(cpCaptureR>0)then
+     if(kpCaptureR>0)then
       if((i=0)and(map_scenario=mc_KotH))
-      then map_minimap_KeyPoint(tar,cpmx,cpmy,cpmr,char_koth,c_white)
+      then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_koth,c_white)
       else
-        if(cpenergy<=0)
-        then map_minimap_KeyPoint(tar,cpmx,cpmy,cpmr,char_kp ,c_white)
-        else map_minimap_KeyPoint(tar,cpmx,cpmy,cpmr,char_gen,c_white);
+        if(kpEnergy<=0)
+        then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_kp ,c_white)
+        else map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_gen,c_white);
 end;
 
 procedure map_RedrawMenuMinimap;

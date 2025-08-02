@@ -36,19 +36,19 @@ var i:byte;
 begin
    for i:=0 to LastPlayer do
    begin
-      map_psx[i]:=-5000;
-      map_psy[i]:=-5000;
+      map_PlayerStartX[i]:=-5000;
+      map_PlayerStartY[i]:=-5000;
    end;
 end;
 procedure cmp_SetPStart(p:byte;px,py:integer);
 begin
-   map_psx[p]:=px;
-   map_psy[p]:=py;
+   map_PlayerStartX[p]:=px;
+   map_PlayerStartY[p]:=py;
 end;
 procedure cmp_SetPStartMir(p1,p2:byte);
 begin
-   map_psx[p1]:=map_Size-map_psx[p2];
-   map_psy[p1]:=map_Size-map_psy[p2];
+   map_PlayerStartX[p1]:=map_Size-map_PlayerStartX[p2];
+   map_PlayerStartY[p1]:=map_Size-map_PlayerStartY[p2];
 end;
 procedure cmp_FillPStartsCircle(pstart,pnum:byte;cx,cy,cr,cd:integer);
 var p:byte;
@@ -62,8 +62,8 @@ begin
 
    for p:=1 to pnum do
    begin
-      map_psx[pstart]:=cx+round(cr*cos(ddir*DEGTORAD));
-      map_psy[pstart]:=cy+round(cr*sin(ddir*DEGTORAD));
+      map_PlayerStartX[pstart]:=cx+round(cr*cos(ddir*DEGTORAD));
+      map_PlayerStartY[pstart]:=cy+round(cr*sin(ddir*DEGTORAD));
       ddir  +=dstep;
       pstart+=1;
       if(pstart>LastPlayer)then break;
@@ -89,17 +89,18 @@ begin
    cmp_data_b2:= 0;
    cmp_data_b3:= 0;
    cmp_data_c1:= 0;
+   g_type:=gt_campaing;
 
    g_DefeatedObs:=false;
    case cmp_sel of
 0  : begin
-        map_scenario      :=mc_scirmish;
+        map_scenario      :=mc_ffa8;
         map_generators:=0;
         map_seed    :=666;
         map_Size      :=4000;
-        map_Obstacles     :=4;
+        map_ObstaclesF     :=4;
         map_Symmetry:=false;
-        map_vars;
+        map_BaseVars;
 
         LocalPlayer :=0;
         UIPlayer:=0;
@@ -111,18 +112,18 @@ begin
         cmp_SetPStart(1,map_Size div 4,map_Size div 3);
         cmp_SetPStartMir(4,1);
 
-        cmp_CreateUnit(LocalPlayer,map_psx[LocalPlayer],map_psy[LocalPlayer],UID_HKeep);
+        cmp_CreateUnit(LocalPlayer,map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer],UID_HKeep);
 
-        cmp_CreateUnit(4,map_psx[4]-150,map_psy[4]-150,UID_UCommandCenter);
-        cmp_CreateUnit(4,map_psx[4]+150,map_psy[4]+150,UID_UPortal);
+        cmp_CreateUnit(4,map_PlayerStartX[4]-150,map_PlayerStartY[4]-150,UID_UCommandCenter);
+        cmp_CreateUnit(4,map_PlayerStartX[4]+150,map_PlayerStartY[4]+150,UID_UPortal);
 
         PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HTower,
                                         UID_Imp,UID_Demon], MaxUnits,true);
      end;
    end;
 
-   Map_premap(true);
-   ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
+   Map_premap;
+   ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
 end;
 
 procedure cmp_MissionCode;

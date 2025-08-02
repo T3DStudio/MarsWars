@@ -18,29 +18,29 @@ end;
 procedure DoodadAnimation(d:integer;sprl:PTUSpriteList;anml:PTThemeAnimL;lst:PTIntList;lstn:pinteger;first:boolean);
 begin
    if(lstn^>0)then
-    with map_dds[d] do
-     if(animt>0)or(first)then
+    with map_ObstaclesL[d] do
+     if(o_animt>0)or(first)then
      begin
-        animt-=1;
-        if(animt<=0)then
+        o_animt-=1;
+        if(o_animt<=0)then
         begin
-           if(animn<0)or(first)then
+           if(o_animn<0)or(first)then
            begin
-              animn:= d mod lstn^;
-              animn:= lst^[animn];
+              o_animn:= d mod lstn^;
+              o_animn:= lst^[o_animn];
            end
            else
            begin
-              animn:=anml^[animn].anext;
+              o_animn:=anml^[o_animn].anext;
            end;
-           animt  :=DoodadAnimationTime(anml^[animn].atime);
-           shadowz:= anml^[animn].sh;
-           ox     := anml^[animn].xo;
-           oy     := anml^[animn].yo;
-           sprite :=@sprl^[animn];
-           {case anml^[animn].depth of
-           0    : depth :=y;                     ?????????????????????
-           else   depth :=anml^[animn].depth;
+           o_animt  :=DoodadAnimationTime(anml^[o_animn].atime);
+           o_ShadowZ:= anml^[o_animn].sh;
+           o_OffsetX     := anml^[o_animn].xo;
+           o_OffsetY     := anml^[o_animn].yo;
+           o_FrontSprite :=@sprl^[o_animn];
+           {case anml^[o_animn].depth of
+           0    : o_SpriteDepth :=o_y;                     ?????????????????????
+           else   o_SpriteDepth :=anml^[o_animn].depth;
            end;}
         end;
      end;
@@ -49,42 +49,42 @@ end;
 procedure doodads_sprites(noanim:boolean);
 var d,ro:integer;
 begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t>0)then
-     if(RectInCam(x,y,r,r,0))then
+   for d:=1 to MaxObstacles do
+    with map_ObstaclesL[d] do
+     if(o_type>0)then
+     if(RectInCam(o_x,o_y,o_r,o_r,0))then
      begin
         ro:=0;
         with g_players[LocalPlayer] do
           case m_brush of
-1..255         : ro:=r-bld_dec_mr;
+1..255         : ro:=o_r-bld_dec_mr;
 co_pability    : if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^._ability of
                   uab_RebuildInPoint,
                   uab_HTowerBlink,
                   uab_HKeepBlink,
-                  uab_CCFly         : ro:=r-bld_dec_mr;
+                  uab_CCFly         : ro:=o_r-bld_dec_mr;
                   end;
           end;
 
-        if(not noanim)or(sprite=pspr_dummy)then
-          case t of
+        if(not noanim)or(o_FrontSprite=pspr_dummy)then
+          case o_type of
           DID_LiquidR1,
           DID_LiquidR2,
           DID_LiquidR3,
           DID_LiquidR4 : if(theme_liquid_animt<2)
-                         then sprite:=@spr_liquid[((g_tick div theme_liquid_animm) mod LiquidAnim)+1,animn]
-                         else sprite:=@spr_liquid[1                                                 ,animn];
+                         then o_FrontSprite:=@spr_liquid[((g_tick div theme_liquid_animm) mod LiquidAnim)+1,o_animn]
+                         else o_FrontSprite:=@spr_liquid[1                                                 ,o_animn];
           DID_Other    : DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
           DID_SRock    : DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
           DID_BRock    : DoodadAnimation(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
           end;
 
-        if(RectInCam(x+ox,y+oy,sprite^.hw,sprite^.hh,0))then
+        if(RectInCam(o_x+o_OffsetX,o_y+o_OffsetY,o_FrontSprite^.hw,o_FrontSprite^.hh,0))then
         begin
-           SpriteListAddDoodad(x,y,depth,shadowz,sprite,255,ox,oy);
-           if(back_sprite<>nil)then SpriteListAddDoodad(x,y,sd_liquid_back,-32000,back_sprite,255,ox,oy);
-           if(ro>0)then UnitsInfoAddCircle(x,y,ro,ui_blink2_color_BY);
+           SpriteListAddDoodad(o_x,o_y,o_SpriteDepth,o_ShadowZ,o_FrontSprite,255,o_OffsetX,o_OffsetY);
+           if(o_BackSprite<>nil)then SpriteListAddDoodad(o_x,o_y,sd_liquid_back,-32000,o_BackSprite,255,o_OffsetX,o_OffsetY);
+           if(ro>0)then UnitsInfoAddCircle(o_x,o_y,ro,ui_blink2_color_BY);
         end;
      end;
 end;
@@ -92,50 +92,50 @@ end;
 procedure map_DoodadsDrawData;
 var d:integer;
 begin
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t>0)then
+   for d:=1 to MaxObstacles do
+    with map_ObstaclesL[d] do
+     if(o_type>0)then
      begin
-        shadowz:= -32000;
-        depth  :=0;
-        animn  := -1;
-        animt  := 0;
-        ox     := 0;
-        oy     := 0;
-        sprite := pspr_dummy;
-        back_sprite:=nil;
+        o_ShadowZ:= -32000;
+        o_SpriteDepth  :=0;
+        o_animn  := -1;
+        o_animt  := 0;
+        o_OffsetX     := 0;
+        o_OffsetY     := 0;
+        o_FrontSprite := pspr_dummy;
+        o_BackSprite:=nil;
 
-        case t of
+        case o_type of
         DID_LiquidR1,
         DID_LiquidR2,
         DID_LiquidR3,
         DID_LiquidR4: begin
-                         depth  := sd_liquid;
-                         mmc    := theme_liquid_color;
-                         animn  := t;
-                         back_sprite := @spr_liquidb[animn];
+                         o_SpriteDepth  := sd_liquid;
+                         o_mmc    := theme_liquid_color;
+                         o_animn  := o_type;
+                         o_BackSprite := @spr_liquidb[o_animn];
                       end;
         DID_Srock  :  begin
-                         depth  := sd_srocks+y;
-                         mmc    := c_dgray;
+                         o_SpriteDepth  := sd_srocks+o_y;
+                         o_mmc    := c_dgray;
                          DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,true);
                       end;
         DID_Brock  :  begin
-                         depth  := sd_brocks+y;
-                         mmc    := c_dgray;
+                         o_SpriteDepth  := sd_brocks+o_y;
+                         o_mmc    := c_dgray;
                          DoodadAnimation(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,true);
                       end;
         DID_other  :  begin
-                         depth  := sd_ground+y;
-                         shadowz:= 0;
-                         mmc    := c_gray;
+                         o_SpriteDepth  := sd_ground+o_y;
+                         o_ShadowZ:= 0;
+                         o_mmc    := c_gray;
                          DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,true);
                       end;
         end;
 
-        mmx:=round(x*map_mmcx);
-        mmy:=round(y*map_mmcx);
-        mmr:=max2i(1,round(r*map_mmcx));
+        o_mmx:=round(o_x*map_mmcx);
+        o_mmy:=round(o_y*map_mmcx);
+        o_mmr:=max2i(1,round(o_r*map_mmcx));
      end;
 end;
 

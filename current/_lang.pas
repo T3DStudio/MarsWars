@@ -582,7 +582,7 @@ begin
   with g_uids[uid] do
   begin
      weapons_str:='';
-     if(_attack=atm_always)then
+     if(_attack)then
       for w:=0 to MaxUnitWeapons do
        with _a_weap[w] do
         STRADD(@weapons_str,str_MakeWeaponString(uid,w,docSTR),sep_sdots);
@@ -910,19 +910,28 @@ begin
    str_map_Symmetry              := 'Symmetric';
    str_map_Random                := 'Random map';
    str_map_Scenario              := 'Scenario';
-   str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Skirmish'    +tc_default;
+   str_map_ScenarioL[mc_ffa3    ]:= tc_lime  +'FFA(3)'      +tc_default;
+   str_map_ScenarioL[mc_ffa4    ]:= tc_lime  +'FFA(4)'      +tc_default;
+   str_map_ScenarioL[mc_ffa5    ]:= tc_lime  +'FFA(5)'      +tc_default;
+   str_map_ScenarioL[mc_ffa6    ]:= tc_lime  +'FFA(6)'      +tc_default;
+   str_map_ScenarioL[mc_ffa7    ]:= tc_lime  +'FFA(7)'      +tc_default;
+   str_map_ScenarioL[mc_ffa8    ]:= tc_lime  +'FFA(8)'      +tc_default;
+   str_map_ScenarioL[mc_1x1     ]:= tc_yellow+'1x1'         +tc_default;
+   str_map_ScenarioL[mc_2x2     ]:= tc_yellow+'2x2'         +tc_default;
+   str_map_ScenarioL[mc_3x3     ]:= tc_yellow+'3x3'         +tc_default;
    str_map_ScenarioL[mc_4x4     ]:= tc_yellow+'4x4'         +tc_default;
+   str_map_ScenarioL[mc_2x2x2   ]:= tc_orange+'2x2x2'       +tc_default;
    str_map_ScenarioL[mc_2x2x2x2 ]:= tc_orange+'2x2x2x2'     +tc_default;
-   str_map_ScenarioL[mc_capture ]:= tc_purple+'Key points'  +tc_default;
-   str_map_ScenarioL[mc_KotH    ]:= tc_purple+'KotH'        +tc_default;
+   str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Key points'  +tc_default;
+   str_map_ScenarioL[mc_KotH    ]:= tc_aqua  +'KotH'        +tc_default;
    str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
    str_map_Generators            := 'Generators';
-   str_map_GeneratorsL[0]        := 'no';
-   str_map_GeneratorsL[1]        := '5 min';
-   str_map_GeneratorsL[2]        := '10 min';
-   str_map_GeneratorsL[3]        := '15 min';
-   str_map_GeneratorsL[4]        := '20 min';
-   str_map_GeneratorsL[5]        := 'infinity';
+   str_map_GeneratorsL[mapg_no ] := 'no';
+   str_map_GeneratorsL[mapg_5  ] := '5 min';
+   str_map_GeneratorsL[mapg_10 ] := '10 min';
+   str_map_GeneratorsL[mapg_15 ] := '15 min';
+   str_map_GeneratorsL[mapg_20 ] := '20 min';
+   str_map_GeneratorsL[mapg_inf] := 'infinity';
 
    str_FileError_NExists         := 'File not'+tc_nl3+'exists!';
    str_FileError_Open            := 'Can`t open'+tc_nl3+'file!';
@@ -1500,11 +1509,20 @@ begin
   str_map_Random        := 'Случайная карта';
 
   str_map_Scenario              := 'Сценарий';
-  str_map_ScenarioL[mc_scirmish]:= tc_lime  +'Схватка'          +tc_default;
-  str_map_ScenarioL[mc_4x4     ]:= tc_orange+'3x3'              +tc_default;
-  str_map_ScenarioL[mc_2x2x2x2   ]:= tc_yellow+'2x2x2'            +tc_default;
+  str_map_ScenarioL[mc_ffa3    ]:= tc_lime  +'Схватка(3)'       +tc_default;
+  str_map_ScenarioL[mc_ffa4    ]:= tc_lime  +'Схватка(4)'       +tc_default;
+  str_map_ScenarioL[mc_ffa5    ]:= tc_lime  +'Схватка(5)'       +tc_default;
+  str_map_ScenarioL[mc_ffa6    ]:= tc_lime  +'Схватка(6)'       +tc_default;
+  str_map_ScenarioL[mc_ffa7    ]:= tc_lime  +'Схватка(7)'       +tc_default;
+  str_map_ScenarioL[mc_ffa8    ]:= tc_lime  +'Схватка(8)'       +tc_default;
+  str_map_ScenarioL[mc_1x1     ]:= tc_yellow+'1x1'              +tc_default;
+  str_map_ScenarioL[mc_2x2     ]:= tc_yellow+'2x2'              +tc_default;
+  str_map_ScenarioL[mc_3x3     ]:= tc_yellow+'3x3'              +tc_default;
+  str_map_ScenarioL[mc_4x4     ]:= tc_yellow+'4x4'              +tc_default;
+  str_map_ScenarioL[mc_2x2x2   ]:= tc_orange+'2x2x2'            +tc_default;
+  str_map_ScenarioL[mc_2x2x2x2 ]:= tc_orange+'2x2x2x2'          +tc_default;
   str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Захват точек'     +tc_default;
-  str_map_ScenarioL[mc_KotH    ]:= tc_purple+'Царь горы'        +tc_default;
+  str_map_ScenarioL[mc_KotH    ]:= tc_aqua  +'Царь горы'        +tc_default;
   str_map_ScenarioL[mc_royale  ]:= tc_red   +'Королевская битва'+tc_default;
 
   str_map_Generators            := 'Генераторы';
@@ -2017,7 +2035,7 @@ begin
 
         writeln(f,RemoveSpecChars(un_txt_uihint4));
 
-        if(_attack=atm_always)then
+        if(_attack)then
         begin
            writeln(f,str_UnitArming);
            for w:=0 to MaxUnitWeapons do

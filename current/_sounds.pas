@@ -565,7 +565,7 @@ begin
    if(snd_command_ticks>0)then snd_command_ticks-=1;
    if(snd_mmap_ticks   >0)then snd_mmap_ticks   -=1;
 
-   if(G_Started)and(G_status=0)and(not MainMenu)
+   if(G_Started)and(G_status=gs_running)and(not MainMenu)
    then SoundPlayUnitSelect;
 end;
 

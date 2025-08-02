@@ -43,20 +43,20 @@ g_random_p        : byte    = 0;
 //  MAP
 //
 
-map_scenario      : byte     = 0;
+map_scenario      : byte     = mc_ffa8;
 map_generators    : byte     = 0;
 map_seed          : cardinal = 1;
 map_Size          : integer  = 5000;
-map_hmw           : integer  = 2500;
-map_decor_gap     : integer  = 40;
-map_b1            : integer  = 0;
-map_Obstacles     : byte     = 1;
+map_hSize         : integer  = 2500;
+map_ObstaclesGap  : integer  = 40;
+map_ObstaclesF    : byte     = 1;
 map_Symmetry      : boolean  = true;
-map_psx           : array[0..LastPlayer] of integer;
-map_psy           : array[0..LastPlayer] of integer;
-map_dds           : array[0..MaxDoodads] of TDoodad;
-map_ddn           : integer = 0;
-map_ObstaclesGrid         : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TDCell;
+map_MaxPlayers    : byte     = MaxPlayers;
+map_PlayerStartX,
+map_PlayerStartY  : array[0..LastPlayer] of integer;
+map_ObstaclesL    : array[0..MaxObstacles] of TObstacle;
+map_ObstaclesN    : integer = 0;
+map_ObstaclesGrid : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TObstacleCell;
 map_pf_lastZone   : word = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,6 +190,9 @@ vid_ShowFPS         : boolean = true;
 
 UIPlayer          : byte = 1;
 
+ui_update_timer   : integer = 0;
+ui_update_now     : boolean = false;
+
 ui_blink_timer1   : integer = 0;
 ui_blink_timer2   : integer = 0;
 
@@ -291,6 +294,7 @@ ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
+ui_uibtn_attack   : integer = 0;   // ui attack buttons
 ui_uibtn_sabilityu: PTUnit  = nil; // ui self ability order unit
 ui_uibtn_sabilityd: integer = integer.MaxValue;
 ui_uibtn_sabilitys: boolean = false;
@@ -300,7 +304,6 @@ ui_uibtn_pabilitys: boolean = false;
 ui_uibtn_rebuildu : PTUnit  = nil; // ui rebuild button
 ui_uibtn_rebuildd : integer = integer.MaxValue;
 ui_uibtn_rebuilds : boolean = false;
-m_UnitTarget          : integer = 0;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_max_color,                                       // unit max count color
@@ -489,6 +492,9 @@ m_btnN            : integer;
 m_DragCamMove     : boolean = false;
 m_RightClickAct   : boolean = true;
 m_mmap_move       : boolean = false;
+
+m_UnitTargetN     : integer = 0;
+m_UnitTargetP     : PTUnit = nil;
 
 
 input_actions     : array[byte] of TInputKey;
@@ -814,7 +820,7 @@ spr_cp_gen        : TMWTexture;
 
 str_ability_name  : array[byte     ] of shortstring;
 str_race          : array[0..r_cnt ] of shortstring;
-str_map_ScenarioL         : array[0..mc_count] of shortstring;
+str_map_ScenarioL : array[0..mc_Last] of shortstring;
 
 str_menu_Campaings,
 str_menu_Tutorials,
@@ -940,8 +946,8 @@ str_GO_FixedStarts,
 str_map_Scenario,
 str_gmsg_PlayerLeft,
 str_gmsg_PlayerSurrender,
-str_gmsg_PlayerDefeat   : shortstring;
-str_map_GeneratorsL   : array[0..map_MaxGenerators] of shortstring;
+str_gmsg_PlayerDefeat      : shortstring;
+str_map_GeneratorsL        : array[0..map_MaxGenerators] of shortstring;
 str_SG_PlayersColorL       : array[0..vid_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL         : array[0..2] of shortstring;
 str_SG_ControlPanelPosL    : array[0..3] of shortstring;

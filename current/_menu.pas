@@ -395,9 +395,11 @@ begin
    for p:=0 to LastPlayer do
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
+      if(p<map_MaxPlayers)then
       menu_Item_Set(mi_Players_State0+p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle  (p,true     ));mtx0+=menu_PlayersStateW;
       menu_Item_Set(mi_Players_Name0 +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSlotEnabled           );mtx0+=menu_PlayersNameW;
       menu_Item_Set(mi_Players_Race0 +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll(p,true     ));mtx0+=menu_PlayersRaceW;
+      if(p<map_MaxPlayers)then
       menu_Item_Set(mi_Players_Team0 +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll(p,true,true));mtx0+=menu_PlayersTeamW;
       menu_Item_Set(mi_Players_Ping0 +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true);
       mty0+=menu_PListLineH;

@@ -8,8 +8,8 @@ procedure unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolea
 procedure unit_Bonuses (pu:PTUnit);forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function unit_sability (pu:PTUnit;check:boolean):cardinal;      forward;
-function unit_pability (pu:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
+function unit_sability (pCaster:PTUnit;check:boolean):cardinal;      forward;
+function unit_pability (pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
 function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;
 function unit_CheckTransport(uTransport,uTarget:PTUnit):boolean;forward;
 
@@ -26,6 +26,8 @@ function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 
 function pf_IfObstacleZone(zone:word):boolean;  forward;
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
+
+procedure GameRemoveAIObservers; forward;
 
 {$IFDEF _FULLGAME}
 procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);  forward;
@@ -744,9 +746,9 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with g_KeyPoints[kpoint] do
-     if(cpenergy>0)
-     then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',cpx,cpy,false)
-     else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',cpx,cpy,false);
+     if(kpEnergy>0)
+     then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kpx,kpy,false)
+     else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kpx,kpy,false);
 end;
 procedure GameLogKeyPointLost(from_player,kpoint:byte);
 begin
@@ -756,16 +758,16 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with g_KeyPoints[kpoint] do
-     if(cpenergy>0)
-     then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',cpx,cpy,false)
-     else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',cpx,cpy,false);
+     if(kpEnergy>0)
+     then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kpx,kpy,false)
+     else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kpx,kpy,false);
 end;
 procedure GameLogKotHControl;
 begin
    if(map_scenario<>mc_KotH)then exit;
 
    with g_KeyPoints[0] do
-     PlayersAddToLog(255,255,lmt_koth_control,0,cpTimerOwnerTeam,'',cpx,cpy,false);
+     PlayersAddToLog(255,255,lmt_koth_control,0,kpTimerOwnerTeam,'',kpx,kpy,false);
 end;
 procedure GameLogNgenExh(from_player,kpoint:byte);
 begin
@@ -775,7 +777,7 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with g_KeyPoints[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',cpx,cpy,false);
+     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kpx,kpy,false);
 end;
 
 procedure PlayerClearLog(playerN:byte);
@@ -822,13 +824,29 @@ end;
 
 function PlayerGetFixedTeams(gm,p:byte):byte;
 begin
-   PlayerGetFixedTeams:=0;
+   PlayerGetFixedTeams:=LastPlayer;
    if(p<=LastPlayer)then
      with g_players[p] do
        case gm of
+mc_1x1     : case p of
+             0,1 : PlayerGetFixedTeams:=p;
+             end;
+mc_2x2     : case p of
+             0..1: PlayerGetFixedTeams:=0;
+             2..3: PlayerGetFixedTeams:=1;
+             end;
+mc_3x3     : case p of
+             0..2: PlayerGetFixedTeams:=0;
+             3..5: PlayerGetFixedTeams:=1;
+             end;
 mc_4x4     : case p of
              0..3: PlayerGetFixedTeams:=0;
              4..7: PlayerGetFixedTeams:=1;
+             end;
+mc_2x2x2   : case p of
+             0,1 : PlayerGetFixedTeams:=0;
+             2,3 : PlayerGetFixedTeams:=1;
+             4,5 : PlayerGetFixedTeams:=2;
              end;
 mc_2x2x2x2 : case p of
              0,1 : PlayerGetFixedTeams:=0;
@@ -836,7 +854,7 @@ mc_2x2x2x2 : case p of
              4,5 : PlayerGetFixedTeams:=2;
              6,7 : PlayerGetFixedTeams:=3;
              end;
-       else        PlayerGetFixedTeams:=p;
+       else  PlayerGetFixedTeams:=p;
        end;
 end;
 
@@ -904,7 +922,7 @@ end;
 function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
    if(map_scenario=mc_royale)
-   then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_hmw,map_hmw)+d)>=g_royal_r
+   then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_hSize,map_hSize)+d)>=g_royal_r
    else g_CheckRoyalBattlePoint:=false;
 end;
 
@@ -1111,7 +1129,7 @@ begin
 
       if(speed          <=0)then exit;
       if(_ukbuilding       )then exit;
-      if(_attack  =atm_none)then exit;
+      if(not _attack       )then exit;
       if(uo_id=ua_psability)
       or(uo_id=ua_hold     )
       or(uo_bx>0           )then exit;
@@ -1402,10 +1420,10 @@ begin
    end;
    if(keyPoint>LastKeyPoint)then exit;
    with g_KeyPoints[keyPoint] do
-     if(cpCaptureR>0)then
-       if(cpTimer>0)and(ui_blink3=0)
-       then GetKeyPointColor:=PlayerGetColor(cpTimerOwnerPlayer,shadow)
-       else GetKeyPointColor:=PlayerGetColor(cpOwnerPlayer     ,shadow);
+     if(kpCaptureR>0)then
+       if(kpTimer>0)and(ui_blink3=0)
+       then GetKeyPointColor:=PlayerGetColor(kpTimerOwnerPlayer,shadow)
+       else GetKeyPointColor:=PlayerGetColor(kpOwnerPlayer     ,shadow);
 end;
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal;POVPlayer:byte):boolean;
@@ -1413,7 +1431,7 @@ var t:byte;
 begin
    GameGetStatus:=false;
 
-   if(G_status>gs_running)then
+   if(G_status<>gs_running)then
    begin
       GameGetStatus:=true;
       if(pstr<>nil)then pstr^:=str_gstat_Unknown;
@@ -1495,6 +1513,7 @@ begin
       if(check)then exit;
 
       MainMenu   :=false;
+      ui_update_now:=false;
       menu_update:=true;
       menu_ItemSelected  :=0;
       if(net_status=ns_none)and(g_Status<=LastPlayer)then
@@ -1551,7 +1570,7 @@ function ui_UnitNeedDrawRange(pu:PTUnit):boolean;
 begin
    with pu^  do
     with uid^ do
-     ui_UnitNeedDrawRange:=(_attack>0)
+     ui_UnitNeedDrawRange:=(_attack)
                          or(_isbuilder and not ukfly)
                          or(_ability=uab_UACScan)
                          or(_ability=uab_HellVision);
@@ -2017,7 +2036,7 @@ begin
    if(vint<map_MinSize)or(map_MaxSize<vint )then exit
                                             else strInfoVar^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl3;
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_Obstacles ));
+   BlockRead(f,vbyte1,sizeof(map_ObstaclesF ));
    if(vbyte1>map_MaxObstacles              )then exit
                                             else strInfoVar^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl3;
 

@@ -95,7 +95,7 @@ begin
    net_writebyte(map_scenario  );
    net_writebyte(map_generators);
    net_writeint (map_Size      );
-   net_writebyte(map_Obstacles );
+   net_writebyte(map_ObstaclesF );
    net_writecard(map_seed      );
    net_writebool(map_Symmetry  );
 
@@ -106,8 +106,8 @@ begin
    if(G_Started)and(not g_FixedPositions)then
      for p:=0 to LastPlayer do
      begin
-        net_writeint(map_psx[p]);
-        net_writeint(map_psy[p]);
+        net_writeint(map_PlayerStartX[p]);
+        net_writeint(map_PlayerStartY[p]);
      end;
 end;
 
@@ -227,7 +227,7 @@ nmid_ClientData  : with g_players[pid] do
                       if(log_n_cl=log_n)then net_logsend_pause:=0;
                    end;
 nmid_pause       : begin
-                      if(G_Status<>gs_running)and(G_Status<=LastPlayer)then
+                      if(G_Status<=LastPlayer)then
                       begin
                          G_Status:=gs_running;
                          GameLogChat(pid,255,str_gmsg_PlayerResumed,false);
@@ -357,7 +357,7 @@ begin
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_generators  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrInt (@map_Size        ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrByte(@map_Obstacles   ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrByte(@map_ObstaclesF   ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrBool(@map_Symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
 
@@ -371,8 +371,8 @@ begin
    if(StartGame)and(not g_FixedPositions)then
      for p:=0 to LastPlayer do
      begin
-        map_psx[p]:=net_readint;
-        map_psy[p]:=net_readint;
+        map_PlayerStartX[p]:=net_readint;
+        map_PlayerStartY[p]:=net_readint;
      end;
 end;
 
@@ -477,7 +477,7 @@ nmid_lobby_info  : begin
                          begin
                             MainMenu  :=false;
                             ServerSide:=false;
-                            ui_Camera_MoveToPoint(map_psx[LocalPlayer],map_psy[LocalPlayer]);
+                            ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
                             if(g_players[LocalPlayer].observer)then
                             begin
                                ui_tab  :=tab_controls;

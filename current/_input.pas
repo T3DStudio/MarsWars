@@ -1,11 +1,4 @@
 
-{function kbState2pct:byte;
-begin
-   kbState2pct:=pct_left;
-   if(InputAction(iact_Control))then kbState2pct:=pct_right;
-   if(InputAction(iact_Alt    ))then kbState2pct:=pct_middle;
-end; }
-
 procedure input_InitDefaultActionHotkeys;
 procedure input_SetAction(aaction:byte;aktype:TInputKeyType;adepend:byte;aktvalue:cardinal);
 begin
@@ -352,7 +345,7 @@ begin
       for i:=1 to MaxUnits do
        with g_units[i] do
         with uid^ do
-         if(hits>0)and(sel)and(playeri=LocalPlayer)then
+         if(hits>0)and(isselected)and(playeri=LocalPlayer)then
          begin
             SelectedAll+=1;
             if(CheckBOrders(g_punits[i]))then
@@ -449,7 +442,7 @@ begin
            net_writeint(s_all);
          for u:=1 to MaxUnits do
            with g_punits[u]^ do
-             if(hits>0)and(sel)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+             if(hits>0)and(isselected)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
                net_writeint(unum);
 
          net_send(net_cl_svip,net_cl_svport);
@@ -469,68 +462,93 @@ begin
    end;
 end;
 
-function _whoInPoint(tx,ty:integer;tt:byte):integer;
-var i,sc:integer;
-  tteam :byte;
-function _ch(up:PTPlayer):boolean;
-begin
-   _ch:=true;
-   case tt of
-   1  : _ch:=up^.team<>tteam;
-   2  : _ch:=up^.team= tteam;
-   3,4: _ch:=up^.pnum= LocalPlayer;
-   end;
-end;
-begin
-   {
-   tt:
-      0 - any
-      1 - enemy, unum
-      2 - own&ally, unum
-      3 - own, uid
-      4 - own, unum
-      5 - any
-   }
-   {sc:=0;
-   with g_players[UIPlayer] do
-   begin
-      sc+=ucl_cs[false];
-      sc+=ucl_cs[true ];
-      tteam:=team;
-   end;
-   _whoInPoint:=0;
-   if(PointInCam(tx,ty))then
-    for i:=1 to MaxUnits do
-     with g_punits[i]^ do
-      if(hits>0)and(transport=0)and(_ch(player))then
-       if(CheckUnitTeamVision(tteam,g_punits[i],false))or(CheckUnitUIVision(g_punits[i]))then
-        if(point_dist_rint(vx,vy,tx,ty)<uid^._r)then
-        begin
-           case tt of
-           1,2: begin
-                   if(playeri=UIPlayer)and(sc=1)and(sel=true)then continue;
-                   _whoInPoint:=i;
-                end;
-           3  : _whoInPoint:=uidi;
-           else _whoInPoint:=i;
-           end;
-           break;
-       end;  }
-end;
 function mouse_BrushTarget(tx,ty,mbrush:integer):integer;
-var u:integer;
+var
+u        : integer;
+btar_pu  : PTUnit;
+w,
+btar_w   : byte;
+pUIPlayer: pTPlayer;
+function GetWeight(pu:PTUnit):byte;
+begin
+   GetWeight:=0;
+   with pu^  do
+   with uid^ do
+   begin
+      if(ukfly)then GetWeight+=1;
+      if(btar_pu<>nil)then
+      begin
+         if(_r<btar_pu^.uid^._r)then GetWeight+=2;
+         if(hits<btar_pu^.hits )then GetWeight+=4;
+      end;
+   end;
+end;
 begin
    mouse_BrushTarget:=0;
 
-   if(PointInCam(tx,ty))then
-    for u:=1 to MaxUnits do
+   if(not PointInCam(tx,ty))then exit;
+
+   if(UIPlayer<=LastPlayer)
+   then pUIPlayer:=@g_players[UIPlayer]
+   else pUIPlayer:=nil;
+
+   if(pUIPlayer<>nil)then
+     case mbrush of
+     1..255,
+     co_patrol,
+     co_apatrol : exit;
+     co_pability: if(ui_uibtn_pabilityu=nil)
+                  then exit
+                  else
+                    case ui_uibtn_pabilityu^.uid^._ability of
+                    uab_Teleport,
+                    uab_HInvulnerability,
+                    uab_HellVision      :;
+                    else exit;
+                    end;
+     end;
+
+   btar_pu:=nil;
+   btar_w :=0;
+
+   for u:=1 to MaxUnits do
      with g_punits[u]^ do
-      if(hits>0)and(not isUnitRange(transport,nil))then
-      begin
-         case mbrush of
-         co_empty  :;
-         end;
-      end;
+       if(hits>0)and(not isUnitRange(transport,nil))then
+       begin
+          with uid^ do
+            if(tx<(vx-_r))or((vx+_r)<tx)
+            or(ty<(vy-_r))or((vy+_r)<ty)then continue;
+          if(not ui_CheckUnitUIPlayerVision(g_punits[u],true))then continue;
+
+          case mbrush of
+          co_empty,
+          co_rcamove,
+          co_rcmove,
+          co_move,
+          co_amove,
+          co_mmark   :; // allowed any units
+          co_pability: if(pUIPlayer<>nil)then
+                         case ui_uibtn_pabilityu^.uid^._ability of
+                         uab_Teleport        : if(player      <>pUIPlayer      )then continue;
+                         uab_HInvulnerability,
+                         uab_HellVision      : if(player^.team<>pUIPlayer^.team)then continue;
+                         else continue;
+                         end;
+          end;
+
+          w:=GetWeight(g_punits[u]);
+
+          if(btar_pu=nil)
+          then
+          else
+            if(w<=btar_w)
+            then continue
+            else ;
+
+          btar_pu:=g_punits[u];
+          btar_w :=w;
+          mouse_BrushTarget:=u;
+       end;
 end;
 
 procedure mouse_BrushCheck(logErrors:boolean);
@@ -814,7 +832,7 @@ end;
 procedure ui_SicpleClick;
 var u:integer;
 begin
-   u:=_whoInPoint(mouse_map_x,mouse_map_y,4);
+   u:=mouse_BrushTarget(mouse_map_x,mouse_map_y,co_empty);
    if(u>0)then ui_UpdateLastSelectedUnit(u);
 end;
 
@@ -859,25 +877,28 @@ begin
 
    mouse_BrushCheck(false);
 
-   m_UnitTarget:=0;
-   if(mouse_select_x0=-1)or(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then
-     case m_brush of
-co_empty   : m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,0);
-co_move    : m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,2);
-co_amove   : m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,1);
-co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
-     else
-     end;
+   m_UnitTargetN:=0;
+   m_UnitTargetP:=nil;
+   if(mouse_select_x0=-1)
+   or(CheckSimpleClick(mouse_select_x0,mouse_select_y0,mouse_map_x,mouse_map_y))then
+   begin
+      m_UnitTargetN:=mouse_BrushTarget(mouse_map_x,mouse_map_y,m_brush);
+      if(m_UnitTargetN>0)then
+        m_UnitTargetP:=g_punits[m_UnitTargetN];
+   end;
 
    if(InputActionPressed(iact_MLB))then                // LMB down
      case m_focus of
      mf_map     : case m_brush of
-                  co_empty  : if(InputAction(iact_Control))or(InputActionDPressed(iact_MLB))
-                              then units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,_whoInPoint(mouse_map_x,mouse_map_y,3))
+                  co_empty  : if(m_UnitTargetP<>nil)and( (InputAction(iact_Control))or(InputActionDPressed(iact_MLB)) )then
+                              begin
+                                 if(m_UnitTargetP^.playeri=UIPlayer)then
+                                   units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi);
+                              end
                               else
                               begin
-                                 if(m_UnitTarget>0)then
-                                   if(d_UpdateUIPlayer(m_UnitTarget))then exit;
+                                 if(m_UnitTargetP<>nil)then
+                                   if(d_UpdateUIPlayer(m_UnitTargetN))then exit;
                                  mouse_select_x0:=mouse_map_x;
                                  mouse_select_y0:=mouse_map_y;
                               end;
@@ -888,7 +909,7 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
                   co_move,
                   co_amove,
                   co_patrol,
-                  co_apatrol: ui_command(m_brushx,m_brushy,m_UnitTarget);
+                  co_apatrol: ui_command(m_brushx,m_brushy,m_UnitTargetN);
                   co_mmark  : MapMarker (mouse_map_x,mouse_map_y);
                   end;
      mf_minimap : case m_brush of
@@ -896,7 +917,7 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
                   co_move,
                   co_amove,
                   co_patrol,
-                  co_apatrol : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTarget);
+                  co_apatrol : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTargetN);
                   co_mmark   : MapMarker (trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx));
                   else         if(not rpls_POVRecorder)then m_mmap_move:=true;
                   end;
@@ -941,8 +962,8 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
      then m_brush:=co_empty
      else
        case m_focus of
-       mf_map      : ui_command(mouse_map_x,mouse_map_y,m_UnitTarget);
-       mf_minimap  : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx), trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTarget);
+       mf_map      : ui_command(mouse_map_x,mouse_map_y,m_UnitTargetN);
+       mf_minimap  : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx), trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTargetN);
        mf_CtrlPanel: ui_ControlPanel_click(pct_right,@clickSound);     // panel
        end;
 
@@ -956,7 +977,11 @@ co_pability: m_UnitTarget:=_whoInPoint(mouse_map_x,mouse_map_y,5);
    if(InputActionReleased(iact_MMB))then          // MMB up
      m_DragCamMove:=false;
 
-   if(clickSound)then SoundPlayUI(snd_click);
+   if(clickSound)then
+   begin
+      SoundPlayUI(snd_click);
+      ui_update_now:=true;
+   end;
 end;
 
 procedure GameControlsCameraMove;
@@ -1115,7 +1140,11 @@ begin
       end;
    end;
 
-   if(clickSound)then SoundPlayUI(snd_click);
+   if(clickSound)then
+   begin
+      SoundPlayUI(snd_click);
+      ui_update_now:=true;
+   end;
 end;
 
 

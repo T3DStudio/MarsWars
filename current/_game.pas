@@ -272,41 +272,39 @@ begin
    PlayerKill(pid,true);
 end;
 
-procedure GameCreateStartBase(x,y:integer;uidF,uidA,pl,c:byte;AdvancedBase:boolean);
-var  i,n,uid:byte;
-r,d,ds:integer;
-procedure _Spawn(tx,ty:integer);
+procedure GameRemoveAIObservers;
+var p:byte;
 begin
-   if(AdvancedBase)
-   then uid:=uidA
-   else uid:=uidF;
-   unit_add(tx,ty,0,uid    ,pl,true,false,0);
-   n+=1;
+   for p:=0 to LastPlayer do
+     with g_players[p] do
+       if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
+procedure GameCreateStartBase(x,y:integer;uid,playerN,count:byte);
+var
+i     :byte;
+r,d,ds:integer;
 begin
-   if(c>6)then c:=6;
-   n:=0;
+   if(count>6)then count:=6;
 
-   if(c=0)
-   then _Spawn(x,y)
+   if(count=0)
+   then unit_add(x,y,0,uid,playerN,true,false,0)
    else
    begin
-      if(c>5)then
+      if(count>5)then
       begin
-         _Spawn(x,y);
-         c-=1;
+         unit_add(x,y,0,uid,playerN,true,false,0);
+         count-=1;
       end;
-      ds :=map_Size div 2;
-      d  :=point_dir(x,y,ds,ds);
-      ds :=360 div (c+1);
-      r  :=50+c*18;
-      for i:=0 to c do
+      d  :=point_dir(x,y,map_hSize,map_hSize);
+      ds :=360 div (count+1);
+      r  :=50+count*18;
+      for i:=0 to count do
       begin
-         _Spawn(
+         unit_add(
          x+trunc(r*cos(d*degtorad)),
-         y-trunc(r*sin(d*degtorad))
-         );
+         y-trunc(r*sin(d*degtorad)),
+         0,uid,playerN,true,false,0);
 
          d+=ds;
       end;
@@ -316,7 +314,12 @@ end;
 procedure GameStartSkirmish;
 var p:byte;
 begin
-   g_royal_r:=trunc(sqrt(sqr(map_hmw)*2));
+   g_royal_r:=trunc(sqrt(sqr(map_hSize)*2));
+   if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
+
+   for p:=0 to LastPlayer do
+     with g_players[p] do
+       if(p>=map_MaxPlayers)then observer:=true;
 
    for p:=0 to LastPlayer do
      with g_players[p] do
@@ -350,12 +353,12 @@ begin
           ai_PlayerSetSkirmishSettings(p);
           if(not observer)then
              if(map_generators>0)
-             then GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,1,true )
-             else GameCreateStartBase(map_psx[p],map_psy[p],uid_race_start_fbase[race],uid_race_start_abase[race],p,0,false);
+             then GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_abase[race],p,1)
+             else GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],p,0);
        end;
 
    {$IFDEF _FULLGAME}
-   ui_Camera_MoveToPoint(map_psx[LocalPlayer] , map_psy[LocalPlayer]);
+   ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer] , map_PlayerStartY[LocalPlayer]);
    if(g_players[LocalPlayer].observer)then
    begin
       ui_tab  :=tab_controls;
@@ -384,8 +387,8 @@ begin
                                  G_Status:=LocalPlayer;
                                  GameLogChat(LocalPlayer,255,str_gmsg_PlayerPaused,false);
                               end;
-                gs_paused1..
-                gs_paused6  : begin
+                gs_paused0..
+                gs_paused7  : begin
                                  GamePauseToggle:=true;
                                  if(check)then exit;
 
@@ -493,25 +496,25 @@ begin
      with g_punits[u]^ do
        if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
        begin
-          wassel:=sel;
+          wassel:=isselected;
 
-          if(not add)then sel:=false;
+          if(not add)then isselected:=false;
           if(usel_max>0)then
             if(not add)or(not wassel and add)then
               if(fuid=255)or(fuid=uidi)then
                 with uid^ do
-                  sel:=((x0-_r)<=vx)and(vx<=(x1+_r))
+                  isselected:=((x0-_r)<=vx)and(vx<=(x1+_r))
                     and((y0-_r)<=vy)and(vy<=(y1+_r))
                     and(SelectBuildings or not _ukbuilding);
 
-          if(wassel<>sel)then
-            if(sel)then
+          if(wassel<>isselected)then
+            if(isselected)then
             begin
                unit_counters_inc_select(g_punits[u]);
                ui_UpdateLastSelectedUnit(unum);
             end
             else unit_counters_dec_select(g_punits[u]);
-          if(sel)and(usel_max>0)then usel_max-=1;
+          if(isselected)and(usel_max>0)then usel_max-=1;
        end;
 end;
 procedure units_SelectGroup(add:boolean;fgroup:byte);
@@ -525,22 +528,22 @@ begin
      with g_punits[u]^ do
        if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
        begin
-          wassel:=sel;
+          wassel:=isselected;
 
-          if(not add)then sel:=false;
+          if(not add)then isselected:=false;
           if(not add)or(not wassel and add)then
             case fgroup of
             1..
-            MaxUnitGroups: sel:=group=fgroup;
-            255          : sel:=UnitF2Select(g_punits[u]);
+            MaxUnitGroups: isselected:=group=fgroup;
+            255          : isselected:=UnitF2Select(g_punits[u]);
             end;
 
-          if(wassel<>sel)then
-            if(sel)
+          if(wassel<>isselected)then
+            if(isselected)
             then unit_counters_inc_select(g_punits[u])
             else unit_counters_dec_select(g_punits[u]);
 
-          if(sel)then ui_UpdateLastSelectedUnit(unum);
+          if(isselected)then ui_UpdateLastSelectedUnit(unum);
        end;
 end;
 procedure units_Grouping(add:boolean;fgroup:byte);
@@ -553,11 +556,11 @@ begin
        with g_punits[u]^ do
          if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
            case add of
-           false: if(sel)
+           false: if(isselected)
                   then group:=fgroup
                   else
                     if(group=fgroup)then group:=0;
-           true : if(sel)
+           true : if(isselected)
                   then group:=fgroup;
            end;
 end;
@@ -758,7 +761,7 @@ begin
    0:   map_scenario:=mc_royale;
    1:   map_scenario:=mc_capture;
    2:   map_scenario:=mc_KotH;
-   else map_scenario:=mc_scirmish;
+   else map_scenario:=mc_ffa8;
    end;
 
    if(random(3)=0)
@@ -822,18 +825,18 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
              begin
                 if(o_id=uo_corder)then
                   case o_x0 of
-                  co_supgrade : if(s_smiths  <=0)or(sel)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_y0      ,true)=0,true,true );
-                  co_cupgrade : if(s_smiths  <=0)or(sel)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_y0,false,true)=0,true,false);
-                  co_suprod   : if(s_barracks<=0)or(sel)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_y0      ,true)=0,true,true );
-                  co_cuprod   : if(s_barracks<=0)or(sel)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_y0,false,true)=0,true,false);
-                  co_pcancle  : if(sel)then
+                  co_supgrade : if(s_smiths  <=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_y0      ,true)=0,true,true );
+                  co_cupgrade : if(s_smiths  <=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_y0,false,true)=0,true,false);
+                  co_suprod   : if(s_barracks<=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_y0      ,true)=0,true,true );
+                  co_cuprod   : if(s_barracks<=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_y0,false,true)=0,true,false);
+                  co_pcancle  : if(isselected)then
                                 begin
                                    UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade(pu,o_y0,false,true)=0,true,false);
                                    UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit   (pu,o_y0,false,true)=0,true,false);
                                 end;
                   end;
 
-                if(sel)then
+                if(isselected)then
                 begin
                    case o_id of
                uo_corder     : case o_x0 of
@@ -1015,7 +1018,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(PlayerTarget<=LastPlayer)then
+   if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
      with g_players[PlayerTarget] do
        if(state=ps_AI)then
        begin
@@ -1044,7 +1047,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(PlayerTarget<=LastPlayer)then
+   if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
      with g_players[PlayerTarget] do
        if(state<>ps_human)then
        begin
@@ -1078,7 +1081,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(PlayerTarget<=LastPlayer)then
+   if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
      with g_players[PlayerTarget] do
        if(state=ps_AI)or(PlayerTarget={$IFDEF _FULLGAME}LocalPlayer{$ELSE}PlayerRequestor{$ENDIF})then
        begin
@@ -1128,7 +1131,7 @@ begin
 
    if(not GameOptionsChangeable)then exit;
 
-   if(PlayerTarget<=LastPlayer)then
+   if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
      with g_players[PlayerTarget] do
       if(not observer)then
         if(state=ps_AI)or(PlayerTarget={$IFDEF _FULLGAME}LocalPlayer{$ELSE}PlayerRequestor{$ENDIF})then  // check on server side PlayerTarget requestor
@@ -1223,7 +1226,7 @@ begin
                                   end;
                                   Map_premap;
                                end;
-   nmid_lobby_MObs           : begin ScrollByte(@map_Obstacles,forward,0,map_MaxObstacles); Map_premap; end;
+   nmid_lobby_MObs           : begin ScrollByte(@map_ObstaclesF,forward,0,map_MaxObstacles); Map_premap; end;
    nmid_lobby_MSym           : begin map_Symmetry:=not map_Symmetry; Map_premap; end;
    nmid_lobby_MRandom        : begin Map_randommap; Map_premap;end;
    nmid_lobby_GFixedPositions: begin

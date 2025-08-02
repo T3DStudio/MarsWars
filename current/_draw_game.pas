@@ -378,9 +378,9 @@ begin
    begin
       acolor:=PlayerGetColor(playeri,false);
 
-      choosen:=((m_UnitTarget=unum)or(ui_umark_u=unum))and(ui_blink1_colorb);
+      choosen:=((m_UnitTargetN=unum)or(ui_umark_u=unum))and(ui_blink1_colorb);
 
-      srect :=((sel)and(playeri=UIPlayer))
+      srect :=((isselected)and(playeri=UIPlayer))
             or(InputAction(iact_Alt))
             or(choosen);
 
@@ -445,7 +445,7 @@ procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
 var t:integer;
 begin
    case map_scenario of
-mc_royale: circleColor(tar,lx+map_hmw-ui_cam_x,ly+map_hmw-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
+mc_royale: circleColor(tar,lx+map_hSize-ui_cam_x,ly+map_hSize-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
    end;
 
 
@@ -555,21 +555,21 @@ scolor:cardinal;
 begin
    for t:=0 to LastKeyPoint do
     with g_KeyPoints[t] do
-     if(cpCaptureR>0)and(RectInCam(cpx,cpy,cpCaptureR,cpCaptureR,0))then
+     if(kpCaptureR>0)and(RectInCam(kpx,kpy,kpCaptureR,kpCaptureR,0))then
      begin
         ccolor:=GetKeyPointColor(t,false);
         scolor:=GetKeyPointColor(t,true );
 
-        if(cpenergy>0)then
+        if(kpEnergy>0)then
         begin
-           SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,scolor,@spr_cp_gen,255);
+           SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_cp_gen,255);
            for i:=1 to 6 do
            begin
               ddir:=(i*60)*degtorad;
               SpriteListAddEffect(
-              cpx+round(cpCaptureR*cos(ddir)),
-              cpy+round(cpCaptureR*sin(ddir)),
-              sd_fly+cpy,0,@spr_cp_koth,255);
+              kpx+round(kpCaptureR*cos(ddir)),
+              kpy+round(kpCaptureR*sin(ddir)),
+              sd_fly+kpy,0,@spr_cp_koth,255);
            end;
         end
         else
@@ -579,9 +579,9 @@ begin
              begin
                 ddir:=(i*15)*degtorad;
                 SpriteListAddEffect(
-                cpx+round(cpCaptureR*cos(ddir)),
-                cpy+round(cpCaptureR*sin(ddir)),
-                sd_fly+cpy,scolor,@spr_cp_koth,255);
+                kpx+round(kpCaptureR*cos(ddir)),
+                kpy+round(kpCaptureR*sin(ddir)),
+                sd_fly+kpy,scolor,@spr_cp_koth,255);
              end;
           end
           else
@@ -590,17 +590,17 @@ begin
              begin
                 ddir:=(i*45-integer((g_tick shr 2) mod 360))*degtorad;
                 SpriteListAddEffect(
-                cpx+round(cpCaptureR*cos(ddir)),
-                cpy+round(cpCaptureR*sin(ddir)),
-                sd_fly+cpy,scolor,@spr_cp_koth,255);
+                kpx+round(kpCaptureR*cos(ddir)),
+                kpy+round(kpCaptureR*sin(ddir)),
+                sd_fly+kpy,0,@spr_cp_koth,255);
              end;
-             SpriteListAddEffect(cpx,cpy,sd_tcraters+cpy,scolor,@spr_cp_out,255);
+             SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_cp_out,255);
           end;
 
-        if(MapPointInScreenP(cpx,cpy,true))then
+        if(MapPointInScreenP(kpx,kpy,true))then
         begin
-           if(cpTimer   >0)then UnitsInfoAddText(cpx,cpy+10,ir2s(cpCaptureTime-cpTimer),ccolor );
-           if(cplifetime>0)then UnitsInfoAddText(cpx,cpy   ,cr2s(cplifetime           ),c_white);
+           if(kpTimer   >0)then UnitsInfoAddText(kpx,kpy+10,ir2s(kpCaptureTime-kpTimer),ccolor );
+           if(kplifetime>0)then UnitsInfoAddText(kpx,kpy   ,cr2s(kplifetime           ),c_white);
         end;
      end;
 end;
@@ -767,7 +767,7 @@ begin
         begin
            circleColor(vid_screen,ix,iy,_r  ,c_gray);
           // circleColor(vid_screen,ix,iy,srange,c_white);
-           if(sel)then
+           if(isselected)then
            begin
               //lineColor(vid_screen,ix,iy,ui_mapx+pf_mv_nx-ui_cam_x  ,ui_mapy+pf_mv_ny-ui_cam_y  ,c_red );
               //lineColor(vid_screen,ix,iy,ui_mapx+mv_x    -ui_cam_x+1,ui_mapy+mv_y    -ui_cam_y+1,c_lime);
@@ -827,7 +827,7 @@ begin
         end;
 
          //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_left,255, plcolor[player]);
-         //if(sel)then            i2s(TeamVision[g_players[player].team])+#13+i2s(TeamDetection[g_players[player].team])
+         //if(isselected)then            i2s(TeamVision[g_players[player].team])+#13+i2s(TeamDetection[g_players[player].team])
          //if(alrm_r<=0)then
          //
 
@@ -840,7 +840,7 @@ begin
 
         draw_text(vid_screen,ix,iy,i2s(u)+' '+i2s(rld_a), ta_left,255, plcolor[player]);// }
 
-        //if(sel)then  circleColor(vid_screen,ix,iy,r+5,plcolor[player]);
+        //if(isselected)then  circleColor(vid_screen,ix,iy,r+5,plcolor[player]);
      end;
 
    if(InputAction(iact_Control))then

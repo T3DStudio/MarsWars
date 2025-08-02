@@ -5,9 +5,10 @@ begin
      with pu^  do
      with uid^ do
      begin
-        if(uid^._ukbuilding)
-        then filledCircleColor(ui_minimap,mmx,mmy,mmr,PlayerGetColor(player^.pnum,false))
-        else pixelColor       (ui_minimap,mmx,mmy,    PlayerGetColor(player^.pnum,false));
+        if(uid^._ukbuilding)and(mmr>0)
+        then rectangleColor(ui_minimap,mmx-mmr,mmy-mmr,
+                                       mmx+mmr,mmy+mmr,PlayerGetColor(player^.pnum,false))
+        else pixelColor    (ui_minimap,mmx,mmy,        PlayerGetColor(player^.pnum,false));
 
         with player^ do
         begin
@@ -109,24 +110,6 @@ begin
          then unit_FogReveal:=true
          else
            if(TeamVision[g_players[UIplayer].team]>0)then unit_FogReveal:=true;
-  { unit_FogReveal:=false;
-   with pu^     do
-   with uid^    do
-   with player^ do
-    if(ui_fog=false)
-    then unit_FogReveal:=true
-    else
-      case unit_FogReveal(pu) of
-    1:begin
-         //if(fog_IfInScreen(fx,fy,_fr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,_fr);
-         unit_FogReveal:=true;
-      end;
-    2:begin
-         if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
-         unit_FogReveal:=true;
-         if(_ability=uab_UACScan)and(rld>radar_vision_time)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,(uo_y div fog_cw)-ui_fog_sy,fsr);
-      end;
-      end;}
 end;
 
 
@@ -140,7 +123,7 @@ begin
    begin
       if(_isbarrack)then
       begin
-         pcurrent:=(s_barracks<=0)or(sel);
+         pcurrent:=(s_barracks<=0)or(isselected);
          if(pcurrent)then ui_uprod_max+=1;
 
          if(uprod_r[pn]>0)then
@@ -159,7 +142,7 @@ begin
       if(_issmith)then
       begin
          for t:=1 to 255 do
-          if(s_smiths<=0)or(sel)then
+          if(s_smiths<=0)or(isselected)then
            if(t in ups_upgrades)then ui_pprod_max[t]+=1;    // possible productions count of each upgrade type
 
          if(pprod_r[pn]>0)then
@@ -230,7 +213,7 @@ begin
          if(iscomplete)then
          begin
             if(_isbuilder)and(not ukfly)then
-              if(s_builders=0)or(sel)then
+              if(s_builders=0)or(isselected)then
               begin
                  ui_bprod_possible+=ups_builder;
                  if(0<m_brush)and(m_brush<=255)then
@@ -243,16 +226,16 @@ begin
               then break
               else ui_ProductionCounters(pu,i);
          end;
-         if(sel)and(UnitHaveRPoint(pu^.uidi))and(uo_x>0)then
+         if(isselected)and(UnitHaveRPoint(pu^.uidi))and(uo_x>0)then
          begin
             UnitsInfoAddLine(x,y,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
             SpriteListAddMarker(uo_x,uo_y,@spr_mp[_urace]);
          end;
       end;
 
-      if(uo_x>0)and((uo_x<>x)or(uo_y<>y))then
+      if(uo_x>0)and((uo_x<>x)or(uo_y<>y))and(speed>0)then // unit is moving
       begin
-         if(sel)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
+         if(isselected)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
            if(uo_id=ua_move)or(uo_id=ua_amove)then
              if(uo_bx>0)then UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
 
@@ -260,7 +243,7 @@ begin
            case _ability of
 uab_RebuildInPoint: begin
                     SpriteListAddEffect(uo_x,uo_y,0,0,uid2spr(_rebuild_uid,270,0),128);
-                    if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+                    if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
                     case m_brush of
                     1..255,
                     co_pability   : UnitsInfoAddCircle(uo_x,uo_y,g_uids[_rebuild_uid]._r,ui_blink2_color_BY);
@@ -268,13 +251,13 @@ uab_RebuildInPoint: begin
                     end;
 uab_CCFly         : begin
                     SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,uid2spr(uidi,270,0),128);
-                    if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[ui_blink2_colorb]);
+                    if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[ui_blink2_colorb]);
                     case m_brush of
                     1..255,
                     co_pability   : UnitsInfoAddCircle(uo_x,uo_y+fly_hz,_r,ui_blink2_color_BY);
                     end;
                     end;
-           else     if(sel)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+           else     if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
            end;
       end;
 
@@ -284,9 +267,10 @@ uab_CCFly         : begin
          if(_ukbuilding)then
            if(rld<ui_bucl_reload[_ucl])or(ui_bucl_reload[_ucl]<0)then ui_bucl_reload[_ucl]:=rld;
 
-         if(sel)then
+         if(isselected)then
          begin
-            if(speed>0)then ui_uibtn_move+=1;
+            if(speed  >0)then ui_uibtn_move  +=1;
+            if(_attack  )then ui_uibtn_attack+=1;
 
             if(uo_id<>ua_psability)or(s_all=1)then
             begin
@@ -395,7 +379,7 @@ begin
            if(aw_dupgr>0)then WeaponUpgrInc(aw_dupgr);
            if(aw_rupgr>0)and(upgr[aw_rupgr]>=aw_rupgr_l)then sl+=1;
         end;
-      lvlstr_w:=i2s6(wl,(_attack>atm_none)and(_attack<>atm_bunker));
+      lvlstr_w:=i2s6(wl,_attack);
       if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w;
 
       // armor
@@ -630,7 +614,7 @@ begin
       with pu^ do
        if(IsUnitRange(transport,@tu))then
        begin
-          if(tu^.sel)and(G_Status=gs_running)and(playeri=UIPlayer)then ui_units_inapc[uidi]+=1;
+          if(tu^.isselected)and(G_Status=gs_running)and(playeri=UIPlayer)then ui_units_inapc[uidi]+=1;
        end
        else
          if(hits<=0)

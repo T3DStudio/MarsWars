@@ -67,7 +67,7 @@ begin
      if(mi_state>0)then
      begin
         boxColor(tar,mi_x0,mi_y0,mi_x1,mi_y1,c_black);
-        draw_rectw(tar,mi_x0,mi_y0,mi_x1,mi_y1,border,-1,c_ltgray);
+        draw_rectw(tar,mi_x0+1,mi_y0+1,mi_x1-1,mi_y1-1,border,-1,c_ltgray);
      end;
 end;
 
@@ -81,7 +81,7 @@ begin
         then color:=c_gray
         else color:=c_white;
 
-        rectangleColor(tar,mi_xc-menu_ItemCaptionhW,mi_y0-1,
+        rectangleColor(tar,mi_xc-menu_ItemCaptionhW,mi_y0,
                            mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonhH,c_ltgray);
         draw_text(tar,mi_xc,mi_y0+font_hw ,text,ta_middle,255,color);
      end;
@@ -385,10 +385,10 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
           d_MenuItemTextC(tar,mi_Players_Name0 +p,ta_left  ,name               ,mic(menu_items[mi_Players_Name0 +p].mi_state>1,p=LocalPlayer));
           d_MenuItemTextC(tar,mi_Players_State0+p,ta_middle,PlayerStatusChar(p),mic(menu_items[mi_Players_State0+p].mi_state>1,p=LocalPlayer));
 
-          if(observer)then
+          if(observer)or(p>=map_MaxPlayers)then
           begin
           d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_observer       ,c_gray);
-          d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,'-'                ,mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ));
+          d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,'-'                ,mic((menu_items[mi_Players_Team0 +p].mi_state>1)and(p<map_MaxPlayers),false        ));
           end
           else
           begin
@@ -408,11 +408,15 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
        begin
           if(g_AISlots>0)then
           begin
-             d_MenuItemTextC(tar,mi_Players_Name0+p,ta_left  ,str_ps_comp+' '+b2s(g_AISlots)            ,c_gray);
-             d_MenuItemTextC(tar,mi_Players_Race0+p,ta_middle,str_race[r_random]                        ,c_gray);
-             d_MenuItemTextC(tar,mi_Players_Team0+p,ta_middle,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
+             if(p<map_MaxPlayers)then
+             begin
+                d_MenuItemTextC(tar,mi_Players_Name0+p,ta_left  ,str_ps_comp+' '+b2s(g_AISlots)            ,c_gray);
+                d_MenuItemTextC(tar,mi_Players_Race0+p,ta_middle,str_race[r_random]                        ,c_gray);
+                d_MenuItemTextC(tar,mi_Players_Team0+p,ta_middle,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
+             end
+             else d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_observer       ,c_gray);
           end;
-          if(not g_started)then
+          if(not g_started)and(p<map_MaxPlayers)then
             d_MenuItemTextC(tar,mi_Players_State0+p,ta_middle,'+',c_lime);
        end;
 
@@ -435,7 +439,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_menuItemText2(tar,mi_Map_Generators,str_map_Generators,str_map_GeneratorsL[map_generators],0);
    d_menuItemText2(tar,mi_Map_Seed      ,str_map_Seed      ,menu_mseed+vc(mi_Map_Seed)         ,menu_ItemSelected);
    d_menuItemText2(tar,mi_Map_Size      ,str_map_Size      ,i2s(map_Size)                      ,0);
-   d_menuItemText2(tar,mi_Map_Obstacles ,str_map_Obstacles ,strMX(map_Obstacles)               ,0);
+   d_menuItemText2(tar,mi_Map_Obstacles ,str_map_Obstacles ,strMX(map_ObstaclesF)               ,0);
    d_menuItemText2(tar,mi_Map_Symmetry  ,str_map_Symmetry  ,b2cc[map_Symmetry]                 ,0);
 
    d_menuItemText1(tar,mi_Map_Theme     ,theme_name[theme_i],0);

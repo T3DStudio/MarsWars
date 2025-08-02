@@ -17,18 +17,18 @@ begin
    FillChar(pf_pathgrid_areas,SizeOf(pf_pathgrid_areas),0);
 
    // solid cells
-   for d:=1 to MaxDoodads do
-    with map_dds[d] do
-     if(t>0)and(r>=pf_pathmap_w)then
+   for d:=1 to MaxObstacles do
+    with map_ObstaclesL[d] do
+     if(o_type>0)and(o_r>=pf_pathmap_w)then
      begin
-        sx:=mm3i(0,(x-r) div pf_pathmap_w,pf_pathmap_c);
-        sy:=mm3i(0,(y-r) div pf_pathmap_w,pf_pathmap_c);
-        ex:=mm3i(0,(x+r) div pf_pathmap_w,pf_pathmap_c);
-        ey:=mm3i(0,(y+r) div pf_pathmap_w,pf_pathmap_c);
+        sx:=mm3i(0,(o_x-o_r) div pf_pathmap_w,pf_pathmap_c);
+        sy:=mm3i(0,(o_y-o_r) div pf_pathmap_w,pf_pathmap_c);
+        ex:=mm3i(0,(o_x+o_r) div pf_pathmap_w,pf_pathmap_c);
+        ey:=mm3i(0,(o_y+o_r) div pf_pathmap_w,pf_pathmap_c);
 
         for ix:=sx to ex do
          for iy:=sy to ey do
-          if(point_dist_int(ix*pf_pathmap_w+pf_pathmap_hw,iy*pf_pathmap_w+pf_pathmap_hw,x,y)<=r)then //-bld_dec_mr
+          if(point_dist_int(ix*pf_pathmap_w+pf_pathmap_hw,iy*pf_pathmap_w+pf_pathmap_hw,o_x,o_y)<=o_r)then //-bld_dec_mr
            pf_pathgrid_areas[ix,iy]:=pf_solid;
      end;
 

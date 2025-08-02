@@ -32,17 +32,13 @@ begin
    d_UpdateUIPlayer(0);
    PlayersUpdateColorSchema(UIPlayer);
 
-   D_AddObjSprites(G_Status>gs_running);
+   D_AddObjSprites(G_Status<>gs_running);
 
    D_terrain   (vid_screen,ui_mapx,ui_mapy);
    D_SpriteList(vid_screen,ui_mapx,ui_mapy);
    D_Fog       (vid_screen,ui_mapx,ui_mapy);
    D_UnitsInfo (vid_screen,ui_mapx,ui_mapy);
    D_ui        (vid_screen,ui_mapx,ui_mapy);
-
-   draw_sdlsurface(vid_screen,ui_panelx,ui_panely,ui_uipanel);
-
-   d_UIMouseBaseBrush(vid_screen);
 
    if(TestMode>1)and(net_status=0)then _draw_dbg;
 end;
@@ -53,6 +49,8 @@ var i,n:integer;
 begin
    ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod ui_blink_period1;
    ui_blink_timer2+=1;ui_blink_timer2:=ui_blink_timer2 mod ui_blink_period2;
+
+   ui_update_timer+=1;ui_update_timer:=ui_update_timer mod ui_update_period1;
 
    if(ui_blink_timer1=0)then
    begin
@@ -78,19 +76,19 @@ begin
 
    if(TestMode>1)then
    begin
-   n:=0;
+   {n:=0;
    if(UIPlayer<=LastPlayer)then
     with g_players[UIPlayer] do
      for i:=0 to LastPlayer do
       with ai_alarms[i] do
-       if(aia_enemy_limit>0)then n+=1;
+       if(aia_enemy_limit>0)then n+=1;  }
 
    draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    ' '+b2c[ui_uibtn_sabilityu=nil]+
    ' '+b2c[ui_uibtn_pabilityu=nil]+
    //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
-   ' '+i2s(i)+' '+i2s(n)
+   ' '+tc_aqua+i2s(m_UnitTargetN)+' '+b2c[m_UnitTargetP<>nil]
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+

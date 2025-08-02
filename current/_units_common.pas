@@ -198,7 +198,6 @@ begin
 end;
 
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean;
-var tu:PTUnit;
 begin
    unit_canAttack:=false;
    with pu^  do
@@ -206,28 +205,14 @@ begin
    begin
       if(not iscomplete)
       or(hits<=0)
-      or(_attack=atm_none)then exit;
+      or(not _attack)then exit;
 
       if(check_buffs)then
         if(not _ukbuilding)then
           if(buffs[ub_Pain]>0)
           or(buffs[ub_Cast]>0)then exit;
 
-      case _attack of
-      atm_bunker,
-      atm_always  : if(IsUnitRange(transport,@tu))then
-                    begin
-                       if(IsUnitRange(tu^.transport,nil))then exit;
-                       case tu^.uid^._attack of
-                       atm_always,
-                       atm_none,
-                       atm_sturret: exit;
-                       end;
-                    end;
-      atm_sturret : if(transportC<=0)then exit;
-      atm_inapc   : if(transport <=0)then exit;
-      else exit;
-      end;
+      if(IsUnitRange(transport,nil))then exit;
    end;
    unit_canAttack:=true;
 end;
@@ -606,14 +591,14 @@ begin
       dy:=ty div MapObstaclesGridW;
       if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
        with map_ObstaclesGrid[dx,dy] do
-        if(n>0)then
-         for u:=0 to n-1 do
-          with l[u]^ do
-           if(r>0)and(t>0)then
+        if(oc_n>0)then
+         for u:=0 to oc_n-1 do
+          with oc_l[u]^ do
+           if(o_r>0)and(o_type>0)then
            begin
-              o:=tr+r;
-              d:=point_dist_int(x,y,tx,ty)-o;
-              add(x,y,d,o);
+              o:=tr+o_r;
+              d:=point_dist_int(o_x,o_y,tx,ty)-o;
+              add(o_x,o_y,d,o);
            end;
       tr+=bld_dec_mr;
    end;
@@ -621,11 +606,11 @@ begin
    if(not _ukfly)then
     for u:=0 to LastKeyPoint do
      with g_KeyPoints[u] do
-      if(cpCaptureR>0)and(cpNoBuildR>0)then
+      if(kpCaptureR>0)and(kpNoBuildR>0)then
       begin
-         o:=cpNoBuildR;
-         d:=point_dist_int(cpx,cpy,tx,ty)-o;
-         add(cpx,cpy,d,o);
+         o:=kpNoBuildR+tr;
+         d:=point_dist_int(kpx,kpy,tx,ty)-o;
+         add(kpx,kpy,d,o);
       end;
 
    for u:=1 to MaxUnits do
@@ -673,6 +658,14 @@ begin
      if(nrd[0]<=-1)
      then math_2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],-2000,-2000,-2000);
 
+   if(not _ukfly)then
+   begin
+      dx:=tr;
+      dy:=map_size-dx;
+      tx:=mm3i(dx,tx,dy);
+      ty:=mm3i(dx,ty,dy);
+   end;
+
    newx^:=tx;
    newy^:=ty;
 end;
@@ -688,7 +681,7 @@ begin
    begin
       aukfly:=_ukfly;
       with g_players[pl] do
-       math_push_out(tx,ty,_r,0,@tx,@ty,aukfly,true,UnitObsTeamVis);
+        math_push_out(tx,ty,_r,0,@tx,@ty,aukfly,true,UnitObsTeamVis);
    end;
 
    dx:=-2000;
@@ -699,7 +692,7 @@ begin
     with g_units[u] do
      with uid^ do
       if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=pl)and(_isbuilder)and(not ukfly)then
-       if(player^.s_builders=0)or(sel)then
+       if(player^.s_builders=0)or(isselected)then
         if(buid in ups_builder)and(not IsUnitRange(transport,nil))then
         begin
            o:=point_dist_int(x,y,tx,ty)-srange;
@@ -719,8 +712,13 @@ begin
       if(0<dr)then math_1c_push(@tx,@ty,dx,dy,sr-1);
    end;
 
-   tx:=mm3i(map_b0,tx,map_b1);
-   ty:=mm3i(map_b0,ty,map_b1);
+   with g_uids[buid] do
+   begin
+      dx:=_r;
+      dy:=map_size-dx;
+      tx:=mm3i(dx,tx,dy);
+      ty:=mm3i(dx,ty,dy);
+   end;
    newx^:=tx;
    newy^:=ty;
 end;
@@ -754,20 +752,28 @@ begin
 
    for u:=0 to LastKeyPoint do
     with g_KeyPoints[u] do
-     if(cpCaptureR>0)then
+     if(kpCaptureR>0)then
      begin
         if(building)
-        then dx:=max2i(cpsolidr,cpNoBuildR)
-        else dx:=cpsolidr;
+        then dx:=max2i(kpSolidr,kpNoBuildR)
+        else dx:=kpSolidr;
         if(dx<=0)then continue;
-        if(point_dist_int(tx,ty,cpx,cpy)<dx)then
+        if(point_dist_int(tx,ty,kpx,kpy)<dx)then
         begin
            CheckCollisionR:=3;
            exit;
         end;
      end;
 
-   if(check_obstacles=false)then exit;
+   if(building)then
+     if(tx<tr)or((map_size-tr)<tx)
+     or(ty<tr)or((map_size-tr)<ty)then
+     begin
+        CheckCollisionR:=5;  // out of bounds
+        exit;
+     end;
+
+   if(not check_obstacles)then exit;
 
    tr-=bld_dec_mr;
 
@@ -776,11 +782,11 @@ begin
 
    if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
     with map_ObstaclesGrid[dx,dy] do
-     if(n>0)then
-      for u:=0 to n-1 do
-       with l[u]^ do
-        if(r>0)and(t>0)then
-         if(point_dist_int(x,y,tx,ty)<(tr+r))then
+     if(oc_n>0)then
+      for u:=0 to oc_n-1 do
+       with oc_l[u]^ do
+        if(o_r>0)and(o_type>0)then
+         if(point_dist_int(o_x,o_y,tx,ty)<(tr+o_r))then
          begin
             CheckCollisionR:=4;
             exit;
@@ -800,17 +806,18 @@ begin
           exit;
        end;
 
-   if(tx<map_b0)or(map_b1<tx)
-   or(ty<map_b0)or(map_b1<ty)then
-   begin
-      CheckInBuildArea:=2;  // out of bounds
-      exit;
-   end;
+   with g_uids[buid] do
+     if(tx<_r)or((map_size-_r)<tx)
+     or(ty<_r)or((map_size-_r)<ty)then
+     begin
+        CheckInBuildArea:=2;  // out of bounds
+        exit;
+     end;
 
    for u:=0 to LastKeyPoint do
      with g_KeyPoints[u] do
-       if(cpCaptureR>0)and(cpNoBuildR>0)then
-         if(point_dist_int(tx,ty,cpx,cpy)<cpNoBuildR)then
+       if(kpCaptureR>0)and(kpNoBuildR>0)then
+         if(point_dist_int(tx,ty,kpx,kpy)<kpNoBuildR)then
          begin
             CheckInBuildArea:=2;
             exit;
@@ -824,7 +831,7 @@ begin
     with g_punits[u]^ do
      with uid^ do
       if(hits>0)and(iscomplete)and(_isbuilder)and(not ukfly)and(playeri=pl)then
-       if(player^.s_builders=0)or(sel)then
+       if(player^.s_builders=0)or(isselected)then
         if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
          if(buid in ups_builder)and(IsUnitRange(transport,nil)=false)then
           if(point_dist_int(x,y,tx,ty)<srange)then
@@ -1146,7 +1153,7 @@ begin
             uo_by   := -1;
             mv_x    := x;
             mv_y    := y;
-            sel     := false;
+            isselected     := false;
             transportC:= 0;
 
             FillChar(buffs,sizeof(buffs),0);
@@ -1479,19 +1486,19 @@ end;
 procedure unit_UnSelect(pu:PTUnit);
 begin
    with pu^ do
-   if(sel)then
+   if(isselected)then
    begin
       unit_counters_dec_select(pu);
-      sel:=false;
+      isselected:=false;
    end;
 end;
 procedure unit_Select(pu:PTUnit);
 begin
    with pu^ do
-   if(not sel)then
+   if(not isselected)then
    begin
       unit_counters_inc_select(pu);
-      sel:=true;
+      isselected:=true;
    end;
 end;
 
@@ -1898,12 +1905,12 @@ uab_CCFly         : if(level>0)then
                        speed:=0;
 
                        if(ServerSide)and(zfall<>0)then
-                        if(CheckCollisionR(x,y+zfall,_r,unum,_ukbuilding,false,true,pu )>0)then
-                        begin
-                           level:=1;
-                           buffs[ub_CCast]:=fr_fps2;
-                           PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
-                        end;
+                         if(CheckCollisionR(x,y+zfall,_r,unum,_ukbuilding,false,true,pu )>0)then
+                         begin
+                            level:=1;
+                            buffs[ub_CCast]:=fr_fps2;
+                            PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
+                         end;
                     end;
       end;
 

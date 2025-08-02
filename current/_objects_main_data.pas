@@ -95,7 +95,7 @@ begin
       _ucl       := 255;
       _transportS:= 1;
       _urace     := r_hell;
-      _attack    := atm_none;
+      _attack    := false;
       _fastdeath_hits:=-32000;
       _limituse  := MinUnitLimit;
 
@@ -263,6 +263,7 @@ begin
    _btime     := ptime2;
    _limituse  := ul4;
    _ability   := uab_Teleport;
+   //_ability_rupgr:=
    _ukbuilding:= true;
    _ukmech    := true;
    _baseregen := BaseArmorBonus1;
@@ -295,7 +296,7 @@ begin
    _srange    := 300;
    _ucl       := 6;
    _btime     := ptime1hh;
-   _attack    := atm_always;
+   _attack    := true;
    _ability   := uab_HTowerBlink;
    _ability_rupgr:=upgr_hell_tblink;
    _ukbuilding:= true;
@@ -316,7 +317,7 @@ begin
    _ucl       := 7;
    _btime     := ptime2;
    _ruid1     := UID_HFortress;
-   _attack    := atm_always;
+   _attack    := true;
    _ability   := uab_HTowerBlink;
    _ability_rupgr :=upgr_hell_tblink;
    _ukbuilding:= true;
@@ -370,7 +371,7 @@ begin
    _ucl       := 0;
    _painc     := 2;
    _btime     := ptime1mh;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
    _a_BonusAntiFlyRange:=-50;
@@ -388,7 +389,7 @@ begin
    _transportS:= 2;
    _painc     := 8;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _weapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps2d3,0,0,0,0,upgr_hell_mattack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitBioHeavy2);
 end;
 UID_Cacodemon :
@@ -406,7 +407,7 @@ begin
    _ukfly     := uf_fly;
    _ruid1     := UID_HPools;
    _ruid2     := UID_HAKeep;
-   _attack    := atm_always;
+   _attack    := true;
    _zfall     := fly_height[uf_fly];
    _a_BonusAntiFlyRange:=50;
    _weapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1   ,MID_Cacodemon,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive      ,wpr_any,uids_all-[UID_Cacodemon],[],0,0,wtp_UnitMech,0,dm_AntiUnitMech2);
@@ -429,7 +430,7 @@ begin
    _btime     := ptime1h;
    _transportS:= 3;
    _limituse  := ul2;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _ruid1     := UID_HPools;
    _weapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1  ,MID_Baron,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Knight,UID_Baron],[],0,0,wtp_UnitLight,0,dm_AntiUnitLight2);
@@ -452,7 +453,7 @@ begin
    _btime     := ptime1h;
    _transportS:= 3;
    _limituse  := ul3;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := false;
    _ruid1     := UID_HPools;
    _weapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1   ,MID_Baron,0,0,0,upgr_hell_t1attack,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Knight,UID_Baron],[],0,0,wtp_UnitLight,0,dm_AntiUnitLight2);
@@ -474,7 +475,7 @@ begin
    _btime     := ptime4;
    _transportS:= 12;
    _ruid1     := UID_HPentagram;
-   _attack    := atm_always;
+   _attack    := true;
    _limituse  := ul10;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
@@ -506,7 +507,7 @@ begin
    _btime     := ptime4;
    _transportS:= 12;
    _ruid1     := UID_HPentagram;
-   _attack    := atm_always;
+   _attack    := true;
    _limituse  := ul10;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
@@ -529,7 +530,7 @@ begin
    _ruid2     := UID_HAKeep;
    _limituse  := ul1;
    _ukfly     := uf_fly;
-   _attack    := atm_always;
+   _attack    := true;
    _ability   := uab_SpawnLost;
    _death_uid := UID_LostSoul;
    _death_uidn:= 3;
@@ -551,7 +552,7 @@ begin
    _btime     := ptime1;
    _ruid1     := UID_HMonastery;
    _limituse  := ul1h;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := false;
    _a_BonusAntiFlyRange:=100;
    _weapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1,MID_Revenant ,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Revenant],[],0,-7,wtp_Fly     ,0,dm_AntiFly2);
@@ -574,7 +575,7 @@ begin
    _btime     := ptime1h;
    _ruid1     := UID_HMonastery;
    _limituse  := ul3;
-   _attack    := atm_always;
+   _attack    := true;
    _a_BonusAntiBuildingRange:=50;
    _weapon(0,wpt_missle,aw_srange,0,-9,fr_mancubus_rld,MID_Mancubus,0,0,0,upgr_hell_t2attack,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,wtp_building,0,dm_Siege4);
 end;
@@ -591,7 +592,7 @@ begin
    _btime     := ptime1h;
    _ruid1     := UID_HMonastery;
    _limituse  := ul3;
-   _attack    := atm_always;
+   _attack    := true;
    _ukmech    := true;
    _upgr_regen:= upgr_race_regen_bio[r_hell];
    _upgr_armor:= upgr_race_armor_bio[r_hell];
@@ -611,7 +612,7 @@ begin
    _transportS:= 4;
    _ruid1     := UID_HMonastery;
    _limituse  := ul4;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _a_BonusAntiUnitRange:=50;
    _weapon(0,wpt_resurect,aw_dmelee,0,3  ,fr_fpsd2,0           ,0,upgr_hell_resurrect,1,0,0,wtrset_resurect   ,wpr_any           ,uids_arch_res,[             ],0,0,wtp_distance,0,0);
@@ -630,7 +631,7 @@ begin
    _painc     := 1;
    _btime     := ptimeh;
    _ukfly     := uf_fly;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _fastdeath_hits:=1;
    if(i=UID_Phantom)then
@@ -652,7 +653,7 @@ begin
    _ucl       := 14;
    _painc     := 1;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
    _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
@@ -668,7 +669,7 @@ begin
    _ucl       := 15;
    _painc     := 1;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
    _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsd2,0          ,0,0,0,0                 ,0               ,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
@@ -684,7 +685,7 @@ begin
    _ucl       := 16;
    _painc     := 2;
    _btime     := ptime1mh;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 3;
@@ -701,7 +702,7 @@ begin
    _ucl       := 17;
    _painc     := 2;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := false;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 3;
@@ -718,7 +719,7 @@ begin
    _ucl       := 18;
    _painc     := 4;
    _btime     := ptime1mh;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := false;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 3;
@@ -736,7 +737,7 @@ begin
    _ucl       := 19;
    _painc     := 4;
    _btime     := ptime1mh;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 3;
@@ -754,7 +755,7 @@ begin
    _ucl       := 20;
    _painc     := 5;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := true;
    _ruid1     := UID_HBarracks;
    _ruid1n    := 3;
@@ -771,7 +772,7 @@ begin
    _ucl       := 21;
    _painc     := 5;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _limituse  := ul1h;
    _uklight   := true;
    _ukfly     := true;
@@ -792,7 +793,7 @@ begin
    _ucl       := 22;
    _painc     := 5;
    _btime     := ptime3;
-   _attack    := atm_always;
+   _attack    := true;
    _uklight   := false;
    _transportS:= 2;
    _ruid1     := UID_HBarracks;
@@ -818,7 +819,7 @@ begin
    _srange    := 300;
    _ucl       := 0;
    _btime     := ptime3;
-   _attack    := atm_always;
+   _attack    := true;
    _ability   := uab_CCFly;
    _ukbuilding:= true;
    _ukmech    := true;
@@ -1031,7 +1032,7 @@ begin
    _srange    := 300;
    _ucl       := 6;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _ukbuilding:= true;
    _ukmech    := true;
    _upgr_armor:= upgr_uac_turarm;
@@ -1052,7 +1053,7 @@ begin
    _srange    := 300;
    _ucl       := 7;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _ukbuilding:= true;
    _ukmech    := true;
    _uklight   := true;
@@ -1073,7 +1074,7 @@ begin
    _srange    := 100;
    _ucl       := 19;
    _btime     := 5;
-   _attack    := atm_always;
+   _attack    := true;
    _ukbuilding:= true;
    _ukmech    := true;
    _uklight   := true;
@@ -1095,7 +1096,7 @@ begin
    _srange    := 175;
    _ucl       := 0;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZSergant;
    _uklight   := true;
    _fastdeath_hits:=fdead_hits_border;
@@ -1110,7 +1111,7 @@ begin
    _srange    := 175;
    _ucl       := 1;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZSSergant;
    _uklight   := false;
    _limituse  := ul1h;
@@ -1126,7 +1127,7 @@ begin
    _srange    := 175;
    _ucl       := 2;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZCommando;
    _uklight   := true;
    _ruid1     := UID_UWeaponFactory;
@@ -1143,7 +1144,7 @@ begin
    _srange    := 175;
    _ucl       := 3;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZAntiaircrafter;
    _uklight   := false;
    _ruid1     := UID_UWeaponFactory;
@@ -1160,7 +1161,7 @@ begin
    _srange    := 175;
    _ucl       := 4;
    _btime     := ptime1;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZSiegeMarine;
    _uklight   := false;
    _ruid1     := UID_UWeaponFactory;
@@ -1176,7 +1177,7 @@ begin
    _srange    := 200;
    _ucl       := 5;
    _btime     := ptime1hh;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZFPlasmagunner;
    _uklight   := false;
    _limituse  := ul1h;
@@ -1197,7 +1198,7 @@ begin
    _ucl       := 6;
    _transportS:= 2;
    _btime     := ptime3;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZBFGMarine;
    _uklight   := false;
    _limituse  := ul5;
@@ -1216,7 +1217,7 @@ begin
    _srange    := 175;
    _ucl       := 7;
    _btime     := ptime1hh;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZEngineer;
    _ability   := 0;
    _uklight   := true;
@@ -1235,7 +1236,7 @@ begin
    _srange    := 175;
    _ucl       := 8;
    _btime     := ptime1hh;
-   _attack    := atm_always;
+   _attack    := true;
    _zombie_uid:= UID_ZMedic;
    _uklight   := true;
    _ruid1     := UID_UWeaponFactory;
@@ -1255,7 +1256,7 @@ begin
    _btime     := ptime1;
    _transportS:= 3;
    _limituse  := ul2;
-   _attack    := atm_always;
+   _attack    := true;
    _ukmech    := true;
    _uklight   := true;
    _ability   := uab_RebuildInPoint;
@@ -1276,7 +1277,7 @@ begin
    _transportM:= 8;
    _transportS:= 8;
    _ukfly     := uf_fly;
-   _attack    := atm_none;
+   _attack    := false;
    _ukmech    := true;
    _ruid1     := UID_UACommandCenter;
    _fastdeath_hits:=1;
@@ -1293,7 +1294,7 @@ begin
    _btime     := ptime1h;
    _transportS:= 4;
    _limituse  := ul3;
-   _attack    := atm_always;
+   _attack    := true;
    _ukmech    := true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
@@ -1314,7 +1315,7 @@ begin
    _btime     := ptime2;
    _transportS:= 6;
    _limituse  := ul4;
-   _attack    := atm_always;
+   _attack    := true;
    _ukmech    := true;
    _ruid1     := UID_UTechCenter;
    _fastdeath_hits:=1;
@@ -1333,7 +1334,7 @@ begin
    _transportS:= 6;
    _ukfly     := uf_fly;
    _limituse  := ul4;
-   _attack    := atm_always;
+   _attack    := true;
    _ukmech    := true;
    _ruid1     := UID_UTechCenter;
    _ruid2     := UID_UACommandCenter;
@@ -1353,7 +1354,7 @@ begin
    _btime     := ptime2;
    _transportM:= 4;
    _transportS:= 10;
-   _attack    := atm_bunker;
+   _attack    := false;
    _ukmech    := true;
    _slowturn  := true;
    _fastdeath_hits:=1;

@@ -154,7 +154,7 @@ begin
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
    AddItem(@map_Size            ,SizeOf(map_Size         ));
-   AddItem(@map_Obstacles       ,SizeOf(map_Obstacles    ));
+   AddItem(@map_ObstaclesF       ,SizeOf(map_ObstaclesF    ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
@@ -182,9 +182,9 @@ begin
    AddItem(@g_status            ,SizeOf(g_status         ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order    ));
    AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen    ));
-   AddItem(@map_dds             ,SizeOf(map_dds          ));
-   AddItem(@map_psx             ,SizeOf(map_psx          ));
-   AddItem(@map_psy             ,SizeOf(map_psy          ));
+   AddItem(@map_ObstaclesL             ,SizeOf(map_ObstaclesL          ));
+   AddItem(@map_PlayerStartX             ,SizeOf(map_PlayerStartX          ));
+   AddItem(@map_PlayerStartY             ,SizeOf(map_PlayerStartY          ));
    AddItem(@ui_cam_x            ,SizeOf(ui_cam_x         ));
    AddItem(@ui_cam_y            ,SizeOf(ui_cam_y         ));
    AddItem(@ui_blink_timer1     ,SizeOf(ui_blink_timer1  ));
@@ -296,7 +296,7 @@ begin
             exit;
          end;
 
-         map_vars;
+         map_BaseVars;
          case g_type of
          gt_campaing: SetThemeCampaing(cmp_sel);
          gt_scirmish: map_seed2theme;

@@ -6,41 +6,41 @@ begin
    for i:=0 to LastKeyPoint do
      with g_KeyPoints[i] do
      begin
-        cpOwnerPlayer     :=255;
-        cpOwnerTeam       :=255;
-        cpTimerOwnerTeam  :=255;
-        cpTimerOwnerPlayer:=255;
+        kpOwnerPlayer     :=255;
+        kpOwnerTeam       :=255;
+        kpTimerOwnerTeam  :=255;
+        kpTimerOwnerPlayer:=255;
      end;
 end;
 
 procedure KeyPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
 begin
    with g_KeyPoints[i] do
-     if(cpOwnerPlayer<>newOwnerPlayer)then
+     if(kpOwnerPlayer<>newOwnerPlayer)then
      begin
-        if(cpOwnerPlayer<=LastPlayer)then
+        if(kpOwnerPlayer<=LastPlayer)then
         begin
-           with g_players[cpOwnerPlayer] do
+           with g_players[kpOwnerPlayer] do
            begin
-              cenergy-=cpenergy;
-              menergy-=cpenergy;
+              cenergy-=kpEnergy;
+              menergy-=kpEnergy;
            end;
-           if(log)then GameLogKeyPointLost(cpOwnerPlayer,i);
+           if(log)then GameLogKeyPointLost(kpOwnerPlayer,i);
         end;
 
-        cpOwnerPlayer:=newOwnerPlayer;
-        if(cpOwnerPlayer<=LastPlayer)
-        then cpOwnerTeam:=g_players[newOwnerPlayer].team
-        else cpOwnerTeam:=cpOwnerPlayer;
+        kpOwnerPlayer:=newOwnerPlayer;
+        if(kpOwnerPlayer<=LastPlayer)
+        then kpOwnerTeam:=g_players[newOwnerPlayer].team
+        else kpOwnerTeam:=kpOwnerPlayer;
 
-        if(cpOwnerPlayer<=LastPlayer)then
+        if(kpOwnerPlayer<=LastPlayer)then
         begin
-           with g_players[cpOwnerPlayer] do
+           with g_players[kpOwnerPlayer] do
            begin
-              cenergy+=cpenergy;
-              menergy+=cpenergy;
+              cenergy+=kpEnergy;
+              menergy+=kpEnergy;
            end;
-           if(log)then GameLogKeyPointCaptured(cpOwnerPlayer,i);
+           if(log)then GameLogKeyPointCaptured(kpOwnerPlayer,i);
         end;
      end;
 end;
@@ -49,47 +49,59 @@ procedure Scenario_KeyPointsCode;
 var
 i,p,
 iOwnerPlayer,
-iPlayers: integer;
+iPlayers,
+iTeams  : integer;
 begin
    for i:=0 to LastKeyPoint do
      with g_KeyPoints[i] do
-       if(cpCaptureR>0)then
+       if(kpCaptureR>0)then
        begin
           p:=0;
-          if(map_scenario=mc_royale)and(g_royal_r<cp_ToCenterD)then p:=1;
-          if(cplifetime>0)and(cpOwnerPlayer<=LastPlayer)then
+          if(map_scenario=mc_royale)and(g_royal_r<kpToCenterD)then p:=1;
+          if(kplifetime>0)and(kpOwnerPlayer<=LastPlayer)then
           begin
-             cplifetime-=1;
-             if(cplifetime=0)then p:=1;
+             kplifetime-=1;
+             if(kplifetime=0)then p:=1;
           end;
 
           if(p>0)then // life expired
           begin
-             GameLogNGenExh(cpOwnerPlayer,i);
+             GameLogNGenExh(kpOwnerPlayer,i);
              KeyPoint_ChangeOwner(i,255,false);
-             cpCaptureR:=-cpCaptureR;
+             kpCaptureR:=-kpCaptureR;
              {$IFDEF _FULLGAME}
-             effect_KPointExplode(cpx,cpy);
+             effect_KPointExplode(kpx,kpy);
              {$ENDIF}
              continue;
           end;
 
-          cpunitsp_pstate:=cpUnitsPlayer;
-          cpunitst_pstate:=cpUnitsTeam;
-          iOwnerPlayer   :=cpOwnerPlayer;
           iPlayers:=0;
+          iOwnerPlayer:=kpOwnerPlayer;
+          kpunitsp_pstate:=kpUnitsPlayer;
+          kpunitst_pstate:=kpUnitsTeam;
+          if(kpTimerOwnerPlayer<=LastPlayer)then
+            if(kpUnitsPlayer[kpTimerOwnerPlayer]>0)then
+            begin
+               iPlayers:=1;
+               iOwnerPlayer:=kpTimerOwnerPlayer;
+            end;
+
+          iTeams:=0;
           for p:=0 to LastPlayer do
           begin
-             if(cpUnitsPlayer[p]>0)then
+             if(kpUnitsPlayer[p]>0)and(p<>kpTimerOwnerPlayer)then
              begin
+                if(iPlayers=0)then iOwnerPlayer:=p;
                 iPlayers+=1;
-                iOwnerPlayer:=p;
              end;
-             cpUnitsPlayer[p]:=0;
-             cpUnitsTeam  [p]:=0;
+             if(kpUnitsTeam  [p]>0)then
+               iTeams+=1;
+
+             kpUnitsPlayer[p]:=0;
+             kpUnitsTeam  [p]:=0;
           end;
 
-       if((iPlayers=0)and(cpenergy>0))
+       if((iPlayers=0)and(kpEnergy>0))
        or((i=0)and(map_scenario=mc_KotH)and(g_tick<g_step_koth_pause))then
        begin
           iPlayers:=1;
@@ -97,27 +109,27 @@ begin
        end;
 
        if(iPlayers=0)
-       then cpTimer:=0
+       then kpTimer:=0
        else
-         if(iPlayers=1)then
-           if(cpOwnerPlayer=iOwnerPlayer)
-           then cpTimer:=0
+         if(iPlayers=1)or(iTeams=1)then
+           if(kpOwnerPlayer=iOwnerPlayer)
+           then kpTimer:=0
            else
            begin
-              if(cpTimerOwnerPlayer<>iOwnerPlayer)then
+              if(kpTimerOwnerPlayer<>iOwnerPlayer)then
               begin
-                 cpTimerOwnerPlayer:=iOwnerPlayer;
-                 if(cpTimerOwnerPlayer<=LastPlayer)
-                 then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team
-                 else cpTimerOwnerTeam:=255;
+                 kpTimerOwnerPlayer:=iOwnerPlayer;
+                 if(kpTimerOwnerPlayer<=LastPlayer)
+                 then kpTimerOwnerTeam:=g_players[kpTimerOwnerPlayer].team
+                 else kpTimerOwnerTeam:=255;
                  if(i=0)and(map_scenario=mc_KotH)then GameLogKotHControl;
-                 cpTimer:=0;
+                 kpTimer:=0;
               end;
-              if(cpTimer<cpCaptureTime)
-              then cpTimer+=1
+              if(kpTimer<kpCaptureTime)
+              then kpTimer+=1
               else
               begin
-                 cpTimer:=0;
+                 kpTimer:=0;
                  KeyPoint_ChangeOwner(i,iOwnerPlayer);
               end;
            end;
@@ -137,15 +149,15 @@ begin
 
    for i:=0 to LastKeyPoint do
     with g_KeyPoints[i] do
-     if(cpCaptureR>0)and(cpenergy<=0)then
+     if(kpCaptureR>0)and(kpEnergy<=0)then
      begin
         kp_captured_n+=1;
-        if(cpOwnerTeam<=LastPlayer)then
+        if(kpOwnerTeam<=LastPlayer)then
         begin
            if(wteam=255)
-           or(wteam<>cpOwnerTeam)
+           or(wteam<>kpOwnerTeam)
            then wteam_n:=0;
-           wteam  :=cpOwnerTeam;
+           wteam  :=kpOwnerTeam;
            wteam_n+=1;
         end;
      end;

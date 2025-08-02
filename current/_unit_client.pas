@@ -1,4 +1,12 @@
 
+const
+
+kpdata_owner  = %10000000;
+kpdata_timer  = %11000000;
+kpdata_life   = %01000000;
+kpdata_pmask  = %00001111;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +167,7 @@ begin
       SetBBit(@byte1,3, (level and %10)      >0);
       SetBBit(@byte1,4, buffs[ub_Pain        ]>0);
       SetBBit(@byte1,5,(a_tar_cl>0)and(a_rld>0));
-      SetBBit(@byte1,6, sel                    );
+      SetBBit(@byte1,6, isselected                    );
       SetBBit(@byte1,7, byte2>0                );
 
       wudata_byte(byte1,rpl);
@@ -167,11 +175,11 @@ begin
    end;
 end;
 
-function wudata_reload(r:pinteger;rpl:boolean):byte;
+function wudata_reload(r:integer;rpl:boolean):byte;
 begin
-   if(r^<=0)
+   if(r<=0)
    then wudata_reload:=0
-   else wudata_reload:=mm3i(1,(r^ div fr_fps1)+1,255);
+   else wudata_reload:=byte(mm3i(1,(r div fr_fps1)+1,255));
    wudata_byte(wudata_reload,rpl);
 end;
 
@@ -184,8 +192,8 @@ begin
        for i:=0 to MaxUnitLevel do
        begin
           if(i>level)then break;
-          if(_isbarrack)then if(wudata_reload(@uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
-          if(_issmith  )then if(wudata_reload(@pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
+          if(_isbarrack)then if(wudata_reload(uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
+          if(_issmith  )then if(wudata_reload(pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
        end;
 end;
 
@@ -231,11 +239,11 @@ begin
 
       if(iscomplete)then
         if(_ability in client_rld_abils)
-        or(uidi     in client_rld_uids )then wudata_reload(@rld,rpl);
+        or(uidi     in client_rld_uids )then wudata_reload(rld,rpl);
 
       wudata_prod(pu,rpl);
 
-      if(sel or not rpl)then
+      if(isselected or not rpl)then
         if(UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
           if(IsUnitRange(uo_tar,nil))
           then wudata_int(-uo_tar,rpl)
@@ -291,7 +299,7 @@ begin
 
             if(buffs[ub_Cast]>0)then
              if(_ability in client_cast_abils)then
-              if(wudata_reload(@rld,rpl)>0)then
+              if(wudata_reload(rld,rpl)>0)then
               begin
                  wudata_byte(byte(uo_x shr 5),rpl);
                  wudata_byte(byte(uo_y shr 5),rpl);
@@ -342,42 +350,73 @@ begin
    if((b and %00000100)>0)then b2bs[6]:='1';
    if((b and %00000010)>0)then b2bs[7]:='1';
    if((b and %00000001)>0)then b2bs[8]:='1';
-end; }
+end;}
 
-procedure wclinet_KeyPoint(cpi:byte;rpl:boolean);
-var    b: byte;
+procedure wclinet_KeyPoint(kpi:byte;rpl:boolean);
+var  o,b: byte;
 wdcptime: pbyte;
+procedure WriteOwner;
+begin
+   with g_KeyPoints[kpi] do
+   begin
+      b:=kpdata_owner;
+      if(kpOwnerPlayer>MaxPlayers)
+      then o:=kpdata_pmask
+      else o:=kpOwnerPlayer;
+      o:=o and kpdata_pmask;
+
+      wudata_byte(b or o,rpl);
+   end;
+end;
+procedure WriteTimer;
+begin
+   with g_KeyPoints[kpi] do
+   begin
+      b:=kpdata_timer;
+      if(kpTimerOwnerPlayer>MaxPlayers)
+      then o:=kpdata_pmask
+      else o:=kpTimerOwnerPlayer;
+      o:=o and kpdata_pmask;
+
+      wudata_byte(b or o,rpl);
+      wudata_reload(kpTimer,rpl);
+   end;
+end;
+procedure WriteLife;
+begin
+   with g_KeyPoints[kpi] do
+   begin
+     b:=kpdata_life;
+
+     wudata_byte(b,rpl);
+     wudata_reload(integer(kplifetime div 5),rpl);
+     writeln(kpi,' ',integer(kplifetime div 5));
+   end;
+end;
+
 begin
    b:=0;
    if(rpl)
-   then wdcptime:=@rpls_kpoints_t[cpi]
-   else wdcptime:= @net_kpoints_t[cpi];
+   then wdcptime:=@rpls_kpoints_t[kpi]
+   else wdcptime:= @net_kpoints_t[kpi];
 
-   wdcptime^:=(wdcptime^+1) mod 2;
+   wdcptime^:=(wdcptime^+1) mod 3;
 
-   with g_KeyPoints[cpi] do
-     if(cpCaptureR<=0)
+   with g_KeyPoints[kpi] do
+     if(kpCaptureR<=0)
      then wudata_byte(0,rpl)
      else
-     begin
-        b:=b or (cpOwnerPlayer      shl 2) and %00011100;  // ???????????????
-        b:=b or (cpTimerOwnerPlayer shl 5) and %11100000;
-
-        case wdcptime^ of
-0       : begin
-             wudata_byte(b or %00000010,rpl);
-             if(cpOwnerPlayer<>cpTimerOwnerPlayer)
-             then wudata_reload(@cpTimer,rpl);
-          end;
-1       : if(cpLifeTime<=0)
-          then wudata_byte(b or %00000001,rpl)
-          else
-          begin
-             wudata_byte(b or %00000011,rpl);
-             wudata_byte((cpLifeTime div fr_fps1) div 5,rpl);
-          end;
-        end;
-     end;
+       case wdcptime^ of
+       0 : WriteOwner;
+       1 : WriteTimer;
+       2 : if(map_generators=mapg_inf)or((map_scenario=mc_KotH)and(kpi=0))then
+           begin
+              if(kpTimer>0)
+              then WriteTimer
+              else WriteOwner;
+           end
+           else WriteLife;
+       end;
 end;
 
 procedure wclinet_gframe(POVPlayer:byte;rpl:boolean);
@@ -404,7 +443,7 @@ begin
    else wtickb1:=wtickb0;                // every second
 
    if(not rpl)and(wtickb1)then
-     with g_players[POVPlayer] do wudata_reload(@build_cd,rpl);
+     with g_players[POVPlayer] do wudata_reload(build_cd,rpl);
 
    if(wtickb0)then
      if(map_scenario=mc_capture)
@@ -504,7 +543,7 @@ begin
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(sel)and(rpl)then unit_counters_inc_select(pu);
+         if(isselected)and(rpl)then unit_counters_inc_select(pu);
          if(not iscomplete)
          then cenergy-=_renergy
          else
@@ -572,7 +611,7 @@ begin
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(sel)and(rpl)then unit_counters_dec_select(pu);
+         if(isselected)and(rpl)then unit_counters_dec_select(pu);
          if(not iscomplete)
          then cenergy+=_renergy
          else
@@ -666,7 +705,7 @@ begin
      begin
         unit_UnSelect(pu);
         uu^.group:=0;
-        uu^.sel:=false;
+        uu^.isselected:=false;
      end
      else
        if(uu^.hits<=0)
@@ -706,7 +745,7 @@ begin
            begin
               if(not iscomplete)then
                 with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
-              if(not rpl)and(sel)then ui_UpdateLastSelectedUnit(unum);
+              if(not rpl)and(isselected)then ui_UpdateLastSelectedUnit(unum);
            end;
         end;
 
@@ -775,7 +814,7 @@ begin
                  if(playeri=UIPlayer)then
                    with uid^ do SoundPlayAnoncer(snd_build_place[_urace],false,false);
 
-               if(not rpl)and(pu^.sel=false)and(sel)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
+               if(not rpl)and(pu^.isselected=false)and(isselected)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
                if(pu^.transport<>transport)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
@@ -992,7 +1031,7 @@ begin
       buffs[ub_Pain]:=_buffst[GetBBit(@byte1,4)];
       if(GetBBit(@byte1,5))then a_tar:=-1 else a_tar:=0;
       if(rpl)then
-        sel:=GetBBit(@byte1,6);
+        isselected:=GetBBit(@byte1,6);
       if(GetBBit(@byte1,7))
       then byte2:=rudata_byte(rpl,0)
       else byte2:=0;
@@ -1084,7 +1123,7 @@ begin
 
       rudata_prod(uu,rpl);
 
-      if(sel or not rpl)then
+      if(isselected or not rpl)then
         if(UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
         begin
            uo_x:=rudata_int(rpl,0);
@@ -1224,41 +1263,46 @@ begin
 end;
 
 procedure rclinet_KeyPoint(kpi:byte;rpl,no_effect:boolean);
-var b,t,p:byte;
+var
+b,t,p:byte;
+i    :integer;
 begin
    with g_KeyPoints[kpi] do
    begin
       b:=rudata_byte(rpl,0);
-      t:=b and %00000011;
-      if(t=0)then
-      begin
-         if(cpCaptureR>0)then
-         begin
-            KeyPoint_ChangeOwner(kpi,255);
-            cpCaptureR:=-cpCaptureR;
-            if(not no_effect)then
-              effect_KPointExplode(cpx,cpy);
-         end;
-      end
+      t:=b and %11000000;
+      case t of
+      0 : if(kpCaptureR>0)then
+          begin
+             KeyPoint_ChangeOwner(kpi,255);
+             kpCaptureR:=-kpCaptureR;
+             if(not no_effect)then
+               effect_KPointExplode(kpx,kpy);
+          end;
       else
-      begin
-         if(cpCaptureR<0)then cpCaptureR:=-cpCaptureR;
-         p:=(b and %00011100) shr 2;
-         KeyPoint_ChangeOwner(kpi,p);
-         cpTimerOwnerPlayer:=(b and %11100000) shr 5;
-         if(cpTimerOwnerPlayer<=LastPlayer)
-         then cpTimerOwnerTeam:=g_players[cpTimerOwnerPlayer].team
-         else cpTimerOwnerTeam:=255;
 
-         case t of
-%00000001 : ;
-%00000010 : begin
-               if(cpOwnerPlayer<>cpTimerOwnerPlayer)
-               then rudata_reload(@cpTimer,rpl)
-               else cpTimer:=0;
-            end;
-%00000011 : cpLifeTime:=(rudata_byte(rpl,0)*fr_fps1)*5;
-         end;
+        if(kpCaptureR<0)then kpCaptureR:=-kpCaptureR;
+        if(map_generators=mapg_inf)
+        or((map_scenario=mc_koth)and(kpi=0))then kplifetime:=0;
+
+        case t of
+        kpdata_owner: begin
+                         p:=b and kpdata_pmask;
+                         if(p>LastPlayer)then p:=255;
+                         KeyPoint_ChangeOwner(kpi,p);
+                      end;
+        kpdata_timer: begin
+                         p:=b and kpdata_pmask;
+                         if(p>LastPlayer)then p:=255;
+                         kpTimerOwnerPlayer:=p;
+                         rudata_reload(@kpTimer,rpl);
+                      end;
+        kpdata_life : begin
+                         rudata_reload(@i,rpl);
+                         writeln(kpi,' ',i);
+                         kplifetime:=i*5;
+                      end;
+        end;
       end;
    end;
 end;

@@ -45,33 +45,56 @@ APM_1Period            = fr_fps60;
 //
 
 g_MaxAISlots           = 11; // 0-11 max skirmish AI skills
-map_MaxGenerators      = 5;  // 0-5  max neutrall generators options
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  BASE
 //
 
-ps_None                = 0;  // player state
+// player state
+ps_None                = 0;
 ps_human               = 1;
 ps_AI                  = 2;
 
-mc_scirmish            = 0;  // map scenario
-mc_4x4                 = 1;
-mc_2x2x2x2               = 2;
-mc_capture             = 3;
-mc_KotH                = 4;
-mc_royale              = 5;
+// map scenario
+mc_ffa3                = 0;
+mc_ffa4                = 1;
+mc_ffa5                = 2;
+mc_ffa6                = 3;
+mc_ffa7                = 4;
+mc_ffa8                = 5;
+mc_1x1                 = 6;
+mc_2x2                 = 7;
+mc_3x3                 = 8;
+mc_4x4                 = 9;
+mc_2x2x2               = 10;
+mc_2x2x2x2             = 11;
+mc_capture             = 12;
+mc_KotH                = 13;
+mc_royale              = 14;
 
-mc_fixed_teams         : set of byte = [mc_4x4,mc_2x2x2x2];
+mc_fixed_teams         : set of byte = [mc_1x1,mc_2x2,mc_3x3,mc_4x4,mc_2x2x2,mc_2x2x2x2];
 
-allmapscenarios        : set of byte = [mc_scirmish,mc_4x4,mc_2x2x2x2,mc_capture,mc_KotH,mc_royale];
-mc_count               = 5;
+allmapscenarios        : set of byte = [mc_ffa3..mc_royale];
+mc_Last                = 14;
 
-gt_none                = 0;   // game type
+// map scenario
+mapg_no                = 0;
+mapg_5                 = 1;
+mapg_10                = 2;
+mapg_15                = 3;
+mapg_20                = 4;
+mapg_inf               = 5;
+
+map_MaxGenerators      = 5;  // 0-5  max neutrall generators options
+
+// game type
+gt_none                = 0;
 gt_scirmish            = 1;
 gt_campaing            = 2;
 
+// game status
 gs_paused0             = 0;
 gs_paused1             = 1;
 gs_paused2             = 2;
@@ -100,20 +123,20 @@ r_hell                 = 1;
 r_uac                  = 2;
 
 MaxPlayers             = 8;
-
 LastPlayer             = MaxPlayers-1; //0-7
+
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-LastKeyPoint           = LastPlayer*2-1;
+
+MaxKeyPoints           = MaxPlayers*2;
+LastKeyPoint           = MaxKeyPoints-1;
 
 map_MaxSize            = 8000;
 map_MinSize            = 2500;
 map_SizeMenuStep       = 250;
 
 map_MaxObstacles       = 7;
-
-map_b0                 = 5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -125,13 +148,6 @@ map_generators_Energy  = 900;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Invastion
-//
-
-InvMaxWaves            = 20;
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  PATH FIND SYSTEM
 //
 
@@ -140,7 +156,7 @@ pf_pathmap_c           = (map_MaxSize div pf_pathmap_w)+1;
 
 pf_pathmap_hw          = pf_pathmap_w div 2;
 
-pf_solid               : word = 65535;
+pf_solid               : word = word.MaxValue;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -361,18 +377,6 @@ ua_patrol              = 6; // only for client data transfer
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Conditionals for attack
-//
-
-atm_none               = 0;   // cant attack
-atm_always             = 1;   // can attack
-atm_bunker             = 2;   // can attack, units inside can attack too
-atm_sturret            = 3;   // can attack when somebody inside
-atm_inapc              = 4;   // can attack only when in apc
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  Weapon: requirements to attacker and some bits
 //
 
@@ -522,7 +526,7 @@ b2ib                   : array[false..true] of smallint = (0,ub_infinity);
 //  OBSTACLES
 //
 
-MaxDoodads             = 800;
+MaxObstacles             = 800;
 
 //
 ddc_div                = 1000000;
@@ -1349,6 +1353,8 @@ tab_Units              = 1;
 tab_Upgrades           = 2;
 tab_Controls           = 3;
 
+ui_update_persecond    = 6;
+ui_update_period1      = fr_fps1 div ui_update_persecond;
 ui_blink_persecond     = 6;
 ui_blink_period1       = fr_fps1  div ui_blink_persecond;
 ui_blink_periodh       = ui_blink_period1 div 2;
