@@ -212,8 +212,8 @@ begin
       then wudtick:=@rpls_wudata_t[unum]
       else wudtick:=@net_wudata_t[unum];
       if(rpl)
-      then wudelay:=fr_fpsd2
-      else wudelay:=fr_fpsd4;
+      then wudelay:=fr_fpsh
+      else wudelay:=fr_fpsq;
 
       if(wudtick^>g_tick)
       then wb:=true
@@ -437,7 +437,7 @@ begin
 
    wtick:=g_tick shr 1;
 
-   wtickb0:=(wtick mod fr_fpsd2)=0;
+   wtickb0:=(wtick mod fr_fpsh)=0;
    if(rpl)
    then wtickb1:=(wtick mod fr_fps1 )=0  // every 2 second
    else wtickb1:=wtickb0;                // every second
@@ -997,8 +997,8 @@ begin
          end;
 
          if(x=255)
-         then PlayerAddLog(p,mtype,argt,argx,str,-1     ,-1     ,false)
-         else PlayerAddLog(p,mtype,argt,argx,str,x shl 5,y shl 5,false);
+         then PlayerAddLog(p,mtype,argt,argx,str,-1     ,-1     )
+         else PlayerAddLog(p,mtype,argt,argx,str,x shl 5,y shl 5);
 
          s-=1;
       end;
@@ -1323,7 +1323,7 @@ begin
 
    wtick:=g_tick shr 1;
 
-   wtickb0:=(wtick mod fr_fpsd2)=0;
+   wtickb0:=(wtick mod fr_fpsh)=0;
    if(rpl)
    then wtickb1:=(wtick mod fr_fps1)=0
    else wtickb1:=wtickb0;

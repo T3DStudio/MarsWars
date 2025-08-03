@@ -34,17 +34,18 @@ TUSpriteList  = array of TMWTexture;
 PTUSpriteList = ^TUSpriteList;
 
 TMWSModel = record
-   sl       : TUSpriteList;
-   sel_hw,
-   sel_hh,
-   sk,
-   sn       : integer;
-   mkind    : byte;
+   sm_spritesL   : TUSpriteList;
+   sm_SelectionHW,
+   sm_SelectionHH,
+   sm_spritesLast,
+   sm_spritesNum : integer;
+   sm_kind       : byte;
 end;
 PTMWSModel = ^TMWSModel;
 
 TDecal = record
-   x,y      : integer;
+   decal_x,
+   decal_y       : integer;
 end;
 
 TEID = record
@@ -181,6 +182,15 @@ TSaveLoadItem = record
    data_p:pointer;
    data_s:cardinal;
 end;
+
+TUnitGroup = record
+   ugroup_n,
+   ugroup_d,
+   ugroup_x,
+   ugroup_y   : integer;
+   ugroup_uids: array[boolean] of TSoB;
+end;
+pTUnitGroup = ^TUnitGroup;
 
 {$ENDIF}
 

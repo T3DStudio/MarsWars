@@ -512,7 +512,7 @@ Upgrades:
 
 Cacodemon
 
-Hotkey: Y
+Hotkey: H
 Categories/Attributes: [unit,biological,heavy,flying]
 Max hits: 2000
 Limit used: 1.5
@@ -539,7 +539,7 @@ Upgrades:
 
 Hell Knight
 
-Hotkey: F
+Hotkey: Y
 Categories/Attributes: [unit,biological,light,ground]
 Max hits: 2500
 Limit used: 2
@@ -567,7 +567,7 @@ Upgrades:
 
 Baron of Hell
 
-Hotkey: G
+Hotkey: F
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 4500
 Limit used: 3
@@ -595,7 +595,7 @@ Upgrades:
 
 Cyberdemon
 
-Hotkey: V
+Hotkey: B
 Categories/Attributes: [unit,mechanical,heavy,ground]
 Max hits: 15000
 Limit used: 10
@@ -622,7 +622,7 @@ Immune to splash damage.
 
 Spider Mastermind
 
-Hotkey: H
+Hotkey: V
 Categories/Attributes: [unit,mechanical,heavy,ground]
 Max hits: 14000
 Limit used: 10
@@ -649,7 +649,7 @@ Immune to splash damage.
 
 Pain Elemental
 
-Hotkey: B
+Hotkey: N
 Categories/Attributes: [unit,biological,heavy,flying]
 Max hits: 1500
 Limit used: 1
@@ -676,7 +676,7 @@ Special ability: "Spawn LostSoul".
 
 Revenant
 
-Hotkey: N
+Hotkey: G
 Categories/Attributes: [unit,biological,heavy,ground]
 Max hits: 1500
 Limit used: 1.5
@@ -687,7 +687,7 @@ Build time: 20
 Energy required: 300
 PainState base threshold: 5
 Places in transport: 2
-Requirements: Monastery of Despair
+Requirements: Infernal Pools
 Produced by: Demon`s Gate
 Arming/Abilities: 
 - ranged attack, max. range: vision range, bonus anti-fly range: +100, targets: [alive] except [Revenant], impact 78*1, target priority: [fly], upgrade: Demon`s Weapons(+7), factor: x2 [flying];

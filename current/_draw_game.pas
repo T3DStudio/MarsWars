@@ -364,13 +364,14 @@ end;
 
 procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
 const buff_sprite_w = 18;
-var srect,
+var
+srect,
 choosen,
 pain,
-      hbar :boolean;
-    acolor :cardinal;
-   buffx,
-   buffy   :integer;
+hbar   : boolean;
+ acolor: cardinal;
+buffx,
+buffy  : integer;
 begin
    with pu^   do
    with uid^  do
@@ -396,35 +397,32 @@ begin
       if(srect)then
       begin
          if(playeri=UIPlayer)
-         then UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-         else UnitsInfoAddRectText(vx-sel_hw,vy-sel_hh,vx+sel_hw,vy+sel_hh,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
-         UnitsInfoAddText(vx,vy-sel_hh-font_w,lvlstr_l,c_white);
+         then UnitsInfoAddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
+         else UnitsInfoAddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
+         UnitsInfoAddText(vx,vy-sm_SelectionHH-font_w,lvlstr_l,c_white);
       end;
-      if(hbar )then UnitsInfoProgressbar(vx-sel_hw,vy-sel_hh-4,vx+sel_hw,vy-sel_hh,hits/_mhits,acolor);
+      if(hbar )then UnitsInfoProgressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/_mhits,acolor);
 
-      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfoAddText(vx,vy-sel_hh+font_w,lvlstr_r,c_aqua);
+      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfoAddText(vx,vy-sm_SelectionHH+font_w,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
-        case m_brush of
-1..255,
-co_pability   : UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
-        end;
-
+        if(ui_DrawEdges)then
+          UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
 
       if(srect)and(_ukbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
 
       //ub_Scaned
       case ui_blink3 of
-      0: if(buffs[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_scan );
-      1: if(buffs[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_decay);
+      0: if(buffs[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_effect_Scan );
+      1: if(buffs[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_effect_Decay);
       2:;
       end;
 
-      pain:=(buffs[ub_Pain]>0)and(_ukmech and not _ukbuilding);
+      pain:=(buffs[ub_Pain]>0)and(_ukmech)and(not _ukbuilding);
       buffx:=0;
       if(buffs[ub_HVision]>0)then buffx+=1;
       if(buffs[ub_Invuln ]>0)then buffx+=1;
-      if(pain              )then buffx+=1;
+      if(pain               )then buffx+=1;
 
       if(buffx=0)then exit;
 
@@ -433,10 +431,10 @@ co_pability   : UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
 
       if(_ukbuilding)
       then buffy:=vy
-      else buffy:=vy-sel_hh-font_w;
+      else buffy:=vy-sm_SelectionHH-font_w;
 
-      if(buffs[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_hvision);buffx+=buff_sprite_w;end;
-      if(buffs[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_invuln );buffx+=buff_sprite_w;end;
+      if(buffs[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_effect_HVision);buffx+=buff_sprite_w;end;
+      if(buffs[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_effect_Invuln );buffx+=buff_sprite_w;end;
       if(pain               )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
    end;
 end;
@@ -518,8 +516,8 @@ begin
     for i:=1 to map_ter_decaln do
      with map_ter_decalL[i-1] do
      begin
-        ix:=x-vx+ui_mwa;
-        iy:=y-vy+ui_mha;
+        ix:=decal_x-vx+ui_mwa;
+        iy:=decal_y-vy+ui_mha;
 
         s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decaln;
 
@@ -612,107 +610,33 @@ end;
 
 
 procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
-var cx,cy,ssx,ssy,sty:integer;
-   { b:boolean;
-    cl:cardinal;
-    ci:integer;
-    pf:word;
-    cl:cardinal; }
+var
+cx,cy,
+ssx,ssy,
+sty:integer;
+fcell:pboolean;
 begin
-   if(not ui_fog)then exit;
+   if(not ui_fog)
+   or(ui_fog_gridw<=0)
+   or(ui_fog_gridh<=0)then exit;
 
    ssx:=lx-ui_cam_fx;
    sty:=ly-ui_cam_fy;
 
-   for cx:=0 to ui_fog_vfw do
+   for cx:=0 to ui_fog_gridw-1 do
    begin
       ssy:=sty;
-      //vlineColor(tar,ssx,0,vid_vh,c_white);
-      for cy:=0 to ui_fog_vfh do
+      for cy:=0 to ui_fog_gridh-1 do
       begin
-         //hlineColor(tar,0,vid_vw,ssy,c_white);
-         ui_fog_pgrid[cx,cy]:=ui_fog_grid[cx,cy];
-         if(ui_fog)then
-         begin
-            if(ui_fog_grid[cx,cy]=0)then
-              draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, ui_fog_surf);
-            ui_fog_grid[cx,cy]:=0;
-         end
-         else ui_fog_grid[cx,cy]:=2;
+         fcell:=@ui_fog_fgrid[cx,cy];
+         if(not fcell^)then
+           draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, ui_fog_surf);
+         ui_fog_pgrid[cx,cy]:=fcell^;
+         fcell^:=false;
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
    end;
-
-
- {  if(pfNodes_c>0)then
-    for ci:=1 to pfNodes_c do
-     with pfNodes[ci] do
-     begin
-        ssx:=(pos_x*pf_pathmap_w+pf_pathmap_hw)-ui_cam_x+lx;
-        ssy:=(pos_y*pf_pathmap_w+pf_pathmap_hw)-ui_cam_y+ly;
-        circleColor(tar,ssx,ssy,16,c_lime);
-        cx:=(rootx*pf_pathmap_w+pf_pathmap_hw)-ui_cam_x+lx;
-        cy:=(rooty*pf_pathmap_w+pf_pathmap_hw)-ui_cam_y+ly;
-        linecolor(tar,ssx,ssy,cx,cy,c_green);
-     end;
-
-   ssx:=lx-(ui_cam_x mod pf_pathmap_w);
-   sty:=ly-(ui_cam_y mod pf_pathmap_w);
-
-   ci:=5;
-
-   while(ssx<vid_vw)do
-   begin
-
-      if(ci=5)
-      then ci:=-5
-      else ci:= 5;
-
-      ssy:=sty;
-      while(ssy<vid_vh)do
-      begin
-         cx:= (ui_cam_x+ssx+pf_pathmap_hw-lx) div pf_pathmap_w ;
-         cy:= (ui_cam_y+ssy+pf_pathmap_hw-ly) div pf_pathmap_w;
-         pf:=pf_pathgrid_areas[cx , cy  ];
-
-         if(pf=pf_solid)
-         then cl:=c_red
-         else cl:=c_white;
-
-         rectangleColor(tar,ssx,ssy,ssx+pf_pathmap_w-1,ssy+pf_pathmap_w-1,cl);
-
-         _draw_text(tar,
-         ssx+pf_pathmap_hw,
-         ssy+pf_pathmap_hw+ci,
-         w2s(pf),
-         ta_middle,255,cl);
-
-         ssy+=pf_pathmap_w;
-      end;
-      ssx+=pf_pathmap_w;
-   end;    }
-
-   {if(menu_s2=ms2_camp)then
-   begin
-      if(ui_msks>=0)then
-      begin
-         if(integer(ui_msk+ui_msks)>255)
-         then ui_msk:=255
-         else inc(ui_msk,ui_msks);
-      end
-      else
-      begin
-         if(integer(ui_msk+ui_msks)<0)
-         then ui_msk:=0
-         else inc(ui_msk,ui_msks);
-      end;
-      if(ui_msk>0)then
-      begin
-         boxColor(tar,ui_CtrlPanelW,0,ui_cam_w,ui_cam_h,rgba2c(255,255,255,ui_msk));
-         if(vid_rtui=0)then dec(ui_msks,1);
-      end;
-   end;  }
 end;
 
 procedure _draw_dbg;
@@ -872,13 +796,13 @@ begin
    x:=0;
    with mwsm^ do
    begin
-      for i:=1 to sn do
-       with sl[i-1] do
+      for i:=1 to sm_spritesNum do
+       with sm_spritesL[i-1] do
        begin
           draw_sdlsurface(vid_screen,x,0,surf);
           x+=w;
        end;
-      draw_text(vid_screen,0,48,i2s(sn), ta_left,255, c_white);
+      draw_text(vid_screen,0,48,i2s(sm_spritesNum), ta_left,255, c_white);
    end;
 end;
 

@@ -19,11 +19,11 @@ end;
 
 procedure d_AddObjSprites(noanim:boolean);
 begin
- doodads_sprites(noanim);
-    unit_sprites(noanim);
- effects_sprites(noanim,vid_draw);
- if(not vid_draw)then exit;
-missiles_sprites;
+  doodads_sprites(noanim);
+     unit_sprites(noanim);
+  effects_sprites(noanim,vid_draw);
+   if(not vid_draw)then exit;
+ missiles_sprites;
 keyPoints_sprites;
 end;
 
@@ -31,6 +31,8 @@ procedure d_Game;
 begin
    d_UpdateUIPlayer(0);
    PlayersUpdateColorSchema(UIPlayer);
+
+   ui_DrawEdges:=ui_MouseBrushNeedDrawEdges;
 
    D_AddObjSprites(G_Status<>gs_running);
 
@@ -88,7 +90,7 @@ begin
    ' '+b2c[ui_uibtn_sabilityu=nil]+
    ' '+b2c[ui_uibtn_pabilityu=nil]+
    //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
-   ' '+tc_aqua+i2s(m_UnitTargetN)+' '+b2c[m_UnitTargetP<>nil]
+   ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y))
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+

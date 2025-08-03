@@ -735,7 +735,7 @@ wtp_heal              : if(tu^.hits     >a_tarp^^.hits       )
    end;
 end;
 
-procedure unit_aura_effects(pAuraSrcUnit,pTarget:PTUnit;ud:integer);
+procedure unit_AuraEffects(pAuraSrcUnit,pTarget:PTUnit;ud:integer);
 begin
    // pAuraSrcUnit - aura source
    // pTarget - target
@@ -746,13 +746,14 @@ begin
 UID_HAKeep,
 UID_HKeep     : if(ud<srange)
                and(not pTarget^.uid^._ukbuilding)
+               and(pTarget^.iscomplete)
                and(team<>pTarget^.player^.team)then
-                 if(pTarget^.buffs[ub_Decay]<=fr_fpsd2)and(upgr[upgr_hell_paina]>0)then
-                 begin
-                    AddToInt(@TeamVision[pTarget^.player^.team],MinVisionTime);
-                    unit_damage(pTarget,DecayAuraDamage,1,playeri,true);
-                    pTarget^.buffs[ub_Decay]:=fr_fps1;
-                 end;
+                  if(pTarget^.buffs[ub_Decay]<=fr_fpsh)and(upgr[upgr_hell_paina]>0)then
+                  begin
+                     AddToInt(@TeamVision[pTarget^.player^.team],MinVisionTime);
+                     unit_damage(pTarget,DecayAuraDamage,1,playeri,true);
+                     pTarget^.buffs[ub_Decay]:=fr_fps1;
+                  end;
    end;
 end;
 
@@ -829,10 +830,10 @@ begin
       fteleport_tar:= (not IsUnitRange(uo_tar,nil))and(_ability=uab_Teleport);
       swtarget     := false;
       puo:=nil;
-      if(IsUnitRange(uo_tar,@puo))and(aicode=false)then
+      if(IsUnitRange(uo_tar,@puo))and(not aicode)then
        if(puo^.player=player)and(puo^.hits>0)and(puo^.rld>0)then
         case g_uids[puo^.uidi]._ability of
-uab_Teleport      : swtarget:=true;
+uab_Teleport : swtarget:=true;
         end;
 
       aiu_InitVars(pu);
@@ -867,27 +868,27 @@ uab_Teleport      : swtarget:=true;
 
             if(tu^.hits>0)and(tu_transport=nil)then
             begin
-               unit_aura_effects(pu,tu,ud);
+               unit_AuraEffects(pu,tu,ud);
 
                if(pushout)then
-                if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.iscomplete)then
-                 if(tu^.solid)and(ukfly=tu^.ukfly)then unit_push(pu,tu,uds);
+                 if(_r<=tu^.uid^._r)or(tu^.speed<=0)or(not tu^.iscomplete)then
+                   if(tu^.solid)and(ukfly=tu^.ukfly)then unit_push(pu,tu,uds);
 
                if(swtarget)then
-                if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)and(tu^.iscomplete)then
-                 if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=puo^.uo_tar))
-                 or((tu^.uo_x=puo^.uo_x)and(tu^.uo_y=puo^.uo_y))
-                 then uo_tar:=tu^.unum;
+                 if(ud<srange)and(tu^.playeri=playeri)and(tu^.uidi=puo^.uidi)and(tu^.rld<puo^.rld)and(tu^.iscomplete)then
+                   if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=puo^.uo_tar))
+                   or((tu^.uo_x=puo^.uo_x)and(tu^.uo_y=puo^.uo_y))
+                   then uo_tar:=tu^.unum;
 
                if(fteleport_tar)then
                begin
                   ud:=point_dist_int(uo_x,uo_y,tu^.x,tu^.y)-tu^.uid^._r;
                   if(ud<srange)and(ud<uontard)then
-                   if(team=tu^.player^.team)then
-                   begin
-                      uontar :=uc;
-                      uontard:=ud;
-                   end;
+                    if(team=tu^.player^.team)then
+                    begin
+                       uontar :=uc;
+                       uontard:=ud;
+                    end;
                end;
             end;
          end;
@@ -958,7 +959,7 @@ begin
             begin
                unit_detect(pu,tu,ud);
                if(au=nil)and(tu^.hits>0)then
-                if(tu^.transport<=0)or(MaxUnits<tu^.transport)then unit_aura_effects(pu,tu,ud);
+                if(tu^.transport<=0)or(MaxUnits<tu^.transport)then unit_AuraEffects(pu,tu,ud);
             end;
             if(ftarget)then unit_target(pu,tu,ud,@a_tard,@t_weap,@a_tarp,@t_prio);
          end;
@@ -1080,7 +1081,7 @@ begin
               if(tt^.hits<=0)then exit;
 
               if(ukfly=uf_ground)then
-               if(pf_IfObstacleZone(tt^.pfzone))then exit;
+                if(map_IfObstacleZone(tt^.pfzone))then exit;
 
               tu^.uo_x:=tt^.x;
               tu^.uo_y:=tt^.y;
@@ -1127,7 +1128,7 @@ begin
    with tu^ do
    if(transport=pu^.unum)and(pu^.buffs[ub_CCast]<=0)then
    begin
-      pu^.buffs[ub_CCast]:=fr_fpsd4;
+      pu^.buffs[ub_CCast]:=fr_fpsq;
       pu^.transportC-=uid^._transportS;
       transport:=0;
       x    :=pu^.x-g_randomr(pu^.uid^._r);
@@ -1162,7 +1163,7 @@ begin
       if(ServerSide)then
       begin
          if(ptransport^.uo_id=ua_unload)or(ptransport^.transportC>ptransport^.transportM)then
-          if(not ptransport^.ukfly)or(not pf_IfObstacleZone(ptransport^.pfzone))then
+          if(not ptransport^.ukfly)or(not map_IfObstacleZone(ptransport^.pfzone))then
            if(unit_UnLoad(ptransport,pu))then exit;
 
          if(ptransport^.uo_id=ua_move )
@@ -1513,7 +1514,7 @@ wmove_noneed    : if(not attackinmove)then
           if(aw_eid_target>0)and(aw_eid_target_onlyshot=false)then
           begin
              if(not IsUnitRange(pTarget^.transport,nil))then
-              if((g_tick mod fr_fpsd3)=0)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^._missile_r),pTarget^.vy-g_randomr(pTarget^.uid^._missile_r),draw_SpriteDepth(pTarget^.vy+1,pTarget^.ukfly),aw_eid_target);
+              if((g_tick mod fr_fpst)=0)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^._missile_r),pTarget^.vy-g_randomr(pTarget^.uid^._missile_r),draw_SpriteDepth(pTarget^.vy+1,pTarget^.ukfly),aw_eid_target);
              if(aw_snd_target<>nil)then
               if((g_tick mod fr_fps1)=0)then SoundPlayUnit(aw_snd_target,pTarget,@targetvis);
           end;
@@ -1619,27 +1620,27 @@ begin
 
          if(uo_id=ua_psability)then
            case uid^._ability of
-uab_SpawnLost:  begin
-                   mv_x:=x;
-                   mv_y:=y;
-                   uo_id:=ua_amove;
-                   unit_sability(pu,false);
-                   uo_id:=ua_psability;
-                end;
-uab_CCFly    :  if(x=uo_x)and(y=uo_y)then
-                begin
-                   uo_id:=ua_amove;
-                   unit_sability(pu,false);
-                end;
-           else
-             if(speed<=0)
-             then uo_id:=ua_amove
-             else
-               if(x=uo_x)and(y=uo_y)then
-               begin
-                  uo_id:=ua_amove;
-                  unit_sability(pu,false);
-               end;
+uab_SpawnLost     : begin
+                       mv_x:=x;
+                       mv_y:=y;
+                       uo_id:=ua_amove;
+                       unit_sability(pu,false);
+                       uo_id:=ua_psability;
+                    end;
+uab_CCFly         : if(x=uo_x)and(y=uo_y)then
+                    begin
+                       uo_id:=ua_amove;
+                       unit_sability(pu,false);
+                    end;
+uab_RebuildInPoint: if(speed<=0)
+                    then uo_id:=ua_amove
+                    else
+                      if(x=uo_x)and(y=uo_y)then
+                      begin
+                         uo_id:=ua_amove;
+                         PlayerSetProdError(playeri,lmt_argt_unit,uidi,unit_rebuild(pu,false),pu);
+                      end;
+           else uo_id:=ua_amove;
            end
          else
            if(x=uo_x)and(y=uo_y)then
@@ -1745,7 +1746,7 @@ begin
       if(rld>0)then AddUREQ(ureq_reloading);
 
       if(_ability_no_obstacles)then
-       if(pf_IfObstacleZone(pfzone))then AddUREQ(ureq_place);
+        if(map_IfObstacleZone(pfzone))then AddUREQ(ureq_place);
 
       if(_ability_ruid>0)then
        if(uid_eb[_ability_ruid]<=0)then AddUREQ(ureq_ruid);
@@ -1768,7 +1769,6 @@ begin
    with uid^ do
    with player^ do
    case _ability of
-   uab_RebuildInPoint  : unit_sability:=unit_rebuild(pCaster,true);
    uab_SpawnLost       : if(buffs[ub_Cast]>0)
                          or(buffs[ub_CCast]>0)then unit_sability:=ureq_reloading;
    uab_CCFly           : if(zfall<>0)
@@ -1787,7 +1787,7 @@ begin
    case _ability of
    uab_RebuildInPoint  : unit_rebuild(pCaster,false);
    uab_SpawnLost       : begin
-                            buffs[ub_Cast ]:=fr_fpsd2;
+                            buffs[ub_Cast ]:=fr_fpsh;
                             buffs[ub_CCast]:=fr_fps2;
                             if(upgr[upgr_hell_phantoms]>0)
                             then ability_unit_spawn(pCaster,UID_Phantom )
@@ -1860,14 +1860,11 @@ end;
 
 procedure unit_prod(pu:PTUnit);
 var i:integer;
-procedure _uXCheck(pui:pinteger);
+procedure uXCheck(pui:pinteger);
 var tu:PTUnit;
 begin
    if(not IsUnitRange(pui^,@tu))
    then pui^:=pu^.unum;
-   {else
-    if(tu^.rld>pu^.rld)
-    then pui^:=pu^.unum;}
 end;
 begin
    with pu^     do
@@ -1878,8 +1875,8 @@ begin
       unit_end_uprod(pu);
       unit_end_pprod(pu);
 
-      _uXCheck(@uid_x[            uidi]);
-      _uXCheck(@ucl_x[_ukbuilding,_ucl]);
+      uXCheck(@uid_x[            uidi]);
+      uXCheck(@ucl_x[_ukbuilding,_ucl]);
 
       // REGENERATION
       if(cycle_order=g_cycle_regen)then
@@ -1932,8 +1929,8 @@ begin
       with pu^ do
       if(hits>dead_hits)then
       begin
-         if(cycle_order=g_cycle_order)
-         then unit_reveal(pu,false);
+         if(cycle_order=g_cycle_order)then
+           unit_reveal(pu,false);
 
          unit_counters(pu);
 

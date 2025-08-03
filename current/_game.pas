@@ -385,7 +385,7 @@ begin
                                  if(check)then exit;
 
                                  G_Status:=LocalPlayer;
-                                 GameLogChat(LocalPlayer,255,str_gmsg_PlayerPaused,false);
+                                 GameLogChat(LocalPlayer,255,str_gmsg_PlayerPaused);
                               end;
                 gs_paused0..
                 gs_paused7  : begin
@@ -393,7 +393,7 @@ begin
                                  if(check)then exit;
 
                                  G_Status:=gs_running;
-                                 GameLogChat(LocalPlayer,255,str_gmsg_PlayerResumed,false);
+                                 GameLogChat(LocalPlayer,255,str_gmsg_PlayerResumed);
                               end;
                 end;
    end;
@@ -536,6 +536,7 @@ begin
             1..
             MaxUnitGroups: isselected:=group=fgroup;
             255          : isselected:=UnitF2Select(g_punits[u]);
+            254          : isselected:=UnitF1Select(g_punits[u]);
             end;
 
           if(wassel<>isselected)then
@@ -976,12 +977,12 @@ begin
                   else
                   begin
                      log_EnergyCheck:=fr_fps6;
-                     PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1,false);
+                     PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1);
                   end;
            end;
 
            if(prod_error_cndt>0)then
-             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y,not ServerSide);
+             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y);
            prod_error_cndt  :=0;
         end;
      end;

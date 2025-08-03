@@ -120,11 +120,11 @@ begin
       if(ans>0)then
       begin
          if(ei=-1)
-         then sc := sm^.sn
+         then sc := sm^.sm_spritesNum
          else
-           if(ei<sm^.sn)
-           then sc := sm^.sn-ei
-           else sc := sm^.sn;
+           if(ei<sm^.sm_spritesNum)
+           then sc := sm^.sm_spritesNum-ei
+           else sc := sm^.sm_spritesNum;
 
          anim_last_i:=(sc*anim_step)-1;
 

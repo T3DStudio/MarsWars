@@ -24,7 +24,9 @@ procedure ai_scout_pick(pu:PTUnit);forward;
 procedure ai_code(pu:PTUnit);forward;
 function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;forward;
 
-function pf_IfObstacleZone(zone:word):boolean;  forward;
+function map_IfObstacleZone(zone:word):boolean;       forward;
+function map_GetZone(mx,my:integer;mr:integer=0):word;forward;
+
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 procedure GameRemoveAIObservers; forward;
@@ -525,7 +527,7 @@ begin
    PlayerLogCheckNearEvent:=false;
 end;
 
-procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:integer;local:boolean);
+procedure PlayerAddLog(ptarget,amtype,aargt,aargx:byte;astr:shortstring;ax,ay:integer);
 {$IFDEF _FULLGAME}
 var ThisPlayer:byte;
 {$ENDIF}
@@ -597,65 +599,65 @@ lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,[amtype],fr_fps5,ax,ay
    end;
 end;
 
-procedure PlayersAddToLog(from_player,to_players,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer;local:boolean);
+procedure PlayersAddToLog(from_player,to_players,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer);
 var p:byte;
 begin
    for p:=0 to LastPlayer do
      if(GetBBit(@to_players,p))
-     or(p=from_player)then PlayerAddLog(p,amtype,auidt,auid,astr,ax,ay,local);
+     or(p=from_player)then PlayerAddLog(p,amtype,auidt,auid,astr,ax,ay);
 end;
 
-procedure GameLogChat(sender,targets:byte;message:shortstring;local:boolean);
+procedure GameLogChat(sender,targets:byte;message:shortstring);
 begin
    if(targets>0)then
     if(sender<=LastPlayer)
-    then PlayersAddToLog(sender,targets,sender         ,0,0,message,0,0,local)
-    else PlayersAddToLog(sender,targets,lmt_player_chat,0,0,message,0,0,local);
+    then PlayersAddToLog(sender,targets,sender         ,0,0,message,0,0)
+    else PlayersAddToLog(sender,targets,lmt_player_chat,0,0,message,0,0);
 end;
-procedure GameLogCommon(sender,targets:byte;message:shortstring;local:boolean);
+procedure GameLogCommon(sender,targets:byte;message:shortstring);
 begin
-   PlayersAddToLog(sender,targets,lmt_game_message,0,0,message,0,0,local);
+   PlayersAddToLog(sender,targets,lmt_game_message,0,0,message,0,0);
 end;
 procedure GameLogEndGame(wteam:byte);
 begin
    if(not ServerSide)then exit;
-   PlayersAddToLog(0,log_to_all,lmt_game_end,0,wteam,'',0,0,false);
+   PlayersAddToLog(0,log_to_all,lmt_game_end,0,wteam,'',0,0);
 end;
 procedure GameLogPlayerDefeated(player:byte);
 begin
    if(player>LastPlayer)or(not ServerSide)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,'',0,0,false);
+   PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,'',0,0);
 end;
 procedure GameLogPlayerLeave(player:byte);
 begin
    if(player>LastPlayer)or(not ServerSide)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_players[player].name+str_gmsg_PlayerLeft,0,0,false);
+   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_players[player].name+str_gmsg_PlayerLeft,0,0);
 end;
 procedure GameLogPlayerSurrender(player:byte);
 begin
    if(player>LastPlayer)or(not ServerSide)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,0,g_players[player].name+str_gmsg_PlayerSurrender,0,0,false);
+   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,0,g_players[player].name+str_gmsg_PlayerSurrender,0,0);
 end;
 procedure GameLogUnitReady(pu:PTunit);
 begin
    if(pu=nil)or(not ServerSide)then exit;
 
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y,false);
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y);
 end;
 procedure GameLogUnitPromoted(pu:PTunit);
 begin
    if(pu=nil)or(not ServerSide)then exit;
 
    with pu^ do
-    PlayersAddToLog(playeri,0,lmt_unit_advanced,0,uidi,'',x,y,false);
+    PlayersAddToLog(playeri,0,lmt_unit_advanced,0,uidi,'',x,y);
 end;
 procedure GameLogUpgradeComplete(pl,upid:byte;x,y:integer);
 begin
    if(pl>LastPlayer)or(not ServerSide)then exit;
 
-   PlayersAddToLog(pl,0,lmt_upgrade_complete,0,upid,'',x,y,false);
+   PlayersAddToLog(pl,0,lmt_upgrade_complete,0,upid,'',x,y);
 end;
-procedure GameLogCantProduction(pl,uid,utp:byte;condt:cardinal;x,y:integer;local:boolean);
+procedure GameLogCantProduction(pl,uid,utp:byte;condt:cardinal;x,y:integer);
 var bt:byte;
 begin
    if(pl>LastPlayer)or(condt=0)then exit;
@@ -718,7 +720,7 @@ begin
                                then bt:=lmt_cant_order
                                else bt:=lmt_req_common;
 
-   PlayersAddToLog(pl,0,bt,utp,uid,'',x,y,local);
+   PlayersAddToLog(pl,0,bt,utp,uid,'',x,y);
 end;
 procedure GameLogMapMark(pl:byte;x,y:integer);
 begin
@@ -726,7 +728,7 @@ begin
 
    PlayersAddToLog(pl,
    PlayerGetAlliesByte(pl,true)
-   ,lmt_map_mark,0,pl,'',x,y,false);
+   ,lmt_map_mark,0,pl,'',x,y);
 end;
 procedure GameLogUnitAttacked(pu:PTunit);
 begin
@@ -734,8 +736,8 @@ begin
 
    with pu^ do
    begin
-      PlayersAddToLog(playeri,0                                 ,lmt_unit_attacked  ,0,uidi,'',x,y,false);
-      PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,false),lmt_allies_attacked,0,uidi,'',x,y,false);
+      PlayersAddToLog(playeri,0                                 ,lmt_unit_attacked  ,0,uidi,'',x,y);
+      PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,false),lmt_allies_attacked,0,uidi,'',x,y);
    end;
 end;
 procedure GameLogKeyPointCaptured(from_player,kpoint:byte);
@@ -747,8 +749,8 @@ begin
 
    with g_KeyPoints[kpoint] do
      if(kpEnergy>0)
-     then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kpx,kpy,false)
-     else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kpx,kpy,false);
+     then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kpx,kpy)
+     else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kpx,kpy);
 end;
 procedure GameLogKeyPointLost(from_player,kpoint:byte);
 begin
@@ -759,15 +761,15 @@ begin
 
    with g_KeyPoints[kpoint] do
      if(kpEnergy>0)
-     then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kpx,kpy,false)
-     else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kpx,kpy,false);
+     then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kpx,kpy)
+     else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kpx,kpy);
 end;
 procedure GameLogKotHControl;
 begin
    if(map_scenario<>mc_KotH)then exit;
 
    with g_KeyPoints[0] do
-     PlayersAddToLog(255,255,lmt_koth_control,0,kpTimerOwnerTeam,'',kpx,kpy,false);
+     PlayersAddToLog(255,255,lmt_koth_control,0,kpTimerOwnerTeam,'',kpx,kpy);
 end;
 procedure GameLogNgenExh(from_player,kpoint:byte);
 begin
@@ -777,7 +779,7 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with g_KeyPoints[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kpx,kpy,false);
+     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kpx,kpy);
 end;
 
 procedure PlayerClearLog(playerN:byte);
@@ -1116,6 +1118,19 @@ begin
      UnitHaveRPoint:=(_isbarrack)or(_ability=uab_Teleport);
 end;
 
+function UnitF1Select(pu:PTUnit):boolean;
+begin
+   UnitF1Select:=false;
+   with pu^  do
+   with uid^ do
+     if(hits<=0)
+     or(not iscomplete)
+     or(IsUnitRange(transport,nil))
+     or(not _isbuilder)then exit;
+   UnitF1Select:=true;
+end;
+
+
 function UnitF2Select(pu:PTUnit):boolean;
 var tu:PTUnit;
 begin
@@ -1440,7 +1455,7 @@ begin
       if(pstr<>nil)and(pcol<>nil)then
       case G_status of
 0..LastPlayer : begin
-                   pstr^:=str_gstat_Pauseed;
+                   pstr^:=str_gstat_Paused;
                    pcol^:=PlayerGetColor(G_status,false);
                 end;
 gs_replayerror: begin
@@ -1456,7 +1471,7 @@ gs_waitserver : begin
                    pcol^:=PlayerGetColor(net_cl_Hoster,false);
                 end;
 gs_replaypause: begin
-                   pstr^:=str_gstat_Pauseed;
+                   pstr^:=str_gstat_Paused;
                    pcol^:=c_white;
                 end;
 gs_win_team0..
@@ -1576,6 +1591,21 @@ begin
                          or(_ability=uab_HellVision);
 end;
 
+function ui_MouseBrushNeedDrawEdges:boolean;
+begin
+   ui_MouseBrushNeedDrawEdges:=true;
+   case m_brush of
+   1..255     : exit;
+   co_pability: if(ui_uibtn_pabilityu<>nil)then  // переменная заполняется в процессе
+                  case ui_uibtn_pabilityu^.uid^._ability of
+                  uab_HTowerBlink,
+                  uab_HKeepBlink,
+                  uab_RebuildInPoint,
+                  uab_CCFly         : exit;
+                  end;
+   end;
+   ui_MouseBrushNeedDrawEdges:=false;
+end;
 
 function ui_fog_CheckXY(x,y:integer):boolean;
 var cx,cy:integer;
@@ -1585,13 +1615,13 @@ begin
    cx:=x div fog_cw;
    cy:=y div fog_cw;
    ui_fog_CheckXY:=false;
-   if(0<=cx)and(cx<=fog_vfwm)
-  and(0<=cy)and(cy<=fog_vfhm)then ui_fog_CheckXY:=(ui_fog_pgrid[cx,cy]>0);
+   if(0<=cx)and(cx<ui_fog_gridw)
+  and(0<=cy)and(cy<ui_fog_gridh)then ui_fog_CheckXY:=ui_fog_pgrid[cx,cy];
 end;
 
 function RectInCam(x,y,hw,hh,s:integer):boolean;
 begin
-   RectInCam:=((ui_cam_x-hw          )<x)and(x<(ui_cam_x+ui_cam_w+hw))
+   RectInCam:=((ui_cam_x-hw           )<x)and(x<(ui_cam_x+ui_cam_w+hw))
            and((ui_cam_y-hh-max2i(0,s))<y)and(y<(ui_cam_y+ui_cam_h+hh));
 end;
 function PointInCam(x,y:integer):boolean;
@@ -1712,31 +1742,32 @@ procedure ui_Camera_Bounds;
 begin
    ui_cam_x  :=mm3i(0,ui_cam_x,map_Size-ui_cam_w);
    ui_cam_y  :=mm3i(0,ui_cam_y,map_Size-ui_cam_h);
+
    ui_cam_cx := ui_cam_x+ui_cam_hw;
    ui_cam_cy := ui_cam_y+ui_cam_hh;
-   ui_cam_fx :=(ui_cam_x mod fog_cw);
-   ui_cam_fy :=(ui_cam_y mod fog_cw);
-
    ui_cam_mmx:=round(ui_cam_x*map_mmcx);
    ui_cam_mmy:=round(ui_cam_y*map_mmcx);
-   ui_fog_sx :=ui_cam_x div fog_cw;
-   ui_fog_sy :=ui_cam_y div fog_cw;
-   ui_fog_ex :=ui_fog_sx+ui_fog_vfw;
-   ui_fog_ey :=ui_fog_sy+ui_fog_vfh;
+   ui_cam_fx :=(ui_cam_x mod fog_cw);
+   ui_cam_fy :=(ui_cam_y mod fog_cw);
+   ui_fog_sx := ui_cam_x div fog_cw;
+   ui_fog_sy := ui_cam_y div fog_cw;
+   ui_fog_ex := ui_fog_sx+ui_fog_gridw;
+   ui_fog_ey := ui_fog_sy+ui_fog_gridh;
 end;
 
 procedure ui_Camera_MoveToPoint(mx,my:integer);
 begin
-   ui_cam_x:=mx-(ui_cam_w shr 1);
-   ui_cam_y:=my-(ui_cam_h shr 1);
+   ui_cam_x:=mx-ui_cam_hw;
+   ui_cam_y:=my-ui_cam_hh;
    ui_Camera_Bounds;
 end;
 
-procedure ui_Camera_MoveToGroup(ugroupN:byte);
+procedure ui_Camera_MoveToGroup(pugroup:pTUnitGroup);
 begin
-   if(ugroupN>MaxUnitGroups)then exit;
-   if(ui_groups_n[ugroupN]>0)then
-     ui_Camera_MoveToPoint(ui_groups_x[ugroupN] , ui_groups_y[ugroupN])
+   if(pugroup=nil)then exit;
+   with pugroup^ do
+     if(ugroup_n>0)then
+       ui_Camera_MoveToPoint(ugroup_x,ugroup_y);
 end;
 
 procedure ui_Camera_ToLastEvent;
@@ -2054,7 +2085,7 @@ begin
    strInfoVar^+=tc_nl3;
 
    vcard:=0;
-   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar^+=str_time+str_GTick2Time(vcard)+tc_nl3;
+   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar^+=str_ui_time+str_GTick2Time(vcard)+tc_nl3;
 
    strInfoVar^+=tc_nl3+str_Players+tc_nl3;
    for p:=0 to LastPlayer do

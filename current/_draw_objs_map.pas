@@ -3,7 +3,7 @@
 function DoodadAnimationTime(base:integer):integer;
 begin
    case base of
-   -1 : DoodadAnimationTime:=random(fr_fpsd3)+fr_fpsd3;
+   -1 : DoodadAnimationTime:=random(fr_fpst)+fr_fpst;
    -2 : DoodadAnimationTime:=random(fr_fps2 )+1;
    -3 : DoodadAnimationTime:=random(fr_fps1 )+1;
    -4 : DoodadAnimationTime:=random(fr_fps2 )+1;
@@ -47,25 +47,16 @@ begin
 end;
 
 procedure doodads_sprites(noanim:boolean);
-var d,ro:integer;
+var o,edgesR:integer;
 begin
-   for d:=1 to MaxObstacles do
-    with map_ObstaclesL[d] do
+   for o:=1 to MaxObstacles do
+    with map_ObstaclesL[o] do
      if(o_type>0)then
      if(RectInCam(o_x,o_y,o_r,o_r,0))then
      begin
-        ro:=0;
-        with g_players[LocalPlayer] do
-          case m_brush of
-1..255         : ro:=o_r-bld_dec_mr;
-co_pability    : if(ui_uibtn_pabilityu<>nil)then
-                  case ui_uibtn_pabilityu^.uid^._ability of
-                  uab_RebuildInPoint,
-                  uab_HTowerBlink,
-                  uab_HKeepBlink,
-                  uab_CCFly         : ro:=o_r-bld_dec_mr;
-                  end;
-          end;
+        if(ui_DrawEdges)
+        then edgesR:=o_r-bld_dec_mr
+        else edgesR:=0;
 
         if(not noanim)or(o_FrontSprite=pspr_dummy)then
           case o_type of
@@ -75,16 +66,16 @@ co_pability    : if(ui_uibtn_pabilityu<>nil)then
           DID_LiquidR4 : if(theme_liquid_animt<2)
                          then o_FrontSprite:=@spr_liquid[((g_tick div theme_liquid_animm) mod LiquidAnim)+1,o_animn]
                          else o_FrontSprite:=@spr_liquid[1                                                 ,o_animn];
-          DID_Other    : DoodadAnimation(d,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
-          DID_SRock    : DoodadAnimation(d,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
-          DID_BRock    : DoodadAnimation(d,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
+          DID_Other    : DoodadAnimation(o,@theme_spr_decors,@theme_anm_decors,@theme_decors,@theme_decorn,false);
+          DID_SRock    : DoodadAnimation(o,@theme_spr_srocks,@theme_anm_srocks,@theme_srocks,@theme_srockn,false);
+          DID_BRock    : DoodadAnimation(o,@theme_spr_brocks,@theme_anm_brocks,@theme_brocks,@theme_brockn,false);
           end;
 
         if(RectInCam(o_x+o_OffsetX,o_y+o_OffsetY,o_FrontSprite^.hw,o_FrontSprite^.hh,0))then
         begin
            SpriteListAddDoodad(o_x,o_y,o_SpriteDepth,o_ShadowZ,o_FrontSprite,255,o_OffsetX,o_OffsetY);
            if(o_BackSprite<>nil)then SpriteListAddDoodad(o_x,o_y,sd_liquid_back,-32000,o_BackSprite,255,o_OffsetX,o_OffsetY);
-           if(ro>0)then UnitsInfoAddCircle(o_x,o_y,ro,ui_blink2_color_BY);
+           if(edgesR>0)then UnitsInfoAddCircle(o_x,o_y,edgesR,ui_blink2_color_BY);
         end;
      end;
 end;

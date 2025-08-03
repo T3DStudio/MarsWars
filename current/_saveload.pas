@@ -237,7 +237,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameSaved,true);
+   GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameSaved);
 end;
 
 function saveload_Load(check:boolean):boolean;
@@ -306,14 +306,13 @@ begin
          map_RefreshDoodadsCells;
          map_RedrawMenuMinimap;
          map_DoodadsDrawData;
-         pf_MakeZoneGrid;
          ui_Camera_Bounds;
 
          G_Started:=true;
 
          GameBack(true,false);
 
-         GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameLoaded,true);
+         GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
       end;
       close(f);
    end;

@@ -202,14 +202,14 @@ var i:byte;
 begin
    if(not g_FixedPositions)then
    begin
-      if(map_Symmetry)then ai_PlayerSetAlarm(@g_players[p],map_Size-map_PlayerStartX[p],map_Size-map_PlayerStartY[p],1,base_1r,true,pf_get_area(map_Size-map_PlayerStartX[p],map_Size-map_PlayerStartY[p]));
+      if(map_Symmetry)then ai_PlayerSetAlarm(@g_players[p],map_Size-map_PlayerStartX[p],map_Size-map_PlayerStartY[p],1,base_1r,true,map_GetZone(map_Size-map_PlayerStartX[p],map_Size-map_PlayerStartY[p]));
    end
    else
       for i:=0 to LastPlayer do
         if(i<>p)then
           if(g_players[i].state>ps_None)then
             if(g_players[i].team<>g_players[p].team)then
-              ai_PlayerSetAlarm(@g_players[p],map_PlayerStartX[i],map_PlayerStartY[i],1,base_1r,true,pf_get_area(map_PlayerStartX[i],map_PlayerStartY[i]));
+              ai_PlayerSetAlarm(@g_players[p],map_PlayerStartX[i],map_PlayerStartY[i],1,base_1r,true,map_GetZone(map_PlayerStartX[i],map_PlayerStartY[i]));
 end;
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
@@ -529,7 +529,7 @@ begin
             or(kpy>=map_Size)then continue;
 
             if(transportM>0)then
-              if(pf_IfObstacleZone(kpzone))
+              if(map_IfObstacleZone(kpzone))
               or(kpOwnerPlayer=playeri)then continue;
 
             if(kpOwnerPlayer<>playeri)then
@@ -811,7 +811,7 @@ begin
 
                // teleporter beacon
                if(tu^.aiu_alarm_d<base_1r)then
-                 if(not pf_IfObstacleZone(tu^.pfzone))then
+                 if(not map_IfObstacleZone(tu^.pfzone))then
                    if(ai_teleporter_beacon_u=nil)
                    then ai_teleporter_beacon_u:=tu
                    else

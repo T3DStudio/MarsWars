@@ -75,8 +75,6 @@ _playerAPM        : array[0..LastPlayer] of TAPMCounter;
 
 DID_Square        : array[0..MaxDIDs] of longint;
 
-pf_pathgrid_areas : array[0..pf_pathmap_c,0..pf_pathmap_c] of word;
-
 net_status        : byte = 0;
 net_port          : word = 10666;
 net_socket        : PUDPSocket;
@@ -244,10 +242,10 @@ ui_panely         : integer = 0;
 ui_mapx           : integer = 0;
 ui_mapy           : integer = 0;
 
-ui_fog_grid       : array[0..fog_vfwm,0..fog_vfhm] of byte;
-ui_fog_pgrid      : array[0..fog_vfwm,0..fog_vfhm] of byte;
-ui_fog_vfw        : byte = 0;
-ui_fog_vfh        : byte = 0;
+ui_fog_fgrid,
+ui_fog_pgrid      : array of array of boolean;
+ui_fog_gridw      : integer = 0;
+ui_fog_gridh      : integer = 0;
 ui_fog            : boolean = true;
 ui_fog_surf       : pSDL_Surface;
 ui_fog_sx         : integer = 0;
@@ -265,11 +263,12 @@ ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ButtonsNum] of byte;
 ui_panel_CtrlActs : array[TTabControlContent,0..ui_ButtonsNum] of byte;
 
-ui_groups_n,                                             //
-ui_groups_d,                                             //
-ui_groups_x,                                             //
-ui_groups_y       : array[0..MaxUnitGroups] of integer;         //
-ui_groups_uids    : array[0..MaxUnitGroups,false..true] of TSob;//
+ui_group_d        : array[0..MaxUnitGroups] of TUnitGroup;
+ui_group_f1       : TUnitGroup;
+ui_group_f2       : TUnitGroup;
+{
+TUnitGroup
+}
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -304,6 +303,7 @@ ui_uibtn_pabilitys: boolean = false;
 ui_uibtn_rebuildu : PTUnit  = nil; // ui rebuild button
 ui_uibtn_rebuildd : integer = integer.MaxValue;
 ui_uibtn_rebuilds : boolean = false;
+ui_DrawEdges      : boolean = false;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_max_color,                                       // unit max count color
@@ -355,6 +355,7 @@ menu_sc_cx        : single;
 MainMenu          : boolean = true;
 menu_Page         : byte = 0;
 menu_SettingsPage : byte = mi_settings_Game;
+menu_ItemActs     : byte = 0;
 menu_ItemTarget   : integer;
 menu_ItemSelected : integer;
 menu_items        : array[byte] of TMenuItem;
@@ -363,11 +364,6 @@ menu_redraw       : boolean = true;
 
 menu_ResolutionWi,
 menu_ResolutionHi : integer;
-
-menu_ihint        : byte=0;
-menu_ihintpi      : byte=255;
-menu_ihintlx      : array[0..menu_ihintn] of integer = (228,570,228,570);
-menu_ihintly      : array[0..menu_ihintn] of integer = (76 ,76 ,307,271);
 
 menu_mseed        : shortstring = '1';
 menu_ServerPort   : shortstring = '10666';
@@ -761,17 +757,17 @@ spr_db_u0,
 spr_db_u1,
 
 spr_blood         : TMWSModel;
-spr_pdmodel       : PTMWSModel;
+spr_pdmodel       : PTMWSModel; // default empty model
 
-spr_mp            : array[1..r_cnt] of TMWTexture;
+spr_RallyPoint    : array[1..r_cnt] of TMWTexture;
 spr_b4_a,
 spr_b7_a,
 spr_b9_a,
 spr_ptur,
-spr_scan,
-spr_decay,
-spr_invuln,
-spr_hvision,
+spr_effect_Scan,
+spr_effect_Decay,
+spr_effect_Invuln,
+spr_effect_HVision,
 spr_stun          : TMWTexture;
 
 
@@ -790,6 +786,8 @@ spr_b_rstop,
 spr_b_rvis,
 spr_b_action,
 spr_b_paction,
+spr_b_invuln,
+spr_b_rstrike,
 spr_b_attack,
 spr_b_rebuild,
 spr_b_move,
@@ -802,13 +800,17 @@ spr_b_cancel,
 spr_b_delete,
 spr_mback,
 spr_mlogo,
-spr_cursor        : pSDL_Surface;
-spr_b_up          : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
-spr_b_ab          : array[byte] of pSDL_Surface;
-spr_tabs          : array[0..3] of pSDL_Surface;
+spr_cursor,
+spr_CursorHint_Edit: pSDL_Surface;
+spr_CursorHint_MLB,
+spr_CursorHint_MRB,
+spr_CursorHint_MMB : array[boolean] of pSDL_Surface;
+spr_b_Upgrades     : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
+spr_b_ab           : array[byte] of pSDL_Surface;
+spr_tabs           : array[0..3] of pSDL_Surface;
 spr_cp_koth,
 spr_cp_out,
-spr_cp_gen        : TMWTexture;
+spr_cp_gen         : TMWTexture;
 
 //spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
 
@@ -860,11 +862,13 @@ str_need_energy,
 str_cant_build,
 str_cant_prod,
 str_check_reqs,
-str_transformation,
-str_upgradeslvl,
-str_demons,
-str_except,
-str_UnitArming,
+str_hint_TransformTo,
+str_hint_UpgradesLvl,
+str_hint_Demons,
+str_hint_Except,
+str_hint_UnitArming,
+str_hint_menu,
+str_hint_pause,
 str_weapon_melee,
 str_weapon_ranged,
 str_weapon_zombie,
@@ -874,21 +878,20 @@ str_weapon_spawn,
 str_weapon_suicide,
 str_weapon_targets,
 str_weapon_damage,
-str_splashresist,
-str_hits,
-str_srange,
-str_ability,
-str_builder,
-str_barrack,
-str_smith,
-str_IncEnergyLevel,
-str_CanRebuildTo,
-str_TargetLimit,
+str_hint_SplashResist,
+str_hint_hits,
+str_hint_srange,
+str_hint_Ability,
+str_hint_builder,
+str_hint_barrack,
+str_hint_smith,
+str_hint_IncEnergyLevel,
+str_hint_CanRebuildTo,
+str_hint_TargetLimit,
 str_SS_NextTrack,
 str_SS_MusicListSize,
-str_menu_controls,
-str_RecordingStart,
-str_RecordingStop,
+str_gmsg_RecordStart,
+str_gmsg_RecordStop,
 str_SS_ReloadMusic,
 str_gmsg_PlayerPaused,
 str_gmsg_PlayerResumed,
@@ -956,17 +959,17 @@ str_SG_ColoredShadow,
 str_SG_HealthBars,
 str_SG_PlayersColor,
 str_all,
-str_UnitGroups,
-str_requirements,
-str_req,
-str_uprod,
-str_bprod,
+str_ui_UnitGroups,
+str_hint_requirements,
+str_hint_req,
+str_hint_uprod,
+str_hint_bprod,
 str_SG_Language,
 str_SV_ResolutionApply,
 str_GO_Random,
 str_menu_chat,
-str_chat_all,
-str_chat_allies,
+str_ui_ChatAll,
+str_ui_ChatAllies,
 str_Caption_Server,
 str_Caption_Client,
 str_Caption_GOptions,
@@ -977,11 +980,11 @@ str_gstat_ReplayEnd,
 str_gstat_ReplayError,
 str_SR_ReplayPrefix,
 str_FilePlay,
-str_menu,
-str_time,
-str_kothtime,
-str_kothtime_act,
-str_kothwinner,
+str_ui_menu,
+str_ui_time,
+str_ui_KothTime,
+str_ui_KotHTime_act,
+str_ui_KotHWinner,
 str_Players,
 str_map,
 str_FileSave,
@@ -989,13 +992,13 @@ str_FileLoad,
 str_FileDelete,
 str_gmsg_GameSaved,
 str_gmsg_GameLoaded,
-str_gstat_Pauseed,
+str_gstat_Paused,
 str_observer,
 str_gstat_Win,
 str_gstat_Lose,
-str_msg_WrongVersion,
-str_msg_ServerFull,
-str_msg_GameStarted,
+str_gmsg_WrongVersion,
+str_gmsg_ServerFull,
+str_gmsg_GameStarted,
 str_net_UDPPort,
 str_gmsg_Connecting,
 str_gmsg_PortBlocked,
@@ -1034,10 +1037,9 @@ str_Caption_Players      : shortstring;
 str_NetQualityL,
 str_ReplayQualityL          : array[0..net_MaxQuality] of shortstring;
 str_Camp_DifficultyL          : array[0..CMPMaxSkills] of shortstring;
-str_hint_Tab        : array[0..3] of shortstring;
-str_hint_army     : shortstring;
-str_hint_energy   : shortstring;
-str_hint_m        : array[0..2 ] of shortstring;
+str_ui_Tab        : array[0..3] of shortstring;
+str_ui_army     : shortstring;
+str_ui_energy   : shortstring;
 str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
 str_action_hint   : array[byte] of shortstring;
@@ -1316,6 +1318,7 @@ screen_redraw   : boolean = true;
 consoley        : integer = 0;
 
 {$ENDIF}
+
 
 
 

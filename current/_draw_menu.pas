@@ -596,6 +596,7 @@ true : begin
 end;
 
 procedure D_Menu;
+var tx,ty:integer;
 begin
    if(menu_redraw)then
    begin
@@ -611,6 +612,20 @@ begin
    if(vid_ShowFPS)then draw_text(vid_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_right,255,c_white);
 
    draw_sdlsurface(vid_screen,mouse_x,mouse_y,spr_cursor);
+   if(menu_ItemActs>0)then
+   begin
+      tx:=mouse_x+(spr_cursor^.w div 2);
+      ty:=mouse_y+(spr_cursor^.w div 2);
+      if((menu_ItemActs and %00000111)>0)then
+      begin
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MLB[GetBBit(@menu_ItemActs,0)]);
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MMB[GetBBit(@menu_ItemActs,1)]);
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MRB[GetBBit(@menu_ItemActs,2)]);
+         tx+=spr_CursorHint_MLB[true]^.w;
+      end;
+      if(GetBBit(@menu_ItemActs,3))then
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_Edit);
+   end;
 end;
 
 

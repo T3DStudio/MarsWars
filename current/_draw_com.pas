@@ -128,6 +128,8 @@ begin
    end;
 end;
 
+
+
 procedure map_MinimapBackgroundObj(sd:TSob);
 var d:integer;
 begin

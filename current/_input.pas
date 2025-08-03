@@ -91,7 +91,8 @@ begin
    input_SetAction(iAct_Control_UPatrol  ,ikt_keyboard,0           ,SDLK_C           );
    input_SetAction(iAct_Control_UProdCncl,ikt_keyboard,iAct_control,SDLK_C           );
    input_SetAction(iAct_Control_UDestroy ,ikt_keyboard,0           ,SDLK_DELETE      );
-   input_SetAction(iAct_Control_USelArmy ,ikt_keyboard,0           ,SDLK_F1          );
+   input_SetAction(iAct_Control_USelBase ,ikt_keyboard,0           ,SDLK_F1          );
+   input_SetAction(iAct_Control_USelArmy ,ikt_keyboard,0           ,SDLK_F2          );
 
    input_SetAction(iAct_SProd1           ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_SProd2           ,ikt_keyboard,0           ,SDLK_T           );
@@ -186,7 +187,8 @@ begin
    ui_panel_CtrlActs[tcc_controls,8 ]:=iAct_Control_UPatrol;
    ui_panel_CtrlActs[tcc_controls,9 ]:=iAct_Control_UProdCncl;
    ui_panel_CtrlActs[tcc_controls,10]:=iAct_Control_UDestroy;
-   ui_panel_CtrlActs[tcc_controls,11]:=iAct_Control_USelArmy;
+   ui_panel_CtrlActs[tcc_controls,12]:=iAct_Control_USelBase;
+   ui_panel_CtrlActs[tcc_controls,13]:=iAct_Control_USelArmy;
 
    ui_panel_CtrlActs[tcc_replay  ,0 ]:=iAct_Replay_Fast;
    ui_panel_CtrlActs[tcc_replay  ,1 ]:=iAct_Replay_Pause;
@@ -315,7 +317,7 @@ begin
 end;
 procedure _ClickEffect(color:cardinal);
 begin
-   ui_click_eff(ox1,oy1,fr_fpsd4,color);
+   ui_click_eff(ox1,oy1,fr_fpsq,color);
 end;
 function CheckBOrders(pu:PTUnit):boolean;
 begin
@@ -407,7 +409,7 @@ begin
    if(IsUnitRange(tar,nil))then
    begin
       ui_umark_u:=tar;
-      ui_umark_t:=fr_fpsd2;
+      ui_umark_t:=fr_fpsh;
       exit;
    end;
 
@@ -564,7 +566,7 @@ begin
      1..255            : begin
                             if not(m_brush in ui_bprod_possible)then
                             begin
-                               GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1,true);
+                               GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
                                m_brush:=co_empty;
                                exit;
                             end;
@@ -572,7 +574,7 @@ begin
                             cndt:=CheckUnitReqs(@g_players[LocalPlayer],m_brush);
                             if(cndt>0)then
                             begin
-                               if(logErrors)then GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1,true);
+                               if(logErrors)then GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1);
                                m_brush:=co_empty;
                             end
                             else
@@ -580,7 +582,7 @@ begin
                               begin
                                  if not(m_brush in ui_bprod_possible)or(n_builders<=0)then
                                  begin
-                                    GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1,true);
+                                    GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
                                     m_brush:=co_empty;
                                     exit;
                                  end;
@@ -665,10 +667,15 @@ iAct_SProd24           : if(ui_GameControlsEnabled)then
                                              end;
                               end;
                          end;
-iAct_Control_USelArmy  : if(ui_groups_n[MaxUnitGroups]>0)then
+iAct_Control_USelBase  : if(ui_group_f1.ugroup_n>0)then
                            case click_type of
-                           pct_left : begin units_SelectGroup(false,255);        clickSoundON;end;
-                           pct_Dleft: begin ui_Camera_MoveToGroup(MaxUnitGroups);clickSoundON;end;
+                           pct_left : begin units_SelectGroup(false,254);       clickSoundON;end;
+                           pct_Dleft: begin ui_Camera_MoveToGroup(@ui_group_f1);clickSoundON;end;
+                           end;
+iAct_Control_USelArmy  : if(ui_group_f2.ugroup_n>0)then
+                           case click_type of
+                           pct_left : begin units_SelectGroup(false,255);       clickSoundON;end;
+                           pct_Dleft: begin ui_Camera_MoveToGroup(@ui_group_f2);clickSoundON;end;
                            end;
      else
 
@@ -689,9 +696,9 @@ iAct_Control_USelArmy  : if(ui_groups_n[MaxUnitGroups]>0)then
         iAct_Replay_Back2      :        replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     );
         iAct_Replay_Back10     :        replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     );
         iAct_Replay_Back60     :        replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     );
-        iAct_Replay_Forward2   : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*2;
-        iAct_Replay_Forward10  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*10;
-        iAct_Replay_Forward60  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsd2*60;
+        iAct_Replay_Forward2   : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsh*2;
+        iAct_Replay_Forward10  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsh*10;
+        iAct_Replay_Forward60  : if(not replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1))then rpls_ForwardSkip:=fr_fpsh*60;
         iAct_Replay_POV        : rpls_POVRecorder:=not rpls_POVRecorder;
         iAct_Replay_Log        : rpls_showlog:=not rpls_showlog;
         iAct_Observer_Fog,
@@ -904,7 +911,7 @@ begin
                               end;
                   1..255    : if(m_brushc=c_lime)
                               then PlayerSendOrder(m_brushx,m_brushy,m_brush,0,0, uo_build  ,LocalPlayer)
-                              else GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y,true);
+                              else GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y);
                   co_pability,
                   co_move,
                   co_amove,
@@ -1038,7 +1045,7 @@ begin
            if(ingame_chat>0)then
              if(net_status=ns_client)
              then net_send_chat(            ingame_chat,net_chat_str)
-             else GameLogChat  (LocalPlayer,ingame_chat,net_chat_str,false);
+             else GameLogChat  (LocalPlayer,ingame_chat,net_chat_str);
         end;
         ingame_chat:=0;
      end
@@ -1117,7 +1124,7 @@ begin
       for k:=iAct_UASlGroup0 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup0);
       for k:=iAct_USelGroup0 to iAct_USelGroup9 do
         if(InputActionDPressed(k))and(k<>iAct_USelGroup0)
-        then ui_Camera_MoveToGroup(k-iAct_USelGroup0)
+        then ui_Camera_MoveToGroup(@ui_group_d[k-iAct_USelGroup0])
         else
           if(InputActionPressed(k))
           then units_SelectGroup(false,k-iAct_USelGroup0);
@@ -1129,6 +1136,8 @@ begin
          if(InputActionPressed(act))then
            ui_ExecAction(act,pct_left,@clickSound);
       end;
+      if(InputActionDPressed(iAct_Control_USelBase))then ui_Camera_MoveToGroup(@ui_group_f1);
+      if(InputActionDPressed(iAct_Control_USelArmy))then ui_Camera_MoveToGroup(@ui_group_f2);
 
       // Production hotkeys
       case ui_tab of

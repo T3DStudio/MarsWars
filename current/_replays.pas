@@ -170,7 +170,7 @@ begin
    if(length(rpls_str_path)>0)then
    begin
       if(rpls_pstate=rpls_write)
-      or(rpls_fstate=rpls_write)then GameLogCommon(0,255,str_RecordingStop+rpls_str_path,true);
+      or(rpls_fstate=rpls_write)then GameLogCommon(0,255,str_gmsg_RecordStop+rpls_str_path);
    end;
    if(rpls_fstate>rpls_none)then
    begin
@@ -230,7 +230,7 @@ begin
          rpls_pstate:=rpls_none;
       end;
 
-      GameLogCommon(0,255,str_RecordingStart+rpls_str_path,true);
+      GameLogCommon(0,255,str_gmsg_RecordStart+rpls_str_path);
    end;
 end;
 procedure replay_WriteGameFrame;

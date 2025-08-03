@@ -17,22 +17,22 @@ begin
 
    with sm^ do
    begin
-      if(sn<=0)then exit;
+      if(sm_spritesNum<=0)then exit;
 
-      if(mkind=smt_fapc)
+      if(sm_kind=smt_fapc)
       then dd:=dir_MOD360(dir+12) div 23  // 0..15
       else dd:=dir_MOD360(dir+23) div 45; // 0..7
 
-      if(sk=0)
+      if(sm_spritesLast=0)
       then i:=0
       else
-      case mkind of
+      case sm_kind of
 smt_effect  : if(animk=sms_death)
               then i:=anim
               else i:=0;
 smt_effect2 : if(animk=sms_death)
               then i:=anim
-              else i:=sk;
+              else i:=sm_spritesLast;
 
 smt_missile : if(animk=sms_death)
               then i:=8+anim
@@ -41,7 +41,7 @@ smt_missile : if(animk=sms_death)
 smt_buiding : case animk of
         sms_build: i:=mm3i(0,anim,2);
         sms_death: exit;
-              else i:=aa3(3,3+anim,sk);
+              else i:=aa3(3,3+anim,sm_spritesLast);
               end;
 
 smt_turret  : case animk of
@@ -300,12 +300,12 @@ smt_terminat :case animk of
 
       if(stat<>nil)then
       begin
-         if(i<sk)then stat^:=0;
-         if(i=sk)then stat^:=1;
-         if(i>sk)then stat^:=2;
+         if(i<sm_spritesLast)then stat^:=0;
+         if(i=sm_spritesLast)then stat^:=1;
+         if(i>sm_spritesLast)then stat^:=2;
       end;
 
-      _sm2s:=@sl[mm3i(0,i,sk)];
+      _sm2s:=@sm_spritesL[mm3i(0,i,sm_spritesLast)];
    end;
 end;
 

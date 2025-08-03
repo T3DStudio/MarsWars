@@ -291,7 +291,7 @@ begin
   AddReq:='';
   if(ruid >0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
   if(rupid>0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
-  if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_req+tc_default+AddReq+'}';
+  if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_hint_req+tc_default+AddReq+'}';
 end;
 
 function str_MakeUnitDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
@@ -306,30 +306,30 @@ begin
     with g_uids[uid] do
     begin
        if(not for_doc)then
-       STRADD(@str_MakeUnitDefaultDescription,str_hits+i2s(_mhits),sep_sdot);
-       //STRADD(@str_MakeUnitDefaultDescription,str_srange+i2s(_srange),sep_sdot);
+       STRADD(@str_MakeUnitDefaultDescription,str_hint_hits+i2s(_mhits),sep_sdot);
+       //STRADD(@str_MakeUnitDefaultDescription,str_hint_srange+i2s(_srange),sep_sdot);
 
-       if(_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_builder,sep_sdot);
-       if(_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_barrack,sep_sdot);
-       if(_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_smith  ,sep_sdot);
-       if(_genergy    >0)then STRADD(@str_MakeUnitDefaultDescription,str_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
+       if(_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_builder,sep_sdot);
+       if(_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
+       if(_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_hint_smith  ,sep_sdot);
+       if(_genergy    >0)then STRADD(@str_MakeUnitDefaultDescription,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
        if(_rebuild_uid>0)and(_ability<>uab_RebuildInPoint)then
        begin
           STRADD(@str_MakeUnitDefaultDescription,
-          str_CanRebuildTo+
+          str_hint_CanRebuildTo+
           RebuildStr(_rebuild_uid,_rebuild_uid=uid)+
           AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot );
        end;
        if(_ability>0)then
        begin
           if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
-          then STRADD(@str_MakeUnitDefaultDescription,str_ability+str_transformation+RebuildStr(_rebuild_uid,uid=_rebuild_uid)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
+          then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+str_hint_TransformTo+RebuildStr(_rebuild_uid,uid=_rebuild_uid)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
           else
             if(length(str_ability_name[_ability])>0)
-            then STRADD(@str_MakeUnitDefaultDescription,str_ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
+            then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
        end;
 
-       if(_splashresist)or(_ukmech)then STRADD(@str_MakeUnitDefaultDescription,str_splashresist,sep_sdot);
+       if(_splashresist)or(_ukmech)then STRADD(@str_MakeUnitDefaultDescription,str_hint_SplashResist,sep_sdot);
 
        STRADD(@str_MakeUnitDefaultDescription,basedesc,sep_sdot);;
        if(length(str_MakeUnitDefaultDescription)>0)then str_MakeUnitDefaultDescription+='.';
@@ -350,12 +350,12 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_demons+'] '+str_except+' ['+g_uids[UID_Cyberdemon].un_txt_name+','
+    then instr:='['+str_attr_dead+tc_default+','+str_hint_Demons+'] '+str_hint_Except+' ['+g_uids[UID_Cyberdemon].un_txt_name+','
                                                                                 +g_uids[UID_Mastermind].un_txt_name+','
                                                                                 +g_uids[UID_ArchVile  ].un_txt_name+']'
     else
      if(tset= uids_demons)
-     then instr:='['+str_demons+']'
+     then instr:='['+str_hint_Demons+']'
      else
      begin
       inset:=[];
@@ -387,7 +387,7 @@ begin
          for u:=1 to 255 do
           if(u in exset)then
            STRADD(@exstr,g_uids[u].un_txt_name,sep_comma);
-         if(length(exstr)>0)then exstr:=str_except+' ['+exstr+']';
+         if(length(exstr)>0)then exstr:=str_hint_Except+' ['+exstr+']';
       end;
    end;
 
@@ -590,7 +590,7 @@ begin
      if(length(weapons_str)>0)then
       if(docSTR)
       then STRADD(@str_MakeWeaponsDescription,weapons_str,sep_sdot)
-      else STRADD(@str_MakeWeaponsDescription,str_UnitArming+weapons_str,sep_sdot);
+      else STRADD(@str_MakeWeaponsDescription,str_hint_UnitArming+weapons_str,sep_sdot);
   end;
   if(length(str_MakeWeaponsDescription)>0)then str_MakeWeaponsDescription+='.';
 end;
@@ -692,12 +692,12 @@ begin
          un_txt_uihint3:=str_MakeWeaponsDescription(uid,false);
          un_txt_uihint4:='';
 
-         if(length(REQ )>0)then un_txt_uihint4+=tc_yellow+str_requirements+tc_default+REQ+tc_nl1
+         if(length(REQ )>0)then un_txt_uihint4+=tc_yellow+str_hint_requirements+tc_default+REQ+tc_nl1
                            else un_txt_uihint4+=tc_nl1;
          if(length(PROD)>0)then
           if(_ukbuilding)
-          then un_txt_uihint4+=str_bprod+PROD
-          else un_txt_uihint4+=str_uprod+PROD;
+          then un_txt_uihint4+=str_hint_bprod+PROD
+          else un_txt_uihint4+=str_hint_uprod+PROD;
       end;
    end;
 
@@ -711,7 +711,7 @@ begin
       if(_up_rupgr >0)then STRADD(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
 
       _up_hint:='';
-      if(length(REQ)>0)then _up_hint+=tc_yellow+str_requirements+tc_default+REQ;
+      if(length(REQ)>0)then _up_hint+=tc_yellow+str_hint_requirements+tc_default+REQ;
    end;
 end;
 
@@ -845,7 +845,6 @@ begin
    str_menu_Back                 := 'BACK';
 
    str_menu_chat                 := 'CHAT(ALL PLAYERS)';
-   str_menu_controls             := '- use the left and right mouse buttons to manipulate the menu items -';
 
    str_S_Game                    := 'GAME';
    str_S_Replay                  := 'RECORDING';
@@ -938,6 +937,28 @@ begin
    str_FileError_WData           := 'Wrong file'+tc_nl3+'data!';
    str_FileError_WVer            := 'Wrong version!';
 
+   str_ReplayQualityL[0]         := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
+   str_ReplayQualityL[1]         := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
+   str_ReplayQualityL[2]         := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
+   str_ReplayQualityL[3]         := tc_lime  +'x4 '+tc_default+'/'+tc_orange+' x4';
+   str_ReplayQualityL[4]         := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+' x5';
+   str_ReplayQualityL[5]         := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+' x6';
+   str_ReplayQualityL[6]         := tc_orange+'x7 '+tc_default+'/'+tc_lime  +' x7';
+   str_ReplayQualityL[7]         := tc_orange+'x8 '+tc_default+'/'+tc_lime  +' x8';
+   str_ReplayQualityL[8]         := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +' x9';
+   str_ReplayQualityL[9]         := tc_red   +'x10'+tc_default+'/'+tc_aqua  +' x10';
+
+   str_NetQualityL[0]            := tc_red   +'x1';
+   str_NetQualityL[1]            := tc_red   +'x2';
+   str_NetQualityL[2]            := tc_orange+'x3';
+   str_NetQualityL[3]            := tc_orange+'x4';
+   str_NetQualityL[4]            := tc_yellow+'x5';
+   str_NetQualityL[5]            := tc_yellow+'x6';
+   str_NetQualityL[6]            := tc_lime  +'x7';
+   str_NetQualityL[7]            := tc_lime  +'x8';
+   str_NetQualityL[8]            := tc_aqua  +'x9 ';
+   str_NetQualityL[9]            := tc_aqua  +'x10';
+
    str_PT_Player                 := 'PLAYER';
    str_PT_State                  := 'STATUS';
    str_PT_Race                   := 'RACE';
@@ -950,6 +971,8 @@ begin
    str_race[r_uac   ]            := tc_lime   +'UAC'   +tc_default;
 
    str_observer                  := 'OBSERVER';
+   str_Players                   := 'Players';
+   str_all                       := 'All';
 
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
@@ -959,7 +982,7 @@ begin
 
    str_gstat_Win                 := 'VICTORY!';
    str_gstat_Lose                := 'DEFEAT!';
-   str_gstat_Pauseed             := 'Paused by ';
+   str_gstat_Paused              := 'Paused by ';
    str_gstat_ReplayEnd           := 'Replay ended!';
    str_gstat_ReplayError         := 'Read file error!';
    str_gstat_WaitForServer       := 'Awaiting server...';
@@ -974,65 +997,58 @@ begin
    str_gmsg_PortBlocked          := 'Port is blocked!';
    str_gmsg_PlayerPaused         := 'player paused the game';
    str_gmsg_PlayerResumed        := 'player has resumed the game';
+   str_gmsg_WrongVersion         := 'Wrong version!';
+   str_gmsg_ServerFull           := 'Server full!';
+   str_gmsg_GameStarted          := 'Game started!';
+   str_gmsg_RecordStart          := 'Start recording: ';
+   str_gmsg_RecordStop           := 'Stop recording: ';
 
-   str_msg_WrongVersion  := 'Wrong version!';
-   str_msg_ServerFull    := 'Server full!';
-   str_msg_GameStarted   := 'Game started!';
+   str_ui_time                   := 'Time: ';
+   str_ui_menu                   := 'Menu';
+   str_ui_UnitGroups             := 'Unit groups: ';
+   str_ui_KothTime               := 'Center capture time left: ';
+   str_ui_KotHTime_act           := 'Time left until center area is active: ';
+   str_ui_KotHWinner             := ' is King of the Hill!';
+   str_ui_ChatAll                := 'ALL:';
+   str_ui_ChatAllies             := 'ALLIES:';
+   str_ui_Tab[tab_Buildings]     := 'Buildings';
+   str_ui_Tab[tab_Units    ]     := 'Units';
+   str_ui_Tab[tab_Upgrades ]     := 'Researches';
+   str_ui_Tab[tab_Controls ]     := 'Controls';
+   str_ui_army                   := 'Army: ';
+   str_ui_energy                 := 'Energy: ';
 
+   str_hint_menu                 := 'Menu (' +tc_lime+'Esc'+tc_default+')';
+   str_hint_pause                := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
+   str_hint_requirements         := 'Requirements: ';
+   str_hint_req                  := 'Req.: ';
+   str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
+   str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
+   str_hint_Ability              := 'Special ability: ';
+   str_hint_TransformTo          := 'transformation to ';
+   str_hint_UpgradesLvl          := 'Upgrades: ';
+   str_hint_Demons               := 'demons&zombies';
+   str_hint_Except               := 'except';
+   str_hint_SplashResist         := 'Immune to splash damage';
+   str_hint_TargetLimit          := 'target limit';
+   str_hint_builder              := 'Builder';
+   str_hint_barrack              := 'Unit production';
+   str_hint_smith                := 'Researches and upgrades facility';
+   str_hint_IncEnergyLevel       := 'Increase energy level';
+   str_hint_CanRebuildTo         := 'Can be rebuilt into ';
+   str_hint_UnitArming           := 'Arming/Abilities: ';
+   str_hint_hits                 := 'Hits: ';
+   str_hint_srange               := 'Base sight range: ';
 
-   str_Players           := 'Players';
-   str_all               := 'All';
-
-   str_time              := 'Time: ';
-   str_menu              := 'Menu';
-
-   str_chat_all          := 'ALL:';
-   str_chat_allies       := 'ALLIES:';
-
-   str_requirements      := 'Requirements: ';
-   str_req               := 'Req.: ';
-   str_UnitGroups            := 'Unit groups: ';
-
-   str_uprod             := tc_lime+'Produced by: '   +tc_default;
-   str_bprod             := tc_lime+'Constructed by: '+tc_default;
-
-   str_kothtime          := 'Center capture time left: ';
-   str_kothtime_act      := 'Time left until center area is active: ';
-   str_kothwinner        := ' is King of the Hill!';
-
-
-   str_ability           := 'Special ability: ';
-   str_transformation    := 'transformation to ';
-   str_upgradeslvl       := 'Upgrades: ';
-   str_demons            := 'demons&zombies';
-   str_except            := 'except';
-   str_splashresist      := 'Immune to splash damage';
-   str_TargetLimit       := 'target limit';
-
-
-
-   str_RecordingStart    := 'Start recording: ';
-   str_RecordingStop     := 'Stop recording: ';
-
-
-   str_builder           := 'Builder';
-   str_barrack           := 'Unit production';
-   str_smith             := 'Researches and upgrades facility';
-   str_IncEnergyLevel    := 'Increase energy level';
-   str_CanRebuildTo      := 'Can be rebuilt into ';
-   str_UnitArming        := 'Arming/Abilities: ';
-   str_hits              := 'Hits: ';
-   str_srange            := 'Base sight range: ';
-
-   str_weapon_melee      := 'melee attack';
-   str_weapon_ranged     := 'ranged attack';
-   str_weapon_zombie     := '+zombification';
-   str_weapon_ressurect  := 'resurrection';
-   str_weapon_heal       := 'heal/repair';
-   str_weapon_spawn      := 'spawn';
-   str_weapon_suicide    := 'suicide';
-   str_weapon_targets    := 'targets: ';
-   str_weapon_damage     := 'impact';
+   str_weapon_melee              := 'melee attack';
+   str_weapon_ranged             := 'ranged attack';
+   str_weapon_zombie             := '+zombification';
+   str_weapon_ressurect          := 'resurrection';
+   str_weapon_heal               := 'heal/repair';
+   str_weapon_spawn              := 'spawn';
+   str_weapon_suicide            := 'suicide';
+   str_weapon_targets            := 'targets: ';
+   str_weapon_damage             := 'impact';
 
    str_cant_land         := 'Can`t land or teleport here';
    str_cant_build        := 'Can`t build here';
@@ -1080,27 +1096,7 @@ begin
    str_attr_detector     := tc_purple+'detector'    ;
    str_attr_transport    := tc_gray  +'transport'   ;
 
-   str_ReplayQualityL[0]           := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
-   str_ReplayQualityL[1]           := tc_aqua  +'x2 '+tc_default+'/'+tc_red   +' x2';
-   str_ReplayQualityL[2]           := tc_lime  +'x3 '+tc_default+'/'+tc_orange+' x3';
-   str_ReplayQualityL[3]           := tc_lime  +'x4 '+tc_default+'/'+tc_orange+' x4';
-   str_ReplayQualityL[4]           := tc_yellow+'x5 '+tc_default+'/'+tc_yellow+' x5';
-   str_ReplayQualityL[5]           := tc_yellow+'x6 '+tc_default+'/'+tc_yellow+' x6';
-   str_ReplayQualityL[6]           := tc_orange+'x7 '+tc_default+'/'+tc_lime  +' x7';
-   str_ReplayQualityL[7]           := tc_orange+'x8 '+tc_default+'/'+tc_lime  +' x8';
-   str_ReplayQualityL[8]           := tc_red   +'x9 '+tc_default+'/'+tc_aqua  +' x9';
-   str_ReplayQualityL[9]           := tc_red   +'x10'+tc_default+'/'+tc_aqua  +' x10';
 
-   str_NetQualityL[0]          := tc_red   +'x1 ';
-   str_NetQualityL[1]          := tc_red   +'x2 ';
-   str_NetQualityL[2]          := tc_orange+'x3 ';
-   str_NetQualityL[3]          := tc_orange+'x4 ';
-   str_NetQualityL[4]          := tc_yellow+'x5 ';
-   str_NetQualityL[5]          := tc_yellow+'x6 ';
-   str_NetQualityL[6]          := tc_lime  +'x7 ';
-   str_NetQualityL[7]          := tc_lime  +'x8 ';
-   str_NetQualityL[8]          := tc_aqua  +'x9 ';
-   str_NetQualityL[9]          := tc_aqua  +'x10';
 
    str_Camp_Difficulty   := 'Difficulty';
    str_Camp_DifficultyL[0]           := tc_aqua  +'I`m too young to die'+tc_default;
@@ -1120,17 +1116,7 @@ begin
    str_net_Address       := 'Address';
    str_net_LANSearch     := 'Search for LAN servers';
 
-   str_hint_Tab[0]         := 'Buildings';
-   str_hint_Tab[1]         := 'Units';
-   str_hint_Tab[2]         := 'Researches';
-   str_hint_Tab[3]         := 'Controls';
 
-   str_hint_army         := 'Army: ';
-   str_hint_energy       := 'Energy: ';
-
-   str_hint_m[0]         := 'Menu (' +tc_lime+'Esc'+tc_default+')';
-   str_hint_m[1]         := '';
-   str_hint_m[2]         := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
 
 
    str_ability_name[uab_Teleport        ]:='Teleportation';
@@ -1552,7 +1538,7 @@ begin
 
   str_race[r_random]    := tc_white+'ЛЮБАЯ'  +tc_default;
   str_observer          := 'ЗРИТЕЛЬ';
-  str_gstat_Pauseed             := 'Пауза';
+  str_gstat_Paused             := 'Пауза';
   str_gstat_Win               := 'ПОБЕДА!';
   str_gstat_Lose              := 'ПОРАЖЕНИЕ!';
   str_gstat_Unknown         := 'Неизвестный статус!';
@@ -1564,8 +1550,8 @@ begin
   str_FileError_Open  := 'Неполучилось'+tc_nl3+'открыть файл!';
   str_FileError_WData := 'Неправильные'+tc_nl3+'данные файла!';
   str_FileError_WVer  := 'Неправильная'+tc_nl3+'версия файла!';
-  str_time              := 'Время: ';
-  str_menu              := 'Меню';
+  str_ui_time              := 'Время: ';
+  str_ui_menu              := 'Меню';
   str_gmsg_PlayerDefeat        := ' уничтожен!';
   str_FilePlay              := 'Проиграть';
 
@@ -1575,8 +1561,8 @@ begin
   str_Caption_Server            := 'СЕРВЕР';
   str_Caption_Client            := 'КЛИЕНТ';
   str_menu_chat         := 'ЧАТ(ВСЕ ИГРОКИ)';
-  str_chat_all          := 'ВСЕ:';
-  str_chat_allies       := 'СОЮЗНИКИ:';
+  str_ui_ChatAll          := 'ВСЕ:';
+  str_ui_ChatAllies       := 'СОЮЗНИКИ:';
   str_GO_Random           := 'Случайная схватка';
 
   str_gmsg_PlayerLeft             := ' покинул игру';
@@ -1585,36 +1571,35 @@ begin
 
 
 
-  str_requirements      := 'Требования: ';
-  str_req               := 'Треб.: ';
-  str_UnitGroups            := 'Отряды: ';
+  str_hint_requirements      := 'Требования: ';
+  str_hint_req               := 'Треб.: ';
+  str_ui_UnitGroups            := 'Отряды: ';
   str_all               := 'Все';
-  str_uprod             := tc_lime+'Создается в: '+tc_default;
-  str_bprod             := tc_lime+'Чем может быть построен: '     +tc_default;
+  str_hint_uprod             := tc_lime+'Создается в: '+tc_default;
+  str_hint_bprod             := tc_lime+'Чем может быть построен: '     +tc_default;
   str_SG_ColoredShadow  := 'Цветные тени';
-  str_kothtime          := 'Время до захвата центра: ';
-  str_kothtime_act      := 'Время до активации центральной зоны: ';
-  str_kothwinner        := ' - Царь Горы!';
+  str_ui_KothTime          := 'Время до захвата центра: ';
+  str_ui_KotHTime_act      := 'Время до активации центральной зоны: ';
+  str_ui_KotHWinner        := ' - Царь Горы!';
   str_GO_DefeatedObs     := 'Наблюдатель после поражения';
   str_SV_MenuScale        := 'Растягивание меню';
   str_SV_MenuScaleSmooth       := 'Гладкое растянутое меню';
   str_SV_ShowFPS               := 'Показать FPS';
   str_SG_ShowAPM               := 'Показать APM';
-  str_ability           := 'Специальная способность: ';
-  str_transformation    := 'превращение в ';
-  str_upgradeslvl       := 'Улучшения: ';
-  str_demons            := 'демоны и зомби';
-  str_except            := 'кроме';
-  str_splashresist      := 'Невосприимчив к взрывной волне';
-  str_TargetLimit       := 'лимит цели';
+  str_hint_Ability           := 'Специальная способность: ';
+  str_hint_TransformTo    := 'превращение в ';
+  str_hint_UpgradesLvl       := 'Улучшения: ';
+  str_hint_Demons            := 'демоны и зомби';
+  str_hint_Except            := 'кроме';
+  str_hint_SplashResist      := 'Невосприимчив к взрывной волне';
+  str_hint_TargetLimit       := 'лимит цели';
   str_SS_NextTrack         := 'Следующий трек';
   str_SS_ReloadMusic       := 'Загрузить новый плейлист';
   str_gmsg_PlayerPaused      := 'игрок приостановил игру';
   str_gmsg_PlayerResumed     := 'игрок возобновил игру';
   str_SS_MusicListSize     := 'Размер плейлиста';
-  str_menu_controls     := '- используйте левую и правую кнопки мыши для управления пунктами меню -';
-  str_RecordingStart    := 'Начало записи: ';
-  str_RecordingStop     := 'Остановка записи: ';
+  str_gmsg_RecordStart    := 'Начало записи: ';
+  str_gmsg_RecordStop     := 'Остановка записи: ';
   str_PT_Player          := 'ИГРОК';
   str_PT_State           := 'СТАТУС';
   str_PT_Race            := 'РАСА';
@@ -1622,14 +1607,14 @@ begin
   str_PT_Color           := 'ЦВЕТ';
   str_PT_Ping            := 'ПИНГ+';
 
-  str_builder           := 'Строитель';
-  str_barrack           := 'Производит юнитов';
-  str_smith             := 'Исследует улучшения и апгрейды';
-  str_IncEnergyLevel    := 'Увеличивает уровень энергии';
-  str_CanRebuildTo      := 'Можно перестроить в ';
-  str_UnitArming        := 'Вооружение/Способности: ';
-  str_hits              := 'Здоровье: ';
-  str_srange            := 'Базовый радиус обзора: ';
+  str_hint_builder           := 'Строитель';
+  str_hint_barrack           := 'Производит юнитов';
+  str_hint_smith             := 'Исследует улучшения и апгрейды';
+  str_hint_IncEnergyLevel    := 'Увеличивает уровень энергии';
+  str_hint_CanRebuildTo      := 'Можно перестроить в ';
+  str_hint_UnitArming        := 'Вооружение/Способности: ';
+  str_hint_hits              := 'Здоровье: ';
+  str_hint_srange            := 'Базовый радиус обзора: ';
 
   str_weapon_melee      := 'ближний бой';
   str_weapon_ranged     := 'дальний бой';
@@ -1720,20 +1705,20 @@ begin
 
   str_gmsg_Connecting        := 'Соединение...';
   str_gmsg_PortBlocked       := 'Порт занят!';
-  str_msg_WrongVersion              := 'Другая версия!';
-  str_msg_ServerFull             := 'Нет мест!';
-  str_msg_GameStarted              := 'Игра началась!';
+  str_gmsg_WrongVersion              := 'Другая версия!';
+  str_gmsg_ServerFull             := 'Нет мест!';
+  str_gmsg_GameStarted              := 'Игра началась!';
 
-  str_hint_Tab[0]         := 'Здания';
-  str_hint_Tab[1]         := 'Юниты';
-  str_hint_Tab[2]         := 'Исследования';
-  str_hint_Tab[3]         := 'Запись';
+  str_ui_Tab[0]         := 'Здания';
+  str_ui_Tab[1]         := 'Юниты';
+  str_ui_Tab[2]         := 'Исследования';
+  str_ui_Tab[3]         := 'Запись';
 
-  str_hint_m[0]         := 'Меню (' +tc_lime+'Esc'        +tc_default+')';
-  str_hint_m[2]         := 'Пауза ('+tc_lime+'Pause/Break'+tc_default+')';
+  str_hint_menu         := 'Меню (' +tc_lime+'Esc'        +tc_default+')';
+  str_hint_pause         := 'Пауза ('+tc_lime+'Pause/Break'+tc_default+')';
 
-  str_hint_army         := 'Армия: ';
-  str_hint_energy       := 'Энергия: ';
+  str_ui_army         := 'Армия: ';
+  str_ui_energy       := 'Энергия: ';
 
   str_ability_name[uab_Teleport        ]:='Призыв';
   str_ability_name[uab_UACScan         ]:='Сканирование';
@@ -2037,7 +2022,7 @@ begin
 
         if(_attack)then
         begin
-           writeln(f,str_UnitArming);
+           writeln(f,str_hint_UnitArming);
            for w:=0 to MaxUnitWeapons do
             with _a_weap[w] do
             begin

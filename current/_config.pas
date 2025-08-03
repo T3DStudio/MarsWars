@@ -116,8 +116,8 @@ begin
 
       if(length(PlayerName)>MaxPlayerNameLen)then SetLength(PlayerName,MaxPlayerNameLen);
 
-      vid_vw:=mm3i(vid_minw,vid_vw,vid_maxw);
-      vid_vh:=mm3i(vid_minh,vid_vh,vid_maxh);
+      vid_vw:=max2i(vid_minw,vid_vw);
+      vid_vh:=max2i(vid_minh,vid_vh);
 
       if(g_AISlots      >g_MaxAISlots     )then g_AISlots     :=g_MaxAISlots;
       if(map_generators >map_MaxGenerators)then map_generators:=map_MaxGenerators;

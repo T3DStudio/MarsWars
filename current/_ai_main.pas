@@ -383,6 +383,7 @@ uprod_base : begin
                         if(ai_UnitProduction(pu,UID_Pain          ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Knight        ,i))then exit;
                         if(ai_UnitProduction(pu,UID_Baron         ,i))then exit;
+                        if(ai_UnitProduction(pu,UID_Revenant      ,i))then exit;
                         if(ai_UnitProduction(pu,UID_ZSergant      ,i))then exit;
                         if(ai_UnitProduction(pu,UID_ZCommando     ,i))then exit;
                      end;
@@ -899,7 +900,7 @@ begin
       uo_y:=mm3i(1,uo_y,map_Size);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
       or(force)
-      or(not ukfly and not ukfloater and (pfzone<>pf_get_area(uo_x,uo_y)))
+      or(not ukfly and not ukfloater and (pfzone<>map_GetZone(uo_x,uo_y)))
       or(g_CheckRoyalBattlePoint(uo_x,uo_y,base_1r))
       then ai_RunTo(pu,-1,random(map_Size),random(map_Size),0,nil);
    end;
@@ -1177,7 +1178,7 @@ UID_Cyberdemon : if(srange<ai_enemy_build_d)and(ai_enemy_build_d<base_1rh)then
          SpecialMicro:=true;
       end
       else
-        if(pf_IfObstacleZone(tar_z))then
+        if(map_IfObstacleZone(tar_z))then
         begin
            ai_RunTo(pu,tar_d,tar_x,tar_y,base_1r,nil);
            SpecialMicro:=true;
@@ -1268,8 +1269,8 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
         then SetNearestTarget(ai_abase_u,0,0,ai_abase_d,0,ai_abase_d>base_3r,false,2*byte((group=aio_home)or(group=aio_home_busy)))
         else SetNearestTarget(nil,ai_abase_u^.aiu_alarm_x,
                                   ai_abase_u^.aiu_alarm_y,
-                                  0,pf_GetAreaZone(ai_abase_u^.aiu_alarm_x,
-                                                   ai_abase_u^.aiu_alarm_y),false,false,2);
+                                  0,map_GetZone(ai_abase_u^.aiu_alarm_x,
+                                                ai_abase_u^.aiu_alarm_y),false,false,2);
 
       if(ai_kpoint_d<NOTSET)then
         with ai_kpoint_kp^ do SetNearestTarget(nil,kpx,kpy,ai_kpoint_d,kpzone,ai_kpoint_d>base_3r,(ai_kpoint_d>base_3r)and(not ai_kpoint_koth),byte(ai_kpoint_koth or(map_scenario=mc_capture)));
@@ -1392,7 +1393,7 @@ begin
                   if(ai_base_d<base_1r)
                   or(ai_base_d=NOTSET)
                   then
-                    if(not pf_IfObstacleZone(pfzone))
+                    if(not map_IfObstacleZone(pfzone))
                     then unit_sability(pu,false);
                   {with player^ do
                   with uid^ do
@@ -1519,7 +1520,7 @@ begin
       if(srange<ai_alarm_d)and(ai_alarm_d<NOTSET)then
         SetBlinkTarget(ai_alarm_x,ai_alarm_y,ai_alarm_d,ai_alarm_zone);
 
-      if(map_scenario=mc_royale)then SetBlinkTarget(map_hSize,map_hSize,0,pf_get_area(map_hSize,map_hSize));
+      if(map_scenario=mc_royale)then SetBlinkTarget(map_hSize,map_hSize,0,map_GetZone(map_hSize,map_hSize));
 
       if(bd=NOTSET)then exit;
 

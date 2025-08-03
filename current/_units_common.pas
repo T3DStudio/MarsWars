@@ -218,16 +218,11 @@ begin
 end;
 
 procedure unit_UpdateXY(pu:PTUnit);
-var newzone:word;
 begin
    with pu^ do
    begin
-      newzone:=pf_get_area(x,y);
-      if(ukfly)or(ukfloater)
-      then pfzone:=newzone
-      else
-        if(not pf_IfObstacleZone(newzone))then pfzone:=newzone;
-
+      if(uid<>nil)then
+        pfzone:=map_GetZone(x,y,uid^._r);
       {$IFDEF _FULLGAME}
       unit_MiniMapXY(pu);
       unit_UpdateFogXY(pu);
@@ -855,7 +850,7 @@ begin
 
    if(playern<=LastPlayer)then
      if(g_players[playern].state=ps_AI)then
-       if(pf_IfObstacleZone(pf_get_area(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
+       if(map_IfObstacleZone(map_GetZone(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
 
    i:=CheckInBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
    case i of
@@ -949,7 +944,7 @@ begin
       end;
 
       upgr[upgr_hell_tblink]-=1;
-      buffs[ub_CCast]:=fr_fpsd2;
+      buffs[ub_CCast]:=fr_fpsh;
       unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
    end;
 end;
@@ -1153,11 +1148,11 @@ begin
             uo_by   := -1;
             mv_x    := x;
             mv_y    := y;
-            isselected     := false;
+            isselected:= false;
             transportC:= 0;
 
             FillChar(buffs,sizeof(buffs),0);
-            FillChar(TeamVision,SizeOf(TeamVision),0);
+            FillChar(TeamVision   ,SizeOf(TeamVision   ),0);
             FillChar(TeamDetection,SizeOf(TeamDetection),0);
 
             if(Ulevel>MaxUnitLevel)
@@ -1168,6 +1163,7 @@ begin
             unit_reveal     (LastCreatedUnitP,false);
             unit_ApplyUID   (LastCreatedUnitP);
             unit_inc_cntrs  (LastCreatedUnitP,Ucomplete,Usummoned);
+            unit_UpdateXY   (LastCreatedUnitP);
          end;
       end;
    end;
@@ -1933,7 +1929,7 @@ UID_UGTurret      : level:=byte(upgr[upgr_uac_plasmt]>0);
 UID_Phantom,
 UID_LostSoul      : begin
                        tu:=nil;
-                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_CCast]:=fr_fpsd2;
+                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_CCast]:=fr_fpsh;
                        if(buffs[ub_pain]<=0)then
                          if(buffs[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=_ukfly;
                        ukfloater:=not ukfly;

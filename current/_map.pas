@@ -21,7 +21,10 @@ end;
 {$ENDIF}
 
 procedure map_RefreshDoodadsCells;
-var dx0,dy0,dx1,dy1,d,dy:integer;
+var d,
+dx0,dy0,
+dx1,dy1,
+dx,dy:integer;
 begin
    for dx0:=0 to MapObstaclesGridN do
    for dy0:=0 to MapObstaclesGridN do
@@ -32,26 +35,24 @@ begin
    end;
 
    for d:=1 to MaxObstacles do
-    with map_ObstaclesL[d] do
+     with map_ObstaclesL[d] do
      if(o_type>0)then
-     begin
-        dx0:=(o_x-o_r-MapObstaclesGridW) div MapObstaclesGridW;
-        dy0:=(o_y-o_r-MapObstaclesGridW) div MapObstaclesGridW;
-        dx1:=(o_x+o_r+MapObstaclesGridW) div MapObstaclesGridW;
-        dy1:=(o_y+o_r+MapObstaclesGridW) div MapObstaclesGridW;
-        while(dx0<=dx1)do
-        begin
-           for dy:=dy0 to dy1 do
-            if(0<=dx0)and(dx0<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-             with map_ObstaclesGrid[dx0,dy] do
-             begin
-                oc_n+=1;
-                setlength(oc_l,oc_n);
-                oc_l[oc_n-1]:=@map_ObstaclesL[d];
-             end;
-           dx0+=1;
-        end;
-     end;
+       begin
+          dx0:=(o_x-o_r-MapObstaclesGridW) div MapObstaclesGridW;
+          dy0:=(o_y-o_r-MapObstaclesGridW) div MapObstaclesGridW;
+          dx1:=(o_x+o_r+MapObstaclesGridW) div MapObstaclesGridW;
+          dy1:=(o_y+o_r+MapObstaclesGridW) div MapObstaclesGridW;
+          for dx:=dx0 to dx1 do
+            if(0<=dx)and(dx<=MapObstaclesGridN)then
+              for dy:=dy0 to dy1 do
+                if(0<=dy)and(dy<=MapObstaclesGridN)then
+                  with map_ObstaclesGrid[dx,dy] do
+                  begin
+                     oc_n+=1;
+                     setlength(oc_l,oc_n);
+                     oc_l[oc_n-1]:=@map_ObstaclesL[d];
+                  end;
+       end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,11 +60,16 @@ end;
 //   COMMON
 //
 
-function map_GetZone(mx,my:integer):word;
-var i,
-dx,dy:integer;
+function map_IfObstacleZone(zone:word):boolean;
 begin
-   map_GetZone:=pf_Solid;
+   map_IfObstacleZone:=(zone=zone_solid);
+end;
+
+function map_GetZone(mx,my:integer;mr:integer=0):word;
+var
+i,dx,dy:integer;
+begin
+   map_GetZone:=zone_solid;
 
    dx:=mx div MapObstaclesGridW;
    dy:=my div MapObstaclesGridW;
@@ -74,7 +80,7 @@ begin
       for i:=0 to oc_n-1 do
        with oc_l[i]^ do
         if(o_r>0)and(o_type>0)then
-         if(point_dist_int(mx,my,o_x,o_y)<=o_r)then exit;
+          if(point_dist_int(mx,my,o_x,o_y)<=o_r)and(mr<=o_r)then exit;
 
    map_GetZone:=0;
 end;
@@ -240,12 +246,12 @@ end;
 //   KEY POINTS
 //
 
-procedure map_KeyPoints_UpdatePFZone;
+procedure map_KeyPoints_UpdateZone;
 var pn:integer;
 begin
    for pn:=0 to LastKeyPoint do
      with g_KeyPoints[pn] do
-       if(kpCaptureR>0)then kpzone:=pf_get_area(kpx,kpy);
+       if(kpCaptureR>0)then kpzone:=map_GetZone(kpx,kpy,kpCaptureR);
 end;
 
 procedure map_KeyPoints_Default(acount,aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
@@ -289,7 +295,6 @@ begin
       if(map_Symmetry)
       then acount-=2
       else acount-=1;
-      writeln(acount);
 
       attempts:=0;
       while(attempts<max_attempts)do
@@ -691,8 +696,7 @@ begin
 
    map_Seed2RandomBase;
    map_KeyPoints;
-   pf_MakeZoneGrid;
-   map_KeyPoints_UpdatePFZone;
+   map_KeyPoints_UpdateZone;
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;
    map_RedrawMenuMinimap;

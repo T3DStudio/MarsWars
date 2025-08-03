@@ -18,7 +18,7 @@ begin
    gfx_InitColors;
    vid_MakeScreen;
    vid_LoadingScreen(@str_loading_gfx,c_yellow);
-   gfx_LoadAll(true);
+   gfx_LoadAll;
    cmp_Init;
 
    InitVideo:=true;

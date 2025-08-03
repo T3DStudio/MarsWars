@@ -172,7 +172,7 @@ begin
             case mid of
 nmid_LogMessage      : begin
                           i:=net_readbyte;
-                          GameLogChat(pid,i,net_readstring,false);    // chat
+                          GameLogChat(pid,i,net_readstring);    // chat
                           continue;
                        end;
 nmid_PlayerLeave     : begin
@@ -230,13 +230,13 @@ nmid_pause       : begin
                       if(G_Status<=LastPlayer)then
                       begin
                          G_Status:=gs_running;
-                         GameLogChat(pid,255,str_gmsg_PlayerResumed,false);
+                         GameLogChat(pid,255,str_gmsg_PlayerResumed);
                       end
                       else
                         if(G_Status=gs_running)then
                         begin
                            G_Status:=pid;
-                           GameLogChat(pid,255,str_gmsg_PlayerPaused,false);
+                           GameLogChat(pid,255,str_gmsg_PlayerPaused);
                         end;
                      {$IFNDEF _FULLGAME}
                      screen_redraw:=true;
@@ -324,19 +324,19 @@ nmid_pause       : begin
                net_writebyte(nmid_LogUpdate);
                wudata_log(i,@log_n_cl,false);
                net_send(nip,nport);
-               net_logsend_pause:=fr_fpsd2;
+               net_logsend_pause:=fr_fpsh;
             end;
          end;
 
    net_period+=1;
-   net_period:=net_period mod fr_fpsd2;
+   net_period:=net_period mod fr_fpsh;
 end;
 
 {$IFDEF _FULLGAME}
 
 procedure net_ErrorLog(msg:shortstring);
 begin
-   if(net_error_timer=0)then GameLogChat(255,255,msg,true);
+   if(net_error_timer=0)then GameLogChat(255,255,msg);
    net_error_timer:=fr_fps2;
 end;
 
@@ -426,15 +426,15 @@ begin
       mid:=net_readbyte;
       case mid of
 nmid_ServerFull  : begin
-                      net_ErrorLog(str_msg_ServerFull  );
+                      net_ErrorLog(str_gmsg_ServerFull  );
                       menu_update:=true;
                    end;
 nmid_WrongVersion: begin
-                      net_ErrorLog(str_msg_WrongVersion);
+                      net_ErrorLog(str_gmsg_WrongVersion);
                       menu_update:=true;
                    end;
 nmid_GameStarted : begin
-                      net_ErrorLog(str_msg_GameStarted);
+                      net_ErrorLog(str_gmsg_GameStarted);
                       menu_update:=true;
                    end;
 nmid_NotConnected: begin
@@ -528,7 +528,7 @@ nmid_lobby_info  : begin
    end;
 
    net_period+=1;
-   net_period:=net_period mod fr_fpsd2;
+   net_period:=net_period mod fr_fpsh;
    if(net_cl_svttl<ServerTTL)then
    begin
       net_cl_svttl+=1;

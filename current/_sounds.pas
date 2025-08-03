@@ -452,7 +452,7 @@ begin
    SoundPlay(ss,sss_ucommand,true);
 
    snd_command_last:=ss;
-   snd_command_ticks:=fr_fps2d3;
+   snd_command_ticks:=fr_fpst2;
 end;
 
 procedure SoundPlayUnitSelect;

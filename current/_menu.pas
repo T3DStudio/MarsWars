@@ -93,10 +93,10 @@ begin
              menu_GetClientAddress;
              rpls_pnu:=0;
              if(net_UpSocket)
-             then GameLogChat(255,255,str_gmsg_Connecting,true)
+             then GameLogChat(255,255,str_gmsg_Connecting)
              else
              begin
-                GameLogChat(255,255,str_gmsg_PortBlocked,true);
+                GameLogChat(255,255,str_gmsg_PortBlocked);
                 net_dispose;
                 net_status:=ns_none;
              end;
@@ -566,7 +566,7 @@ mi_MP_Chat         : if(EnterKey)then
                         begin
                            if(net_status=ns_client)
                            then net_send_chat(            255,net_chat_str)
-                           else GameLogChat  (LocalPlayer,255,net_chat_str,false);
+                           else GameLogChat  (LocalPlayer,255,net_chat_str);
                         end;
                         net_chat_str:='';
                      end;
@@ -576,113 +576,63 @@ mi_MP_Chat         : if(EnterKey)then
    menu_update:=changed or menu_update;
 end;
 
-procedure menu_Controls;
-var
-mnx,
-mny    :integer;
-clickSound,
-changed:boolean;
-function SetSelectedItem(newItem:byte):boolean;
+
+function menu_Controls_MLB(item:byte;check:boolean):boolean;
 begin
-   SetSelectedItem:=true;
-   if(menu_items[newItem].mi_state>0)
-   then menu_ItemSelected:=newItem
-   else SetSelectedItem:=false;
-end;
+   menu_Controls_MLB:=true;
+   case item of
+mi_back                : if(not check)then GameBack(false,false);
+mi_exit                : if(not check)then GameCycle:=false;
 
-begin
-   mnx:=mouse_x;
-   mny:=mouse_y;
-   mouse_x:=round((mouse_x-menu_sc_x)*menu_sc_cx);
-   mouse_y:=round((mouse_y-menu_sc_y)*menu_sc_cx);
-
-   clickSound:=false;
-
-   {p:=menu_MouseXY2Item; // menu hint
-   if(p<>menu_ihint)then
-   begin
-      menu_ihint:=p;
-
-      menu_ihintpi:=255;
-      for p:=0 to menu_ihintn do
-        if(menu_ihintly[p]<mouse_y)and(abs(menu_ihintlx[p]-mouse_x)<166)then
-         if(menu_ihintpi=255)
-         then menu_ihintpi:=p
-         else
-           if(abs(menu_ihintly[p]-mouse_y)<abs(menu_ihintly[menu_ihintpi]-mouse_y))
-           then menu_ihintpi:=p;
-      menu_update:=true;
-   end; }
-
-   menu_ItemTarget:=menu_MouseXY2Item;
-
-   if(InputActionPressed(iact_MLB))or(InputActionPressed(iact_MRB)) then   //right or left click
-   begin
-      if(menu_ItemTarget<>menu_ItemSelected)then
-         menu_EndEdition(false);
-
-      menu_ItemSelected:=menu_ItemTarget;
-   end;
-
-///////////////////////////////////
-///////////////////////////////////   left button pressed
-///////////////////////////////////
-
-   if(InputActionPressed(iact_MLB))then
-   begin
-      changed:=true;
-      case menu_ItemSelected of
-mi_back                : GameBack(false,false);
-mi_exit                : GameCycle:=false;
-
-mi_Start               : GameStart(false);      // start game
-mi_Break               : GameBreak(false);      // break game
-mi_Surrender           : if(PlayerSurrender(LocalPlayer,false))then
-                           if(MainMenu)then GameBack(true,false);
+mi_Start               : if(not check)then GameStart(false);      // start game
+mi_Break               : if(not check)then GameBreak(false);      // break game
+mi_Surrender           : if(not check)then
+                           if(PlayerSurrender(LocalPlayer,false))then
+                             if(MainMenu)then GameBack(true,false);
 // Surrender
+mi_Campaings           : if(not check)then g_type:=gt_campaing;
+mi_Scirmish            : if(not check)then g_type:=gt_scirmish;
 
-
-mi_Campaings           : g_type:=gt_campaing;
-mi_Scirmish            : g_type:=gt_scirmish;
-
-mi_SaveLoad            : begin menu_page:=menu_ItemSelected;saveload_MakeFolderList; end;
-mi_Replays             : begin menu_page:=menu_ItemSelected;  replay_MakeFolderList; end;
-mi_Settings            : begin menu_page:=menu_ItemSelected; menu_ResolutionWi:=vid_vw;menu_ResolutionHi:=vid_vh;end;
+mi_SaveLoad            : if(not check)then begin menu_page:=menu_ItemSelected;saveload_MakeFolderList;end;
+mi_Replays             : if(not check)then begin menu_page:=menu_ItemSelected;  replay_MakeFolderList;end;
+mi_Settings            : if(not check)then begin menu_page:=menu_ItemSelected; menu_ResolutionWi:=vid_vw;menu_ResolutionHi:=vid_vh;end;
 
 // SETTINGS LIST
 mi_settings_Game,
 mi_settings_Record,
 mi_settings_Video,
-mi_settings_Sound      : menu_SettingsPage:=menu_ItemSelected;
+mi_settings_Sound      : if(not check)then menu_SettingsPage:=menu_ItemSelected;
 
 // SETTINGS GAME
-mi_SG_ColoredShadows   : ui_ColoredShadow:=not ui_ColoredShadow;
-mi_SG_ShowAPM          : ui_ShowAPM      :=not ui_ShowAPM;
-mi_SG_HealthBars       : ScrollByte(@ui_HealthBars,true,0,vid_MaxHealthBars);
-mi_SG_RightClickAction : m_RightClickAct :=not m_RightClickAct;
-mi_SG_ScrollSpeed      : menu_GetBarValByte(menu_ItemSelected,@ui_CamSpeed,1,vid_MaxCamSpeed,true);
-mi_SG_MouseScroll      : ui_MouseScroll  :=not ui_MouseScroll;
+mi_SG_ColoredShadows   : if(not check)then ui_ColoredShadow:=not ui_ColoredShadow;
+mi_SG_ShowAPM          : if(not check)then ui_ShowAPM      :=not ui_ShowAPM;
+mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars,true,0,vid_MaxHealthBars);
+mi_SG_RightClickAction : if(not check)then m_RightClickAct :=not m_RightClickAct;
+mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(menu_ItemSelected,@ui_CamSpeed,1,vid_MaxCamSpeed,true);
+mi_SG_MouseScroll      : if(not check)then ui_MouseScroll  :=not ui_MouseScroll;
 mi_SG_PlayerName       : ;
-mi_SG_Language         : begin ui_language:=not ui_language;SwitchLanguage;end;
-mi_SG_ControlPanelPos  : begin
+mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;end;
+mi_SG_ControlPanelPos  : if(not check)then
+                         begin
                             ScrollByte(@ui_ControlPanelPos,true,0,vid_MaxControlPanelPos);
                             vid_RemakeScreenSurfaces;
                             theme_map_pTerrain:=255;
                             gfx_MapMakeTerrain;
                          end;
-mi_SG_PlayersColor     : ScrollByte(@ui_PlayersColor,true,0,vid_MaxPlayersColor);
+mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,vid_MaxPlayersColor);
 
 // SETTINGS GAME RECORDING
 
-mi_SR_RecordGames      : rpls_Record:=not rpls_Record;
+mi_SR_RecordGames      : if(not check)then rpls_Record:=not rpls_Record;
 mi_SR_RecordPrefix     : ;
-mi_SR_RecordQuality    : ScrollByte(@rpls_Quality,true,0,rpls_MaxQuality);
+mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality,true,0,rpls_MaxQuality);
 
 // SETTINGS VIDEO
 
 mi_SV_ResolutionW      :;
 mi_SV_ResolutionH      :;
-mi_SV_ResolutionApply  :begin
+mi_SV_ResolutionApply  : if(not check)then
+                         begin
                             vid_vw:=max2i(vid_minw,menu_ResolutionWi);menu_ResolutionWi:=vid_vw;
                             vid_vh:=max2i(vid_minh,menu_ResolutionHi);menu_ResolutionHi:=vid_vh;
 
@@ -690,198 +640,278 @@ mi_SV_ResolutionApply  :begin
                             theme_map_pTerrain:=255;
                             gfx_MapMakeTerrain;
                          end;
-mi_SV_Windowed         : begin vid_windowed:=not vid_windowed; vid_MakeScreen;end;
-mi_SV_ShowFPS          : vid_ShowFPS:=not vid_ShowFPS;
-mi_SV_MenuScaling      : menu_scale:=not menu_scale;
-mi_SV_SmoothScaled     : menu_ScaleSmooth:=not menu_ScaleSmooth;
+mi_SV_Windowed         : if(not check)then begin vid_windowed:=not vid_windowed; vid_MakeScreen;end;
+mi_SV_ShowFPS          : if(not check)then vid_ShowFPS:=not vid_ShowFPS;
+mi_SV_MenuScaling      : if(not check)then menu_scale:=not menu_scale;
+mi_SV_SmoothScaled     : if(not check)then menu_ScaleSmooth:=not menu_ScaleSmooth;
 
 // SETTINGS SOUND
 
-mi_SS_SoundVolume      : begin
-                         menu_GetBarValByte(menu_ItemSelected,@snd_SoundVolume,0,snd_MaxSoundVolume,true);
-                         snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
-                         SoundSourceUpdateGainAll;
+mi_SS_SoundVolume      : if(not check)then
+                         begin
+                            menu_GetBarValByte(menu_ItemSelected,@snd_SoundVolume,0,snd_MaxSoundVolume,true);
+                            snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
+                            SoundSourceUpdateGainAll;
                          end;
-mi_SS_MusicVolume      : begin
-                         menu_GetBarValByte(menu_ItemSelected,@snd_MusicVolume,0,snd_MaxSoundVolume,true);
-                         snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
-                         SoundSourceUpdateGainAll;
+mi_SS_MusicVolume      : if(not check)then
+                         begin
+                            menu_GetBarValByte(menu_ItemSelected,@snd_MusicVolume,0,snd_MaxSoundVolume,true);
+                            snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
+                            SoundSourceUpdateGainAll;
                          end;
-mi_SS_PlayerNext       : SoundMusicControll(true);
-mi_SS_PlaylistSize     : ScrollByte(@snd_musicListSize,true,1,snd_musicListSizeMax);
-mi_SS_ReloadPlaylist   : GameMusicReLoad;
+mi_SS_PlayerNext       : if(not check)then SoundMusicControll(true);
+mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,true,1,snd_musicListSizeMax);
+mi_SS_ReloadPlaylist   : if(not check)then GameMusicReLoad;
 
 // SAVE LOAD
-mi_SaveLoad_list       : begin
+mi_SaveLoad_list       : if(not check)then
+                         begin
                             menu_ListMouseXY2Line(menu_ItemSelected,@svld_list_sel,svld_list_scroll,menu_ListLineH);
                             saveload_Select;
                          end;
 mi_SaveLoad_info       :;
 mi_SaveLoad_fname      :;
-mi_SaveLoad_save       : saveload_Save  (false);
-mi_SaveLoad_load       : saveload_Load  (false);
-mi_SaveLoad_delete     : saveload_Delete(false);
+mi_SaveLoad_save       : if(not check)then saveload_Save  (false);
+mi_SaveLoad_load       : if(not check)then saveload_Load  (false);
+mi_SaveLoad_delete     : if(not check)then saveload_Delete(false);
 
 // REPLAYS
-mi_Replays_list        : begin
+mi_Replays_list        : if(not check)then
+                         begin
                             menu_ListMouseXY2Line(menu_ItemSelected,@rpls_list_sel,rpls_list_scroll,menu_ListLineH);
                             replay_Select;
                          end;
 mi_Replays_info        : ;
-mi_Replays_play        : replay_Play  (false);
-mi_Replays_delete      : replay_Delete(false);
+mi_Replays_play        : if(not check)then replay_Play  (false);
+mi_Replays_delete      : if(not check)then replay_Delete(false);
 
 // SCIRMISH PLAYERS
 mi_Players_State0..
-mi_Players_State7      : PlayerAIToggle     (menu_ItemSelected-mi_Players_State0,false);
+mi_Players_State7      : if(not check)then PlayerAIToggle     (menu_ItemSelected-mi_Players_State0,false);
 mi_Players_Name0..
-mi_Players_Name7       : if(not PlayersSwap      (menu_ItemSelected-mi_Players_Name0,LocalPlayer))
-                         then PlayerAILevelScroll(menu_ItemSelected-mi_Players_Name0,true ,false);
+mi_Players_Name7       : if(not check)then
+                           if(not PlayersSwap      (menu_ItemSelected-mi_Players_Name0,LocalPlayer))
+                           then PlayerAILevelScroll(menu_ItemSelected-mi_Players_Name0,true ,false);
 mi_Players_Race0..
-mi_Players_Race7       : PlayerRaceScroll   (menu_ItemSelected-mi_Players_Race0 ,false);
+mi_Players_Race7       : if(not check)then PlayerRaceScroll   (menu_ItemSelected-mi_Players_Race0 ,false);
 mi_Players_Team0..
-mi_Players_Team7       : PlayerTeamScroll   (menu_ItemSelected-mi_Players_Team0 ,true ,false);
-mi_Players_Ready       : PlayerReady:=not PlayerReady;
+mi_Players_Team7       : if(not check)then PlayerTeamScroll   (menu_ItemSelected-mi_Players_Team0 ,true ,false);
+mi_Players_Ready       : if(not check)then PlayerReady:=not PlayerReady;
 
 // SCIRMISH MAP
-mi_Map_Scenario        : GameSetOption(nmid_lobby_MScenario      ,true,false);
-mi_Map_Generators      : GameSetOption(nmid_lobby_MGenerators    ,true,false);
+mi_Map_Scenario        : if(not check)then GameSetOption(nmid_lobby_MScenario      ,true,false);
+mi_Map_Generators      : if(not check)then GameSetOption(nmid_lobby_MGenerators    ,true,false);
 mi_Map_Seed            : ;
-mi_Map_Size            : GameSetOption(nmid_lobby_MSize          ,true,false);
-mi_Map_Obstacles       : GameSetOption(nmid_lobby_MObs           ,true,false);
-mi_Map_Symmetry        : GameSetOption(nmid_lobby_MSym           ,true,false);
-mi_Map_Random          : GameSetOption(nmid_lobby_MRandom        ,true,false);
+mi_Map_Size            : if(not check)then GameSetOption(nmid_lobby_MSize          ,true,false);
+mi_Map_Obstacles       : if(not check)then GameSetOption(nmid_lobby_MObs           ,true,false);
+mi_Map_Symmetry        : if(not check)then GameSetOption(nmid_lobby_MSym           ,true,false);
+mi_Map_Random          : if(not check)then GameSetOption(nmid_lobby_MRandom        ,true,false);
 
-mi_Game_FixedPositions : GameSetOption(nmid_lobby_GFixedPositions,true,false);
-mi_Game_AISlots        : GameSetOption(nmid_lobby_GAISlots       ,true,false);
-mi_Game_DefeatedObs    : GameSetOption(nmid_lobby_GDefeatedObs   ,true,false);
-mi_Game_Random         : GameSetOption(nmid_lobby_GRandomScirmish,true,false);
+mi_Game_FixedPositions : if(not check)then GameSetOption(nmid_lobby_GFixedPositions,true,false);
+mi_Game_AISlots        : if(not check)then GameSetOption(nmid_lobby_GAISlots       ,true,false);
+mi_Game_DefeatedObs    : if(not check)then GameSetOption(nmid_lobby_GDefeatedObs   ,true,false);
+mi_Game_Random         : if(not check)then GameSetOption(nmid_lobby_GRandomScirmish,true,false);
 
 // SCIRMISH MULTIPLAYER
-mi_MP_ServerToggle     : GameNetServer(net_status<>ns_server,false);
-mi_MP_Connect          : GameNetClient(true ,false);
-mi_MP_Disconnect       : GameNetClient(false,false);
-mi_MP_ClientQuality    : ScrollByte(@net_cl_Quality,true,0,net_MaxQuality);
+mi_MP_ServerToggle     : if(not check)then GameNetServer(net_status<>ns_server,false);
+mi_MP_Connect          : if(not check)then GameNetClient(true ,false);
+mi_MP_Disconnect       : if(not check)then GameNetClient(false,false);
+mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,true,0,net_MaxQuality);
 mi_MP_ServerPort       : ;
 mi_MP_ClientAddress    : ;
 mi_MP_ClientLANSearch  : ;
-      else changed:=false;
-      end;
-      menu_update:=menu_update or changed;
-      clickSound :=clickSound  or changed;
+   else
+      menu_Controls_MLB:=false;
    end;
+end;
 
-///////////////////////////////////
-///////////////////////////////////   right button pressed
-///////////////////////////////////
+function menu_Controls_MRB(item:byte;check:boolean):boolean;
+begin
+   menu_Controls_MRB:=true;
+   case item of
+mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor  ,false,0,vid_MaxPlayersColor);
+mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars    ,false,0,vid_MaxHealthBars  );
+mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality     ,false,0,rpls_MaxQuality    );
+mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
 
-   if(InputActionPressed(iact_MRB))then
-   begin
-      changed:=true;
-      case menu_ItemSelected of
-mi_SG_PlayersColor     : ScrollByte(@ui_PlayersColor  ,false,0,vid_MaxPlayersColor);
-mi_SG_HealthBars       : ScrollByte(@ui_HealthBars    ,false,0,vid_MaxHealthBars  );
-mi_SR_RecordQuality    : ScrollByte(@rpls_Quality     ,false,0,rpls_MaxQuality    );
-mi_SS_PlaylistSize     : ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
-
-mi_SG_ScrollSpeed      : menu_GetBarValByte(menu_ItemSelected,@ui_CamSpeed,1,vid_MaxCamSpeed,false);
-mi_SS_SoundVolume      : begin
-                         menu_GetBarValByte(menu_ItemSelected,@snd_SoundVolume,0,snd_MaxSoundVolume,false);
-                         snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
-                         SoundSourceUpdateGainAll;
+mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(menu_ItemSelected,@ui_CamSpeed,1,vid_MaxCamSpeed,false);
+mi_SS_SoundVolume      : if(not check)then
+                         begin
+                            menu_GetBarValByte(menu_ItemSelected,@snd_SoundVolume,0,snd_MaxSoundVolume,false);
+                            snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
+                            SoundSourceUpdateGainAll;
                          end;
-mi_SS_MusicVolume      : begin
-                         menu_GetBarValByte(menu_ItemSelected,@snd_MusicVolume,0,snd_MaxSoundVolume,false);
-                         snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
-                         SoundSourceUpdateGainAll;
+mi_SS_MusicVolume      : if(not check)then
+                         begin
+                            menu_GetBarValByte(menu_ItemSelected,@snd_MusicVolume,0,snd_MaxSoundVolume,false);
+                            snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
+                            SoundSourceUpdateGainAll;
                          end;
 mi_Players_Name0..
-mi_Players_Name7       : PlayerAILevelScroll(menu_ItemSelected-mi_Players_Name0,false,false);
+mi_Players_Name7       : if(not check)then PlayerAILevelScroll(menu_ItemSelected-mi_Players_Name0,false,false);
 mi_Players_Team0..
-mi_Players_Team7       : PlayerTeamScroll   (menu_ItemSelected-mi_Players_Team0,false,false);
+mi_Players_Team7       : if(not check)then PlayerTeamScroll   (menu_ItemSelected-mi_Players_Team0,false,false);
 
-mi_Map_Scenario        : GameSetOption(nmid_lobby_MScenario  ,false,false);
-mi_Map_Generators      : GameSetOption(nmid_lobby_MGenerators,false,false);
-mi_Map_Seed            : GameSetOption(nmid_lobby_MSeed      ,false,false);
-mi_Map_Size            : GameSetOption(nmid_lobby_MSize      ,false,false);
-mi_Map_Obstacles       : GameSetOption(nmid_lobby_MObs       ,false,false);
+mi_Map_Scenario        : if(not check)then GameSetOption(nmid_lobby_MScenario  ,false,false);
+mi_Map_Generators      : if(not check)then GameSetOption(nmid_lobby_MGenerators,false,false);
+mi_Map_Seed            : if(not check)then GameSetOption(nmid_lobby_MSeed      ,false,false);
+mi_Map_Size            : if(not check)then GameSetOption(nmid_lobby_MSize      ,false,false);
+mi_Map_Obstacles       : if(not check)then GameSetOption(nmid_lobby_MObs       ,false,false);
 
-mi_Game_AISlots        : GameSetOption(nmid_lobby_GAISlots   ,false,false);
+mi_Game_AISlots        : if(not check)then GameSetOption(nmid_lobby_GAISlots   ,false,false);
 
-mi_MP_ClientQuality    : ScrollByte(@net_cl_Quality,false,0,net_MaxQuality);
-      else changed:=false;
-      end;
-      menu_update:=menu_update or changed;
-      clickSound :=clickSound  or changed;
+mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,false,0,net_MaxQuality);
+   else
+      menu_Controls_MRB:=false;
    end;
+end;
 
-///////////////////////////////////
-///////////////////////////////////   mouse wheel
-///////////////////////////////////
+function menu_Controls_MWD(item:byte;check:boolean):boolean;
+begin
+   menu_Controls_MWD:=true;
+   case item of
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll, 10,0,svld_list_size-menu_BaseListH,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll, 10,0,rpls_list_size-menu_BaseListH,false);
+   else
+      menu_Controls_MWD:=false;
+   end;
+end;
 
-   if(InputActionPressed(iact_MWD))then
+function menu_Controls_MWU(item:byte;check:boolean):boolean;
+begin
+   menu_Controls_MWU:=true;
+   case item of
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll,-10,0,svld_list_size-menu_BaseListH,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll,-10,0,rpls_list_size-menu_BaseListH,false);
+   else
+      menu_Controls_MWU:=false;
+   end;
+end;
+
+function menu_Controls_Text(item:byte;check:boolean;changed:pboolean):boolean;
+begin
+   menu_Controls_Text:=true;
+   case item of
+mi_SG_PlayerName   : if(not check)then PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen   ,changed);
+mi_SR_RecordPrefix : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,SvRpLen            ,changed);
+
+mi_SV_ResolutionW  : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,changed));
+mi_SV_ResolutionH  : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,changed));
+
+mi_SaveLoad_fname  : if(not check)then svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars,changed);
+
+mi_Map_Seed        : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,changed);
+
+mi_MP_ServerPort   : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,changed);
+mi_MP_ClientAddress: if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,30                 ,changed);
+mi_MP_Chat         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,255                ,changed);
+   else
+      menu_Controls_Text:=false;
+   end;
+end;
+
+procedure menu_Controls;
+var
+mnx,
+mny       :integer;
+changed,
+clickSound:boolean;
+function SetSelectedItem(newItem:byte):boolean;
+begin
+   SetSelectedItem:=true;
+   if(menu_items[newItem].mi_state>0)
+   then menu_ItemSelected:=newItem
+   else SetSelectedItem:=false;
+end;
+begin
+   mnx:=mouse_x;
+   mny:=mouse_y;
+   mouse_x:=round((mouse_x-menu_sc_x)*menu_sc_cx);
+   mouse_y:=round((mouse_y-menu_sc_y)*menu_sc_cx);
+
+   clickSound:=false;
+   changed:=false;
+
+   menu_ItemTarget:=menu_MouseXY2Item;
+
+   //
+   if(InputActionPressed(iact_MLB)or(InputActionPressed(iact_MRB)))then  //select item
    begin
-      SetSelectedItem(mi_SaveLoad_list);
-      SetSelectedItem(mi_Replays_list );
+      if(menu_ItemTarget<>menu_ItemSelected)then
+         menu_EndEdition(false);
 
-      changed:=true;
-      case menu_ItemSelected of
-//98: if not(G_Started)then
-//    ScrollInt(@camp_list_scroll, 1,0,LastMission     -menu_BaseListH);
-mi_SaveLoad_list       : ScrollInt(@svld_list_scroll, 10,0,svld_list_size-menu_BaseListH,false);
-mi_Replays_list        : ScrollInt(@rpls_list_scroll, 10,0,rpls_list_size-menu_BaseListH,false);
-      else changed:=false;
-      end;
-      menu_update:=menu_update or changed;
+      menu_ItemSelected:=menu_ItemTarget;
    end;
 
-   if(InputActionPressed(iact_MWU))then
-   begin
-      SetSelectedItem(mi_SaveLoad_list);
-      SetSelectedItem(mi_Replays_list );
+   menu_ItemActs:=0;
 
-      changed:=true;
-      case menu_ItemSelected of
-//98: if not(G_Started)then
-//    ScrollInt(@camp_list_scroll, 1,0,LastMission     -menu_BaseListH);
-mi_SaveLoad_list       : ScrollInt(@svld_list_scroll,-10,0,svld_list_size-menu_BaseListH,false);
-mi_Replays_list        : ScrollInt(@rpls_list_scroll,-10,0,rpls_list_size-menu_BaseListH,false);
-      else changed:=false;
-      end;
-      menu_update:=menu_update or changed;
+///////////////////////////////////   left button pressed
+   case InputActionPressed(iact_MLB) of
+   true : if(menu_Controls_MLB(menu_ItemSelected,false))then
+          begin
+             SetBBit(@menu_ItemActs,0,true);
+             menu_update:=true;
+             clickSound :=true;
+          end;
+   false: if(menu_Controls_MLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,0,true);
    end;
 
-///////////////////////////////////
+///////////////////////////////////   right button pressed
+   case InputActionPressed(iact_MRB) of
+   true : if(menu_Controls_MRB(menu_ItemSelected,false))then
+          begin
+             SetBBit(@menu_ItemActs,2,true);
+             menu_update:=true;
+             clickSound :=true;
+          end;
+   false: if(menu_Controls_MRB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,2,true);
+   end;
+
+///////////////////////////////////   mouse wheel down
+   case InputActionPressed(iact_MWD) of
+   true : begin
+             SetSelectedItem(mi_SaveLoad_list);
+             SetSelectedItem(mi_Replays_list );
+             if(menu_Controls_MWD(menu_ItemSelected,false))then
+             begin
+                SetBBit(@menu_ItemActs,1,true);
+                menu_update:=true;
+             end;
+          end;
+   false: if(menu_Controls_MWD(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,1,true);
+   end;
+
+///////////////////////////////////   mouse wheel up
+   case InputActionPressed(iact_MWU) of
+   true : begin
+             SetSelectedItem(mi_SaveLoad_list);
+             SetSelectedItem(mi_Replays_list );
+             if(menu_Controls_MWU(menu_ItemSelected,false))then
+             begin
+                SetBBit(@menu_ItemActs,1,true);
+                menu_update:=true;
+             end;
+          end;
+   false: if(menu_Controls_MWU(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,1,true);
+   end;
+
 ///////////////////////////////////   text input
-///////////////////////////////////
-   if(length(k_KeyboardString)>0)then
-   begin
-      SetSelectedItem(mi_SaveLoad_fname);
-      SetSelectedItem(mi_MP_Chat);
+   case(length(k_KeyboardString)>0)of
+   true : begin
+             SetSelectedItem(mi_SaveLoad_fname);
+             SetSelectedItem(mi_MP_Chat);
 
-      changed:=false;
-      case menu_ItemSelected of
-mi_SG_PlayerName   : PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen   ,@changed);
-mi_SR_RecordPrefix : rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,SvRpLen            ,@changed);
-
-mi_SV_ResolutionW  : menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,@changed));
-mi_SV_ResolutionH  : menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,@changed));
-
-mi_SaveLoad_fname  : svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars,@changed);
-
-mi_Map_Seed        : menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,@changed);
-
-mi_MP_ServerPort   : menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,@changed);
-mi_MP_ClientAddress: menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,30                 ,@changed);
-mi_MP_Chat         : net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,255                ,@changed);
-      end;
-
-      menu_update:=menu_update or changed;
+             if(menu_Controls_Text(menu_ItemSelected,false,@changed))then
+             begin
+                SetBBit(@menu_ItemActs,3,true);
+                menu_update:=menu_update or changed;
+             end;
+          end;
+   false: if(menu_Controls_Text(menu_ItemTarget  ,true ,nil))then SetBBit(@menu_ItemActs,3,true);
    end;
 
-///////////////////////////////////
-///////////////////////////////////   other keys
-///////////////////////////////////
+
+///////////////////////////////////   other keyboards keys
 
    if(InputActionPressed(iact_Esc   ))then GameBack(false,false);
    if(InputActionPressed(iact_Return))then menu_EndEdition(true);

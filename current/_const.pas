@@ -19,21 +19,18 @@ NOTSET                 = smallint.MaxValue;
 fr_fps1                = 60;
 fr_RateTicks           = 1000/fr_fps1;
 
-fr_fpsd2               = fr_fps1 div 2;
-fr_fpsd3               = fr_fps1 div 3;
-fr_fpsd4               = fr_fps1 div 4;
-fr_fpsd5               = fr_fps1 div 5;
-fr_fpsd6               = fr_fps1 div 6;
-fr_fpsd8               = fr_fps1 div 8;
-fr_fps1d2              = fr_fpsd2*3;   //1,5
+fr_fpsh                = fr_fps1 div 2; // half
+fr_fpst                = fr_fps1 div 3; // thrid
+fr_fpsq                = fr_fps1 div 4; // quarter
+fr_fpss                = fr_fps1 div 6; // six
+fr_fps1h               = fr_fpsh*3;     // 1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
 fr_fps4                = fr_fps1*4;
 fr_fps5                = fr_fps1*6;
 fr_fps6                = fr_fps1*6;
-fr_fps8                = fr_fps1*8;
 fr_fps10               = fr_fps1*10;
-fr_fps2d3              = fr_fpsd3*2; //2/3
+fr_fpst2               = fr_fpst*2; //2/3
 fr_fps60               = fr_fps1*60;
 
 APM_UPDPeriod          = fr_fps1*5;
@@ -138,6 +135,8 @@ map_SizeMenuStep       = 250;
 
 map_MaxObstacles       = 7;
 
+zone_solid             : word = word.MaxValue;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Key Points life
@@ -145,18 +144,6 @@ map_MaxObstacles       = 7;
 
 map_generators_LifeTime: array[0..map_MaxGenerators] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
 map_generators_Energy  = 900;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  PATH FIND SYSTEM
-//
-
-pf_pathmap_w           = 40;
-pf_pathmap_c           = (map_MaxSize div pf_pathmap_w)+1;
-
-pf_pathmap_hw          = pf_pathmap_w div 2;
-
-pf_solid               : word = word.MaxValue;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -688,7 +675,7 @@ dm_AntiBio2            = 16; //   2*[unit bio]
 
 // LIMIT
 ul1                    = MinUnitLimit;
-ul1hh                  = MinUnitLimit+(MinUnitLimit div 4);
+ul1q                   = MinUnitLimit+(MinUnitLimit div 4);
 ul1h                   = MinUnitLimit+(MinUnitLimit div 2);
 ul2                    = MinUnitLimit*2;
 ul3                    = MinUnitLimit*3;
@@ -697,32 +684,25 @@ ul5                    = MinUnitLimit*5;
 ul6                    = MinUnitLimit*6;
 ul8                    = MinUnitLimit*8;
 ul10                   = MinUnitLimit*10;
-ul12                   = MinUnitLimit*12;
 ul15                   = MinUnitLimit*15;
-ul20                   = MinUnitLimit*20;
-ul32                   = MinUnitLimit*32;
-ul100                  = MinUnitLimit*100;
-ul110                  = MinUnitLimit*110;
 
 // production time
 ptime1                 = 20;
-ptimeh                 = ptime1  div 2;
-ptimehh                = ptimeh  div 2;
-ptimehhh               = ptimehh div 2;
+ptimeh                 = ptime1 div 2;
+ptimeq                 = ptimeh div 2;
 ptime1h                = ptime1+ptimeh;
-ptime1hh               = ptime1+ptimehh;
-ptime1mh               = ptime1-ptimehh;
+ptime1q                = ptime1+ptimeq;
+ptimeq3                = ptime1-ptimeq;
 ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
 ptime5                 = ptime1*5;
-ptime6                 = ptime1*6;
 ptime10                = ptime1*10;
 
 uf_ground              = false;
 uf_fly                 = true;
 
-MaxUnitGroups          = 10;
+MaxUnitGroups          = 9;
 
 mvxy_none              = 0;
 mvxy_relative          = 1;
@@ -730,8 +710,8 @@ mvxy_strict            = 2;
 
 BaseDamage1            = 52;
 BaseDamageh            = BaseDamage1 div 2;
-BaseDamageh3           = BaseDamage1 div 3;
-BaseDamageh2           = BaseDamage1 div 4;
+BaseDamaget            = BaseDamage1 div 3;
+BaseDamageq            = BaseDamage1 div 4;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
@@ -898,7 +878,7 @@ client_cast_abils      = [
                          uab_UACStrike
                          ];
 
-uab_sabilityOrder       = [uab_RebuildInPoint,uab_SpawnLost,uab_CCFly,uab_ToUACDron,uab_Unload];
+uab_sabilityOrder       = [uab_SpawnLost,uab_CCFly,uab_ToUACDron,uab_Unload];
 uab_pabilityOrder       = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
                            uab_HKeepBlink,uab_RebuildInPoint,uab_HInvulnerability,
                            uab_SpawnLost,uab_HellVision,uab_CCFly,uab_Unload];
@@ -912,12 +892,12 @@ PlayerMaxBuilders      = 4;
 
 g_step_koth_pause      = fr_fps1*120;
 
-fr_mancubus_rld        = fr_fps2+fr_fpsd2;  //2.5
-fr_mancubus_rld_s1     = fr_fps2-fr_fpsd6;
-fr_mancubus_rld_s2     = fr_fps1+fr_fpsd6;
-fr_mancubus_rld_s3     = fr_fpsd2;
+fr_mancubus_rld        = fr_fps2+fr_fpsh;  //2.5
+fr_mancubus_rld_s1     = fr_fps2-fr_fpss;
+fr_mancubus_rld_s2     = fr_fps1+fr_fpss;
+fr_mancubus_rld_s3     = fr_fpsh;
 
-fr_archvile_s          = fr_fps1+fr_fpsd6;
+fr_archvile_s          = fr_fps1+fr_fpss;
 
 MaxPlayerNameLen       = 13;
 
@@ -938,7 +918,7 @@ base_6r                = base_1r*6;
 
 apc_exp_damage         = BaseDamage4;
 regen_period           = fr_fps1;
-order_period           = fr_fpsd2+1;
+order_period           = fr_fpsh+1;
 MinVisionTime          = fr_fps2;
 
 detection_time_sec     = 8;
@@ -975,14 +955,14 @@ tank_sr                = 20;
 rocket_sr              = tank_sr*2;
 mine_sr                = rocket_sr*2;
 bfg_sr                 = rocket_sr*4;
-blizzard_sr            = rocket_sr;
+blizzard_sr            = mine_sr;
 
 bld_dec_mr             = 6;
 player_default_ai_level= 7;
 _mms                   = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
-gm_cptp_gtime          = fr_fps1*ptimehh;
+gm_cptp_gtime          = fr_fps1*ptimeq;
 gm_cptp_time           = fr_fps1*ptimeh;
 gm_cptp_r              = 100;
 gm_cptp_gr             = gm_cptp_r-(gm_cptp_r div 3);
@@ -1079,9 +1059,10 @@ iAct_Control_UAPatrol  = 65;
 iAct_Control_UMove     = 66;
 iAct_Control_UStop     = 67;
 iAct_Control_UPatrol   = 68;
-iAct_Control_UProdCncl=69;
+iAct_Control_UProdCncl  =69;
 iAct_Control_UDestroy  = 70;
-iAct_Control_USelArmy  = 71;
+iAct_Control_USelBase  = 71;
+iAct_Control_USelArmy  = 72;
 
 iAct_Replay_Fast       = 110;
 iAct_Replay_Back2      = 111;
@@ -1187,7 +1168,7 @@ dead_time              = -dead_hits;
 char_detect            = #7;
 char_advanced          = #10;
 
-spr_upgrade_icons      = 24;
+spr_upgrade_icons      = 20;
 
 vid_MaxPlayersColor    = 5;
 vid_MaxHealthBars      = 2;
@@ -1342,8 +1323,6 @@ fr_ifps                = fr_fps1-1;
 vid_bpp                = 32;
 vid_minw               = 800;
 vid_minh               = 600;
-vid_maxw               = 1920;
-vid_maxh               = 1080;
 
 vid_ab                 = 128;
 vid_MaxScreenSprites   = 1000; // max vis sprites;
@@ -1382,12 +1361,8 @@ ui_GroupIcoW2q3        = 2*ui_GroupIcoW1+ui_GroupIcoWq3;
 
 ui_max_alarms          = 12;
 
-ui_bottomsy            = ui_ButtonW1*4;
 ui_hwp                 = ui_CtrlPanelW div 2;
 ui_ButtonsNum          = (ui_CtrlPanelBH-ui_CtrlPanelBW-2)*ui_CtrlPanelBW-1;
-
-
-menu_ihintn            = 3;
 
 chat_type              : array[false..true] of char = ('|',' ');
 chat_LastMsgTime       = fr_fps1*3;
@@ -1442,8 +1417,6 @@ fog_cw                 = 48;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_ds                 = fog_cw-fog_cr;
-fog_vfwm               = (vid_maxw div fog_cw)+2;
-fog_vfhm               = (vid_maxh div fog_cw)+2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1623,7 +1596,6 @@ menu_ListLinehH        = menu_ListLineH div 2;
 
 menu_CaptionhW         = menu_BaseW*3;
 menu_BigButtonW        = menu_BaseW*4;
-menu_BigButtonhW       = menu_BigButtonW div 2;
 menu_BigButtonH        = menu_BaseW;
 menu_BigButtonhH       = menu_BigButtonH div 2;
 menu_StepFromBottom    = menu_BaseW+menu_BasehW;
