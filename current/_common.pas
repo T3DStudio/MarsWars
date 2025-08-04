@@ -47,6 +47,7 @@ function menu_MouseXY2Item:byte; forward;
 function menu_ReadyButtonEnabled:boolean;forward;
 function PlayerNameChangeble  :boolean;forward;
 
+function PlayerGetColor(player:byte;shadow:boolean):cardinal;  forward;
 function PlayersSlotEnabled:boolean;forward;
 function PlayerAIToggle  (PlayerTarget:byte;check:boolean):boolean;forward;
 function PlayerRaceScroll(PlayerTarget:byte;check:boolean):boolean;forward;
@@ -928,6 +929,14 @@ begin
    else g_CheckRoyalBattlePoint:=false;
 end;
 
+procedure Game_SetStatusWinnerTeam(team:byte);
+begin
+   if(team>LastPlayer)then exit;
+
+   G_status:=gs_win_team0+team;
+   GameLogEndGame(team);
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   RANDOM
@@ -1160,13 +1169,7 @@ begin
    UnitF2Select:=true;
 end;
 
-procedure GameSetStatusWinnerTeam(team:byte);
-begin
-   if(team>LastPlayer)then exit;
 
-   G_status:=gs_win_team0+team;
-   GameLogEndGame(team);
-end;
 
 function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal):boolean;
 begin
@@ -1210,17 +1213,17 @@ begin
    else
      if(CanExec=pCanExec^)then
        case CanExec or noReload of
-     true : if(    closest and(d<pdist^))
-            or(not closest and(d>pdist^))then
-            begin
-               pdist^:=d;
-               ptaru^:=taru;
-            end;
-     false: if(taru^.rld<pdist^)then
-            begin
-               pdist^:=taru^.rld;
-               ptaru^:=taru;
-            end;
+       true : if(    closest and(d<pdist^))
+              or(not closest and(d>pdist^))then
+              begin
+                 pdist^:=d;
+                 ptaru^:=taru;
+              end;
+       false: if(taru^.rld<pdist^)then
+              begin
+                 pdist^:=taru^.rld;
+                 ptaru^:=taru;
+              end;
        end;
 end;
 
@@ -1266,8 +1269,6 @@ begin
 
    ui_rebuild:=true;
 end;
-
-
 
 {$IFDEF _FULLGAME}
 
@@ -1344,6 +1345,31 @@ begin
    str_GTick2Time+=sm+':'+ss;
 end;
 
+function str_SpaceSize(str:shortstring;newSize:byte):shortstring;
+var l,i:byte;
+begin
+   str_SpaceSize:=str;
+   l:=0;
+   i:=length(str_SpaceSize);
+   while(i>0)do
+   begin
+      if not(str_SpaceSize[i] in tc_SpecChars)then l+=1;
+      i-=1;
+   end;
+   if(newSize>l)then
+   begin
+      while(l<newSize)do
+      begin
+         l+=1;
+         str_SpaceSize+=' ';
+      end;
+   end
+   else
+     if(newSize<l)then
+       setlength(str_SpaceSize,newSize);
+end;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   INPUT
@@ -1375,6 +1401,125 @@ end;
 function Game_IsEnded:boolean;
 begin
    Game_IsEnded:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
+end;
+
+function GameGetStatus(pstr:pshortstring;pcol:pcardinal;POVPlayer:byte):boolean;
+begin
+   GameGetStatus:=false;
+
+   if(G_status<>gs_running)then
+   begin
+      GameGetStatus:=true;
+      if(pstr<>nil)then pstr^:=str_gstat_Unknown;
+      if(pcol<>nil)then pcol^:=c_gray;
+
+      if(pstr<>nil)and(pcol<>nil)then
+        case G_status of
+0..LastPlayer : begin
+                   pstr^:=str_gstat_Paused;
+                   pcol^:=PlayerGetColor(G_status,false);
+                end;
+gs_replayerror: begin
+                   pstr^:=str_gstat_ReplayError;
+                   pcol^:=c_white;
+                end;
+gs_replayend  : begin
+                   pstr^:=str_gstat_ReplayEnd;
+                   pcol^:=c_white;
+                end;
+gs_waitserver : begin
+                   pstr^:=str_gstat_WaitForServer;
+                   pcol^:=PlayerGetColor(net_cl_Hoster,false);
+                end;
+gs_replaypause: begin
+                   pstr^:=str_gstat_Paused;
+                   pcol^:=c_white;
+                end;
+gs_win_team0..
+gs_win_team7  : if(POVPlayer>LastPlayer)
+                then pstr^:=''
+                else
+                  if((G_status-gs_win_team0)=g_players[POVPlayer].team)then
+                  begin
+                     pstr^:=str_gstat_Win;
+                     pcol^:=c_lime;
+                  end
+                  else
+                  begin
+                     pstr^:=str_gstat_Lose;
+                     pcol^:=c_red;
+                  end;
+        end;
+   end;
+end;
+
+function MenuBack(offMenu,check:boolean):boolean;
+begin
+   MenuBack:=false;
+   if(not MainMenu)then exit;
+
+   if(menu_page<>0)then
+   begin
+      MenuBack:=true;
+      if(check)then exit;
+
+      menu_page:=0;
+      menu_update:=true;
+      if(not offMenu)then exit;
+   end;
+
+   if(not G_Started)and(g_type<>0)and(net_status=ns_none)then
+   begin
+      MenuBack:=true;
+      if(check)then exit;
+
+      g_type:=0;
+      menu_update:=true;
+      if(not offMenu)then exit;
+   end;
+
+   if(G_Started)then
+   begin
+      MenuBack:=true;
+      if(check)then exit;
+
+      MainMenu     :=false;
+      ui_update_now:=false;
+      menu_update  :=true;
+      menu_ItemSelected  :=0;
+      if(net_status=ns_none)and(g_Status<=LastPlayer)then
+        if(MainMenu)
+        then g_Status:=LocalPlayer
+        else g_Status:=gs_running;
+   end;
+end;
+procedure GameOpenMenu;
+begin
+   if(MainMenu)then exit;
+
+   MainMenu   :=true;
+   menu_update:=true;
+   menu_ItemSelected:=0;
+   if(net_status=ns_none)and(g_Status<=LastPlayer)then
+     if(MainMenu)
+     then g_Status:=LocalPlayer
+     else g_Status:=gs_running;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   UI
+//
+
+function RectInCam(x,y,hw,hh,s:integer):boolean;
+begin
+   RectInCam:=((ui_cam_x-hw           )<x)and(x<(ui_cam_x+ui_cam_w+hw))
+           and((ui_cam_y-hh-max2i(0,s))<y)and(y<(ui_cam_y+ui_cam_h+hh));
+end;
+function PointInCam(x,y:integer):boolean;
+begin
+   PointInCam:=(ui_cam_x<x)and(x<(ui_cam_x+ui_cam_w))
+            and(ui_cam_y<y)and(y<(ui_cam_y+ui_cam_h));
 end;
 
 procedure PlayersUpdateColorSchema(POVPlayer:byte);
@@ -1441,120 +1586,6 @@ begin
        else GetKeyPointColor:=PlayerGetColor(kpOwnerPlayer     ,shadow);
 end;
 
-function GameGetStatus(pstr:pshortstring;pcol:pcardinal;POVPlayer:byte):boolean;
-var t:byte;
-begin
-   GameGetStatus:=false;
-
-   if(G_status<>gs_running)then
-   begin
-      GameGetStatus:=true;
-      if(pstr<>nil)then pstr^:=str_gstat_Unknown;
-      if(pcol<>nil)then pcol^:=c_gray;
-
-      if(pstr<>nil)and(pcol<>nil)then
-      case G_status of
-0..LastPlayer : begin
-                   pstr^:=str_gstat_Paused;
-                   pcol^:=PlayerGetColor(G_status,false);
-                end;
-gs_replayerror: begin
-                   pstr^:=str_gstat_ReplayError;
-                   pcol^:=c_white;
-                end;
-gs_replayend  : begin
-                   pstr^:=str_gstat_ReplayEnd;
-                   pcol^:=c_white;
-                end;
-gs_waitserver : begin
-                   pstr^:=str_gstat_WaitForServer;
-                   pcol^:=PlayerGetColor(net_cl_Hoster,false);
-                end;
-gs_replaypause: begin
-                   pstr^:=str_gstat_Paused;
-                   pcol^:=c_white;
-                end;
-gs_win_team0..
-gs_win_team7  : if(POVPlayer>LastPlayer)then
-                begin
-                   if(pstr<>nil)then pstr^:='';
-                end
-                else
-                begin
-                   t:=G_status-gs_win_team0;
-                   if(t=g_players[POVPlayer].team)then
-                   begin
-                      pstr^:=str_gstat_Win;
-                      pcol^:=c_lime;
-                   end
-                   else
-                   begin
-                      pstr^:=str_gstat_Lose;
-                      pcol^:=c_red;
-                   end;
-                end;
-      end;
-   end;
-end;
-
-function GameBack(offMenu,check:boolean):boolean;
-begin
-   GameBack:=false;
-   if(not MainMenu)then exit;
-
-   if(menu_page<>0)then
-   begin
-      GameBack:=true;
-      if(check)then exit;
-
-      menu_page:=0;
-      menu_update:=true;
-      if(not offMenu)then exit;
-   end;
-
-   if(not G_Started)and(g_type<>0)and(net_status=ns_none)then
-   begin
-      GameBack:=true;
-      if(check)then exit;
-
-      g_type:=0;
-      menu_update:=true;
-      if(not offMenu)then exit;
-   end;
-
-   if(G_Started)then
-   begin
-      GameBack:=true;
-      if(check)then exit;
-
-      MainMenu   :=false;
-      ui_update_now:=false;
-      menu_update:=true;
-      menu_ItemSelected  :=0;
-      if(net_status=ns_none)and(g_Status<=LastPlayer)then
-        if(MainMenu)
-        then g_Status:=LocalPlayer
-        else g_Status:=gs_running;
-   end;
-end;
-procedure GameOpenMenu;
-begin
-   if(MainMenu)then exit;
-
-   MainMenu   :=true;
-   menu_update:=true;
-   menu_ItemSelected:=0;
-   if(net_status=ns_none)and(g_Status<=LastPlayer)then
-     if(MainMenu)
-     then g_Status:=LocalPlayer
-     else g_Status:=gs_running;
-end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//   UI
-//
-
 function ui_ControlTabType:TTabControlContent;
 begin
    ui_ControlTabType:=tcc_none;
@@ -1596,7 +1627,7 @@ begin
    ui_MouseBrushNeedDrawEdges:=true;
    case m_brush of
    1..255     : exit;
-   co_pability: if(ui_uibtn_pabilityu<>nil)then  // переменная заполняется в процессе
+   co_pability: if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^._ability of
                   uab_HTowerBlink,
                   uab_HKeepBlink,
@@ -1619,16 +1650,6 @@ begin
   and(0<=cy)and(cy<ui_fog_gridh)then ui_fog_CheckXY:=ui_fog_pgrid[cx,cy];
 end;
 
-function RectInCam(x,y,hw,hh,s:integer):boolean;
-begin
-   RectInCam:=((ui_cam_x-hw           )<x)and(x<(ui_cam_x+ui_cam_w+hw))
-           and((ui_cam_y-hh-max2i(0,s))<y)and(y<(ui_cam_y+ui_cam_h+hh));
-end;
-function PointInCam(x,y:integer):boolean;
-begin
-   PointInCam:=(ui_cam_x<x)and(x<(ui_cam_x+ui_cam_w))
-            and(ui_cam_y<y)and(y<(ui_cam_y+ui_cam_h));
-end;
 
 function ui_CheckUnitUIPlayerVision(tu:PTUnit;CheckCam:boolean):boolean;
 begin
@@ -1662,21 +1683,6 @@ begin
    ui_CheckUnitUIPlayerVision:=false;
 end;
 
-{function CheckUnitUIVision(tu:PTUnit):boolean;
-begin
-   CheckUnitUIVision:=true;
-
-   if(not ui_fog)then exit;
-
-   if(UIPlayer=0)then
-     if(rpls_pstate>=rpls_read)or(g_players[LocalPlayer].observer)or(Game_IsEnded)then exit;
-
-   if(tu<>nil)then
-     if(tu^.player^.team=g_players[UIPlayer].team)then exit;
-
-   CheckUnitUIVision:=false;
-end; }
-
 function ui_CheckUnitFullFogReveal(tu:PTUnit):boolean;
 begin
    ui_CheckUnitFullFogReveal:=false;
@@ -1693,47 +1699,29 @@ begin
    else ui_CheckUnitFullFogReveal:=(tu^.player^.team=g_players[LocalPlayer].team);
 end;
 
-{function CheckUnitUIVisionScreen(tu:PTUnit):boolean;
+function ui_CheckMapPointFogVision(x,y:integer;CheckSquare:boolean):boolean;
 begin
-   CheckUnitUIVisionScreen:=false;
-   with tu^ do
-    with uid^ do
-     if(RectInCam(vx,vy,_r,_r,0))then
-     begin
-        if(UIPlayer=0)then
-          if(rpls_pstate=rpls_read)or(g_players[LocalPlayer].observer)or(Game_IsEnded)then
-          begin
-             CheckUnitUIVisionScreen:=true;
-             exit;
-          end;
-
-        CheckUnitUIVisionScreen:=(TeamVision[g_players[UIPlayer].team]>0)or(not ui_fog);
-     end;
-end;}
-
-function MapPointInScreenP(x,y:integer;CheckSquare:boolean):boolean;
-begin
-   MapPointInScreenP:=false;
+   ui_CheckMapPointFogVision:=false;
    x-=ui_cam_x;
    y-=ui_cam_y;
    if(-fog_cw<x)and(x<(ui_cam_w+fog_cw))and
      (-fog_cw<y)and(y<(ui_cam_h+fog_cw))then
    begin
       if(not ui_fog)
-      then MapPointInScreenP:=true
-      else MapPointInScreenP:=ui_fog_CheckXY(x,y);
-      if(CheckSquare)and(not MapPointInScreenP)then
+      then ui_CheckMapPointFogVision:=true
+      else ui_CheckMapPointFogVision:=ui_fog_CheckXY(x,y);
+      if(CheckSquare)and(not ui_CheckMapPointFogVision)then
       begin
          x+=ui_cam_x;
          y+=ui_cam_y;
-         MapPointInScreenP:=MapPointInScreenP(x-fog_cw,y,false)or
-                            MapPointInScreenP(x+fog_cw,y,false)or
-                            MapPointInScreenP(x,y+fog_cw,false)or
-                            MapPointInScreenP(x,y-fog_cw,false)or
-                            MapPointInScreenP(x-fog_cw,y-fog_cw,false)or
-                            MapPointInScreenP(x+fog_cw,y-fog_cw,false)or
-                            MapPointInScreenP(x+fog_cw,y+fog_cw,false)or
-                            MapPointInScreenP(x-fog_cw,y+fog_cw,false);
+         ui_CheckMapPointFogVision:=ui_CheckMapPointFogVision(x-fog_cw,y       ,false)or
+                                    ui_CheckMapPointFogVision(x+fog_cw,y       ,false)or
+                                    ui_CheckMapPointFogVision(x       ,y+fog_cw,false)or
+                                    ui_CheckMapPointFogVision(x       ,y-fog_cw,false)or
+                                    ui_CheckMapPointFogVision(x-fog_cw,y-fog_cw,false)or
+                                    ui_CheckMapPointFogVision(x+fog_cw,y-fog_cw,false)or
+                                    ui_CheckMapPointFogVision(x+fog_cw,y+fog_cw,false)or
+                                    ui_CheckMapPointFogVision(x-fog_cw,y+fog_cw,false);
       end;
    end;
 end;
@@ -1956,78 +1944,81 @@ lmt_map_mark         : begin
     end;
 end;
 
-procedure MakeLogListForDraw(playern:byte;widthchars,listheight:integer;logtypes:TSoB);
-var ts:shortstring;
-mc,n,i:cardinal;
+procedure MakeLogListForDraw(playern:byte;widthChars,listHeight:integer;logTypes:TSoB);
+var
+lineL :byte;
+n,i   :cardinal;
 chunkp,
 chunkl,
 chunks:integer;
- st,sl:byte;
-procedure addLine(s:shortstring;t:byte;c:cardinal);
+aline :shortstring;
+atype :byte;
+acolor:cardinal;
+procedure addLine(line:shortstring;ltype:byte;color:cardinal);
 begin
-   if(ui_log_n>=listheight)then exit;
+   if(ui_log_n>=listHeight)then exit;
    ui_log_n+=1;
-   SetLength(ui_log_s,ui_log_n);
-   SetLength(ui_log_t,ui_log_n);
-   SetLength(ui_log_c,ui_log_n);
-   ui_log_s[ui_log_n-1]:=s;
-   ui_log_t[ui_log_n-1]:=t;
-   ui_log_c[ui_log_n-1]:=c;
+   SetLength(ui_log_lines,ui_log_n);
+   SetLength(ui_log_type ,ui_log_n);
+   SetLength(ui_log_color,ui_log_n);
+   ui_log_lines[ui_log_n-1]:=line;
+   ui_log_type [ui_log_n-1]:=ltype;
+   ui_log_color[ui_log_n-1]:=color;
 end;
 begin
    ui_log_n:=0;
-   SetLength(ui_log_s,ui_log_n);
-   SetLength(ui_log_t,ui_log_n);
-   SetLength(ui_log_c,ui_log_n);
+   SetLength(ui_log_lines,ui_log_n);
+   SetLength(ui_log_type ,ui_log_n);
+   SetLength(ui_log_color,ui_log_n);
 
-   if(listheight>MaxPlayerLog)then listheight:=MaxPlayerLog;
+   if(listHeight>MaxPlayerLog)then listHeight:=MaxPlayerLog;
 
-   if(widthchars>0)and(listheight>0)and(playern<=LastPlayer)then
+   if(widthChars>0)and(listHeight>0)and(playern<=LastPlayer)then
      with g_players[playern] do
      begin
-        widthchars+=1;
+        widthChars+=1;
         i:=log_i;
-        n:=listheight;
+        n:=listHeight;
 
         while(n>0)do
         begin
-           mc:=c_white;
-           st:=log_l[i].mtype;
-           if(st in logtypes)
-           then ts:=ParseLogMessage(@log_l[i],@mc)
-           else ts:='';
-           sl:=length(ts);
+           acolor:=c_white;
+           atype :=log_l[i].mtype;
+           if(atype in logTypes)
+           then aline:=ParseLogMessage(@log_l[i],@acolor)
+           else aline:='';
+           lineL:=length(aline);
            if(i=0)
            then i:=MaxPlayerLog
            else i-=1;
            n-=1;
 
-           if(sl>0)then
-            if(sl<=widthchars)
-            then addLine(ts,st,mc)
-            else
-            begin
-               chunks:=sl div widthchars;
-               while(chunks>=0)do
-               begin
-                  chunkp:=chunks*widthchars+1;
-                  if(chunkp>sl)then continue;
-                  chunkl:=widthchars;
-                  if((chunkl+chunkp)>sl)then
-                  begin
-                     chunkl:=(sl mod widthchars);
-                     if(chunkl<=0)then chunkl:=1;
-                  end;
-                  addLine(copy(ts,chunkp,chunkl),st,mc);
-                  chunks-=1;
-               end;
-            end;
+           if(lineL>0)then
+             if(lineL<=widthChars)
+             then addLine(aline,atype,acolor)
+             else
+             begin
+                chunks:=lineL div widthChars;
+                while(chunks>=0)do
+                begin
+                   chunkp:=chunks*widthChars+1;
+                   if(chunkp>lineL)then continue;
+                   chunkl:=widthChars;
+                   if((chunkl+chunkp)>lineL)then
+                   begin
+                      chunkl:=(lineL mod widthChars);
+                      if(chunkl<=0)then chunkl:=1;
+                   end;
+                   addLine(copy(aline,chunkp,chunkl),atype,acolor);
+                   chunks-=1;
+                end;
+             end;
         end;
      end;
-   while(ui_log_n<listheight)do addLine('',0,0);
+   while(ui_log_n<listHeight)do addLine('',0,0);
 end;
 
-function FileReadBaseGameInfo(var f:file;strInfoVar:pshortstring):boolean;
+function FileReadBaseGameInfo(var f:file;strInfoVar1,strInfoVar2:pshortstring):boolean;
 type
 TShortPlayerInfo = record
    mrace,
@@ -2049,45 +2040,47 @@ begin
    vint   :=0;
    vcard  :=0;
    lplayer:=0;
-   strInfoVar^:=str_map+tc_nl2;
+   strInfoVar1^:=str_map+tc_nl2;
 
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_scenario  ));
    if not(vbyte1 in allmapscenarios        )then exit
-                                            else strInfoVar^+=' '+str_map_Scenario  +': '+str_map_ScenarioL  [vbyte1]+tc_default+tc_nl2;
+                                            else strInfoVar1^+=' '+str_map_Scenario  +': '+str_map_ScenarioL  [vbyte1]+tc_default+tc_nl2;
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_generators));
    if(vbyte1>map_MaxGenerators             )then exit
-                                            else strInfoVar^+=' '+str_map_Generators+': '+str_map_GeneratorsL[vbyte1]+tc_nl2;
+                                            else strInfoVar1^+=' '+str_map_Generators+': '+str_map_GeneratorsL[vbyte1]+tc_nl2;
    vcard:=0;
-   BlockRead(f,vcard ,sizeof(map_seed      ));   strInfoVar^+=' '+str_map_Seed      +': '+c2s(vcard)+tc_nl2;
+   BlockRead(f,vcard ,sizeof(map_seed      ));   strInfoVar1^+=' '+str_map_Seed      +': '+c2s(vcard)+tc_nl2;
 
    vint:=-1;
    BlockRead(f,vint  ,sizeof(map_Size      ));
    if(vint<map_MinSize)or(map_MaxSize<vint )then exit
-                                            else strInfoVar^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl2;
+                                            else strInfoVar1^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl2;
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_ObstaclesF ));
    if(vbyte1>map_MaxObstacles              )then exit
-                                            else strInfoVar^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
+                                            else strInfoVar1^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
 
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar^+=' '+str_map_Symmetry  +': '+b2cc[vbyte1>0]+tc_nl2;
+   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar1^+=' '+str_map_Symmetry  +': '+b2cc[vbyte1>0]+tc_nl2;
 
    vint:=-1;
    BlockRead(f,vint  ,sizeof(theme_i       ));
    if(vint>=theme_n                        )then exit
-                                            else strInfoVar^+=' '+theme_name[vint]+tc_default+tc_nl2;
+                                            else strInfoVar1^+=' '+theme_name[vint]+tc_default+tc_nl2;
 
    lplayer:=255;
    BlockRead(f,lplayer,sizeof(LocalPlayer  ));
 
-   strInfoVar^+=tc_nl2;
+   strInfoVar1^+=tc_nl2;
 
    vcard:=0;
-   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar^+=str_ui_time+str_GTick2Time(vcard)+tc_nl2;
+   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar1^+=str_ui_time+str_GTick2Time(vcard)+tc_nl2+tc_nl2;
 
-   strInfoVar^+=tc_nl2+str_Players+tc_nl2;
+   strInfoVar1^+=str_Players+tc_nl2;
+   //----------------  seconds string
+   strInfoVar2^:='';
    for p:=0 to LastPlayer do
      with playerInfo do
      begin
@@ -2096,16 +2089,19 @@ begin
         BlockRead(f,mrace   ,sizeof(mrace   ));
         BlockRead(f,team    ,sizeof(team    ));
         BlockRead(f,observer,sizeof(observer));
+        if(length(name)>MaxPlayerNameLen)then SetLength(name,MaxPlayerNameLen);
 
         if(p=lplayer)
-        then strInfoVar^+=' '+chr(p)+'>'+tc_default
-        else strInfoVar^+=' '+chr(p)+'#'+tc_default;
+        then strInfoVar2^+=chr(p)+'>'+tc_default
+        else strInfoVar2^+=chr(p)+'#'+tc_default;
+
+        strInfoVar2^+=str_SpaceSize(name,MaxPlayerNameLen+1);
 
         if(state>ps_None)then
           if(observer)
-          then strInfoVar^+=str_observer[1]   +','+b2s(team+1)+','
-          else strInfoVar^+=str_race[mrace][2]+','+b2s(team+1)+',';
-        strInfoVar^+=name+tc_nl2
+          then strInfoVar2^+=str_SpaceSize(str_observer   ,9)+b2s(team+1)
+          else strInfoVar2^+=str_SpaceSize(str_race[mrace],9)+b2s(team+1);
+        strInfoVar2^+=tc_nl2
      end;
 
    FileReadBaseGameInfo:=true;
@@ -2121,12 +2117,12 @@ begin
    c_players:=0;
    c_ready  :=0;
    for p:=0 to MaxPlayers do
-    with g_players[p] do
-     if(state=PS_human)then
-     begin
-        c_players+=1;
-        if(ttl=ClientTTL)then c_ready+=1;
-     end;
+     with g_players[p] do
+       if(state=PS_human)then
+       begin
+          c_players+=1;
+          if(ttl=ClientTTL)then c_ready+=1;
+       end;
    PlayerAllOut:=(c_ready=c_players)and(c_players>0);
 end;
 

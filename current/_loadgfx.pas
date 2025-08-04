@@ -826,7 +826,7 @@ procedure gfx_MakeAbilityIcons;
 begin
    spr_b_ab[uab_Teleport        ]:=spr_b_Upgrades[r_hell,14].surf;
    spr_b_ab[uab_UACScan         ]:=spr_b_Upgrades[r_uac ,8 ].surf;
-   spr_b_ab[uab_HTowerBlink     ]:=spr_b_Upgrades[r_hell,19].surf;
+   spr_b_ab[uab_HTowerBlink     ]:=spr_b_Upgrades[r_hell,18].surf;
    spr_b_ab[uab_UACStrike       ]:=spr_b_rstrike;
    spr_b_ab[uab_HKeepBlink      ]:=spr_b_Upgrades[r_hell,9 ].surf;
    spr_b_ab[uab_RebuildInPoint  ]:=spr_b_paction;
@@ -874,7 +874,7 @@ begin
    ui_hinty4    := ui_mapy+ui_cam_h-txt_line_h1*2;
    ui_chaty     := ui_hinty1-font_3hw;
    ui_logy      := ui_chaty-font_3hw;
-   ui_oicox     := ui_mapx+ui_cam_w-font_hw;
+   ui_oicox     := ui_mapx+ui_cam_w-font_w;
    ui_uiuphx    := ui_mapx+(ui_cam_w div 2);
    ui_uiuphy    := ui_texty+font_6hw;
    ui_uiplayery := ui_uiuphy+font_3hw;

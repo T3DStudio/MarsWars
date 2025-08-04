@@ -870,7 +870,7 @@ uab_ToUACDron          = 11;
 uab_Unload             = 12;
 
 client_rld_abils       = [
-                         uab_Teleport,uab_HellVision,uab_HInvulnerability
+                         uab_Teleport,uab_HellVision,uab_HInvulnerability,uab_HKeepBlink,uab_HTowerBlink
                          ];
 client_rld_uids        = [];
 client_cast_abils      = [
@@ -950,6 +950,11 @@ dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
 
 invuln_time_sec        = 30;
 invuln_time            = fr_fps1*invuln_time_sec;
+
+hblink_reload_sec      = 30;
+hblink_reload          = hblink_reload_sec*fr_fps1;
+hkeep_reload_sec       = 60;
+hkeep_reload           = hkeep_reload_sec*fr_fps1;
 
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;

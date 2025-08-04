@@ -140,7 +140,7 @@ begin
              if(menergy<2000)}
 
         end;
-        if(g_players[4].ucl_e[true,0]=0)then GameSetStatusWinnerTeam(g_players[LocalPlayer].team);
+        if(g_players[4].ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_players[LocalPlayer].team);
 
      end;
    end;

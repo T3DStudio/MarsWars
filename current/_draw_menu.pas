@@ -133,8 +133,10 @@ begin
      end;
 end;
 
-procedure d_MenuItemInfo(tar:pSDL_Surface;mi:byte;text:shortstring);
-var color:cardinal;
+procedure d_MenuItemInfo(tar:pSDL_Surface;mi:byte;text1,text2:shortstring);
+var
+color:cardinal;
+y    :integer;
 begin
    with menu_items[mi] do
      if(mi_state>0)then
@@ -143,7 +145,9 @@ begin
         then color:=c_gray
         else color:=c_white;
 
-        draw_text(tar,mi_x0+font_hw,mi_y0+menu_BigButtonH,text,ta_LU,mi_charw,color);
+        draw_text(tar,mi_x0+font_hw,mi_y0+menu_BigButtonH,text1,ta_LU,mi_charw,color,@y);
+        if(length(text2)>0)then
+        draw_text(tar,mi_x0+font_hw,y                    ,text2,ta_LU,mi_charw,color);
      end;
 end;
 procedure d_MenuItemTextC(tar:pSDL_Surface;mi,pos:byte;text:shortstring;color:cardinal);
@@ -341,7 +345,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemList(tar,mi_SaveLoad_list,@svld_list,svld_list_size,svld_list_scroll,svld_list_sel,menu_ListLineH,menu_ListLineWChars,menu_BaseListH);
 
    d_MenuItemCaption(tar,mi_SaveLoad_info,str_FileInfo );
-   d_MenuItemInfo   (tar,mi_SaveLoad_info,svld_str_info);
+   d_MenuItemInfo   (tar,mi_SaveLoad_info,svld_str_info1,svld_str_info2);
 
    d_menuItemText (tar,mi_SaveLoad_fname,ta_LM,svld_str_fname+vc(mi_SaveLoad_fname),menu_ItemSelected);
    d_menuItemText1(tar,mi_SaveLoad_save      ,str_FileSave  ,0);
@@ -352,7 +356,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemList(tar,mi_Replays_list,@rpls_list,rpls_list_size,rpls_list_scroll,rpls_list_sel,menu_ListLineH,menu_ListLineWChars,menu_BaseListH);
 
    d_MenuItemCaption(tar,mi_Replays_info,str_FileInfo );
-   d_MenuItemInfo   (tar,mi_Replays_info,rpls_str_info);
+   d_MenuItemInfo   (tar,mi_Replays_info,rpls_str_info1,rpls_str_info2);
 
    d_menuItemText1(tar,mi_Replays_play   ,str_FilePlay,0);
    d_menuItemText1(tar,mi_Replays_delete ,str_FileDelete,0);
@@ -527,7 +531,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
                  MakeLogListForDraw(HPlayer,ui_menu_chat_width,ui_menu_chat_height,lmts_menu_chat);
                  if(ui_log_n>0)then
                    for t:=0 to ui_log_n-1 do
-                     if(ui_log_c[t]>0)then draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_LU,255,ui_log_c[t]);
+                     if(ui_log_color[t]>0)then draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_lines[t],ta_LU,255,ui_log_color[t]);
 
                  hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,_yl(12),c_gray);
                  draw_text(tar,ui_menu_csm_xct, _yt(12), net_chat_str+chat_type[menu_ItemSelected<>100] , ta_chat,ui_menu_chat_width, c_white);
@@ -539,7 +543,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemCaption(tar,mi_ReplayInfo_Panel,str_FileInfo);
 
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then
-   d_MenuItemInfo   (tar,mi_ReplayInfo_Panel,rpls_list[rpls_list_sel]);
+   d_MenuItemInfo   (tar,mi_ReplayInfo_Panel,rpls_list[rpls_list_sel],'');
 
    //mi_ReplayInfo_Panel
 

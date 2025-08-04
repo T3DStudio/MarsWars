@@ -258,7 +258,7 @@ begin
 
    mtx0:=mtx1+menu_BasehW;
    mtx1:=menu_w-menu_border1;
-   menu_Item_Set(mi_SaveLoad_info   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true);
+   menu_Item_Set(mi_SaveLoad_info   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
 
    with menu_items[mi_SaveLoad_list] do
    menu_Item_Set(mi_SaveLoad_fname  ,mi_x0,mi_y1,mi_x1,mi_y1+menu_ListLineH,true);
@@ -284,7 +284,7 @@ begin
 
    mtx0:=mtx1+menu_BasehW;
    mtx1:=menu_w-menu_border1;
-   menu_Item_Set(mi_Replays_info    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true);
+   menu_Item_Set(mi_Replays_info    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
 
    menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0);
 
@@ -359,7 +359,7 @@ btns : array[0..4] of byte = (0,0,mi_Settings,0,0);
 begin
    menu_page_TopCaption(mi_caption_Scirmish);
 
-   if(GameBack(false,true))then
+   if(MenuBack(false,true))then
      btns[0]:=mi_back;
 
    if(saveload_Allowed)and(g_started)
@@ -585,14 +585,14 @@ function menu_Controls_MLB(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MLB:=true;
    case item of
-mi_back                : if(not check)then GameBack(false,false);
+mi_back                : if(not check)then MenuBack(false,false);
 mi_exit                : if(not check)then GameCycle:=false;
 
 mi_Start               : if(not check)then GameStart(false);      // start game
 mi_Break               : if(not check)then GameBreak(false);      // break game
 mi_Surrender           : if(not check)then
                            if(PlayerSurrender(LocalPlayer,false))then
-                             if(MainMenu)then GameBack(true,false);
+                             if(MainMenu)then MenuBack(true,false);
 // Surrender
 mi_Campaings           : if(not check)then g_type:=gt_campaing;
 mi_Scirmish            : if(not check)then g_type:=gt_scirmish;
@@ -917,10 +917,10 @@ begin
 
 ///////////////////////////////////   other keyboards keys
 
-   if(InputActionPressed(iact_Esc   ))then GameBack(false,false);
+   if(InputActionPressed(iact_Esc   ))then MenuBack(false,false);
    if(InputActionPressed(iact_Return))then menu_EndEdition(true);
 
-  // if(InputActionPressed(iAct_test_debug0      ))then writeln(GameBack(false,true));
+  // if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
   // if(InputActionPressed(iAct_test_debug1      ))then ;
 
    if(clickSound)then SoundPlayUI(snd_click);

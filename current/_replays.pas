@@ -1,11 +1,12 @@
 
 
 procedure replay_MenuSelectedInfo;
-var  f:file;
-    fn:shortstring;
-vbyte1:byte;
+var  f: file;
+    fn: shortstring;
+vbyte1: byte;
 begin
-   rpls_str_info:='';
+   rpls_str_info1:='';
+   rpls_str_info2:='';
 
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
 
@@ -14,7 +15,7 @@ begin
    fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
    if(not FileExists(fn))then
    begin
-      rpls_str_info:=str_FileError_NExists;
+      rpls_str_info1:=str_FileError_NExists;
       exit;
    end;
 
@@ -24,13 +25,13 @@ begin
    {$I+}
    if(ioresult<>0)then
    begin
-      rpls_str_info:=str_FileError_Open;
+      rpls_str_info1:=str_FileError_Open;
       exit;
    end;
    if(FileSize(f)<rpls_file_head_size)then
    begin
       close(f);
-      rpls_str_info:=str_FileError_WData;
+      rpls_str_info1:=str_FileError_WData;
       exit;
    end;
 
@@ -38,12 +39,12 @@ begin
    {$I-}
    BlockRead(f,vbyte1,SizeOf(g_version));
    if(vbyte1<>g_version)
-   then rpls_str_info:=str_FileError_WVer
+   then rpls_str_info1:=str_FileError_WVer
    else
-     if(not FileReadBaseGameInfo(f,@rpls_str_info))then rpls_str_info:=str_FileError_WData;
+     if(not FileReadBaseGameInfo(f,@rpls_str_info1,@rpls_str_info2))then rpls_str_info1:=str_FileError_WData;
 
    {$I+}
-   if(IOResult<>0)then rpls_str_info:=str_FileError_WData;
+   if(IOResult<>0)then rpls_str_info1:=str_FileError_WData;
    close(f);
 end;
 
@@ -282,8 +283,9 @@ begin
    if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then
    begin
       rpls_pstate   :=rpls_none;
-      g_started    :=false;
-      rpls_str_info:='';
+      g_started     :=false;
+      rpls_str_info1:='';
+      rpls_str_info2:='';
       exit;
    end;
 
@@ -291,9 +293,10 @@ begin
 
    if(not FileExists(rpls_str_path))then
    begin
-      rpls_pstate  :=rpls_none;
-      g_started    :=false;
-      rpls_str_info:=str_FileError_NExists;
+      rpls_pstate   :=rpls_none;
+      g_started     :=false;
+      rpls_str_info1:=str_FileError_NExists;
+      rpls_str_info2:='';
       exit;
    end;
 
@@ -305,8 +308,9 @@ begin
    if(ioresult<>0)then
    begin
       replay_Abort;
-      g_started    :=false;
-      rpls_str_info:=str_FileError_Open;
+      g_started     :=false;
+      rpls_str_info1:=str_FileError_Open;
+      rpls_str_info2:='';
    end
    else
    begin
@@ -315,8 +319,9 @@ begin
       if(rpls_file_size<rpls_file_head_size)then
       begin
          replay_Abort;
-         g_started    :=false;
-         rpls_str_info:=str_FileError_WData;
+         g_started     :=false;
+         rpls_str_info1:=str_FileError_WData;
+         rpls_str_info2:='';
          exit;
       end;
 
@@ -328,8 +333,9 @@ begin
       if(i<>g_version)then
       begin
          replay_Abort;
-         g_started    :=false;
-         rpls_str_info:=str_FileError_WVer;
+         g_started     :=false;
+         rpls_str_info1:=str_FileError_WVer;
+         rpls_str_info2:='';
       end
       else
       begin
@@ -345,7 +351,8 @@ begin
          if(ioresult<>0)then
          begin
             replay_Abort;
-            rpls_str_info:=str_FileError_WVer;
+            rpls_str_info1:=str_FileError_WVer;
+            rpls_str_info2:='';
             GameDefaultAll;
             exit;
          end;
@@ -358,7 +365,8 @@ begin
          begin
             replay_Abort;
             g_started:=false;
-            rpls_str_info:=str_FileError_WVer;
+            rpls_str_info1:=str_FileError_WVer;
+            rpls_str_info2:='';
             GameDefaultAll;
             exit;
          end;
@@ -372,7 +380,8 @@ begin
             or(team >LastPlayer)then
             begin
                replay_Abort;
-               rpls_str_info:=str_FileError_WVer;
+               rpls_str_info1:=str_FileError_WVer;
+               rpls_str_info2:='';
                GameDefaultAll;
                exit;
             end;
@@ -498,7 +507,11 @@ begin
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)
    then replay_MenuSelectedInfo
    else
-     if(not g_started)then rpls_str_info:='';
+     if(not g_started)then
+     begin
+        rpls_str_info1:='';
+        rpls_str_info2:='';
+     end;
 end;
 
 procedure replay_MakeFolderList;
@@ -535,7 +548,7 @@ begin
    replay_Play:=true;
    if(check)then exit;
 
-   GameBack(true,false);
+   MenuBack(true,false);
 
    g_type     :=gt_scirmish;
    rpls_pstate:=rpls_read;

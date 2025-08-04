@@ -55,7 +55,7 @@ end;
 procedure effect_KPointExplode(vx,vy:integer);
 begin
    effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
-   if(MapPointInScreenP(vx,vy,true))then
+   if(ui_CheckMapPointFogVision(vx,vy,true))then
    begin
       effect_add(vx,vy,draw_SpriteDepth(vy+1,false),EID_BBExp);
       SoundPlayUnit(snd_exp,nil,nil);
@@ -134,7 +134,7 @@ begin
       if(not pUIVision^)then exit
    end
    else
-     if(not MapPointInScreenP(tx,ty,true))then exit;
+     if(not ui_CheckMapPointFogVision(tx,ty,true))then exit;
 
    effect_add(tx,ty,dy,effect);
    SoundPlayUnit(sound,nil,nil);
@@ -864,6 +864,20 @@ begin
    if(i>0)then CheckBuildPlace:=1;
 end;
 
+function unit_ability_SpecReload(pu:PTUnit;ability:byte;newReload:integer):integer;
+var u:integer;
+begin
+   unit_ability_SpecReload:=0;
+   for u:=1 to MaxUnits do
+     with g_punits[u]^ do
+       if(hits>0)and(playeri=pu^.playeri)and(uid^._ability=ability)then
+         if(newReload>0)
+         then rld:=newReload
+         else
+           if(rld>0)
+           then unit_ability_SpecReload:=max2i(rld,unit_ability_SpecReload);
+end;
+
 function unit_ability_HKeepBlink(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
    with pu^ do
@@ -874,13 +888,10 @@ begin
       if(hits<=0)
       or(not iscomplete)then exit;
 
+      rld:=max2i(unit_ability_SpecReload(pu,_ability,-1),rld);
       unit_ability_HKeepBlink:=ureq_reloading;
       if(buffs[ub_CCast]>0)
       or(rld>0)then exit;
-
-      unit_ability_HKeepBlink:=ureq_rupid;
-      if(upgr[upgr_hell_HKTeleport]<=0)
-      then exit;
 
       math_push_out(x0,y0,_r,unum,@x0,@y0,ukfly, true, team );
       x0:=mm3i(1,x0,map_Size);
@@ -896,8 +907,8 @@ begin
          exit;
       end;
 
-      upgr[upgr_hell_HKTeleport]-=1;
       buffs[ub_CCast]:=fr_fps1;
+      unit_ability_SpecReload(pu,_ability,hkeep_reload);
 
       case uidi of
       UID_HKeep : unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_cube{$ENDIF});   // нет эффекта когда телепортируемся в неразведанную область
@@ -921,10 +932,6 @@ begin
       if(buffs[ub_CCast]>0)
       or(rld>0)then exit;
 
-      unit_ability_HTowerBlink:=ureq_rupid;
-      if(upgr[upgr_hell_tblink]<=0)
-      then exit;
-
       if(srange<point_dist_int(x,y,x0,y0))then math_1c_push(@x0,@y0,x,y,srange-1);
       math_push_out(x0,y0,_r,unum,@x0,@y0,ukfly, true ,team );
       x0:=mm3i(1,x0,map_Size);
@@ -943,7 +950,7 @@ begin
          exit;
       end;
 
-      upgr[upgr_hell_tblink]-=1;
+      rld:=hblink_reload;
       buffs[ub_CCast]:=fr_fpsh;
       unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
    end;

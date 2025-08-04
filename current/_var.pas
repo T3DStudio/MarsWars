@@ -335,9 +335,9 @@ ui_fpsx           : integer = 0;
 ui_fpsy           : integer = 0;
 ui_game_log_height: integer = 0;
 
-ui_log_s          : array of shortstring;
-ui_log_t          : array of byte;
-ui_log_c          : array of cardinal;
+ui_log_lines      : array of shortstring;
+ui_log_type       : array of byte;
+ui_log_color      : array of cardinal;
 ui_log_n          : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -425,7 +425,8 @@ net_chat_tar      : byte = 255;
 //  SAVE LOAD
 //
 
-svld_str_info     : shortstring = '';
+svld_str_info1    : shortstring = '';
+svld_str_info2    : shortstring = '';
 svld_str_fname    : shortstring = '';
 svld_items        : array of TSaveLoadItem;
 svld_itemn        : integer = 0;
@@ -446,8 +447,9 @@ rpls_fstate      : byte = 0;    // file status (none,write,read)
 rpls_pnu          : integer = 0; // quality
 rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
-rpls_str_info     : shortstring = '';
-rpls_pstate        : byte = rpls_none;
+rpls_str_info1    : shortstring = '';
+rpls_str_info2    : shortstring = '';
+rpls_pstate       : byte = rpls_none;
 rpls_list         : TStringList;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;

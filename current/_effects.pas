@@ -146,7 +146,7 @@ begin
    or(ee=0)
    or(g_eids[ee].smodel=nil)then exit;
 
-   if not MapPointInScreenP(ex,ey,true)then exit;
+   if not ui_CheckMapPointFogVision(ex,ey,true)then exit;
 
    for e:=1 to vid_MaxScreenSprites do
    with g_effects[e] do
@@ -232,7 +232,7 @@ var i,o,r:byte;
 begin
    with g_missiles[m] do
    with g_mids[mid] do
-   if(MapPointInScreenP(vx,vy,true))then
+   if(ui_CheckMapPointFogVision(vx,vy,true))then
    begin
       o:=ms_eid_death_cnt[ms_eid_bio_death];
       r:=ms_eid_death_r  [ms_eid_bio_death];
@@ -258,7 +258,7 @@ var  m:integer;
 begin
    for m:=0 to MaxMissiles do
      with g_missiles[m] do
-       if(MapPointInScreenP(vx,vy,true))then
+       if(ui_CheckMapPointFogVision(vx,vy,true))then
          with g_mids[mid] do
            if(vstep>0)then
            begin
@@ -270,8 +270,8 @@ end;
 
 procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
-   if MapPointInScreenP(vx,vy,true)
-   or MapPointInScreenP(tx,ty,true) then SoundPlayUnit(snd,nil,nil);
+   if ui_CheckMapPointFogVision(vx,vy,true)
+   or ui_CheckMapPointFogVision(tx,ty,true) then SoundPlayUnit(snd,nil,nil);
    effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),eidstart);
    effect_add(tx,ty,draw_SpriteDepth(ty+1,ukfly),eidend  );
 end;

@@ -89,7 +89,7 @@ begin
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    ' '+b2c[ui_uibtn_sabilityu=nil]+
    ' '+b2c[ui_uibtn_pabilityu=nil]+
-   //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   MapPointInScreenP(mouse_map_x,mouse_map_y,true)
+   //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   ui_CheckMapPointFogVision(mouse_map_x,mouse_map_y,true)
    ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y))
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+

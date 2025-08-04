@@ -7,7 +7,8 @@ vbyte1:byte;
 vint  :integer=0;
 vcard :cardinal;
 begin
-   svld_str_info:='';
+   svld_str_info1:='';
+   svld_str_info2:='';
 
    if(length(svld_str_fname)=0)then exit;
 
@@ -15,7 +16,7 @@ begin
 
    if(not FileExists(fn))then
    begin
-      svld_str_info:=str_FileError_NExists;
+      svld_str_info1:=str_FileError_NExists;
       exit;
    end;
    assign(f,fn);
@@ -24,13 +25,13 @@ begin
    {$I+}
    if(ioresult<>0)then
    begin
-      svld_str_info:=str_FileError_Open;
+      svld_str_info1:=str_FileError_Open;
       close(f);
       exit;
    end;
    if(FileSize(f)<>svld_file_size)then
    begin
-      svld_str_info:=str_FileError_WData;
+      svld_str_info1:=str_FileError_WData;
       close(f);
       exit;
    end;
@@ -51,13 +52,13 @@ begin
 
                        if(vint<0)
                        or(LastMission<vint)
-                       then svld_str_info:=str_FileError_WVer
+                       then svld_str_info1:=str_FileError_WVer
                        else
                        begin
                           BlockRead(f,vbyte1,sizeof(cmp_skill));
                           if(CMPMaxSkills<vbyte1)
-                          then svld_str_info:=str_FileError_WVer
-                          else svld_str_info:=str_camp_MissionName[vint]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
+                          then svld_str_info1:=str_FileError_WVer
+                          else svld_str_info1:=str_camp_MissionName[vint]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
 
                           BlockRead(f,vbyte1,sizeof(cmp_data_b1));
                           BlockRead(f,vbyte1,sizeof(cmp_data_b2));
@@ -74,14 +75,14 @@ begin
                        BlockRead(f,vbyte1,sizeof(cmp_data_b3));
                        BlockRead(f,vcard ,sizeof(cmp_data_c1));
 
-                       if(not FileReadBaseGameInfo(f,@svld_str_info))then svld_str_info:=str_FileError_WData;
+                       if(not FileReadBaseGameInfo(f,@svld_str_info1,@svld_str_info2))then svld_str_info1:=str_FileError_WData;
                     end;
-      else svld_str_info:=str_FileError_WVer;
+      else svld_str_info1:=str_FileError_WVer;
       end;
    end
-   else svld_str_info:=str_FileError_WVer;
+   else svld_str_info1:=str_FileError_WVer;
    {$I+}
-   if(IOResult<>0)then svld_str_info:=str_FileError_WData;
+   if(IOResult<>0)then svld_str_info1:=str_FileError_WData;
 
    close(f);
 end;
@@ -96,7 +97,8 @@ begin
    else
    begin
       svld_str_fname:='';
-      svld_str_info :='';
+      svld_str_info1:='';
+      svld_str_info2:='';
    end;
 end;
 
@@ -154,7 +156,7 @@ begin
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
    AddItem(@map_Size            ,SizeOf(map_Size         ));
-   AddItem(@map_ObstaclesF       ,SizeOf(map_ObstaclesF    ));
+   AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
@@ -170,28 +172,28 @@ begin
      end;
 
    // other
-   AddItem(@g_FixedPositions    ,SizeOf(g_FixedPositions ));
-   AddItem(@g_players           ,SizeOf(TPList           ));
-   AddItem(@g_units             ,SizeOf(g_units          ));
-   AddItem(@g_missiles          ,SizeOf(g_missiles       ));
-   AddItem(@g_effects           ,SizeOf(g_effects        ));
-   AddItem(@g_random_i          ,SizeOf(g_random_i       ));
-   AddItem(@g_random_p          ,SizeOf(g_random_p       ));
-   AddItem(@g_KeyPoints         ,SizeOf(g_KeyPoints      ));
-   AddItem(@g_royal_r           ,SizeOf(g_royal_r        ));
-   AddItem(@g_status            ,SizeOf(g_status         ));
-   AddItem(@g_cycle_order       ,SizeOf(g_cycle_order    ));
-   AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen    ));
-   AddItem(@map_ObstaclesL             ,SizeOf(map_ObstaclesL          ));
-   AddItem(@map_PlayerStartX             ,SizeOf(map_PlayerStartX          ));
-   AddItem(@map_PlayerStartY             ,SizeOf(map_PlayerStartY          ));
-   AddItem(@ui_cam_x            ,SizeOf(ui_cam_x         ));
-   AddItem(@ui_cam_y            ,SizeOf(ui_cam_y         ));
-   AddItem(@ui_blink_timer1     ,SizeOf(ui_blink_timer1  ));
-   AddItem(@ui_blink_timer2     ,SizeOf(ui_blink_timer2  ));
-   AddItem(@ui_alarms           ,SizeOf(ui_alarms        ));
+   AddItem(@g_FixedPositions    ,SizeOf(g_FixedPositions   ));
+   AddItem(@g_players           ,SizeOf(TPList             ));
+   AddItem(@g_units             ,SizeOf(g_units            ));
+   AddItem(@g_missiles          ,SizeOf(g_missiles         ));
+   AddItem(@g_effects           ,SizeOf(g_effects          ));
+   AddItem(@g_random_i          ,SizeOf(g_random_i         ));
+   AddItem(@g_random_p          ,SizeOf(g_random_p         ));
+   AddItem(@g_KeyPoints         ,SizeOf(g_KeyPoints        ));
+   AddItem(@g_royal_r           ,SizeOf(g_royal_r          ));
+   AddItem(@g_status            ,SizeOf(g_status           ));
+   AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));
+   AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen      ));
+   AddItem(@map_ObstaclesL      ,SizeOf(map_ObstaclesL     ));
+   AddItem(@map_PlayerStartX    ,SizeOf(map_PlayerStartX   ));
+   AddItem(@map_PlayerStartY    ,SizeOf(map_PlayerStartY   ));
+   AddItem(@ui_cam_x            ,SizeOf(ui_cam_x           ));
+   AddItem(@ui_cam_y            ,SizeOf(ui_cam_y           ));
+   AddItem(@ui_blink_timer1     ,SizeOf(ui_blink_timer1    ));
+   AddItem(@ui_blink_timer2     ,SizeOf(ui_blink_timer2    ));
+   AddItem(@ui_alarms           ,SizeOf(ui_alarms          ));
    AddItem(@PlayerColorsDefault ,SizeOf(PlayerColorsDefault));
-   AddItem(@m_brush             ,SizeOf(m_brush          ));
+   AddItem(@m_brush             ,SizeOf(m_brush            ));
 end;
 
 function saveload_Allowed:boolean;
@@ -233,7 +235,7 @@ begin
 
    close(f);
 
-   GameBack(true,false);
+   MenuBack(true,false);
 
    saveload_MakeFolderList;
 
@@ -292,7 +294,8 @@ begin
          if(ioresult<>0)then
          begin
             GameDefaultAll;
-            svld_str_info:=str_FileError_Open;
+            svld_str_info1:=str_FileError_Open;
+            svld_str_info2:='';
             exit;
          end;
 
@@ -310,7 +313,7 @@ begin
 
          G_Started:=true;
 
-         GameBack(true,false);
+         MenuBack(true,false);
 
          GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
       end;

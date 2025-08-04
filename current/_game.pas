@@ -921,7 +921,7 @@ begin
         wteams_n  +=1;
      end;
 
-   if(wteams_n=1)then GameSetStatusWinnerTeam(wteam_last);
+   if(wteams_n=1)then Game_SetStatusWinnerTeam(wteam_last);
 end;
 
 procedure Scenario_DefaultDefeatConditions;
@@ -929,7 +929,7 @@ var p:byte;
 begin
    for p:=0 to LastPlayer do
      if(g_players[p].army>0)then exit;
-   GameSetStatusWinnerTeam(255);
+   Game_SetStatusWinnerTeam(255);
 end;
 
 procedure PlayersCycle;

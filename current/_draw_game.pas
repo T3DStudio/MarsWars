@@ -479,17 +479,17 @@ uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
 uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
 uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
 uinfo_text   : begin
-               draw_text(tar,x0,y0-font_hw,text_lt,ta_MU,255,color);
+               draw_text(tar,x0,y0,text_lt,ta_MM,255,color);
                continue;
                end;
         else
         end;
 
-       if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1       ,text_lt ,ta_LU ,255,c_white);
-       if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_w+4,text_lt2,ta_LU ,255,c_white);
+       if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1       ,text_lt ,ta_LU,255,c_white);
+       if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_3hw,text_lt2,ta_LU,255,c_white);
        if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1       ,text_rt ,ta_RU,255,c_white);
-       if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1-font_w,text_rd ,ta_RU,255,c_white);
-       if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1-font_w,text_ld ,ta_LU ,255,c_white);
+       if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1       ,text_rd ,ta_RB,255,c_white);
+       if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1       ,text_ld ,ta_LB,255,c_white);
     end;
 end;
 
@@ -595,7 +595,7 @@ begin
              SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_cp_out,255);
           end;
 
-        if(MapPointInScreenP(kpx,kpy,true))then
+        if(ui_CheckMapPointFogVision(kpx,kpy,true))then
         begin
            if(kpTimer   >0)then UnitsInfoAddText(kpx,kpy+10,ir2s(kpCaptureTime-kpTimer),ccolor );
            if(kplifetime>0)then UnitsInfoAddText(kpx,kpy   ,cr2s(kplifetime           ),c_white);
@@ -767,7 +767,7 @@ begin
         //if(isselected)then  circleColor(vid_screen,ix,iy,r+5,plcolor[player]);
      end;
 
-   if(InputAction(iact_Control))then
+   {if(InputAction(iact_Control))then
    for u:=0 to MaxMissiles do
    with g_missiles[u] do
    if(vstep>0)then
@@ -777,7 +777,7 @@ begin
 
       circleColor(vid_screen,ix,iy,5,c_lime);
       draw_text(vid_screen,ix,iy,i2s(dir), ta_LU,255, c_white);
-   end;
+   end;  }
 
    {for u:=0 to 255 do
     if(ordx[u]>0)then

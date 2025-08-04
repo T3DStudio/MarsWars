@@ -846,7 +846,7 @@ begin
    str_menu_chat                 := 'CHAT(ALL PLAYERS)';
 
    str_S_Game                    := 'GAME';
-   str_S_Replay                  := 'RECORDING';
+   str_S_Replay                  := 'GAME RECORDING';
    str_S_Video                   := 'VIDEO';
    str_S_Sound                   := 'SOUND';
 

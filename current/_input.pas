@@ -1107,7 +1107,7 @@ begin
          if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
          if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
          if(InputActionPressed(iAct_test_BePlayer7   ))then ;//PlayerClient:=7;
-         if(InputActionPressed(iAct_test_debug0      ))then writeln(GameBack(false,true));
+         if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
          if(InputActionPressed(iAct_test_debug1      ))then ;
       end;
 

@@ -40,7 +40,7 @@ begin
    end;
 end;
 
-procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
+procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal;lastLineY:pinteger=nil);
 var
 strLen,
 i,start,
@@ -223,6 +223,7 @@ begin
       tc_nl2 : y+=txt_line_h2;
       end;
    end;
+   if(lastLineY<>nil)then lastLineY^:=y;
 end;
 
 procedure map_MinimapBackgroundObj(sd:TSob);

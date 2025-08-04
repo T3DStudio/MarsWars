@@ -368,7 +368,7 @@ mh_homing   : begin
       else
         if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
          if((vstep mod ms_eid_fly_st)=0)then
-           if(MapPointInScreenP(vx,vy,true))then effect_add(vx,vy,draw_SpriteDepth(vy,mfs),ms_eid_fly);
+           if(ui_CheckMapPointFogVision(vx,vy,true))then effect_add(vx,vy,draw_SpriteDepth(vy,mfs),ms_eid_fly);
       {$ENDIF};
    end;
 end;
