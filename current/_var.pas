@@ -825,7 +825,6 @@ str_race          : array[0..r_cnt ] of shortstring;
 str_map_ScenarioL : array[0..mc_Last] of shortstring;
 
 str_menu_Campaings,
-str_menu_Tutorials,
 str_menu_Scirmish,
 str_menu_Playback,
 str_menu_SaveLoad,

@@ -803,11 +803,11 @@ end;
 
 function str_cmp_map(date,location,area:shortstring):shortstring;
 begin
-   str_cmp_map:=str_cmp_Date    +tc_nl2+
-                  str_Center0(date    ,14)+tc_nl2+
-                str_cmp_Location+tc_nl2+
-                  str_Center0(location,14)+tc_nl2+
-                str_cmp_Area    +tc_nl2+
+   str_cmp_map:=str_cmp_Date    +tc_nl3+
+                  str_Center0(date    ,14)+tc_nl3+
+                str_cmp_Location+tc_nl3+
+                  str_Center0(location,14)+tc_nl3+
+                str_cmp_Area    +tc_nl3+
                   str_Center0(area    ,14);
 end;
 
@@ -828,8 +828,7 @@ begin
    str_Caption_Client            := 'CLIENT';
    str_Caption_Objectives        := 'OBJECTIVES';
 
-   str_menu_Tutorials            := 'TUTORIALS';
-   str_menu_Campaings            := 'CAMPAIGNS';
+   str_menu_Campaings            := 'TUTORIALS & CAMPAIGNS';
    str_menu_Scirmish             := 'SKIRMISH';
    str_menu_Playback             := 'REPLAY PLAYBACK';
    str_menu_SaveLoad             := 'SAVE/LOAD';
@@ -932,9 +931,9 @@ begin
    str_map_GeneratorsL[mapg_20 ] := '20 min';
    str_map_GeneratorsL[mapg_inf] := 'infinity';
 
-   str_FileError_NExists         := 'File not'+tc_nl3+'exists!';
-   str_FileError_Open            := 'Can`t open'+tc_nl3+'file!';
-   str_FileError_WData           := 'Wrong file'+tc_nl3+'data!';
+   str_FileError_NExists         := 'File not exists!';
+   str_FileError_Open            := 'Can`t open file!';
+   str_FileError_WData           := 'Wrong file data!';
    str_FileError_WVer            := 'Wrong version!';
 
    str_ReplayQualityL[0]         := tc_aqua  +'x1 '+tc_default+'/'+tc_red   +' x1';
@@ -1416,26 +1415,26 @@ begin
 
    str_camp_obj [2 ] := '- Destroy Military Base';
 
-   str_camp_obj [3 ] := '- Destroy all human bases and armies'+tc_nl2+'-Cyberdemon must survive'+tc_nl2+'-Protect portal';
-   str_camp_obj [4 ] := '- Destroy Nuclear Plant'+tc_nl2+'-Cyberdemon must survive';
-   str_camp_obj [5 ] := '- Destroy Science Center'+tc_nl2+'-Cyberdemon must survive';
+   str_camp_obj [3 ] := '- Destroy all human bases and armies'+tc_nl3+'-Cyberdemon must survive'+tc_nl3+'-Protect portal';
+   str_camp_obj [4 ] := '- Destroy Nuclear Plant'+tc_nl3+'-Cyberdemon must survive';
+   str_camp_obj [5 ] := '- Destroy Science Center'+tc_nl3+'-Cyberdemon must survive';
 
    str_camp_obj [6 ] := '- Destroy all human bases and armies';
    str_camp_obj [7 ] := '???';
    str_camp_obj [8 ] := '- Kill all humans!';
-   str_camp_obj [9 ] := '- Protect Hell Fortess'+tc_nl2+'-Destroy all human towns and armies';
-   str_camp_obj [10] := '- Destroy all industrial buildings'+tc_nl2+'-Destroy all command centers';
+   str_camp_obj [9 ] := '- Protect Hell Fortess'+tc_nl3+'-Destroy all human towns and armies';
+   str_camp_obj [10] := '- Destroy all industrial buildings'+tc_nl3+'-Destroy all command centers';
    str_camp_obj [11] := '- Destroy all military bases';
 
-   str_camp_obj [12] := '- Find, protect and reapir'+tc_nl2+'Command Center'+tc_nl2+'-At least one engineer must survive';
+   str_camp_obj [12] := '- Find, protect and reapir'+tc_nl3+'Command Center'+tc_nl3+'-At least one engineer must survive';
    str_camp_obj [13] := '- Find and repair 5 Super Generators';
-   str_camp_obj [14] := '- Destroy all bases and armies of hell'+tc_nl2+'around portal until the arrival of'+tc_nl2+'enemy reinforcements(for 20 minutes)';
+   str_camp_obj [14] := '- Destroy all bases and armies of hell'+tc_nl3+'around portal until the arrival of'+tc_nl3+'enemy reinforcements(for 20 minutes)';
 
-   str_camp_obj [15] := '- Destroy all bases and armies of hell'+tc_nl2+'-Protect portal';
-   str_camp_obj [16] := '- Repair and protect Science Center'+tc_nl2+'-Destroy all bases and armies of hell';
+   str_camp_obj [15] := '- Destroy all bases and armies of hell'+tc_nl3+'-Protect portal';
+   str_camp_obj [16] := '- Repair and protect Science Center'+tc_nl3+'-Destroy all bases and armies of hell';
    str_camp_obj [17] := '- Destroy fortess of hell';
 
-   str_camp_obj [18] := '- Destroy all altars of hell'+tc_nl2+'-Protect portal';
+   str_camp_obj [18] := '- Destroy all altars of hell'+tc_nl3+'-Protect portal';
    str_camp_obj [19] := '- Reach the opposite side of the area';
    str_camp_obj [20] := '- Find and kill the Spiderdemon';
 
@@ -1455,13 +1454,12 @@ begin
   str_Caption_Players           := 'ИГРОКИ';
   str_Caption_Multiplayer       := 'СЕТЕВАЯ ИГРА';
   str_Caption_GOptions          := 'ПАРАМЕТРЫ ИГРЫ';
-  str_Caption_Objectives               := 'ЗАДАЧИ';
+  str_Caption_Objectives        := 'ЗАДАЧИ';
 
-  str_menu_Tutorials            := 'ОБУЧЕНИЕ';
-  str_menu_Campaings            := 'КАМПАНИИ';
+  str_menu_Campaings            := 'КАМПАНИИ И ОБУЧЕНИЕ';
   str_menu_Scirmish             := 'СХВАТКА';
   str_menu_Playback             := 'ПРОСМОТР ЗАПИСИ';
-  str_menu_SaveLoad             := 'СОХР./ЗАГР.';
+  str_menu_SaveLoad             := 'СОХРАНИТЬ/ЗАГРУЗИТЬ';
   str_menu_LoadGame             := 'ЗАГРУЗИТЬ ИГРУ';
   str_menu_Replays              := 'ЗАПИСИ';
   str_menu_Settings             := 'НАСТРОЙКИ';
@@ -1526,9 +1524,9 @@ begin
   str_SG_PlayerName           := 'Имя игрока';
   str_SG_RightClickAct        := 'Действие на правый клик';
   str_SG_RightClickActL[true ]:= tc_lime+'движение'+tc_default;
-  str_SG_RightClickActL[false]:= tc_lime+'движ.'   +tc_default+'+'+tc_red+'атака'+tc_default;
-  str_SG_ScrollSpeed          := 'Скорость пр.';
-  str_SG_MouseScroll          := 'Прокр. мышью';
+  str_SG_RightClickActL[false]:= tc_lime+'движение'   +tc_default+'+'+tc_red+'атака'+tc_default;
+  str_SG_ScrollSpeed          := 'Скорость движения камеры';
+  str_SG_MouseScroll          := 'Перемещение камеры курсором';
   str_SG_Language       := 'Язык интерфейса';
 
   str_SV_ResolutionApply:= 'Применить разрешение';
@@ -1546,10 +1544,10 @@ begin
   str_gstat_ReplayEnd            := 'Конец записи!';
   str_gstat_ReplayError          := 'Ошибка при чтении файла!';
 
-  str_FileError_NExists  := 'Файл не'+tc_nl3+'существует!';
-  str_FileError_Open  := 'Неполучилось'+tc_nl3+'открыть файл!';
-  str_FileError_WData := 'Неправильные'+tc_nl3+'данные файла!';
-  str_FileError_WVer  := 'Неправильная'+tc_nl3+'версия файла!';
+  str_FileError_NExists  := 'Файл не существует!';
+  str_FileError_Open  := 'Неполучилось открыть файл!';
+  str_FileError_WData := 'Неправильные данные файла!';
+  str_FileError_WVer  := 'Неправильная версия файла!';
   str_ui_time              := 'Время: ';
   str_ui_menu              := 'Меню';
   str_gmsg_PlayerDefeat        := ' уничтожен!';
@@ -1679,7 +1677,7 @@ begin
   str_SG_ControlPanelPosL[3]      := tc_aqua  +'внизу' +tc_default;
 
   str_SG_HealthBars             := 'Полоски здоровья';
-  str_SG_HealthBarsL[0]         := tc_lime  +'выбранные'+tc_default+'+'+tc_red+'поврежд.'+tc_default;
+  str_SG_HealthBarsL[0]         := tc_lime  +'выбранные'+tc_default+'+'+tc_red+'поврежденные'+tc_default;
   str_SG_HealthBarsL[1]         := tc_aqua  +'всегда'   +tc_default;
   str_SG_HealthBarsL[2]         := tc_orange+'только '  +tc_lime+'выбранные'+tc_default;
 
@@ -1737,10 +1735,10 @@ begin
   str_SetUnitBaseHint(UID_HKeep           ,'Адская Крепость'            ,'');
   str_SetUnitBaseHint(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
   str_SetUnitBaseHint(UID_HGate           ,'Врата Демонов'              ,'');
-  str_SetUnitBaseHint(UID_HSymbol1        ,'Нечестивый Символ ур.1'     ,'');
-  str_SetUnitBaseHint(UID_HSymbol2        ,'Нечестивый Символ ур.2'     ,'');
-  str_SetUnitBaseHint(UID_HSymbol3        ,'Нечестивый Символ ур.3'     ,'');
-  str_SetUnitBaseHint(UID_HSymbol4        ,'Нечестивый Символ ур.4'     ,'');
+  str_SetUnitBaseHint(UID_HSymbol1        ,'Нечестивый Символ 1 уровня' ,'');
+  str_SetUnitBaseHint(UID_HSymbol2        ,'Нечестивый Символ 2 уровня' ,'');
+  str_SetUnitBaseHint(UID_HSymbol3        ,'Нечестивый Символ 3 уровня' ,'');
+  str_SetUnitBaseHint(UID_HSymbol4        ,'Нечестивый Символ 4 уровня' ,'');
   str_SetUnitBaseHint(UID_HPools          ,'Инфернальные Омуты'         ,'');
   str_SetUnitBaseHint(UID_HTeleport       ,'Телепорт'                   ,'Базовая перезарядка телепортации - '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[лимит перемещаемого юнита]');
   str_SetUnitBaseHint(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
@@ -1792,10 +1790,10 @@ begin
   str_SetUnitBaseHint(UID_UACommandCenter ,'Продвинутый Командный Центр','');
   str_SetUnitBaseHint(UID_UBarracks       ,'Казармы'                    ,'');
   str_SetUnitBaseHint(UID_UFactory        ,'Фабрика'                    ,'');
-  str_SetUnitBaseHint(UID_UGenerator1     ,'Генератор ур.1'             ,'');
-  str_SetUnitBaseHint(UID_UGenerator2     ,'Генератор ур.2'             ,'');
-  str_SetUnitBaseHint(UID_UGenerator3     ,'Генератор ур.3'             ,'');
-  str_SetUnitBaseHint(UID_UGenerator4     ,'Генератор ур.4'             ,'');
+  str_SetUnitBaseHint(UID_UGenerator1     ,'Генератор 1 уровня'         ,'');
+  str_SetUnitBaseHint(UID_UGenerator2     ,'Генератор 2 уровня'         ,'');
+  str_SetUnitBaseHint(UID_UGenerator3     ,'Генератор 3 уровня'         ,'');
+  str_SetUnitBaseHint(UID_UGenerator4     ,'Генератор 4 уровня'         ,'');
   str_SetUnitBaseHint(UID_UWeaponFactory  ,'Завод Вооружений'           ,'');
   str_SetUnitBaseHint(UID_UGTurret        ,'Анти-наземная Турель'       ,'Анти-наземное защитное сооружение' );
   str_SetUnitBaseHint(UID_UATurret        ,'Анти-воздушная Турель'      ,'Анти-воздушное защитное сооружение');
@@ -1944,23 +1942,23 @@ begin
   str_camp_MissionName[6]         := 'Hell #5: Ад на Земле';
   str_camp_MissionName[7]         := 'Hell #6: Космодром';
 
-  str_camp_obj[0]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
+  str_camp_obj[0]         := '-Уничтожь все людские базы и армии'+tc_nl2+'-Защити портал';
   str_camp_obj[1]         := '-Уничтожь военную базу';
-  str_camp_obj[2]         := '-Уничтожь все людские базы и армии'+tc_nl3+'-Защити портал';
+  str_camp_obj[2]         := '-Уничтожь все людские базы и армии'+tc_nl2+'-Защити портал';
   str_camp_obj[3]         := '-Защити алтари в течении 20 минут';
   str_camp_obj[4]         := '-Уничтожь все людские базы и армии';
   str_camp_obj[5]         := '-Уничтожь все людские базы и армии';
   str_camp_obj[6]         := '-Уничтожь все людские базы и армии';
-  str_camp_obj[7]         := '-Уничтожь космодром'+tc_nl3+'-Ни один людской транспорт не должен'+tc_nl3+'уйти';
+  str_camp_obj[7]         := '-Уничтожь космодром'+tc_nl2+'-Ни один людской транспорт не должен'+tc_nl2+'уйти';
 
-  str_camp_map[0]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
-  str_camp_map[1]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ФОБОС' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Халл';
-  str_camp_map[2]         := tc_lime+'Дата:'+tc_default+tc_nl2+'15.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Аномалия';
-  str_camp_map[3]         := tc_lime+'Дата:'+tc_default+tc_nl2+'16.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ДЕЙМОС'+tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Кратер Свифт';
-  str_camp_map[4]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
-  str_camp_map[5]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'МАРС'  +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Равнина Хеллас';
-  str_camp_map[6]         := tc_lime+'Дата:'+tc_default+tc_nl2+'18.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';
-  str_camp_map[7]         := tc_lime+'Дата:'+tc_default+tc_nl2+'19.11.2145'+tc_nl2+tc_lime+'Место:'+tc_default+tc_nl2+'ЗЕМЛЯ' +tc_nl2+tc_lime+'Район:'+tc_default+tc_nl2+'Неизвестно';  }
+  str_camp_map[0]         := tc_lime+'Дата:'+tc_default+tc_nl3+'15.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ФОБОС' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Аномалия';
+  str_camp_map[1]         := tc_lime+'Дата:'+tc_default+tc_nl3+'16.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ФОБОС' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Кратер Халл';
+  str_camp_map[2]         := tc_lime+'Дата:'+tc_default+tc_nl3+'15.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ДЕЙМОС'+tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Аномалия';
+  str_camp_map[3]         := tc_lime+'Дата:'+tc_default+tc_nl3+'16.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ДЕЙМОС'+tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Кратер Свифт';
+  str_camp_map[4]         := tc_lime+'Дата:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'МАРС'  +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Равнина Хеллас';
+  str_camp_map[5]         := tc_lime+'Дата:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'МАРС'  +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Равнина Хеллас';
+  str_camp_map[6]         := tc_lime+'Дата:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ЗЕМЛЯ' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Неизвестно';
+  str_camp_map[7]         := tc_lime+'Дата:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ЗЕМЛЯ' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Неизвестно';  }
 
   str_makeHints;
 end;

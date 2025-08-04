@@ -180,7 +180,7 @@ mtx1    : integer;
 
 /////   BASIC
 
-procedure menu_Item_Set(mi:byte;x0,y0,x1,y1:integer;enabled:boolean);
+procedure menu_Item_Set(mi:byte;x0,y0,x1,y1:integer;enabled:boolean;maxChars:byte=0);
 begin
    with menu_items[mi] do
    begin
@@ -191,6 +191,10 @@ begin
 
       mi_xc:=(mi_x0+mi_x1) div 2;
       mi_yc:=(mi_y0+mi_y1) div 2;
+
+      if(maxChars>0)
+      then mi_charw:=maxChars
+      else mi_charw:=(mi_x1-mi_x0-font_w) div font_w;
 
       mi_state:=1+byte(enabled);
    end;
@@ -382,26 +386,26 @@ begin
 
    mty0+=menu_ListLineH-2;
    mtx0:=menu_items[mi_Players_Panel].mi_x0;
-   menu_Item_Set(mi_Players_StateC,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_ListLineH,false);mtx0+=menu_PlayersStateW;
-   menu_Item_Set(mi_Players_NameC ,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersNameW;
-   menu_Item_Set(mi_Players_RaceC ,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersRaceW;
-   menu_Item_Set(mi_Players_TeamC ,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_ListLineH,false);mtx0+=menu_PlayersTeamW;
-   menu_Item_Set(mi_Players_ColorC,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false);
+   menu_Item_Set(mi_Players_StateC,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersStateW;
+   menu_Item_Set(mi_Players_NameC ,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersNameW;
+   menu_Item_Set(mi_Players_RaceC ,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersRaceW;
+   menu_Item_Set(mi_Players_TeamC ,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersTeamW;
+   menu_Item_Set(mi_Players_ColorC,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false,9);
    mty0-=menu_ListLinehH;
    if(net_status<>ns_none)then
-   menu_Item_Set(mi_Players_PingC ,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false);
+   menu_Item_Set(mi_Players_PingC ,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false,9);
 
    mty0+=menu_ListLineH+menu_ListLinehH;
    for p:=0 to LastPlayer do
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
       if(p<map_MaxPlayers)then
-      menu_Item_Set(mi_Players_State0+p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle  (p,true     ));mtx0+=menu_PlayersStateW;
-      menu_Item_Set(mi_Players_Name0 +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSlotEnabled           );mtx0+=menu_PlayersNameW;
-      menu_Item_Set(mi_Players_Race0 +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll(p,true     ));mtx0+=menu_PlayersRaceW;
+      menu_Item_Set(mi_Players_State0+p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle  (p,true     ),9);mtx0+=menu_PlayersStateW;
+      menu_Item_Set(mi_Players_Name0 +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSlotEnabled             );mtx0+=menu_PlayersNameW;
+      menu_Item_Set(mi_Players_Race0 +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll(p,true     )  );mtx0+=menu_PlayersRaceW;
       if(p<map_MaxPlayers)then
-      menu_Item_Set(mi_Players_Team0 +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll(p,true,true));mtx0+=menu_PlayersTeamW;
-      menu_Item_Set(mi_Players_Ping0 +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true);
+      menu_Item_Set(mi_Players_Team0 +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll(p,true,true)  );mtx0+=menu_PlayersTeamW;
+      menu_Item_Set(mi_Players_Ping0 +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true                         ,9);
       mty0+=menu_PListLineH;
    end;
    mtx0:=menu_items[mi_Players_Panel].mi_x0;

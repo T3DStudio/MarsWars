@@ -887,7 +887,7 @@ begin
    ui_fpsx      := ui_mapx+ui_cam_w-(font_w*font_3hw);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
-   ui_apmy      := ui_fpsy+txt_line_h3;
+   ui_apmy      := ui_fpsy+txt_line_h2;
 
    ui_ingamecl  :=(ui_cam_w-font_w) div font_w;
 

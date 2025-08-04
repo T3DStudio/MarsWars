@@ -175,6 +175,7 @@ TMenuItem = record
    mi_y1,
    mi_xc,
    mi_yc   :integer;
+   mi_charw:byte;
    mi_state:byte;
 end;
 

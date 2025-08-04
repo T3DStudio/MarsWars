@@ -98,17 +98,17 @@ begin
    ' '+tc_orange+i2s(g_players[UIPlayer].ai_attack_timer)+
    ' '+tc_green+b2c[g_players[UIPlayer].ai_ReadyForAttack]}
    ,
-   ta_right,255, c_white);
+   ta_RU,255, c_white);
 
    draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-20,
        i2s(mouse_map_x)+
    ' '+i2s(mouse_map_y),
-   ta_right,255, c_white);
+   ta_RU,255, c_white);
 
    draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-30,
        i2s(rpls_pstate)+
    ' '+i2s(rpls_fstate),
-   ta_right,255, c_white);
+   ta_RU,255, c_white);
    end;
 
    sdl_flip(vid_screen);

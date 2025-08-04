@@ -41,94 +41,189 @@ begin
 end;
 
 procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal);
-var strLen,
-    i,
-    chars :byte;
-    ix    :integer;
-    charc :char;
- color    :cardinal;
+var
+strLen,
+i,start,
+lastSplitChar,
+lastSplitChars,
+chars,
+lines_n,
+line   :byte;
+textH,
+textW,
+ix     :integer;
+charc  :char;
+color  :cardinal;
+lines_spos,
+lines_epos,
+lines_endc,
+lines_len :shortstring;
+procedure AddLine(endChar:char);
+begin
+   lines_spos+=chr(start);
+   lines_epos+=chr(i    );
+   lines_len +=chr(chars);
+   lines_endc+=endChar;
+   start:=i+1;
+   chars:=0;
+   lastSplitChar:=0;
+end;
 begin
    if(BaseColor=0)then exit;
    strLen:=length(str);
    if(strLen=0)then exit;
+   if(MaxLineChars<1)then MaxLineChars:=1;
 
-   if(alignment=ta_middle)
-   or(alignment=ta_right )then
+   // text analize
+   lines_spos:='';
+   lines_epos:='';
+   lines_endc:='';
+   lines_len :='';
+   if(alignment=ta_chat)then
    begin
+      if(strLen>MaxLineChars)then
+      begin
+         lines_spos+=chr(strLen-MaxLineChars);
+         lines_epos+=chr(strLen);
+         lines_len +=chr(MaxLineChars);
+      end
+      else
+      begin
+         lines_spos+=#1;
+         lines_epos+=chr(strLen);
+         lines_len +=chr(strLen);
+      end;
+      lines_endc+=#0;
+      textW:=strLen*font_w;
+      textH:=font_w;
+      ix:=x;
+   end
+   else
+   begin
+      textW:=0;
+      textH:=0;
       chars:=0;
-      for i:=1 to strLen do
-        if not(str[i] in [tc_player0..tc_player7,tc_purple..tc_default])then chars+=1;
+      start:=1;
+      lastSplitChar:=0;
+      i:=0;
+      while(i<strLen)do
+      begin
+         i+=1;
+         charc:=str[i];
+
+         case charc of
+         tc_nl1 : begin textH+=txt_line_h1-font_w;AddLine(charc);end;
+         tc_nl2 : begin textH+=txt_line_h2-font_w;AddLine(charc);end;
+         tc_nl3 : begin textH+=txt_line_h3-font_w;AddLine(charc);end;
+         else
+            if not(charc in tc_SpecChars)then
+            begin
+               case charc of
+               ' ',
+               '/',
+               '\',
+               ':',
+               '-'  : begin
+                         lastSplitChar :=i;
+                         lastSplitChars:=chars;
+                      end;
+               ',',
+               '.'  : if(i<255)and(i<strLen)then
+                       if(str[i+1]=' ')then
+                       begin
+                          lastSplitChar :=i;
+                          lastSplitChars:=chars;
+                       end;
+               end;
+               chars+=1;
+               if(chars>=MaxLineChars)and(i<strLen)then
+               begin
+                  textH+=txt_line_h1-font_w;
+                  if(lastSplitChar>0)then
+                  begin
+                     i:=lastSplitChar;
+                     chars:=lastSplitChars;
+                  end;
+                  AddLine(tc_nl1);
+               end;
+            end;
+         end;
+         if(i=strLen)then AddLine(#0);
+      end;
+      lines_n:=length(lines_len);
+      textH+=lines_n*font_w;
 
       case alignment of
-      ta_middle: ix:=x-((chars*font_w) shr 1);
-      ta_right : ix:=x- (chars*font_w);
+      ta_LU,
+      ta_MU,
+      ta_RU  : ;
+      ta_LM,
+      ta_MM,
+      ta_RM  : y-=(textH div 2);
+      ta_LB,
+      ta_MB,
+      ta_RB  : y-= textH;
       end;
-   end
-   else ix:=x;
+   end;
 
-   if(alignment=ta_chat)and(strLen>MaxLineChars)
-   then i:=strLen-MaxLineChars
-   else i:=1;
-
-   chars:=0;
    color:=BaseColor;
-   for i:=i to strLen do
+   for line:=1 to lines_n do
    begin
-      charc:=str[i];
-
-      case charc of
-      tc_player0..
-      tc_player7  : begin color:=PlayerGetColor(ord(charc),false);if(i<strLen)then continue;end;
-      tc_nl1..
-      tc_nl3      : ;
-      tc_purple   : begin color:=c_purple ;if(i<strLen)then continue;end;
-      tc_red      : begin color:=c_red    ;if(i<strLen)then continue;end;
-      tc_orange   : begin color:=c_orange ;if(i<strLen)then continue;end;
-      tc_yellow   : begin color:=c_yellow ;if(i<strLen)then continue;end;
-      tc_lime     : begin color:=c_lime   ;if(i<strLen)then continue;end;
-      tc_aqua     : begin color:=c_aqua   ;if(i<strLen)then continue;end;
-      tc_blue     : begin color:=c_blue   ;if(i<strLen)then continue;end;
-      tc_gray     : begin color:=c_gray   ;if(i<strLen)then continue;end;
-      tc_dgray    : begin color:=c_dgray  ;if(i<strLen)then continue;end;
-      tc_white    : begin color:=c_white  ;if(i<strLen)then continue;end;
-      tc_green    : begin color:=c_green  ;if(i<strLen)then continue;end;
-      tc_default  : begin color:=BaseColor;if(i<strLen)then continue;end;
-      else
-         case charc of
-         char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple );
-         char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white  );
-         ',',';','[',']','{','}'
-                      : boxColor(sur,ix,y,ix+font_iw,y+font_iw,BaseColor);
-         else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
-         end;
-
-         draw_mwtexture(sur,ix,y,@font_1[charc]);
-
-         chars+= 1;
-         ix   += font_w;
+      textW:=ord(lines_len[line])*font_w;
+      case alignment of
+      ta_LU,
+      ta_LM,
+      ta_LB  : ix:=x;
+      ta_MU,
+      ta_MM,
+      ta_MB  : ix:=x-(textW div 2);
+      ta_RU,
+      ta_RM,
+      ta_RB  : ix:=x- textW;
       end;
 
-      if(alignment=ta_left)then
-       if(chars>=MaxLineChars)
-       or(charc  =tc_nl1)
-       or(charc  =tc_nl2)
-       or(charc  =tc_nl3)
-       or(i      =strLen)then
-       begin
-          if(chars>=MaxLineChars)then charc:=tc_nl1;
-          if(i<strLen)then chars:=0;
+      for i:=ord(lines_spos[line]) to ord(lines_epos[line]) do
+      begin
+         charc:=str[i];
 
-          ix:=x;
-          case charc of
-          tc_nl1 : y+=txt_line_h1;
-          tc_nl2 : y+=txt_line_h2;
-          else     y+=txt_line_h3;
-          end;
-       end;
+         case charc of
+         tc_player0..
+         tc_player7  : begin color:=PlayerGetColor(ord(charc),false);if(i<strLen)then continue;end;
+         tc_nl1..
+         tc_nl2      : ;
+         tc_purple   : begin color:=c_purple ;if(i<strLen)then continue;end;
+         tc_red      : begin color:=c_red    ;if(i<strLen)then continue;end;
+         tc_orange   : begin color:=c_orange ;if(i<strLen)then continue;end;
+         tc_yellow   : begin color:=c_yellow ;if(i<strLen)then continue;end;
+         tc_lime     : begin color:=c_lime   ;if(i<strLen)then continue;end;
+         tc_aqua     : begin color:=c_aqua   ;if(i<strLen)then continue;end;
+         tc_blue     : begin color:=c_blue   ;if(i<strLen)then continue;end;
+         tc_gray     : begin color:=c_gray   ;if(i<strLen)then continue;end;
+         tc_dgray    : begin color:=c_dgray  ;if(i<strLen)then continue;end;
+         tc_white    : begin color:=c_white  ;if(i<strLen)then continue;end;
+         tc_green    : begin color:=c_green  ;if(i<strLen)then continue;end;
+         tc_default  : begin color:=BaseColor;if(i<strLen)then continue;end;
+         else
+            case charc of
+            char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple );
+            char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white  );
+            ',',';','[',']','{','}'
+                         : boxColor(sur,ix,y,ix+font_iw,y+font_iw,BaseColor);
+            else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
+            end;
+
+            draw_mwtexture(sur,ix,y,@font_1[charc]);
+            ix   += font_w;
+         end;
+      end;
+
+      case lines_endc[line] of
+      tc_nl1 : y+=txt_line_h1;
+      tc_nl3 : y+=txt_line_h3;
+      tc_nl2 : y+=txt_line_h2;
+      end;
    end;
 end;
-
-
 
 procedure map_MinimapBackgroundObj(sd:TSob);
 var d:integer;

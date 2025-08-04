@@ -1291,12 +1291,16 @@ uinfo_text             = 6;
 //  TEXT
 //
 
-ta_left                = 0;
-ta_middle              = 1;
-ta_right               = 2;
-ta_chat                = 3;
-ta_miMU                = 4;
-ta_miMD                = 5;
+ta_LU                  = 0;
+ta_LM                  = 1;
+ta_LB                  = 2;
+ta_MU                  = 3;
+ta_MM                  = 4;
+ta_MB                  = 5;
+ta_RU                  = 6;
+ta_RM                  = 7;
+ta_RB                  = 8;
+ta_chat                = 9;
 
 font_w                 = 8;
 font_hw                = font_w div 2;
@@ -1307,8 +1311,8 @@ font_3hw               = font_w+(font_w div 2);
 font_6hw               = font_3hw*2;
 
 txt_line_h1            = font_w+2;
-txt_line_h2            = 25-font_w;
-txt_line_h3            = font_w+5;
+txt_line_h2            = font_w+5;
+txt_line_h3            = font_w+17;
 
 chat_all               = 255;
 chat_allies            = 254;
@@ -1676,6 +1680,8 @@ tc_white               = #22;
 tc_green               = #23;
 tc_dgray               = #24;
 tc_default             = #25;
+
+tc_SpecChars           = [tc_player0..tc_default];
 
 b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
 

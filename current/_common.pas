@@ -2049,45 +2049,45 @@ begin
    vint   :=0;
    vcard  :=0;
    lplayer:=0;
-   strInfoVar^:=str_map+tc_nl3;
+   strInfoVar^:=str_map+tc_nl2;
 
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_scenario  ));
    if not(vbyte1 in allmapscenarios        )then exit
-                                            else strInfoVar^+=' '+str_map_Scenario  +': '+str_map_ScenarioL  [vbyte1]+tc_default+tc_nl3;
+                                            else strInfoVar^+=' '+str_map_Scenario  +': '+str_map_ScenarioL  [vbyte1]+tc_default+tc_nl2;
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_generators));
    if(vbyte1>map_MaxGenerators             )then exit
-                                            else strInfoVar^+=' '+str_map_Generators+': '+str_map_GeneratorsL[vbyte1]+tc_nl3;
+                                            else strInfoVar^+=' '+str_map_Generators+': '+str_map_GeneratorsL[vbyte1]+tc_nl2;
    vcard:=0;
-   BlockRead(f,vcard ,sizeof(map_seed      ));   strInfoVar^+=' '+str_map_Seed      +': '+c2s(vcard)+tc_nl3;
+   BlockRead(f,vcard ,sizeof(map_seed      ));   strInfoVar^+=' '+str_map_Seed      +': '+c2s(vcard)+tc_nl2;
 
    vint:=-1;
    BlockRead(f,vint  ,sizeof(map_Size      ));
    if(vint<map_MinSize)or(map_MaxSize<vint )then exit
-                                            else strInfoVar^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl3;
+                                            else strInfoVar^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl2;
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_ObstaclesF ));
    if(vbyte1>map_MaxObstacles              )then exit
-                                            else strInfoVar^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl3;
+                                            else strInfoVar^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
 
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar^+=' '+str_map_Symmetry  +': '+b2cc[vbyte1>0]+tc_nl3;
+   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar^+=' '+str_map_Symmetry  +': '+b2cc[vbyte1>0]+tc_nl2;
 
    vint:=-1;
    BlockRead(f,vint  ,sizeof(theme_i       ));
    if(vint>=theme_n                        )then exit
-                                            else strInfoVar^+=' '+theme_name[vint]+tc_default+tc_nl3;
+                                            else strInfoVar^+=' '+theme_name[vint]+tc_default+tc_nl2;
 
    lplayer:=255;
    BlockRead(f,lplayer,sizeof(LocalPlayer  ));
 
-   strInfoVar^+=tc_nl3;
+   strInfoVar^+=tc_nl2;
 
    vcard:=0;
-   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar^+=str_ui_time+str_GTick2Time(vcard)+tc_nl3;
+   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar^+=str_ui_time+str_GTick2Time(vcard)+tc_nl2;
 
-   strInfoVar^+=tc_nl3+str_Players+tc_nl3;
+   strInfoVar^+=tc_nl2+str_Players+tc_nl2;
    for p:=0 to LastPlayer do
      with playerInfo do
      begin
@@ -2105,7 +2105,7 @@ begin
           if(observer)
           then strInfoVar^+=str_observer[1]   +','+b2s(team+1)+','
           else strInfoVar^+=str_race[mrace][2]+','+b2s(team+1)+',';
-        strInfoVar^+=name+tc_nl3
+        strInfoVar^+=name+tc_nl2
      end;
 
    FileReadBaseGameInfo:=true;

@@ -83,7 +83,7 @@ begin
 
         rectangleColor(tar,mi_xc-menu_ItemCaptionhW,mi_y0,
                            mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonhH,c_ltgray);
-        draw_text(tar,mi_xc,mi_y0+font_hw ,text,ta_middle,255,color);
+        draw_text(tar,mi_xc,mi_y0+font_hw ,text,ta_MU,255,color);
      end;
 end;
 
@@ -120,7 +120,7 @@ begin
            begin
               y:=mi_y0+t*lineH;
 
-              draw_text(tar,mi_x0+font_hw,y+font_hw,str_Trim(b2s(i+1)+'] '+plist^[i],lineWChars),ta_left,255,mic(mi_state>1,i=selected));
+              draw_text(tar,mi_x0+font_hw,y+font_hw,str_Trim(b2s(i+1)+'] '+plist^[i],lineWChars),ta_LU,255,mic(mi_state>1,i=selected));
               if(i=selected)then
               begin
                  hlineColor(tar,mi_x0,mi_x1,y        ,c_gray);
@@ -143,7 +143,7 @@ begin
         then color:=c_gray
         else color:=c_white;
 
-        draw_text(tar,mi_x0+font_hw,mi_y0+menu_BigButtonH,text,ta_left,255,color);
+        draw_text(tar,mi_x0+font_hw,mi_y0+menu_BigButtonH,text,ta_LU,mi_charw,color);
      end;
 end;
 procedure d_MenuItemTextC(tar:pSDL_Surface;mi,pos:byte;text:shortstring;color:cardinal);
@@ -152,11 +152,17 @@ begin
      if(mi_state>0)then
      begin
         case pos of
-        ta_left  : draw_text(tar,mi_x0+font_hw,mi_yc-font_hw ,text,pos      ,255,color);
-        ta_right : draw_text(tar,mi_x1-font_hw,mi_yc-font_hw ,text,pos      ,255,color);
-        ta_middle: draw_text(tar,mi_xc        ,mi_yc-font_hw ,text,pos      ,255,color);
-        ta_miMU  : draw_text(tar,mi_xc        ,mi_y0+font_hw ,text,ta_middle,255,color);
-        ta_miMD  : draw_text(tar,mi_xc        ,mi_y1-font_3hw,text,ta_middle,255,color);
+        ta_LU  : draw_text(tar,mi_x0+font_hw,mi_y0+font_hw,text,pos,mi_charw,color);
+        ta_MU  : draw_text(tar,mi_xc        ,mi_y0+font_hw,text,pos,mi_charw,color);
+        ta_RU  : draw_text(tar,mi_x1-font_hw,mi_y0+font_hw,text,pos,mi_charw,color);
+
+        ta_LM  : draw_text(tar,mi_x0+font_hw,mi_yc        ,text,pos,mi_charw,color);
+        ta_MM  : draw_text(tar,mi_xc        ,mi_yc        ,text,pos,mi_charw,color);
+        ta_RM  : draw_text(tar,mi_x1-font_hw,mi_yc        ,text,pos,mi_charw,color);
+
+        ta_LB  : draw_text(tar,mi_x0+font_hw,mi_y1-font_hw,text,pos,mi_charw,color);
+        ta_MB  : draw_text(tar,mi_xc        ,mi_y1-font_hw,text,pos,mi_charw,color);
+        ta_RB  : draw_text(tar,mi_x1-font_hw,mi_y1-font_hw,text,pos,mi_charw,color);
         end;
      end;
 end;
@@ -181,28 +187,17 @@ procedure d_menuItemText1(tar:pSDL_Surface;mi:byte;text:shortstring;selectedVal:
 begin
    with menu_items[mi] do
      if(mi_state>0)then
-       d_MenuItemText(tar,mi,ta_middle,text,selectedVal);
+       d_MenuItemText(tar,mi,ta_MM,text,selectedVal);
 end;
 procedure d_menuItemText2(tar:pSDL_Surface;mi:byte;text1,text2:shortstring;selectedVal:byte);
 begin
    with menu_items[mi] do
      if(mi_state>0)then
      begin
-        d_MenuItemText(tar,mi,ta_left ,text1,selectedVal);
-        d_MenuItemText(tar,mi,ta_right,text2,selectedVal);
+        d_MenuItemText(tar,mi,ta_LM,text1,selectedVal);
+        d_MenuItemText(tar,mi,ta_RM,text2,selectedVal);
      end;
 end;
-
-procedure d_menuItemText2L(tar:pSDL_Surface;mi:byte;text1,text2:shortstring;selectedVal:byte);
-begin
-   with menu_items[mi] do
-     if(mi_state>0)then
-     begin
-        d_MenuItemText(tar,mi ,ta_miMU   ,text1 ,selectedVal);
-        d_MenuItemText(tar,mi ,ta_miMD   ,text2 ,selectedVal);
-     end;
-end;
-
 
 procedure d_MenuItemTextBar(tar:pSDL_Surface;mi:byte;text:shortstring;vcur,vmin,vmax:integer;selectedVal:byte);
 var tx:integer;
@@ -210,14 +205,14 @@ begin
    with menu_items[mi] do
      if(mi_state>0)then
      begin
-        d_MenuItemText(tar,mi,ta_left  ,text     ,selectedVal);
+        d_MenuItemText(tar,mi,ta_LM  ,text     ,selectedVal);
 
         tx:=mi_x1-menu_BarStepX;
         vlineColor(tar,tx+1,mi_y0,mi_y1-1,c_ltgray);
-        draw_text(tar,tx+font_hw,mi_yc-font_hw ,'>',ta_left ,255,c_white);
+        draw_text(tar,tx+font_hw,mi_yc ,'>',ta_LM ,255,c_white);
 
         tx-=vmax-vmin;
-        draw_text(tar,tx-font_hw,mi_yc-font_hw ,i2s(vcur)+' <',ta_right ,255,c_white);
+        draw_text(tar,tx-font_hw,mi_yc ,i2s(vcur)+' <',ta_RM ,255,c_white);
         vlineColor(tar,tx-1,mi_y0,mi_y1-1,c_ltgray);
         boxColor(tar,tx,mi_yc-font_hw,tx+vcur-vmin,mi_yc+font_hw,c_lime);
      end;
@@ -234,14 +229,12 @@ begin
    draw_sdlsurface(tar,0,0,spr_mback);
    draw_sdlsurface(tar,menu_hw-(spr_mlogo^.w div 2),0,spr_mlogo);
 
-   draw_text(tar,menu_w,menu_h-font_w,str_ver,ta_right,255,c_white);
+   draw_text(tar,menu_w,menu_h,str_ver,ta_RB,255,c_white);
 
    if(TestMode>0)then
-   draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode)    ,ta_middle,255,c_white);
+   draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode)    ,ta_MU,255,c_white);
 
-   //draw_text(tar,menu_hw,menu_h-font_3w,str_menu_controls,ta_middle,255,c_white);
-
-   draw_text(tar,menu_hw,menu_h-font_w, str_cprt         ,ta_middle,255,c_white);
+   draw_text(tar,menu_hw,menu_h, str_cprt         ,ta_MB,255,c_white);
 
    // draw pannels
    for i in byte do
@@ -265,8 +258,7 @@ mi_caption_Settings : d_MenuItemPanel(tar,i,3);
 
    /////////////////////////////////////////////////////////////////////////////
    // Captions
-   d_menuItemText2L(tar,mi_caption_Campaings,str_menu_Campaings,
-                                             str_menu_Tutorials  ,255);
+   d_menuItemText1(tar,mi_caption_Campaings ,str_menu_Campaings  ,255);
 
    if(rpls_pstate=rpls_read)
 then d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Playback   ,255)
@@ -281,8 +273,7 @@ else d_menuItemText1(tar,mi_caption_SaveLoad,str_menu_LoadGame   ,255);
 
    /////////////////////////////////////////////////////////////////////////////
    // Main buttons
-   d_MenuItemText2L(tar,mi_Campaings        ,str_menu_Campaings  ,
-                                             str_menu_Tutorials  ,0);
+   d_MenuItemText1(tar,mi_Campaings         ,str_menu_Campaings  ,0);
 
    d_menuItemText1(tar,mi_Scirmish          ,str_menu_Scirmish   ,0);
 
@@ -325,7 +316,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    // SETTINGS  GAME RECORDING
    d_menuItemText2(tar,mi_SR_RecordGames     ,str_SR_RecordGames    ,b2cc[rpls_Record]                          ,0);
    d_menuItemText2(tar,mi_SR_RecordPrefix    ,str_SR_ReplayPrefix   ,rpls_NamePrefix+vc(mi_SR_RecordPrefix)     ,menu_ItemSelected);
-   d_menuItemText2(tar,mi_SR_RecordQuality   ,str_SR_Quality        ,str_ReplayQualityL[rpls_Quality]                 ,0);
+   d_menuItemText2(tar,mi_SR_RecordQuality   ,str_SR_Quality        ,str_ReplayQualityL[rpls_Quality]           ,0);
 
    // SETTINGS  VIDEO
    d_menuItemText2(tar,mi_SV_ResolutionW     ,str_SV_ResolutionW    ,i2s(menu_ResolutionWi)+vc(mi_SV_ResolutionW),menu_ItemSelected);
@@ -352,7 +343,7 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemCaption(tar,mi_SaveLoad_info,str_FileInfo );
    d_MenuItemInfo   (tar,mi_SaveLoad_info,svld_str_info);
 
-   d_menuItemText (tar,mi_SaveLoad_fname,ta_left,svld_str_fname+vc(mi_SaveLoad_fname),menu_ItemSelected);
+   d_menuItemText (tar,mi_SaveLoad_fname,ta_LM,svld_str_fname+vc(mi_SaveLoad_fname),menu_ItemSelected);
    d_menuItemText1(tar,mi_SaveLoad_save      ,str_FileSave  ,0);
    d_menuItemText1(tar,mi_SaveLoad_load      ,str_FileLoad  ,0);
    d_menuItemText1(tar,mi_SaveLoad_delete    ,str_FileDelete,0);
@@ -363,40 +354,40 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemCaption(tar,mi_Replays_info,str_FileInfo );
    d_MenuItemInfo   (tar,mi_Replays_info,rpls_str_info);
 
-   d_menuItemText1(tar,mi_Replays_play       ,str_FilePlay,0);
-   d_menuItemText1(tar,mi_Replays_delete     ,str_FileDelete,0);
+   d_menuItemText1(tar,mi_Replays_play   ,str_FilePlay,0);
+   d_menuItemText1(tar,mi_Replays_delete ,str_FileDelete,0);
 
    // SCIRMISH PLAYERS
    d_MenuItemCaption(tar,mi_Players_Panel,str_Caption_Players);
 
-   d_MenuItemTextC(tar,mi_Players_StateC,ta_left  ,str_PT_State ,c_ltgray);
-   d_MenuItemTextC(tar,mi_Players_NameC ,ta_middle,str_PT_Player,c_ltgray);
-   d_MenuItemTextC(tar,mi_Players_RaceC ,ta_middle,str_PT_Race  ,c_ltgray);
-   d_MenuItemTextC(tar,mi_Players_TeamC ,ta_middle,str_PT_Team  ,c_ltgray);
-   d_MenuItemTextC(tar,mi_Players_ColorC,ta_middle,str_PT_Color ,c_ltgray);
-   d_MenuItemTextC(tar,mi_Players_PingC ,ta_middle,str_PT_Ping  ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_StateC,ta_LM,str_PT_State ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_NameC ,ta_MM,str_PT_Player,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_RaceC ,ta_MM,str_PT_Race  ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_TeamC ,ta_MM,str_PT_Team  ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_ColorC,ta_MM,str_PT_Color ,c_ltgray);
+   d_MenuItemTextC(tar,mi_Players_PingC ,ta_MM,str_PT_Ping  ,c_ltgray);
 
-   d_MenuItemText (tar,mi_Players_Ready ,ta_left  ,str_net_Ready+b2cc[PlayerReady],0);
+   d_MenuItemText (tar,mi_Players_Ready ,ta_LM  ,str_net_Ready+b2cc[PlayerReady],0);
 
    for p:=0 to LastPlayer do
      with g_players[p] do
        if(state<>ps_None)then
        begin
-          d_MenuItemTextC(tar,mi_Players_Name0 +p,ta_left  ,name               ,mic(menu_items[mi_Players_Name0 +p].mi_state>1,p=LocalPlayer));
-          d_MenuItemTextC(tar,mi_Players_State0+p,ta_middle,PlayerStatusChar(p),mic(menu_items[mi_Players_State0+p].mi_state>1,p=LocalPlayer));
+          d_MenuItemTextC(tar,mi_Players_Name0 +p,ta_LM,name               ,mic(menu_items[mi_Players_Name0 +p].mi_state>1,p=LocalPlayer));
+          d_MenuItemTextC(tar,mi_Players_State0+p,ta_MM,PlayerStatusChar(p),mic(menu_items[mi_Players_State0+p].mi_state>1,p=LocalPlayer));
 
           if(observer)or(p>=map_MaxPlayers)then
           begin
-          d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_observer       ,c_gray);
-          d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,'-'                ,mic((menu_items[mi_Players_Team0 +p].mi_state>1)and(p<map_MaxPlayers),false        ));
+          d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_MM,str_observer       ,c_gray);
+          d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_MM,'-'                ,mic((menu_items[mi_Players_Team0 +p].mi_state>1)and(p<map_MaxPlayers),false        ));
           end
           else
           begin
-          d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_race[mrace]    ,mic(menu_items[mi_Players_Race0 +p].mi_state>1,false        ));
+          d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_MM,str_race[mrace]    ,mic(menu_items[mi_Players_Race0 +p].mi_state>1,false        ));
           if(map_scenario in mc_fixed_teams)
-     then d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,
+     then d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_MM,
                                      b2s(PlayerGetFixedTeams(map_scenario,p)+1),mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ))
-     else d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_middle,b2s(team+1)        ,mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ));
+     else d_MenuItemTextC(tar,mi_Players_Team0 +p,ta_MM,b2s(team+1)        ,mic(menu_items[mi_Players_Team0 +p].mi_state>1,false        ));
           end;
 
           if(defeated)and(G_Started)then
@@ -410,14 +401,15 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
           begin
              if(p<map_MaxPlayers)then
              begin
-                d_MenuItemTextC(tar,mi_Players_Name0+p,ta_left  ,str_ps_comp+' '+b2s(g_AISlots)            ,c_gray);
-                d_MenuItemTextC(tar,mi_Players_Race0+p,ta_middle,str_race[r_random]                        ,c_gray);
-                d_MenuItemTextC(tar,mi_Players_Team0+p,ta_middle,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
+                d_MenuItemTextC(tar,mi_Players_Name0+p,ta_LM,str_ps_comp+' '+b2s(g_AISlots)            ,c_gray);
+                d_MenuItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[r_random]                        ,c_gray);
+                d_MenuItemTextC(tar,mi_Players_Team0+p,ta_MM,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
              end
-             else d_MenuItemTextC(tar,mi_Players_Race0 +p,ta_middle,str_observer       ,c_gray);
+             else
+                d_MenuItemTextC(tar,mi_Players_Race0+p,ta_MM,str_observer       ,c_gray);
           end;
           if(not g_started)and(p<map_MaxPlayers)then
-            d_MenuItemTextC(tar,mi_Players_State0+p,ta_middle,'+',c_lime);
+            d_MenuItemTextC(tar,mi_Players_State0+p,ta_MM,'+',c_lime);
        end;
 
    for p:=0 to LastPlayer do
@@ -484,58 +476,58 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
 
    case net_status of
    ns_none  : begin
-                 draw_text(tar,ui_menu_csm_xt1, y, str_Caption_Server, ta_left,255, c_white);
-                 draw_text(tar,ui_menu_csm_xt2, y,str_svup[net_status=ns_server]        , ta_right ,255, mic(menu_NetServer(net_status<>ns_server,true),false));
+                 draw_text(tar,ui_menu_csm_xt1, y, str_Caption_Server, ta_LU,255, c_white);
+                 draw_text(tar,ui_menu_csm_xt2, y,str_svup[net_status=ns_server]        , ta_RU ,255, mic(menu_NetServer(net_status<>ns_server,true),false));
                  vlineColor(tar,ui_menu_csm_xc, _yl(2),_yl(2)+ui_menu_csm_ys, c_gray);
                  y:=_yt(3);
-                 draw_text(tar,ui_menu_csm_xt0, y,str_net_UDPPort                           , ta_left  ,255 ,mic((net_status=ns_none),menu_ItemSelected=87));
-                 draw_text(tar,ui_menu_csm_xt2, y,net_sv_pstr+chat_type[menu_ItemSelected<>87]  , ta_right ,255 ,mic((net_status=ns_none),menu_ItemSelected=87));
+                 draw_text(tar,ui_menu_csm_xt0, y,str_net_UDPPort                           , ta_LU  ,255 ,mic((net_status=ns_none),menu_ItemSelected=87));
+                 draw_text(tar,ui_menu_csm_xt2, y,net_sv_pstr+chat_type[menu_ItemSelected<>87]  , ta_RU ,255 ,mic((net_status=ns_none),menu_ItemSelected=87));
 
                  y:=_yt(5);
-                 draw_text(tar,ui_menu_csm_xt1, y, str_Caption_Client , ta_left,255, c_white);
-                 draw_text(tar,ui_menu_csm_xt2, y, str_net_Connect[net_status=ns_client]    , ta_right ,255, mic(menu_NetClient(net_status<>ns_client,true),false));
+                 draw_text(tar,ui_menu_csm_xt1, y, str_Caption_Client , ta_LUta_LU,255, c_white);
+                 draw_text(tar,ui_menu_csm_xt2, y, str_net_Connect[net_status=ns_client]    , ta_RU ,255, mic(menu_NetClient(net_status<>ns_client,true),false));
                  vlineColor(tar,ui_menu_csm_xc, _yl(5),_yl(5)+ui_menu_csm_ys, c_gray);
 
                  y:=_yt(6);
-                 draw_text(tar,ui_menu_csm_xt0, y, net_cl_svstr+chat_type[menu_ItemSelected<>90], ta_left  ,255, mic((net_status=ns_none),menu_ItemSelected=90));
+                 draw_text(tar,ui_menu_csm_xt0, y, net_cl_svstr+chat_type[menu_ItemSelected<>90], ta_LU  ,255, mic((net_status=ns_none),menu_ItemSelected=90));
                  y:=_yt(7);
-                 draw_text(tar,ui_menu_csm_xt0, y, str_net_Quality+str_npnua[net_pnui]         , ta_left  ,255, mic((net_status<>ns_server),false));
+                 draw_text(tar,ui_menu_csm_xt0, y, str_net_Quality+str_npnua[net_pnui]         , ta_LU  ,255, mic((net_status<>ns_server),false));
                  if(g_cl_units>0)then
                  draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units),
-                                                                                          ta_right ,255, c_white);
+                                                                                          ta_RU ,255, c_white);
               end;
    ns_server: begin
                  for t:=2 to 4 do hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,_yl(t),c_gray);
 
                  y:=_yt(1);
-                 draw_text(tar,ui_menu_csm_xt0, y,str_svup[net_status=ns_server]        , ta_left  ,255, mic(menu_NetServer(net_status<>ns_server,true),false));
-                 draw_text(tar,ui_menu_csm_xt2, y,str_net_UDPPort+net_sv_pstr               , ta_right ,255 ,mic(false        ,false));
+                 draw_text(tar,ui_menu_csm_xt0, y,str_svup[net_status=ns_server]        , ta_LU  ,255, mic(menu_NetServer(net_status<>ns_server,true),false));
+                 draw_text(tar,ui_menu_csm_xt2, y,str_net_UDPPort+net_sv_pstr               , ta_RU ,255 ,mic(false        ,false));
               end;
    ns_client: begin
                  for t:=2 to 4 do hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,_yl(t),c_gray);
 
                  y:=_yt(1);
-                 draw_text(tar,ui_menu_csm_xt0, y, str_net_Connect[net_status=ns_client]    , ta_left ,255, mic(menu_NetClient(net_status<>ns_client,true),false));
-                 draw_text(tar,ui_menu_csm_xt2, y, net_cl_svstr                         , ta_right,255, mic(false        ,false));
+                 draw_text(tar,ui_menu_csm_xt0, y, str_net_Connect[net_status=ns_client]    , ta_LU ,255, mic(menu_NetClient(net_status<>ns_client,true),false));
+                 draw_text(tar,ui_menu_csm_xt2, y, net_cl_svstr                         , ta_RU,255, mic(false        ,false));
 
                  y:=_yt(2);
-                 draw_text(tar,ui_menu_csm_xt0, y, str_net_Quality+str_npnua[net_pnui]         , ta_left  ,255, mic((net_status<>ns_server),false));
+                 draw_text(tar,ui_menu_csm_xt0, y, str_net_Quality+str_npnua[net_pnui]         , ta_LU  ,255, mic((net_status<>ns_server),false));
                  if(g_cl_units>0)then
                  draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[net_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units),
-                                                                                          ta_right ,255, c_white);
+                                                                                          ta_RU ,255, c_white);
               end;
    end;
    // chat
    case net_status of
    ns_server,
    ns_client: begin
-                 draw_text(tar,ui_menu_csm_xc, _yt(3), str_menu_chat, ta_middle,255, mic((net_status<>ns_none),menu_ItemSelected=100));
+                 draw_text(tar,ui_menu_csm_xc, _yt(3), str_menu_chat, ta_MU,255, mic((net_status<>ns_none),menu_ItemSelected=100));
 
                  y:=_yt(11)+1;
                  MakeLogListForDraw(HPlayer,ui_menu_chat_width,ui_menu_chat_height,lmts_menu_chat);
                  if(ui_log_n>0)then
                    for t:=0 to ui_log_n-1 do
-                     if(ui_log_c[t]>0)then draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_left,255,ui_log_c[t]);
+                     if(ui_log_c[t]>0)then draw_text(tar,ui_menu_csm_xct,y-t*ui_menu_csm_ycs,ui_log_s[t],ta_LU,255,ui_log_c[t]);
 
                  hlineColor(tar,ui_menu_csm_x0,ui_menu_csm_x1,_yl(12),c_gray);
                  draw_text(tar,ui_menu_csm_xct, _yt(12), net_chat_str+chat_type[menu_ItemSelected<>100] , ta_chat,ui_menu_chat_width, c_white);
@@ -554,38 +546,38 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
     {
 
    // replays
-   draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_left  ,255, c_white);
-   draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_pstate], ta_right ,255, mic( menu_ReplayStatusToggleEnabled ,rpls_pstate>rpls_none));
+   draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_LU  ,255, c_white);
+   draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_pstate], ta_RU ,255, mic( menu_ReplayStatusToggleEnabled ,rpls_pstate>rpls_none));
 
    if(rpls_pstate>rpls_none)and(g_cl_units>0)then
-   draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_right,255, c_white);
+   draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_RU,255, c_white);
 
 
    if(menu_ihint>0)then
    begin
       if(menu_ihintpi<=menu_ihintn)then
-        draw_text(tar,menu_ihintlx[menu_ihintpi],menu_ihintly[menu_ihintpi],str_menu_hint[menu_ihint],ta_middle,255,c_white);
+        draw_text(tar,menu_ihintlx[menu_ihintpi],menu_ihintly[menu_ihintpi],str_menu_hint[menu_ihint],ta_MU,255,c_white);
    end;
 
    case G_Started of
 false: begin
-          draw_text(tar, 70,554, str_menu_Exit , ta_middle,255, c_white);
+          draw_text(tar, 70,554, str_menu_Exit , ta_MU,255, c_white);
           case net_status  of
           ns_server,
-          ns_none   : draw_text(tar,730,554, str_menu_Start, ta_middle,255, mic(PlayersReadyStatus,false));
+          ns_none   : draw_text(tar,730,554, str_menu_Start, ta_MU,255, mic(PlayersReadyStatus,false));
           ns_client : ;
           end;
        end;
 true : begin
-          draw_text(tar, 70,554, str_menu_Back , ta_middle,255, c_white);
+          draw_text(tar, 70,554, str_menu_Back , ta_MU,255, c_white);
 
           if(menu_surrender(true))then
           begin
              draw_sdlsurface(tar,360,542,spr_mbtn);
-             draw_text(tar,400,554,str_menu_Surrender,ta_middle,255, c_white);
+             draw_text(tar,400,554,str_menu_Surrender,ta_MU,255, c_white);
           end;
 
-          draw_text(tar,730,554, str_menu_Break     , ta_middle,255, c_white);
+          draw_text(tar,730,554, str_menu_Break     , ta_MU,255, c_white);
        end;
    end;
 
@@ -609,7 +601,7 @@ begin
 
    draw_sdlsurface(vid_screen,menu_sc_x,menu_sc_y,menu_SurfaceSC);
 
-   if(vid_ShowFPS)then draw_text(vid_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_right,255,c_white);
+   if(vid_ShowFPS)then draw_text(vid_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_RU,255,c_white);
 
    draw_sdlsurface(vid_screen,mouse_x,mouse_y,spr_cursor);
    if(menu_ItemActs>0)then
