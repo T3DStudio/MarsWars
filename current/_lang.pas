@@ -4,25 +4,20 @@
 //  COMMON TOOLS
 //
 
-function RemoveSpecChars(str:shortstring):shortstring;
+function RemoveSpecChars(str:shortstring;letNewLine:boolean=true):shortstring;
 var i:byte;
 begin
-   RemoveSpecChars:=str;
-   i:=1;
-   while(i<=length(RemoveSpecChars)) do
-   begin
-      // 10 13
-      if(RemoveSpecChars[i]=tc_nl1)
-      then RemoveSpecChars[i]:=#10
-      else
-        if(RemoveSpecChars[i] in [#14..#25])then
-        begin
-           delete(RemoveSpecChars,i,1);
-           i-=1;
-        end;
-      i+=1;
-      if(i=255)then break;
-   end;
+   RemoveSpecChars:='';
+   if(length(str)>0)then
+     for i:=1 to length(str) do
+     begin
+        if(letNewLine)then
+          if(str[i]=tc_nl1)
+          or(str[i]=tc_nl2)
+          or(str[i]=tc_nl3)
+          then RemoveSpecChars+=#10;
+        if not(str[i] in tc_SpecChars)then RemoveSpecChars+=str[i];
+     end;
 end;
 
 function i2sSign(i:integer):shortstring;
@@ -134,8 +129,8 @@ procedure str_SetUnitBaseHint(uid:byte;NAME,DESCR:shortstring);
 begin
    with g_uids[uid] do
    begin
-      un_txt_name  :=NAME;
-      un_txt_udescr:=DESCR;
+      uid_txt_name        :=NAME;
+      uid_txt_BaseDescript:=DESCR;
    end;
 end;
 
@@ -143,10 +138,10 @@ procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
 begin
    with g_upids[upid] do
    begin
-      _up_name :=NAME;
-      _up_descr:=DESCR;
-      if(length(_up_descr)>0)then
-       if(_up_descr[length(_up_descr)]<>'.')then _up_descr+='.';
+      upgr_txt_name :=NAME;
+      upgr_txt_Descript:=DESCR;
+      if(length(upgr_txt_Descript)>0)then
+       if(upgr_txt_Descript[length(upgr_txt_Descript)]<>'.')then upgr_txt_Descript+='.';
    end;
 end;
 
@@ -178,8 +173,8 @@ begin
    FindSourceProd:='';
    for i:=0 to 255 do
    begin
-      if(uid in g_uids[i].ups_units  )then STRADD(@up,g_uids[i].un_txt_name,sep_comma);
-      if(uid in g_uids[i].ups_builder)then STRADD(@bp,g_uids[i].un_txt_name,sep_comma);
+      if(uid in g_uids[i].uid_prod_Units  )then STRADD(@up,g_uids[i].uid_txt_name,sep_comma);
+      if(uid in g_uids[i].uid_prod_Buildings)then STRADD(@bp,g_uids[i].uid_txt_name,sep_comma);
    end;
 
    if(length(up)>0)then STRADD(@FindSourceProd,up,sep_comma);
@@ -196,7 +191,7 @@ begin
       begin
          uidi:=auid;
          playeri:=0;
-         player :=@g_players[playeri];
+         player :=@g_gplayers[playeri];
          unit_ApplyUID(pu);
          hits:=-32000;
       end;
@@ -210,13 +205,13 @@ begin
        then STRADD(@str_UnitAttributes,str_attr_alive    ,sep_comma)
        else STRADD(@str_UnitAttributes,str_attr_dead     ,sep_comma);
 
-      if(_ukbuilding)
+      if(uid_ukbuilding)
       then STRADD(@str_UnitAttributes,str_attr_building  ,sep_comma)
       else STRADD(@str_UnitAttributes,str_attr_unit      ,sep_comma);
-      if(_ukmech)
+      if(uid_ukmech)
       then STRADD(@str_UnitAttributes,str_attr_mech      ,sep_comma)
       else STRADD(@str_UnitAttributes,str_attr_bio       ,sep_comma);
-      if(_uklight)
+      if(uid_uklight)
       then STRADD(@str_UnitAttributes,str_attr_light     ,sep_comma)
       else STRADD(@str_UnitAttributes,str_attr_heavy     ,sep_comma);
       if(ukfly)
@@ -228,9 +223,9 @@ begin
       if(transportM>0)
       then STRADD(@str_UnitAttributes,str_attr_transport,sep_comma);
       if(level>0)then
-        if(not _ukbuilding)
-        or(_ukbuilding and (_isbarrack or _issmith))then STRADD(@str_UnitAttributes,str_attr_level+b2s(level+1),sep_comma);
-      if(buffs[ub_Detect]>0)or(_detector)
+        if(not uid_ukbuilding)
+        or(uid_ukbuilding and (uid_isbarrack or uid_issmith))then STRADD(@str_UnitAttributes,str_attr_level+b2s(level+1),sep_comma);
+      if(buffs[ub_Detect]>0)or(uid_detector)
       then STRADD(@str_UnitAttributes,str_attr_detector,sep_comma);
       if(buffs[ub_Invuln]>0)
       then STRADD(@str_UnitAttributes,str_attr_invuln,sep_comma)
@@ -274,7 +269,7 @@ function str_DamageHint(dmod:byte):shortstring;
 var i:byte;
 begin
    str_DamageHint:='';
-   for i:=0 to MaxDamageModFactors do
+   for i:=0 to LastDamageModFactor do
     with g_DamageMods[dmod][i] do
      if(dm_factor<>100)and(dm_flags>0)then
       STRADD(@str_DamageHint,'x'+limit2s(dm_factor,100)+' '+BaseFlags2Str(dm_flags),sep_comma);
@@ -289,47 +284,51 @@ end;
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_uids [ruid ].un_txt_name,1     )+'"' ,sep_comma);
-  if(rupid>0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_upids[rupid]._up_name   ,rupidl)+'"' ,sep_comma);
+  if(ruid >0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_uids [ruid ].uid_txt_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_upids[rupid].upgr_txt_name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_hint_req+tc_default+AddReq+'}';
+  //str_hint_requirements
+end;
+
+function str_RebuildName(uid:byte;levelup,quotes:boolean):shortstring;
+begin
+  if(levelup)
+  then str_RebuildName:=g_uids[uid].uid_txt_name+'['+str_attr_level+'+1]'
+  else str_RebuildName:=g_uids[uid].uid_txt_name;
+  if(quotes)then str_RebuildName:='"'+str_RebuildName+'"';
 end;
 
 function str_MakeUnitDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
-function RebuildStr(uid:byte;levelup:boolean):shortstring;
-begin
-  if(levelup)
-  then RebuildStr:='"'+g_uids[uid].un_txt_name+'['+str_attr_level+'+1]"'
-  else RebuildStr:='"'+g_uids[uid].un_txt_name+'"';
-end;
+
 begin
    str_MakeUnitDefaultDescription:='';
     with g_uids[uid] do
     begin
        if(not for_doc)then
-       STRADD(@str_MakeUnitDefaultDescription,str_hint_hits+i2s(_mhits),sep_sdot);
-       //STRADD(@str_MakeUnitDefaultDescription,str_hint_srange+i2s(_srange),sep_sdot);
+       STRADD(@str_MakeUnitDefaultDescription,str_hint_hits+i2s(uid_MaxHits1),sep_sdot);
+       //STRADD(@str_MakeUnitDefaultDescription,str_hint_srange+i2s(uid_SightR),sep_sdot);
 
-       if(_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_builder,sep_sdot);
-       if(_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
-       if(_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_hint_smith  ,sep_sdot);
-       if(_genergy    >0)then STRADD(@str_MakeUnitDefaultDescription,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(_genergy)+tc_default+')',sep_sdot);
-       if(_rebuild_uid>0)and(_ability<>uab_RebuildInPoint)then
+       if(uid_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_builder,sep_sdot);
+       if(uid_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
+       if(uid_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_hint_smith  ,sep_sdot);
+       if(uid_EnergyGen    >0)then STRADD(@str_MakeUnitDefaultDescription,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_sdot);
+       if(uid_rebuild_uid>0)and(uid_ability<>uab_RebuildInPoint)then
        begin
           STRADD(@str_MakeUnitDefaultDescription,
           str_hint_CanRebuildTo+
-          RebuildStr(_rebuild_uid,_rebuild_uid=uid)+
-          AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot );
+          str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,true)+
+          AddReq(uid_rebuild_ruid,uid_rebuild_rupgr,uid_rebuild_rupgrl),sep_sdot );
        end;
-       if(_ability>0)then
+       if(uid_ability>0)then
        begin
-          if(_ability=uab_RebuildInPoint)and(_rebuild_uid>0)
-          then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+str_hint_TransformTo+RebuildStr(_rebuild_uid,uid=_rebuild_uid)+AddReq(_rebuild_ruid,_rebuild_rupgr,_rebuild_rupgrl),sep_sdot)
+          if(uid_ability=uab_RebuildInPoint)and(uid_rebuild_uid>0)
+          then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+str_hint_TransformTo+str_RebuildName(uid_rebuild_uid,uid=uid_rebuild_uid,true)+AddReq(uid_rebuild_ruid,uid_rebuild_rupgr,uid_rebuild_rupgrl),sep_sdot)
           else
-            if(length(str_ability_name[_ability])>0)
-            then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+'"'+str_ability_name[_ability]+'"'+AddReq(_ability_ruid,_ability_rupgr,_ability_rupgrl),sep_sdot);
+            if(length(str_ability_name[uid_ability])>0)
+            then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+'"'+str_ability_name[uid_ability]+'"'+AddReq(uid_ability_ReqUID,uid_ability_ReqUpgr,uid_ability_ReqUpgrl),sep_sdot);
        end;
 
-       if(_splashresist)or(_ukmech)then STRADD(@str_MakeUnitDefaultDescription,str_hint_SplashResist,sep_sdot);
+       if(uid_SplashResist)or(uid_ukmech)then STRADD(@str_MakeUnitDefaultDescription,str_hint_SplashResist,sep_sdot);
 
        STRADD(@str_MakeUnitDefaultDescription,basedesc,sep_sdot);;
        if(length(str_MakeUnitDefaultDescription)>0)then str_MakeUnitDefaultDescription+='.';
@@ -350,9 +349,9 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_hint_Demons+'] '+str_hint_Except+' ['+g_uids[UID_Cyberdemon].un_txt_name+','
-                                                                                +g_uids[UID_Mastermind].un_txt_name+','
-                                                                                +g_uids[UID_ArchVile  ].un_txt_name+']'
+    then instr:='['+str_attr_dead+tc_default+','+str_hint_Demons+'] '+str_hint_Except+' ['+g_uids[UID_Cyberdemon].uid_txt_name+','
+                                                                                          +g_uids[UID_Mastermind].uid_txt_name+','
+                                                                                          +g_uids[UID_ArchVile  ].uid_txt_name+']'
     else
      if(tset= uids_demons)
      then instr:='['+str_hint_Demons+']'
@@ -379,14 +378,14 @@ begin
       begin
          for u:=1 to 255 do
           if(u in inset)then
-           STRADD(@instr,g_uids[u].un_txt_name,sep_comma);
+           STRADD(@instr,g_uids[u].uid_txt_name,sep_comma);
          if(length(instr)>0)then instr:='['+instr+']';
       end;
       if(exnum<3)then
       begin
          for u:=1 to 255 do
           if(u in exset)then
-           STRADD(@exstr,g_uids[u].un_txt_name,sep_comma);
+           STRADD(@exstr,g_uids[u].uid_txt_name,sep_comma);
          if(length(exstr)>0)then exstr:=str_hint_Except+' ['+exstr+']';
       end;
    end;
@@ -407,14 +406,14 @@ var BaseDmg,
 begin
   str_MakeWeaponDPS:='';
   with g_uids[uid] do
-  with _a_weap[wid] do
+  with uid_arms[wid] do
   begin
      BaseDmg:=0;
      ocount :=0;
      case aw_type of
-     wpt_suicide   : if(_death_missile>0)then
+     wpt_suicide   : if(uid_DeathMissile>0)then
                      begin
-                        BaseDmg:=g_mids[_death_missile].mid_base_damage;
+                        BaseDmg:=g_mids[uid_DeathMissile].mid_base_damage;
                         ocount:=1;
                      end
                      else exit;       //wpt_suicide
@@ -462,7 +461,7 @@ var
 dmod_str:shortstring;
 begin
   with g_uids[uid] do
-   with _a_weap[wid] do
+   with uid_arms[wid] do
    begin
       str_MakeWeaponString:='';
       case aw_type of
@@ -474,7 +473,7 @@ begin
                       else STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
       wpt_resurect  :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
       wpt_heal      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
-      wpt_unit      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].un_txt_name+'"',sep_scomma);
+      wpt_unit      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].uid_txt_name+'"',sep_scomma);
       wpt_suicide   :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
       end;
 
@@ -486,10 +485,10 @@ begin
          if(aw_max_range=aw_srange)then
          begin
             STRADD(@str_MakeWeaponString,'max. range: vision range',sep_scomma);
-            if(_a_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
-            if(_a_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
-            if(_a_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(_a_BonusAntiUnitRange    ),sep_scomma);
-            if(_a_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(_a_BonusAntiBuildingRange),sep_scomma);
+            if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+            if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+            if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
+            if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
          end
          else
            if(aw_max_range<aw_srange) // melee
@@ -504,10 +503,10 @@ begin
              else
              begin
                 STRADD(@str_MakeWeaponString,'max. range: '+i2s(aw_max_range),sep_scomma);  // absolute
-                if(_a_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
-                if(_a_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(_a_BonusAntiFlyRange     ),sep_scomma);
-                if(_a_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(_a_BonusAntiUnitRange    ),sep_scomma);
-                if(_a_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(_a_BonusAntiBuildingRange),sep_scomma);
+                if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+                if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+                if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
+                if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
              end;
       end;
 
@@ -523,8 +522,8 @@ begin
           with g_mids[aw_oid] do
            if(mid_base_splashr>0)then  STRADD(@str_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
-         if(aw_type=wpt_suicide)and(_death_missile>0)then
-          with g_mids[_death_missile] do
+         if(aw_type=wpt_suicide)and(uid_DeathMissile>0)then
+          with g_mids[uid_DeathMissile] do
            if(mid_base_splashr>0)then  STRADD(@str_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
 
          dmod_str:='';
@@ -551,13 +550,13 @@ wtp_GroundLight  : dmod_str:='[ground,light]';
            STRADD(@str_MakeWeaponString,'target priority: '+dmod_str,sep_scomma);
 
          if(aw_dupgr>0)then
-           STRADD(@str_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr]._up_name+'('+i2sSign(aw_dupgr_s)+')',sep_scomma);
+           STRADD(@str_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr].upgr_txt_name+'('+i2sSign(aw_dupgr_s)+')',sep_scomma);
       end;
 
       dmod_str:='';
 
       case aw_type of
-      wpt_suicide   : if(_death_missile>0)then dmod_str:=str_DamageHint(_death_missile_dmod);
+      wpt_suicide   : if(uid_DeathMissile>0)then dmod_str:=str_DamageHint(uid_DeathMissile_dmod);
       wpt_missle,
       wpt_directdmg,
       wpt_directdmgZ: if(aw_dmod>0)then dmod_str:=str_DamageHint(aw_dmod);
@@ -582,9 +581,9 @@ begin
   with g_uids[uid] do
   begin
      weapons_str:='';
-     if(_attack)then
-      for w:=0 to MaxUnitWeapons do
-       with _a_weap[w] do
+     if(uid_CanAttack)then
+      for w:=0 to LastUnitArms do
+       with uid_arms[w] do
         STRADD(@weapons_str,str_MakeWeaponString(uid,w,docSTR),sep_sdots);
 
      if(length(weapons_str)>0)then
@@ -604,43 +603,71 @@ var HK,
 begin
   with g_upids[upid] do
   begin
-     HK  :=str_ProductionHotKey(_up_btni);
+     HK  :=str_ProductionHotKey(upgr_btni);
      ENRG:='';
      TIME:='';
      INFO:='';
 
-     if(_up_max<=1)or(_up_mfrg)
+     if(upgr_max<=1)or(upgr_mfrg)
      then curlvl:=1
      else
-       if(curlvl>_up_max)and(curlvl<255)then curlvl:=_up_max;
+       if(curlvl>upgr_max)and(curlvl<255)then curlvl:=upgr_max;
 
-     HK:=str_ProductionHotKey(_up_btni);
-     if(_up_renerg>0)then
+     HK:=str_ProductionHotKey(upgr_btni);
+     if(upgr_renerg>0)then
        if(curlvl<255)
        then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
        else
-         if(_up_max>0)then
+         if(upgr_max>0)then
          begin
-            for i:=1 to _up_max do STRADD(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
+            for i:=1 to upgr_max do STRADD(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
             ENRG:=tc_aqua+ENRG+tc_default;
          end;
-     if(_up_time  >0)then
+     if(upgr_time  >0)then
        if(curlvl<255)
        then TIME:=tc_white+i2s(GetUpgradeTime(upid,curlvl)div fr_fps1)+tc_default
        else
-         if(_up_max>0)then
+         if(upgr_max>0)then
          begin
-            for i:=1 to _up_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
+            for i:=1 to upgr_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
             TIME:=tc_white+TIME+tc_default;
          end;
      if(length(HK  )>0)then STRADD(@INFO,HK  ,sep_comma);
      if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
      if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
-     STRADD(@INFO,tc_orange+'x'+i2s(_up_max)+tc_default,sep_comma);
-     if(_up_max>1)and(_up_mfrg)then STRADD(@INFO,tc_red+'*'+tc_default,sep_comma);
+     STRADD(@INFO,tc_orange+'x'+i2s(upgr_max)+tc_default,sep_comma);
+     if(upgr_max>1)and(upgr_mfrg)then STRADD(@INFO,tc_red+'*'+tc_default,sep_comma);
 
-     str_makeUpgrBaseHint:=_up_name+' ('+INFO+')'+tc_nl1+tc_nl1+_up_descr;
+     str_makeUpgrBaseHint:=upgr_txt_name+' ('+INFO+')'+tc_nl1+tc_nl1+upgr_txt_Descript;
   end;
+end;
+
+function str_hintUnitCost(uid:byte):shortstring;
+begin
+   str_hintUnitCost:='';
+   with g_uids[uid] do
+   begin
+      if(uid_EnergyReq>0)then STRADD(@str_hintUnitCost,tc_aqua +i2s(uid_EnergyReq)+tc_default,sep_comma);
+      if(uid_ProdTimeSec  >0)then STRADD(@str_hintUnitCost,tc_white+i2s(uid_ProdTimeSec  )+tc_default,sep_comma);
+      STRADD(@str_hintUnitCost,tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default,sep_comma);
+   end;
+   if(length(str_hintUnitCost)>0)then str_hintUnitCost:='('+str_hintUnitCost+')';
+end;
+
+function strMakeRebuildHint(uid:byte):shortstring;
+var tmps:shortstring;
+begin
+   strMakeRebuildHint:='';
+   with g_uids[uid] do
+     if(uid_rebuild_uid>0)then
+     begin
+        strMakeRebuildHint:=str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,false);
+        tmps:=str_hintUnitCost(uid_rebuild_uid);
+        if(length(tmps)>0)then strMakeRebuildHint+=' '+tmps;
+
+        tmps:=AddReq(uid_rebuild_ruid,uid_rebuild_rupgr,uid_rebuild_rupgrl);
+        if(length(tmps)>0)then strMakeRebuildHint:=strMakeRebuildHint+tc_nl1+tmps;
+     end;
 end;
 
 procedure str_makeHints;
@@ -660,44 +687,42 @@ begin
       LMT :='';
       INFO:='';
 
-      if(_ucl>=23)then
+      if(uid_class>=23)then
       begin
-         un_txt_uihint1:=un_txt_name+tc_nl1+un_txt_fdescr+tc_nl1;
-         un_txt_uihint2:='';
-         un_txt_uihintS:='';
+         uid_txt_NameCostHK  :=uid_txt_name;
+         uid_txt_FullDescript:=uid_txt_BaseDescript;
       end
       else
       begin
-         HK:=str_ProductionHotKey(_ucl);
-         if(_renergy>0)then ENRG:=tc_aqua +i2s(_renergy)+tc_default;
-         if(_btime  >0)then TIME:=tc_white+i2s(_btime  )+tc_default;
-         LMT:=tc_orange+limit2s(_limituse,MinUnitLimit)+tc_default;
+         HK:=str_ProductionHotKey(uid_class);
+         if(uid_EnergyReq>0)then ENRG:=tc_aqua +i2s(uid_EnergyReq)+tc_default;
+         if(uid_ProdTimeSec  >0)then TIME:=tc_white+i2s(uid_ProdTimeSec  )+tc_default;
+         LMT:=tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default;
 
          PROD:=FindSourceProd(uid);
-         if(_ruid1>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid1].un_txt_name,_ruid1n),sep_comma);
-         if(_ruid2>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid2].un_txt_name,_ruid2n),sep_comma);
-         if(_ruid3>0)then STRADD(@REQ,str_ReqNum2s(g_uids [_ruid3].un_txt_name,_ruid3n),sep_comma);
-         if(_rupgr>0)then STRADD(@REQ,str_ReqNum2s(g_upids[_rupgr]._up_name   ,_rupgrl),sep_comma);
+         if(uid_req_uid1>0)then STRADD(@REQ,str_ReqNum2s(g_uids [uid_req_uid1].uid_txt_name,uid_req_uid1n),sep_comma);
+         if(uid_req_uid2>0)then STRADD(@REQ,str_ReqNum2s(g_uids [uid_req_uid2].uid_txt_name,uid_req_uid2n),sep_comma);
+         if(uid_req_uid3>0)then STRADD(@REQ,str_ReqNum2s(g_uids [uid_req_uid3].uid_txt_name,uid_req_uid3n),sep_comma);
+         if(uid_req_upgr>0)then STRADD(@REQ,str_ReqNum2s(g_upids[uid_req_upgr].upgr_txt_name   ,uid_req_upgrl),sep_comma);
 
          if(length(HK  )>0)then STRADD(@INFO,HK  ,sep_comma);
          if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
          if(length(LMT )>0)then STRADD(@INFO,LMT ,sep_comma);
          if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
 
-         un_txt_fdescr :=str_MakeUnitDefaultDescription(uid,un_txt_udescr,false);
+         uid_txt_FullDescript :=str_MakeUnitDefaultDescription(uid,uid_txt_BaseDescript,false);
 
-         un_txt_uihint1:=un_txt_name+' ('+INFO+')'+tc_nl1+str_UnitAttributes(nil,uid);
-         un_txt_uihintS:=un_txt_name+tc_nl1;
-         un_txt_uihint2:=un_txt_fdescr;
-         un_txt_uihint3:=str_MakeWeaponsDescription(uid,false);
-         un_txt_uihint4:='';
+         uid_txt_NameCostHK:=uid_txt_name+' ('+INFO+')'+tc_nl1+str_UnitAttributes(nil,uid);
 
-         if(length(REQ )>0)then un_txt_uihint4+=tc_yellow+str_hint_requirements+tc_default+REQ+tc_nl1
-                           else un_txt_uihint4+=tc_nl1;
+         uid_txt_Weapons:=str_MakeWeaponsDescription(uid,false);
+
+         uid_txt_Reqs:='';
+         if(length(REQ )>0)then uid_txt_Reqs+=tc_yellow+str_hint_requirements+tc_default+REQ;
+
          if(length(PROD)>0)then
-          if(_ukbuilding)
-          then un_txt_uihint4+=str_hint_bprod+PROD
-          else un_txt_uihint4+=str_hint_uprod+PROD;
+           if(uid_ukbuilding)
+           then uid_txt_Prod:=str_hint_bprod+PROD
+           else uid_txt_Prod:=str_hint_uprod+PROD;
       end;
    end;
 
@@ -707,11 +732,11 @@ begin
    begin
       REQ  :='';
 
-      if(_up_ruid  >0)then STRADD(@REQ,g_uids [_up_ruid ].un_txt_name,sep_comma);
-      if(_up_rupgr >0)then STRADD(@REQ,g_upids[_up_rupgr]._up_name   ,sep_comma);
+      if(upgr_ruid  >0)then STRADD(@REQ,g_uids [upgr_ruid ].uid_txt_name,sep_comma);
+      if(upgr_rupgr >0)then STRADD(@REQ,g_upids[upgr_rupgr].upgr_txt_name   ,sep_comma);
 
-      _up_hint:='';
-      if(length(REQ)>0)then _up_hint+=tc_yellow+str_hint_requirements+tc_default+REQ;
+      upgr_txt_Hint:='';
+      if(length(REQ)>0)then upgr_txt_Hint+=tc_yellow+str_hint_requirements+tc_default+REQ;
    end;
 end;
 
@@ -817,9 +842,13 @@ end;
 //
 
 procedure lng_eng;
-var t: shortstring;
+var t:shortstring;
     i:byte;
 begin
+   str_ps_AI                     := 'AI';
+   str_ps_Host                   := 'HOST';
+   str_ps_Hum                    := 'HUM';
+
    str_Caption_Map               := 'MAP';
    str_Caption_Players           := 'PLAYERS';
    str_Caption_Multiplayer       := 'MULTIPLAYER';
@@ -827,6 +856,7 @@ begin
    str_Caption_Server            := 'SERVER';
    str_Caption_Client            := 'CLIENT';
    str_Caption_Objectives        := 'OBJECTIVES';
+   str_Caption_NetSVSearch       := 'Searching for LAN servers...';
 
    str_menu_Campaings            := 'TUTORIALS & CAMPAIGNS';
    str_menu_Scirmish             := 'SKIRMISH';
@@ -844,6 +874,11 @@ begin
    str_menu_Back                 := 'BACK';
 
    str_menu_chat                 := 'CHAT(ALL PLAYERS)';
+   str_menu_Pause                := 'Pause';
+
+   str_menuMsg_Error             := '! ERROR !';
+   str_menuMsg_HintDefault       := '- press any key to close message -';
+   str_menuMsg_HintClient        := '- press any key to disconnect -';
 
    str_S_Game                    := 'GAME';
    str_S_Replay                  := 'GAME RECORDING';
@@ -923,6 +958,8 @@ begin
    str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Key points'  +tc_default;
    str_map_ScenarioL[mc_KotH    ]:= tc_aqua  +'KotH'        +tc_default;
    str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
+   for i:=0 to mc_Last do
+   str_map_ScenarioEngL[i]:=RemoveSpecChars(str_map_ScenarioL[i]);
    str_map_Generators            := 'Generators';
    str_map_GeneratorsL[mapg_no ] := 'no';
    str_map_GeneratorsL[mapg_5  ] := '5 min';
@@ -992,7 +1029,6 @@ begin
    str_gmsg_PlayerDefeat         := ' was terminated!';
    str_gmsg_PlayerLeft           := ' left the game';
    str_gmsg_PlayerSurrender      := ' surrenders!';
-   str_gmsg_Connecting           := 'Connecting...';
    str_gmsg_PortBlocked          := 'Port is blocked!';
    str_gmsg_PlayerPaused         := 'player paused the game';
    str_gmsg_PlayerResumed        := 'player has resumed the game';
@@ -1114,9 +1150,8 @@ begin
    str_net_Quality       := 'Units update rate';
    str_net_Address       := 'Address';
    str_net_LANSearch     := 'Search for LAN servers';
-
-
-
+   str_net_ServerLANVis  := 'LAN Advertise';
+   str_net_ConnectedToDed:= '- connected to dedicated server -';
 
    str_ability_name[uab_Teleport        ]:='Teleportation';
    str_ability_name[uab_UACScan         ]:='Scan';
@@ -1177,27 +1212,27 @@ begin
    str_SetUnitBaseHint(UID_ZBFGMarine     ,'Zombie BFG Marine'           ,'');
 
 
-   str_SetUpgrBaseHint(upgr_hell_t1attack  ,'Hell Firepower'                ,'Increase the damage of ranged attacks for T1 units and defensive structures');
-   str_SetUpgrBaseHint(upgr_hell_uarmor    ,'Combat Flesh'                  ,'Increase the armor of all Hell units'                                   );
-   str_SetUpgrBaseHint(upgr_hell_barmor    ,'Stone Walls'                   ,'Increase the armor of all Hell buildings'                               );
-   str_SetUpgrBaseHint(upgr_hell_mattack   ,'Claws and Teeth'               ,'Increase the damage of melee attacks'                                   );
-   str_SetUpgrBaseHint(upgr_hell_regen     ,'Flesh Regeneration'            ,'Health regeneration for all Hell units'                                 );
-   str_SetUpgrBaseHint(upgr_hell_pains     ,'Pain Threshold'                ,'Hell units can take more hits before being stunned by pain'             );
-   str_SetUpgrBaseHint(upgr_hell_towers    ,'Demonic Spirits'               ,'Increase the range of defensive structures'                             );
-   str_SetUpgrBaseHint(upgr_hell_HKTeleport,'Hell Keep Blink Charge'        ,'Charge for Hell Keep`s ability'                                         );
-   str_SetUpgrBaseHint(upgr_hell_paina     ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor');
-   str_SetUpgrBaseHint(upgr_hell_buildr    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s range of vision'                                   );
-   str_SetUpgrBaseHint(upgr_hell_spectre   ,'Specters'                      ,'Pinky Demon becomes invisible'                                  );
-   str_SetUpgrBaseHint(upgr_hell_vision    ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
-   str_SetUpgrBaseHint(upgr_hell_phantoms  ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
-   str_SetUpgrBaseHint(upgr_hell_t2attack  ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
-   str_SetUpgrBaseHint(upgr_hell_teleport  ,'Teleport Upgrade'              ,'Reduced cooldown on Teleport ability'                           );
-   str_SetUpgrBaseHint(upgr_hell_rteleport ,'Recall'                        ,'The Teleport can recall units'                                  );
-   str_SetUpgrBaseHint(upgr_hell_heye      ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
-   str_SetUpgrBaseHint(upgr_hell_totminv   ,'Totem of Horror Invisibility'  ,'Totem of Horror becomes invisible'                              );
-   str_SetUpgrBaseHint(upgr_hell_bldrep    ,'Building Restoration'          ,'Health regeneration for all Hell buildings'                     );
-   str_SetUpgrBaseHint(upgr_hell_tblink    ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
-   str_SetUpgrBaseHint(upgr_hell_resurrect ,'Resurrection'                  ,'ArchVile`s ability'                    );
+   str_SetUpgrBaseHint(upgr_hell_DistDamage1 ,'Hell Firepower'                ,'Increase the damage of ranged attacks for T1 units and defensive structures');
+   str_SetUpgrBaseHint(upgr_hell_UnitArmor   ,'Combat Flesh'                  ,'Increase the armor of all Hell units'                                   );
+   str_SetUpgrBaseHint(upgr_hell_BuildArmor  ,'Stone Walls'                   ,'Increase the armor of all Hell buildings'                               );
+   str_SetUpgrBaseHint(upgr_hell_MeleeDamage ,'Claws and Teeth'               ,'Increase the damage of melee attacks'                                   );
+   str_SetUpgrBaseHint(upgr_hell_Regeneration,'Flesh Regeneration'            ,'Health regeneration for all Hell units'                                 );
+   str_SetUpgrBaseHint(upgr_hell_PainFactor  ,'Pain Threshold'                ,'Hell units can take more hits before being stunned by pain'             );
+   str_SetUpgrBaseHint(upgr_hell_TowerR      ,'Demonic Spirits'               ,'Increase the range of defensive structures'                             );
+   str_SetUpgrBaseHint(upgr_hell_HKTeleport  ,'Hell Keep Blink Charge'        ,'Charge for Hell Keep`s ability'                                         );
+   str_SetUpgrBaseHint(upgr_hell_DecayAura   ,'Decay Aura'                    ,'Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor');
+   str_SetUpgrBaseHint(upgr_hell_BuilderR    ,'Hell Keep Range Upgrade'       ,'Increase Hell Keep`s range of vision'                                   );
+   str_SetUpgrBaseHint(upgr_hell_Spectre     ,'Specters'                      ,'Pinky Demon becomes invisible'                                  );
+   str_SetUpgrBaseHint(upgr_hell_UnitSightR  ,'Hell Sight'                    ,'Increase the sight range of all Hell units'                     );
+   str_SetUpgrBaseHint(upgr_hell_Phantoms    ,'Phantoms'                      ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
+   str_SetUpgrBaseHint(upgr_hell_DistDamage2 ,'Demon`s Weapons'               ,'Increase the damage of ranged attacks for T2 units and defensive structures'  );
+   str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Teleport Upgrade'              ,'Reduced cooldown on Teleport ability'                           );
+   str_SetUpgrBaseHint(upgr_hell_Recall      ,'Recall'                        ,'The Teleport can recall units'                                  );
+   str_SetUpgrBaseHint(upgr_hell_EvilEyeR    ,'Evil Eye Upgrade'              ,'Increase the sight range of Evil Eye'                           );
+   str_SetUpgrBaseHint(upgr_hell_TotemInvis  ,'Totem of Horror Invisibility'  ,'Totem of Horror becomes invisible'                              );
+   str_SetUpgrBaseHint(upgr_hell_BuildRestore,'Building Restoration'          ,'Health regeneration for all Hell buildings'                     );
+   str_SetUpgrBaseHint(upgr_hell_TowerBlink  ,'Tower Teleportation Charge'    ,'Charges for ability of Guard Tower and Totem of Horror');
+   str_SetUpgrBaseHint(upgr_hell_Resurrect   ,'Resurrection'                  ,'ArchVile`s ability'                    );
 
 
    str_SetUnitBaseHint(UID_UCommandCenter   ,'Command Center'                ,''      );
@@ -1234,28 +1269,30 @@ begin
    str_SetUnitBaseHint(UID_APC              ,'Ground APC'                    ,'');
 
 
-   str_SetUpgrBaseHint(upgr_uac_attack     ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
-   str_SetUpgrBaseHint(upgr_uac_uarmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units'                     );
-   str_SetUpgrBaseHint(upgr_uac_barmor     ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
-   str_SetUpgrBaseHint(upgr_uac_tools      ,'Advanced Tools'                   ,'Increase repair/healing efficiency of Engineers/Medics'        );
-   str_SetUpgrBaseHint(upgr_uac_mspeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
-   str_SetUpgrBaseHint(upgr_uac_ssgup      ,'Expansive bullets'                ,'Attacks of Shotguner, SuperShotguner and Terminator are more likely to cause a pain state' );
-   str_SetUpgrBaseHint(upgr_uac_towers     ,'Spotlights'                       ,'Increase the range of defensive structures'                    );
-   str_SetUpgrBaseHint(upgr_uac_CCFly      ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
-   str_SetUpgrBaseHint(upgr_uac_ccturr     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
-   str_SetUpgrBaseHint(upgr_uac_buildr     ,'Command Center Range Upgrade'     ,'Increase Command Center`s range of vision'                           );
-   str_SetUpgrBaseHint(upgr_uac_botturret  ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
-   str_SetUpgrBaseHint(upgr_uac_vision     ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
-   str_SetUpgrBaseHint(upgr_uac_commando   ,'Stealth Technology'               ,'Commando becomes invisible'                 );
-   str_SetUpgrBaseHint(upgr_uac_airsp      ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'     );
-   str_SetUpgrBaseHint(upgr_uac_mechspd    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
-   str_SetUpgrBaseHint(upgr_uac_mecharm    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
-   str_SetUpgrBaseHint(upgr_uac_antiair    ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
-   str_SetUpgrBaseHint(upgr_uac_transport  ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                       );
-   str_SetUpgrBaseHint(upgr_uac_radar_r    ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
-   str_SetUpgrBaseHint(upgr_uac_plasmt     ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
-   str_SetUpgrBaseHint(upgr_uac_turarm     ,'Additional Armoring'              ,'Additional armor for Turrets'               );
+   str_SetUpgrBaseHint(upgr_uac_DistDamage   ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
+   str_SetUpgrBaseHint(upgr_uac_BioArmor     ,'Infantry Combat Armor Upgrade'    ,'Increase the armor of all Barrack`s units'                     );
+   str_SetUpgrBaseHint(upgr_uac_BuildArmor   ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
+   str_SetUpgrBaseHint(upgr_uac_RepairTools  ,'Advanced Tools'                   ,'Increase repair/healing efficiency of Engineers/Medics'        );
+   str_SetUpgrBaseHint(upgr_uac_BioSpeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
+   str_SetUpgrBaseHint(upgr_uac_ssgup        ,'Expansive bullets'                ,'Attacks of Shotguner, SuperShotguner and Terminator are more likely to cause a pain state' );
+   str_SetUpgrBaseHint(upgr_uac_TowerR       ,'Spotlights'                       ,'Increase the range of defensive structures'                    );
+   str_SetUpgrBaseHint(upgr_uac_CCFly        ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
+   str_SetUpgrBaseHint(upgr_uac_CCAttack     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
+   str_SetUpgrBaseHint(upgr_uac_BuilderR     ,'Command Center Range Upgrade'     ,'Increase Command Center`s range of vision'                           );
+   str_SetUpgrBaseHint(upgr_uac_DronTurret   ,'Drone Transformation Protocol'    ,'Drone can rebuild to Anti-ground turret'    );
+   str_SetUpgrBaseHint(upgr_uac_UnitSightR   ,'Light Amplification Visors'       ,'Increase the sight range of all UAC units'  );
+   str_SetUpgrBaseHint(upgr_uac_CommandoInvis,'Stealth Technology'               ,'Commando becomes invisible'                 );
+   str_SetUpgrBaseHint(upgr_uac_AASplash     ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'     );
+   str_SetUpgrBaseHint(upgr_uac_MechSpeed    ,'Advanced Engines'                 ,'Increase the movement speed of all Factory`s units'      );
+   str_SetUpgrBaseHint(upgr_uac_MechArmor    ,'Mech Combat Armor Upgrade'        ,'Increase the armor of all Factory`s units'               );
+   str_SetUpgrBaseHint(upgr_uac_TerAAWeapon  ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
+   str_SetUpgrBaseHint(upgr_uac_Transport    ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                       );
+   str_SetUpgrBaseHint(upgr_uac_RadarR       ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
+   str_SetUpgrBaseHint(upgr_uac_TurretPlasma ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
+   str_SetUpgrBaseHint(upgr_uac_TurretArmor  ,'Additional Armoring'              ,'Additional armor for Turrets'               );
 
+
+   str_MakeActionHint(iAct_Control_USelBase,'Select all builders');
    str_MakeActionHint(iAct_Control_USelArmy,'Select all battle units');
 
    t:='attack enemies';
@@ -1450,6 +1487,8 @@ procedure lng_rus;
 var t: shortstring;
     i: byte;
 begin
+  str_ps_AI                     := 'ИИ';
+
   str_Caption_Map               := 'КАРТА';
   str_Caption_Players           := 'ИГРОКИ';
   str_Caption_Multiplayer       := 'СЕТЕВАЯ ИГРА';
@@ -1470,6 +1509,9 @@ begin
   str_menu_PlaybackStop         := 'ПРЕРВАТЬ';
   str_menu_Exit                 := 'ВЫХОД';
   str_menu_Back                 := 'НАЗАД';
+
+  str_menuMsg_Error             := '! ОШИБКА !';
+  str_menu_Pause                := 'Пауза';
 
   str_S_Game      := 'ИГРА';
   str_S_Replay    := 'ЗАПИСЬ ИГРЫ';
@@ -1691,7 +1733,7 @@ begin
 
   str_GO_FixedStarts            := 'Фиксированные старты';
 
-  str_net_Ready             := 'Готов';
+  str_net_Ready             := 'Готов: ';
   str_net_UDPPort           := 'UDP порт';
   str_net_ServerStart       := 'Включить сервер';
   str_net_ServerStop        := 'Выключить сервер';
@@ -1701,7 +1743,6 @@ begin
   str_net_Address           := 'Адрес';
   str_net_LANSearch         := 'Поиск серверов в LAN';
 
-  str_gmsg_Connecting        := 'Соединение...';
   str_gmsg_PortBlocked       := 'Порт занят!';
   str_gmsg_WrongVersion              := 'Другая версия!';
   str_gmsg_ServerFull             := 'Нет мест!';
@@ -1762,28 +1803,28 @@ begin
   str_SetUnitBaseHint(UID_ZFPlasmagunner  ,'Зомби Плазмаганнер'         ,'');
   str_SetUnitBaseHint(UID_ZBFGMarine      ,'Зомби Солдат с BFG'         ,'');
 
-  str_SetUpgrBaseHint(upgr_hell_t1attack  ,'Адская Огневая Мощь'           ,'Увеличение урона от дальних атак всех Т1 юнитов и защитных сооружений');
-  str_SetUpgrBaseHint(upgr_hell_uarmor    ,'Боевая Плоть'                  ,'Увеличение защиты всех адских юнитов'                                 );
-  str_SetUpgrBaseHint(upgr_hell_barmor    ,'Каменные Стены'                ,'Увеличение защиты всех адских зданий'                                 );
-  str_SetUpgrBaseHint(upgr_hell_mattack   ,'Когти и зубы'                  ,'Увеличение урона от ближних атак'                                     );
-  str_SetUpgrBaseHint(upgr_hell_regen     ,'Регенерация Плоти'             ,'Восстановление здоровья всех адских юнитов'                           );
-  str_SetUpgrBaseHint(upgr_hell_pains     ,'Болевой Порог'                 ,'Адские юниты реже испытывают болевой паралич'                         );
-  str_SetUpgrBaseHint(upgr_hell_towers    ,'Демоническое Чутье'            ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
+  str_SetUpgrBaseHint(upgr_hell_DistDamage1  ,'Адская Огневая Мощь'           ,'Увеличение урона от дальних атак всех Т1 юнитов и защитных сооружений');
+  str_SetUpgrBaseHint(upgr_hell_UnitArmor    ,'Боевая Плоть'                  ,'Увеличение защиты всех адских юнитов'                                 );
+  str_SetUpgrBaseHint(upgr_hell_BuildArmor    ,'Каменные Стены'                ,'Увеличение защиты всех адских зданий'                                 );
+  str_SetUpgrBaseHint(upgr_hell_MeleeDamage   ,'Когти и зубы'                  ,'Увеличение урона от ближних атак'                                     );
+  str_SetUpgrBaseHint(upgr_hell_Regeneration     ,'Регенерация Плоти'             ,'Восстановление здоровья всех адских юнитов'                           );
+  str_SetUpgrBaseHint(upgr_hell_PainFactor     ,'Болевой Порог'                 ,'Адские юниты реже испытывают болевой паралич'                         );
+  str_SetUpgrBaseHint(upgr_hell_TowerR    ,'Демоническое Чутье'            ,'Увеличение радиуса обзора и атаки для защитных сооружений'            );
   str_SetUpgrBaseHint(upgr_hell_HKTeleport,'Телепортация Адской Крепости'  ,'Заряд для способности Адской Крепости'                                );
-  str_SetUpgrBaseHint(upgr_hell_paina     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
-  str_SetUpgrBaseHint(upgr_hell_buildr    ,'Увеличение Области Обзора Адской Крепости',''                                       );
+  str_SetUpgrBaseHint(upgr_hell_DecayAura     ,'Аура Разложения'               ,'Адская крепость наносит урон всем вражеских не-зданиям вокруг. Урон игнорирует броню юнитов');
+  str_SetUpgrBaseHint(upgr_hell_BuilderR    ,'Увеличение Области Обзора Адской Крепости',''                                       );
 
-  str_SetUpgrBaseHint(upgr_hell_spectre   ,'Призраки'                      ,'Pinky Demon становиться невидимым'                                         );
-  str_SetUpgrBaseHint(upgr_hell_vision    ,'Адское Зрение'                 ,'Увеличение области обзора и атаки всех адских юнитов'                      );
-  str_SetUpgrBaseHint(upgr_hell_phantoms  ,'Фантомы'                       ,'Pain Elemental создает Фантомов вместо Lost Soul'                          );
-  str_SetUpgrBaseHint(upgr_hell_t2attack  ,'Демоническое Оружие'           ,'Увеличение урона от дальних атак всех Т2 юнитов и защитных сооружений'     );
-  str_SetUpgrBaseHint(upgr_hell_teleport  ,'Улучшение Телепорта'           ,'Уменьшение времени перезарядки Телепорта'                              );
-  str_SetUpgrBaseHint(upgr_hell_rteleport ,'Призыв'                        ,'Юнитов можно перемещать обратно в Телепорт'                            );
-  str_SetUpgrBaseHint(upgr_hell_heye      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
-  str_SetUpgrBaseHint(upgr_hell_totminv   ,'Невидимость Тотема Ужаса'      ,''                               );
-  str_SetUpgrBaseHint(upgr_hell_bldrep    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );
-  str_SetUpgrBaseHint(upgr_hell_tblink    ,'Короткая Телепортация'         ,'Заряды для способности Сторожевой Башни и Тотема Ужаса');
-  str_SetUpgrBaseHint(upgr_hell_resurrect ,'Воскрешение'                   ,'Способность ArchVile'                    );
+  str_SetUpgrBaseHint(upgr_hell_Spectre   ,'Призраки'                      ,'Pinky Demon становиться невидимым'                                         );
+  str_SetUpgrBaseHint(upgr_hell_UnitSightR    ,'Адское Зрение'                 ,'Увеличение области обзора и атаки всех адских юнитов'                      );
+  str_SetUpgrBaseHint(upgr_hell_Phantoms  ,'Фантомы'                       ,'Pain Elemental создает Фантомов вместо Lost Soul'                          );
+  str_SetUpgrBaseHint(upgr_hell_DistDamage2  ,'Демоническое Оружие'           ,'Увеличение урона от дальних атак всех Т2 юнитов и защитных сооружений'     );
+  str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Улучшение Телепорта'           ,'Уменьшение времени перезарядки Телепорта'                              );
+  str_SetUpgrBaseHint(upgr_hell_Recall ,'Призыв'                        ,'Юнитов можно перемещать обратно в Телепорт'                            );
+  str_SetUpgrBaseHint(upgr_hell_EvilEyeR      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
+  str_SetUpgrBaseHint(upgr_hell_TotemInvis   ,'Невидимость Тотема Ужаса'      ,''                               );
+  str_SetUpgrBaseHint(upgr_hell_BuildRestore    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );
+  str_SetUpgrBaseHint(upgr_hell_TowerBlink    ,'Короткая Телепортация'         ,'Заряды для способности Сторожевой Башни и Тотема Ужаса');
+  str_SetUpgrBaseHint(upgr_hell_Resurrect ,'Воскрешение'                   ,'Способность ArchVile'                    );
 
 
   str_SetUnitBaseHint(UID_UCommandCenter  ,'Командный Центр'            ,'');
@@ -1820,28 +1861,28 @@ begin
   str_SetUnitBaseHint(UID_APC             ,'БТР'                    ,'');
 
 
-  str_SetUpgrBaseHint(upgr_uac_attack     ,'Улучшение Воружений'               ,'Увеличение урона от дальних атак всех юнитов и защитных сооружений');
-  str_SetUpgrBaseHint(upgr_uac_uarmor     ,'Улучшение Пехотной Брони'          ,'Увеличение защиты всех юнитов из Казарм'                     );
-  str_SetUpgrBaseHint(upgr_uac_barmor     ,'Бетонные Стены'                    ,'Увеличение защиты всех зданий'                               );
-  str_SetUpgrBaseHint(upgr_uac_tools      ,'Продвинутые Инструменты'           ,'Увеличение эффективности ремонта Инженера и лечения Медика'  );
-  str_SetUpgrBaseHint(upgr_uac_mspeed     ,'Легковесная Броня'                 ,'Увеличение скорости передвижения всех юнитов из Казарм'      );
+  str_SetUpgrBaseHint(upgr_uac_DistDamage     ,'Улучшение Воружений'               ,'Увеличение урона от дальних атак всех юнитов и защитных сооружений');
+  str_SetUpgrBaseHint(upgr_uac_BioArmor     ,'Улучшение Пехотной Брони'          ,'Увеличение защиты всех юнитов из Казарм'                     );
+  str_SetUpgrBaseHint(upgr_uac_BuildArmor     ,'Бетонные Стены'                    ,'Увеличение защиты всех зданий'                               );
+  str_SetUpgrBaseHint(upgr_uac_RepairTools      ,'Продвинутые Инструменты'           ,'Увеличение эффективности ремонта Инженера и лечения Медика'  );
+  str_SetUpgrBaseHint(upgr_uac_BioSpeed     ,'Легковесная Броня'                 ,'Увеличение скорости передвижения всех юнитов из Казарм'      );
   str_SetUpgrBaseHint(upgr_uac_ssgup      ,'Разрывные Пули'                    ,'Атака Сержанта, Старшего Сержанта и Терминатора чаще вызывают pain state' );
-  str_SetUpgrBaseHint(upgr_uac_towers     ,'Прожекторы'                        ,'Увеличение радиуса обзора и атаки для защитных сооружений'      );
+  str_SetUpgrBaseHint(upgr_uac_TowerR     ,'Прожекторы'                        ,'Увеличение радиуса обзора и атаки для защитных сооружений'      );
   str_SetUpgrBaseHint(upgr_uac_CCFly      ,'Летные Двигатели Командного Центра','Командный Центр может летать'                                   );
-  str_SetUpgrBaseHint(upgr_uac_ccturr     ,'Турель Командного Центра'          ,'Командный Центр может атаковать'                                );
-  str_SetUpgrBaseHint(upgr_uac_buildr     ,'Увеличение Области Обзора Командного Центра',''                           );
+  str_SetUpgrBaseHint(upgr_uac_CCAttack     ,'Турель Командного Центра'          ,'Командный Центр может атаковать'                                );
+  str_SetUpgrBaseHint(upgr_uac_BuilderR     ,'Увеличение Области Обзора Командного Центра',''                           );
 
-  str_SetUpgrBaseHint(upgr_uac_botturret  ,'Протокол Трансформации Дрона'      ,'Дрон может превратиться в Анти-наземную Турель'    );
-  str_SetUpgrBaseHint(upgr_uac_vision     ,'Улучшенные Визоры'                 ,'Увеличение области обзора и атаки всех юнитов'  );
-  str_SetUpgrBaseHint(upgr_uac_commando   ,'Стелс-Технологии'                  ,'Коммандо становиться невидимым'                 );
-  str_SetUpgrBaseHint(upgr_uac_airsp      ,'Осколочные Снаряды'                ,'Антивоздушные снаряды наносят урон по области'  );
-  str_SetUpgrBaseHint(upgr_uac_mechspd    ,'Улучшеные Двигатели'               ,'Увеличение скорости передвижения юнитов из Фабрики'      );
-  str_SetUpgrBaseHint(upgr_uac_mecharm    ,'Улучшение Технической Брони'       ,'Увеличение защиты всех юнитов из Фабрики'                );
-  str_SetUpgrBaseHint(upgr_uac_antiair    ,'Анти-воздушное Орудие'             ,'Анти-воздушное оружие для Терминатора'                   );
-  str_SetUpgrBaseHint(upgr_uac_transport  ,'Улучшение Транспорта'              ,'Увеличение вместимости Десантного Корабля'               );
-  str_SetUpgrBaseHint(upgr_uac_radar_r    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
-  str_SetUpgrBaseHint(upgr_uac_plasmt     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
-  str_SetUpgrBaseHint(upgr_uac_turarm     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
+  str_SetUpgrBaseHint(upgr_uac_DronTurret  ,'Протокол Трансформации Дрона'      ,'Дрон может превратиться в Анти-наземную Турель'    );
+  str_SetUpgrBaseHint(upgr_uac_UnitSightR     ,'Улучшенные Визоры'                 ,'Увеличение области обзора и атаки всех юнитов'  );
+  str_SetUpgrBaseHint(upgr_uac_CommandoInvis   ,'Стелс-Технологии'                  ,'Коммандо становиться невидимым'                 );
+  str_SetUpgrBaseHint(upgr_uac_AASplash      ,'Осколочные Снаряды'                ,'Антивоздушные снаряды наносят урон по области'  );
+  str_SetUpgrBaseHint(upgr_uac_MechSpeed    ,'Улучшеные Двигатели'               ,'Увеличение скорости передвижения юнитов из Фабрики'      );
+  str_SetUpgrBaseHint(upgr_uac_MechArmor    ,'Улучшение Технической Брони'       ,'Увеличение защиты всех юнитов из Фабрики'                );
+  str_SetUpgrBaseHint(upgr_uac_TerAAWeapon    ,'Анти-воздушное Орудие'             ,'Анти-воздушное оружие для Терминатора'                   );
+  str_SetUpgrBaseHint(upgr_uac_Transport  ,'Улучшение Транспорта'              ,'Увеличение вместимости Десантного Корабля'               );
+  str_SetUpgrBaseHint(upgr_uac_RadarR    ,'Улучшение Радара'                  ,'Увеличение области обзора Радара'            );
+  str_SetUpgrBaseHint(upgr_uac_TurretPlasma     ,'Анти-наземное Плазменное Орудие'   ,'Анти-['+str_attr_mech+'] орудие для Анти-наземной Турели');
+  str_SetUpgrBaseHint(upgr_uac_TurretArmor     ,'Дополнительное Бронирование'       ,'Дополнительная защита для турелей'              );
 
   {str_sability := 'Специальная способность';
   str_spability:= 'Специальная способность в точке';
@@ -1974,7 +2015,7 @@ procedure upgrLine(upid:byte;info:shortstring);
 begin
    if(upid>0)then
     with g_upids[upid] do
-      writeln(f,'- ',_up_name,' - ',info,';');
+      writeln(f,'- ',upgr_txt_name,' - ',info,';');
 end;
 
 begin
@@ -1983,46 +2024,46 @@ begin
 
    for u:=0 to 255 do
     with g_uids[u] do
-     if(length(un_txt_uihint1)>0)and(_r>0)then
+     if(length(uid_txt_NameCostHK)>0)and(uid_r>0)then
      begin
-        writeln(f,un_txt_name);
+        writeln(f,uid_txt_name);
         writeln(f);
 
-        writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(_ucl)));
+        writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(uid_class)));
         writeln(f,'Categories/Attributes: ',RemoveSpecChars(str_UnitAttributes(nil,u)));
-        writeln(f,'Max hits: ',_mhits);
+        writeln(f,'Max hits: ',uid_MaxHits1);
         //if(_base_armor>0)then
         //writeln(f,'Base armor: ',_base_armor);
-        if(_baseregen>0)then
-        writeln(f,'Base regeneration: ',_baseregen);
-        writeln(f,'Limit used: ', limit2s(_limituse,ul1));
-        writeln(f,'Size: ',_r);
-        if(_speed>0)then
-        writeln(f,'Base movement speed: ' , _speed);
-        writeln(f,'Base vision range: ', _srange);
-        writeln(f,'Build time: ' , _btime);
-        writeln(f,'Energy required: ' , _renergy);
-        if(_painc>0)then
-        writeln(f,'PainState base threshold: ' , _painc);
-        if(not _ukfly)and(not _ukbuilding)then
-        writeln(f,'Places in transport: ',_transportS );
-        if(_transportM>0)then
-        writeln(f,'Base transport capacity: ',_transportM );
+        if(uid_BaseRegen>0)then
+        writeln(f,'Base regeneration: ',uid_BaseRegen);
+        writeln(f,'Limit used: ', limit2s(uid_LimitUse,ul1));
+        writeln(f,'Size: ',uid_r);
+        if(uid_speed>0)then
+        writeln(f,'Base movement speed: ' , uid_speed);
+        writeln(f,'Base vision range: ', uid_SightR);
+        writeln(f,'Build time: ' , uid_ProdTimeSec);
+        writeln(f,'Energy required: ' , uid_EnergyReq);
+        if(uid_PainC>0)then
+        writeln(f,'PainState base threshold: ' , uid_PainC);
+        if(not uid_ukfly)and(not uid_ukbuilding)then
+        writeln(f,'Places in transport: ',uid_TransportSize );
+        if(uid_TransportMax>0)then
+        writeln(f,'Base transport capacity: ',uid_TransportMax );
 
-        if(_zombie_uid>0)then
-        if(_zombie_hits>0)or(_fastdeath_hits<0)then
+        if(uid_ZombieUID>0)then
+        if(uid_ZombieHits>0)or(uid_FastDeathHits<0)then
         begin
-        writeln(f,'Zombie: ',g_uids[_zombie_uid].un_txt_name );
-        writeln(f,'Zombification hits: ',_zombie_hits);
+        writeln(f,'Zombie: ',g_uids[uid_ZombieUID].uid_txt_name );
+        writeln(f,'Zombification hits: ',uid_ZombieHits);
         end;
 
-        writeln(f,RemoveSpecChars(un_txt_uihint4));
+        writeln(f,RemoveSpecChars(uid_txt_Reqs));
 
-        if(_attack)then
+        if(uid_CanAttack)then
         begin
            writeln(f,str_hint_UnitArming);
-           for w:=0 to MaxUnitWeapons do
-            with _a_weap[w] do
+           for w:=0 to LastUnitArms do
+            with uid_arms[w] do
             begin
                tmp:=str_MakeWeaponString(u,w,true);
                if(length(tmp)>0)then writeln(f,tmp,';');
@@ -2031,42 +2072,42 @@ begin
 
 
         writeln(f,'Upgrades:');
-        upgrLine(_upgr_srange,'vision range '+i2sSign(_upgr_srange_step));
-        if(not _ukbuilding)then
-        upgrLine(upgr_race_unit_srange[_urace],'vision range '+i2sSign(upgr_race_srange_unit_bonus[_urace]));
+        upgrLine(uid_upgr_SightR,'vision range '+i2sSign(uid_SightRUpgrStep));
+        if(not uid_ukbuilding)then
+        upgrLine(upgr_race_unit_srange[uid_race],'vision range '+i2sSign(upgr_race_srange_unit_bonus[uid_race]));
 
-        if(_ukbuilding)
-        then upgrLine(_upgr_armor,'armor '+i2sSign(UpgradeBuildArmorBonus))
-        else upgrLine(_upgr_armor,'armor '+i2sSign(UpgradeUnitArmorBonus ));
+        if(uid_ukbuilding)
+        then upgrLine(uid_upgr_Armor,'armor '+i2sSign(UpgradeBuildArmorBonus))
+        else upgrLine(uid_upgr_Armor,'armor '+i2sSign(UpgradeUnitArmorBonus ));
 
-        if(_ukbuilding)
-        then upgrLine(upgr_race_armor_build[_urace],'armor '+i2sSign(UpgradeBuildArmorBonus))
+        if(uid_ukbuilding)
+        then upgrLine(upgr_race_armor_build[uid_race],'armor '+i2sSign(UpgradeBuildArmorBonus))
         else
-          if(_ukmech)
-          then upgrLine(upgr_race_armor_mech[_urace],'armor '+i2sSign(UpgradeUnitArmorBonus))
-          else upgrLine(upgr_race_armor_bio [_urace],'armor '+i2sSign(UpgradeUnitArmorBonus));
+          if(uid_ukmech)
+          then upgrLine(upgr_race_armor_mech[uid_race],'armor '+i2sSign(UpgradeUnitArmorBonus))
+          else upgrLine(upgr_race_armor_bio [uid_race],'armor '+i2sSign(UpgradeUnitArmorBonus));
 
-        upgrLine(_upgr_regen,'hits regeneration '+i2sSign(BaseArmorBonus1));
-        if(_ukbuilding)
-        then upgrLine(upgr_race_regen_build[_urace],'hits regeneration '+i2sSign(BaseArmorBonus1))
+        upgrLine(uid_upgr_Regen,'hits regeneration '+i2sSign(BaseArmorBonus1));
+        if(uid_ukbuilding)
+        then upgrLine(upgr_race_regen_build[uid_race],'hits regeneration '+i2sSign(BaseArmorBonus1))
         else
-          if(_ukmech)
-          then upgrLine(upgr_race_regen_mech[_urace],'hits regeneration '+i2sSign(BaseArmorBonus1))
-          else upgrLine(upgr_race_regen_bio [_urace],'hits regeneration '+i2sSign(BaseArmorBonus1));
+          if(uid_ukmech)
+          then upgrLine(upgr_race_regen_mech[uid_race],'hits regeneration '+i2sSign(BaseArmorBonus1))
+          else upgrLine(upgr_race_regen_bio [uid_race],'hits regeneration '+i2sSign(BaseArmorBonus1));
 
-        if(_ukbuilding)
+        if(uid_ukbuilding)
         then
         else
-          if(_ukmech)
-          then upgrLine(upgr_race_mspeed_mech[_urace],'movement speed '+i2sSign(2))
-          else upgrLine(upgr_race_mspeed_bio [_urace],'movement speed '+i2sSign(2));
+          if(uid_ukmech)
+          then upgrLine(upgr_race_mspeed_mech[uid_race],'movement speed '+i2sSign(2))
+          else upgrLine(upgr_race_mspeed_bio [uid_race],'movement speed '+i2sSign(2));
 
-        if(not _ukbuilding)and(_painc>0)and(_urace=r_hell)then
-        upgrLine(upgr_hell_pains,'PainState threshold '+i2sSign(_painc_upgr_step));
+        if(not uid_ukbuilding)and(uid_PainC>0)and(uid_race=r_hell)then
+        upgrLine(upgr_hell_PainFactor,'PainState threshold '+i2sSign(uid_PainCUpgrStep));
 
         writeln(f);
 
-        writeln(f,RemoveSpecChars(str_MakeUnitDefaultDescription(u,un_txt_udescr,true)));
+        writeln(f,RemoveSpecChars(str_MakeUnitDefaultDescription(u,uid_txt_BaseDescript,true)));
 
         writeln(f);
         {
@@ -2080,17 +2121,17 @@ begin
 
    for u:=0 to 255 do
     with g_upids[u] do
-     if(length(_up_name)>0)then
+     if(length(upgr_txt_name)>0)then
      begin
         writeln(f,RemoveSpecChars(str_makeUpgrBaseHint(u,255)));
-        writeln(f,RemoveSpecChars(_up_hint));
+        writeln(f,RemoveSpecChars(upgr_txt_Hint));
         writeln(f);
      end;
    writeln(f);
 {
 s1:=str_makeUpgrBaseHint(uid,upgr[uid]+1);
 hs1:=@s1;
-hs4:=@g_upids[uid]._up_hint;
+hs4:=@g_upids[uid].upgr_txt_Hint;
 }
 
    close(f);

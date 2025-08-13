@@ -1,4 +1,5 @@
 
+const camXYt1b = 5;
 
 procedure replay_MenuSelectedInfo;
 var  f: file;
@@ -77,7 +78,7 @@ begin
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
    AddItem(@g_tick              ,SizeOf(g_tick           ));
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
      begin
         AddItem(@state   ,SizeOf(state   ));
         AddItem(@name    ,SizeOf(name    ));
@@ -87,7 +88,7 @@ begin
      end;
 
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        AddItem(@race,SizeOf(race));
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
 end;
@@ -107,7 +108,7 @@ end;
 procedure replay_SavePlayPosition;
 begin
    if(rpls_fstate<>rpls_read)
-   or(rpls_pstate  <>rpls_read)then exit;
+   or(rpls_pstate<>rpls_read)then exit;
 
    if(rpls_ReadPosN>0)then
      with rpls_ReadPosL[rpls_ReadPosN-1] do
@@ -131,7 +132,15 @@ begin
    replay_SetPlayPosition:=false;
    if(rpls_ReadPosN=0)
    or(rpls_fstate<>rpls_read)
-   or(rpls_pstate  <>rpls_read)then exit;
+   or(rpls_pstate<>rpls_read)then exit;
+
+   if(timetick<g_Tick)then
+   begin
+      with rpls_ReadPosL[0] do
+        if(timetick<rp_gtick)then timetick:=rp_gtick;
+      with rpls_ReadPosL[rpls_ReadPosN-1] do
+        if(rp_gtick<timetick)then timetick:=rp_gtick;
+   end;
 
    ni:=cardinal.MaxValue;
    vi:=0;
@@ -141,7 +150,7 @@ begin
        begin
           vt:=abs(rp_gtick-timetick);
           if(mindist<0)or(vt<=mindist)then
-            if(vt<vi)or(ni=0)then
+            if(vt<vi)or(ni=cardinal.MaxValue)then
             begin
                ni:=i;
                vi:=vt;
@@ -179,24 +188,18 @@ begin
       rpls_fstate:=rpls_none;
    end;
    rpls_str_path:='';
-   rpls_pstate:=rpls_none;
+   rpls_pstate  :=rpls_none;
    rpls_ReadPosN:=0;
    setlength(rpls_ReadPosl,rpls_ReadPosN);
 end;
 
-procedure replay_Code;
-const vxyc = 5;
-var  i,gs,
-      _vx,
-      _vy  : byte;
-
-// WRITE
+// REPLAY WRITE
 procedure replay_WriteHead;
 var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=str_f_rpls+rpls_NamePrefix+'_'+str_DateTime+str_e_rpls;
+   rpls_str_path:=str_f_rpls+rpls_NamePrefix+'_'+str_map_ScenarioEngL[map_scenario]+'_'+str_DateTime+str_e_rpls;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -212,7 +215,7 @@ begin
    begin
       rpls_fstate :=rpls_write;
       rpls_pstate :=rpls_write;
-      rpls_u      :=1;
+      rpls_u      :=0;
       rpls_player :=LocalPlayer;
       rpls_log_c  :=0;
       rpls_POVRecorder:=false;
@@ -234,18 +237,22 @@ begin
       GameLogCommon(0,255,str_gmsg_RecordStart+rpls_str_path);
    end;
 end;
-procedure replay_WriteGameFrame;
-begin
-   if((rpls_ticks mod 2)<>0)then exit;
 
-   _vx:=byte((ui_cam_x+ui_cam_hw) shr vxyc);
-   _vy:=byte((ui_cam_y+ui_cam_hh) shr vxyc);
+procedure replay_WriteGameFrame;
+var
+i,gs,
+camx,
+camy: byte;
+begin
+   camx:=byte(ui_cam_cx shr camXYt1b);
+   camy:=byte(ui_cam_cy shr camXYt1b);
 
    gs:=G_Status and %00111111;
    i :=gs;
    if(rpls_log_c>0)then i:=i or %10000000;
-   if(rpls_vidx<>_vx)or(rpls_vidy<>_vy)then
-    if(gs=gs_running)then i:=i or %01000000;
+   if(rpls_vidx<>camx)
+   or(rpls_vidy<>camy)then
+     if(gs=gs_running)then i:=i or %01000000;
 
    if((i and %11000000)>0)or(gs=gs_running)then
    begin
@@ -255,8 +262,8 @@ begin
       if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_c,true);
       if((i and %01000000)>0)then
       begin
-         rpls_vidx:=_vx;
-         rpls_vidy:=_vy;
+         rpls_vidx:=camx;
+         rpls_vidy:=camy;
          {$I-}
          BlockWrite(rpls_file,rpls_vidx,sizeof(rpls_vidx));
          BlockWrite(rpls_file,rpls_vidy,sizeof(rpls_vidy));
@@ -273,10 +280,9 @@ begin
    end;
 end;
 
-
-// READ
+// REPLAY READ
 procedure replay_ReadHead;
-var p:byte;
+var p,i:byte;
 begin
    replay_Abort;
 
@@ -358,7 +364,7 @@ begin
          end;
 
          if(map_Size<map_MinSize)or(map_Size>map_MaxSize)
-         or(map_ObstaclesF >map_MaxObstacles)
+         or(map_ObstaclesF>map_MaxObstacles)
          or(map_Generators>map_MaxGenerators)
          or not(map_scenario in allmapscenarios)
          or(rpls_player>LastPlayer)then
@@ -372,19 +378,19 @@ begin
          end;
 
          for p:=0 to LastPlayer do
-          with g_players[p] do
-            if(length(name)>MaxPlayerNameLen)
-            or not(state in [ps_None,ps_human,ps_AI])
-            or(race >r_cnt)
-            or(mrace>r_cnt)
-            or(team >LastPlayer)then
-            begin
-               replay_Abort;
-               rpls_str_info1:=str_FileError_WVer;
-               rpls_str_info2:='';
-               GameDefaultAll;
-               exit;
-            end;
+           with g_gplayers[p] do
+             if(length(name)>MaxPlayerNameLen)
+             or not(state in [ps_None,ps_human,ps_AI])
+             or(race >r_cnt)
+             or(mrace>r_cnt)
+             or(team >LastPlayer)then
+             begin
+                replay_Abort;
+                rpls_str_info1:=str_FileError_WVer;
+                rpls_str_info2:='';
+                GameDefaultAll;
+                exit;
+             end;
 
          if(rpls_pnu=0)then rpls_pnu:=NetTickN;
          UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
@@ -397,9 +403,9 @@ begin
          LocalPlayer:=rpls_player;
          UIPlayer   :=LocalPlayer;
 
-         rpls_POVRecorder  :=false;
+         rpls_POVRecorder:=false;
 
-         map_premap;
+         Map_Make;
          ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
 
          ui_Camera_Bounds;
@@ -411,8 +417,17 @@ begin
    end;
 end;
 procedure replay_ReadGameFrame;
+var
+i,gs: byte;
 begin
-   if((rpls_ticks mod 2)<>0)then exit;
+   if(eof(rpls_file))then
+   begin
+      G_Status        :=gs_replayend;
+      sys_uncappedFPS :=false;
+      rpls_ForwardSkip:=0;
+      ioresult; // clear error
+      exit;
+   end;
 
    if(ioresult<>0)then
    begin
@@ -422,30 +437,19 @@ begin
       exit;
    end;
 
-   if(eof(rpls_file))then
-   begin
-      G_Status   :=gs_replayend;
-      sys_uncappedFPS :=false;
-      rpls_ForwardSkip:=0;
-      exit;
-   end;
-
    //gs_replaypause
    gs:=G_Status;
-   if(rpls_ForwardSkip<=0)and(G_Status=gs_running)then rpls_ForwardSkip:=1;
+   if(rpls_ForwardSkip>1)then rpls_FastSkip:=true;
+   if(rpls_ForwardSkip<=0)and(G_Status=gs_running)and(not MainMenu)then rpls_ForwardSkip:=1;
    while(rpls_ForwardSkip>0)do
    begin
       replay_SavePlayPosition;
 
+      i:=0;
       {$I-}
       BlockRead(rpls_file,i,SizeOf(i));
       {$I+}
       G_Status:=i and %00111111;
-      {if(G_Status>26)then
-      begin
-         writeln('unknown game status ',G_Status);
-         readln;
-      end; }
 
       if((i and %10000000)>0)then rudata_log(rpls_player,true);
       if((i and %01000000)>0)then
@@ -456,22 +460,24 @@ begin
          {$I+}
       end;
 
-      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_ForwardSkip>1);
+      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_FastSkip);
 
-      if(rpls_ForwardSkip>1)then effects_sprites(false,false);
+      if(rpls_FastSkip)then effects_sprites(false,false);
       rpls_ForwardSkip-=1;
    end;
+   if(rpls_ForwardSkip=0)then rpls_FastSkip:=false;
 
    if(rpls_POVRecorder)then
    begin
-      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl vxyc)-ui_cam_hw) div 2;
-      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl vxyc)-ui_cam_hh) div 2;
+      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl camXYt1b)-ui_cam_hw) div 2;
+      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl camXYt1b)-ui_cam_hh) div 2;
       ui_Camera_Bounds;
    end;
 
    if(gs=gs_replaypause)then G_Status:=gs;
 end;
 
+procedure replay_Code;
 begin
    if(rpls_RecordTryPause>0)
    then rpls_RecordTryPause-=1
@@ -493,10 +499,14 @@ begin
         case rpls_pstate of
 rpls_write : if(rpls_fstate<>rpls_write)
              then replay_WriteHead
-             else replay_WriteGameFrame;
+             else
+               if((rpls_ticks mod 2)<>0)then
+                 replay_WriteGameFrame;
 rpls_read  : if(rpls_fstate<>rpls_read)
              then replay_Readhead
-             else replay_ReadGameFrame;
+             else
+               if((rpls_ticks mod 2)<>0)then
+                 replay_ReadGameFrame;
         else replay_Abort;
         end;
      end;
@@ -573,6 +583,34 @@ begin
       DeleteFile(fn);
       replay_MakeFolderList;
    end;
+end;
+
+function replay_IsPaused:boolean;
+begin
+   replay_IsPaused:=(G_Status=gs_replaypause)or(G_Status<MaxPlayers);
+end;
+
+function replay_Pause(check:boolean):boolean;
+begin
+   replay_Pause:=false;
+
+   if(G_Status=gs_running)then
+   begin
+      replay_Pause:=true;
+      if(check)then exit;
+
+      G_Status:=gs_replaypause;
+      rpls_ForwardSkip:=0;
+   end
+   else
+     if(G_Status=gs_replaypause)or(G_Status<MaxPlayers)then
+     begin
+        replay_Pause:=true;
+        if(check)then exit;
+
+        G_Status:=gs_running;
+        rpls_ForwardSkip:=0;
+     end;
 end;
 
 

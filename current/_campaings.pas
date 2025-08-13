@@ -71,7 +71,7 @@ begin
 end;
 procedure cmp_SetPlayer(p,r,t:byte);
 begin
-   with g_players[p] do
+   with g_gplayers[p] do
    begin
       state:=t;
       race :=r;
@@ -122,7 +122,7 @@ begin
      end;
    end;
 
-   Map_premap;
+   Map_Make;
    ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
 end;
 
@@ -132,7 +132,7 @@ begin
    case cmp_sel of
 0  : begin
         // tutorial stages, subtasks
-        with g_players[LocalPlayer] do
+        with g_gplayers[LocalPlayer] do
         begin
            {if(menergy<2000)
            then cmp_data_b1:=1
@@ -140,7 +140,7 @@ begin
              if(menergy<2000)}
 
         end;
-        if(g_players[4].ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_players[LocalPlayer].team);
+        if(g_gplayers[4].ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_gplayers[LocalPlayer].team);
 
      end;
    end;

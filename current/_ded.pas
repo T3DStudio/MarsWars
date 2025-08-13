@@ -1,16 +1,14 @@
 
 procedure Dedicated_Init;
 begin
-   net_status:=ns_server;
-   if(not net_UpSocket)then
+   if(net_UpSocket(net_ServerPort))then
    begin
-      net_dispose;
-      net_status:=ns_none;
-      GameCycle :=false;
+      net_status:=ns_server;
+      PlayersSetDefault;
    end
-   else PlayersSetDefault;
+   else GameCycle :=false;
 
-   screen_redraw:=true;
+   menu_update:=true;
 end;
 
 procedure Dedicated_Code;
@@ -18,7 +16,7 @@ begin
    case G_Started of
 false: if(PlayersAllReady)then
        begin
-          screen_redraw:=true;
+          menu_update:=true;
           G_Started:=true;
           GameStartSkirmish;
        end;
@@ -64,13 +62,13 @@ end;
 
 procedure ps(p:byte);
 begin
-   with g_players[p] do
+   with g_gplayers[p] do
      if(state=ps_none)
-     then   Dedicated_screenLine(name,1,PlayerGetStatus(p),15,'--'           ,25, ''       ,35, '',0, '',0)
+     then   Dedicated_screenLine(PlayerStateString(p),1,name,7,'--'           ,25, ''         ,35, '',0, '',0)
      else
        if(observer)
-       then Dedicated_screenLine(name,1,PlayerGetStatus(p),15,str_observer   ,25, t2c(team),35, '',0, '',0)
-       else Dedicated_screenLine(name,1,PlayerGetStatus(p),15,str_race[mrace],25, t2c(team),35, '',0, '',0);
+       then Dedicated_screenLine(PlayerStateString(p),1,name,7,str_observer   ,25, '-'        ,35, '',0, '',0)
+       else Dedicated_screenLine(PlayerStateString(p),1,name,7,str_race[mrace],25, b2s(team+1),35, '',0, '',0);
 end;
 
 function SVGameStatus:shortstring;
@@ -80,36 +78,36 @@ begin
    else SVGameStatus:=str_GameLobby;
    case G_status of
 gs_running    : ;
-0..LastPlayer : SVGameStatus:=str_GamePaused+b2s(G_Status)
-   else
-     if(gs_win_team0<=G_status)and(G_status<=gs_win_team7)then SVGameStatus:=str_GameEnded+b2s(G_Status-gs_win_team0);
+0..LastPlayer : SVGameStatus:=str_GamePaused+b2s(G_Status+1);
+gs_win_team0..
+gs_win_team7  : SVGameStatus:=str_GameEnded+b2s(G_Status-gs_win_team0);
    end;
 end;
 
 procedure Dedicated_Screen;
 begin
-   if(screen_redraw)then
+   if(menu_update)then
    begin
       clrscr;
       consoley:=0;
-      screen_redraw:=false;
+      menu_update:=false;
    end;
 
    if(consoley<=fr_fps1)then
    begin
       case consoley of
-      0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_port);
+      0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_ServerPort);
       1 : writeln(str_GameStatus, SVGameStatus);
       2 : writeln(str_GameOptions);
-      4 : writeln('   ',str_game_FixedPositions,b2c[g_FixedPositions]           );
-      6 : writeln('   ',str_game_AISlots       ,g_AISlots                       );
-      8 : writeln('   ',str_game_DefeatedObs   ,b2c[g_DefeatedObs ]             );
+      4 : writeln('   ',str_game_FixedPositions,b2c[g_FixedPositions]);
+      6 : writeln('   ',str_game_AISlots       ,g_AISlots            );
+      8 : writeln('   ',str_game_DefeatedObs   ,b2c[g_DefeatedObs ]  );
       10: writeln;
       12: writeln(str_MapOptions);
-      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size ,45, str_map_Obstacles   ,55, str_map_Symmetry ,70);
-      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_size),45, strMX(map_obstacles),55, b2c[map_symmetry],70);
+      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size ,45, str_map_Obstacles    ,55, str_map_Symmetry ,70);
+      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_size),45, strMX(map_ObstaclesF),55, b2c[map_symmetry],70);
       18: writeln;
-      20: Dedicated_screenLine(str_Player,1   , str_PlayerState          ,15, str_srace      ,25, str_team ,35, '',0, '',0);   // captions
+      20: Dedicated_screenLine(str_PlayerState,1,str_Player,7,str_srace,25,str_team ,35, '',0, '',0);   // captions
       22: ps(0);
       24: ps(1);
       26: ps(2);

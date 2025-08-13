@@ -244,9 +244,9 @@ begin
         text_lt:=text;
         color  :=acolor;
 
-        tw:=length(text)*font_hw;
+        tw:=length(text)*font_wh;
         x0:=mm3i(ui_cam_x+tw     ,x0,ui_cam_x+ui_cam_w-tw    );
-        y0:=mm3i(ui_cam_y+font_hw,y0,ui_cam_y+ui_cam_h-font_w);
+        y0:=mm3i(ui_cam_y+font_wh,y0,ui_cam_y+ui_cam_h-font_w1);
      end;
 end;
 procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
@@ -390,7 +390,7 @@ begin
       then hbar:=true
       else
         case ui_HealthBars of
-      0: if(hits<_mhits)then hbar:=true;
+      0: if(hits<uid_MaxHits1)then hbar:=true;
       1: hbar:=true;
         end;
 
@@ -399,17 +399,17 @@ begin
          if(playeri=UIPlayer)
          then UnitsInfoAddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
          else UnitsInfoAddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
-         UnitsInfoAddText(vx,vy-sm_SelectionHH-font_w,lvlstr_l,c_white);
+         UnitsInfoAddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
       end;
-      if(hbar )then UnitsInfoProgressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/_mhits,acolor);
+      if(hbar )then UnitsInfoProgressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/uid_MaxHits1,acolor);
 
-      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfoAddText(vx,vy-sm_SelectionHH+font_w,lvlstr_r,c_aqua);
+      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfoAddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
         if(ui_DrawEdges)then
-          UnitsInfoAddCircle(x,y,_r,ui_blink2_color_BY);
+          UnitsInfoAddCircle(x,y,uid_r,ui_blink2_color_BY);
 
-      if(srect)and(_ukbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
+      if(srect)and(uid_ukbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
 
       //ub_Scaned
       case ui_blink3 of
@@ -418,7 +418,7 @@ begin
       2:;
       end;
 
-      pain:=(buffs[ub_Pain]>0)and(_ukmech)and(not _ukbuilding);
+      pain:=(buffs[ub_Pain]>0)and(uid_ukmech)and(not uid_ukbuilding);
       buffx:=0;
       if(buffs[ub_HVision]>0)then buffx+=1;
       if(buffs[ub_Invuln ]>0)then buffx+=1;
@@ -429,9 +429,9 @@ begin
       buffx-=1;
       buffx:=vx-((buffx*buff_sprite_w) div 2);
 
-      if(_ukbuilding)
+      if(uid_ukbuilding)
       then buffy:=vy
-      else buffy:=vy-sm_SelectionHH-font_w;
+      else buffy:=vy-sm_SelectionHH-font_w1;
 
       if(buffs[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_effect_HVision);buffx+=buff_sprite_w;end;
       if(buffs[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_effect_Invuln );buffx+=buff_sprite_w;end;
@@ -486,7 +486,7 @@ uinfo_text   : begin
         end;
 
        if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1       ,text_lt ,ta_LU,255,c_white);
-       if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_3hw,text_lt2,ta_LU,255,c_white);
+       if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_w1h,text_lt2,ta_LU,255,c_white);
        if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1       ,text_rt ,ta_RU,255,c_white);
        if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1       ,text_rd ,ta_RB,255,c_white);
        if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1       ,text_ld ,ta_LB,255,c_white);
@@ -648,7 +648,7 @@ begin
 
    //draw_text(vid_screen,750,0,b2pm[map_ffly] , ta_RU,255, c_white);
 
-  { with g_players[LocalPlayer] do
+  { with g_gplayers[LocalPlayer] do
    begin
       draw_text(vid_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
       draw_text(vid_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
@@ -656,7 +656,7 @@ begin
 
    if(InputAction(iact_Shift))then
      for u:=0 to LastPlayer do
-      with g_players[u] do
+      with g_gplayers[u] do
       begin
          ix:=170+89*u;
 
@@ -689,7 +689,7 @@ begin
         if(hits>0)then
         //if(k_shift>1)then
         begin
-           circleColor(vid_screen,ix,iy,_r  ,c_gray);
+           circleColor(vid_screen,ix,iy,uid_r  ,c_gray);
           // circleColor(vid_screen,ix,iy,srange,c_white);
            if(isselected)then
            begin
@@ -712,16 +712,16 @@ begin
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
            draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+30,b2c[ukfly], ta_LU,255, PlayerGetColor(playeri));
-           //draw_text(vid_screen,ix,iy+40,li2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
+           //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
-//           draw_text(vid_screen,ix,iy+40,i2s(_level_armor), ta_LU,255, PlayerGetColor(playeri));
+//           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 
            //draw_text(vid_screen,ix,iy+20,b2pm[iscomplete], ta_LU,255, PlayerGetColor(playeri));
 
         end;
 
-        {if(hits>0)and(transport=0)then
+        {if(hits>0)and(transportU=0)then
         if(playeri=LocalPlayer)then
         begin
            if(isbuild)then
@@ -740,7 +740,7 @@ begin
 
         draw_text(vid_screen,ix,iy,i2s(alrm_r)+#13+b2pm[alrm_b]+#12+i2s(player^.pnum), ta_LU,255, PlayerGetColor(playeri));}
 
-        if(transport>0)then continue;
+        if(transportU>0)then continue;
 
         if(hits>0){and(uidi=UID_URMStation)}then
         begin
@@ -751,7 +751,7 @@ begin
         end;
 
          //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);
-         //if(isselected)then            i2s(TeamVision[g_players[player].team])+#13+i2s(TeamDetection[g_players[player].team])
+         //if(isselected)then            i2s(TeamVision[g_gplayers[player].team])+#13+i2s(TeamDetection[g_gplayers[player].team])
          //if(alrm_r<=0)then
          //
 
@@ -767,6 +767,16 @@ begin
         //if(isselected)then  circleColor(vid_screen,ix,iy,r+5,plcolor[player]);
      end;
 
+  { for u:=1 to MaxObstacles do
+    with map_ObstaclesL[u] do
+     if(o_type>0)then
+      if(RectInCam(o_x,o_y,o_r,o_r,0))then
+      begin
+         ix:=o_x-ui_cam_x+ui_mapx;
+         iy:=o_y-ui_cam_y+ui_mapy;
+         draw_text(vid_screen,ix,iy,i2s(o_x)+' '+i2s(o_y), ta_mm,255, c_white);
+      end;   }
+
    {if(InputAction(iact_Control))then
    for u:=0 to MaxMissiles do
    with g_missiles[u] do
@@ -778,6 +788,7 @@ begin
       circleColor(vid_screen,ix,iy,5,c_lime);
       draw_text(vid_screen,ix,iy,i2s(dir), ta_LU,255, c_white);
    end;  }
+
 
    {for u:=0 to 255 do
     if(ordx[u]>0)then

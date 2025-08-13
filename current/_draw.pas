@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_players[LocalPlayer].observer)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
+   if(not g_gplayers[LocalPlayer].observer)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
    then UIPlayer:=LocalPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -80,7 +80,7 @@ begin
    begin
    {n:=0;
    if(UIPlayer<=LastPlayer)then
-    with g_players[UIPlayer] do
+    with g_gplayers[UIPlayer] do
      for i:=0 to LastPlayer do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then n+=1;  }
@@ -94,9 +94,9 @@ begin
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
-   ' '+tc_aqua+i2s(g_players[UIPlayer].ai_scout_timer)+
-   ' '+tc_orange+i2s(g_players[UIPlayer].ai_attack_timer)+
-   ' '+tc_green+b2c[g_players[UIPlayer].ai_ReadyForAttack]}
+   ' '+tc_aqua+i2s(g_gplayers[UIPlayer].ai_scout_timer)+
+   ' '+tc_orange+i2s(g_gplayers[UIPlayer].ai_attack_timer)+
+   ' '+tc_green+b2c[g_gplayers[UIPlayer].ai_ReadyForAttack]}
    ,
    ta_RU,255, c_white);
 

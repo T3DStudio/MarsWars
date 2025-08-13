@@ -1,7 +1,7 @@
 
 procedure PlayerSetSkirmishTech(playerN:byte);
 begin
-   with g_players[playerN] do
+   with g_gplayers[playerN] do
    begin
       PlayerSetAllowedUnits(playerN,[ UID_HKeep         ..UID_HBarracks,
                                       UID_LostSoul      ..UID_ZBFGMarine,
@@ -23,13 +23,15 @@ begin
    end;
 end;
 
-function PlayersSwap(p0,p1:byte):boolean;
-var tp:TPlayer;
- t0,t1:byte;
+function PlayersSwap(pSlot,pTarget:byte;Check:boolean):boolean;
+var
+  tgp:TPlayer;
+  tnp:TPlayerNetData;
+t0,t1:byte;
 begin
-   //p0 - target slot
-   //p1 - player target
-   //p1 -> p0
+   //pSlot - target slot
+   //pTarget - player target
+   //pTarget -> pSlot
    PlayersSwap:=false;
 
    if(g_started)
@@ -37,57 +39,65 @@ begin
    or(g_type=gt_campaing)
    {$ENDIF}then exit;
 
-   if(p0>LastPlayer)
-   or(p1>LastPlayer)
+   if(pSlot>LastPlayer)
+   or(pTarget>LastPlayer)
    then exit;
 
-   if(g_players[p0].state<>ps_none)
-   or(p1=p0)then exit;
+   if(g_gplayers[pSlot].state<>ps_none)
+   or(pTarget=pSlot)then exit;
 
    PlayersSwap:=true;
+
+   if(Check)then exit;
 
    {$IFDEF _FULLGAME}
    if(net_status=ns_client)then
    begin
       net_clearbuffer;
-      net_writebyte(nmid_lobby_PPosSwap);
-      net_writebyte(p0);
+      net_writebyte(nmid_lobby_PJumpToSlot);
+      net_writebyte(pSlot);
       net_send(net_cl_svip,net_cl_svport);
       exit;
    end;
    {$ENDIF}
 
-   t0:=g_players[p0].team;
-   t1:=g_players[p1].team;
+   t0:=g_gplayers[pSlot  ].team;
+   t1:=g_gplayers[pTarget].team;
 
-   tp:=g_players[p0];
-   g_players[p0]:=g_players[p1];
-   g_players[p1]:=tp;
+   tgp:=g_gplayers[pSlot];
+   g_gplayers[pSlot  ]:=g_gplayers[pTarget];
+   g_gplayers[pTarget]:=tgp;
 
-   g_players[p0].pnum:=p0;
-   g_players[p1].pnum:=p1;
+   tnp:=g_nplayers[pSlot];
+   g_nplayers[pSlot  ]:=g_nplayers[pTarget];
+   g_nplayers[pTarget]:=tnp;
 
-   g_players[p0].observer:=t1>LastPlayer;
-   g_players[p1].observer:=t0>LastPlayer;
 
-   g_players[p0].team:=PlayerValidateTeam(p0,t1);
-   g_players[p1].team:=PlayerValidateTeam(p1,t0);
+   g_gplayers[pSlot  ].pnum:=pSlot;
+   g_gplayers[pTarget].pnum:=pTarget;
+
+   g_gplayers[pSlot  ].observer:=t1>LastPlayer;
+   g_gplayers[pTarget].observer:=t0>LastPlayer;
+
+   g_gplayers[pSlot  ].team:=PlayerValidateTeam(pSlot,t1);
+   g_gplayers[pTarget].team:=PlayerValidateTeam(pTarget,t0);
 
    {$IFDEF _FULLGAME}
-   if(LocalPlayer=p1)then LocalPlayer:=p0
+   if(LocalPlayer=pTarget)then LocalPlayer:=pSlot
    else
-     if(LocalPlayer=p0)then LocalPlayer:=p1;
+     if(LocalPlayer=pSlot)then LocalPlayer:=pTarget;
    {$ENDIF}
 end;
 
 procedure PlayerSetState(playerN,newState:byte);
 begin
-   with g_players[playerN] do
+   with g_gplayers[playerN] do
    begin
       case newState of
-ps_None : begin ready:=false;name :=str_ps_none;       ttl:=0;end;
-ps_AI   : begin ready:=true; name :=ai_name(ai_skill); ttl:=0;observer:=false;end;
-ps_human: begin ready:=false;name :='';                ttl:=0;end;
+ps_None : begin ready:=false;if(not g_started)then
+                             name :=str_ps_none;      end;
+ps_AI   : begin ready:=true; name :=ai_name(ai_skill);observer:=false;end;
+ps_human: begin ready:=false;name :='';               end;
       end;
       team:=PlayerValidateTeam(playerN,team);
       state:=newState;
@@ -106,9 +116,10 @@ end;
 procedure PlayersSetDefault;
 var p:byte;
 begin
-   FillChar(g_players,SizeOf(TPList),0);
+   FillChar(g_gplayers,SizeOf(TPList),0);
+   FillChar(g_nplayers,SizeOf(g_nplayers),0);
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
      begin
         ai_skill :=player_default_ai_level;
         race     :=r_random;
@@ -125,7 +136,7 @@ begin
 
    {$IFDEF _FULLGAME}
    LocalPlayer:=0;
-   with g_players[LocalPlayer] do
+   with g_gplayers[LocalPlayer] do
    begin
       state:=ps_human;
       name :=PlayerName;
@@ -171,7 +182,7 @@ begin
      with g_units[u] do
      begin
         hits  :=dead_hits;
-        player:=@g_players[playeri];
+        player:=@g_gplayers[playeri];
         uid   :=@g_units  [uidi   ];
      end;
    LastCreatedUnit :=0;
@@ -186,15 +197,15 @@ begin
    g_cycle_order := 0;
    g_cycle_regen := 0;
 
-   Map_premap;
+   Map_Make;
    {$IFDEF DEBUG0}
    test_InstaProd:=false;
    {$ENDIF}
 
+   menu_update:=true;
+
    {$IFDEF _FULLGAME}
    sys_uncappedFPS:=false;
-
-   menu_update:=true;
 
    vid_ScreenSpritesS:=0;
 
@@ -214,8 +225,7 @@ begin
    ingame_chat :=0;
    net_chat_str:='';
    net_cl_svttl:=0;
-   net_cl_Hoster  :=255;
-   net_error_timer:=0;
+   net_cl_Hoster:=255;
 
    ui_umark_u:=0;
    ui_umark_t:=0;
@@ -230,12 +240,21 @@ begin
    rpls_pnu  :=0;
    rpls_POVRecorder:=false;
    rpls_pstate:=rpls_none;
-   {$ELSE}
-   screen_redraw:=true;
    {$ENDIF}
 end;
 
 {$IFDEF _FULLGAME}
+procedure GameLocalStart;
+begin
+   ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer] , map_PlayerStartY[LocalPlayer]);
+   if(g_gplayers[LocalPlayer].observer)then
+   begin
+      ui_tab  :=tab_controls;
+      UIPlayer:=255;
+   end;
+   rpls_RecordTryPause:=0;
+end;
+
 {$include _replays.pas}
 {$ENDIF}
 
@@ -248,14 +267,20 @@ begin
    {$IFDEF _FULLGAME}
    or(rpls_pstate=rpls_read)
    {$ENDIF}
-   or(not g_DefeatedObs)then exit;
+   or(not g_DefeatedObs)
+   or(g_started and Game_IsEnded)then exit;
 
-   with g_players[pid] do
-     if(state<>ps_None)
+   with g_gplayers[pid] do
+     if(state<>ps_Human)
      or(armylimit<=0)
      or(army<=0)
      or(defeated)
      or(observer)then exit;
+
+   {$IFDEF _FULLGAME}
+   if (net_status=ns_client)
+   and(net_cl_svttl>=ServerTTL)then exit;
+   {$ENDIF}
 
    PlayerSurrender:=true;
    if(check)then exit;
@@ -263,7 +288,9 @@ begin
    {$IFDEF _FULLGAME}
    if(net_status=ns_client)then
    begin
-      net_surrender;
+      net_clearbuffer;
+      net_writebyte(nmid_PlayerSurrender);
+      net_send(net_cl_svip,net_cl_svport);
       exit;
    end;
    {$ENDIF}
@@ -276,7 +303,7 @@ procedure GameRemoveAIObservers;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
@@ -318,11 +345,11 @@ begin
    if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
 
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        if(p>=map_MaxPlayers)then observer:=true;
 
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        if(observer)then
        begin
           team:=0;
@@ -346,7 +373,7 @@ begin
        end;
 
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        if(state<>ps_None)then
        begin
           PlayerSetSkirmishTech(p);
@@ -358,15 +385,9 @@ begin
        end;
 
    {$IFDEF _FULLGAME}
-   ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer] , map_PlayerStartY[LocalPlayer]);
-   if(g_players[LocalPlayer].observer)then
-   begin
-      ui_tab  :=tab_controls;
-      UIPlayer:=255;
-   end;
+   GameLocalStart;
    {$ENDIF}
 end;
-
 
 {$IFDEF _FULLGAME}
 function GamePauseToggle(check:boolean):boolean;
@@ -453,7 +474,7 @@ end;
 function ui_GameControlsEnabled:boolean;
 begin
    ui_GameControlsEnabled:=false;
-   with g_players[LocalPlayer] do
+   with g_gplayers[LocalPlayer] do
      if(UIPlayer<>LocalPlayer)
      or(observer)
      or(defeated)
@@ -477,16 +498,16 @@ begin
 
    SelectBuildings:=true;
    if(add)
-   then SelectBuildings:=(g_players[LocalPlayer].ucl_cs[false]=0)
+   then SelectBuildings:=(g_gplayers[LocalPlayer].ucl_cs[false]=0)
    else
      if(fuid=255)then
        for u:=1 to MaxUnits do
         with g_punits[u]^ do
-         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
           with uid^ do
-           if(not _ukbuilding)then
-             if((x0-_r)<=vx)and(vx<=(x1+_r))
-            and((y0-_r)<=vy)and(vy<=(y1+_r))then
+           if(not uid_ukbuilding)then
+             if((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
+            and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))then
              begin
                 SelectBuildings:=false;
                 break;
@@ -494,7 +515,7 @@ begin
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
-       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
        begin
           wassel:=isselected;
 
@@ -503,9 +524,9 @@ begin
             if(not add)or(not wassel and add)then
               if(fuid=255)or(fuid=uidi)then
                 with uid^ do
-                  isselected:=((x0-_r)<=vx)and(vx<=(x1+_r))
-                    and((y0-_r)<=vy)and(vy<=(y1+_r))
-                    and(SelectBuildings or not _ukbuilding);
+                  isselected:=((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
+                    and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))
+                    and(SelectBuildings or not uid_ukbuilding);
 
           if(wassel<>isselected)then
             if(isselected)then
@@ -526,7 +547,7 @@ begin
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
-       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
        begin
           wassel:=isselected;
 
@@ -555,7 +576,7 @@ begin
    if(fgroup<=MaxUnitGroups)then
      for u:=1 to MaxUnits do
        with g_punits[u]^ do
-         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
            case add of
            false: if(isselected)
                   then group:=fgroup
@@ -770,7 +791,7 @@ begin
    else map_generators:=0;
 
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        if(state<>ps_human)then
        begin
           race :=random(r_cnt+1);
@@ -786,7 +807,7 @@ begin
        end;
 
    {$IFDEF _FULLGAME}
-   PlayersSwap(random(MaxPlayers),LocalPlayer);
+   PlayersSwap(random(MaxPlayers),LocalPlayer,false);
    {$ENDIF}
 
    if(random(3)=0)
@@ -795,7 +816,7 @@ begin
 
    g_FixedPositions:=random(2)=0;
 
-   Map_premap;
+   Map_Make;
 end;
 
 procedure PlayerExecuteOrder(tPlayer:byte);
@@ -806,7 +827,7 @@ u,
 tar_d : integer;
 tar_ex: boolean;
 begin
-   with g_players[tPlayer] do
+   with g_gplayers[tPlayer] do
    if(o_id>0)and(army>0)then
    begin
 
@@ -822,7 +843,7 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
             pu:=g_punits[u];
             with pu^ do
             with uid^ do
-             if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transport,nil))then
+             if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transportU,nil))then
              begin
                 if(o_id=uo_corder)then
                   case o_x0 of
@@ -843,13 +864,13 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
                uo_corder     : case o_x0 of
                                // TO ONE
                                co_sability,
-                               co_pability : if(_ability=o_a0)then
+                               co_pability : if(uid_ability=o_a0)then
                                                if(uo_id<>ua_psability)or(s_all=1)then
                                                  case o_x0 of
                                                  co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
                                                  co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
                                                  end;
-                               co_rebuild  : if(_rebuild_uid=o_a0)then
+                               co_rebuild  : if(uid_rebuild_uid=o_a0)then
                                                UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
 
                                // TO ALL
@@ -911,7 +932,7 @@ begin
    wteams_n  :=0;
    FillChar(teams_army,SizeOf(teams_army),0);
    for p:=0 to LastPlayer do
-     with g_players[p] do
+     with g_gplayers[p] do
        teams_army[team]+=army;
 
    for p:=0 to LastPlayer do
@@ -928,7 +949,7 @@ procedure Scenario_DefaultDefeatConditions;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-     if(g_players[p].army>0)then exit;
+     if(g_gplayers[p].army>0)then exit;
    Game_SetStatusWinnerTeam(255);
 end;
 
@@ -936,56 +957,58 @@ procedure PlayersCycle;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-    with g_players[p] do
-     if(state>ps_None)then
-     begin
-        if(state=ps_human)and(net_status=ns_server){$IFDEF _FULLGAME}and(p<>LocalPlayer){$ENDIF}then
-        begin
-           if(ttl<ClientTTL)then
-           begin
-              ttl+=1;
-              if(ttl=ClientTTL)or(ttl=fr_fps1)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
-           end
-           else
-             if(G_Started=false)then
+     with g_gplayers[p] do
+     with g_nplayers[p] do
+       if(state>ps_None)then
+       begin
+          if(state=ps_human)and(net_status=ns_server){$IFDEF _FULLGAME}and(p<>LocalPlayer){$ENDIF}then
+          begin
+             if(net_ttl<ClientTTL)then
              begin
-                PlayerSetState(p,ps_None);
-                {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
-             end;
-        end;
-        if(net_logsend_pause>0)then net_logsend_pause-=1;
+                net_ttl+=1;
+                if(net_ttl=ClientTTL)
+                or(net_ttl=fr_fps1)then menu_update:=true;
+             end
+             else
+               if(not G_Started)then
+               begin
+                  PlayerSetState(p,ps_None);
+                  menu_update:=true;
+               end;
+          end;
+          if(net_logsend_pause>0)then net_logsend_pause-=1;
 
-        if(G_Started)and(G_Status=gs_running)and(not observer)and(not defeated)then
-        begin
-           if(build_cd>0)then build_cd-=1;
+          if(G_Started)and(G_Status=gs_running)and(not observer)and(not defeated)then
+          begin
+             if(build_cd>0)then build_cd-=1;
 
-           if(ServerSide)then
-           begin
-              revealed:=false;
-              if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then revealed:=true;
+             if(ServerSide)then
+             begin
+                revealed:=false;
+                if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then revealed:=true;
 
-              PlayerExecuteOrder(p);
+                PlayerExecuteOrder(p);
 
-              if(state=ps_AI)
-              then ai_player_code(p)
-              else
-                if(log_EnergyCheck>0)
-                then log_EnergyCheck-=1
+                if(state=ps_AI)
+                then ai_player_code(p)
                 else
-                  if(cenergy>=0)
-                  then log_EnergyCheck:=1
+                  if(log_EnergyCheck>0)
+                  then log_EnergyCheck-=1
                   else
-                  begin
-                     log_EnergyCheck:=fr_fps6;
-                     PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1);
-                  end;
-           end;
+                    if(cenergy>=0)
+                    then log_EnergyCheck:=1
+                    else
+                    begin
+                       log_EnergyCheck:=fr_fps6;
+                       PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1);
+                    end;
+             end;
 
-           if(prod_error_cndt>0)then
-             GameLogCantProduction(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y);
-           prod_error_cndt  :=0;
-        end;
-     end;
+             if(prod_error_cndt>0)then
+               GameLogBits2Message(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y);
+             prod_error_cndt  :=0;
+          end;
+       end;
 
    for p:=0 to LastPlayer do PlayerAPMUpdate(p);
 end;
@@ -1007,20 +1030,42 @@ begin
    case net_status of
    ns_none,
    ns_server: ;
-   ns_client: {$IFDEF _FULLGAME}if(net_cl_Hoster<>0)then{$ENDIF} exit;
+   ns_client: {$IFDEF _FULLGAME}
+              if(net_cl_svttl>=ServerTTL)then
+              {$ENDIF}
+              exit;
+   else exit;
    end;
 
    GameOptionsChangeable:=true;
 end;
 
-function PlayerAILevelScroll(PlayerTarget:byte;forward,check:boolean):boolean;
+{$IFDEF _FULLGAME}
+function GameOptionsIsLobbyMaster(PlayerRequestor:byte):boolean;
+begin
+   GameOptionsIsLobbyMaster:=false;
+   case net_status of
+   ns_none,
+   ns_server: if(PlayerRequestor<>LocalPlayer)then exit;
+   ns_client: if(net_cl_Hoster<>255)then exit;
+   else exit;
+   end;
+   GameOptionsIsLobbyMaster:=true;
+end;
+{$ENDIF}
+
+function PlayerAILevelScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;
 begin
    PlayerAILevelScroll:=false;
 
    if(not GameOptionsChangeable)then exit;
 
+   {$IFDEF _FULLGAME}
+   if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
+   {$ENDIF}
+
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_players[PlayerTarget] do
+     with g_gplayers[PlayerTarget] do
        if(state=ps_AI)then
        begin
           PlayerAILevelScroll:=true;
@@ -1031,8 +1076,9 @@ begin
           if(net_status=ns_client)then
           begin
              net_clearbuffer;
-             net_writebyte(nmid_lobby_PAIUp);
+             net_writebyte(nmid_lobby_PAILevelScroll);
              net_writebyte(PlayerTarget);
+             net_writebool(forward);
              net_send(net_cl_svip,net_cl_svport);
              exit;
           end;
@@ -1042,14 +1088,18 @@ begin
        end;
 end;
 
-function PlayerAIToggle(PlayerTarget:byte;check:boolean):boolean;
+function PlayerAIToggle(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;
 begin
    PlayerAIToggle:=false;
 
    if(not GameOptionsChangeable)then exit;
 
+   {$IFDEF _FULLGAME}
+   if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
+   {$ENDIF}
+
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_players[PlayerTarget] do
+     with g_gplayers[PlayerTarget] do
        if(state<>ps_human)then
        begin
           PlayerAIToggle:=true;
@@ -1076,93 +1126,131 @@ begin
        end;
 end;
 
-function PlayerTeamScroll(PlayerTarget{$IFNDEF _FULLGAME},PlayerRequestor{$ENDIF}:byte;forward,check:boolean):boolean;
+function PlayerTeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;
 begin
    PlayerTeamScroll:=false;
 
    if(not GameOptionsChangeable)then exit;
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_players[PlayerTarget] do
-       if(state=ps_AI)or(PlayerTarget={$IFDEF _FULLGAME}LocalPlayer{$ELSE}PlayerRequestor{$ENDIF})then
-       begin
-          if(map_scenario in mc_fixed_teams)and(state=ps_AI)then exit;
+     with g_gplayers[PlayerTarget] do
+     begin
+        if(state=ps_None)then exit;
 
-          PlayerTeamScroll:=true;
-
-          if(check)then exit;
-
-          {$IFDEF _FULLGAME}
-          if(net_status=ns_client)then
-          begin
-             net_clearbuffer;
-             net_writebyte(nmid_lobby_PTeam);
-             net_writebyte(PlayerTarget);
-             net_writebool(forward);
-             net_send(net_cl_svip,net_cl_svport);
-             exit;
-          end;
-          {$ENDIF}
-
-          case (map_scenario in mc_fixed_teams) of
-          true : observer:=not observer;
-          false: if(state=ps_AI)
-                 then ScrollByte(@team,forward,0,LastPlayer)
-                 else
-                   if(observer)then
-                   begin
-                      observer:=false;
-                      ScrollByte(@team,forward,0,LastPlayer);
-                   end
-                   else
-                   begin
-                      case forward of
-                      true : if(team=LastPlayer)then observer:=true;
-                      false: if(team=0         )then observer:=true;
-                      end;
-                      if(not observer)then ScrollByte(@team,forward,0,LastPlayer);
+        case net_status of
+        ns_none,
+        ns_server: case state of
+                   ps_AI   : {$IFDEF _FULLGAME}if(PlayerRequestor<>LocalPlayer)then exit{$ENDIF};
+                   ps_Human: if(PlayerTarget<>PlayerRequestor)then exit;
                    end;
-          end;
-       end;
+        ns_client: {$IFDEF _FULLGAME}
+                   case state of
+                   ps_AI   : if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
+                   ps_Human: if(PlayerTarget<>PlayerRequestor)then exit;
+                   end;
+                   {$ELSE}
+                   exit;
+                   {$ENDIF}
+        end;
+
+        if(map_scenario in mc_fixed_teams)and(state=ps_AI)then exit;
+
+        PlayerTeamScroll:=true;
+
+        if(check)then exit;
+
+        {$IFDEF _FULLGAME}
+        if(net_status=ns_client)then
+        begin
+           net_clearbuffer;
+           net_writebyte(nmid_lobby_PTeam);
+           net_writebyte(PlayerTarget);
+           net_writebool(forward);
+           net_send(net_cl_svip,net_cl_svport);
+           exit;
+        end;
+        {$ENDIF}
+
+        case (map_scenario in mc_fixed_teams) of
+        true : observer:=not observer;
+        false: if(state=ps_AI)
+               then ScrollByte(@team,forward,0,LastPlayer)
+               else
+                 if(observer)then
+                 begin
+                    observer:=false;
+                    ScrollByte(@team,forward,0,LastPlayer);
+                 end
+                 else
+                 begin
+                    case forward of
+                    true : if(team=LastPlayer)then observer:=true;
+                    false: if(team=0         )then observer:=true;
+                    end;
+                    if(not observer)then ScrollByte(@team,forward,0,LastPlayer);
+                 end;
+        end;
+     end;
 end;
 
-function PlayerRaceScroll(PlayerTarget{$IFNDEF _FULLGAME},PlayerRequestor{$ENDIF}:byte;check:boolean):boolean;
+function PlayerRaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;
 begin
    PlayerRaceScroll:=false;
 
    if(not GameOptionsChangeable)then exit;
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_players[PlayerTarget] do
-      if(not observer)then
-        if(state=ps_AI)or(PlayerTarget={$IFDEF _FULLGAME}LocalPlayer{$ELSE}PlayerRequestor{$ENDIF})then  // check on server side PlayerTarget requestor
-        begin
-           PlayerRaceScroll:=true;
-           if(check)then exit;
+     with g_gplayers[PlayerTarget] do
+      if(not observer)and(state<>ps_None)then
+      begin
+         if(state=ps_None)then exit;
 
-           {$IFDEF _FULLGAME}
-           if(net_status=ns_client)then
-           begin
-              net_clearbuffer;
-              net_writebyte(nmid_lobby_PRace);
-              net_writebyte(PlayerTarget);
-              net_send(net_cl_svip,net_cl_svport);
-              exit;
-           end;
-           {$ENDIF}
+         case net_status of
+         ns_none,
+         ns_server: case state of
+                    ps_AI   : {$IFDEF _FULLGAME}if(PlayerRequestor<>LocalPlayer)then exit{$ENDIF};
+                    ps_Human: if(PlayerTarget<>PlayerRequestor)then exit;
+                    end;
+         ns_client: {$IFDEF _FULLGAME}
+                    case state of
+                    ps_AI   : if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
+                    ps_Human: if(PlayerTarget<>PlayerRequestor)then exit;
+                    end;
+                    {$ELSE}
+                    exit;
+                    {$ENDIF}
+         end;
 
-           race+=1;
-           if(race>r_cnt)then race:=r_random;
-           mrace:=race;
-        end;
+         PlayerRaceScroll:=true;
+         if(check)then exit;
+
+         {$IFDEF _FULLGAME}
+         if(net_status=ns_client)then
+         begin
+            net_clearbuffer;
+            net_writebyte(nmid_lobby_PRace);
+            net_writebyte(PlayerTarget);
+            net_send(net_cl_svip,net_cl_svport);
+            exit;
+         end;
+         {$ENDIF}
+
+         race+=1;
+         if(race>r_cnt)then race:=r_random;
+         mrace:=race;
+      end;
 end;
 
-function GameMapSetSeed(newSeed:cardinal;check:boolean):boolean;
+function GameMapSetSeed(PlayerRequestor:byte;newSeed:cardinal;check:boolean):boolean;
 begin
    GameMapSetSeed:=false;
 
    if(not GameOptionsChangeable)
    or(map_seed=newSeed)then exit;
+
+   {$IFDEF _FULLGAME}
+   if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
+   {$ENDIF}
 
    GameMapSetSeed:=true;
 
@@ -1173,7 +1261,7 @@ begin
    begin
       net_clearbuffer;
       net_writebyte(nmid_lobby_MSeed);
-      net_writecard(s2c(menu_mseed));
+      net_writecard(newSeed);
       net_send(net_cl_svip,net_cl_svport);
       exit;
    end;
@@ -1182,14 +1270,18 @@ begin
 
    map_seed  :=newSeed;
 
-   map_premap;
+   Map_Make;
 end;
 
-function GameSetOption(param_type:byte;forward,check:boolean):boolean;
+function GameSetOption(PlayerRequestor,param_type:byte;forward,check:boolean):boolean;
 begin
    GameSetOption:=false;
 
    if(not GameOptionsChangeable)then exit;
+
+   {$IFDEF _FULLGAME}
+   if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
+   {$ENDIF}
 
    GameSetOption:=true;
 
@@ -1201,10 +1293,9 @@ begin
       case param_type of
       nmid_lobby_MScenario,
       nmid_lobby_MGenerators,
-      nmid_lobby_MSeed,
       nmid_lobby_MSize,
-      nmid_lobby_MObs,
-      nmid_lobby_MSym,
+      nmid_lobby_MObstacles,
+      nmid_lobby_MSymmetry,
       nmid_lobby_MRandom,
 
       nmid_lobby_GFixedPositions,
@@ -1217,19 +1308,18 @@ begin
    {$ENDIF}
 
    case param_type of
-   nmid_lobby_MScenario      : begin ScrollByteSet(@map_scenario,forward,@allmapscenarios);PlayersValidateTeam;Map_premap;end;
-   nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,map_MaxGenerators);Map_premap;end;
-   nmid_lobby_MSeed          : if(not forward)then begin Map_RandomSeed;Map_premap;end;
+   nmid_lobby_MScenario      : begin ScrollByteSet(@map_scenario,forward,@allmapscenarios);PlayersValidateTeam;Map_Make;end;
+   nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,map_MaxGenerators);Map_Make;end;
    nmid_lobby_MSize          : begin
                                   case forward of
                                   true : ScrollInt(@map_Size, map_SizeMenuStep,map_MinSize,map_MaxSize);
                                   false: ScrollInt(@map_Size,-map_SizeMenuStep,map_MinSize,map_MaxSize);
                                   end;
-                                  Map_premap;
+                                  Map_Make;
                                end;
-   nmid_lobby_MObs           : begin ScrollByte(@map_ObstaclesF,forward,0,map_MaxObstacles); Map_premap; end;
-   nmid_lobby_MSym           : begin map_Symmetry:=not map_Symmetry; Map_premap; end;
-   nmid_lobby_MRandom        : begin Map_randommap; Map_premap;end;
+   nmid_lobby_MObstacles     : begin ScrollByte(@map_ObstaclesF,forward,0,map_MaxObstacles); Map_Make; end;
+   nmid_lobby_MSymmetry      : begin map_Symmetry:=not map_Symmetry; Map_Make; end;
+   nmid_lobby_MRandom        : begin Map_randommap; Map_Make;end;
    nmid_lobby_GFixedPositions: begin
                                   g_FixedPositions:=not g_FixedPositions;
                                   {$IFDEF _FULLGAME}
@@ -1252,16 +1342,20 @@ end;
 procedure GameMain;
 begin
    {$IFDEF _FULLGAME}
-   if(net_error_timer>0)then net_error_timer-=1;
    SoundControl;
 
-   if(net_status=ns_client)then net_Client;
+   if(net_status=ns_client)then
+     if(net_svsearch)
+     then net_Discowering
+     else net_Client;
    replay_Code;
 
    {$ELSE}
    Dedicated_Code;
    Dedicated_Screen;
    {$ENDIF}
+
+   if(g_Started)and(net_status=ns_none)and(MainMenu)then exit;
 
    PlayersCycle;
 

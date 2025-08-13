@@ -129,7 +129,7 @@ MID_SSShot   : begin
    ms_eid_bio_death_uids:=[];
    for m:=0 to 255 do
      with g_uids[m] do
-       if(not _ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then ms_eid_bio_death_uids+=[m];
+       if(not uid_ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then ms_eid_bio_death_uids+=[m];
 end;
 
 {$ENDIF}
@@ -139,7 +139,7 @@ var i:byte;
 begin
    ApplyDamageMod:=base_damage;
    if(tu<>nil)then
-     for i:=0 to MaxDamageModFactors do
+     for i:=0 to LastDamageModFactor do
       with g_DamageMods[dmod][i] do
        if(dm_flags>0)then
         if(CheckUnitBaseFlags(tu,dm_flags))then
@@ -192,8 +192,8 @@ begin
 
        damage:=adddmg;
        if(player<=LastPlayer)and(tu<>nil)then
-         with g_players[player] do
-           if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_airsp]>0)then mid:=MID_URocketS;
+         with g_gplayers[player] do
+           if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_AASplash]>0)then mid:=MID_URocketS;
 
        with g_mids[mid] do
        begin
@@ -209,8 +209,8 @@ begin
 
           if(tu<>nil)then
           begin
-             x-=sign(tu^.x-vx)*g_random(tu^.uid^._missile_r);
-             y-=sign(tu^.y-vy)*g_random(tu^.uid^._missile_r);
+             x-=sign(tu^.x-vx)*g_random(tu^.uid^.uid_missileR);
+             y-=sign(tu^.y-vy)*g_random(tu^.uid^.uid_missileR);
           end;
 
           if(tar<=0)or(mid_base_splashr>0)
@@ -235,12 +235,12 @@ begin
    with g_missiles[m] do
    with g_mids[mid] do
     if(IsUnitRange(tar,@tu))then
-     if(tu^.hits>0)and(not IsUnitRange(tu^.transport,nil))then
+     if(tu^.hits>0)and(not IsUnitRange(tu^.transportU,nil))then
      begin
         if(not mid_noflycheck)and(mfs<>tu^.ukfly)then exit;
         if(tu^.uidi in mid_nodamage)then exit;
 
-        teams  :=g_players[player].team=tu^.player^.team;
+        teams  :=g_gplayers[player].team=tu^.player^.team;
 
         if(teams)then
           if(mid_base_splashr<=0)
@@ -248,13 +248,13 @@ begin
           else
             if(not mid_teamdamage)then exit;
 
-        ud:=point_dist_rint(vx,vy,tu^.x,tu^.y)-tu^.uid^._r-mid_size;
+        ud:=point_dist_rint(vx,vy,tu^.x,tu^.y)-tu^.uid^.uid_r-mid_size;
         if(ud<0)then ud:=0;
 
         rdamage:=ApplyDamageMod(tu,dmod,damage);
         painX:=1;
         if(player<=LastPlayer)and(tu<>nil)then
-          with g_players[player] do
+          with g_gplayers[player] do
             case mid of
           MID_SSShot,
           MID_SShot  : painX+=upgr[upgr_uac_ssgup]*2;
@@ -273,7 +273,7 @@ begin
            then unit_damage(tu,rdamage,painX,player,false);
         end
         else
-          if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^._splashresist)and(not tu^.uid^._ukmech)then // splash damage
+          if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ukmech)then // splash damage
           begin
              {$IFDEF _FULLGAME}
              if(ms_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
@@ -309,7 +309,7 @@ begin
         else
           if(tu^.x<>tu^.vx)
           or(tu^.y<>tu^.vy)
-          or(max2i(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^._missile_r)then
+          or(max2i(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^.uid_missileR)then
             case homing of
 mh_magnetic : begin
                  x  +=sign(tu^.x-x)*3;

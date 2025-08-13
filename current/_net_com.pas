@@ -21,7 +21,7 @@ begin
    end;
 end;
 
-function net_UpSocket:boolean;
+function net_UpSocket(port:word):boolean;
 begin
    net_UpSocket:=false;
 
@@ -30,21 +30,17 @@ begin
    net_period:=0;
 
    net_buffer:=SDLNet_AllocPacket(MaxNetBuffer);
-   if (net_buffer=nil) then
+   if(net_buffer=nil)then
    begin
       WriteSDLError;
       exit;
    end;
 
-   if(net_status=ns_client)
-   then net_socket:=SDLNet_UDP_Open(0)
-   else
-     if(net_status=ns_server)
-     then net_socket:=SDLNet_UDP_Open(net_port);
-
-   if (net_socket=nil) then
+   net_socket:=SDLNet_UDP_Open(port);
+   if(net_socket=nil) then
    begin
       WriteSDLError;
+      net_dispose;
       exit;
    end;
 
@@ -54,7 +50,7 @@ end;
 function InitNET:boolean;
 begin
    InitNET:=(SDLNet_Init=0);
-   if(InitNET=false)then WriteSDLError;
+   if(not InitNET)then WriteSDLError;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,8 +183,8 @@ function net_LastinPort:word    ;begin net_LastinPort:=net_buffer^.address.port;
 
 procedure menu_GetServerPort;
 begin
-   net_port:=s2w(menu_ServerPort);
-   menu_ServerPort:=w2s(net_port);
+   net_ServerPort :=s2w(menu_ServerPort);
+   menu_ServerPort:=w2s(net_ServerPort );
 end;
 
 function ip2c(s:shortstring;isip:pboolean):cardinal;
@@ -299,15 +295,6 @@ begin
    begin
       net_clearbuffer;
       net_writebyte(nmid_PlayerLeave);
-      net_send(net_cl_svip,net_cl_svport);
-   end;
-end;
-procedure net_surrender;
-begin
-   if(net_status=ns_client)then
-   begin
-      net_clearbuffer;
-      net_writebyte(nmid_PlayerSurrender);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;

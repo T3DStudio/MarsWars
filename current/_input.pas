@@ -257,8 +257,8 @@ ikt_keyboard: case kvalue of
 
    for i:=0 to 255 do
      with input_actions[i] do
-       if (ik_type =ktype )
-       and(ik_value=kvalue)then
+       if((ik_type =ktype )
+       and(ik_value=kvalue))or(i=iAct_any)then
          if(ik_depend=0)then
            case down of
            false : begin
@@ -308,7 +308,7 @@ function _checkEnemy:boolean;
 begin
    _checkEnemy:=false;
    if(IsUnitRange(tar,nil))then
-    if(g_units[tar].player^.team<>g_players[LocalPlayer].team)then _checkEnemy:=true;
+    if(g_units[tar].player^.team<>g_gplayers[LocalPlayer].team)then _checkEnemy:=true;
 end;
 procedure _PlayCommand(ss:PTSoundSet);
 begin
@@ -342,7 +342,7 @@ begin
    SelectedActions:=0;
    SelectedRebuild:=0;      // ????????????????????
 
-   with g_players[LocalPlayer] do
+   with g_gplayers[LocalPlayer] do
    begin
       for i:=1 to MaxUnits do
        with g_units[i] do
@@ -356,14 +356,14 @@ begin
                if(iscomplete)then
                begin
                   if(LeaderUID<>0)then
-                   if(_mhits<=g_uids[LeaderUID]._mhits)then
-                    if(_ucl<g_uids[LeaderUID]._ucl)then continue;
+                   if(uid_MaxHits1<=g_uids[LeaderUID].uid_MaxHits1)then
+                    if(uid_class<g_uids[LeaderUID].uid_class)then continue;
 
                   LeaderUID:=uidi;
                end;
             end;
-            if(_ability    >0)or(transportC>0)then SelectedActions+=1;
-            if(_rebuild_uid>0)then SelectedRebuild+=1;
+            if(uid_ability    >0)or(transportC>0)then SelectedActions+=1;
+            if(uid_rebuild_uid>0)then SelectedRebuild+=1;
          end;
 
       case cmd of
@@ -395,12 +395,12 @@ begin
    co_move,
    co_astand,
    co_stand,
-   co_patrol   : _PlayCommand(un_snd_move);
+   co_patrol   : _PlayCommand(uid_snd_move);
    co_amove,
-   co_apatrol  : _PlayCommand(un_snd_attack);
+   co_apatrol  : _PlayCommand(uid_snd_attack);
    co_rcamove  : if(_checkEnemy)
-                 then _PlayCommand(un_snd_attack)
-                 else _PlayCommand(un_snd_move  );
+                 then _PlayCommand(uid_snd_attack)
+                 else _PlayCommand(uid_snd_move  );
    end;
 
    ox1+=ui_mapx;
@@ -440,17 +440,17 @@ begin
          net_writeint (oa0);
          net_writebyte(oid);
 
-         with g_players[LocalPlayer] do
+         with g_gplayers[LocalPlayer] do
            net_writeint(s_all);
          for u:=1 to MaxUnits do
            with g_punits[u]^ do
-             if(hits>0)and(isselected)and(LocalPlayer=playeri)and(not IsUnitRange(transport,nil))then
+             if(hits>0)and(isselected)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
                net_writeint(unum);
 
          net_send(net_cl_svip,net_cl_svport);
       end
       else
-        with g_players[playerN] do
+        with g_gplayers[playerN] do
         begin
            o_x0:=ox0;
            o_y0:=oy0;
@@ -480,7 +480,7 @@ begin
       if(ukfly)then GetWeight+=1;
       if(btar_pu<>nil)then
       begin
-         if(_r<btar_pu^.uid^._r)then GetWeight+=2;
+         if(uid_r<btar_pu^.uid^.uid_r)then GetWeight+=2;
          if(hits<btar_pu^.hits )then GetWeight+=4;
       end;
    end;
@@ -491,7 +491,7 @@ begin
    if(not PointInCam(tx,ty))then exit;
 
    if(UIPlayer<=LastPlayer)
-   then pUIPlayer:=@g_players[UIPlayer]
+   then pUIPlayer:=@g_gplayers[UIPlayer]
    else pUIPlayer:=nil;
 
    if(pUIPlayer<>nil)then
@@ -502,7 +502,7 @@ begin
      co_pability: if(ui_uibtn_pabilityu=nil)
                   then exit
                   else
-                    case ui_uibtn_pabilityu^.uid^._ability of
+                    case ui_uibtn_pabilityu^.uid^.uid_ability of
                     uab_Teleport,
                     uab_HInvulnerability,
                     uab_HellVision      :;
@@ -515,11 +515,11 @@ begin
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
-       if(hits>0)and(not isUnitRange(transport,nil))then
+       if(hits>0)and(not isUnitRange(transportU,nil))then
        begin
           with uid^ do
-            if(tx<(vx-_r))or((vx+_r)<tx)
-            or(ty<(vy-_r))or((vy+_r)<ty)then continue;
+            if(tx<(vx-uid_r))or((vx+uid_r)<tx)
+            or(ty<(vy-uid_r))or((vy+uid_r)<ty)then continue;
           if(not ui_CheckUnitUIPlayerVision(g_punits[u],true))then continue;
 
           case mbrush of
@@ -530,7 +530,7 @@ begin
           co_amove,
           co_mmark   :; // allowed any units
           co_pability: if(pUIPlayer<>nil)then
-                         case ui_uibtn_pabilityu^.uid^._ability of
+                         case ui_uibtn_pabilityu^.uid^.uid_ability of
                          uab_Teleport        : if(player      <>pUIPlayer      )then continue;
                          uab_HInvulnerability,
                          uab_HellVision      : if(player^.team<>pUIPlayer^.team)then continue;
@@ -566,30 +566,30 @@ begin
      1..255            : begin
                             if not(m_brush in ui_bprod_possible)then
                             begin
-                               GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
+                               GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
                                m_brush:=co_empty;
                                exit;
                             end;
 
-                            cndt:=CheckUnitReqs(@g_players[LocalPlayer],m_brush);
+                            cndt:=CheckUnitReqs(@g_gplayers[LocalPlayer],m_brush);
                             if(cndt>0)then
                             begin
-                               if(logErrors)then GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1);
+                               if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1);
                                m_brush:=co_empty;
                             end
                             else
-                              with g_players[LocalPlayer] do
+                              with g_gplayers[LocalPlayer] do
                               begin
                                  if not(m_brush in ui_bprod_possible)or(n_builders<=0)then
                                  begin
-                                    GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
+                                    GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
                                     m_brush:=co_empty;
                                     exit;
                                  end;
 
                                 if(not InputAction(iact_Control))then
                                 begin
-                                   BuildingFindNewPlace(mouse_map_x,mouse_map_y,m_brush,LocalPlayer,@m_brushx,@m_brushy,g_players[LocalPlayer].team);
+                                   BuildingFindNewPlace(mouse_map_x,mouse_map_y,m_brush,LocalPlayer,@m_brushx,@m_brushy,g_gplayers[LocalPlayer].team);
                                    m_brushx:=mm3i(ui_cam_x,m_brushx,ui_cam_x+ui_cam_w);
                                    m_brushy:=mm3i(ui_cam_y,m_brushy,ui_cam_y+ui_cam_h);
                                 end;
@@ -605,16 +605,16 @@ begin
   co_pability          : if(ui_uibtn_pabilityu=nil)
                          then m_brush:=co_empty
                          else
-                           if(PlayerSetProdError(LocalPlayer,lmt_argt_abil,ui_uibtn_pabilityu^.uid^._ability,unit_pability(ui_uibtn_pabilityu,0,0,0,true),ui_uibtn_pabilityu))
+                           if(PlayerSetProdError(LocalPlayer,lmt_argt_abil,ui_uibtn_pabilityu^.uid^.uid_ability,unit_pability(ui_uibtn_pabilityu,0,0,0,true),ui_uibtn_pabilityu))
                            then m_brush:=co_empty
                            else
                              with ui_uibtn_pabilityu^ do
                              with uid^ do
-                               case _ability of
+                               case uid_ability of
                                uab_HKeepBlink,
                                uab_HTowerBlink,
-                               uab_CCFly         : math_push_out(mouse_map_x,mouse_map_y,_r                     ,unum,@m_brushx,@m_brushy,false,true,g_players[LocalPlayer].team);
-                               uab_RebuildInPoint: math_push_out(mouse_map_x,mouse_map_y,g_uids[_rebuild_uid]._r,unum,@m_brushx,@m_brushy,false,true,g_players[LocalPlayer].team);
+                               uab_CCFly         : math_push_out(mouse_map_x,mouse_map_y,uid_r                     ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                               uab_RebuildInPoint: math_push_out(mouse_map_x,mouse_map_y,g_uids[uid_rebuild_uid].uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
                                end;
   co_move   ,co_patrol  ,
   co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
@@ -628,7 +628,7 @@ begin
 co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // move
 co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // attack
 co_pability: if(ui_uibtn_pabilityu<>nil)then
-             PlayerSendOrder(m_brush   ,target,x,y,ui_uibtn_pabilityu^.uid^._ability,
+             PlayerSendOrder(m_brush   ,target,x,y,ui_uibtn_pabilityu^.uid^.uid_ability,
                                                       uo_corder,LocalPlayer);
 co_patrol,
 co_apatrol : PlayerSendOrder(m_brush   ,0     ,x,y,0,uo_corder,LocalPlayer);
@@ -648,7 +648,7 @@ begin
    if(clickSound<>nil)then clickSound^:=true;
 end;
 begin
-   with g_players[LocalPlayer] do
+   with g_gplayers[LocalPlayer] do
      case action of
 iAct_SProd1..
 iAct_SProd24           : if(ui_GameControlsEnabled)then
@@ -685,14 +685,7 @@ iAct_Control_USelArmy  : if(ui_group_f2.ugroup_n>0)then
         iAct_Pause             : GamePauseToggle(false);
 
         iAct_Replay_Fast       : sys_uncappedFPS:=not sys_uncappedFPS;
-        iAct_Replay_Pause      : if (G_Status<>gs_replayend)
-                                 and(G_Status<>gs_replayerror)then
-                                 begin
-                                    if  (G_Status =gs_running    )
-                                    then G_Status:=gs_replaypause
-                                    else G_Status:=gs_running;
-                                    rpls_ForwardSkip:=0;
-                                 end;
+        iAct_Replay_Pause      : replay_Pause(false);
         iAct_Replay_Back2      :        replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     );
         iAct_Replay_Back10     :        replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     );
         iAct_Replay_Back60     :        replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     );
@@ -715,8 +708,8 @@ iAct_Control_USelArmy  : if(ui_group_f2.ugroup_n>0)then
         if(ui_GameControlsEnabled)then
           case action of
 iAct_Control_UAbility1 : if(ui_uibtn_sabilityu<>nil)then
-                           if(not PlayerSetProdError(LocalPlayer,lmt_argt_abil,ui_uibtn_sabilityu^.uid^._ability,unit_sability(ui_uibtn_sabilityu,true),ui_uibtn_sabilityu))then
-                             PlayerSendOrder(co_sability,0,ui_cam_cx,ui_cam_cy,ui_uibtn_sabilityu^.uid^._ability, uo_corder  ,LocalPlayer);
+                           if(not PlayerSetProdError(LocalPlayer,lmt_argt_abil,ui_uibtn_sabilityu^.uid^.uid_ability,unit_sability(ui_uibtn_sabilityu,true),ui_uibtn_sabilityu))then
+                             PlayerSendOrder(co_sability,0,ui_cam_cx,ui_cam_cy,ui_uibtn_sabilityu^.uid^.uid_ability, uo_corder  ,LocalPlayer);
 iAct_Control_UAbility2 : if(ui_uibtn_pabilityu<>nil)then
                          begin
                             m_brush :=co_pability;
@@ -724,7 +717,7 @@ iAct_Control_UAbility2 : if(ui_uibtn_pabilityu<>nil)then
                          end;
 iAct_Control_UAbility3 : if(ui_uibtn_rebuildu<>nil)then
                            if(not PlayerSetProdError(LocalPlayer,lmt_argt_unit,0,unit_rebuild (ui_uibtn_rebuildu,true),ui_uibtn_rebuildu))then
-                             PlayerSendOrder(co_rebuild ,0,ui_cam_cx,ui_cam_cy,ui_uibtn_rebuildu^.uid^._rebuild_uid, uo_corder  ,LocalPlayer);
+                             PlayerSendOrder(co_rebuild ,0,ui_cam_cx,ui_cam_cy,ui_uibtn_rebuildu^.uid^.uid_rebuild_uid, uo_corder  ,LocalPlayer);
 iAct_Control_UAMove     : m_brush :=co_amove;
 iAct_Control_UAStop     : PlayerSendOrder(co_astand  ,0,0,0,0, uo_corder  ,LocalPlayer);
 iAct_Control_UAPatrol   : m_brush :=co_apatrol;
@@ -743,7 +736,6 @@ iAct_Control_UDestroy   : PlayerSendOrder(co_destroy,0,0,0,0 ,uo_corder  ,LocalP
 
 {
 12: m_brush :=co_mmark;
-13: m_RightClickAct:=not m_RightClickAct;
 }
           end;
      end;
@@ -792,6 +784,8 @@ begin
 
    if(k_LastChar_t>k_LastCharStuckDealy)then
      if(length(k_KeyboardString)<255)then k_KeyboardString+=k_LastChar;
+
+
 
    while (SDL_PollEvent(sys_EVENT)>0) do
     case (sys_EVENT^.type_) of
@@ -911,7 +905,7 @@ begin
                               end;
                   1..255    : if(m_brushc=c_lime)
                               then PlayerSendOrder(m_brushx,m_brushy,m_brush,0,0, uo_build  ,LocalPlayer)
-                              else GameLogCantProduction(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y);
+                              else GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y);
                   co_pability,
                   co_move,
                   co_amove,
@@ -1016,7 +1010,7 @@ end;
 procedure test_nullupgr(playeri:byte);
 var i:byte;
 begin
-   with g_players[playeri] do
+   with g_gplayers[playeri] do
     for i:=1 to 255 do
      upgr[i]:=0;
 end;
@@ -1046,6 +1040,7 @@ begin
              if(net_status=ns_client)
              then net_send_chat(            ingame_chat,net_chat_str)
              else GameLogChat  (LocalPlayer,ingame_chat,net_chat_str);
+           net_chat_str:='';
         end;
         ingame_chat:=0;
      end
@@ -1094,9 +1089,9 @@ begin
          {$IFDEF DEBUG0}
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
          {$ENDIF}
-         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_players[LocalPlayer] do if(state=ps_human     )then state:=ps_AI         else state:=ps_human;
-         if(InputActionPressed(iAct_test_iddqd       ))then with g_players[LocalPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
-         if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog:=not ui_fog;
+         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_gplayers[LocalPlayer] do if(state=ps_human     )then state:=ps_AI         else state:=ps_human;
+         if(InputActionPressed(iAct_test_iddqd       ))then with g_gplayers[LocalPlayer] do if(upgr[upgr_invuln]=0)then upgr[upgr_invuln]:=1 else upgr[upgr_invuln]:=0;
+         if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
          if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(LocalPlayer);
          if(InputActionPressed(iAct_test_BePlayer0   ))then LocalPlayer:=0;
@@ -1106,7 +1101,7 @@ begin
          if(InputActionPressed(iAct_test_BePlayer4   ))then LocalPlayer:=4;
          if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
          if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
-         if(InputActionPressed(iAct_test_BePlayer7   ))then ;//PlayerClient:=7;
+         if(InputActionPressed(iAct_test_BePlayer7   ))then LocalPlayer:=7;
          if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
          if(InputActionPressed(iAct_test_debug1      ))then ;
       end;
@@ -1186,8 +1181,8 @@ begin
          mi_Map_Seed        : menu_mseed:=c2s(map_seed);
          mi_SV_ResolutionW  : menu_ResolutionWi:=vid_vw;
          mi_SV_ResolutionH  : menu_ResolutionHi:=vid_vh;
-         mi_MP_ServerPort   : menu_ServerPort:=w2s(net_port);
-         mi_MP_ClientAddress:;
+         mi_MP_ServerPort   : menu_ServerPort:=w2s(net_ServerPort);
+         mi_MP_ClientAddress: menu_ClientAddress:=c2ip(net_cl_svip)+':'+w2s(swap(net_cl_svport));
          end;
          menu_ItemSelected:=0;
       end;

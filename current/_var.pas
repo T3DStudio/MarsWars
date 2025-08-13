@@ -21,7 +21,8 @@ g_DefeatedObs     : boolean  = true;
 g_royal_r         : integer  = 0;
 g_KeyPoints       : array[0..LastKeyPoint] of TKeyPoint;
 
-g_players         : TPList;
+g_gplayers        : TPList;
+g_nplayers        : array[0..LastPlayer ] of TPlayerNetData;
 g_units           : array[0..MaxUnits   ] of TUnit;
 g_punits          : array[0..MaxUnits   ] of PTUnit;
 
@@ -76,14 +77,17 @@ _playerAPM        : array[0..LastPlayer] of TAPMCounter;
 DID_Square        : array[0..MaxDIDs] of longint;
 
 net_status        : byte = 0;
-net_port          : word = 10666;
+net_ServerPort    : word = 10666;
+net_period        : byte = 0;
+net_log_n         : word = 0;
+net_svLanAdv      : boolean = true;
+net_svLanAdv_timer: integer = 0;
+net_ping_timer    : integer = 0;
+net_wudata_t      : TWUDataTime;
+net_kpoints_t     : TWCPDataTime;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
-net_period        : byte = 0;
-net_log_n         : word = 0;
-net_wudata_t      : TWUDataTime;
-net_kpoints_t     : TWCPDataTime;
 
 rpls_file         : file;
 rpls_u            : integer = 0;
@@ -266,9 +270,6 @@ ui_panel_CtrlActs : array[TTabControlContent,0..ui_ButtonsNum] of byte;
 ui_group_d        : array[0..MaxUnitGroups] of TUnitGroup;
 ui_group_f1       : TUnitGroup;
 ui_group_f2       : TUnitGroup;
-{
-TUnitGroup
-}
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -349,10 +350,13 @@ menu_SurfaceSC,
 menu_Surface      : pSDL_SURFACE;
 
 menu_sc_x,
-menu_sc_y         : integer;
+menu_sc_y,
+menu_sc_hw,
+menu_sc_hh        : integer;
 menu_sc_cx        : single;
 
 MainMenu          : boolean = true;
+
 menu_Page         : byte = 0;
 menu_SettingsPage : byte = mi_settings_Game;
 menu_ItemActs     : byte = 0;
@@ -361,6 +365,7 @@ menu_ItemSelected : integer;
 menu_items        : array[byte] of TMenuItem;
 menu_update       : boolean = true;
 menu_redraw       : boolean = true;
+menu_NetMsg       : TMenuMessage;
 
 menu_ResolutionWi,
 menu_ResolutionHi : integer;
@@ -409,8 +414,6 @@ cmp_sel           : integer = 0;
 //  NET
 //
 
-net_error_timer   : byte = 0;
-net_cl_StatusStr  : shortstring = '';
 net_cl_svip       : cardinal = 0;
 net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
@@ -418,7 +421,13 @@ net_cl_Hoster     : byte = 0;
 net_cl_Quality    : byte = 4;
 net_chat_shlm     : integer = 0;
 net_chat_str      : shortstring = '';
-net_chat_tar      : byte = 255;
+
+net_svsearch      : boolean = false;
+net_svsearch_listi: array of TServerInfo;
+net_svsearch_lists: TStringList;
+net_svsearch_size: integer = 0;
+net_svsearch_scroll: integer = 0;
+net_svsearch_sel  : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -454,9 +463,10 @@ rpls_list         : TStringList;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
-rpls_ReadPosN     : int64 = 0;
+rpls_ReadPosN     : cardinal = 0;
 rpls_ReadPosL     : array of TReplayPos;
-rpls_ForwardSkip         : integer = 1;
+rpls_ForwardSkip  : integer = 0;
+rpls_FastSkip     : boolean = false;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
@@ -780,8 +790,12 @@ spr_c_phobos,
 spr_c_deimos ,
 spr_b_mmark,
 spr_b_rfast,
-spr_b_rskip,
-spr_b_rback,
+spr_b_rforw1,
+spr_b_rforw2,
+spr_b_rforw3,
+spr_b_rback1,
+spr_b_rback2,
+spr_b_rback3,
 spr_b_rfog,
 spr_b_rlog,
 spr_b_rstop,
@@ -822,9 +836,16 @@ spr_cp_gen         : TMWTexture;
 //  TEXT
 //
 
-str_ability_name  : array[byte     ] of shortstring;
-str_race          : array[0..r_cnt ] of shortstring;
-str_map_ScenarioL : array[0..mc_Last] of shortstring;
+str_ability_name  : array[byte      ] of shortstring;
+str_race          : array[0..r_cnt  ] of shortstring;
+str_map_ScenarioL,
+str_map_ScenarioEngL
+                  : array[0..mc_Last] of shortstring;
+
+str_ps_AI,
+str_ps_Hum,
+str_ps_Host       : string4;
+
 
 str_menu_Campaings,
 str_menu_Scirmish,
@@ -840,6 +861,7 @@ str_menu_Break,
 str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
+str_menu_Pause,
 
 str_S_Game,
 str_S_Replay,
@@ -968,6 +990,10 @@ str_hint_bprod,
 str_SG_Language,
 str_SV_ResolutionApply,
 str_GO_Random,
+str_menuMsg_Error,
+str_menuMsg_HintDefault,
+str_menuMsg_HintClient,
+
 str_menu_chat,
 str_ui_ChatAll,
 str_ui_ChatAllies,
@@ -1001,9 +1027,10 @@ str_gmsg_WrongVersion,
 str_gmsg_ServerFull,
 str_gmsg_GameStarted,
 str_net_UDPPort,
-str_gmsg_Connecting,
+str_net_ServerLANVis,
 str_gmsg_PortBlocked,
 str_SR_Quality,
+str_net_ConnectedToDed,
 str_net_Quality,
 str_net_Address,
 str_SS_SoundVolume,
@@ -1033,6 +1060,7 @@ str_cmp_Location,
 str_cmp_Area,
 str_Caption_Objectives,
 str_Caption_Multiplayer,
+str_Caption_NetSVSearch,
 str_Caption_Map,
 str_Caption_Players      : shortstring;
 str_NetQualityL,
@@ -1315,7 +1343,7 @@ snd_hell
 
 {$ELSE}
 
-screen_redraw   : boolean = true;
+menu_update   : boolean = true;
 consoley        : integer = 0;
 
 {$ENDIF}

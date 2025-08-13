@@ -9,6 +9,7 @@ type
 TSob  = set of byte;
 PTSob = ^TSob;
 
+string4 = string[4];
 
 {$IFDEF _FULLGAME}
 TSoc = set of char;
@@ -179,6 +180,14 @@ TMenuItem = record
    mi_state:byte;
 end;
 
+TMenuMessage = record
+   mm_time     : integer;
+   mm_Caption,
+   mm_Message,
+   mm_Hint     : shortstring;
+end;
+pTMenuMessage = ^TMenuMessage;
+
 TSaveLoadItem = record
    data_p:pointer;
    data_s:cardinal;
@@ -193,6 +202,12 @@ TUnitGroup = record
 end;
 pTUnitGroup = ^TUnitGroup;
 
+TServerInfo = record
+   ip       : cardinal;
+   port     : word;
+   info     : shortstring;
+end;
+
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,7 +215,7 @@ pTUnitGroup = ^TUnitGroup;
 //   GAME
 //
 
-TDamageMod = array[0..MaxDamageModFactors] of record
+TDamageMod = array[0..LastDamageModFactor] of record
   dm_factor : integer;  // 100 = x1
   dm_flags  : cardinal;
 end;
@@ -251,9 +266,9 @@ TMissile = record
 end;
 
 TWUDataTime  = array[1..MaxUnits] of cardinal;
-TWCPDataTime = array[1..LastKeyPoint] of byte;
+TWCPDataTime = array[0..LastKeyPoint] of byte;
 
-TUWeapon = record
+TUnitArms = record
   aw_type,
   aw_tarprior,
   aw_fakeshots,
@@ -286,166 +301,161 @@ TUWeapon = record
   aw_AnimStay : byte;
   {$ENDIF}
 end;
-PTUWeapon = ^TUWeapon;
+PTUWeapon = ^TUnitArms;
 
 TUID = record
-   _square,
-   _hmhits,
-   _hhmhits,
-   _mhits       : longint;
-   _speed,
-   _r,_missile_r,
-   _srange,
-   _renergy,
-   _genergy,
-   _btime,
-   _bstep,
-   _tprod,
-   _painc,
-   _painc_upgr_step,
-   _zfall,
-   _transportS,
-   _transportM,
-   //_base_armor,
-   _baseregen,
-   _zombie_hits,
-   _upgr_srange_step,
-   _limituse,
-   _level_damage,
-   _level_armor
-                : integer;
+   uid_square,
+   uid_MaxHits1,
+   uid_MaxHitsh,
+   uid_MaxHitsq     : longint;
+   uid_speed,
+   uid_r,
+   uid_missileR,
+   uid_SightR,
+   uid_SightRUpgrStep,
+   uid_EnergyReq,
+   uid_EnergyGen,
+   uid_ProdTimeSec,
+   uid_ProdHitStep,
+   uid_ProdTick,
+   uid_PainC,
+   uid_PainCUpgrStep,
+   uid_zfall,
+   uid_TransportSize,
+   uid_TransportMax,
+   uid_BaseRegen,
+   uid_LimitUse,
+   uid_LevelBonusDamage,
+   uid_LevelBonusArmor
+                    : integer;
 
-   _upgr_srange,
-   _upgr_armor,
-   _upgr_regen,
-   _rebuild_uid,
-   //_rebuild_level,
-   _rebuild_ruid,
-   _rebuild_rupgr,
-   _rebuild_rupgrl,
-   _zombie_uid,
-   _death_missile,
-   _death_missile_dmod,
-   _death_uid,
-   _death_uidn,
-   _urace,
-   _ucl,
-   _ruid1,
-   _ruid1n,
-   _ruid2,
-   _ruid2n,
-   _ruid3,
-   _ruid3n,
-   _rupgr,
-   _rupgrl      : byte;
+   uid_ZombieHits   : integer;
+   uid_ZombieUID    : byte;
 
-   _shots2advanced
-                : byte;
+   uid_upgr_SightR,
+   uid_upgr_Armor,
+   uid_upgr_Regen,
+   uid_rebuild_uid,
+   uid_rebuild_ruid,
+   uid_rebuild_rupgr,
+   uid_rebuild_rupgrl,
+   uid_DeathMissile,
+   uid_DeathMissile_dmod,
+   uid_DeathUID,
+   uid_DeathUIDn,
+   uid_race,
+   uid_class,
+   uid_req_uid1,
+   uid_req_uid1n,
+   uid_req_uid2,
+   uid_req_uid2n,
+   uid_req_uid3,
+   uid_req_uid3n,
+   uid_req_upgr,
+   uid_req_upgrl    : byte;
 
-   _a_BonusAntiFlyRange,
-   _a_BonusAntiGroundRange,
-   _a_BonusAntiBuildingRange,
-   _a_BonusAntiUnitRange
-                : integer;
-   _a_weap      : array[0..MaxUnitWeapons] of TUWeapon;
+   uid_CanAttack    : boolean;
+   uid_arms_BonusAntiFlyRange,
+   uid_arms_BonusAntiGroundRange,
+   uid_arms_BonusAntiBuildingRange,
+   uid_arms_BonusAntiUnitRange
+                    : integer;
+   uid_arms         : array[0..LastUnitArms] of TUnitArms;
 
-   _shcf        : single;
+   uid_hits_li2si   : single;
 
-   _ability_no_obstacles
-                : boolean;
-   _ability,
-   _ability_rupgr,
-   _ability_rupgrl,
-   _ability_ruid: byte;
-   _attack      : boolean;
-   _barrack_teleport,
-   _slowturn,
-   _ukbuilding,
-   _ukmech,
-   _uklight,
-   _detector,
-   _isbuilder,
-   _issmith,
-   _isbarrack,
-   _issolid,
-   _ukfly,
-   _splashresist: boolean;
-   _fastdeath_hits
-                : integer;
+   uid_ability_ReqNoObstacles
+                    : boolean;
+   uid_ability,
+   uid_ability_ReqUpgr,
+   uid_ability_ReqUpgrl,
+   uid_ability_ReqUID
+                    : byte;
 
-   ups_builder,
-   ups_units,
-   ups_upgrades,
-   ups_transport      : TSoB;
+   uid_OutUnitsTeleBuff,
+   uid_SlowTurn,
+   uid_ukbuilding,
+   uid_ukmech,
+   uid_uklight,
+   uid_detector,
+   uid_isbuilder,
+   uid_issmith,
+   uid_isbarrack,
+   uid_issolid,
+   uid_ukfly,
+   uid_SplashResist : boolean;
+   uid_FastDeathHits
+                    : integer;
+
+   uid_prod_Buildings,
+   uid_prod_Units,
+   uid_prod_Upgrades,
+   ups_TransportUIDs: TSoB;
    {$IFDEF _FULLGAME}
-   _animw,
-   _animd,
-   _fr          : integer;
-   un_btn,
-   un_sbtn      : TMWTexture;
+   uid_AnimStepWalk,
+   uid_AnimStepDeath,
+   uid_AnimStepFoot,
+   uid_FogcR        : integer;
+   uid_BTNBig,
+   uid_BTNSmall     : TMWTexture;
    {$IFDEF UNITDATA}
    un_btn2      : TMWTexture;
    {$ENDIF}
-   un_smodel    : array[0..MaxUnitLevel] of PTMWSModel;
+   uid_SpriteModel  : array[0..LastUnitLevel] of pTMWSModel;
 
-   un_txt_name,
-   un_txt_udescr,
-   un_txt_fdescr,
-   un_txt_uihint1,
-   un_txt_uihint2,
-   un_txt_uihint3,
-   un_txt_uihint4,
-   un_txt_uihintS
-                : shortstring;
+   uid_txt_name,
+   uid_txt_BaseDescript,
+   uid_txt_FullDescript,
+   uid_txt_NameCostHK,
+   uid_txt_Weapons,
+   uid_txt_Reqs,
+   uid_txt_Prod     : shortstring;
 
-   un_build_amode,
-   un_eid_bcrater
-                : byte;
-   un_eid_bcrater_y,
-   un_foot_anim : integer;
+   uid_AnimBuildMode,
+   uid_eid_bcrater
+                    : byte;
+   uid_eid_bcrater_y: integer;
 
-   un_eid_summon_spr
-                : array[0..MaxUnitLevel] of PTMWTexture;
-   un_eid_summon,
-   un_eid_death,
-   un_eid_fdeath,
-   un_eid_pain
-                : array[0..MaxUnitLevel] of byte;
+   uid_eid_SummonSpr: array[0..LastUnitLevel] of PTMWTexture;
+   uid_eid_Summon,
+   uid_eid_Death,
+   uid_eid_DeathFast,
+   uid_eid_pain
+                    : array[0..LastUnitLevel] of byte;
 
-   un_eid_snd_foot,
-   un_eid_snd_summon,
-   un_eid_snd_death,
-   un_eid_snd_fdeath,
-   un_eid_snd_pain,
+   uid_eid_snd_foot,
+   uid_eid_snd_summon,
+   uid_eid_snd_death,
+   uid_eid_snd_fdeath,
+   uid_eid_snd_pain,
 
-   un_snd_ready, //command sounds
-   un_snd_move,
-   un_snd_attack,
-   un_snd_annoy,
-   un_snd_select
-                : PTSoundSet;
+   uid_snd_ready, //command sounds
+   uid_snd_move,
+   uid_snd_attack,
+   uid_snd_annoy,
+   uid_snd_select   : PTSoundSet;
    {$ENDIF}
 end;
 PTUID = ^TUID;
 TUPID = record  // upgrade
-   _up_ruid,
-   _up_rupgr,
-   _up_btni,
-   _up_race     : byte;
-   _up_renerg,
-   _up_renerg_xpl, // energy * per level
-   _up_renerg_apl, // energy + per level
-   _up_time,
-   _up_time_xpl,
-   _up_time_apl,
-   _up_max      : integer;
-   _up_mfrg     : boolean;
+   upgr_ruid,
+   upgr_rupgr,
+   upgr_btni,
+   upgr_race     : byte;
+   upgr_renerg,
+   upgr_renerg_xpl, // energy * per level
+   upgr_renerg_apl, // energy + per level
+   upgr_time,
+   upgr_time_xpl,
+   upgr_time_apl,
+   upgr_max      : integer;
+   upgr_mfrg     : boolean;
 
    {$IFDEF _FULLGAME}
-   _up_btn      : TMWTexture;
-   _up_name,
-   _up_descr,
-   _up_hint     : shortstring;
+   upgr_btn      : TMWTexture;
+   upgr_txt_name,
+   upgr_txt_Descript,
+   upgr_txt_Hint : shortstring;
    {$ENDIF}
 end;
 
@@ -581,20 +591,12 @@ o_x1,o_y1  : integer;
    n_smiths
            : integer;
 
-   PNU     : byte;
-   n_u,
-   ttl     : word;
-   nip     : cardinal;
-   nport   : word;
-
    prod_error_cndt: cardinal;
    prod_error_utp,
    prod_error_uid : byte;
    prod_error_x,
    prod_error_y   : integer;
 
-   net_logsend_pause
-           : integer;
    log_l   : array[0..MaxPlayerLog] of TLogMes;
    log_i,
    log_n,
@@ -607,6 +609,17 @@ end;
 PTPlayer = ^TPlayer;
 TPList = array[0..LastPlayer] of TPLayer;
 
+TPlayerNetData = record
+   PNU     : byte;
+   n_u,
+   net_ping,
+   net_ttl : word;
+   net_ip  : cardinal;
+   net_port: word;
+   net_logsend_pause
+           : integer;
+end;
+
 TUnitVisionData = array[0..LastPlayer] of integer;
 
 TUnit = record
@@ -615,7 +628,8 @@ TUnit = record
    x,y,
    zfall,
    srange,
-   speed,dir,rld,vstp,
+   speed,dir,
+   rld,vstp,
    unum     : integer;
    pfzone   : word;
 
@@ -627,9 +641,9 @@ TUnit = record
 
    uprod_r,
    pprod_r,
-   pprod_e  : array[0..MaxUnitLevel] of integer;
+   pprod_e  : array[0..LastUnitLevel] of integer;
    uprod_u,
-   pprod_u  : array[0..MaxUnitLevel] of byte;
+   pprod_u  : array[0..LastUnitLevel] of byte;
 
    a_exp,
    a_exp_next,
@@ -650,13 +664,13 @@ TUnit = record
             : integer;
    uo_id    : byte;
 
-   transport,
    pains,
+   transportU,
    transportM,
    transportC
             : integer;
 
-   buffs    : array[0..MaxUnitBuffs] of integer;
+   buffs    : array[0..LastUnitBuff] of integer;
 
    TeamDetection,
    TeamVision     : TUnitVisionData;
@@ -664,8 +678,8 @@ TUnit = record
    StayWaitForNewTarget:byte;
    ukfly,
    ukfloater,
-   iscomplete,
    solid,
+   iscomplete,
    isselected      : boolean;
 
    aiu_FiledSquareNear,

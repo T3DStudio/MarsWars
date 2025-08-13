@@ -483,15 +483,15 @@ begin
       c:=chr(i);
       with font_1[c] do
       begin
-         surf:=gfx_CreateSDLSurface(font_w,font_w);
+         surf:=gfx_CreateSDLSurface(font_w1,font_w1);
          SDL_FillRect(surf,nil,0);
          SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,ccc);
       end;
 
-      vid_RECT^.x:=ord(i)*font_w;
+      vid_RECT^.x:=ord(i)*font_w1;
       vid_RECT^.y:=0;
-      vid_RECT^.w:=font_w;
-      vid_RECT^.h:=font_w;
+      vid_RECT^.w:=font_w1;
+      vid_RECT^.h:=font_w1;
       SDL_BLITSURFACE(fspr,vid_RECT,font_1[c].surf,nil);
    end;
    gfx_FreeSDLSurface(fspr);
@@ -577,8 +577,12 @@ begin
    spr_b_selall   := gfx_LoadButton('b_selall' ,ui_ButtonW1);
    spr_b_cancel   := gfx_LoadButton('b_cancle' ,ui_ButtonW1);
    spr_b_rfast    := gfx_LoadButton('b_rfast'  ,ui_ButtonW1);
-   spr_b_rskip    := gfx_LoadButton('b_rskip'  ,ui_ButtonW1);
-   spr_b_rback    := gfx_LoadButton('b_rback'  ,ui_ButtonW1);
+   spr_b_rforw1   := gfx_LoadButton('b_rforw1' ,ui_ButtonW1);
+   spr_b_rforw2   := gfx_LoadButton('b_rforw2' ,ui_ButtonW1);
+   spr_b_rforw3   := gfx_LoadButton('b_rforw3' ,ui_ButtonW1);
+   spr_b_rback1   := gfx_LoadButton('b_rback1' ,ui_ButtonW1);
+   spr_b_rback2   := gfx_LoadButton('b_rback2' ,ui_ButtonW1);
+   spr_b_rback3   := gfx_LoadButton('b_rback3' ,ui_ButtonW1);
    spr_b_rfog     := gfx_LoadButton('b_fog'    ,ui_ButtonW1);
    spr_b_rlog     := gfx_LoadButton('b_log'    ,ui_ButtonW1);
    spr_b_rstop    := gfx_LoadButton('b_rstop'  ,ui_ButtonW1);
@@ -750,19 +754,19 @@ begin
    gfx_LoadMWSModel(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect );
    gfx_LoadMWSModel(@spr_blood          ,effects_folder+'blood'          ,smt_effect );
 
-   gfx_LoadMWTexture(@spr_RallyPoint[r_hell],race_dir[r_hell]+'h_mp',true);
-   gfx_LoadMWTexture(@spr_RallyPoint[r_uac ],race_dir[r_uac ]+'u_mp',true);
-   gfx_LoadMWTexture(@spr_ptur              ,race_dir[r_uac ]+'ptur',true);
+   gfx_LoadMWTexture(@spr_RallyPoint[r_hell],race_dir[r_hell]+'h_mp'        ,true);
+   gfx_LoadMWTexture(@spr_RallyPoint[r_uac ],race_dir[r_uac ]+'u_mp'        ,true);
+   gfx_LoadMWTexture(@spr_ptur              ,race_dir[r_uac ]+'ptur'        ,true);
 
-   gfx_LoadMWTexture(@spr_b4_a      ,race_buildings[r_uac ]+'u_b4_a',true);
-   gfx_LoadMWTexture(@spr_b7_a      ,race_buildings[r_uac ]+'u_b7_a',true);
-   gfx_LoadMWTexture(@spr_b9_a      ,race_buildings[r_uac ]+'u_b9_a',true);
+   gfx_LoadMWTexture(@spr_b4_a              ,race_buildings[r_uac ]+'u_b4_a',true);
+   gfx_LoadMWTexture(@spr_b7_a              ,race_buildings[r_uac ]+'u_b7_a',true);
+   gfx_LoadMWTexture(@spr_b9_a              ,race_buildings[r_uac ]+'u_b9_a',true);
 
-   gfx_LoadMWTexture(@spr_stun             ,effects_folder+'stun'   ,true);
-   gfx_LoadMWTexture(@spr_effect_Invuln    ,effects_folder+'invuln' ,true);
-   gfx_LoadMWTexture(@spr_effect_HVision   ,effects_folder+'hvision',true);
-   gfx_LoadMWTexture(@spr_effect_Scan      ,effects_folder+'scan'   ,true);
-   gfx_LoadMWTexture(@spr_effect_Decay     ,effects_folder+'decay'  ,true);
+   gfx_LoadMWTexture(@spr_stun              ,effects_folder+'stun'          ,true);
+   gfx_LoadMWTexture(@spr_effect_Invuln     ,effects_folder+'invuln'        ,true);
+   gfx_LoadMWTexture(@spr_effect_HVision    ,effects_folder+'hvision'       ,true);
+   gfx_LoadMWTexture(@spr_effect_Scan       ,effects_folder+'scan'          ,true);
+   gfx_LoadMWTexture(@spr_effect_Decay      ,effects_folder+'decay'         ,true);
 
 
    gfx_LoadMWTexture(@spr_cp_koth   ,'cp_koth',true);
@@ -790,18 +794,18 @@ begin
    for u:=0 to 255 do
    with g_uids[u] do
    begin
-      with un_btn do
+      with uid_BTNBig do
       begin
-         case _urace of
+         case uid_race of
          r_hell: surf:= gfx_LoadButtonFS(uid2spr(u,315,0)^.surf,ui_ButtonW1 );
          r_uac : surf:= gfx_LoadButtonFS(uid2spr(u,225,0)^.surf,ui_ButtonW1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
-      with un_sbtn do
+      with uid_BTNSmall do
       begin
-         case _urace of
+         case uid_race of
          r_hell: surf:= gfx_LoadButtonFS(uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1 );
          r_uac : surf:= gfx_LoadButtonFS(uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1 );
          end;
@@ -831,10 +835,10 @@ begin
    spr_b_ab[uab_HKeepBlink      ]:=spr_b_Upgrades[r_hell,9 ].surf;
    spr_b_ab[uab_RebuildInPoint  ]:=spr_b_paction;
    spr_b_ab[uab_HInvulnerability]:=spr_b_invuln;
-   spr_b_ab[uab_SpawnLost       ]:=g_uids[UID_LostSoul].un_btn.surf;
+   spr_b_ab[uab_SpawnLost       ]:=g_uids[UID_LostSoul].uid_BTNBig.surf;
    spr_b_ab[uab_HellVision      ]:=spr_b_Upgrades[r_hell,6 ].surf;
    spr_b_ab[uab_CCFly           ]:=spr_b_Upgrades[r_uac ,9 ].surf;
-   spr_b_ab[uab_ToUACDron       ]:=g_uids[UID_UACDron].un_btn.surf;
+   spr_b_ab[uab_ToUACDron       ]:=g_uids[UID_UACDron].uid_BTNBig.surf;
    spr_b_ab[uab_Unload          ]:=spr_b_paction;
 end;
 
@@ -866,30 +870,30 @@ begin
    ui_vmb_x1   := vid_vw-ui_vmb_x0;
    ui_vmb_y1   := vid_vh-ui_vmb_y0;
 
-   ui_textx     := ui_mapx+font_hw;
-   ui_texty     := ui_mapy+font_hw;
+   ui_textx     := ui_mapx+font_wh;
+   ui_texty     := ui_mapy+font_wh;
    ui_hinty1    := ui_mapy+ui_cam_h-txt_line_h1*10;
    ui_hinty2    := ui_mapy+ui_cam_h-txt_line_h1*8;
    ui_hinty3    := ui_mapy+ui_cam_h-txt_line_h1*5;
    ui_hinty4    := ui_mapy+ui_cam_h-txt_line_h1*2;
-   ui_chaty     := ui_hinty1-font_3hw;
-   ui_logy      := ui_chaty-font_3hw;
-   ui_oicox     := ui_mapx+ui_cam_w-font_w;
+   ui_chaty     := ui_hinty1-font_w1h;
+   ui_logy      := ui_chaty-font_w1h;
+   ui_oicox     := ui_mapx+ui_cam_w-font_w1;
    ui_uiuphx    := ui_mapx+(ui_cam_w div 2);
-   ui_uiuphy    := ui_texty+font_6hw;
-   ui_uiplayery := ui_uiuphy+font_3hw;
-   ui_game_log_height:=(ui_hinty1-font_5w) div font_3hw;
+   ui_uiuphy    := ui_texty+font_w3;
+   ui_uiplayery := ui_uiuphy+font_w1h;
+   ui_game_log_height:=(ui_hinty1-font_w5) div font_w1h;
 
    ui_energx    := ui_uiuphx-150;
    ui_energy    := ui_texty;
    ui_armyx     := ui_uiuphx+40;
    ui_armyy     := ui_texty;
-   ui_fpsx      := ui_mapx+ui_cam_w-(font_w*font_3hw);
+   ui_fpsx      := ui_mapx+ui_cam_w-(font_w1*font_w1h);
    ui_fpsy      := ui_texty;
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+txt_line_h2;
 
-   ui_ingamecl  :=(ui_cam_w-font_w) div font_w;
+   ui_ingamecl  :=(ui_cam_w-font_w1) div font_w1;
 
    ui_fog_gridw :=(ui_cam_w div fog_cw)+2;
    ui_fog_gridh :=(ui_cam_h div fog_cw)+2;

@@ -153,10 +153,8 @@ map_generators_Energy  = 900;
 str_ver                = 'v54';
 str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
-str_ps_c               : array[0..2] of char = (' ','P','C');
-str_ps_t               : char = '?';
-str_ps_h               : char = '>';
-str_ps_comp            : shortstring = 'AI';
+str_ps_ttl             : char = '?';
+str_ps_Me              : char = '>';
 str_ps_none            : shortstring = '--';
 b2c                    : array[false..true] of char = ('-','+');
 
@@ -179,7 +177,9 @@ lmt_chat2              = 2;
 lmt_chat3              = 3;
 lmt_chat4              = 4;
 lmt_chat5              = 5;
-lmt_chat6              = 6; }
+lmt_chat6              = 6;
+lmt_chat7              = 7;}
+lmt_player_chat        = 8;
 lmt_game_message       = 10;
 lmt_game_end           = 11;
 lmt_player_defeated    = 12;
@@ -198,7 +198,7 @@ lmt_allies_attacked    = 24;
 lmt_unit_limit         = 25;
 lmt_unit_needbuilder   = 26;
 lmt_production_busy    = 27;
-lmt_already_adv        = 28;
+lmt_MaximumLevel       = 28;
 lmt_NeedMoreProd       = 29;
 lmt_MaximumReached     = 30;
 lmt_player_surrender   = 31;
@@ -213,7 +213,7 @@ lmt_ngen_captured      = 39;
 lmt_ngen_lost          = 40;
 lmt_koth_control       = 41;
 lmt_invalid_tar        = 42;
-lmt_player_chat        = 255;
+
 
 lmts_menu_chat         = [
                           0..LastPlayer,
@@ -240,38 +240,47 @@ uia_newstrict          = 2;  }
 //  NETGAME
 //
 
-net_MaxQuality         = 9;
-rpls_MaxQuality        = net_MaxQuality div 2;
+net_MaxQuality            = 9;
+rpls_MaxQuality           = net_MaxQuality div 2;
                                                           // 60 140 220 300 380 460 540 620 700 800
-Quality2Units          : array[0..net_MaxQuality] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
+Quality2Units             : array[0..net_MaxQuality] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
-ClientTTL              = fr_fps1*10;
-ServerTTL              = fr_fps1;
+ClientTTL                 = fr_fps1*10;
+ServerTTL                 = fr_fps1;
 
-NetTickN               = 2;
-MaxNetBuffer           = 4096;
+net_PingTime              = fr_fps2;
+net_PeriodTime            = fr_fpsh;
 
-ns_none                = 0;
-ns_server              = 1;
-ns_client              = 2;
+NetTickN                  = 2;
+MaxNetBuffer              = 4096;
 
-nmid_lobby_info           = 3;
+net_svLanAdv_port         = 63666; // local servers advertisement port
+net_svLanAdv_portS        = swap(net_svLanAdv_port);
+net_svLanAdv_ip           : cardinal = $FFFFFFFF; // 255.255.255.255
+net_svLanAdv_time         = fr_fps1*2;
+
+ns_none                   = 0;
+ns_server                 = 1;
+ns_client                 = 2;
+
+nmid_LAN_Adv              = 2;
+nmid_GameInfo             = 3;
 nmid_connect              = 4;
-nmid_ClientData          = 5;
-nmid_LogMessage             = 6;
+nmid_ClientData           = 5;
+nmid_LogMessage           = 6;
 nmid_LogUpdate            = 7;
 nmid_snapshot             = 8;
 nmid_pause                = 9;
-nmid_ServerFull          = 10;
-nmid_WrongVersion            = 11;
-nmid_GameStarted         = 12;
+nmid_ServerFull           = 10;
+nmid_WrongVersion         = 11;
+nmid_GameStarted          = 12;
 nmid_NotConnected         = 13;
 nmid_order                = 14;
-nmid_PlayerLeave         = 15;
+nmid_PlayerLeave          = 15;
 nmid_map_mark             = 16;
-nmid_PlayerSurrender     = 17;
-nmid_lobby_PPosSwap       = 18;
-nmid_lobby_PAIUp          = 19;
+nmid_PlayerSurrender      = 17;
+nmid_lobby_PJumpToSlot    = 18;
+nmid_lobby_PAILevelScroll = 19;
 nmid_lobby_PAIToggle      = 20;
 nmid_lobby_PRace          = 21;
 nmid_lobby_PTeam          = 22;
@@ -279,13 +288,16 @@ nmid_lobby_MSeed          = 23;
 nmid_lobby_MScenario      = 24;
 nmid_lobby_MGenerators    = 25;
 nmid_lobby_MSize          = 26;
-nmid_lobby_MObs           = 27;
-nmid_lobby_MSym           = 28;
+nmid_lobby_MObstacles     = 27;
+nmid_lobby_MSymmetry      = 28;
 nmid_lobby_MRandom        = 29;
 nmid_lobby_GFixedPositions= 30;
 nmid_lobby_GAISlots       = 31;
 nmid_lobby_GDefeatedObs   = 32;
 nmid_lobby_GRandomScirmish= 33;
+nmid_ping_Request         = 40;
+nmid_ping_Answer          = 41;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -307,7 +319,7 @@ ureq_armylimit         : cardinal = 1 shl 11;
 ureq_place             : cardinal = 1 shl 12; // cant build here
 ureq_busy              : cardinal = 1 shl 13; // production is busy
 ureq_unknown           : cardinal = 1 shl 14; //
-ureq_alreadyAdv        : cardinal = 1 shl 15; //
+ureq_MaxLevel          : cardinal = 1 shl 15; //
 ureq_needbuilders      : cardinal = 1 shl 16; // need more builders
 ureq_common            : cardinal = 1 shl 17; // common
 ureq_usespability      : cardinal = 1 shl 18; // need use 'special ability at point' order
@@ -368,7 +380,7 @@ ua_patrol              = 6; // only for client data transfer
 //
 
 wpr_any                : cardinal =  0;
-wpr_avis               : cardinal =  1;
+//wpr_avis               : cardinal =  1;
 wpr_ground             : cardinal =  1 shl 1;
 wpr_air                : cardinal =  1 shl 2;
 wpr_move               : cardinal =  1 shl 3;
@@ -484,7 +496,8 @@ aif_army_smart_prio    : cardinal = 1 shl 13;
 //  UNIT BUFFs
 //
 
-MaxUnitBuffs           = 15;
+MaxUnitBuffs           = 16;
+LastUnitBuff           = MaxUnitBuffs-1;
 
 ub_Pain                = 0;
 ub_Resurect            = 1;
@@ -505,7 +518,6 @@ ub_ArchFire            = 15;
 
 ub_infinity            = NOTSET;
 b2ib                   : array[false..true] of smallint = (0,ub_infinity);
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -542,70 +554,70 @@ DID_R                  : array[0..MaxDIDs] of smallint = (0,380,300,220,160,102,
 //  UPGRADES
 //
 
-upgr_hell_t1attack     = 1;  // t1 distance attacks damage    // t1
-upgr_hell_uarmor       = 2;  // base unit armor
-upgr_hell_barmor       = 3;  // base building armor
-upgr_hell_mattack      = 4;  // melee attack damage
-upgr_hell_regen        = 5;  // regeneration
-upgr_hell_pains        = 6;  // pain state
-upgr_hell_buildr       = 7;  // main range
+upgr_hell_DistDamage1  = 1;  // t1 distance attacks damage    // "t1"
+upgr_hell_UnitArmor    = 2;  // base unit armor
+upgr_hell_BuildArmor   = 3;  // base building armor
+upgr_hell_MeleeDamage  = 4;  // melee attack damage
+upgr_hell_Regeneration = 5;  // regeneration
+upgr_hell_PainFactor   = 6;  // pain state
+upgr_hell_BuilderR     = 7;  // main range
 upgr_hell_HKTeleport   = 8;  // HK teleportation
-upgr_hell_paina        = 9;  // decay aura
-upgr_hell_towers       = 10; // towers range
+upgr_hell_DecayAura    = 9;  // decay aura
+upgr_hell_TowerR       = 10; // towers range
 
-upgr_hell_spectre      = 11; // demon spectre                 // t2
-upgr_hell_vision       = 12; // demons vision
-upgr_hell_phantoms     = 13; // phantoms
-upgr_hell_t2attack     = 14; // t2 distance attacks damage
-upgr_hell_resurrect    = 15; // archvile ability
-upgr_hell_teleport     = 16; // Teleport reload
-upgr_hell_rteleport    = 17; // revers teleport
-upgr_hell_heye         = 18; // hell Eye time
-upgr_hell_totminv      = 19; // totem and eye invisible
-upgr_hell_bldrep       = 20; // build restoration
-upgr_hell_tblink       = 21; // teleport towers
-
-
-upgr_uac_attack        = 31; // distance attack               // t1
-upgr_uac_uarmor        = 32; // base armor
-upgr_uac_barmor        = 33; // base b armor
-upgr_uac_tools         = 34; // repair/health upgr
-upgr_uac_mspeed        = 35; // infantry speed
-upgr_uac_ssgup         = 36; // expansive bullets
-upgr_uac_buildr        = 37; // main sr
-upgr_uac_CCFly         = 38; // CC fly
-upgr_uac_ccturr        = 39; // CC turret
-upgr_uac_towers        = 40; // towers sr
-
-upgr_uac_botturret     = 41; // bot turret                    // t2
-upgr_uac_vision        = 42; // infatry vision
-upgr_uac_commando      = 43; // commando invis
-upgr_uac_airsp         = 44; // anti-air missiles splash
-upgr_uac_mechspd       = 45; // mech speed
-upgr_uac_mecharm       = 46; // mech arm
-upgr_uac_antiair       = 47; // termintator anti-air weapon
-upgr_uac_transport     = 48; // transport capacity upgrade
-upgr_uac_radar_r       = 49; // Radar
-upgr_uac_plasmt        = 50; // plasma weapons fro anti-ground turret
-upgr_uac_turarm        = 51; // turrets armor
+upgr_hell_Spectre      = 11; // demon invisibility            // "t2"
+upgr_hell_UnitSightR   = 12; // demons vision
+upgr_hell_Phantoms     = 13; // phantoms
+upgr_hell_DistDamage2  = 14; // t2 distance attacks damage
+upgr_hell_Resurrect    = 15; // archvile ability
+upgr_hell_TeleportCD   = 16; // Teleport reload
+upgr_hell_Recall       = 17; // revers teleport
+upgr_hell_EvilEyeR     = 18; // hell Eye time
+upgr_hell_TotemInvis   = 19; // totem and eye invisible
+upgr_hell_BuildRestore = 20; // build restoration
+upgr_hell_TowerBlink   = 21; // teleport towers
 
 
-upgr_fog_vision        = 249;
-upgr_fast_build        = 250;
-upgr_fast_product      = 251;
-upgr_mult_product      = 252;
-upgr_invuln            = 255;
+upgr_uac_DistDamage    = 31; // distance attack               // "t1"
+upgr_uac_BioArmor      = 32; // infantry armor
+upgr_uac_BuildArmor    = 33; // base b armor
+upgr_uac_RepairTools   = 34; // repair/health upgr
+upgr_uac_BioSpeed      = 35; // infantry speed
+upgr_uac_ssgup         = 36; // expansive bullets ????????
+upgr_uac_BuilderR      = 37; // main sr
+upgr_uac_CCFly         = 38; // CC fly ability
+upgr_uac_CCAttack      = 39; // CC turret
+upgr_uac_TowerR        = 40; // towers sr
 
-// BASIC RACE UPGRADES                                 HELL                UAC
-upgr_race_armor_bio         : array[1..r_cnt] of byte    = (upgr_hell_uarmor  , upgr_uac_uarmor  );
-upgr_race_armor_mech        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mecharm );
-upgr_race_armor_build       : array[1..r_cnt] of byte    = (upgr_hell_barmor  , upgr_uac_barmor  );
-upgr_race_regen_bio         : array[1..r_cnt] of byte    = (upgr_hell_regen   , 0                );
+upgr_uac_DronTurret    = 41; // dron turret                   // "t2"
+upgr_uac_UnitSightR    = 42; // infatry vision
+upgr_uac_CommandoInvis = 43; // commando invis
+upgr_uac_AASplash      = 44; // anti-air missiles splash
+upgr_uac_MechSpeed     = 45; // mech speed
+upgr_uac_MechArmor     = 46; // mech arm
+upgr_uac_TerAAWeapon   = 47; // termintator anti-air weapon
+upgr_uac_Transport     = 48; // transport capacity upgrade
+upgr_uac_RadarR        = 49; // Radar
+upgr_uac_TurretPlasma  = 50; // plasma weapons fro anti-ground turret
+upgr_uac_TurretArmor   = 51; // turrets armor
+
+
+upgr_AI_FogVision      = 250;
+upgr_fast_build        = 251;
+upgr_fast_product      = 252;
+upgr_mult_product      = 253;
+upgr_invuln            = 254;
+
+// BASIC RACE UPGRADES                                      HELL                UAC
+upgr_race_armor_bio         : array[1..r_cnt] of byte    = (upgr_hell_UnitArmor  , upgr_uac_BioArmor  );
+upgr_race_armor_mech        : array[1..r_cnt] of byte    = (0                 , upgr_uac_MechArmor );
+upgr_race_armor_build       : array[1..r_cnt] of byte    = (upgr_hell_BuildArmor  , upgr_uac_BuildArmor  );
+upgr_race_regen_bio         : array[1..r_cnt] of byte    = (upgr_hell_Regeneration   , 0                );
 upgr_race_regen_mech        : array[1..r_cnt] of byte    = (0                 , 0                );
-upgr_race_regen_build       : array[1..r_cnt] of byte    = (upgr_hell_bldrep  , 0                );
-upgr_race_mspeed_bio        : array[1..r_cnt] of byte    = (0                 , upgr_uac_mspeed  );
-upgr_race_mspeed_mech       : array[1..r_cnt] of byte    = (0                 , upgr_uac_mechspd );
-upgr_race_unit_srange       : array[1..r_cnt] of byte    = (upgr_hell_vision  , upgr_uac_vision  );
+upgr_race_regen_build       : array[1..r_cnt] of byte    = (upgr_hell_BuildRestore  , 0                );
+upgr_race_mspeed_bio        : array[1..r_cnt] of byte    = (0                 , upgr_uac_BioSpeed  );
+upgr_race_mspeed_mech       : array[1..r_cnt] of byte    = (0                 , upgr_uac_MechSpeed );
+upgr_race_unit_srange       : array[1..r_cnt] of byte    = (upgr_hell_UnitSightR  , upgr_uac_UnitSightR  );
 upgr_race_srange_unit_bonus : array[1..r_cnt] of smallint= (25                , 25               );
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -647,13 +659,18 @@ mh_homing              = 2;
 //
 
 MaxUnits               = LastPlayer*MaxPlayerUnits+MaxPlayerUnits;
-MaxUnitWeapons         = 3;  //0-3
-MaxUnitLevel           = 3;  //0-3
 MaxMissiles            = MaxUnits;
+
+MaxUnitWeapons         = 4;
+LastUnitArms         = MaxUnitWeapons-1;  //0-3
+
+MaxUnitLevel           = 4;
+LastUnitLevel          = MaxUnitLevel-1;  //0-3
 
 // damage modificator
 
-MaxDamageModFactors    = 1;
+MaxDamageModFactors    = 2 ;
+LastDamageModFactor    = MaxDamageModFactors-1; //0..1
 
 dm_AntiUnitBioHeavy2   = 1 ; //   2*[unit bio heavy]
 dm_SSGShot2            = 2 ; //   2*[unit bio heavy] 0.5*[mech]
@@ -662,15 +679,12 @@ dm_AntiUnitBio2        = 4 ; //   2*[unit bio]       0.5*[buildings]
 dm_AntiUnitMech2       = 5 ; //   2*[unit mech]
 dm_AntiUnitLight2      = 6 ; //   2*[unit light]
 dm_AntiFly2            = 7 ; //   2*[fly]
-dm_AntiUnitHeavy2      = 8 ; //   2*[heavy]
-dm_AntiLight2          = 9 ; //   2*[light]
-dm_AntiGroundLight2    = 10; //   2*[light ground]
-dm_RSMShot             = 11; //   2*[buildings]
-dm_Siege3              = 12; //   3*[buildings]
-dm_Siege4              = 13; //   4*[buildings]
-dm_Lost                = 14; //                      0.5*[mech]
-dm_BFG                 = 15; // 0.5*[buildings]
-dm_AntiBio2            = 16; //   2*[unit bio]
+dm_AntiGroundLight2    = 8 ; //   2*[light ground]
+dm_RSMShot             = 9 ; //   2*[buildings]
+dm_Siege4              = 10; //   4*[buildings]
+dm_Lost                = 11; //                      0.5*[mech]
+dm_BFG                 = 12; // 0.5*[buildings]
+dm_AntiBio2            = 13; //   2*[unit bio]
 
 
 // LIMIT
@@ -987,6 +1001,7 @@ snd_musicListSizeMax   = 10;
 //  INPUT
 //
 
+iAct_any               = 0;
 iAct_mlb               = 1;
 iAct_mrb               = 2;
 iAct_mmb               = 3;
@@ -1307,17 +1322,18 @@ ta_RM                  = 7;
 ta_RB                  = 8;
 ta_chat                = 9;
 
-font_w                 = 8;
-font_hw                = font_w div 2;
-font_3w                = font_w*3;
-font_5w                = font_w*5;
-font_iw                = font_w-1;
-font_3hw               = font_w+(font_w div 2);
-font_6hw               = font_3hw*2;
+font_w1                = 8;
+font_wh                = font_w1 div 2;
+font_wq                = font_w1 div 4;
+font_w2                = font_w1*2;
+font_w3                = font_w1*3;
+font_w5                = font_w1*5;
+font_wi                = font_w1-1;
+font_w1h               = font_w1+(font_w1 div 2);
 
-txt_line_h1            = font_w+2;
-txt_line_h2            = font_w+5;
-txt_line_h3            = font_w+17;
+txt_line_h1            = font_w1+font_wq;
+txt_line_h2            = font_w1+font_wh+1;
+txt_line_h3            = font_w1+font_w2+1;
 
 chat_all               = 255;
 chat_allies            = 254;
@@ -1377,7 +1393,7 @@ chat_type              : array[false..true] of char = ('|',' ');
 chat_LastMsgTime       = fr_fps1*3;
 chat_LastMsgTimeMax    = chat_LastMsgTime*6;
 
-ui_dBW                 = ui_ButtonW1-font_w-3;
+ui_dBW                 = ui_ButtonW1-font_w1-3;
 
 // ui alarms
 
@@ -1449,6 +1465,7 @@ mi_caption_Scirmish    = 21;
 mi_caption_SaveLoad    = 22;
 mi_caption_Replays     = 23;
 mi_caption_Settings    = 24;
+mi_caption_SVSearch    = 25;
 
 ////  SETTINGS
 mi_settings_Game       = 30;
@@ -1509,86 +1526,105 @@ mi_Players_ColorC      = 105;
 mi_Players_PingC       = 106;
 mi_Players_Ready       = 107;
 
-mi_Players_Name0       = 110;
-mi_Players_Name1       = 111;
-mi_Players_Name2       = 112;
-mi_Players_Name3       = 113;
-mi_Players_Name4       = 114;
-mi_Players_Name5       = 115;
-mi_Players_Name6       = 116;
-mi_Players_Name7       = 117;
+mi_Players_Player0     = 110;
+mi_Players_Player1     = 111;
+mi_Players_Player2     = 112;
+mi_Players_Player3     = 113;
+mi_Players_Player4     = 114;
+mi_Players_Player5     = 115;
+mi_Players_Player6     = 116;
+mi_Players_Player7     = 117;
 
-mi_Players_State0      = 120;
-mi_Players_State1      = 121;
-mi_Players_State2      = 122;
-mi_Players_State3      = 123;
-mi_Players_State4      = 124;
-mi_Players_State5      = 125;
-mi_Players_State6      = 126;
-mi_Players_State7      = 127;
+mi_Players_Slot0       = 120;
+mi_Players_Slot1       = 121;
+mi_Players_Slot2       = 122;
+mi_Players_Slot3       = 123;
+mi_Players_Slot4       = 124;
+mi_Players_Slot5       = 125;
+mi_Players_Slot6       = 126;
+mi_Players_Slot7       = 127;
 
-mi_Players_Race0       = 130;
-mi_Players_Race1       = 131;
-mi_Players_Race2       = 132;
-mi_Players_Race3       = 133;
-mi_Players_Race4       = 134;
-mi_Players_Race5       = 135;
-mi_Players_Race6       = 136;
-mi_Players_Race7       = 137;
+mi_Players_State0      = 130;
+mi_Players_State1      = 131;
+mi_Players_State2      = 132;
+mi_Players_State3      = 133;
+mi_Players_State4      = 134;
+mi_Players_State5      = 135;
+mi_Players_State6      = 136;
+mi_Players_State7      = 137;
 
-mi_Players_Team0       = 140;
-mi_Players_Team1       = 141;
-mi_Players_Team2       = 142;
-mi_Players_Team3       = 143;
-mi_Players_Team4       = 144;
-mi_Players_Team5       = 145;
-mi_Players_Team6       = 146;
-mi_Players_Team7       = 147;
+mi_Players_Race0       = 140;
+mi_Players_Race1       = 141;
+mi_Players_Race2       = 142;
+mi_Players_Race3       = 143;
+mi_Players_Race4       = 144;
+mi_Players_Race5       = 145;
+mi_Players_Race6       = 146;
+mi_Players_Race7       = 147;
 
-mi_Players_Ping0       = 150;
-mi_Players_Ping1       = 151;
-mi_Players_Ping2       = 152;
-mi_Players_Ping3       = 153;
-mi_Players_Ping4       = 154;
-mi_Players_Ping5       = 155;
-mi_Players_Ping6       = 156;
-mi_Players_Ping7       = 157;
+mi_Players_Team0       = 150;
+mi_Players_Team1       = 151;
+mi_Players_Team2       = 152;
+mi_Players_Team3       = 153;
+mi_Players_Team4       = 154;
+mi_Players_Team5       = 155;
+mi_Players_Team6       = 156;
+mi_Players_Team7       = 157;
+
+mi_Players_Ping0       = 160;
+mi_Players_Ping1       = 161;
+mi_Players_Ping2       = 162;
+mi_Players_Ping3       = 163;
+mi_Players_Ping4       = 164;
+mi_Players_Ping5       = 165;
+mi_Players_Ping6       = 166;
+mi_Players_Ping7       = 167;
 
 //// SCIRMISH MAP BLOCK
-mi_Map_Panel           = 160;
-mi_Map_Map             = 161;
-mi_Map_Scenario        = 162;
-mi_Map_Generators      = 163;
-mi_Map_Seed            = 164;
-mi_Map_Size            = 165;
-mi_Map_Obstacles       = 166;
-mi_Map_Symmetry        = 167;
-mi_Map_Theme           = 168;
-mi_Map_Random          = 169;
+mi_Map_Panel           = 170;
+mi_Map_Map             = 171;
+mi_Map_Scenario        = 172;
+mi_Map_Generators      = 173;
+mi_Map_Seed            = 174;
+mi_Map_Size            = 175;
+mi_Map_Obstacles       = 176;
+mi_Map_Symmetry        = 177;
+mi_Map_Theme           = 178;
+mi_Map_Random          = 179;
 
 //// SCIRMISH GAME BLOCK
-mi_Game_Panel          = 170;
-mi_Game_FixedPositions = 171;
-mi_Game_AISlots        = 172;
-mi_Game_DefeatedObs    = 173;
-mi_Game_Random         = 174;
+mi_Game_Panel          = 180;
+mi_Game_FixedPositions = 181;
+mi_Game_AISlots        = 182;
+mi_Game_DefeatedObs    = 183;
+mi_Game_Random         = 184;
 
 //// SCIRMISH MULTIPLAYER BLOCK
-mi_MP_Panel            = 180;
-mi_MP_ServerToggle     = 181;
-mi_MP_ServerPort       = 182;
-mi_MP_Connect          = 183;
-mi_MP_Disconnect       = 184;
-mi_MP_ClientAddress    = 185;
-mi_MP_ClientQuality    = 186;
-mi_MP_ClientLANSearch  = 187;
-mi_MP_Chat             = 188;
-mi_MP_Status           = 189;
+mi_MP_Panel            = 190;
+mi_MP_ServerToggle     = 191;
+mi_MP_ServerPort       = 192;
+mi_MP_ServerLANVis     = 193;
+mi_MP_Connect          = 194;
+mi_MP_Disconnect       = 195;
+mi_MP_ClientAddress    = 196;
+mi_MP_ClientQuality    = 197;
+mi_MP_ClientLANSearch  = 198;
+mi_MP_Chat             = 199;
+
+mi_NetSearch_List      = 200;
+mi_NetSearch_Connect   = 201;
 
 //// SCIRMISH REPLAY INFO
-mi_ReplayInfo_Panel    = 190;
+mi_SubCaptionInfoLine  = 210;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+// menu item activation type
+miat_TextEdit          = 0;
+miat_BtnLeft           = 1;
+miat_MWhell            = 2;
+miat_BtnRight          = 3;
+miat_BtnDLeft          = 4;
 
 menu_w                 = 800;
 menu_hw                = menu_w div 2;
@@ -1596,39 +1632,44 @@ menu_h                 = 600;
 menu_hh                = menu_h div 2;
 menu_logoh             = 64;
 
-menu_BaseW             = 28;
-menu_BasehW            = menu_BaseW div 2;
-menu_SmallW            =(menu_BaseW div 4)*3;
-menu_ListLineH         =(menu_BaseW div 3)*2;
+menu_BaseW1            = 28;
+menu_BaseW1h           = 28+(menu_BaseW1 div 2);
+menu_BaseW2            = menu_BaseW1*2;
+menu_BasehW            = menu_BaseW1 div 2;
+menu_SmallW            =(menu_BaseW1 div 4)*3;
+menu_ListLineH         =(menu_BaseW1 div 3)*2;
+menu_ListLineH2        = menu_ListLineH*2;
 menu_PListLineH        = menu_ListLineH-2;
 menu_ListLinehH        = menu_ListLineH div 2;
 
-menu_CaptionhW         = menu_BaseW*3;
-menu_BigButtonW        = menu_BaseW*4;
-menu_BigButtonH        = menu_BaseW;
+menu_CaptionhW         = menu_BaseW1*3;
+menu_BigButtonW        = menu_BaseW1*4;
+menu_BigButtonH        = menu_BaseW1;
 menu_BigButtonhH       = menu_BigButtonH div 2;
-menu_StepFromBottom    = menu_BaseW+menu_BasehW;
-menu_ItemCaptionhW     = menu_BaseW*3;
+menu_StepFromBottom    = menu_BaseW1+menu_BasehW;
+menu_ItemCaptionhW     = menu_BaseW1*3;
 
-menu_underLogoY        = menu_logoh+menu_BaseW;
-menu_CaptionH          = menu_BaseW;
-menu_underCaptionY     = menu_underLogoY+menu_CaptionH+menu_BaseW;
+menu_underLogoY        = menu_logoh+menu_BaseW1;
+menu_CaptionH          = menu_BaseW1;
+menu_underCaptionY     = menu_underLogoY+menu_CaptionH+menu_BaseW1;
 
 menu_border0           = 100;
 menu_border1           = 125;
 menu_border2           = 150;
-menu_BarStepX          = font_3hw;
+menu_BarStepX          = font_w1h;
 
-menu_BaseListH         = 16;
+menu_BaseList1H        = 16;
+menu_SvSearchListH     = 10;
 menu_ListLineWChars    = 40;
-menu_ListW             = menu_ListLineWChars*font_w+font_w;
-//menu_SaveLoadInfoWChars= ((menu_w-menu_border2-menu_border2-menu_ListW-menu_BasehW)-2*font_w) div font_w;
+menu_ListLineWChars2   = menu_ListLineWChars*2;
+menu_ListW             = menu_ListLineWChars*font_w1+font_w1;
+menu_ListhW            = menu_ListW div 2;
 
-menu_PlayersNameW      = font_3w+MaxPlayerNameLen*font_w;
-menu_PlayersStateW     = font_3hw+menu_ListLineH;
-menu_PlayersRaceW      = font_3hw+8*font_w;
-menu_PlayersTeamW      = font_3hw+4*font_w;
-menu_PlayersPingW      = font_3hw+4*font_w;
+menu_PlayersNameW      = font_w3+MaxPlayerNameLen*font_w1;
+menu_PlayersStateW     = font_w1h+menu_ListLineH;
+menu_PlayersRaceW      = font_w1h+8*font_w1;
+menu_PlayersTeamW      = font_w1h+4*font_w1;
+menu_PlayersPingW      = font_w1h+4*font_w1;
 menu_PlayersW          = menu_PlayersNameW+menu_PlayersStateW+menu_PlayersRaceW+menu_PlayersTeamW+menu_PlayersPingW;
 
 LastMission            = 23;
@@ -1732,7 +1773,21 @@ str_GameOptions          : shortstring = 'Game options:';
 str_MapOptions           : shortstring = 'Map options:';
 
 str_map_GeneratorsL      : array[0..5       ] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
-str_map_ScenarioL        : array[0..mc_count] of shortstring = ('Skirmish','4x4','2x2x2x2','Key points','Assault','Royal Battle');
+str_map_ScenarioL        : array[0..mc_Last ] of shortstring = ('FFA(3)',
+                                                                'FFA(4)',
+                                                                'FFA(5)',
+                                                                'FFA(6)',
+                                                                'FFA(7)',
+                                                                'FFA(8)',
+                                                                '1x1',
+                                                                '2x2',
+                                                                '3x3',
+                                                                '4x4',
+                                                                '2x2x2',
+                                                                '2x2x2x2',
+                                                                'key points',
+                                                                'KotH',
+                                                                'Royal Battle');
 str_map_Scenario         : shortstring = 'Scenario';
 str_map_Generators       : shortstring = 'Generators';
 str_map_Seed             : shortstring = 'Seed';
@@ -1751,6 +1806,9 @@ str_Player               : shortstring = 'Player';
 str_PlayerState          : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
+
+str_ps_AI                : string[4] = 'AI';
+str_ps_Hum               : string[4] = 'Hum.';
 
 str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
 str_observer             : shortstring = 'OBSERVER';

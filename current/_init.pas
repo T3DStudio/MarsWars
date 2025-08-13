@@ -29,13 +29,14 @@ var t,i:integer;
     s:string;
 begin
    t:=ParamCount;
-   for i:=1 to t do
-   begin
-      s:=ParamStr(i);
+   if(t>0)then
+     for i:=1 to t do
+     begin
+        s:=ParamStr(i);
 
-      if(s='test' )then TestMode:=1;
-      if(s='testD')then TestMode:=2;
-   end;
+        if(s='test' )then TestMode:=1;
+        if(s='testD')then TestMode:=2;
+     end;
 end;
 
 {$ELSE}
@@ -44,16 +45,22 @@ procedure StartParams;
 var t:integer;
 begin
    t:=ParamCount;
-   net_port:=10666;
-   if(t>0)then
-   begin
-      net_port:=s2w(ParamStr(1));
-      if(net_port=0)then net_port:=10666;
-   end;
+   net_ServerPort:=10666;
+   if(ParamCount>0)then
+     for t:=1 to ParamCount do
+       case t of
+       1: begin
+             net_ServerPort:=s2w(ParamStr(t));
+             if(net_ServerPort=0)then net_ServerPort:=10666;
+          end;
+       2: case ParamStr(t) of
+          '-',
+          '0': net_svLanAdv:=false;
+          end;
+       end;
 end;
 
 {$ENDIF}
-
 
 procedure GameInit;
 begin
@@ -68,6 +75,7 @@ begin
 
    {$IFDEF _FULLGAME}
 
+   FillChar(menu_NetMsg,SizeOf(menu_NetMsg),0);
    input_InitDefaultActionHotkeys;
    ui_InitControlPanelBTNActions;
 

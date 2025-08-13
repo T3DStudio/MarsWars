@@ -358,7 +358,7 @@ begin
      for y:=0 to map_MaxPlayers-1 do
        if(random(2)=0)and(x<>y)then
        begin
-          if(teamShuffle)and(map_MaxPlayers>2)and(g_players[x].team<>g_players[y].team)then continue;
+          if(teamShuffle)and(map_MaxPlayers>2)and(g_gplayers[x].team<>g_gplayers[y].team)then continue;
           i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
           i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
        end;
@@ -554,40 +554,40 @@ begin
    end;
 end;
 
-function map_PickDoodad(ix,iy,lqs,rks:pinteger;doodad_r:integer):boolean;
+function map_PickAndAddObstacle(ix,iy:integer;lqs,rks:pinteger;obstacleGapR:integer):boolean;
 var di:byte;
 begin
-   map_PickDoodad:=false;
+   map_PickAndAddObstacle:=false;
    for di:=DID_liquidR1 to DID_Other do
      case di of
      DID_LiquidR1,
      DID_LiquidR2,
      DID_LiquidR3,
-     DID_LiquidR4  : if(lqs^<=0)
-                     then continue
-                     else
-                       if(map_TryAddObstacle(di,ix^,iy^,doodad_r))then
-                       begin
-                          map_PickDoodad:=true;
-                          lqs^-=1;
-                          break;
-                       end
-                       else continue;
+     DID_LiquidR4: if(lqs^<=0)
+                   then continue
+                   else
+                     if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
+                     begin
+                        map_PickAndAddObstacle:=true;
+                        lqs^-=1;
+                        break;
+                     end
+                     else continue;
      DID_SRock,
-     DID_BRock     : if(rks^<=0)
-                     then continue
-                     else
-                       if(map_TryAddObstacle(di,ix^,iy^,doodad_r))then
-                       begin
-                          map_PickDoodad:=true;
-                          rks^-=1;
-                          break;
-                       end
-                       else continue;
+     DID_BRock   : if(rks^<=0)
+                   then continue
+                   else
+                     if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
+                     begin
+                        map_PickAndAddObstacle:=true;
+                        rks^-=1;
+                        break;
+                     end
+                     else continue;
      else
-       if(map_TryAddObstacle(di,ix^,iy^,doodad_r))then
+       if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
        begin
-          map_PickDoodad:=true;
+          map_PickAndAddObstacle:=true;
           break;
        end
        else continue;
@@ -639,14 +639,14 @@ begin
    end;
 end; }
 
-procedure map_make;
+procedure map_ReCreateObjects;
 const attempts_max = 200;
 var
 i,ir,
 ix,iy,
-lqs,
-rks,
-ddc,
+n_liquids,
+n_rocks,
+n_obstacles,
 attempts:integer;
 begin
    map_ObstaclesN:=0;
@@ -659,33 +659,34 @@ begin
         setlength(oc_l,oc_n);
      end;
 
-   ddc:=trunc(MaxObstacles*((sqr(map_Size) div ddc_div)/ddc_cf))+1;
+   n_obstacles:=trunc(MaxObstacles*((sqr(map_Size) div ddc_div)/ddc_cf))+1;
 
    if(map_Symmetry)
-   then ddc:=mm3i(1,round(ddc/2),MaxObstacles)
-   else ddc:=mm3i(1,      ddc   ,MaxObstacles);
+   then n_obstacles:=mm3i(1,round(n_obstacles/2),MaxObstacles)
+   else n_obstacles:=mm3i(1,      n_obstacles   ,MaxObstacles);
 
-   rks :=0;
-   lqs :=0;
+   n_rocks  :=0;
+   n_liquids:=0;
 
-   i  :=(ddc div 11);
+   i  :=(n_obstacles div 11);
    ix :=i*map_ObstaclesF;
-   lqs:=ix div 4;
-   rks:=ix-lqs;
+   n_liquids:=ix div 4;
+   n_rocks  :=ix-n_liquids;
 
    ir :=base_1r+(map_Size div 100);
    ix :=map_seed;
    iy :=0;
 
-   for i:=1 to ddc do
+   while(n_obstacles>0)do
    begin
+      n_obstacles-=1;
       attempts:=0;
       while true do
       begin
          ix:=g_randomx(ix,map_Size);
-         iy:=g_randomx(iy,map_Size); //+ix*attempts
+         iy:=g_randomx(iy,map_Size);
 
-         if(map_PickDoodad(@ix,@iy,@lqs,@rks,ir))then break;
+         if(map_PickAndAddObstacle(ix,iy,@n_liquids,@n_rocks,ir))then break;
 
          attempts+=1;
          if(attempts>=attempts_max)then break;
@@ -721,9 +722,9 @@ begin
    map_Symmetry :=random(2)>0;
 end;
 
-procedure Map_premap;
-begin                //map_MaxPlayers
-   case g_type of
+procedure Map_Make;
+begin
+   case g_type of //map_MaxPlayers
 gt_none,
 gt_scirmish: begin
              map_BaseVars;
@@ -746,7 +747,9 @@ gt_scirmish: begin
              GameRemoveAIObservers;
 
              map_PlayersStarts;
+             {$IFDEF _FULLGAME}
              map_seed2theme;
+             {$ENDIF}
              end;
 {$IFDEF _FULLGAME}
 gt_campaing: SetThemeCampaing(cmp_sel);
@@ -756,7 +759,7 @@ gt_campaing: SetThemeCampaing(cmp_sel);
    {$IFDEF _FULLGAME}
    map_MakeThemeSprites;
    {$ENDIF}
-   map_Make;
+   map_ReCreateObjects;
 end;
 
 

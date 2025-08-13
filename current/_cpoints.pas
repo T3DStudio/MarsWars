@@ -20,7 +20,7 @@ begin
      begin
         if(kpOwnerPlayer<=LastPlayer)then
         begin
-           with g_players[kpOwnerPlayer] do
+           with g_gplayers[kpOwnerPlayer] do
            begin
               cenergy-=kpEnergy;
               menergy-=kpEnergy;
@@ -30,12 +30,12 @@ begin
 
         kpOwnerPlayer:=newOwnerPlayer;
         if(kpOwnerPlayer<=LastPlayer)
-        then kpOwnerTeam:=g_players[newOwnerPlayer].team
+        then kpOwnerTeam:=g_gplayers[newOwnerPlayer].team
         else kpOwnerTeam:=kpOwnerPlayer;
 
         if(kpOwnerPlayer<=LastPlayer)then
         begin
-           with g_players[kpOwnerPlayer] do
+           with g_gplayers[kpOwnerPlayer] do
            begin
               cenergy+=kpEnergy;
               menergy+=kpEnergy;
@@ -120,7 +120,7 @@ begin
               begin
                  kpTimerOwnerPlayer:=iOwnerPlayer;
                  if(kpTimerOwnerPlayer<=LastPlayer)
-                 then kpTimerOwnerTeam:=g_players[kpTimerOwnerPlayer].team
+                 then kpTimerOwnerTeam:=g_gplayers[kpTimerOwnerPlayer].team
                  else kpTimerOwnerTeam:=255;
                  if(i=0)and(map_scenario=mc_KotH)then GameLogKotHControl;
                  kpTimer:=0;

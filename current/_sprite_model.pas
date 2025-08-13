@@ -314,21 +314,21 @@ begin
    with pu^   do
    with uid^  do
    begin
-      if(_wanim_)or(_ukbuilding)
+      if(_wanim_)or(uid_ukbuilding)
       then _unit2SMAnimK:=sms_walk
       else _unit2SMAnimK:=sms_stand;
 
       if(hits          <=0)then begin _unit2SMAnimK:=sms_death;exit;end;
       if(not iscomplete   )then begin _unit2SMAnimK:=sms_build;exit;end;
 
-      if(not _ukbuilding)then
+      if(not uid_ukbuilding)then
       begin
       if(buffs[ub_Pain  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
       if(buffs[ub_Cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
       end;
 
-      if(a_rld>0)and(a_weap_cl<=MaxUnitWeapons)then //and(0<a_tar)and(a_tar<=MaxUnits)
-       with _a_weap[a_weap_cl] do
+      if(a_rld>0)and(a_weap_cl<=LastUnitArms)then //and(0<a_tar)and(a_tar<=MaxUnits)
+       with uid_arms[a_weap_cl] do
         if(aw_max_range>=0)then
         begin
            if not(a_rld in aw_rld_a)
@@ -352,7 +352,7 @@ begin
    with u^   do
    with uid^ do
    begin
-      smodel:=un_smodel[level];
+      smodel:=uid_SpriteModel[level];
 
       if(smodel<>spr_pdmodel)then
       begin
@@ -361,7 +361,7 @@ begin
          case ak of
 sms_walk:    if(animw>0)then
              begin
-                if(wanim)or(_ukbuilding)then
+                if(wanim)or(uid_ukbuilding)then
                 begin
                    anim+=animw;
                    if(anim<0)then anim:=0;
@@ -370,16 +370,16 @@ sms_walk:    if(animw>0)then
              end
              else unit_GetSprite:=_sm2s(smodel,ak,dir,0,nil);
 sms_dattack,
-sms_mattack: if(a_weap<=MaxUnitWeapons)
-             then unit_GetSprite:=_sm2s(smodel,ak,dir,byte(a_rld in _a_weap[a_weap].aw_rld_a),nil)
+sms_mattack: if(a_weap<=LastUnitArms)
+             then unit_GetSprite:=_sm2s(smodel,ak,dir,byte(a_rld in uid_arms[a_weap].aw_rld_a),nil)
              else unit_GetSprite:=_sm2s(smodel,ak,dir,0                                      ,nil);
 sms_death:   begin
                 anim:=abs(hits);
-                if(_animd>0)
-                then unit_GetSprite:=_sm2s(smodel,ak,dir,anim div _animd,nil)
+                if(uid_AnimStepDeath>0)
+                then unit_GetSprite:=_sm2s(smodel,ak,dir,anim div uid_AnimStepDeath,nil)
                 else unit_GetSprite:=_sm2s(smodel,ak,dir,0              ,nil);
              end;
-sms_build:   unit_GetSprite:=_sm2s(smodel,ak,dir,(hits*3) div _mhits,nil);
+sms_build:   unit_GetSprite:=_sm2s(smodel,ak,dir,(hits*3) div uid_MaxHits1,nil);
          else
              unit_GetSprite:=_sm2s(smodel,ak,dir,0,nil); //stand,pain,cast
          end;
@@ -389,7 +389,7 @@ end;
 
 function uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;
 begin
-   with g_uids[auid] do uid2spr:=_sm2s(un_smodel[level],sms_stand,dir,0,nil);
+   with g_uids[auid] do uid2spr:=_sm2s(uid_SpriteModel[level],sms_stand,dir,0,nil);
 end;
 
 

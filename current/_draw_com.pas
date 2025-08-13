@@ -2,7 +2,7 @@
 procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);
 begin
    SDL_FillRect(vid_screen,nil,0);
-   stringColor(vid_screen,(vid_vw div 2)-(length(load_str^)*font_w div 2), vid_vh div 2,@(load_str^[1]),color);
+   stringColor(vid_screen,(vid_vw div 2)-(length(load_str^)*font_w1 div 2), vid_vh div 2,@(load_str^[1]),color);
    SDL_FLIP(vid_screen);
 end;
 
@@ -94,9 +94,11 @@ begin
          lines_len +=chr(strLen);
       end;
       lines_endc+=#0;
-      textW:=strLen*font_w;
-      textH:=font_w;
+      lines_n:=1;
+      textW:=strLen*font_w1;
+      textH:=font_w1;
       ix:=x;
+      y:=y-font_w1;
    end
    else
    begin
@@ -112,9 +114,9 @@ begin
          charc:=str[i];
 
          case charc of
-         tc_nl1 : begin textH+=txt_line_h1-font_w;AddLine(charc);end;
-         tc_nl2 : begin textH+=txt_line_h2-font_w;AddLine(charc);end;
-         tc_nl3 : begin textH+=txt_line_h3-font_w;AddLine(charc);end;
+         tc_nl1 : begin textH+=txt_line_h1-font_w1;AddLine(charc);end;
+         tc_nl2 : begin textH+=txt_line_h2-font_w1;AddLine(charc);end;
+         tc_nl3 : begin textH+=txt_line_h3-font_w1;AddLine(charc);end;
          else
             if not(charc in tc_SpecChars)then
             begin
@@ -138,7 +140,7 @@ begin
                chars+=1;
                if(chars>=MaxLineChars)and(i<strLen)then
                begin
-                  textH+=txt_line_h1-font_w;
+                  textH+=txt_line_h1-font_w1;
                   if(lastSplitChar>0)then
                   begin
                      i:=lastSplitChar;
@@ -151,7 +153,7 @@ begin
          if(i=strLen)then AddLine(#0);
       end;
       lines_n:=length(lines_len);
-      textH+=lines_n*font_w;
+      textH+=lines_n*font_w1;
 
       case alignment of
       ta_LU,
@@ -169,7 +171,7 @@ begin
    color:=BaseColor;
    for line:=1 to lines_n do
    begin
-      textW:=ord(lines_len[line])*font_w;
+      textW:=ord(lines_len[line])*font_w1;
       case alignment of
       ta_LU,
       ta_LM,
@@ -205,15 +207,15 @@ begin
          tc_default  : begin color:=BaseColor;if(i<strLen)then continue;end;
          else
             case charc of
-            char_detect  : boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_purple );
-            char_advanced: boxColor(sur,ix,y,ix+font_iw,y+font_iw,c_white  );
+            char_detect  : boxColor(sur,ix,y,ix+font_wi,y+font_wi,c_purple );
+            char_advanced: boxColor(sur,ix,y,ix+font_wi,y+font_wi,c_white  );
             ',',';','[',']','{','}'
-                         : boxColor(sur,ix,y,ix+font_iw,y+font_iw,BaseColor);
-            else           boxColor(sur,ix,y,ix+font_iw,y+font_iw,color    );
+                         : boxColor(sur,ix,y,ix+font_wi,y+font_wi,BaseColor);
+            else           boxColor(sur,ix,y,ix+font_wi,y+font_wi,color    );
             end;
 
             draw_mwtexture(sur,ix,y,@font_1[charc]);
-            ix   += font_w;
+            ix   += font_w1;
          end;
       end;
 
@@ -261,7 +263,7 @@ begin
      begin
         if(g_FixedPositions)then
         begin
-           if(g_players[p].state=ps_none)and(g_AISlots=0)then continue;
+           if(g_gplayers[p].state=ps_none)and(g_AISlots=0)then continue;
            color:=PlayerGetColor(p,false);
            pc:=i2s(p+1)[1];
         end
@@ -386,18 +388,18 @@ begin
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
    if(UIPlayer<=LastPlayer)then
-     with g_players[UIPlayer] do
+     with g_gplayers[UIPlayer] do
        with log_l[log_i] do
          case mtype of
 lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
-lmt_unit_ready       : if(g_uids[argx]._ukbuilding)
+lmt_unit_ready       : if(g_uids[argx].uid_ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
                        else ui_AddMarker(xi,yi,aummat_created_u ,true);
 lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade   ,true);
 lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info      ,true);
 lmt_allies_attacked,
 lmt_unit_attacked    : begin
-                       if(g_uids[argx]._ukbuilding)
+                       if(g_uids[argx].uid_ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_attacked_b,false)
                        else ui_AddMarker(xi,yi,aummat_attacked_u,false);
 

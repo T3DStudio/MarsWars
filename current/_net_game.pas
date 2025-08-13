@@ -1,5 +1,6 @@
 
-function net_NewPlayer(sip:cardinal;sp:word):byte;
+
+function net_NewPlayer(sip:cardinal;sport:word):byte;
 var p:byte;
 begin
    net_NewPlayer:=255;
@@ -7,22 +8,26 @@ begin
      {$IFDEF _FULLGAME}
      if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_players[p] do
+       with g_gplayers[p] do
+       with g_nplayers[p] do
          if(state=ps_None)then
          begin
             net_NewPlayer:=p;
-            nip          :=sip;
-            nport        :=sp;
+            net_ip       :=sip;
+            net_port     :=sport;
+            net_ttl      :=0;
+            net_ping     :=0;
+            n_u          :=0;
             state        :=ps_human;
-            ttl          :=0;
             {$IFNDEF _FULLGAME}
-            GameLogCommon(i,0,'MarsWars dedicated server, '+str_ver,false);
+            GameLogCommon(p,0,'MarsWars dedicated server, '+str_ver);
             {$ENDIF}
+            menu_update:=true;
             break;
          end;
 end;
 
-function net_GetPlayer(aip:cardinal;ap:word;MakeNew:boolean):byte;
+function net_GetPlayer(aip:cardinal;aport:word;MakeNew:boolean):byte;
 var p:byte;
 begin
    net_GetPlayer:=255;
@@ -30,36 +35,34 @@ begin
      {$IFDEF _FULLGAME}
      if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_players[p] do
-         if(state=ps_human)and(nip=aip)and(nport=ap)then
+       with g_gplayers[p] do
+       with g_nplayers[p] do
+         if(state=ps_human)and(net_ip=aip)and(net_port=aport)then
          begin
             net_GetPlayer:=p;
-            if(ttl>=fr_fps1)then {$IFNDEF _FULLGAME}screen_redraw{$ELSE}menu_update{$ENDIF}:=true;
-            ttl:=0;
+            if(net_ttl>=fr_fps1)then menu_update:=true;
+            net_ttl:=0;
             break;
          end;
 
-   if(net_GetPlayer=255)and(not G_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,ap);
+   if(net_GetPlayer=255)and(not G_Started)and(MakeNew)then net_GetPlayer:=net_NewPlayer(aip,aport);
 end;
 
 procedure net_SvReadPlayerData(pid:byte);
 var   i:byte;
 oldname:shortstring;
 begin
-   with g_players[pid] do
+   with g_gplayers[pid] do
+   with g_nplayers[pid] do
    begin
       oldname:=name;
       name   :=net_readstring;
       if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
-      if(oldname<>name)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
-
-      i:=net_readbyte;
-      if(map_scenario in mc_fixed_teams)and(i<>0)and(team<>0)
-      then i:=PlayerValidateTeam(map_scenario,pid);
+      if(oldname<>name)then menu_update:=true;
 
       i    :=byte(ready);
       ready:=net_readbool;
-      if((i>0)<>ready)then {$IFDEF _FULLGAME}menu_update{$ELSE}screen_redraw{$ENDIF}:=true;
+      if((i>0)<>ready)then menu_update:=true;
 
       PNU     :=net_readbyte;
       log_n_cl:=net_readcard;
@@ -68,26 +71,37 @@ begin
    end;
 end;
 
-procedure net_WriteGameData(pid:byte);
+procedure net_ReadMapMark(pid:byte);
+var x,y:integer;
+begin
+   x:=net_readint;
+   y:=net_readint;
+   GameLogMapMark(pid,x,y);
+end;
+
+procedure net_SendGameInfo(pid:byte);
 var p:byte;
 begin
-   net_writebyte(nmid_lobby_info);
+   net_clearbuffer;
+   net_writebyte(nmid_GameInfo);
    net_writebool(G_Started);
 
    for p:=0 to LastPlayer do
-    with g_players[p] do
-    begin
-       net_writestring(name );
-       if(observer)
-       then net_writebyte(255 )
-       else net_writebyte(team);
-       net_writebyte  (mrace);
-       net_writebyte  (state);
-       net_writebool  (ready);
-       net_writeword  (ttl  );
-       if(G_Started)then
-       net_writebyte  (race );
-    end;
+     with g_gplayers[p] do
+     with g_nplayers[p] do
+     begin
+        net_writestring(name );
+        if(observer)
+   then net_writebyte(255  )
+   else net_writebyte(team );
+        net_writebyte(mrace);
+        net_writebyte(state);
+        net_writebool(ready);
+        net_writeword(net_ttl );
+        net_writeword(net_ping);
+        if(G_Started)then
+        net_writebyte(race );
+     end;
 
    net_writebyte(pid);
    net_writebyte({$IFDEF _FULLGAME}LocalPlayer{$ELSE}255{$ENDIF});
@@ -95,7 +109,7 @@ begin
    net_writebyte(map_scenario  );
    net_writebyte(map_generators);
    net_writeint (map_Size      );
-   net_writebyte(map_ObstaclesF );
+   net_writebyte(map_ObstaclesF);
    net_writecard(map_seed      );
    net_writebool(map_Symmetry  );
 
@@ -109,14 +123,9 @@ begin
         net_writeint(map_PlayerStartX[p]);
         net_writeint(map_PlayerStartY[p]);
      end;
-end;
 
-procedure net_ReadMapMark(pid:byte);
-var x,y:integer;
-begin
-   x:=net_readint;
-   y:=net_readint;
-   GameLogMapMark(pid,x,y);
+   with g_nplayers[pid] do
+     net_send(net_ip,net_port);
 end;
 
 procedure net_Server;
@@ -124,12 +133,10 @@ var
 mid,pid,
 i      : byte;
 u,n    : integer;
+tping1,
+tping2 : cardinal;
 pu     : PTUnit;
-net_period_step
-       : boolean;
-{$IFNDEF _FULLGAME}
-c      : cardinal;
-{$ENDIF}
+every2t: boolean;
 begin
    net_clearbuffer;
 
@@ -160,184 +167,219 @@ begin
 
          if(not G_Started)then net_SvReadPlayerData(pid);
 
-         net_clearbuffer;
-         net_WriteGameData(pid);
-         net_send(net_LastinIP,net_LastinPort);
+         net_SendGameInfo(pid);
       end
       else   // other net mess
       begin
          pid:=net_GetPlayer(net_LastinIP,net_LastinPort,false);
-         if(pid<=LastPlayer)then
+         if(pid>LastPlayer)then
+         begin
+            net_clearbuffer;
+            net_writebyte(nmid_NotConnected);
+            net_send(net_LastinIP,net_LastinPort);
+         end
+         else
          begin
             case mid of
-nmid_LogMessage      : begin
-                          i:=net_readbyte;
-                          GameLogChat(pid,i,net_readstring);    // chat
-                          continue;
-                       end;
-nmid_PlayerLeave     : begin
-                          GameLogPlayerLeave(pid);
-                          if(not G_Started)
-                          then PlayerSetState(pid,ps_None)
-                          else PlayerKill    (pid,true);
-                          {$IFNDEF _FULLGAME}
-                          screen_redraw:=true;
-                          {$ENDIF}
-                          continue;
-                       end;
-nmid_PlayerSurrender : if(G_Started)then
-                       begin
-                          GameLogPlayerSurrender(pid);
-                          PlayerKill(pid,true);
-                          {$IFNDEF _FULLGAME}
-                          screen_redraw:=true;
-                          {$ENDIF}
-                          continue;
-                       end;
+            nmid_ping_Request    : begin
+                                      tping1:=net_readcard;
+                                      net_clearbuffer;
+                                      net_writebyte(nmid_ping_Answer);
+                                      net_writecard(tping1);
+                                      with g_nplayers[pid] do
+                                        net_send(net_ip,net_port);
+                                   end;
+            nmid_ping_Answer     : begin
+                                      tping1:=net_readcard;
+                                      tping2:=SDL_GetTicks;
+                                      if(tping1<=tping2)then
+                                        with g_nplayers[pid] do net_ping:=tping2-tping1;
+                                   end;
+            nmid_LogMessage      : begin
+                                      i:=net_readbyte;
+                                      GameLogChat(pid,i,net_readstring);    // chat
+                                   end;
+            nmid_PlayerLeave     : begin
+                                      GameLogPlayerLeave(pid);
+                                      if(not G_Started)then
+                                        PlayerKill(pid,true);
+                                      PlayerSetState(pid,ps_None);
+                                      menu_update:=true;
+                                   end;
             else
                if(G_Started)then
-               case mid of
-nmid_order       : with g_players[pid]do
-                   begin
-                      o_x0:=net_readint;
-                      o_y0:=net_readint;
-                      o_x1:=net_readint;
-                      o_y1:=net_readint;
-                      o_a0:=net_readint;
-                      o_id:=net_readbyte;
+                 case mid of
+                 nmid_order          : with g_gplayers[pid]do
+                                       begin
+                                          o_x0:=net_readint;
+                                          o_y0:=net_readint;
+                                          o_x1:=net_readint;
+                                          o_y1:=net_readint;
+                                          o_a0:=net_readint;
+                                          o_id:=net_readbyte;
 
-                      for u:=1 to MaxUnits do
-                        with g_punits[u]^ do
-                          if(hits>0)and(pid=playeri)then unit_UnSelect(g_punits[u]);
-                      n:=net_readint;
-                      while(n>0)do
-                      begin
-                         u:=net_readint;
-                         if(IsUnitRange(u,@pu))then
-                           with pu^ do
-                             if(hits>0)and(pid=playeri)and(not IsUnitRange(transport,nil))then unit_Select(pu);
-                         n-=1;
-                      end;
-                   end;
-nmid_map_mark    : net_ReadMapMark(pid);
-nmid_ClientData  : with g_players[pid] do
-                   begin
-                      PNU     :=net_readbyte;
-                      log_n_cl:=net_readcard;
-                      if(log_n_cl=log_n)then net_logsend_pause:=0;
-                   end;
-nmid_pause       : begin
-                      if(G_Status<=LastPlayer)then
-                      begin
-                         G_Status:=gs_running;
-                         GameLogChat(pid,255,str_gmsg_PlayerResumed);
-                      end
-                      else
-                        if(G_Status=gs_running)then
-                        begin
-                           G_Status:=pid;
-                           GameLogChat(pid,255,str_gmsg_PlayerPaused);
-                        end;
-                     {$IFNDEF _FULLGAME}
-                     screen_redraw:=true;
-                     {$ENDIF}
-                   end;
-               end
+                                          for u:=1 to MaxUnits do
+                                            with g_punits[u]^ do
+                                              if(hits>0)and(pid=playeri)then unit_UnSelect(g_punits[u]);
+                                          n:=net_readint;
+                                          while(n>0)do
+                                          begin
+                                             u:=net_readint;
+                                             if(IsUnitRange(u,@pu))then
+                                               with pu^ do
+                                                 if(hits>0)and(pid=playeri)and(not IsUnitRange(transportU,nil))then unit_Select(pu);
+                                             n-=1;
+                                          end;
+                                       end;
+                 nmid_map_mark       : net_ReadMapMark(pid);
+                 nmid_ClientData     : with g_gplayers[pid] do
+                                       with g_nplayers[pid] do
+                                       begin
+                                          PNU     :=net_readbyte;
+                                          log_n_cl:=net_readcard;
+                                          if(log_n_cl=log_n)then net_logsend_pause:=0;
+                                       end;
+                 nmid_pause          : begin
+                                          if(G_Status<=LastPlayer)then
+                                          begin
+                                             G_Status:=gs_running;
+                                             GameLogChat(pid,255,str_gmsg_PlayerResumed);
+                                          end
+                                          else
+                                            if(G_Status=gs_running)then
+                                            begin
+                                               G_Status:=pid;
+                                               GameLogChat(pid,255,str_gmsg_PlayerPaused);
+                                            end;
+                                         {$IFNDEF _FULLGAME}
+                                         menu_update:=true;
+                                         {$ENDIF}
+                                       end;
+                 nmid_PlayerSurrender: menu_update:=menu_update or PlayerSurrender(pid,false);
+                 end
                else
                  case mid of
-                 nmid_lobby_PPosSwap   : begin
-                                            i:=net_readbyte; // player
-                                            {$IFNDEF _FULLGAME}
-                                            screen_redraw:=screen_redraw or
-                                            {$ENDIF}
-                                            PlayersSwap(i,pid);
-                                         end;
                  {$IFNDEF _FULLGAME}
-                 nmid_lobby_PAIUp,
+                 nmid_lobby_PAILevelScroll,
                  nmid_lobby_PAIToggle,
+                 {$ENDIF}
                  nmid_lobby_PRace,
-                 nmid_lobby_PTeam      : begin
-                                            i:=net_readbyte; // player
-                                            case mid of
-                                            nmid_lobby_PAIUp    : screen_redraw:=screen_redraw or PlayerAILevelLoop(i);
-                                            nmid_lobby_PAIToggle: screen_redraw:=screen_redraw or PlayerAIToggle   (i,false);
-                                            nmid_lobby_PRace    : screen_redraw:=screen_redraw or PlayerRaceChange (i,pid,false);
-                                            nmid_lobby_PTeam    : screen_redraw:=screen_redraw or PlayerTeamChange (i,pid,net_readbool,false);
-                                            end;
-                                         end;
-                 nmid_lobby_MSeed      : begin
-                                            c:=net_readcard;
-                                            screen_redraw:=c<>map_seed;
-                                            map_seed:=c;
-                                            if(screen_redraw)then map_premap;
-                                         end;
+                 nmid_lobby_PTeam,
+                 nmid_lobby_PJumpToSlot    : begin
+                                                i:=net_readbyte; // player-target
+                                                case mid of
+                                                {$IFNDEF _FULLGAME}
+                                                nmid_lobby_PAILevelScroll: menu_update:=menu_update or PlayerAILevelScroll(i,pid,net_readbool,false);
+                                                nmid_lobby_PAIToggle     : menu_update:=menu_update or PlayerAIToggle     (i,pid             ,false);
+                                                {$ENDIF}
+                                                nmid_lobby_PRace         : menu_update:=menu_update or PlayerRaceScroll   (i,pid             ,false);
+                                                nmid_lobby_PTeam         : menu_update:=menu_update or PlayerTeamScroll   (i,pid,net_readbool,false);
+                                                nmid_lobby_PJumpToSlot   : menu_update:=menu_update or PlayersSwap        (i,pid             ,false);
+                                                end;
+                                             end;
+                 {$IFNDEF _FULLGAME}
+                 nmid_lobby_MSeed          : menu_update:=menu_update or GameMapSetSeed(pid,net_readcard,false);
                  nmid_lobby_MScenario,
                  nmid_lobby_MGenerators,
                  nmid_lobby_MSize,
-                 nmid_lobby_MObs,
-                 nmid_lobby_MSym,
+                 nmid_lobby_MObstacles,
+                 nmid_lobby_MSymmetry,
                  nmid_lobby_MRandom,
 
                  nmid_lobby_GFixedPositions,
                  nmid_lobby_GAISlots,
                  nmid_lobby_GDefeatedObs,
-                 nmid_lobby_GRandomScirmish
-                                       : begin
-                                            GameSetOption(mid,net_readbool,false);
-                                            screen_redraw:=true;
-                                         end;
+                 nmid_lobby_GRandomScirmish: menu_update:= menu_update or GameSetOption(pid,mid,net_readbool,false);
                  {$ENDIF}
                  end;
             end;
-         end
-         else
-         begin
-            net_clearbuffer;
-            net_writebyte(nmid_NotConnected);
-            net_send(net_LastinIP,net_LastinPort);
          end;
       end;
    end;
 
-   net_period_step:=(net_period mod NetTickN)=0;
+   net_period+=1;
+   net_period:=net_period mod net_PeriodTime;
+   every2t:=(net_period mod NetTickN)=0;
+   net_ping_timer+=1;
+   net_ping_timer:=net_ping_timer mod net_PingTime;
 
-   for i:=0 to LastPlayer do
+   for pid:=0 to LastPlayer do
      {$IFDEF _FULLGAME}
-     if(i<>LocalPlayer)then
+     if(pid<>LocalPlayer)then
      {$ENDIF}
-       with g_players[i] do
-         if(state=ps_human)and(ttl<ClientTTL)then
+       with g_gplayers[pid] do
+       with g_nplayers[pid] do
+         if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
-            if(G_Started)and(net_period_step)then
+            case G_Started of
+            //false: if(net_period=0)then net_SendGameInfo(pid);
+            true : if(every2t)then
+                   begin
+                      net_clearbuffer;
+                      net_writebyte(nmid_snapshot);
+                      net_writebyte(G_Status);
+                      if(G_Status=gs_running)then
+                         wclinet_gframe(pid,false);
+                      net_send(net_ip,net_port);
+                   end;
+            end;
+
+            if(pid=net_ping_timer)then
             begin
                net_clearbuffer;
-               net_writebyte(nmid_snapshot);
-               net_writebyte(G_Status);
-               if(G_Status=gs_running)
-               then wclinet_gframe(i,false);
-               net_send(nip,nport);
+               net_writebyte(nmid_ping_request);
+               net_writecard(SDL_GetTicks);
+               net_send(net_ip,net_port);
             end;
 
             if(net_logsend_pause<=0)and(log_n_cl<>log_n)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_LogUpdate);
-               wudata_log(i,@log_n_cl,false);
-               net_send(nip,nport);
+               wudata_log(pid,@log_n_cl,false);
+               net_send(net_ip,net_port);
                net_logsend_pause:=fr_fpsh;
             end;
          end;
 
-   net_period+=1;
-   net_period:=net_period mod fr_fpsh;
+   if(net_svLanAdv)and(not g_Started)then
+     if(net_svLanAdv_timer<=0)then
+     begin
+        net_svLanAdv_timer:=net_svLanAdv_time;
+        net_clearbuffer;
+        net_writebyte(nmid_LAN_Adv);
+        net_writebyte(g_version);
+        net_writebyte(map_scenario);
+        for pid:=0 to LastPlayer do
+          with g_gplayers[pid] do
+            if(state=ps_none)
+            then net_writestring('')
+            else net_writestring(name);
+        net_send(net_svLanAdv_ip,net_svLanAdv_portS);
+     end
+     else net_svLanAdv_timer-=1;
+end;
+
+procedure GameResetNetGame;
+begin
+   net_dispose;
+   GameDefaultAll;
+   g_started :=false;
+   net_status:=ns_none;
 end;
 
 {$IFDEF _FULLGAME}
 
-procedure net_ErrorLog(msg:shortstring);
+////////////////////////////////////////////////////////////////////////////////
+//
+//    NET CLIENT
+//
+
+procedure net_ClientError(msg:shortstring);
 begin
-   if(net_error_timer=0)then GameLogChat(255,255,msg);
-   net_error_timer:=fr_fps2;
+   menu_update:=true;
+   menu_NetMessage(str_menuMsg_Error,msg,str_menuMsg_HintDefault);
+   GameResetNetGame;
 end;
 
 procedure net_ClReadMapData(StartGame:boolean);
@@ -357,7 +399,7 @@ begin
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_generators  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrInt (@map_Size        ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrByte(@map_ObstaclesF   ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrByte(@map_ObstaclesF  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrBool(@map_Symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
 
@@ -365,7 +407,11 @@ begin
    if(nrByte(@g_AISlots       ))then begin redraw_menu:=true;              end;
    if(nrBool(@g_DefeatedObs   ))then begin redraw_menu:=true;              end;
 
-   if(new_map    )then Map_premap;
+   if(new_map    )then
+   begin
+      Map_Make;
+      menu_mseed:=c2s(map_seed);
+   end;
    if(redraw_menu)then menu_update:=true;
 
    if(StartGame)and(not g_FixedPositions)then
@@ -377,10 +423,11 @@ begin
 end;
 
 procedure net_ClReadPlayerData(pid:byte);
-var   i:integer;
+var i,w:integer;
 oldname:shortstring;
 begin
-   with g_players[pid] do
+   with g_gplayers[pid] do
+   with g_nplayers[pid] do
    begin
       oldname:=name;
       name   :=net_readstring;
@@ -390,8 +437,10 @@ begin
       i      :=team;
       team   :=net_readbyte;
       if(i<>team)then menu_update:=true;
+      i:=integer(observer);
       observer:=(team>LastPlayer);
       if(observer)then team:=0;
+      if(i<>integer(observer))then menu_update:=true;
 
       i      :=mrace;
       mrace  :=net_readbyte;
@@ -405,37 +454,43 @@ begin
       ready  :=net_readbool;
       if(i<>byte(ready))then menu_update:=true;
 
-      i      :=ttl;
-      ttl    :=net_readint;
-      if((i< fr_fps1)and(ttl>=fr_fps1))
-      or((i>=fr_fps1)and(ttl< fr_fps1))then menu_update:=true;
+      w      :=net_ttl;
+      net_ttl:=net_readword;
+      if((i< fr_fps1)and(net_ttl>=fr_fps1))
+      or((i>=fr_fps1)and(net_ttl< fr_fps1))then menu_update:=true;
+
+      w       :=net_ping;
+      net_ping:=net_readword;
+      if(w<>net_ping)then menu_update:=true;
    end;
 end;
 
 procedure net_Client;
 var mid,i:byte;
 svstarted:boolean;
+tping1   :cardinal;
 begin
+   // CLIENT INPUT
    net_clearbuffer;
    while(net_Receive>0)do
-   if(net_LastinIP=net_cl_svip)and(net_LastinPort=net_cl_svport)then
-   begin
-      if(net_cl_svttl>=ServerTTL)then menu_update:=true;
-      net_cl_svttl:=0;
+     if(net_LastinIP=net_cl_svip)and(net_LastinPort=net_cl_svport)then
+     begin
+        if(net_cl_svttl>=ServerTTL)then menu_update:=true;
+        net_cl_svttl:=0;
 
-      mid:=net_readbyte;
-      case mid of
+        mid:=net_readbyte;
+        case mid of
 nmid_ServerFull  : begin
-                      net_ErrorLog(str_gmsg_ServerFull  );
-                      menu_update:=true;
+                      net_ClientError(str_gmsg_ServerFull);
+                      exit;
                    end;
 nmid_WrongVersion: begin
-                      net_ErrorLog(str_gmsg_WrongVersion);
-                      menu_update:=true;
+                      net_ClientError(str_gmsg_WrongVersion);
+                      exit;
                    end;
 nmid_GameStarted : begin
-                      net_ErrorLog(str_gmsg_GameStarted);
-                      menu_update:=true;
+                      net_ClientError(str_gmsg_GameStarted);
+                      exit;
                    end;
 nmid_NotConnected: begin
                       G_Started  :=false;
@@ -448,11 +503,19 @@ nmid_LogUpdate   : begin
                       net_chat_shlm:=chat_LastMsgTime;
                       net_period:=0;
                    end;
-nmid_lobby_info  : begin
+nmid_ping_Request: begin
+                      tping1:=net_readcard;
+                      net_clearbuffer;
+                      net_writebyte(nmid_ping_Answer);
+                      net_writecard(tping1);
+                      net_send(net_cl_svip,net_cl_svport);
+                   end;
+nmid_GameInfo    : begin
+                      menu_NetMsg.mm_time:=0;
                       svstarted:=net_readbool;
 
                       for i:=0 to LastPlayer do
-                        with g_players[i] do
+                        with g_gplayers[i] do
                         begin
                            net_ClReadPlayerData(i);
                            if(svstarted)
@@ -462,13 +525,13 @@ nmid_lobby_info  : begin
                         end;
 
                       i:=LocalPlayer;
-                      LocalPlayer:=net_readbyte;if(LocalPlayer<>i)then menu_update:=true;
+                      LocalPlayer:=net_readbyte;
+                      if(LocalPlayer<>i)then menu_update:=true;
                       i:=net_cl_Hoster;
                       net_cl_Hoster:=net_readbyte;
                       if(net_cl_Hoster<>i)then menu_update:=true;
 
                       net_ClReadMapData(svstarted);
-                      net_error_timer:=0;
 
                       if(svstarted<>G_Started)then
                       begin
@@ -477,12 +540,7 @@ nmid_lobby_info  : begin
                          begin
                             MainMenu  :=false;
                             ServerSide:=false;
-                            ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
-                            if(g_players[LocalPlayer].observer)then
-                            begin
-                               ui_tab  :=tab_controls;
-                               UIPlayer:=255;
-                            end;
+                            GameLocalStart;
                          end
                          else
                          begin
@@ -492,20 +550,17 @@ nmid_lobby_info  : begin
                          end;
                       end;
                    end;
-      end;
+nmid_snapshot    : if(G_Started)then
+                   begin
+                      menu_NetMsg.mm_time:=0;
+                      G_Status:=net_readbyte;
+                      if(G_Status=gs_running)then
+                        rclinet_gframe(LocalPlayer,false,false);
+                   end;
+        end;
+     end;
 
-      if(G_Started)then
-      begin
-         if(mid=nmid_snapshot)then
-         begin
-            G_Status:=net_readbyte;
-
-            if(G_Status=gs_running)
-            then rclinet_gframe(LocalPlayer,false,false);
-         end;
-      end;
-   end;
-
+   // CLIENT OUTPUT
    if(net_period=0)then
    begin
       net_clearbuffer;
@@ -527,8 +582,9 @@ nmid_lobby_info  : begin
       net_send(net_cl_svip,net_cl_svport);
    end;
 
+   // CLIENT TIMERS
    net_period+=1;
-   net_period:=net_period mod fr_fpsh;
+   net_period:=net_period mod net_PeriodTime;
    if(net_cl_svttl<ServerTTL)then
    begin
       net_cl_svttl+=1;
@@ -539,6 +595,78 @@ nmid_lobby_info  : begin
       end;
    end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    NET LAN SEARCH
+//
+
+procedure net_DiscoweringUpdate(aip:cardinal;aport:word;ainfo:shortstring);
+var i,e:word;
+begin
+   e:=0;
+   if(net_svsearch_size>0)then
+     for i:=0 to net_svsearch_size-1 do
+       with net_svsearch_listi[i] do
+         if(aip=ip)and(aport=port)then
+         begin
+            e:=i+1;
+            break;
+         end;
+
+   if(e=0)then
+     if(net_svsearch_size<net_svsearch_size.MaxValue)then
+     begin
+        net_svsearch_size+=1;
+        setlength(net_svsearch_listi,net_svsearch_size);
+        setlength(net_svsearch_lists,net_svsearch_size);
+        with net_svsearch_listi[net_svsearch_size-1] do
+        begin
+           ip  :=aip;
+           port:=aport;
+        end;
+        e:=net_svsearch_size;
+        menu_update:=true;
+     end;
+
+   if(e>0)then
+   begin
+      e-=1;
+      if(net_svsearch_lists[e]<>ainfo)then menu_update:=true;
+      net_svsearch_lists[e]:=ainfo;
+   end;
+end;
+
+procedure net_Discowering;
+var mid,v,p:byte;
+          s:shortstring;
+begin
+   net_clearbuffer;
+   while(net_Receive>0)do
+   begin
+      mid:=net_readbyte;
+      if(mid<>nmid_LAN_Adv)then continue;
+
+      s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_gmsg_WrongVersion;
+
+      v:=net_readbyte;
+      if(v=g_version)then
+      begin
+         v:=net_readbyte;
+         if(v<=mc_last)then
+         begin
+            s:='';
+            for p:=0 to LastPlayer do STRADD(@s,net_readstring,sep_comma);
+            s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort))+' '+str_map_scenariol[v]+'  '+s;
+            net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
+            continue;
+         end;
+      end;
+
+      net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
+   end;
+end;
+
 
 {$ENDIF}
 

@@ -29,7 +29,7 @@ Base regeneration: 7
 Limit used: 1
 Size: 66
 Base vision range: 250
-Build time: 90
+Build time: 60
 Energy required: 300
 
 
@@ -91,7 +91,7 @@ Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
-Build time: 25
+Build time: 20
 Energy required: 0
 
 
@@ -111,7 +111,7 @@ Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
-Build time: 25
+Build time: 20
 Energy required: 0
 
 Constructed by: Hell Keep,Great Hell Keep
@@ -131,7 +131,7 @@ Max hits: 1000
 Limit used: 1
 Size: 22
 Base vision range: 44
-Build time: 25
+Build time: 20
 Energy required: 0
 
 Constructed by: Hell Keep,Great Hell Keep
@@ -367,7 +367,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 300
-Build time: 90
+Build time: 60
 Energy required: 300
 
 
@@ -1060,7 +1060,7 @@ Max hits: 15000
 Limit used: 1
 Size: 66
 Base vision range: 300
-Build time: 90
+Build time: 60
 Energy required: 300
 Zombie: Advanced Hell Command Center
 Zombification hits: 3750
@@ -1143,7 +1143,7 @@ Max hits: 2000
 Limit used: 2
 Size: 38
 Base vision range: 76
-Build time: 25
+Build time: 20
 Energy required: 0
 
 
@@ -1162,7 +1162,7 @@ Max hits: 2000
 Limit used: 2
 Size: 38
 Base vision range: 76
-Build time: 25
+Build time: 20
 Energy required: 0
 
 Constructed by: Command Center,Advanced Command Center
@@ -1181,7 +1181,7 @@ Max hits: 2000
 Limit used: 2
 Size: 38
 Base vision range: 76
-Build time: 25
+Build time: 20
 Energy required: 0
 
 Constructed by: Command Center,Advanced Command Center

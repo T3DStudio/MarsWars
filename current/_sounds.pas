@@ -470,51 +470,62 @@ begin
 
       with g_units[ui_UnitSelectedNU] do
        with uid^ do
-        if(_ukbuilding)and(iscomplete=false)
-        then SoundPlayUnitCommand(snd_building[_urace])
+        if(uid_ukbuilding)and(iscomplete=false)
+        then SoundPlayUnitCommand(snd_building[uid_race])
         else
          if(ui_UnitSelectedn<annoystart)
-         then SoundPlayUnitCommand(un_snd_select)
-         else SoundPlayUnitCommand(un_snd_annoy );
+         then SoundPlayUnitCommand(uid_snd_select)
+         else SoundPlayUnitCommand(uid_snd_annoy );
 
       ui_UnitSelectedPU:=ui_UnitSelectedNU;
       ui_UnitSelectedNU:=0;
    end;
 end;
 
-procedure SoundLogUIPlayer(playern:byte);
+procedure SoundLogUIPlayer(PListener:byte);
 begin
-   if(playern<=LastPlayer)then
-     with g_players[playern] do
+   if(PListener<=LastPlayer)then
+     with g_gplayers[PListener] do
        with log_l[log_i] do
          case mtype of
-0..LastPlayer         : if(mtype<>playern)then SoundPlayUI(snd_chat);
+0..LastPlayer         : if(mtype<>PListener)then SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
 lmt_player_chat,
 lmt_game_message      : SoundPlayUI(snd_chat);
+// Basic
 lmt_game_end          : if(argx<=LastPlayer)then
                           if(argx=team)
                           then SoundPlayAnoncer(snd_victory[race],false,true)
                           else SoundPlayAnoncer(snd_defeat [race],false,true);
 lmt_player_defeated   : if(argx<=LastPlayer)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true,false);
-lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
-lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
 lmt_unit_ready        : with g_uids[argx] do
-                        SoundPlayUnitCommand(un_snd_ready);
+                        SoundPlayUnitCommand(uid_snd_ready);
+lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
+lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
+lmt_map_mark,
+lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
+lmt_unit_attacked     : with g_uids[argx] do
+                        SoundPlayMMapAlarm(snd_under_attack[uid_ukbuilding,race],true);
+// Key Point Events
 lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control,
 lmt_ngen_captured,
 lmt_kpoint_captured   : SoundPlayAnoncer(snd_capture,true,false);
+lmt_ngen_exh,
+lmt_ngen_lost,
+lmt_kpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
+
+//
 lmt_invalid_tar,
 lmt_ability_cantland,
 lmt_ability_reload,
 lmt_ability_needS ,
 lmt_ability_needSP ,
 lmt_unit_needbuilder,
-lmt_already_adv,
+lmt_MaximumLevel,
 lmt_NeedMoreProd,
 lmt_MaximumReached,
 lmt_unit_limit,
@@ -522,13 +533,7 @@ lmt_production_busy,
 lmt_req_ruids,
 lmt_req_common,
 lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
-lmt_ngen_exh,
-lmt_ngen_lost,
-lmt_kpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
-lmt_map_mark,
-lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
-lmt_unit_attacked     : with g_uids[argx] do
-                        SoundPlayMMapAlarm(snd_under_attack[_ukbuilding,race],true);
+
          end;
 end;
 
@@ -560,13 +565,13 @@ end;
 
 procedure SoundControl;
 begin
-   if(ui_blink_timer1 =0)then SoundMusicControll(false);
+   if(ui_blink_timer1  =0)then SoundMusicControll(false);
    if(snd_anoncer_ticks>0)then snd_anoncer_ticks-=1;
    if(snd_command_ticks>0)then snd_command_ticks-=1;
    if(snd_mmap_ticks   >0)then snd_mmap_ticks   -=1;
 
-   if(G_Started)and(G_status=gs_running)and(not MainMenu)
-   then SoundPlayUnitSelect;
+   if(G_Started)and(G_status=gs_running)and(not MainMenu)then
+     SoundPlayUnitSelect;
 end;
 
 
