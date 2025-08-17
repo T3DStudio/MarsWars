@@ -222,7 +222,7 @@ begin
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
    FillChar(g_effects,SizeOf(g_effects),0);
 
-   ingame_chat :=0;
+   ui_InGameChat :=0;
    net_chat_str:='';
    net_cl_svttl:=0;
    net_cl_Hoster:=255;
@@ -832,7 +832,7 @@ begin
    begin
 
       case o_id of
-uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_unit,byte(o_x1),unit_start_build(o_x0,o_y0,byte(o_x1),tPlayer),nil);
+uo_build   : if(o_a0>0)then GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit,unit_start_build(o_x0,o_y0,o_a0,tPlayer),-1,-1);
       else
          tar_d :=tar_d.MaxValue;
          tar_u :=nil;
@@ -847,14 +847,15 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
              begin
                 if(o_id=uo_corder)then
                   case o_x0 of
-                  co_supgrade : if(s_smiths  <=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_y0      ,true)=0,true,true );
-                  co_cupgrade : if(s_smiths  <=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_y0,false,true)=0,true,false);
-                  co_suprod   : if(s_barracks<=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_y0      ,true)=0,true,true );
-                  co_cuprod   : if(s_barracks<=0)or(isselected)then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_y0,false,true)=0,true,false);
+                  co_supgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0      ,true)=0,true,true );
+                  co_cupgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true,false);
+
+                  co_sunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0      ,true)=0,true,true );
+                  co_cunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true,false);
                   co_pcancle  : if(isselected)then
                                 begin
-                                   UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade(pu,o_y0,false,true)=0,true,false);
-                                   UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit   (pu,o_y0,false,true)=0,true,false);
+                                if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit   (pu,o_a0,false,true)=0,true,false);
+                                if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade(pu,o_a0,false,true)=0,true,false);
                                 end;
                   end;
 
@@ -901,21 +902,35 @@ uo_build   : if(0<o_x1)and(o_x1<=255)then PlayerSetProdError(tPlayer,lmt_argt_un
              end;
          end;
 
-         if(o_id=uo_corder)and(tar_u<>nil)then
-           case o_x0 of
-         co_supgrade: PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStartUpgrade(tar_u,o_y0      ,false),tar_u);
-         co_cupgrade: PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUpgrade (tar_u,o_y0,false,false),tar_u);
-         co_suprod  : PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStartUnit   (tar_u,o_y0      ,false),tar_u);
-         co_cuprod  : PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUnit    (tar_u,o_y0,false,false),tar_u);
+         if(o_id=uo_corder)then
+           if(tar_u<>nil)then
+             with tar_u^ do
+               case o_x0 of
+         co_supgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0          ,false),x,y);
+         co_cupgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y);
+         co_sunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0          ,false),x,y);
+         co_cunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
 
          co_pcancle :
-                   if(PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUpgrade (tar_u,o_y0,false,false),tar_u))then
-                      PlayerSetProdError(tPlayer,lmt_argt_upgr,o_y0,unit_ProdStopUnit    (tar_u,o_y0,false,false),tar_u);
+                   if(GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y))then
+                      GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
 
-         co_sability: PlayerSetProdError(tPlayer,lmt_argt_abil,o_a0,unit_sability(tar_u               ,false),tar_u);
-         co_pability: PlayerSetProdError(tPlayer,lmt_argt_abil,o_a0,unit_pability(tar_u,o_y0,o_x1,o_y1,false),tar_u);
-         co_rebuild : PlayerSetProdError(tPlayer,lmt_argt_unit,o_a0,unit_rebuild (tar_u               ,false),tar_u);
-           end;
+         co_sability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_sability        (tar_u               ,false),x,y);
+         co_pability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_pability        (tar_u,o_y0,o_x1,o_y1,false),x,y);
+         co_rebuild : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_rebuild         (tar_u               ,false),x,y);
+               end
+           else
+             case o_x0 of
+          co_supgrade,
+          co_cupgrade : GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,ureq_smiths  ,-1,-1);
+          co_sunit,
+          co_cunit    : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
+          co_pcancle  : GameLogBits2Message(tPlayer,0   ,255             ,ureq_other ,-1,-1);
+          co_sability,
+          co_pability : GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,ureq_other ,-1,-1);
+          co_rebuild  : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_other ,-1,-1);
+             end;
+
       end;
 
       o_id:=0;
@@ -978,35 +993,28 @@ begin
           end;
           if(net_logsend_pause>0)then net_logsend_pause-=1;
 
-          if(G_Started)and(G_Status=gs_running)and(not observer)and(not defeated)then
+          if(ServerSide)and(G_Started)and(G_Status=gs_running)and(not observer)and(not defeated)then
           begin
              if(build_cd>0)then build_cd-=1;
 
-             if(ServerSide)then
-             begin
-                revealed:=false;
-                if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then revealed:=true;
+             revealed:=false;
+             if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then revealed:=true;
 
-                PlayerExecuteOrder(p);
+             PlayerExecuteOrder(p);
 
-                if(state=ps_AI)
-                then ai_player_code(p)
-                else
-                  if(log_EnergyCheck>0)
-                  then log_EnergyCheck-=1
-                  else
-                    if(cenergy>=0)
-                    then log_EnergyCheck:=1
-                    else
-                    begin
-                       log_EnergyCheck:=fr_fps6;
-                       PlayersAddToLog(p,0,lmt_req_energy,0,0,'',-1,-1);
-                    end;
-             end;
-
-             if(prod_error_cndt>0)then
-               GameLogBits2Message(p,prod_error_uid,prod_error_utp,prod_error_cndt,prod_error_x,prod_error_y);
-             prod_error_cndt  :=0;
+             if(state=ps_AI)
+             then ai_player_code(p)
+             else
+               if(log_EnergyCheck>0)
+               then log_EnergyCheck-=1
+               else
+                 if(cenergy>=0)
+                 then log_EnergyCheck:=1
+                 else
+                 begin
+                    log_EnergyCheck:=fr_fps6;
+                    PlayersAddToLog(p,0,lmt_Req_Energy,0,0,'',-1,-1);
+                 end;
           end;
        end;
 

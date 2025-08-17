@@ -4,7 +4,7 @@ var r,x:integer;
 begin
    for r:=0 to MFogM do
     for x:=0 to r do
-     _RX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
+     CircleRX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
 procedure gfx_MakeScreenshot;
@@ -866,34 +866,133 @@ begin
 end;
 
 procedure vid_CommonVars;
+var
+ui_UIPanelY1:integer;
 begin
-   ui_vmb_x1   := vid_vw-ui_vmb_x0;
-   ui_vmb_y1   := vid_vh-ui_vmb_y0;
+   ui_UIPanelY1  := ui_UIPanelY+ui_UIPanelH;
 
-   ui_textx     := ui_mapx+font_wh;
-   ui_texty     := ui_mapy+font_wh;
-   ui_hinty1    := ui_mapy+ui_cam_h-txt_line_h1*10;
-   ui_hinty2    := ui_mapy+ui_cam_h-txt_line_h1*8;
-   ui_hinty3    := ui_mapy+ui_cam_h-txt_line_h1*5;
-   ui_hinty4    := ui_mapy+ui_cam_h-txt_line_h1*2;
-   ui_chaty     := ui_hinty1-font_w1h;
-   ui_logy      := ui_chaty-font_w1h;
-   ui_oicox     := ui_mapx+ui_cam_w-font_w1;
-   ui_uiuphx    := ui_mapx+(ui_cam_w div 2);
-   ui_uiuphy    := ui_texty+font_w3;
+   ui_vmb_x1     := vid_vw-ui_vmb_x0;
+   ui_vmb_y1     := vid_vh-ui_vmb_y0;
+   ui_UIPortXC   := ui_UIPortX0+ui_cam_hw;
+
+   if(ui_ControlPanelPos=cpp_top)
+   then ui_timerX:= ui_UIPanelX
+   else ui_timerX:= ui_UIPortX0+font_wh;
+   ui_timerY     := ui_UIPortY0+font_wh;
+
+   ui_uiuphy     := ui_timerY+font_w3;
+
+   // hint position
+   case ui_ControlPanelPos of
+   cpp_left  : begin
+               ui_PanelHintX:=ui_UIPanelW+font_wh;
+               ui_PanelHintY:=ui_UIPanelW+ui_ButtonW1;
+               end;
+   cpp_right : begin
+               ui_PanelHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLen*font_w1;
+               ui_PanelHintY:=ui_UIPanelW+ui_ButtonW1;
+               end;
+   cpp_top   : begin
+               ui_PanelHintX:=ui_UIPanelX+ui_UIPanelH;
+               ui_PanelHintY:=ui_UIPanelY1+txt_line_h2*2;
+               end;
+   cpp_bottom: begin
+               ui_PanelHintX:=ui_UIPanelX+ui_UIPanelH;
+               ui_PanelHintY:=ui_UIPanelY-font_w5;
+               end;
+   end;
+
+   // chat line
+   case ui_ControlPanelPos of
+   cpp_left  : begin
+                  ui_chatx:=ui_UIPanelW+font_wh;
+                  ui_chaty:=vid_vh-font_wh;
+                  ui_chat_LineLen:=(vid_vw-ui_chatx-font_w1) div font_w1;
+               end;
+   cpp_right : begin
+                  ui_chatx:=font_wh;
+                  ui_chaty:=vid_vh-font_wh;
+                  ui_chat_LineLen:=(vid_vw-ui_UIPanelW-font_w1) div font_w1;
+               end;
+   cpp_top   : begin
+                  ui_chatx:=font_wh;
+                  ui_chaty:=vid_vh-font_wh;
+                  ui_chat_LineLen:=(vid_vw-font_w1) div font_w1;
+               end;
+   cpp_bottom: begin
+                  ui_chatx:=font_wh;
+                  ui_chaty:=ui_UIPanelY-font_wh;
+                  ui_chat_LineLen:=(vid_vw-font_w1) div font_w1;
+               end;
+   end;
+
+   // log list
+   case ui_ControlPanelPos of
+   cpp_left  : begin
+                  ui_logx:=ui_UIPanelX +ui_UIPanelW+font_wh;
+                  ui_logy:=min2i(ui_UIPanelY1,vid_vh)-font_w1h;
+                  ui_loga:=ta_LU;
+               end;
+   cpp_right : begin
+                  ui_logx:=ui_UIPanelX -font_wh;
+                  ui_logy:=min2i(ui_UIPanelY1,vid_vh)-font_w1h;
+                  ui_loga:=ta_RU;
+               end;
+   cpp_top   : begin
+                  ui_logx:=vid_vw div 2;
+                  ui_logy:=vid_vh-font_w3;
+                  ui_loga:=ta_MU;
+               end;
+   cpp_bottom: begin
+                  ui_logx:=vid_vw div 2;
+                  ui_logy:=ui_UIPanelY-font_w3;
+                  ui_loga:=ta_MU;
+               end;
+   end;
+
+   // hotkey groups icons
+   ui_groupX     := ui_UIPortX0+ui_cam_w-font_w1;
+   if(ui_ControlPanelPos=cpp_top)
+   then ui_groupY:= 0
+   else ui_groupY:= ui_UIPortY0;
+
+   ui_fpsx       := ui_UIPortX1-(font_w1*font_w1h);
+   if(ui_ControlPanelPos=cpp_top)
+   then ui_fpsy  := font_wh
+   else ui_fpsy  := ui_timerY;
+
+   // Replay progress bar
+   ui_ReplayBarY := ui_UIPortY1;
+   if(ui_ControlPanelPos=cpp_bottom)
+   then ui_ReplayBarw:=ui_UIPanelW
+   else ui_ReplayBarw:=vid_vw;
+   case ui_ControlPanelPos of
+   cpp_left  : begin
+               if((ui_UIPanelY1+ui_ReplayBarH)<vid_vh)
+               then ui_ReplayBarX:=0
+               else ui_ReplayBarX:=ui_UIPanelW;
+               ui_ReplayBarw-=ui_UIpanelW;
+               end;
+   cpp_right : begin
+               ui_ReplayBarX:=0;
+               if((ui_UIPanelY1+ui_ReplayBarH)>=vid_vh)
+               then ui_ReplayBarw-=ui_UIpanelW;
+               end;
+   cpp_top   : ui_ReplayBarX:=0;
+   cpp_bottom: ui_ReplayBarX:=ui_UIPanelX;
+   end;
+
+
    ui_uiplayery := ui_uiuphy+font_w1h;
-   ui_game_log_height:=(ui_hinty1-font_w5) div font_w1h;
+   ui_game_log_height:=(ui_PanelHintY-font_w5) div font_w1h;
 
-   ui_energx    := ui_uiuphx-150;
-   ui_energy    := ui_texty;
-   ui_armyx     := ui_uiuphx+40;
-   ui_armyy     := ui_texty;
-   ui_fpsx      := ui_mapx+ui_cam_w-(font_w1*font_w1h);
-   ui_fpsy      := ui_texty;
+   ui_EnergyX   := ui_UIPortXC-font_w2;
+   ui_EnergyY   := ui_timerY;
+   ui_ArmyX     := ui_UIPortXC;
+   ui_ArmyY     := ui_timerY;
+
    ui_apmx      := ui_fpsx;
    ui_apmy      := ui_fpsy+txt_line_h2;
-
-   ui_ingamecl  :=(ui_cam_w-font_w1) div font_w1;
 
    ui_fog_gridw :=(ui_cam_w div fog_cw)+2;
    ui_fog_gridh :=(ui_cam_h div fog_cw)+2;
@@ -908,74 +1007,97 @@ begin
 end;
 
 procedure vid_RemakeScreenSurfaces;
-var i,y:integer;
+var i,y,
+ui_UIPanelWh:integer;
 procedure pline(x0,y0,x1,y1:integer;color:cardinal);
 begin
    if(ui_ControlPanelPos<2)
-   then lineColor(ui_panel,x0,y0,x1,y1,color)
-   else lineColor(ui_panel,y0,x0,y1,x1,color);
+   then lineColor(ui_UIPanelTemplate,x0,y0,x1,y1,color)
+   else lineColor(ui_UIPanelTemplate,y0,x0,y1,x1,color);
 end;
 procedure prect(x0,y0,x1,y1:integer;color:cardinal);
 begin
    if(ui_ControlPanelPos<2)
-   then rectangleColor(ui_panel,x0,y0,x1,y1,color)
-   else rectangleColor(ui_panel,y0,x0,y1,x1,color);
+   then rectangleColor(ui_UIPanelTemplate,x0,y0,x1,y1,color)
+   else rectangleColor(ui_UIPanelTemplate,y0,x0,y1,x1,color);
 end;
 begin
-   gfx_FreeSDLSurface(ui_uipanel );
-   gfx_FreeSDLSurface(ui_panel   );
+   gfx_FreeSDLSurface(ui_UIPanel);
+   gfx_FreeSDLSurface(ui_UIPanelTemplate);
 
-   if(ui_ControlPanelPos<2)then // left-right
-   begin
-      ui_cam_w:=vid_vw-ui_CtrlPanelW;
-      ui_cam_h:=vid_vh;
-
-      if(ui_ControlPanelPos=0)
-      then ui_mapx:=ui_CtrlPanelW
-      else ui_mapx:=0;
-      ui_mapy:=0;
-
-      if(ui_ControlPanelPos=0)
-      then ui_panelx:=0
-      else ui_panelx:=ui_cam_w-1;
-      ui_panely:=0;
-
-      ui_uipanel:=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
-      ui_panel  :=gfx_CreateSDLSurface(ui_CtrlPanelW+1,vid_vh);
-
-      vlineColor(ui_panel,ui_ButtonW1,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
-      vlineColor(ui_panel,ui_ButtonW2,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,c_white);
-   end
-   else
-   begin
-      ui_cam_w:=vid_vw;
-      ui_cam_h:=vid_vh-ui_CtrlPanelW;
-
-      ui_mapx:=0;
-      if(ui_ControlPanelPos=2)
-      then ui_mapy:=ui_CtrlPanelW-1
-      else ui_mapy:=0;
-
-      ui_panelx:=0;
-      if(ui_ControlPanelPos=2)
-      then ui_panely:=0
-      else ui_panely:=ui_cam_h-1;
-
-      ui_uipanel:=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
-      ui_panel  :=gfx_CreateSDLSurface(vid_vw,ui_CtrlPanelW+1);
-
-      hlineColor(ui_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW1 ,c_white);
-      hlineColor(ui_panel,ui_CtrlPanelW+ui_ButtonW1,ui_CtrlPanelH,ui_ButtonW2,c_white);
+   case ui_ControlPanelPos of
+   cpp_left  : ui_UIPortX0:=ui_CtrlPanelW;
+   cpp_right,
+   cpp_top,
+   cpp_bottom: ui_UIPortX0:=0;
+   end;
+   case ui_ControlPanelPos of
+   cpp_right : ui_UIPortX1:=vid_vw-ui_CtrlPanelW;
+   cpp_left,
+   cpp_top,
+   cpp_bottom: ui_UIPortX1:=vid_vw;
+   end;
+   case ui_ControlPanelPos of
+   cpp_left,
+   cpp_right,
+   cpp_bottom: ui_UIPortY0:=0;
+   cpp_top   : ui_UIPortY0:=ui_CtrlPanelW;
+   end;
+   case ui_ControlPanelPos of
+   cpp_left,
+   cpp_right,
+   cpp_top   : ui_UIPortY1:=vid_vh;
+   cpp_bottom: ui_UIPortY1:=vid_vh-ui_CtrlPanelW;
    end;
 
+   ui_cam_w :=vid_vw;
+   ui_cam_h :=vid_vh;
    ui_cam_hw:=ui_cam_w div 2;
    ui_cam_hh:=ui_cam_h div 2;
 
-   rectangleColor(ui_panel,0,0,ui_panel^.w-1,ui_panel^.h-1,c_white);
+   if(ui_ControlPanelPos<2)then // left-right
+   begin
+      ui_UIPanelW :=ui_CtrlPanelWb;
+      ui_UIPanelH :=ui_CtrlPanelH;
+      ui_UIPanelWh:=ui_UIPanelW div 2;
+
+      if(ui_ControlPanelPos=0)
+      then ui_UIPanelX:=0
+      else ui_UIPanelX:=ui_UIPortX1-1;
+      ui_UIPanelY:=0;
+
+      ui_UIPanel        :=gfx_CreateSDLSurface(ui_UIPanelW,ui_UIPanelH);
+      ui_UIPanelTemplate:=gfx_CreateSDLSurface(ui_UIPanelW,ui_UIPanelH);
+
+      vlineColor(ui_UIPanelTemplate,ui_ButtonW1,ui_UIPanelW+ui_ButtonW1,ui_UIPanelH,c_white);
+      vlineColor(ui_UIPanelTemplate,ui_ButtonW2,ui_UIPanelW+ui_ButtonW1,ui_UIPanelH,c_white);
+   end
+   else
+   begin
+      ui_UIPanelW :=ui_CtrlPanelH;
+      ui_UIPanelH :=ui_CtrlPanelWb;
+      ui_UIPanelWh:=ui_UIPanelW div 2;
+
+      if((ui_cam_w-ui_UIPanelW)<ui_UIPanelWh)
+      then ui_UIPanelX:=0
+      else ui_UIPanelX:=ui_cam_hw-ui_UIPanelWh;
+
+      if(ui_ControlPanelPos=2)
+      then ui_UIPanelY:=0
+      else ui_UIPanelY:=ui_UIPortY1-1;
+
+      ui_UIPanel        :=gfx_CreateSDLSurface(ui_UIPanelW,ui_UIPanelH);
+      ui_UIPanelTemplate:=gfx_CreateSDLSurface(ui_UIPanelW,ui_UIPanelH);
+
+      hlineColor(ui_UIPanelTemplate,ui_UIPanelH+ui_ButtonW1,ui_UIPanelW,ui_ButtonW1,c_white);
+      hlineColor(ui_UIPanelTemplate,ui_UIPanelH+ui_ButtonW1,ui_UIPanelW,ui_ButtonW2,c_white);
+   end;
+
+   rectangleColor(ui_UIPanelTemplate,0,0,ui_UIPanelTemplate^.w-1,ui_UIPanelTemplate^.h-1,c_white);
    pline(0,ui_CtrlPanelW,ui_CtrlPanelW,ui_CtrlPanelW,c_white);
 
-   //pline(0,ui_CtrlPanelW+ui_h3bw,ui_panel^.w,ui_CtrlPanelW+ui_h3bw,c_white);
-   pline(0,ui_CtrlPanelW+ui_ButtonW1 ,ui_panel^.w,ui_CtrlPanelW+ui_ButtonW1 ,c_white);
+   //pline(0,ui_CtrlPanelW+ui_h3bw,ui_UIPanelTemplate^.w,ui_CtrlPanelW+ui_h3bw,c_white);
+   pline(0,ui_CtrlPanelW+ui_ButtonW1 ,ui_UIPanelTemplate^.w,ui_CtrlPanelW+ui_ButtonW1 ,c_white);
 
    for y:=0 to 3 do
    pline(y*ui_TabButtonW,ui_CtrlPanelW,y*ui_TabButtonW,ui_CtrlPanelW+ui_ButtonW1,c_white);
@@ -989,7 +1111,7 @@ begin
       y+=ui_ButtonW1;
    end;
 
-   draw_sdlsurface(ui_uipanel,0,0,ui_panel);
+   draw_sdlsurface(ui_UIPanel,0,0,ui_UIPanelTemplate);
 
    vid_CommonVars;
 end;
@@ -1002,7 +1124,7 @@ begin
    then vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, vid_vflags)
    else vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, vid_vflags + SDL_FULLSCREEN);
 
-   if(vid_screen=nil)then begin WriteSDLError; exit; end;
+   if(vid_screen=nil)then begin WriteSDLError; halt; end;
 
    vid_RemakeScreenSurfaces;
 end;

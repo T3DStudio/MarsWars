@@ -1028,7 +1028,7 @@ begin
       if(GetBBit(@byte1,1))then transportU:=1 else transportU:=0;
       if(GetBBit(@byte1,2))then level+=%01;
       if(GetBBit(@byte1,3))then level+=%10;
-      buffs[ub_Pain]:=_buffst[GetBBit(@byte1,4)];
+      buffs[ub_Pain]:=buff_Bool2InfTime[GetBBit(@byte1,4)];
       if(GetBBit(@byte1,5))then a_tar:=-1 else a_tar:=0;
       if(rpl)then
         isselected:=GetBBit(@byte1,6);
@@ -1038,14 +1038,14 @@ begin
 
       if(byte2>0)then
       begin
-         buffs[ub_Resurect]:=_buffst[GetBBit(@byte2,0)];
+         buffs[ub_Resurect]:=buff_Bool2InfTime[GetBBit(@byte2,0)];
          if(GetBBit(@byte2,1))and(buffs[ub_Summoned]<=0)
          then buffs[ub_Summoned]:=fr_fps1;
-         buffs[ub_Invuln  ]:=_buffst[GetBBit(@byte2,2)];
-         buffs[ub_Teleport]:=_buffst[GetBBit(@byte2,3)];
-         buffs[ub_HVision ]:=_buffst[GetBBit(@byte2,4)];
-         buffs[ub_Cast    ]:=_buffst[GetBBit(@byte2,5)];
-         buffs[ub_Scaned  ]:=_buffst[GetBBit(@byte2,6)];
+         buffs[ub_Invuln  ]:=buff_Bool2InfTime[GetBBit(@byte2,2)];
+         buffs[ub_Teleport]:=buff_Bool2InfTime[GetBBit(@byte2,3)];
+         buffs[ub_HVision ]:=buff_Bool2InfTime[GetBBit(@byte2,4)];
+         buffs[ub_Cast    ]:=buff_Bool2InfTime[GetBBit(@byte2,5)];
+         buffs[ub_Scaned  ]:=buff_Bool2InfTime[GetBBit(@byte2,6)];
       end
       else
       begin

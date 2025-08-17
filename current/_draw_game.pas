@@ -103,46 +103,43 @@ begin
       end;
 end;
 
-procedure D_SpriteList(tar:pSDL_Surface;lx,ly:integer);
+procedure D_LayerSpriteList(tar:pSDL_Surface);
 var sx,sy:integer;
 begin
    SpriteListSort;
    while(vid_ScreenSpritesS>0)do
-    with vid_ScreenSpritesL[vid_ScreenSpritesS]^ do
-    begin
-       vid_ScreenSpritesS-=1;
+     with vid_ScreenSpritesL[vid_ScreenSpritesS]^ do
+     begin
+        vid_ScreenSpritesS-=1;
 
-       x-=sprite^.hw;
-       y-=sprite^.hh;
+        x-=xo+sprite^.hw;
+        y-=yo+sprite^.hh;
 
-       x+=lx+xo;
-       y+=ly+yo;
-
-       if(shadowz>-fly_hz)then
-       begin
-          sx:=sprite^.hw;
-          sy:=sprite^.h-(sprite^.h shr 3);
-          filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
-       end;
-       if(alpha>0)then
-        if(alpha=255)
-        then draw_sdlsurface(tar,x,y,sprite^.surf)
-        else
+        if(shadowz>-fly_hz)then
         begin
-           SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
-           draw_sdlsurface(tar,x,y,sprite^.surf);
-           SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
+           sx:=sprite^.hw;
+           sy:=sprite^.h-(sprite^.h shr 3);
+           filledellipseColor(tar,x+sx,y+sy+shadowz,sx,sprite^.hh shr 1,shadowc);
         end;
+        if(alpha>0)then
+          if(alpha=255)
+          then draw_sdlsurface(tar,x,y,sprite^.surf)
+          else
+          begin
+             SDL_SetAlpha(sprite^.surf,SDL_SRCALPHA or SDL_RLEACCEL,alpha);
+             draw_sdlsurface(tar,x,y,sprite^.surf);
+             SDL_SetAlpha(sprite^.surf,SDL_RLEACCEL,255);
+          end;
 
-       if(aura>0)then
-       begin
-          x-=6;
-          y-=6;
-          sx:=sprite^.hw+6;
-          sy:=sprite^.hh+6;
-          filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
-       end;
-    end;
+        if(aura>0)then
+        begin
+           x-=6;
+           y-=6;
+           sx:=sprite^.hw+6;
+           sy:=sprite^.hh+6;
+           filledellipseColor(tar,x+sx,y+sy,sx,sy,aura);
+        end;
+     end;
 end;
 
 
@@ -362,7 +359,7 @@ begin
      else i2s6:='';
 end;
 
-procedure UnitsInfoAddUnit(pu:PTUnit;usmodel:PTMWSModel);
+procedure UnitsInfoAddFromUnit(pu:PTUnit;usmodel:PTMWSModel);
 const buff_sprite_w = 18;
 var
 srect,
@@ -390,8 +387,8 @@ begin
       then hbar:=true
       else
         case ui_HealthBars of
-      0: if(hits<uid_MaxHits1)then hbar:=true;
-      1: hbar:=true;
+        0: if(hits<uid_MaxHits1)then hbar:=true;
+        1: hbar:=true;
         end;
 
       if(srect)then
@@ -439,41 +436,40 @@ begin
    end;
 end;
 
-procedure D_UnitsInfo(tar:pSDL_Surface;lx,ly:integer);
+procedure D_LayerUnitsInfo(tar:pSDL_Surface);
 var t:integer;
 begin
    case map_scenario of
-mc_royale: circleColor(tar,lx+map_hSize-ui_cam_x,ly+map_hSize-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
+   mc_royale: circleColor(tar,map_hSize-ui_cam_x,map_hSize-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
    end;
 
-
    while(vid_PrimitivesS>0)do
-    with vid_PrimitivesL[vid_PrimitivesS-1] do
-    begin
-       vid_PrimitivesS-=1;
+     with vid_PrimitivesL[vid_PrimitivesS-1] do
+     begin
+        vid_PrimitivesS-=1;
 
-       x0+=lx-ui_cam_x;
-       y0+=ly-ui_cam_y;
-       if(kind=uinfo_rect)
-       or(kind=uinfo_box)
-       or(kind=uinfo_line)then
-       begin
-          x1+=lx-ui_cam_x;
-          y1+=ly-ui_cam_y;
-          if(kind<>uinfo_line)then
-          begin
-          if(x0>x1)then begin t:=x0;x0:=x1;x1:=t;end;
-          if(y0>y1)then begin t:=y0;y0:=y1;y1:=t;end;
-          end;
-       end;
+        x0-=ui_cam_x;
+        y0-=ui_cam_y;
+        if(kind=uinfo_rect)
+        or(kind=uinfo_box)
+        or(kind=uinfo_line)then
+        begin
+           x1-=ui_cam_x;
+           y1-=ui_cam_y;
+           if(kind<>uinfo_line)then
+           begin
+              if(x0>x1)then begin t:=x0;x0:=x1;x1:=t;end;
+              if(y0>y1)then begin t:=y0;y0:=y1;y1:=t;end;
+           end;
+        end;
 
-       if(sprite<>nil)then
-        with sprite^ do draw_sdlsurface(tar,x0,y0,surf);
+        if(sprite<>nil)then
+          with sprite^ do draw_sdlsurface(tar,x0,y0,surf);
 
-       if(kind=uinfo_sprite)then continue;
+        if(kind=uinfo_sprite)then continue;
 
-       if(color>0)then
-        case kind of
+        if(color>0)then
+          case kind of
 uinfo_line   : lineColor     (tar,x0,y0,x1,y1,color);
 uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
 uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
@@ -482,15 +478,15 @@ uinfo_text   : begin
                draw_text(tar,x0,y0,text_lt,ta_MM,255,color);
                continue;
                end;
-        else
-        end;
+          else
+          end;
 
-       if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1       ,text_lt ,ta_LU,255,c_white);
-       if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_w1h,text_lt2,ta_LU,255,c_white);
-       if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1       ,text_rt ,ta_RU,255,c_white);
-       if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1       ,text_rd ,ta_RB,255,c_white);
-       if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1       ,text_ld ,ta_LB,255,c_white);
-    end;
+        if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1       ,text_lt ,ta_LU,255,c_white);
+        if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_w1h,text_lt2,ta_LU,255,c_white);
+        if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1       ,text_rt ,ta_RU,255,c_white);
+        if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1       ,text_rd ,ta_RB,255,c_white);
+        if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1       ,text_ld ,ta_LB,255,c_white);
+     end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -498,15 +494,15 @@ end;
 //  Terrain
 //
 
-procedure D_terrain(tar:pSDL_Surface;lx,ly:integer);
+procedure D_LayerTerrain(tar:pSDL_Surface);
 var i,t,
   ix,iy,s:integer;
     vx,vy:integer;
     spr  :PTMWTexture;
 begin
    draw_sdlsurface(tar,
-   lx-ui_cam_x mod map_ter_w,
-   ly-ui_cam_y mod map_ter_h,
+   -ui_cam_x mod map_ter_w,
+   -ui_cam_y mod map_ter_h,
    map_terrain);
 
    vx:=ui_cam_x-vid_ab;
@@ -532,8 +528,8 @@ begin
         if(ix<0)then ix:=ui_mwa+ix;
         if(iy<0)then iy:=ui_mha+iy;
 
-        ix+=lx-vid_ab;
-        iy+=ly-vid_ab;
+        ix-=vid_ab;
+        iy-=vid_ab;
 
         with spr^ do draw_sdlsurface(tar,ix-hw,iy-hh,spr^.surf);
      end;
@@ -609,7 +605,7 @@ end;
 //
 
 
-procedure D_Fog(tar:pSDL_Surface;lx,ly:integer);
+procedure D_LayerFog(tar:pSDL_Surface);
 var
 cx,cy,
 ssx,ssy,
@@ -620,8 +616,8 @@ begin
    or(ui_fog_gridw<=0)
    or(ui_fog_gridh<=0)then exit;
 
-   ssx:=lx-ui_cam_fx;
-   sty:=ly-ui_cam_fy;
+   ssx:=-ui_cam_fx;
+   sty:=-ui_cam_fy;
 
    for cx:=0 to ui_fog_gridw-1 do
    begin
@@ -681,8 +677,8 @@ begin
     with uid^ do
      if(hits>dead_hits)or(u=ai_scout_u_cur)then
      begin
-        ix:=x-ui_cam_x+ui_mapx;
-        iy:=y-ui_cam_y+ui_mapy;
+        ix:=x-ui_cam_x;
+        iy:=y-ui_cam_y;
 
         //draw_text(vid_screen,ix,iy,i2s(anim), ta_LU,255, PlayerGetColor(playeri));
 
@@ -701,10 +697,10 @@ begin
 
                //rectangleColor(vid_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
-              lineColor(vid_screen,ix+1,iy+1,uo_x+ui_mapx-ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
+              lineColor(vid_screen,ix+1,iy+1,uo_x+ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
 
               if(aiu_alarm_d<32000)then
-              lineColor(vid_screen,ix,iy,aiu_alarm_x+ui_mapx-ui_cam_x  ,aiu_alarm_y+ui_mapy-ui_cam_y  ,c_red );
+              lineColor(vid_screen,ix,iy,aiu_alarm_x+ui_cam_x  ,aiu_alarm_y+ui_cam_y  ,c_red );
            end;
 
            draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_LU,255, PlayerGetColor(playeri,false));

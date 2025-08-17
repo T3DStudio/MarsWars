@@ -43,10 +43,7 @@ end;
 procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal;lastLineY:pinteger=nil);
 var
 strLen,
-i,start,
-lastSplitChar,
-lastSplitChars,
-chars,
+i,
 lines_n,
 line   :byte;
 textH,
@@ -58,16 +55,7 @@ lines_spos,
 lines_epos,
 lines_endc,
 lines_len :shortstring;
-procedure AddLine(endChar:char);
-begin
-   lines_spos+=chr(start);
-   lines_epos+=chr(i    );
-   lines_len +=chr(chars);
-   lines_endc+=endChar;
-   start:=i+1;
-   chars:=0;
-   lastSplitChar:=0;
-end;
+
 begin
    if(BaseColor=0)then exit;
    strLen:=length(str);
@@ -83,77 +71,29 @@ begin
    begin
       if(strLen>MaxLineChars)then
       begin
-         lines_spos+=chr(strLen-MaxLineChars);
-         lines_epos+=chr(strLen);
-         lines_len +=chr(MaxLineChars);
+         lines_spos:=chr(strLen-MaxLineChars);
+         lines_epos:=chr(strLen);
+         lines_len :=chr(MaxLineChars);
+         textW:=MaxLineChars*font_w1;
       end
       else
       begin
-         lines_spos+=#1;
-         lines_epos+=chr(strLen);
-         lines_len +=chr(strLen);
+         lines_spos:=#1;
+         lines_epos:=chr(strLen);
+         lines_len :=chr(strLen);
+         textW:=strLen*font_w1;
       end;
-      lines_endc+=#0;
+      lines_endc:=#0;
       lines_n:=1;
-      textW:=strLen*font_w1;
       textH:=font_w1;
       ix:=x;
-      y:=y-font_w1;
+      y :=y-font_w1;
    end
    else
    begin
       textW:=0;
       textH:=0;
-      chars:=0;
-      start:=1;
-      lastSplitChar:=0;
-      i:=0;
-      while(i<strLen)do
-      begin
-         i+=1;
-         charc:=str[i];
-
-         case charc of
-         tc_nl1 : begin textH+=txt_line_h1-font_w1;AddLine(charc);end;
-         tc_nl2 : begin textH+=txt_line_h2-font_w1;AddLine(charc);end;
-         tc_nl3 : begin textH+=txt_line_h3-font_w1;AddLine(charc);end;
-         else
-            if not(charc in tc_SpecChars)then
-            begin
-               case charc of
-               ' ',
-               '/',
-               '\',
-               ':',
-               '-'  : begin
-                         lastSplitChar :=i;
-                         lastSplitChars:=chars;
-                      end;
-               ',',
-               '.'  : if(i<255)and(i<strLen)then
-                       if(str[i+1]=' ')then
-                       begin
-                          lastSplitChar :=i;
-                          lastSplitChars:=chars;
-                       end;
-               end;
-               chars+=1;
-               if(chars>=MaxLineChars)and(i<strLen)then
-               begin
-                  textH+=txt_line_h1-font_w1;
-                  if(lastSplitChar>0)then
-                  begin
-                     i:=lastSplitChar;
-                     chars:=lastSplitChars;
-                  end;
-                  AddLine(tc_nl1);
-               end;
-            end;
-         end;
-         if(i=strLen)then AddLine(#0);
-      end;
-      lines_n:=length(lines_len);
-      textH+=lines_n*font_w1;
+      str_analize(@str,@lines_spos,@lines_epos,@lines_endc,@lines_len,@textH,@lines_n,nil,MaxLineChars);
 
       case alignment of
       ta_LU,
@@ -391,7 +331,7 @@ begin
      with g_gplayers[UIPlayer] do
        with log_l[log_i] do
          case mtype of
-lmt_unit_advanced    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
+lmt_unit_LevelUp    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
 lmt_unit_ready       : if(g_uids[argx].uid_ukbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
                        else ui_AddMarker(xi,yi,aummat_created_u ,true);

@@ -62,7 +62,7 @@ begin
    if(r<0    )then r:=0;
    if(r>MFogM)then r:=MFogM;
    for i:=0 to r do
-     for iy:=0 to _RX2Y[r,i] do
+     for iy:=0 to CircleRX2Y[r,i] do
      begin
         setFOGPoint(x-i,y-iy);
         setFOGPoint(x-i,y+iy);
@@ -102,7 +102,7 @@ begin
        begin
           if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
           if(uid_ability=uab_UACScan)and(rld>radar_vision_time)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,
-                                                                                        (uo_y div fog_cw)-ui_fog_sy,fsr);
+                                                                                           (uo_y div fog_cw)-ui_fog_sy,fsr);
           unit_FogReveal:=true
        end
        else
@@ -466,7 +466,7 @@ begin
 
       if(wanim)then unit_FootEffect(pu);
 
-      UnitsInfoAddUnit(pu,uid_SpriteModel[level]);
+      UnitsInfoAddFromUnit(pu,uid_SpriteModel[level]);
 
       if(buffs[ub_Invis ]>0 )then alpha:=128;
 

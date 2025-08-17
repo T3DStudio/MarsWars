@@ -199,7 +199,7 @@ var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=str_f_rpls+rpls_NamePrefix+'_'+str_map_ScenarioEngL[map_scenario]+'_'+str_DateTime+str_e_rpls;
+   rpls_str_path:=str_f_rpls+rpls_NamePrefix+'_'+str_replay_ScenarioL[map_scenario]+'_'+str_DateTime+str_e_rpls;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -462,7 +462,7 @@ begin
 
       if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_FastSkip);
 
-      if(rpls_FastSkip)then effects_sprites(false,false);
+      if(rpls_FastSkip)then effects_sprites(false);
       rpls_ForwardSkip-=1;
    end;
    if(rpls_ForwardSkip=0)then rpls_FastSkip:=false;

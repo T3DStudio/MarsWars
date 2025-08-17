@@ -143,26 +143,18 @@ test_InstaProd    : boolean = true;
 g_eids            : array[byte] of TEID;
 g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
 
-ms_eid_bio_death_uids
+missiles_UIDsBioEff         // units that trigger "bio" effect of missiles
                   : TSoB;
 
-_RX2Y             : array[0..MFogM,0..MFogM] of integer;
+CircleRX2Y        : array[0..MFogM,0..MFogM] of integer;
 
 TestMode          : byte = 0;
-sys_uncappedFPS       : boolean = false;
+sys_uncappedFPS   : boolean = false;
 
 LocalPlayer       : byte = 1; // 'this' player
 PlayerName        : shortstring = 'DoomPlayer';
 PlayerReady       : boolean = false;
 
-PlayerColorsDefault,
-PlayerColorsCurrent,
-PlayerColorsShadow : array[0..LastPlayer] of cardinal;
-PlayerColorDefaultCurrent: cardinal = 0;
-PlayerColorDefaultShadow : cardinal = 0;
-
-
-ingame_chat       : byte = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -192,6 +184,8 @@ vid_ShowFPS         : boolean = true;
 
 UIPlayer          : byte = 1;
 
+ui_InGameChat     : byte = 0;
+
 ui_update_timer   : integer = 0;
 ui_update_now     : boolean = false;
 
@@ -207,8 +201,8 @@ ui_blink2_color_BY: cardinal;
 ui_blink3         : byte;
 ui_mm_ScanBlink   : boolean = false;
 
-ui_panel,
-ui_uipanel,
+ui_UIPanelTemplate,
+ui_UIPanel,
 ui_minimap,
 ui_mminimap,
 ui_bminimap       : pSDL_SURFACE;
@@ -241,10 +235,14 @@ ui_MouseScroll    : boolean = false;
 ui_ColoredShadow  : boolean = true;
 ui_ControlPanelPos: byte = 0;
 
-ui_panelx         : integer = 0;
-ui_panely         : integer = 0;
-ui_mapx           : integer = 0;
-ui_mapy           : integer = 0;
+ui_UIPanelX         : integer = 0;
+ui_UIPanelY         : integer = 0;
+ui_UIPanelW         : integer = 0;
+ui_UIPanelH         : integer = 0;
+ui_UIPortX0,
+ui_UIPortY0,
+ui_UIPortX1,
+ui_UIPortY1       : integer;
 
 ui_fog_fgrid,
 ui_fog_pgrid      : array of array of boolean;
@@ -266,10 +264,6 @@ ui_tab            : byte = 0;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ButtonsNum] of byte;
 ui_panel_CtrlActs : array[TTabControlContent,0..ui_ButtonsNum] of byte;
-
-ui_group_d        : array[0..MaxUnitGroups] of TUnitGroup;
-ui_group_f1       : TUnitGroup;
-ui_group_f2       : TUnitGroup;
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -313,29 +307,43 @@ ui_limit,                                           // unit limit colors
 ui_blink_color2,
 ui_blink_color1   : array[false..true] of cardinal;
 
-ui_uiuphx         : integer = 0;
+ui_group_d        : array[0..MaxUnitGroups] of TUnitGroup;
+ui_group_f1       : TUnitGroup;
+ui_group_f2       : TUnitGroup;
+ui_groupX         : integer = 0;  // order icons screen X
+ui_groupY         : integer = 0;  // order icons screen Y
+
+ui_UIPortXC       : integer = 0;
 ui_uiuphy         : integer = 0;
 ui_uiplayery      : integer = 0;
-ui_ingamecl       : byte = 0;
-ui_textx          : integer = 0;  // timer/chat screen X
-ui_texty          : integer = 0;  // timer/chat screen Y
-ui_hinty1         : integer = 0;  // hints screen Y 1
-ui_hinty2         : integer = 0;  // hints screen Y 2
-ui_hinty3         : integer = 0;  // hints screen Y 3
-ui_hinty4         : integer = 0;  // hints screen Y 4
-ui_logy           : integer = 0;  // LOG screen Y
-ui_chaty          : integer = 0;  // chat screen Y
-ui_oicox          : integer = 0;  // order icons screen X
-ui_energx         : integer = 0;
-ui_energy         : integer = 0;
-ui_armyx          : integer = 0;
-ui_armyy          : integer = 0;
+ui_timerX         : integer = 0;
+ui_timerY         : integer = 0;
+ui_PanelHintX     : integer = 0;
+ui_PanelHintY     : integer = 0;
+ui_PanelHintN     : integer = 0;
+ui_PanelHintW     : byte = 0;
+ui_PanelHintL     : TStringList;
+
+ui_ReplayBarW     : integer = 0;
+ui_ReplayBarH     : integer = font_w2;
+ui_ReplayBarX     : integer = 0;
+ui_ReplayBarY     : integer = 0;
+ui_energyX        : integer = 0;
+ui_energyY        : integer = 0;
+ui_armyX          : integer = 0;
+ui_armyY          : integer = 0;
 ui_apmx           : integer = 0;
 ui_apmy           : integer = 0;
 ui_fpsx           : integer = 0;
 ui_fpsy           : integer = 0;
 ui_game_log_height: integer = 0;
 
+ui_logx           : integer = 0;  // LOG screen X
+ui_logy           : integer = 0;  // LOG screen Y
+ui_loga           : byte = 0;
+ui_chatx          : integer = 0;  // chat screen X
+ui_chaty          : integer = 0;  // chat screen Y
+ui_chat_LineLen   : byte = 0;
 ui_log_lines      : array of shortstring;
 ui_log_type       : array of byte;
 ui_log_color      : array of cardinal;
@@ -365,6 +373,7 @@ menu_ItemSelected : integer;
 menu_items        : array[byte] of TMenuItem;
 menu_update       : boolean = true;
 menu_redraw       : boolean = true;
+menu_redraw_pause : integer = 0;
 menu_NetMsg       : TMenuMessage;
 
 menu_ResolutionWi,
@@ -452,7 +461,7 @@ svld_file_size    : cardinal = 0;
 
 rpls_Record       : boolean = true;
 rpls_RecordTryPause:integer = 0;
-rpls_fstate      : byte = 0;    // file status (none,write,read)
+rpls_fstate      : byte = 0;     // file status (none,write,read)
 rpls_pnu          : integer = 0; // quality
 rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
@@ -544,6 +553,12 @@ c_ablack,
 c_purple,
 c_violet,
 c_black           : cardinal;
+
+PlayerColorsDefault,
+PlayerColorsCurrent,
+PlayerColorsShadow : array[0..LastPlayer] of cardinal;
+PlayerColorDefaultCurrent: cardinal = 0;
+PlayerColorDefaultShadow : cardinal = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -839,13 +854,12 @@ spr_cp_gen         : TMWTexture;
 str_ability_name  : array[byte      ] of shortstring;
 str_race          : array[0..r_cnt  ] of shortstring;
 str_map_ScenarioL,
-str_map_ScenarioEngL
+str_replay_ScenarioL
                   : array[0..mc_Last] of shortstring;
 
 str_ps_AI,
 str_ps_Hum,
 str_ps_Host       : string4;
-
 
 str_menu_Campaings,
 str_menu_Scirmish,
@@ -862,18 +876,61 @@ str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
 str_menu_Pause,
+str_menu_chat,
+
+str_menuMsg_Error,
+str_menuMsg_HintDefault,
+str_menuMsg_HintClient,
 
 str_S_Game,
 str_S_Replay,
 str_S_Video,
 str_S_Sound,
 
+str_SG_ControlPanelPos,
+str_SG_ColoredShadow,
+str_SG_HealthBars,
+str_SG_PlayersColor,
+str_SG_PlayerName,
+str_SG_Language,
+str_SG_RightClickAct,
+str_SG_ScrollSpeed,
+str_SG_MouseScroll,
+str_SG_ShowAPM,
+
 str_SR_RecordGames,
+str_SR_ReplayPrefix,
+str_SR_Quality,
+
+str_GO_AISlots,
+str_GO_DefeatedObs,
+str_GO_FixedStarts,
+str_GO_Random,
 
 str_SV_ResolutionW,
 str_SV_ResolutionH,
+str_SV_ResolutionApply,
+str_SV_Windowed,
+str_SV_MenuScale,
+str_SV_MenuScaleSmooth,
+str_SV_ShowFPS,
 
+str_SS_NextTrack,
+str_SS_MusicListSize,
+str_SS_ReloadMusic,
+str_SS_SoundVolume,
+str_SS_MusicVolume,
+
+str_FilePlay,
 str_FileInfo,
+str_FileSave,
+str_FileLoad,
+str_FileDelete,
+
+str_FileError_NExists,
+str_FileError_Open,
+str_FileError_WData,
+str_FileError_WVer,
 
 str_net_ServerStart,
 str_net_ServerStop,
@@ -881,10 +938,6 @@ str_net_Connect,
 str_net_Disconnect,
 str_net_LANSearch,
 
-str_need_energy,
-str_cant_build,
-str_cant_prod,
-str_check_reqs,
 str_hint_TransformTo,
 str_hint_UpgradesLvl,
 str_hint_Demons,
@@ -892,18 +945,10 @@ str_hint_Except,
 str_hint_UnitArming,
 str_hint_menu,
 str_hint_pause,
-str_weapon_melee,
-str_weapon_ranged,
-str_weapon_zombie,
-str_weapon_ressurect,
-str_weapon_heal,
-str_weapon_spawn,
-str_weapon_suicide,
-str_weapon_targets,
-str_weapon_damage,
 str_hint_SplashResist,
 str_hint_hits,
-str_hint_srange,
+str_hint_BaseSightR,
+str_hint_SightR,
 str_hint_Ability,
 str_hint_builder,
 str_hint_barrack,
@@ -911,13 +956,53 @@ str_hint_smith,
 str_hint_IncEnergyLevel,
 str_hint_CanRebuildTo,
 str_hint_TargetLimit,
-str_SS_NextTrack,
-str_SS_MusicListSize,
+str_hint_requirements,
+str_hint_req,
+str_hint_uprod,
+str_hint_bprod,
+
+str_uarm_melee,
+str_uarm_ranged,
+str_uarm_zombie,
+str_uarm_ressurect,
+str_uarm_heal,
+str_uarm_spawn,
+str_uarm_suicide,
+str_uarm_targets,
+str_uarm_BaseImpact,
+str_uarm_MinRange,
+str_uarm_MaxRange,
+str_uarm_SplashDamageR,
+str_uarm_BonusAFlyR,
+str_uarm_BonusAGroundR,
+str_uarm_BonusAUnitR,
+str_uarm_BonusABuildingR,
+str_uarm_Priority,
+str_uarm_Upgrade,
+str_uarm_Factor,
+
 str_gmsg_RecordStart,
 str_gmsg_RecordStop,
-str_SS_ReloadMusic,
 str_gmsg_PlayerPaused,
 str_gmsg_PlayerResumed,
+str_gmsg_PlayerLeft,
+str_gmsg_PlayerSurrender,
+str_gmsg_PlayerDefeat,
+str_gmsg_GameSaved,
+str_gmsg_GameLoaded,
+str_gmsg_WrongVersion,
+str_gmsg_ServerFull,
+str_gmsg_GameStarted,
+str_gmsg_PortBlocked,
+
+str_gstat_WaitForServer,
+str_gstat_Unknown,
+str_gstat_ReplayEnd,
+str_gstat_ReplayError,
+str_gstat_Paused,
+str_gstat_Win,
+str_gstat_Lose,
+
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,
@@ -933,158 +1018,113 @@ str_attr_heavy,
 str_attr_fly,
 str_attr_ground,
 str_attr_floater,
-str_unit_advanced,
 str_attr_transport,
-str_advanced,
-str_upgrade_complete,
-str_building_complete,
-str_unit_complete,
-str_unit_attacked,
-str_base_attacked,
-str_allies_attacked,
-str_cant_execute,
-str_ability_reloading,
-str_invalid_target,
-str_cant_land,
-str_cpoint_captured,
-str_cpoint_lost,
-str_koth_control,
-str_ngen_exh,
-str_ngen_captured,
-str_ngen_lost,
-str_maxlimit_reached,
-str_mapMark,
-str_need_more_builders,
-str_production_busy,
-str_cant_advanced,
-str_NeedMoreProd,
-str_MaximumReached,
+
+str_warn_prod_BadPlace,
+str_warn_prod_BadOrder,
+str_warn_Req_Energy,
+str_warn_Req_Common,
+str_warn_unit_Levelup,
+str_warn_unit_complete,
+str_warn_unit_attacked,
+str_warn_upgrade_complete,
+str_warn_building_complete,
+str_warn_base_attacked,
+str_warn_allies_attacked,
+str_warn_Invalid_Order,
+str_warn_Invalid_Target,
+str_warn_AbilityReload,
+str_warn_AbilityBadPlace,
+str_warn_kpoint_captured,
+str_warn_kpoint_lost,
+str_warn_koth_control,
+str_warn_ngen_exh,
+str_warn_ngen_captured,
+str_warn_ngen_lost,
+str_warn_MaxLimitReached,
+str_warn_mapMark,
+str_warn_NeedBuilder,
+str_warn_prod_AllBusy,
+str_warn_upgrade_InProgress,
+str_warn_NeedProdUnit,
+str_warn_MaxCountReached,
+
+str_map,
+str_map_Scenario,
+str_map_Generators,
 str_map_Seed,
 str_map_Size,
 str_map_Obstacles,
 str_map_Symmetry,
-str_SG_PlayerName,
-str_GO_AISlots,
-str_map_Generators,
-str_GO_DefeatedObs,
-str_net_Ready,
-str_GO_FixedStarts,
-str_map_Scenario,
-str_gmsg_PlayerLeft,
-str_gmsg_PlayerSurrender,
-str_gmsg_PlayerDefeat      : shortstring;
-str_map_GeneratorsL        : array[0..map_MaxGenerators] of shortstring;
-str_SG_PlayersColorL       : array[0..vid_MaxPlayersColor] of shortstring;
-str_SG_HealthBarsL         : array[0..2] of shortstring;
-str_SG_ControlPanelPosL    : array[0..3] of shortstring;
-str_SG_ControlPanelPos,
-str_SG_ColoredShadow,
-str_SG_HealthBars,
-str_SG_PlayersColor,
-str_all,
-str_ui_UnitGroups,
-str_hint_requirements,
-str_hint_req,
-str_hint_uprod,
-str_hint_bprod,
-str_SG_Language,
-str_SV_ResolutionApply,
-str_GO_Random,
-str_menuMsg_Error,
-str_menuMsg_HintDefault,
-str_menuMsg_HintClient,
+str_map_Random,
 
-str_menu_chat,
+str_ui_UnitGroups,
 str_ui_ChatAll,
 str_ui_ChatAllies,
-str_Caption_Server,
-str_Caption_Client,
-str_Caption_GOptions,
-str_gstat_WaitForServer,
-str_gstat_Unknown,
-str_Camp_Difficulty,
-str_gstat_ReplayEnd,
-str_gstat_ReplayError,
-str_SR_ReplayPrefix,
-str_FilePlay,
 str_ui_menu,
 str_ui_time,
 str_ui_KothTime,
 str_ui_KotHTime_act,
 str_ui_KotHWinner,
+str_ui_army,
+str_ui_energy,
+
+str_Camp_Difficulty,
+str_cmp_unk,
+str_cmp_Date,
+str_cmp_Location,
+str_cmp_Area,
+
+str_all,
 str_Players,
-str_map,
-str_FileSave,
-str_FileLoad,
-str_FileDelete,
-str_gmsg_GameSaved,
-str_gmsg_GameLoaded,
-str_gstat_Paused,
 str_observer,
-str_gstat_Win,
-str_gstat_Lose,
-str_gmsg_WrongVersion,
-str_gmsg_ServerFull,
-str_gmsg_GameStarted,
+
+str_net_Ready,
 str_net_UDPPort,
 str_net_ServerLANVis,
-str_gmsg_PortBlocked,
-str_SR_Quality,
 str_net_ConnectedToDed,
 str_net_Quality,
 str_net_Address,
-str_SS_SoundVolume,
-str_SS_MusicVolume,
-str_SG_RightClickAct,
-str_SG_ScrollSpeed,
-str_SG_MouseScroll,
-str_SV_Windowed,
-str_SV_MenuScale,
-str_SV_MenuScaleSmooth,
-str_SV_ShowFPS,
-str_SG_ShowAPM,
-str_map_Random,
-str_FileError_NExists,
-str_FileError_Open,
-str_FileError_WData,
-str_FileError_WVer,
+
 str_PT_Player,
 str_PT_State,
 str_PT_Race,
 str_PT_Team,
 str_PT_Color,
 str_PT_Ping,
-str_cmp_unk,
-str_cmp_Date,
-str_cmp_Location,
-str_cmp_Area,
+
+str_Caption_Server,
+str_Caption_Client,
+str_Caption_GOptions,
 str_Caption_Objectives,
 str_Caption_Multiplayer,
 str_Caption_NetSVSearch,
 str_Caption_Map,
 str_Caption_Players      : shortstring;
-str_NetQualityL,
-str_ReplayQualityL          : array[0..net_MaxQuality] of shortstring;
-str_Camp_DifficultyL          : array[0..CMPMaxSkills] of shortstring;
-str_ui_Tab        : array[0..3] of shortstring;
-str_ui_army     : shortstring;
-str_ui_energy   : shortstring;
-str_rstatus       : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
-str_action_hint   : array[byte] of shortstring;
-str_menu_hint     : array[byte] of shortstring;
+str_NetQualityL,
+str_ReplayQualityL       : array[0..net_MaxQuality] of shortstring;
+str_Camp_DifficultyL     : array[0..CMPMaxSkills  ] of shortstring;
+str_ui_Tab               : array[0..3] of shortstring;
+
+str_map_GeneratorsL      : array[0..map_MaxGenerators  ] of shortstring;
+str_SG_PlayersColorL     : array[0..vid_MaxPlayersColor] of shortstring;
+str_SG_HealthBarsL       : array[0..2] of shortstring;
+str_SG_ControlPanelPosL  : array[0..3] of shortstring;
+
+str_action_hint,
+str_uarm_PriorityL,
+str_menu_hint            : array[byte] of shortstring;
 
 str_camp_MissionName,
-//str_camp_obj,
-//str_camp_plot,
-str_camp_map      : array[0..LastMission] of shortstring;
-str_camp_infol    : array[0..LastMission] of TStringList;
-str_camp_infon    : array[0..LastMission] of integer;
-
+str_camp_map             : array[0..LastMission] of shortstring;
+str_camp_infol           : array[0..LastMission] of TStringList;
+str_camp_infon           : array[0..LastMission] of integer;
 
 str_SG_LanguageL,
-str_SG_RightClickActL      : array[false..true] of shortstring;
+str_SG_RightClickActL    : array[false..true] of shortstring;
 
+str_rstatus              : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1318,7 +1358,6 @@ snd_bfg_shot,
 snd_bfg_exp,
 snd_healing,
 snd_electro,
-snd_jetpoff,
 snd_jetpon,
 snd_click,
 snd_chat,

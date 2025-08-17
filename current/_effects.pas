@@ -231,25 +231,26 @@ procedure missile_explode_effect(m:integer);
 var i,o,r:byte;
 begin
    with g_missiles[m] do
-   with g_mids[mid] do
-   if(ui_CheckMapPointFogVision(vx,vy,true))then
-   begin
-      o:=ms_eid_death_cnt[ms_eid_bio_death];
-      r:=ms_eid_death_r  [ms_eid_bio_death];
-      if(r<2)or(o<2)then
-      begin
-         r:=0;
-         o:=1;
-      end;
-      for i:=1 to o do effect_add(vx-g_randomr(r),vy-g_randomr(r),draw_SpriteDepth(vy,mfs)+100,ms_eid_death[ms_eid_bio_death]);
+   with g_mids[m_mid] do
+     if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then
+     begin
+        o:=mid_eid_DeathN[m_eid_DeathType];
+        r:=mid_eid_DeathR[m_eid_DeathType];
+        if(r<2)or(o<2)then
+        begin
+           r:=0;
+           o:=1;
+        end;
+        for i:=1 to o do effect_add(m_vx-g_randomr(r),
+                                    m_vy-g_randomr(r),draw_SpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
 
-      if(mfe=uf_ground)and(ms_eid_decal>0)then effect_add(vx,vy,sd_liquid+vy,ms_eid_decal);
+        if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_vx,m_vy,sd_liquid+m_vy,mid_eid_Decal);
 
-      if(ms_snd_death_ch[ms_eid_bio_death]>0)then
-       if(random(ms_snd_death_ch[ms_eid_bio_death])>0)then exit;
+        if(mid_snd_DeathSkip[m_eid_DeathType]>0)then
+          if(random(mid_snd_DeathSkip[m_eid_DeathType])>0)then exit;
 
-      SoundPlayUnit(ms_snd_death[ms_eid_bio_death],nil,nil);
-   end;
+        SoundPlayUnit(mid_snd_death[m_eid_DeathType],nil,nil);
+     end;
 end;
 
 procedure missiles_sprites;
@@ -258,12 +259,12 @@ var  m:integer;
 begin
    for m:=0 to MaxMissiles do
      with g_missiles[m] do
-       if(ui_CheckMapPointFogVision(vx,vy,true))then
-         with g_mids[mid] do
-           if(vstep>0)then
+       if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then
+         with g_mids[m_mid] do
+           if(m_vstep>0)then
            begin
-              spr:=_sm2s(ms_smodel,sms_stand,dir,0,nil);
-              SpriteListAddEffect(vx,vy,draw_SpriteDepth(vy,mfs)+100,0,spr,255);
+              spr:=_sm2s(mid_SpriteModel,sms_stand,m_dir,0,nil);
+              SpriteListAddEffect(m_vx,m_vy,draw_SpriteDepth(m_vy,m_mfs)+100,0,spr,255);
            end;
 end;
 
@@ -276,7 +277,7 @@ begin
    effect_add(tx,ty,draw_SpriteDepth(ty+1,ukfly),eidend  );
 end;
 
-procedure effects_sprites(noanim,draw:boolean);
+procedure effects_sprites(noanim:boolean);
 var ei,
  alpha:integer;
    spr:PTMWTexture;
@@ -320,8 +321,7 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
         then spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
         else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
-        if(draw)then
-          if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
+        if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
      end;
 end;
 

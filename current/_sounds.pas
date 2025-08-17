@@ -491,7 +491,7 @@ begin
 0..LastPlayer         : if(mtype<>PListener)then SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
-lmt_player_chat,
+lmt_chat_common,
 lmt_game_message      : SoundPlayUI(snd_chat);
 // Basic
 lmt_game_end          : if(argx<=LastPlayer)then
@@ -500,17 +500,17 @@ lmt_game_end          : if(argx<=LastPlayer)then
                           else SoundPlayAnoncer(snd_defeat [race],false,true);
 lmt_player_defeated   : if(argx<=LastPlayer)and(g_status=gs_running)
                         then SoundPlayAnoncer(snd_player_defeated[race],true,false);
-lmt_unit_advanced     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
+lmt_unit_LevelUp     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
 lmt_unit_ready        : with g_uids[argx] do
                         SoundPlayUnitCommand(uid_snd_ready);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
-lmt_cant_build        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
+lmt_prod_BadPlace        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_map_mark,
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_unit_attacked     : with g_uids[argx] do
                         SoundPlayMMapAlarm(snd_under_attack[uid_ukbuilding,race],true);
 // Key Point Events
-lmt_req_energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
+lmt_Req_Energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control,
 lmt_ngen_captured,
 lmt_kpoint_captured   : SoundPlayAnoncer(snd_capture,true,false);
@@ -518,21 +518,18 @@ lmt_ngen_exh,
 lmt_ngen_lost,
 lmt_kpoint_lost       : SoundPlayAnoncer(snd_cplost,false,false);
 
-//
-lmt_invalid_tar,
-lmt_ability_cantland,
+lmt_invalid_Target,
+lmt_ability_BadPlace,
 lmt_ability_reload,
-lmt_ability_needS ,
-lmt_ability_needSP ,
-lmt_unit_needbuilder,
-lmt_MaximumLevel,
-lmt_NeedMoreProd,
-lmt_MaximumReached,
-lmt_unit_limit,
-lmt_production_busy,
-lmt_req_ruids,
-lmt_req_common,
-lmt_cant_order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
+lmt_unit_NeedBuilder,
+lmt_NeedProdUnit,
+lmt_Req_MaxCount,
+lmt_Req_Limit,
+lmt_Req_Common,
+lmt_prod_AllBusy,
+lmt_upgrade_InProgress,
+lmt_prod_BadOrder,
+lmt_Invalid_Order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
 
          end;
 end;
@@ -665,7 +662,6 @@ begin
 
    snd_radar                :=SoundSetLoad(race_dir[r_uac]+'radar');
 
-   snd_jetpoff              :=SoundSetLoad(race_dir[r_uac]+'jetpoff'   );
    snd_jetpon               :=SoundSetLoad(race_dir[r_uac]+'jetpon'    );
    snd_CCup                 :=SoundSetLoad(race_dir[r_uac]+'ccup'      );
    snd_bomblaunch           :=SoundSetLoad(race_dir[r_uac]+'bomblaunch');

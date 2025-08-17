@@ -329,9 +329,9 @@ end;
 function CheckAIRTarget:boolean;
 begin
    CheckAIRTarget:=true;
-   if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.pfzone)then exit;
+   if(ai_alarm_d<NOTSET)and(ai_alarm_zone<>pu^.mapZone)then exit;
    if(ai_generator_d<NOTSET)then
-    if(ai_generator_cp^.kpzone<>pu^.pfzone)then exit;
+    if(ai_generator_cp^.kpzone<>pu^.mapZone)then exit;
    CheckAIRTarget:=false;
 end;
 
@@ -900,7 +900,7 @@ begin
       uo_y:=mm3i(1,uo_y,map_Size);
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
       or(force)
-      or(not ukfly and not ukfloater and (pfzone<>map_GetZone(uo_x,uo_y)))
+      or(not ukfly and not ukfloater and (mapZone<>map_GetZone(uo_x,uo_y)))
       or(g_CheckRoyalBattlePoint(uo_x,uo_y,base_1r))
       then ai_RunTo(pu,-1,random(map_Size),random(map_Size),0,nil);
    end;
@@ -1001,7 +1001,7 @@ begin
       or(kpEnergy<=0)then
         if(kpd<kpCaptureR)then
         begin
-           if(kpzone<>pu^.pfzone)and(not ai_kpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
+           if(kpzone<>pu^.mapZone)and(not ai_kpoint_koth)and(not(pu^.ukfly or pu^.ukfloater))
            then ai_RunTo(pu,0,0,0,0,pu)
            else ai_RunTo(pu,0,kpx,kpy,kpCaptureR div 2,nil);
            au_SetBusyGroup(pu);
@@ -1023,10 +1023,10 @@ begin
    begin
       tx:=tu^.x;
       ty:=tu^.y;
-      tz:=tu^.pfzone;
+      tz:=tu^.mapZone;
    end;
    with pu^ do
-   if(pfzone=tz)or(td<base_1r)or(ukfly)or(ukfloater)then
+   if(mapZone=tz)or(td<base_1r)or(ukfly)or(ukfloater)then
    begin
       if(tweight>tar_weight)
       then
@@ -1069,7 +1069,7 @@ begin
       commander_u:=ai_commander_fly_u;
       commander_d:=ai_commander_fly_d;
       if(ai_commander_grd_u<>nil)then
-        if((tar_d<NOTSET)and(ai_commander_grd_u^.pfzone=tar_z))
+        if((tar_d<NOTSET)and(ai_commander_grd_u^.mapZone=tar_z))
         or(tar_d=NOTSET)then
         begin
            commander_u:=ai_commander_grd_u;
@@ -1192,7 +1192,7 @@ begin
    begin
       if(ai_teleporterR_u<>nil)then
       begin
-         if((ai_teleporterR_u^.pfzone<>pfzone)and(tar_d=NOTSET))then
+         if((ai_teleporterR_u^.mapZone<>mapZone)and(tar_d=NOTSET))then
            if(ai_TryTeleportR(pu))then exit;
 
          if(ai_alarm_d>base_2r)and(ai_teleporterR_u^.aiu_limitaround_ally<ai_teleporterR_u^.aiu_limitaround_enemy)then
@@ -1202,7 +1202,7 @@ begin
       if(ai_teleporterF_u<>nil)then
       begin
          if(ai_teleporterF_d<base_2r)and(ai_abase_d<NOTSET)and(tar_d>base_2r)then  // проверить
-           if((ai_abase_d>base_4r)and((cycle_order mod 5)=0) )or(ai_abase_u^.pfzone<>pfzone)then
+           if((ai_abase_d>base_4r)and((cycle_order mod 5)=0) )or(ai_abase_u^.mapZone<>mapZone)then
             if(ai_TryTeleportF(pu,ai_abase_u))then exit;
 
          if(tar_d=NOTSET)then
@@ -1393,7 +1393,7 @@ begin
                   if(ai_base_d<base_1r)
                   or(ai_base_d=NOTSET)
                   then
-                    if(not map_IfObstacleZone(pfzone))
+                    if(not map_IfObstacleZone(mapZone))
                     then unit_sability(pu,false);
                   {with player^ do
                   with uid^ do
@@ -1405,7 +1405,7 @@ begin
                         if(aiu_FiledSquareNear<=ai_FiledSquareBorder)
                         //or(ai_builders_count>=3)
                         or(map_scenario=mc_royale)then
-                          if(not pf_IfObstacleZone(pfzone))
+                          if(not pf_IfObstacleZone(mapZone))
                           then _unit_sability(pu);  }
                end;
       end
@@ -1488,7 +1488,7 @@ begin
    if(d<bd)then
    begin
       if(bd<NOTSET)then
-        if(zone<>pu^.pfzone)then exit;
+        if(zone<>pu^.mapZone)then exit;
       bd:=d;
       bx:=x;
       by:=y;
@@ -1562,8 +1562,8 @@ begin
       if(ai_enemy_d>srange)then ai_PlayerSetAlarm(player,x,y,0,alarmr,false,0);
       if(ai_enemy_d<NOTSET)then
         if(ai_enemy_d<=srange)
-        then ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_limitaround_enemy     ,alarmr,ai_enemy_u^.uid^.uid_ukbuilding,ai_enemy_u^.pfzone)
-        else ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,ai_enemy_u^.uid^.uid_LimitUse,alarmr,ai_enemy_u^.uid^.uid_ukbuilding,ai_enemy_u^.pfzone);
+        then ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_limitaround_enemy     ,alarmr,ai_enemy_u^.uid^.uid_ukbuilding,ai_enemy_u^.mapZone)
+        else ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,ai_enemy_u^.uid^.uid_LimitUse,alarmr,ai_enemy_u^.uid^.uid_ukbuilding,ai_enemy_u^.mapZone);
 
       if(not iscomplete)then exit;
 

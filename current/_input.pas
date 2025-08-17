@@ -82,7 +82,7 @@ begin
 
    input_SetAction(iAct_Control_UAbility1,ikt_keyboard,0           ,SDLK_Q           );
    input_SetAction(iAct_Control_UAbility2,ikt_keyboard,0           ,SDLK_W           );
-   input_SetAction(iAct_Control_UAbility3,ikt_keyboard,0           ,SDLK_E           );
+   input_SetAction(iAct_Control_Rebuild  ,ikt_keyboard,0           ,SDLK_E           );
    input_SetAction(iAct_Control_UAMove   ,ikt_keyboard,0           ,SDLK_A           );
    input_SetAction(iAct_Control_UAStop   ,ikt_keyboard,0           ,SDLK_S           );
    input_SetAction(iAct_Control_UAPatrol ,ikt_keyboard,0           ,SDLK_D           );
@@ -119,9 +119,9 @@ begin
    input_SetAction(iAct_SProd23          ,ikt_keyboard,iAct_control,SDLK_B           );
    input_SetAction(iAct_SProd24          ,ikt_keyboard,iAct_control,SDLK_N           );
 
-   input_SetAction(iAct_InGameChat       ,ikt_keyboard,0           ,sdlk_return);
-   input_SetAction(iAct_InGameChatAll    ,ikt_keyboard,iAct_Control,sdlk_return);
-   input_SetAction(iAct_InGameChatAllies ,ikt_keyboard,iAct_Shift  ,sdlk_return);
+   input_SetAction(iAct_InGameChat       ,ikt_keyboard,0           ,sdlk_return      );
+   input_SetAction(iAct_InGameChatAll    ,ikt_keyboard,iAct_Control,sdlk_return      );
+   input_SetAction(iAct_InGameChatAllies ,ikt_keyboard,iAct_Shift  ,sdlk_return      );
 
    input_SetAction(iAct_test_FastTime    ,ikt_keyboard,0           ,sdlk_end         );
    input_SetAction(iAct_test_InstaProd   ,ikt_keyboard,0           ,sdlk_home        );
@@ -129,17 +129,17 @@ begin
    input_SetAction(iAct_test_iddqd       ,ikt_keyboard,0           ,sdlk_pagedown    );
    input_SetAction(iAct_test_FogToggle   ,ikt_keyboard,0           ,sdlk_backspace   );
    input_SetAction(iAct_test_DrawToggle  ,ikt_keyboard,0           ,sdlk_insert      );
-   input_SetAction(iAct_test_NullUpgrades,ikt_keyboard,0           ,SDLK_F3          );
-   input_SetAction(iAct_test_BePlayer0   ,ikt_keyboard,0           ,SDLK_F4          );
-   input_SetAction(iAct_test_BePlayer1   ,ikt_keyboard,0           ,SDLK_F5          );
-   input_SetAction(iAct_test_BePlayer2   ,ikt_keyboard,0           ,SDLK_F6          );
-   input_SetAction(iAct_test_BePlayer3   ,ikt_keyboard,0           ,SDLK_F7          );
-   input_SetAction(iAct_test_BePlayer4   ,ikt_keyboard,0           ,SDLK_F8          );
-   input_SetAction(iAct_test_BePlayer5   ,ikt_keyboard,0           ,SDLK_F9          );
-   input_SetAction(iAct_test_BePlayer6   ,ikt_keyboard,0           ,SDLK_F10         );
-   input_SetAction(iAct_test_BePlayer7   ,ikt_keyboard,0           ,SDLK_F11         );
-   input_SetAction(iAct_test_debug0      ,ikt_keyboard,0           ,SDLK_KP0         );
-   input_SetAction(iAct_test_debug1      ,ikt_keyboard,0           ,SDLK_KP1         );
+   input_SetAction(iAct_test_NullUpgrades,ikt_keyboard,0           ,SDLK_KP_MINUS    );
+   input_SetAction(iAct_test_BePlayer0   ,ikt_keyboard,0           ,SDLK_KP0         );
+   input_SetAction(iAct_test_BePlayer1   ,ikt_keyboard,0           ,SDLK_KP1         );
+   input_SetAction(iAct_test_BePlayer2   ,ikt_keyboard,0           ,SDLK_KP2         );
+   input_SetAction(iAct_test_BePlayer3   ,ikt_keyboard,0           ,SDLK_KP3         );
+   input_SetAction(iAct_test_BePlayer4   ,ikt_keyboard,0           ,SDLK_KP4         );
+   input_SetAction(iAct_test_BePlayer5   ,ikt_keyboard,0           ,SDLK_KP5         );
+   input_SetAction(iAct_test_BePlayer6   ,ikt_keyboard,0           ,SDLK_KP6         );
+   input_SetAction(iAct_test_BePlayer7   ,ikt_keyboard,0           ,SDLK_KP7         );
+   input_SetAction(iAct_test_debug0      ,ikt_keyboard,0           ,SDLK_KP8         );
+   input_SetAction(iAct_test_debug1      ,ikt_keyboard,0           ,SDLK_KP9         );
 
    input_SetAction(iAct_Replay_Fast      ,ikt_keyboard,0           ,SDLK_Q           );
    input_SetAction(iAct_Replay_Pause     ,ikt_keyboard,0           ,SDLK_W           );
@@ -178,7 +178,7 @@ begin
 
    ui_panel_CtrlActs[tcc_controls,0 ]:=iAct_Control_UAbility1;
    ui_panel_CtrlActs[tcc_controls,1 ]:=iAct_Control_UAbility2;
-   ui_panel_CtrlActs[tcc_controls,2 ]:=iAct_Control_UAbility3;
+   ui_panel_CtrlActs[tcc_controls,2 ]:=iAct_Control_Rebuild;
    ui_panel_CtrlActs[tcc_controls,3 ]:=iAct_Control_UAMove;
    ui_panel_CtrlActs[tcc_controls,4 ]:=iAct_Control_UAStop;
    ui_panel_CtrlActs[tcc_controls,5 ]:=iAct_Control_UAPatrol;
@@ -296,7 +296,7 @@ begin
    m_brush:=co_empty;
 end;
 
-procedure ui_ClientCommandEffect(cmd,tar,ox1,oy1:integer);
+procedure ui_CommandEffect(cmd,tar,ox1,oy1:integer);
 var
 i,
 SelectedAll,
@@ -369,8 +369,8 @@ begin
       case cmd of
       co_supgrade,
       co_cupgrade,
-      co_suprod,
-      co_cuprod,
+      co_sunit,
+      co_cunit,
       co_pcancle  : ;
       co_rcamove,
       co_rcmove,
@@ -403,9 +403,6 @@ begin
                  else _PlayCommand(uid_snd_move  );
    end;
 
-   ox1+=ui_mapx;
-   oy1+=ui_mapy;
-
    if(IsUnitRange(tar,nil))then
    begin
       ui_umark_u:=tar;
@@ -424,7 +421,7 @@ begin
    end;
 end;
 
-procedure PlayerSendOrder(ox0,oy0,ox1,oy1,oa0:integer;oid,playerN:byte);
+procedure PlayerSendOrder(ox0,oy0,ox1,oy1:integer;oa0,oid,playerN:byte);
 var u:integer;
 begin
    if(G_Status=gs_running)and(rpls_pstate<rpls_read)then
@@ -437,7 +434,7 @@ begin
          net_writeint (oy0);
          net_writeint (ox1);
          net_writeint (oy1);
-         net_writeint (oa0);
+         net_writebyte(oa0);
          net_writebyte(oid);
 
          with g_gplayers[LocalPlayer] do
@@ -460,7 +457,7 @@ begin
            o_id:=oid;
         end;
 
-      if(oid=uo_corder)then ui_ClientCommandEffect(ox0,oy0,ox1,oy1);
+      if(oid=uo_corder)then ui_CommandEffect(ox0,oy0,ox1,oy1);
    end;
 end;
 
@@ -554,7 +551,7 @@ begin
 end;
 
 procedure mouse_BrushCheck(logErrors:boolean);
-var cndt:cardinal;
+var ReqBits:cardinal;
 begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
@@ -571,10 +568,10 @@ begin
                                exit;
                             end;
 
-                            cndt:=CheckUnitReqs(@g_gplayers[LocalPlayer],m_brush);
-                            if(cndt>0)then
+                            ReqBits:=CheckUnitReqs(@g_gplayers[LocalPlayer],m_brush);
+                            if(ReqBits>0)then
                             begin
-                               if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,cndt,-1,-1);
+                               if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
                                m_brush:=co_empty;
                             end
                             else
@@ -605,31 +602,32 @@ begin
   co_pability          : if(ui_uibtn_pabilityu=nil)
                          then m_brush:=co_empty
                          else
-                           if(PlayerSetProdError(LocalPlayer,lmt_argt_abil,ui_uibtn_pabilityu^.uid^.uid_ability,unit_pability(ui_uibtn_pabilityu,0,0,0,true),ui_uibtn_pabilityu))
-                           then m_brush:=co_empty
-                           else
-                             with ui_uibtn_pabilityu^ do
-                             with uid^ do
-                               case uid_ability of
-                               uab_HKeepBlink,
-                               uab_HTowerBlink,
-                               uab_CCFly         : math_push_out(mouse_map_x,mouse_map_y,uid_r                     ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
-                               uab_RebuildInPoint: math_push_out(mouse_map_x,mouse_map_y,g_uids[uid_rebuild_uid].uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
-                               end;
+                           with ui_uibtn_pabilityu^ do
+                             if(GameLogBits2Message(LocalPlayer,uid^.uid_ability,lmt_argt_ability,unit_pability(ui_uibtn_pabilityu,0,0,0,true),x,y))
+                             then m_brush:=co_empty
+                             else
+                               with uid^ do
+                                 case uid_ability of
+                                 uab_HKeepBlink,
+                                 uab_HTowerBlink,
+                                 uab_CCFly         : math_push_out(mouse_map_x,mouse_map_y,uid_r                        ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                 uab_RebuildInPoint: math_push_out(mouse_map_x,mouse_map_y,g_uids[uid_rebuild_uid].uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                 end;
   co_move   ,co_patrol  ,
   co_amove  ,co_apatrol : if(ui_uibtn_move  =0)then m_brush:=co_empty;
      else  m_brush:=co_empty
      end;
 end;
 
-procedure ui_command(x,y,target:integer);
+procedure ui_MBrush2Command(x,y,target:integer);
 begin
    case m_brush of
 co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // move
 co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);   // attack
 co_pability: if(ui_uibtn_pabilityu<>nil)then
-             PlayerSendOrder(m_brush   ,target,x,y,ui_uibtn_pabilityu^.uid^.uid_ability,
-                                                      uo_corder,LocalPlayer);
+             with ui_uibtn_pabilityu^.uid^ do
+             PlayerSendOrder(m_brush   ,target,x,y,uid_ability,
+                                                     uo_corder,LocalPlayer);
 co_patrol,
 co_apatrol : PlayerSendOrder(m_brush   ,0     ,x,y,0,uo_corder,LocalPlayer);
 co_empty   :
@@ -658,12 +656,12 @@ iAct_SProd24           : if(ui_GameControlsEnabled)then
                               case ui_tab of
                               tab_buildings: if(click_type=pct_left)then begin m_brush:=ui_panel_uids[race,ui_tab,u];clickSoundON;end;
                               tab_units    : case click_type of
-                                             pct_left   : begin PlayerSendOrder(co_suprod  ,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
-                                             pct_right  : begin PlayerSendOrder(co_cuprod  ,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
+                                             pct_left   : begin PlayerSendOrder(co_sunit   ,0,ui_cam_cx,ui_cam_cy,ui_panel_uids[race,ui_tab,u],uo_corder,LocalPlayer);clickSoundON;end;
+                                             pct_right  : begin PlayerSendOrder(co_cunit   ,0,ui_cam_cx,ui_cam_cy,ui_panel_uids[race,ui_tab,u],uo_corder,LocalPlayer);clickSoundON;end;
                                              end;
                               tab_upgrades : case click_type of
-                                             pct_left   : begin PlayerSendOrder(co_supgrade,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
-                                             pct_right  : begin PlayerSendOrder(co_cupgrade,ui_panel_uids[race,ui_tab,u],ui_cam_cx,ui_cam_cy,0,uo_corder,LocalPlayer);clickSoundON;end;
+                                             pct_left   : begin PlayerSendOrder(co_supgrade,0,ui_cam_cx,ui_cam_cy,ui_panel_uids[race,ui_tab,u],uo_corder,LocalPlayer);clickSoundON;end;
+                                             pct_right  : begin PlayerSendOrder(co_cupgrade,0,ui_cam_cx,ui_cam_cy,ui_panel_uids[race,ui_tab,u],uo_corder,LocalPlayer);clickSoundON;end;
                                              end;
                               end;
                          end;
@@ -708,16 +706,18 @@ iAct_Control_USelArmy  : if(ui_group_f2.ugroup_n>0)then
         if(ui_GameControlsEnabled)then
           case action of
 iAct_Control_UAbility1 : if(ui_uibtn_sabilityu<>nil)then
-                           if(not PlayerSetProdError(LocalPlayer,lmt_argt_abil,ui_uibtn_sabilityu^.uid^.uid_ability,unit_sability(ui_uibtn_sabilityu,true),ui_uibtn_sabilityu))then
-                             PlayerSendOrder(co_sability,0,ui_cam_cx,ui_cam_cy,ui_uibtn_sabilityu^.uid^.uid_ability, uo_corder  ,LocalPlayer);
+                           with ui_uibtn_sabilityu^ do
+                             if(not GameLogBits2Message(LocalPlayer,uid^.uid_ability,lmt_argt_ability,unit_sability(ui_uibtn_sabilityu,true),x,y))then
+                               PlayerSendOrder(co_sability,0,ui_cam_cx,ui_cam_cy,uid^.uid_ability,uo_corder,LocalPlayer);
 iAct_Control_UAbility2 : if(ui_uibtn_pabilityu<>nil)then
                          begin
                             m_brush :=co_pability;
                             mouse_BrushCheck(true);
                          end;
-iAct_Control_UAbility3 : if(ui_uibtn_rebuildu<>nil)then
-                           if(not PlayerSetProdError(LocalPlayer,lmt_argt_unit,0,unit_rebuild (ui_uibtn_rebuildu,true),ui_uibtn_rebuildu))then
-                             PlayerSendOrder(co_rebuild ,0,ui_cam_cx,ui_cam_cy,ui_uibtn_rebuildu^.uid^.uid_rebuild_uid, uo_corder  ,LocalPlayer);
+iAct_Control_Rebuild   : if(ui_uibtn_rebuildu<>nil)then
+                           with ui_uibtn_rebuildu^ do
+                             if(not GameLogBits2Message(LocalPlayer,uid^.uid_rebuild_uid,lmt_argt_unit,unit_rebuild(ui_uibtn_rebuildu,true),x,y))then
+                               PlayerSendOrder(co_rebuild,0,ui_cam_cx,ui_cam_cy,uid^.uid_rebuild_uid,uo_corder,LocalPlayer);
 iAct_Control_UAMove     : m_brush :=co_amove;
 iAct_Control_UAStop     : PlayerSendOrder(co_astand  ,0,0,0,0, uo_corder  ,LocalPlayer);
 iAct_Control_UAPatrol   : m_brush :=co_apatrol;
@@ -726,11 +726,11 @@ iAct_Control_UStop      : PlayerSendOrder(co_stand   ,0,0,0,0, uo_corder  ,Local
 iAct_Control_UPatrol    : m_brush :=co_patrol;
 iAct_Control_UProdCncl  : if(s_barracks>0)
                           or(s_smiths  >0)
-                          then PlayerSendOrder(co_pcancle ,0,0,0,0, uo_corder  ,LocalPlayer)
+                          then PlayerSendOrder(co_pcancle,0,0,0,0,uo_corder,LocalPlayer)
                           else
                             case ui_tab of
-                            tab_units    : PlayerSendOrder(co_cuprod  ,255,0,0,0,uo_corder,LocalPlayer);
-                            tab_upgrades : PlayerSendOrder(co_cupgrade,255,0,0,0,uo_corder,LocalPlayer);
+                            tab_units    : PlayerSendOrder(co_cunit  ,0,0,0,255,uo_corder,LocalPlayer);
+                            tab_upgrades : PlayerSendOrder(co_cupgrade,0,0,0,255,uo_corder,LocalPlayer);
                             end;
 iAct_Control_UDestroy   : PlayerSendOrder(co_destroy,0,0,0,0 ,uo_corder  ,LocalPlayer);
 
@@ -782,10 +782,8 @@ begin
 
    k_KeyboardString:='';
 
-   if(k_LastChar_t>k_LastCharStuckDealy)then
+   if(k_LastChar_t>k_LastCharStuckDelay)then
      if(length(k_KeyboardString)<255)then k_KeyboardString+=k_LastChar;
-
-
 
    while (SDL_PollEvent(sys_EVENT)>0) do
     case (sys_EVENT^.type_) of
@@ -824,7 +822,8 @@ begin
                             k_LastChar_t:= 1;
                             k_LastChar  :=Widechar(sys_EVENT^.key.keysym.unicode);
                             if(length(k_KeyboardString)<255)then
-                              k_KeyboardString+=k_LastChar;
+                              if(k_LastChar in CharSetAll)then
+                                k_KeyboardString+=k_LastChar;
                             end;
     else
     end;
@@ -842,17 +841,15 @@ var u,bx,by:integer;
 clickSound:boolean;
 begin
    clickSound:=false;
-   mouse_map_x:=mouse_x+ui_cam_x-ui_mapx;
-   mouse_map_y:=mouse_y+ui_cam_y-ui_mapy;
    if(ui_ControlPanelPos<2)then  // vertical
    begin
-      u:=mouse_x-ui_panelx;bx:=u div ui_ButtonW1;if(u<0)then bx-=1;
-      u:=mouse_y-ui_panely;by:=u div ui_ButtonW1;if(u<0)then by-=1;
+      u:=mouse_x-ui_UIPanelX;bx:=u div ui_ButtonW1;if(u<0)then bx-=1;
+      u:=mouse_y-ui_UIPanelY;by:=u div ui_ButtonW1;if(u<0)then by-=1;
    end
    else
    begin
-      u:=mouse_y-ui_panely;bx:=u div ui_ButtonW1;if(u<0)then bx-=1;
-      u:=mouse_x-ui_panelx;by:=u div ui_ButtonW1;if(u<0)then by-=1;
+      u:=mouse_y-ui_UIPanelY;bx:=u div ui_ButtonW1;if(u<0)then bx-=1;
+      u:=mouse_x-ui_UIPanelX;by:=u div ui_ButtonW1;if(u<0)then by-=1;
    end;
 
    m_focus:=mf_map;
@@ -868,12 +865,22 @@ begin
    mf_Map,
    mf_MiniMap  : m_btnN:=-1;
    mf_Tabs     : if(ui_ControlPanelPos<2)
-                 then begin u:=mouse_x-ui_panelx;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end
-                 else begin u:=mouse_y-ui_panely;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end;
+                 then begin u:=mouse_x-ui_UIPanelX;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end
+                 else begin u:=mouse_y-ui_UIPanelY;m_btnN:=u div ui_TabButtonW;if(u<0)then m_btnN-=1;end;
    mf_CtrlPanel: begin
                  by-=4;
                  m_btnN:=(by*ui_CtrlPanelBW)+(bx mod ui_CtrlPanelBW);
                  end;
+   end;
+   if(m_focus=mf_MiniMap)then
+   begin
+      mouse_map_x:=round((mouse_x-ui_UIPanelX)/map_mmcx);
+      mouse_map_y:=round((mouse_y-ui_UIPanelY)/map_mmcx);
+   end
+   else
+   begin
+      mouse_map_x:=mouse_x+ui_cam_x;
+      mouse_map_y:=mouse_y+ui_cam_y;
    end;
 
    mouse_BrushCheck(false);
@@ -904,13 +911,13 @@ begin
                                  mouse_select_y0:=mouse_map_y;
                               end;
                   1..255    : if(m_brushc=c_lime)
-                              then PlayerSendOrder(m_brushx,m_brushy,m_brush,0,0, uo_build  ,LocalPlayer)
+                              then PlayerSendOrder(m_brushx,m_brushy,0,0,byte(m_brush), uo_build  ,LocalPlayer)
                               else GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y);
                   co_pability,
                   co_move,
                   co_amove,
                   co_patrol,
-                  co_apatrol: ui_command(m_brushx,m_brushy,m_UnitTargetN);
+                  co_apatrol: ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
                   co_mmark  : MapMarker (mouse_map_x,mouse_map_y);
                   end;
      mf_minimap : case m_brush of
@@ -918,8 +925,8 @@ begin
                   co_move,
                   co_amove,
                   co_patrol,
-                  co_apatrol : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTargetN);
-                  co_mmark   : MapMarker (trunc((mouse_x-ui_panelx)/map_mmcx),trunc((mouse_y-ui_panely)/map_mmcx));
+                  co_apatrol : ui_MBrush2Command(trunc((mouse_x-ui_UIPanelX)/map_mmcx),trunc((mouse_y-ui_UIPanelY)/map_mmcx),m_UnitTargetN);
+                  co_mmark   : MapMarker (trunc((mouse_x-ui_UIPanelX)/map_mmcx),trunc((mouse_y-ui_UIPanelY)/map_mmcx));
                   else         if(not rpls_POVRecorder)then m_mmap_move:=true;
                   end;
      mf_tabs    : if(0<=m_btnN)and(m_btnN<4)then
@@ -946,7 +953,7 @@ begin
 
    if(m_mmap_move)and(mouse_select_x0=-1)then
    begin
-      ui_Camera_MoveToPoint(trunc((mouse_x-ui_panelx)/map_mmcx), trunc((mouse_y-ui_panely)/map_mmcx));
+      ui_Camera_MoveToPoint(trunc((mouse_x-ui_UIPanelX)/map_mmcx), trunc((mouse_y-ui_UIPanelY)/map_mmcx));
       ui_Camera_Bounds;
    end;
 
@@ -963,8 +970,8 @@ begin
      then m_brush:=co_empty
      else
        case m_focus of
-       mf_map      : ui_command(mouse_map_x,mouse_map_y,m_UnitTargetN);
-       mf_minimap  : ui_command(trunc((mouse_x-ui_panelx)/map_mmcx), trunc((mouse_y-ui_panely)/map_mmcx),m_UnitTargetN);
+       mf_map      : ui_MBrush2Command(mouse_map_x,mouse_map_y,m_UnitTargetN);
+       mf_minimap  : ui_MBrush2Command(trunc((mouse_x-ui_UIPanelX)/map_mmcx), trunc((mouse_y-ui_UIPanelY)/map_mmcx),m_UnitTargetN);
        mf_CtrlPanel: ui_ControlPanel_click(pct_right,@clickSound);     // panel
        end;
 
@@ -1011,8 +1018,8 @@ procedure test_nullupgr(playeri:byte);
 var i:byte;
 begin
    with g_gplayers[playeri] do
-    for i:=1 to 255 do
-     upgr[i]:=0;
+     for i:=1 to 255 do
+       upgr[i]:=0;
 end;
 
 procedure GameControlsKeyboard;
@@ -1025,45 +1032,45 @@ begin
 
    // Chat
    if(InputActionPressed(iAct_InGameChat))then
-     if(ingame_chat>0)then
+     if(ui_InGameChat>0)then
      begin
         if(length(net_chat_str)>0)then
         begin
-           case ingame_chat of
-           chat_all   : ingame_chat:=255;
+           case ui_InGameChat of
+           chat_all   : ui_InGameChat:=255;
            chat_allies: if(PlayerGetAlliesByte(LocalPlayer,false)>0)then
-                          ingame_chat:=PlayerGetAlliesByte(LocalPlayer,true);
-           else         ingame_chat:=0;
+                          ui_InGameChat:=PlayerGetAlliesByte(LocalPlayer,true);
+           else         ui_InGameChat:=0;
            end;
 
-           if(ingame_chat>0)then
+           if(ui_InGameChat>0)then
              if(net_status=ns_client)
-             then net_send_chat(            ingame_chat,net_chat_str)
-             else GameLogChat  (LocalPlayer,ingame_chat,net_chat_str);
+             then net_send_chat(            ui_InGameChat,net_chat_str)
+             else GameLogChat  (LocalPlayer,ui_InGameChat,net_chat_str);
            net_chat_str:='';
         end;
-        ingame_chat:=0;
+        ui_InGameChat:=0;
      end
      else
        if(PlayerGetAlliesByte(LocalPlayer,false)>0)
-       then ingame_chat:=chat_allies
-       else ingame_chat:=chat_all;
+       then ui_InGameChat:=chat_allies
+       else ui_InGameChat:=chat_all;
    if(InputActionPressed(iAct_InGameChatAllies))then
-     if(ingame_chat=0)then
-       if(PlayerGetAlliesByte(LocalPlayer,false)>0)then ingame_chat:=chat_allies;
+     if(ui_InGameChat=0)then
+       if(PlayerGetAlliesByte(LocalPlayer,false)>0)then ui_InGameChat:=chat_allies;
    if(InputActionPressed(iAct_InGameChatAll   ))then
-     if(ingame_chat=0)then ingame_chat:=chat_all;
+     if(ui_InGameChat=0)then ui_InGameChat:=chat_all;
 
    // Chat text input
-   if(ingame_chat>0)then
-     if(length(k_KeyboardString)>0)then
+   if(ui_InGameChat>0)then
+     if(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))then
        net_chat_str:=StringApplyInput(net_chat_str,CharSetCommon,MaxChatStringLength,nil);
 
    // Escape
    if(InputActionPressed(iact_Esc))then
-     if(ingame_chat>0)then
+     if(ui_InGameChat>0)then
      begin
-        ingame_chat :=0;
+        ui_InGameChat :=0;
         net_chat_str:='';
      end
      else GameOpenMenu;
@@ -1080,7 +1087,7 @@ begin
    end;
 
    // other ngame actions
-   if(ingame_chat=0)and(g_status=gs_running)then
+   if(ui_InGameChat=0)and(g_status=gs_running)then
    begin
       // Test mode
       if(TestMode>0)and(net_status=ns_none)then

@@ -6,32 +6,32 @@ begin
    for m:=0 to 255 do
    with g_mids[m] do
    begin
-      ms_smodel   :=spr_pdmodel;
+      mid_SpriteModel   :=spr_pdmodel;
 
       // sprite model
       case m of
-MID_Imp      : ms_smodel:=@spr_h_p0;
-MID_Cacodemon: ms_smodel:=@spr_h_p1;
-MID_Baron    : ms_smodel:=@spr_h_p2;
+MID_Imp      : mid_SpriteModel:=@spr_h_p0;
+MID_Cacodemon: mid_SpriteModel:=@spr_h_p1;
+MID_Baron    : mid_SpriteModel:=@spr_h_p2;
 MID_Blizzard,
 MID_Mine,
-MID_HRocket  : ms_smodel:=@spr_h_p3;
-MID_Revenant : ms_smodel:=@spr_h_p4;
-MID_Mancubus : ms_smodel:=@spr_h_p5;
-MID_YPlasma  : ms_smodel:=@spr_h_p7;
-MID_BPlasma  : ms_smodel:=@spr_u_p0;
+MID_HRocket  : mid_SpriteModel:=@spr_h_p3;
+MID_Revenant : mid_SpriteModel:=@spr_h_p4;
+MID_Mancubus : mid_SpriteModel:=@spr_h_p5;
+MID_YPlasma  : mid_SpriteModel:=@spr_h_p7;
+MID_BPlasma  : mid_SpriteModel:=@spr_u_p0;
 MID_Bullet,
 MID_SChaingun,
-MID_Chaingun : ms_smodel:=@spr_u_p9;
+MID_Chaingun : mid_SpriteModel:=@spr_u_p9;
 MID_SShot,
-MID_SSShot   : ms_smodel:=@spr_u_p1s;
-MID_BFG      : ms_smodel:=@spr_u_p2;
+MID_SSShot   : mid_SpriteModel:=@spr_u_p1s;
+MID_BFG      : mid_SpriteModel:=@spr_u_p2;
 MID_ArchFire : ;
-MID_Flyer    : ms_smodel:=@spr_u_p3;
+MID_Flyer    : mid_SpriteModel:=@spr_u_p3;
 MID_Tank,
 MID_Granade,
 MID_URocketS,
-MID_URocket  : ms_smodel:=@spr_u_p8;
+MID_URocket  : mid_SpriteModel:=@spr_u_p8;
       end;
 
       // tracer
@@ -41,13 +41,13 @@ MID_HRocket,
 MID_URocketS,
 MID_URocket,
 MID_Revenant : begin
-               ms_eid_fly   :=MID_Bullet;
-               ms_eid_fly_st:=4;
+               mid_eid_FlyTrace   :=MID_Bullet;
+               mid_eid_FlyStep:=4;
                end;
 MID_Blizzard : begin
-               ms_eid_fly   :=MID_Granade;
-               ms_eid_fly_st:=1;
-               ms_eid_decal :=EID_db_h1;
+               mid_eid_FlyTrace   :=MID_Granade;
+               mid_eid_FlyStep:=1;
+               mid_eid_Decal :=EID_db_h1;
                end;
       end;
 
@@ -58,7 +58,7 @@ MID_YPlasma,
 MID_BPlasma,
 MID_Imp,
 MID_Cacodemon,
-MID_Baron    : ms_snd_death[false]:=snd_pexp;
+MID_Baron    : mid_snd_death[false]:=snd_pexp;
 MID_ArchFire,
 MID_Blizzard,
 MID_Mine,
@@ -66,70 +66,70 @@ MID_Tank,
 MID_Granade,
 MID_HRocket,
 MID_URocket,
-MID_Revenant : ms_snd_death[false]:=snd_exp;
+MID_Revenant : mid_snd_death[false]:=snd_exp;
 MID_Bullet,
 MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot   : begin
-               ms_snd_death   [false]:=snd_rico;
-               ms_snd_death_ch[false]:=5;
+               mid_snd_death   [false]:=snd_rico;
+               mid_snd_DeathSkip[false]:=5;
                end;
 MID_BFG      : begin
-               ms_snd_death[false]:=snd_bfg_exp;
-               ms_eid_target_eff  :=EID_BFG;
+               mid_snd_death[false]:=snd_bfg_exp;
+               mid_eid_target_eff  :=EID_BFG;
                end;
-MID_Flyer    : ms_snd_death[false]:=snd_flyer_a;
+MID_Flyer    : mid_snd_death[false]:=snd_flyer_a;
       end;
-      ms_snd_death[true ]:=ms_snd_death[false];
-      ms_eid_death    [false]:=m;
-      ms_eid_death    [true ]:=m;
-      ms_eid_death_cnt[false]:=1;
-      ms_eid_death_cnt[true ]:=1;
-      ms_eid_death_r  [false]:=0;
-      ms_eid_death_r  [true ]:=0;
+      mid_snd_death[true ]:=mid_snd_death[false];
+      mid_eid_death    [false]:=m;
+      mid_eid_death    [true ]:=m;
+      mid_eid_DeathN[false]:=1;
+      mid_eid_DeathN[true ]:=1;
+      mid_eid_DeathR  [false]:=0;
+      mid_eid_DeathR  [true ]:=0;
 
       // death sound and effect
       case m of
 MID_URocketS : begin
-                  ms_snd_death    [true ]:=snd_exp;
-                  ms_eid_death_cnt[true ]:=4;
-                  ms_eid_death_r  [true ]:=20;
-                  ms_snd_death    [false]:=snd_exp;
-                  ms_eid_death_cnt[false]:=4;
-                  ms_eid_death_r  [false]:=20;
+                  mid_snd_death    [true ]:=snd_exp;
+                  mid_eid_DeathN[true ]:=4;
+                  mid_eid_DeathR  [true ]:=20;
+                  mid_snd_death    [false]:=snd_exp;
+                  mid_eid_DeathN[false]:=4;
+                  mid_eid_DeathR  [false]:=20;
                end;
 MID_Bullet,
 MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot   : begin
-                  ms_snd_death    [true]:=nil;
-                  ms_snd_death_ch [true]:=0;
-                  ms_eid_death    [true]:=eid_blood;
-                  ms_eid_death_cnt[true]:=0;
+                  mid_snd_death    [true]:=nil;
+                  mid_snd_DeathSkip [true]:=0;
+                  mid_eid_death    [true]:=eid_blood;
+                  mid_eid_DeathN[true]:=0;
                end;
       end;
       case m of
 MID_SShot    : begin
-                  ms_eid_death_cnt[false]:=2;
-                  ms_eid_death_cnt[true ]:=2;
-                  ms_eid_death_r  [false]:=5;
-                  ms_eid_death_r  [true ]:=5;
+                  mid_eid_DeathN[false]:=2;
+                  mid_eid_DeathN[true ]:=2;
+                  mid_eid_DeathR  [false]:=5;
+                  mid_eid_DeathR  [true ]:=5;
                end;
 MID_SSShot   : begin
-                  ms_eid_death_cnt[false]:=4;
-                  ms_eid_death_cnt[true ]:=4;
-                  ms_eid_death_r  [false]:=12;
-                  ms_eid_death_r  [true ]:=12;
+                  mid_eid_DeathN[false]:=4;
+                  mid_eid_DeathN[true ]:=4;
+                  mid_eid_DeathR  [false]:=12;
+                  mid_eid_DeathR  [true ]:=12;
                end;
       end;
    end;
 
-   ms_eid_bio_death_uids:=[];
+   missiles_UIDsBioEff:=[];
    for m:=0 to 255 do
      with g_uids[m] do
-       if(not uid_ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then ms_eid_bio_death_uids+=[m];
+       if(not uid_ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then missiles_UIDsBioEff+=[m];
 end;
 
 {$ENDIF}
@@ -165,126 +165,124 @@ var m,d:integer;
     tu:PTUnit;
 begin
     for m:=0 to MaxUnits do
-    with g_missiles[m] do
-    if(vstep<=0)then
-    begin
-       x      := mxt;  // end point
-       y      := myt;
-       vx     := mvx;  // start point
-       vy     := mvy;
-       tar    := mtar;
-       mid    := msid;
-       player := mpl;
-       mfs    := mfst; // start floor
-       mfe    := mfet; // end floor
-       fake   := mfake;
-       dmod   := mdmod;
+      with g_missiles[m] do
+        if(m_vstep<=0)then
+        begin
+           m_x      := mxt;  // end point
+           m_y      := myt;
+           m_vx     := mvx;  // start point
+           m_vy     := mvy;
+           m_tar    := mtar;
+           m_mid    := msid;
+           m_playeri := mpl;
+           m_mfs    := mfst; // start floor
+           m_mfe    := mfet; // end floor
+           m_fake   := mfake;
+           m_dmod   := mdmod;
 
-       dtars  := 0;
-       dir    := point_dir(vx,vy,x,y);
-       d      := point_dist_rint(x,y,vx,vy);
+           m_dtars  := 0;
+           m_dir    := point_dir(m_vx,m_vy,m_x,m_y);
+           d      := point_dist_rint(m_x,m_y,m_vx,m_vy);
 
-       tu:=nil;
-       IsUnitRange(tar,@tu);
+           tu:=nil;
+           IsUnitRange(m_tar,@tu);
 
-       if(not ServerSide)then
-         if(d>base_1rh)and(tu<>nil)then exit;
+           if(not ServerSide)then
+             if(d>base_1rh)and(tu<>nil)then exit;
 
-       damage:=adddmg;
-       if(player<=LastPlayer)and(tu<>nil)then
-         with g_gplayers[player] do
-           if(mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_AASplash]>0)then mid:=MID_URocketS;
+           m_damage:=adddmg;
+           if(m_playeri<=LastPlayer)and(tu<>nil)then
+             with g_gplayers[m_playeri] do
+               if(m_mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
 
-       with g_mids[mid] do
-       begin
-          damage+=mid_base_damage;
-          homing:=mid_homing;
+           with g_mids[m_mid] do
+           begin
+              m_damage+=mid_base_damage;
+              m_homing:=mid_homing;
 
-          if(mid_speed>0)
-          then vstep:=d div mid_speed
-          else vstep:=-mid_speed;
-          if(vstep<=0)then vstep:=1;
+              if(mid_speed>0)
+              then m_vstep:=d div mid_speed
+              else m_vstep:=-mid_speed;
+              if(m_vstep<=0)then m_vstep:=1;
 
-          hvstep:=vstep div 2;
+              m_hvstep:=m_vstep div 2;
 
-          if(tu<>nil)then
-          begin
-             x-=sign(tu^.x-vx)*g_random(tu^.uid^.uid_missileR);
-             y-=sign(tu^.y-vy)*g_random(tu^.uid^.uid_missileR);
-          end;
+              if(tu<>nil)then
+              begin
+                 m_x-=sign(tu^.x-m_vx)*g_random(tu^.uid^.uid_missileR);
+                 m_y-=sign(tu^.y-m_vy)*g_random(tu^.uid^.uid_missileR);
+              end;
 
-          if(tar<=0)or(mid_base_splashr>0)
-          then mtars:=MaxUnits
-          else mtars:=1;
+              if(m_tar<=0)or(mid_base_SplashR>0)
+              then m_mtars:=MaxUnits
+              else m_mtars:=1;
 
-          {$IFDEF _FULLGAME}
-          ms_eid_bio_death:=false;
-          {$ENDIF}
-       end;
+              {$IFDEF _FULLGAME}
+              m_eid_DeathType:=false;
+              {$ENDIF}
+           end;
 
-       break;
-    end;
+           break;
+        end;
 end;
 
 procedure missle_damage(m:integer);
 var tu: PTUnit;
 teams : boolean;
 ud,rdamage: integer;
-     painX: byte;
 begin
    with g_missiles[m] do
-   with g_mids[mid] do
-    if(IsUnitRange(tar,@tu))then
+   with g_mids[m_mid] do
+    if(IsUnitRange(m_tar,@tu))then
      if(tu^.hits>0)and(not IsUnitRange(tu^.transportU,nil))then
      begin
-        if(not mid_noflycheck)and(mfs<>tu^.ukfly)then exit;
-        if(tu^.uidi in mid_nodamage)then exit;
+        if(not mid_noFlyCheck)and(m_mfs<>tu^.ukfly)then exit;
+        if(tu^.uidi in mid_ImmuneUnits)then exit;
 
-        teams  :=g_gplayers[player].team=tu^.player^.team;
+        teams  :=g_gplayers[m_playeri].team=tu^.player^.team;
 
         if(teams)then
-          if(mid_base_splashr<=0)
+          if(mid_base_SplashR<=0)
           then exit
           else
-            if(not mid_teamdamage)then exit;
+            if(not mid_TeamDamage)then exit;
 
-        ud:=point_dist_rint(vx,vy,tu^.x,tu^.y)-tu^.uid^.uid_r-mid_size;
+        ud:=point_dist_rint(m_vx,m_vy,tu^.x,tu^.y)-tu^.uid^.uid_r-mid_size;
         if(ud<0)then ud:=0;
 
-        rdamage:=ApplyDamageMod(tu,dmod,damage);
-        painX:=1;
-        if(player<=LastPlayer)and(tu<>nil)then
-          with g_gplayers[player] do
-            case mid of
+        rdamage:=ApplyDamageMod(tu,m_dmod,m_damage);
+        {if(m_playeri<=LastPlayer)and(tu<>nil)then
+          with g_gplayers[m_playeri] do
+            case m_mid of
           MID_SSShot,
           MID_SShot  : painX+=upgr[upgr_uac_ssgup]*2;
-            end;
+            end; }
 
-        if(ud<=0)and(dtars=0)then // direct target
+        if(ud<=0)and(m_dtars=0)then // direct target
         begin
            {$IFDEF _FULLGAME}
-           ms_eid_bio_death:=tu^.uidi in ms_eid_bio_death_uids;
+           m_eid_DeathType:=tu^.uidi in missiles_UIDsBioEff;
            {$ENDIF}
 
-           mtars-=1;
-           dtars+=1;
+           m_mtars-=1;
+           m_dtars+=1;
 
-           if(not fake)
-           then unit_damage(tu,rdamage,painX,player,false);
+           if(not m_fake)
+           then unit_damage(tu,rdamage,m_playeri,false);
         end
         else
-          if(mid_base_splashr>0)and(ud<mid_base_splashr)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ukmech)then // splash damage
+          if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ukmech)then // splash m_damage
           begin
              {$IFDEF _FULLGAME}
-             if(ms_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_SpriteDepth(tu^.vy+1,tu^.ukfly),ms_eid_target_eff);
+             if(mid_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_SpriteDepth(tu^.vy+1,tu^.ukfly),mid_eid_target_eff);
              {$ENDIF}
 
-             mtars-=1;
+             m_mtars-=1;
 
-             if(not fake)then
+             if(not m_fake)then
              begin
-                rdamage:=mm3i(0,trunc(rdamage*(1-(ud/mid_base_splashr))),rdamage);
-                unit_damage(tu,rdamage,painX,player,false);
+                rdamage:=mm3i(0,trunc(rdamage*(1-(ud/mid_base_SplashR))),rdamage);
+                unit_damage(tu,rdamage,m_playeri,false);
              end;
           end;
      end;
@@ -298,66 +296,66 @@ var m,u:integer;
 begin
    for m:=0 to MaxMissiles do
    with g_missiles[m] do
-   with g_mids[mid] do
-   if(vstep>0)then
+   with g_mids[m_mid] do
+   if(m_vstep>0)then
    begin
       tu:=nil;
-      if(IsUnitRange(tar,@tu))then
-       if(homing>mh_none)then
+      if(IsUnitRange(m_tar,@tu))then
+       if(m_homing>mh_none)then
         if(tu^.buffs[ub_teleport]>0)
-        then homing:=mh_none
+        then m_homing:=mh_none
         else
           if(tu^.x<>tu^.vx)
           or(tu^.y<>tu^.vy)
-          or(max2i(abs(tu^.x-x),abs(tu^.y-y))>tu^.uid^.uid_missileR)then
-            case homing of
+          or(max2i(abs(tu^.x-m_x),abs(tu^.y-m_y))>tu^.uid^.uid_missileR)then
+            case m_homing of
 mh_magnetic : begin
-                 x  +=sign(tu^.x-x)*3;
-                 y  +=sign(tu^.y-y)*3;
-                 mfe:=tu^.ukfly;
+                 m_x  +=sign(tu^.x-m_x)*3;
+                 m_y  +=sign(tu^.y-m_y)*3;
+                 m_mfe:=tu^.ukfly;
               end;
 mh_homing   : begin
-                 x  :=tu^.x;
-                 y  :=tu^.y;
-                 mfe:=tu^.ukfly;
+                 m_x  :=tu^.x;
+                 m_y  :=tu^.y;
+                 m_mfe:=tu^.ukfly;
               end;
             end;
 
-      if(mid=MID_Blizzard)then
+      if(m_mid=MID_Blizzard)then
       begin
-         if(vstep>mb_s1)
-         then vy-=fr_fps1
+         if(m_vstep>mb_s1)
+         then m_vy-=fr_fps1
          else
-           if(vstep=mb_s1)then
+           if(m_vstep=mb_s1)then
            begin
-              vx:=x;
-              vy:=y-(fr_fps1*mb_s0);
+              m_vx:=m_x;
+              m_vy:=m_y-(fr_fps1*mb_s0);
            end
            else
-             if(vstep<=mb_s0)then vy+=fr_fps1;
+             if(m_vstep<=mb_s0)then m_vy+=fr_fps1;
       end
       else
       begin
-         vx+=(x-vx) div vstep;
-         vy+=(y-vy) div vstep;
+         m_vx+=(m_x-m_vx) div m_vstep;
+         m_vy+=(m_y-m_vy) div m_vstep;
       end;
 
-      vstep-=1;
-      if(vstep<=hvstep)then mfs:=mfe;
+      m_vstep-=1;
+      if(m_vstep<=m_hvstep)then m_mfs:=m_mfe;
 
-      if(mid_ystep>0)then vy-=vstep div mid_ystep;
+      if(mid_ystep>0)then m_vy-=m_vstep div mid_ystep;
 
-      if(vstep=0)then
+      if(m_vstep=0)then
       begin
-         if(damage>0)and(mid_base_splashr>=0)then
-          if IsUnitRange(tar,nil)and(mtars=1)
+         if(m_damage>0)and(mid_base_SplashR>=0)then
+          if IsUnitRange(m_tar,nil)and(m_mtars=1)
           then missle_damage(m)
           else
             for u:=1 to MaxUnits do
             begin
-               tar:=u;
+               m_tar:=u;
                missle_damage(m);
-               if(mtars<=0)then break;
+               if(m_mtars<=0)then break;
             end;
 
          {$IFDEF _FULLGAME}
@@ -366,9 +364,9 @@ mh_homing   : begin
       end
       {$IFDEF _FULLGAME}
       else
-        if(ms_eid_fly_st>0)and(ms_eid_fly>0)then
-         if((vstep mod ms_eid_fly_st)=0)then
-           if(ui_CheckMapPointFogVision(vx,vy,true))then effect_add(vx,vy,draw_SpriteDepth(vy,mfs),ms_eid_fly);
+        if(mid_eid_FlyStep>0)and(mid_eid_FlyTrace>0)then
+         if((m_vstep mod mid_eid_FlyStep)=0)then
+           if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then effect_add(m_vx,m_vy,draw_SpriteDepth(m_vy,m_mfs),mid_eid_FlyTrace);
       {$ENDIF};
    end;
 end;

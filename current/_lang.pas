@@ -68,60 +68,22 @@ begin
 end;
 
 
-
-{function HotKeyBase2Str(ucl:byte):shortstring;  // hotkey units&upgrades tab
+function str_MakeActionHotKey(action:byte):shortstring;
 begin
-   HotKeyBase2Str:='';
-   if(ucl<=max_HotKeys)then
-    if(HotKeysBase1[ucl]>0)then
-    begin
-       if(HotKeysBase2[ucl]>0)then
-       HotKeyBase2Str:=               tc_lime+GetKeyName(HotKeysBase2[ucl])+tc_default+'+';
-       HotKeyBase2Str:=HotKeyBase2Str+tc_lime+GetKeyName(HotKeysBase1[ucl])+tc_default;
-    end;
-end;
-function HotKeyAction2Str(ucl:byte):shortstring;  // hotkey actions tab
-begin
-   HotKeyAction2Str:='';
-   if(ucl<=max_HotKeys)then
-    if(HotKeysAction1[ucl]>0)then
-    begin
-       if(HotKeysAction2[ucl]>0)then
-       HotKeyAction2Str:=                 tc_lime+GetKeyName(HotKeysAction2[ucl])+tc_default+'+';
-       HotKeyAction2Str:=HotKeyAction2Str+tc_lime+GetKeyName(HotKeysAction1 [ucl])+tc_default;
-    end;
-end;
-function HotKeyReplay2Str(ucl:byte):shortstring;  // hotkey replays tab
-begin
-   HotKeyReplay2Str:='';
-   if(ucl<=max_HotKeys)then
-    if(HotKeysReplay[ucl]>0)then
-     HotKeyReplay2Str:=tc_lime+GetKeyName(HotKeysReplay [ucl])+tc_default;
-end;
-function HotKeyObserver2Str(ucl:byte):shortstring;  // hotkey observer tab
-begin
-   HotKeyObserver2Str:='';
-   if(ucl<=max_HotKeys)then
-    if(HotKeysObserv[ucl]>0)then
-     HotKeyObserver2Str:=tc_lime+GetKeyName(HotKeysObserv [ucl])+tc_default;
-end; }
-
-function str_ActionHotKey(action:byte):shortstring;
-begin
-  str_ActionHotKey:='';
+   str_MakeActionHotKey:='';
    with input_actions[action] do
    begin
       if(ik_depend>0)then
-        str_ActionHotKey:=str_ActionHotKey(ik_depend)+'+';
+        str_MakeActionHotKey:=str_MakeActionHotKey(ik_depend)+'+';
 
-      str_ActionHotKey+=tc_lime+str_InputKeyName(ik_value,ik_type)+tc_default;
+      str_MakeActionHotKey+=tc_lime+str_InputKeyName(ik_value,ik_type)+tc_default;
    end;
 end;
 
 function str_ProductionHotKey(uid:byte):shortstring;
 begin
    if(uid<=ui_ButtonsNum)
-   then str_ProductionHotKey:=str_ActionHotKey(iAct_SProd1+uid)
+   then str_ProductionHotKey:=input_actions[byte(iAct_SProd1+uid)].ik_str_HK
    else str_ProductionHotKey:='';
 end;
 
@@ -129,8 +91,8 @@ procedure str_SetUnitBaseHint(uid:byte;NAME,DESCR:shortstring);
 begin
    with g_uids[uid] do
    begin
-      uid_txt_name        :=NAME;
-      uid_txt_BaseDescript:=DESCR;
+      uid_str_name        :=NAME;
+      uid_str_BaseDescript:=DESCR;
    end;
 end;
 
@@ -138,17 +100,17 @@ procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
 begin
    with g_upids[upid] do
    begin
-      upgr_txt_name :=NAME;
-      upgr_txt_Descript:=DESCR;
-      if(length(upgr_txt_Descript)>0)then
-       if(upgr_txt_Descript[length(upgr_txt_Descript)]<>'.')then upgr_txt_Descript+='.';
+      upgr_str_Name    :=NAME;
+      upgr_str_Descript:=DESCR;
+      if(length(upgr_str_Descript)>0)then
+        if(upgr_str_Descript[length(upgr_str_Descript)]<>'.')then upgr_str_Descript+='.';
    end;
 end;
 
 procedure str_MakeActionHint(action:byte;hint:shortstring);
 var hk:shortstring;
 begin
-   hk:=str_ActionHotKey(action);
+   hk:=input_actions[action].ik_str_HK;
    if(length(hk)>0)
    then str_action_hint[action]:=hint+' ('+hk+')'
    else str_action_hint[action]:=hint;
@@ -173,8 +135,8 @@ begin
    FindSourceProd:='';
    for i:=0 to 255 do
    begin
-      if(uid in g_uids[i].uid_prod_Units  )then STRADD(@up,g_uids[i].uid_txt_name,sep_comma);
-      if(uid in g_uids[i].uid_prod_Buildings)then STRADD(@bp,g_uids[i].uid_txt_name,sep_comma);
+      if(uid in g_uids[i].uid_prod_Units    )then STRADD(@up,g_uids[i].uid_str_name,sep_comma);
+      if(uid in g_uids[i].uid_prod_Buildings)then STRADD(@bp,g_uids[i].uid_str_name,sep_comma);
    end;
 
    if(length(up)>0)then STRADD(@FindSourceProd,up,sep_comma);
@@ -284,8 +246,8 @@ end;
 function AddReq(ruid,rupid,rupidl:byte):shortstring;
 begin
   AddReq:='';
-  if(ruid >0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_uids [ruid ].uid_txt_name,1     )+'"' ,sep_comma);
-  if(rupid>0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_upids[rupid].upgr_txt_name   ,rupidl)+'"' ,sep_comma);
+  if(ruid >0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_uids [ruid ].uid_str_name,1     )+'"' ,sep_comma);
+  if(rupid>0)then STRADD(@AddReq,'"'+str_ReqNum2s(g_upids[rupid].upgr_str_Name   ,rupidl)+'"' ,sep_comma);
   if(length(AddReq)>0)then AddReq:='{'+tc_yellow+str_hint_req+tc_default+AddReq+'}';
   //str_hint_requirements
 end;
@@ -293,8 +255,8 @@ end;
 function str_RebuildName(uid:byte;levelup,quotes:boolean):shortstring;
 begin
   if(levelup)
-  then str_RebuildName:=g_uids[uid].uid_txt_name+'['+str_attr_level+'+1]'
-  else str_RebuildName:=g_uids[uid].uid_txt_name;
+  then str_RebuildName:=g_uids[uid].uid_str_name+'['+str_attr_level+'+1]'
+  else str_RebuildName:=g_uids[uid].uid_str_name;
   if(quotes)then str_RebuildName:='"'+str_RebuildName+'"';
 end;
 
@@ -306,7 +268,7 @@ begin
     begin
        if(not for_doc)then
        STRADD(@str_MakeUnitDefaultDescription,str_hint_hits+i2s(uid_MaxHits1),sep_sdot);
-       //STRADD(@str_MakeUnitDefaultDescription,str_hint_srange+i2s(uid_SightR),sep_sdot);
+       //STRADD(@str_MakeUnitDefaultDescription,str_hint_BaseSightR+i2s(uid_SightR),sep_sdot);
 
        if(uid_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_builder,sep_sdot);
        if(uid_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
@@ -349,9 +311,9 @@ begin
   exstr:='';
    if(tset<>uids_all     )then
     if(tset=uids_arch_res)
-    then instr:='['+str_attr_dead+tc_default+','+str_hint_Demons+'] '+str_hint_Except+' ['+g_uids[UID_Cyberdemon].uid_txt_name+','
-                                                                                          +g_uids[UID_Mastermind].uid_txt_name+','
-                                                                                          +g_uids[UID_ArchVile  ].uid_txt_name+']'
+    then instr:='['+str_attr_dead+tc_default+','+str_hint_Demons+'] '+str_hint_Except+' ['+g_uids[UID_Cyberdemon].uid_str_name+','
+                                                                                          +g_uids[UID_Mastermind].uid_str_name+','
+                                                                                          +g_uids[UID_ArchVile  ].uid_str_name+']'
     else
      if(tset= uids_demons)
      then instr:='['+str_hint_Demons+']'
@@ -378,14 +340,14 @@ begin
       begin
          for u:=1 to 255 do
           if(u in inset)then
-           STRADD(@instr,g_uids[u].uid_txt_name,sep_comma);
+           STRADD(@instr,g_uids[u].uid_str_name,sep_comma);
          if(length(instr)>0)then instr:='['+instr+']';
       end;
       if(exnum<3)then
       begin
          for u:=1 to 255 do
           if(u in exset)then
-           STRADD(@exstr,g_uids[u].uid_txt_name,sep_comma);
+           STRADD(@exstr,g_uids[u].uid_str_name,sep_comma);
          if(length(exstr)>0)then exstr:=str_hint_Except+' ['+exstr+']';
       end;
    end;
@@ -456,7 +418,6 @@ begin
 end;
 
 function str_MakeWeaponString(uid,wid:byte;docSTR:boolean):shortstring;
-const tab : array[false..true] of shortstring = ('-','- ');
 var
 dmod_str:shortstring;
 begin
@@ -469,92 +430,55 @@ begin
       wpt_missle,
       wpt_directdmg,
       wpt_directdmgZ: if(aw_max_range<0)
-                      then STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_melee    ,sep_scomma)
-                      else STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_ranged   ,sep_scomma);
-      wpt_resurect  :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_ressurect,sep_scomma);
-      wpt_heal      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_heal     ,sep_scomma);
-      wpt_unit      :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_spawn+' "'+g_uids[aw_oid].uid_txt_name+'"',sep_scomma);
-      wpt_suicide   :      STRADD(@str_MakeWeaponString,tab[docSTR]+str_weapon_suicide  ,sep_scomma);
+                      then STRADD(@str_MakeWeaponString,'- '+str_uarm_melee    ,sep_scomma)
+                      else STRADD(@str_MakeWeaponString,'- '+str_uarm_ranged   ,sep_scomma);
+      wpt_resurect  :      STRADD(@str_MakeWeaponString,'- '+str_uarm_ressurect,sep_scomma);
+      wpt_heal      :      STRADD(@str_MakeWeaponString,'- '+str_uarm_heal     ,sep_scomma);
+      wpt_unit      :      STRADD(@str_MakeWeaponString,'- '+str_uarm_spawn+' "'+g_uids[aw_oid].uid_str_name+'"',sep_scomma);
+      wpt_suicide   :      STRADD(@str_MakeWeaponString,'- '+str_uarm_suicide  ,sep_scomma);
       end;
 
-      if(docSTR)then
+      if(aw_min_range>0)then
+      STRADD(@str_MakeWeaponString,str_uarm_MinRange+i2s(aw_min_range),sep_scomma);
+
+      if(aw_max_range=aw_srange)then
       begin
-         if(aw_min_range>0)then
-         STRADD(@str_MakeWeaponString,'min. range: '+i2s(aw_min_range),sep_scomma);
-
-         if(aw_max_range=aw_srange)then
-         begin
-            STRADD(@str_MakeWeaponString,'max. range: vision range',sep_scomma);
-            if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
-            if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
-            if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
-            if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
-         end
-         else
-           if(aw_max_range<aw_srange) // melee
-           then //STRADD(@str_MakeWeaponString,'max range: melee',sep_scomma)
-           else
-             if(aw_max_range>=aw_fsr0)then  // relative srange
-             begin
-                if(aw_max_range<>aw_fsr)
-                then STRADD(@str_MakeWeaponString,'max. range: vision range'+i2sSign(aw_max_range-aw_fsr),sep_scomma)
-                else STRADD(@str_MakeWeaponString,'max. range: vision range',sep_scomma);
-             end
-             else
-             begin
-                STRADD(@str_MakeWeaponString,'max. range: '+i2s(aw_max_range),sep_scomma);  // absolute
-                if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@str_MakeWeaponString,'bonus anti-fly range: '     +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
-                if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@str_MakeWeaponString,'bonus anti-ground range: '  +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
-                if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@str_MakeWeaponString,'bonus anti-unit range: '    +i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
-                if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@str_MakeWeaponString,'bonus anti-building range: '+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
-             end;
-      end;
+         STRADD(@str_MakeWeaponString,str_uarm_MaxRange+str_hint_SightR,sep_scomma);
+      end
+      else
+        if(aw_max_range<aw_srange) // melee
+        then STRADD(@str_MakeWeaponString,str_uarm_MaxRange+i2s(-aw_max_range),sep_scomma)
+        else
+          if(aw_max_range>=aw_fsr0)then  // relative srange
+          begin
+             if(aw_max_range<>aw_fsr)
+             then STRADD(@str_MakeWeaponString,str_uarm_MaxRange+str_hint_SightR+i2sSign(aw_max_range-aw_fsr),sep_scomma)
+             else STRADD(@str_MakeWeaponString,str_uarm_MaxRange+str_hint_SightR,sep_scomma);
+          end
+          else STRADD(@str_MakeWeaponString,str_uarm_MaxRange+i2s(aw_max_range),sep_scomma);  // absolute
 
       if(aw_type=wpt_directdmgZ)then
-      STRADD(@str_MakeWeaponString,str_weapon_zombie,sep_scomma);
+      STRADD(@str_MakeWeaponString,str_uarm_zombie,sep_scomma);
 
-      STRADD(@str_MakeWeaponString,str_weapon_targets+str_WeaponTargets(aw_tarf,aw_uids),sep_scomma);
+      STRADD(@str_MakeWeaponString,str_uarm_targets+str_WeaponTargets(aw_tarf,aw_uids),sep_scomma);
 
-      STRADD(@str_MakeWeaponString,str_weapon_damage+' '+str_MakeWeaponDPS(uid,wid),sep_scomma);
-      if(docSTR)then
-      begin
-         if(aw_type=wpt_missle)then
-          with g_mids[aw_oid] do
-           if(mid_base_splashr>0)then  STRADD(@str_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
+      STRADD(@str_MakeWeaponString,str_uarm_BaseImpact+' '+str_MakeWeaponDPS(uid,wid),sep_scomma);
 
-         if(aw_type=wpt_suicide)and(uid_DeathMissile>0)then
-          with g_mids[uid_DeathMissile] do
-           if(mid_base_splashr>0)then  STRADD(@str_MakeWeaponString,'splash damage radius: '+i2s(mid_base_splashr),sep_scomma);
+      if(aw_type=wpt_missle)then
+        with g_mids[aw_oid] do
+          if(mid_base_SplashR>0)then  STRADD(@str_MakeWeaponString,str_uarm_SplashDamageR+i2s(mid_base_SplashR),sep_scomma);
 
-         dmod_str:='';
-         case aw_tarprior of
-wtp_Default      : dmod_str:='distance';
-wtp_hits         : dmod_str:='lowest hits';
-wtp_distance     : dmod_str:='distance';
-wtp_building     : dmod_str:='buildings';
-wtp_UnitBioLight : dmod_str:='[unit,bio,light]';
-wtp_UnitBioHeavy : dmod_str:='[unit,bio,heavy]';
-wtp_UnitMech     : dmod_str:='[unit,mech]';
-wtp_UnitBio      : dmod_str:='[unit,bio]';
-wtp_Bio          : dmod_str:='[bio]';
-wtp_Light        : dmod_str:='[light]';
-wtp_UnitLight    : dmod_str:='[unit,light]';
-wtp_BuildingHeavy: dmod_str:='[building,heavy]';
-wtp_heal         : dmod_str:='lowest hits';
-wtp_Fly          : dmod_str:='[fly]';
-wtp_nolost_hits  : dmod_str:='lowest hits';
-wtp_max_hits     : dmod_str:='highest hits';
-wtp_GroundLight  : dmod_str:='[ground,light]';
-         end;
-         if(length(dmod_str)>0)then
-           STRADD(@str_MakeWeaponString,'target priority: '+dmod_str,sep_scomma);
+      if(aw_type=wpt_suicide)and(uid_DeathMissile>0)then
+        with g_mids[uid_DeathMissile] do
+          if(mid_base_SplashR>0)then  STRADD(@str_MakeWeaponString,str_uarm_SplashDamageR+i2s(mid_base_SplashR),sep_scomma);
 
-         if(aw_dupgr>0)then
-           STRADD(@str_MakeWeaponString,'upgrade: '+g_upids[aw_dupgr].upgr_txt_name+'('+i2sSign(aw_dupgr_s)+')',sep_scomma);
-      end;
+      if(length(str_uarm_PriorityL[aw_tarprior])>0)then
+        STRADD(@str_MakeWeaponString,str_uarm_Priority+str_uarm_PriorityL[aw_tarprior],sep_scomma);
+
+      if(aw_dupgr>0)then
+        STRADD(@str_MakeWeaponString,str_uarm_Upgrade+g_upids[aw_dupgr].upgr_str_Name+'('+i2sSign(aw_dupgr_s)+')',sep_scomma);
 
       dmod_str:='';
-
       case aw_type of
       wpt_suicide   : if(uid_DeathMissile>0)then dmod_str:=str_DamageHint(uid_DeathMissile_dmod);
       wpt_missle,
@@ -563,9 +487,7 @@ wtp_GroundLight  : dmod_str:='[ground,light]';
       end;
 
       if(length(dmod_str)>0)then
-        if(docSTR)
-        then STRADD(@str_MakeWeaponString,dmod_str,', factor: ')
-        else STRADD(@str_MakeWeaponString,dmod_str,': '      );
+        STRADD(@str_MakeWeaponString,dmod_str,str_uarm_Factor);
 
       STRADD(@str_MakeWeaponString,AddReq(aw_ruid,aw_rupgr,aw_rupgr_l),sep_scomma);
 
@@ -573,28 +495,7 @@ wtp_GroundLight  : dmod_str:='[ground,light]';
    end;
 end;
 
-function str_MakeWeaponsDescription(uid:byte;docSTR:boolean):shortstring;
-var w:byte;
-weapons_str:shortstring;
-begin
-  str_MakeWeaponsDescription:='';
-  with g_uids[uid] do
-  begin
-     weapons_str:='';
-     if(uid_CanAttack)then
-      for w:=0 to LastUnitArms do
-       with uid_arms[w] do
-        STRADD(@weapons_str,str_MakeWeaponString(uid,w,docSTR),sep_sdots);
-
-     if(length(weapons_str)>0)then
-      if(docSTR)
-      then STRADD(@str_MakeWeaponsDescription,weapons_str,sep_sdot)
-      else STRADD(@str_MakeWeaponsDescription,str_hint_UnitArming+weapons_str,sep_sdot);
-  end;
-  if(length(str_MakeWeaponsDescription)>0)then str_MakeWeaponsDescription+='.';
-end;
-
-function str_makeUpgrBaseHint(upid,curlvl:byte):shortstring;
+function str_makeUpgrINFOHint(upid,curlvl:byte):shortstring;
 var HK,
     ENRG,
     TIME,
@@ -638,106 +539,125 @@ begin
      STRADD(@INFO,tc_orange+'x'+i2s(upgr_max)+tc_default,sep_comma);
      if(upgr_max>1)and(upgr_mfrg)then STRADD(@INFO,tc_red+'*'+tc_default,sep_comma);
 
-     str_makeUpgrBaseHint:=upgr_txt_name+' ('+INFO+')'+tc_nl1+tc_nl1+upgr_txt_Descript;
+     str_makeUpgrINFOHint:=upgr_str_Name+' ('+INFO+')';
   end;
 end;
 
-function str_hintUnitCost(uid:byte):shortstring;
+function str_hintUnitCost(uid:byte;pIHK:pshortstring=nil):shortstring;
 begin
    str_hintUnitCost:='';
    with g_uids[uid] do
    begin
-      if(uid_EnergyReq>0)then STRADD(@str_hintUnitCost,tc_aqua +i2s(uid_EnergyReq)+tc_default,sep_comma);
-      if(uid_ProdTimeSec  >0)then STRADD(@str_hintUnitCost,tc_white+i2s(uid_ProdTimeSec  )+tc_default,sep_comma);
+      if(pIHK<>nil)then
+        if(length(pIHK^)>0)then
+          STRADD(@str_hintUnitCost,pIHK^,sep_comma);
+      if(uid_EnergyReq  >0)then STRADD(@str_hintUnitCost,tc_aqua +i2s(uid_EnergyReq  )+tc_default,sep_comma);
+      if(uid_ProdTimeSec>0)then STRADD(@str_hintUnitCost,tc_white+i2s(uid_ProdTimeSec)+tc_default,sep_comma);
       STRADD(@str_hintUnitCost,tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default,sep_comma);
    end;
    if(length(str_hintUnitCost)>0)then str_hintUnitCost:='('+str_hintUnitCost+')';
 end;
 
-function strMakeRebuildHint(uid:byte):shortstring;
-var tmps:shortstring;
+function str_MakeRebuildHint(uid:byte;IHK:shortstring=''):shortstring;
+var ITEMP:shortstring;
 begin
-   strMakeRebuildHint:='';
+   str_MakeRebuildHint:='';
    with g_uids[uid] do
      if(uid_rebuild_uid>0)then
      begin
-        strMakeRebuildHint:=str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,false);
-        tmps:=str_hintUnitCost(uid_rebuild_uid);
-        if(length(tmps)>0)then strMakeRebuildHint+=' '+tmps;
+        str_MakeRebuildHint:=str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,false);
+        ITEMP:=str_hintUnitCost(uid_rebuild_uid,@IHK);
+        if(length(ITEMP)>0)then str_MakeRebuildHint+=' '+ITEMP;
 
-        tmps:=AddReq(uid_rebuild_ruid,uid_rebuild_rupgr,uid_rebuild_rupgrl);
-        if(length(tmps)>0)then strMakeRebuildHint:=strMakeRebuildHint+tc_nl1+tmps;
+        ITEMP:=AddReq(uid_rebuild_ruid,uid_rebuild_rupgr,uid_rebuild_rupgrl);
+        if(length(ITEMP)>0)then str_MakeRebuildHint:=str_MakeRebuildHint+tc_nl1+ITEMP;
      end;
 end;
 
 procedure str_makeHints;
 var
-uid         :byte;
-ENRG,HK,PROD,LMT,INFO,
-TIME,REQ    :shortstring;
+uid,arm: byte;
+IENRG,
+IHK,
+ILIMIT,
+ITIME,
+ITEMP  : shortstring;
 begin
+   // actions
+   for uid:=0 to 255 do
+     input_actions[uid].ik_str_HK:=str_MakeActionHotKey(uid);
+
    // units
    for uid:=0 to 255 do
-   with g_uids[uid] do
-   begin
-      REQ :='';
-      PROD:='';
-      ENRG:='';
-      TIME:='';
-      LMT :='';
-      INFO:='';
+     with g_uids[uid] do
+     begin
+        IENRG :='';
+        ITIME :='';
+        ILIMIT:='';
+        ITEMP :='';
 
-      if(uid_class>=23)then
-      begin
-         uid_txt_NameCostHK  :=uid_txt_name;
-         uid_txt_FullDescript:=uid_txt_BaseDescript;
-      end
-      else
-      begin
-         HK:=str_ProductionHotKey(uid_class);
-         if(uid_EnergyReq>0)then ENRG:=tc_aqua +i2s(uid_EnergyReq)+tc_default;
-         if(uid_ProdTimeSec  >0)then TIME:=tc_white+i2s(uid_ProdTimeSec  )+tc_default;
-         LMT:=tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default;
+        IHK:=str_ProductionHotKey(uid_class);
+        if(uid_EnergyReq  >0)then IENRG:=tc_aqua +i2s(uid_EnergyReq  )+tc_default;
+        if(uid_ProdTimeSec>0)then ITIME:=tc_white+i2s(uid_ProdTimeSec)+tc_default;
+        ILIMIT:=tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default;
+        if(length(IHK   )>0)then STRADD(@ITEMP,IHK   ,sep_comma);
+        if(length(IENRG )>0)then STRADD(@ITEMP,IENRG ,sep_comma);
+        if(length(ILIMIT)>0)then STRADD(@ITEMP,ILIMIT,sep_comma);
+        if(length(ITIME )>0)then STRADD(@ITEMP,ITIME ,sep_comma);
+        uid_str_NameCostHK  :=uid_str_name+' ('+ITEMP+')';
+        uid_str_DefaultAttr :=str_UnitAttributes(nil,uid);
 
-         PROD:=FindSourceProd(uid);
-         if(uid_req_uid1>0)then STRADD(@REQ,str_ReqNum2s(g_uids [uid_req_uid1].uid_txt_name,uid_req_uid1n),sep_comma);
-         if(uid_req_uid2>0)then STRADD(@REQ,str_ReqNum2s(g_uids [uid_req_uid2].uid_txt_name,uid_req_uid2n),sep_comma);
-         if(uid_req_uid3>0)then STRADD(@REQ,str_ReqNum2s(g_uids [uid_req_uid3].uid_txt_name,uid_req_uid3n),sep_comma);
-         if(uid_req_upgr>0)then STRADD(@REQ,str_ReqNum2s(g_upids[uid_req_upgr].upgr_txt_name   ,uid_req_upgrl),sep_comma);
+        uid_str_Prod:='';
+        ITEMP:=FindSourceProd(uid);
+        if(length(ITEMP)>0)then
+          if(uid_ukbuilding)
+          then uid_str_Prod:=str_hint_bprod+ITEMP
+          else uid_str_Prod:=str_hint_uprod+ITEMP;
 
-         if(length(HK  )>0)then STRADD(@INFO,HK  ,sep_comma);
-         if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
-         if(length(LMT )>0)then STRADD(@INFO,LMT ,sep_comma);
-         if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
+        uid_str_RebuildHint:='';
 
-         uid_txt_FullDescript :=str_MakeUnitDefaultDescription(uid,uid_txt_BaseDescript,false);
+        ITEMP:='';
+        if(uid_req_uid1>0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [uid_req_uid1].uid_str_name ,uid_req_uid1n),sep_comma);
+        if(uid_req_uid2>0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [uid_req_uid2].uid_str_name ,uid_req_uid2n),sep_comma);
+        if(uid_req_uid3>0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [uid_req_uid3].uid_str_name ,uid_req_uid3n),sep_comma);
+        if(uid_req_upgr>0)then STRADD(@ITEMP,str_ReqNum2s(g_upids[uid_req_upgr].upgr_str_Name,uid_req_upgrl),sep_comma);
+        uid_str_Reqs:='';
+        if(length(ITEMP)>0)then uid_str_Reqs+=tc_yellow+str_hint_requirements+tc_default+ITEMP;
 
-         uid_txt_NameCostHK:=uid_txt_name+' ('+INFO+')'+tc_nl1+str_UnitAttributes(nil,uid);
+        uid_str_FullDescript:=str_MakeUnitDefaultDescription(uid,uid_str_BaseDescript,false);
 
-         uid_txt_Weapons:=str_MakeWeaponsDescription(uid,false);
+        uid_str_ArmsCommon:='';
+        if(uid_CanAttack)then
+        begin
+           if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAFlyR     +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+           if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAGroundR  +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+           if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAUnitR    +i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
+           if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusABuildingR+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
+        end;
 
-         uid_txt_Reqs:='';
-         if(length(REQ )>0)then uid_txt_Reqs+=tc_yellow+str_hint_requirements+tc_default+REQ;
-
-         if(length(PROD)>0)then
-           if(uid_ukbuilding)
-           then uid_txt_Prod:=str_hint_bprod+PROD
-           else uid_txt_Prod:=str_hint_uprod+PROD;
-      end;
-   end;
+        for arm:=0 to LastUnitArms do
+          if(uid_CanAttack)
+          then uid_str_Arms[arm]:=str_MakeWeaponString(uid,arm,false)
+          else uid_str_Arms[arm]:='';
+     end;
 
    // upgrades
    for uid:=0 to 255 do
-   with g_upids[uid] do
-   begin
-      REQ  :='';
+     with g_upids[uid] do
+     begin
+        upgr_str_Reqs:='';
+        ITEMP:='';
+        if(upgr_ruid  >0)then STRADD(@ITEMP,g_uids [upgr_ruid ].uid_str_name ,sep_comma);
+        if(upgr_rupgr >0)then STRADD(@ITEMP,g_upids[upgr_rupgr].upgr_str_Name,sep_comma);
+        if(length(ITEMP)>0)
+        then upgr_str_Reqs:=tc_yellow+str_hint_requirements+tc_default+ITEMP
+        else upgr_str_Reqs:='';
+     end;
 
-      if(upgr_ruid  >0)then STRADD(@REQ,g_uids [upgr_ruid ].uid_txt_name,sep_comma);
-      if(upgr_rupgr >0)then STRADD(@REQ,g_upids[upgr_rupgr].upgr_txt_name   ,sep_comma);
-
-      upgr_txt_Hint:='';
-      if(length(REQ)>0)then upgr_txt_Hint+=tc_yellow+str_hint_requirements+tc_default+REQ;
-   end;
+   // unit rebuild hint
+   for uid:=0 to 255 do
+     with g_uids[uid] do
+       uid_str_RebuildHint:=str_MakeRebuildHint(uid,input_actions[iAct_Control_Rebuild].ik_str_HK);
 end;
 
 function str_Center0(src:shortstring;l:byte):shortstring;
@@ -756,7 +676,7 @@ begin
    end;
 end;
 
-function str_AddSpaces(src:shortstring;size:byte):shortstring;
+function str_JustifyBySpaces(src:shortstring;size:byte):shortstring;
 var l,i:byte;
 begin
    src:=Trim(src);
@@ -778,11 +698,123 @@ begin
         insert(' ',src,i);
         l+=1;
      end;
-   str_AddSpaces:=src;
+   str_JustifyBySpaces:=src;
 end;
 
-procedure str_AddToStrList(pslist:PTStringList;psln:pinteger;size:integer;newPara:boolean;newstr:shortstring);
-var i,l,s:byte;
+procedure str_Trim(pstr:pshortstring);
+var l:byte;
+begin
+   l:=length(pstr^);
+   if(l=0)then exit;
+
+   while(pstr^[1]=' ')do
+   begin
+      delete(pstr^,1,1);
+      l:=length(pstr^);
+      if(l=0)then exit;
+   end;
+
+   while(pstr^[l]=' ')do
+   begin
+      delete(pstr^,l,1);
+      l:=length(pstr^);
+      if(l=0)then exit;
+   end;
+end;
+
+procedure str_analize(pstr,pspos,pepos,pendc,plen:pshortstring;ptextH:pinteger;plines_n,pmaxW:pbyte;MaxLineChars:byte);
+var
+strLen,
+i,start,
+lastSplitChar,
+lastSplitChars,
+chars  :byte;
+charc  :char;
+textH  :integer;
+procedure AddLine(endChar:char);
+begin
+   if(pmaxW<>nil)then
+     if(chars>pmaxW^)then
+       pmaxW^:=chars;
+   pspos^+=chr(start);
+   pepos^+=chr(i    );
+   plen^ +=chr(chars);
+   pendc^+=endChar;
+   start:=i+1;
+   chars:=0;
+   lastSplitChar:=0;
+end;
+begin
+   pspos^:='';
+   pepos^:='';
+   plen^ :='';
+   pendc^:='';
+   plines_n^:=0;
+   strLen:=length(pstr^);
+   if(strLen=0)then exit;
+
+   if(ptextH=nil)then ptextH:=@textH;
+   ptextH^:=0;
+
+   chars:=0;
+   start:=1;
+   lastSplitChar:=0;
+   i:=0;
+   while(i<strLen)do
+   begin
+      i+=1;
+      charc:=pstr^[i];
+
+      case charc of
+      tc_nl1 : begin ptextH^+=txt_line_h1-font_w1;AddLine(charc);end;
+      tc_nl2 : begin ptextH^+=txt_line_h2-font_w1;AddLine(charc);end;
+      tc_nl3 : begin ptextH^+=txt_line_h3-font_w1;AddLine(charc);end;
+      else
+         if not(charc in tc_SpecChars)then
+         begin
+            case charc of
+            ' ',
+            '/',
+            '\',
+            ':',
+            '-'  : begin
+                      lastSplitChar :=i;
+                      lastSplitChars:=chars;
+                   end;
+            ',',
+            '.'  : if(i<255)and(i<strLen)then
+                     if(pstr^[i+1]=' ')then
+                     begin
+                        lastSplitChar :=i;
+                        lastSplitChars:=chars;
+                     end;
+            end;
+            chars+=1;
+            if(chars>=MaxLineChars)and(i<strLen)then
+            begin
+               ptextH^+=txt_line_h1-font_w1;
+               if(lastSplitChar>0)then
+               begin
+                  i:=lastSplitChar;
+                  chars:=lastSplitChars;
+               end;
+               AddLine(tc_nl1);
+            end;
+         end;
+      end;
+      if(i=strLen)then AddLine(#0);
+   end;
+   plines_n^:=length(plen^);
+   ptextH^  +=plines_n^*font_w1;
+end;
+
+procedure str_AddToStrList(pslist:PTStringList;psln:pinteger;lineLen:integer;pmaxW:pbyte;newPara,Justify:boolean;newstr:shortstring);
+var
+lines_n,line :byte;
+lines_spos,
+lines_epos,
+lines_endc,
+lines_len :shortstring;
 procedure AddToList(s:shortstring);
 begin
    psln^+=1;
@@ -791,39 +823,20 @@ begin
 end;
 begin
    if(psln^>0)and(newPara)then AddToList('');
-   newstr:=trim(newstr);
-   l:=length(newstr);
-   i:=1;
-   s:=255;
-   while(l>0)do
-   begin
-      if(l<=size)then
-      begin
-         AddToList(newstr);
-         break;
-      end;
+   str_Trim(@newPara);
 
-      if(i=size)or(i=l)then
-      begin
-         if(s=255)or(i=l)then s:=i;
-         AddToList(str_AddSpaces(copy(newstr,1,s),size));
-         delete(newstr,1,s);
-         l:=length(newstr);
-         i:=1;
-         s:=255;
-         continue;
-      end;
+   str_analize(@newstr,@lines_spos,@lines_epos,@lines_endc,@lines_len,nil,@lines_n,pmaxW,lineLen);
 
-      if(newstr[i]=' ')
-      or(newstr[i]='-')
-      or(newstr[i]=',')then s:=i;
-      i+=1;
-   end;
+   if(lines_n>0)then
+     for line:=1 to lines_n do
+       if(Justify)
+       then AddToList(str_JustifyBySpaces(copy(newstr,ord(lines_spos[line]),ord(lines_epos[line])-ord(lines_spos[line])+1 ),lineLen))
+       else AddToList(              copy(newstr,ord(lines_spos[line]),ord(lines_epos[line])-ord(lines_spos[line])+1          ));
 end;
 
 procedure cmp_AddPlot(mission:byte;newPara:boolean;text:shortstring);
 begin
-   str_AddToStrList(@str_camp_infol[mission],@str_camp_infon[mission],37,newPara,text);
+   str_AddToStrList(@str_camp_infol[mission],@str_camp_infon[mission],37,nil,newPara,true,text);
 end;
 
 function str_cmp_map(date,location,area:shortstring):shortstring;
@@ -901,10 +914,10 @@ begin
    str_SG_RightClickActL[true ]  := tc_lime  +'move'  +tc_default;
    str_SG_RightClickActL[false]  := tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default;
    str_SG_ControlPanelPos        := 'Control panel position';
-   str_SG_ControlPanelPosL[0]    := tc_lime  +'left'  +tc_default;
-   str_SG_ControlPanelPosL[1]    := tc_orange+'right' +tc_default;
-   str_SG_ControlPanelPosL[2]    := tc_yellow+'top'   +tc_default;
-   str_SG_ControlPanelPosL[3]    := tc_aqua  +'bottom'+tc_default;
+   str_SG_ControlPanelPosL[cpp_left  ]:= tc_lime  +'left'  +tc_default;
+   str_SG_ControlPanelPosL[cpp_right ]:= tc_orange+'right' +tc_default;
+   str_SG_ControlPanelPosL[cpp_top   ]:= tc_yellow+'top'   +tc_default;
+   str_SG_ControlPanelPosL[cpp_bottom]:= tc_aqua  +'bottom'+tc_default;
    str_SG_HealthBars             := 'Health bars';
    str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
    str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
@@ -959,7 +972,7 @@ begin
    str_map_ScenarioL[mc_KotH    ]:= tc_aqua  +'KotH'        +tc_default;
    str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
    for i:=0 to mc_Last do
-   str_map_ScenarioEngL[i]:=RemoveSpecChars(str_map_ScenarioL[i]);
+   str_replay_ScenarioL[i]:=RemoveSpecChars(str_map_ScenarioL[i]);
    str_map_Generators            := 'Generators';
    str_map_GeneratorsL[mapg_no ] := 'no';
    str_map_GeneratorsL[mapg_5  ] := '5 min';
@@ -1073,85 +1086,112 @@ begin
    str_hint_CanRebuildTo         := 'Can be rebuilt into ';
    str_hint_UnitArming           := 'Arming/Abilities: ';
    str_hint_hits                 := 'Hits: ';
-   str_hint_srange               := 'Base sight range: ';
+   str_hint_SightR               := 'sight range';
+   str_hint_BaseSightR           := 'Base '+str_hint_SightR+': ';
 
-   str_weapon_melee              := 'melee attack';
-   str_weapon_ranged             := 'ranged attack';
-   str_weapon_zombie             := '+zombification';
-   str_weapon_ressurect          := 'resurrection';
-   str_weapon_heal               := 'heal/repair';
-   str_weapon_spawn              := 'spawn';
-   str_weapon_suicide            := 'suicide';
-   str_weapon_targets            := 'targets: ';
-   str_weapon_damage             := 'impact';
+   str_warn_AbilityBadPlace      := 'Invalid landing/teleporting location';
+   str_warn_prod_BadPlace        := 'Invalid building location';
+   str_warn_prod_BadOrder        := 'Invalid production order';
+   str_warn_prod_AllBusy         := 'All production is busy';
+   str_warn_Req_Energy           := 'Need more energy';
+   str_warn_Req_Common           := 'Check requirements';
+   str_warn_unit_Levelup         := 'Unit promoted';
+   str_warn_unit_complete        := 'Unit ready';
+   str_warn_unit_attacked        := 'Unit is under attack';
+   str_warn_upgrade_InProgress   := 'Already in progress';
+   str_warn_upgrade_complete     := 'Upgrade complete';
+   str_warn_building_complete    := 'Construction complete';
+   str_warn_base_attacked        := 'Base is under attack';
+   str_warn_allies_attacked      := 'Our allies is under attack';
+   str_warn_MaxLimitReached      := 'Maximum army limit reached';
+   str_warn_NeedBuilder          := 'Need builder';
+   str_warn_NeedProdUnit         := 'Need production unit';
+   str_warn_MaxCountReached      := 'Maximum reached';
+   str_warn_mapMark              := ' set a mark on the map';
+   str_warn_kpoint_captured      := 'The Key point was captured';
+   str_warn_kpoint_lost          := 'The Key point was lost';
+   str_warn_koth_control         := ' team starts controlling the center';
+   str_warn_ngen_captured        := 'The Neutral Generator was captured';
+   str_warn_ngen_lost            := 'The Neutral Generator was lost';
+   str_warn_ngen_exh             := 'The Neutral Generator was exhausted';
+   str_warn_Invalid_Target       := 'Invalid target';
+   str_warn_Invalid_Order        := 'Invalid order';
+   str_warn_AbilityReload        :='The ability is on cooldown!' ;
 
-   str_cant_land         := 'Can`t land or teleport here';
-   str_cant_build        := 'Can`t build here';
-   str_need_energy       := 'Need more energy';
-   str_cant_prod         := 'Can`t production this';
-   str_check_reqs        := 'Check requirements';
-   str_cant_execute      := 'Can`t execute order';
-   str_advanced          := 'Advanced ';
-   str_unit_advanced     := 'Unit promoted';
-   str_upgrade_complete  := 'Upgrade complete';
-   str_building_complete := 'Construction complete';
-   str_unit_complete     := 'Unit ready';
-   str_unit_attacked     := 'Unit is under attack';
-   str_base_attacked     := 'Base is under attack';
-   str_allies_attacked   := 'Our allies is under attack';
-   str_maxlimit_reached  := 'Maximum army limit reached';
-   str_need_more_builders:= 'Need more builders';
-   str_production_busy   := 'All production is busy';
-   str_cant_advanced     := 'Impassible to rebuild/advance';
-   str_NeedMoreProd      := 'Nowhere to produce that';
-   str_MaximumReached    := 'Maximum reached';
-   str_mapMark           := ' set a mark on the map';
-   str_cpoint_captured   := 'The Key point was captured!';
-   str_cpoint_lost       := 'The Key point was lost!';
-   str_koth_control      := ' team starts controlling the center!';
-   str_ngen_captured     := 'The Neutral Generator was captured!';
-   str_ngen_lost         := 'The Neutral Generator was lost!';
-   str_ngen_exh          := 'The Neutral Generator was exhausted!';
-   str_invalid_target    := 'Invalid target!';
+   str_attr_alive                := tc_lime  +'alive'       ;
+   str_attr_dead                 := tc_dgray +'dead'        ;
+   str_attr_unit                 := tc_gray  +'unit'        ;
+   str_attr_building             := tc_red   +'building'    ;
+   str_attr_mech                 := tc_blue  +'mechanical'  ;
+   str_attr_bio                  := tc_orange+'biological'  ;
+   str_attr_light                := tc_yellow+'light'       ;
+   str_attr_heavy                := tc_green +'heavy'       ;
+   str_attr_fly                  := tc_white +'flying'      ;
+   str_attr_ground               := tc_lime  +'ground'      ;
+   str_attr_floater              := tc_aqua  +'floater'     ;
+   str_attr_level                := tc_white +'level'       ;
+   str_attr_invuln               := tc_lime  +'invulnerable';
+   str_attr_stuned               := tc_yellow+'stuned'      ;
+   str_attr_detector             := tc_purple+'detector'    ;
+   str_attr_transport            := tc_gray  +'transport'   ;
 
-   str_attr_alive        := tc_lime  +'alive'       ;
-   str_attr_dead         := tc_dgray +'dead'        ;
-   str_attr_unit         := tc_gray  +'unit'        ;
-   str_attr_building     := tc_red   +'building'    ;
-   str_attr_mech         := tc_blue  +'mechanical'  ;
-   str_attr_bio          := tc_orange+'biological'  ;
-   str_attr_light        := tc_yellow+'light'       ;
-   str_attr_heavy        := tc_green +'heavy'       ;
-   str_attr_fly          := tc_white +'flying'      ;
-   str_attr_ground       := tc_lime  +'ground'      ;
-   str_attr_floater      := tc_aqua  +'floater'     ;
-   str_attr_level        := tc_white +'level'       ;
-   str_attr_invuln       := tc_lime  +'invulnerable';
-   str_attr_stuned       := tc_yellow+'stuned'      ;
-   str_attr_detector     := tc_purple+'detector'    ;
-   str_attr_transport    := tc_gray  +'transport'   ;
+   str_uarm_melee                := 'melee attack';
+   str_uarm_ranged               := 'ranged attack';
+   str_uarm_zombie               := '+zombification';
+   str_uarm_ressurect            := 'resurrection';
+   str_uarm_heal                 := 'heal/repair';
+   str_uarm_spawn                := 'spawn';
+   str_uarm_suicide              := 'suicide';
+   str_uarm_targets              := 'targets: ';
+   str_uarm_BaseImpact           := 'base impact';
+   str_uarm_MinRange             := 'min. range: ';
+   str_uarm_MaxRange             := 'max. range: ';
+   str_uarm_BonusAFlyR           := 'bonus anti-fly range: ';
+   str_uarm_BonusAGroundR        := 'bonus anti-ground range: ';
+   str_uarm_BonusAUnitR          := 'bonus anti-unit range: ';
+   str_uarm_BonusABuildingR      := 'bonus anti-building range: ';
+   str_uarm_SplashDamageR        := 'splash damage radius: ';
+   str_uarm_Upgrade              := 'upgrade: ';
+   str_uarm_Factor               := ', factor: ';
 
+   str_uarm_Priority             := 'target priority: ';
+   FillChar(str_uarm_PriorityL,SizeOf(str_uarm_PriorityL),0);
+   str_uarm_PriorityL[wtp_Default      ]:='nearest';
+   str_uarm_PriorityL[wtp_hits         ]:='lowest hits';
+   str_uarm_PriorityL[wtp_distance     ]:='nearest';
+   str_uarm_PriorityL[wtp_building     ]:='buildings';
+   str_uarm_PriorityL[wtp_UnitBioLight ]:='['+str_attr_unit+','+str_attr_bio+','+str_attr_light+']';
+   str_uarm_PriorityL[wtp_UnitBioHeavy ]:='['+str_attr_unit+','+str_attr_bio+','+str_attr_heavy+']';
+   str_uarm_PriorityL[wtp_UnitMech     ]:='['+str_attr_unit+','+str_attr_mech+']';
+   str_uarm_PriorityL[wtp_UnitBio      ]:='['+str_attr_unit+','+str_attr_bio +']';
+   str_uarm_PriorityL[wtp_Bio          ]:='['+str_attr_bio+']';
+   str_uarm_PriorityL[wtp_Light        ]:='['+str_attr_light+']';
+   str_uarm_PriorityL[wtp_UnitLight    ]:='['+str_attr_unit+','+str_attr_light+']';
+   str_uarm_PriorityL[wtp_BuildingHeavy]:='['+str_attr_building+','+str_attr_heavy+']';
+   str_uarm_PriorityL[wtp_heal         ]:=str_uarm_PriorityL[wtp_hits];
+   str_uarm_PriorityL[wtp_Fly          ]:='['+str_attr_fly+']';
+   str_uarm_PriorityL[wtp_nolost_hits  ]:=str_uarm_PriorityL[wtp_hits];
+   str_uarm_PriorityL[wtp_max_hits     ]:='highest hits';
+   str_uarm_PriorityL[wtp_GroundLight  ]:='['+str_attr_ground+','+str_attr_light+']';
 
+   str_Camp_Difficulty           := 'Difficulty';
+   str_Camp_DifficultyL[0]       := tc_aqua  +'I`m too young to die'+tc_default;
+   str_Camp_DifficultyL[1]       := tc_lime  +'Hey, not too rough'  +tc_default;
+   str_Camp_DifficultyL[2]       := tc_yellow+'Hurt me plenty'      +tc_default;
+   str_Camp_DifficultyL[3]       := tc_orange+'Ultra-Violence'      +tc_default;
+   str_Camp_DifficultyL[4]       := tc_red   +'Nightmare'           +tc_default;
 
-   str_Camp_Difficulty   := 'Difficulty';
-   str_Camp_DifficultyL[0]           := tc_aqua  +'I`m too young to die'+tc_default;
-   str_Camp_DifficultyL[1]           := tc_lime  +'Hey, not too rough'  +tc_default;
-   str_Camp_DifficultyL[2]           := tc_yellow+'Hurt me plenty'      +tc_default;
-   str_Camp_DifficultyL[3]           := tc_orange+'Ultra-Violence'      +tc_default;
-   str_Camp_DifficultyL[4]           := tc_red   +'Nightmare'           +tc_default;
-
-
-   str_net_Ready         := 'Ready';
-   str_net_UDPPort       := 'UDP port';
-   str_net_ServerStart   := 'Start server';
-   str_net_ServerStop    := 'Stop server';
-   str_net_Connect       := 'Connect';
-   str_net_Disconnect    := 'Disconnect';
-   str_net_Quality       := 'Units update rate';
-   str_net_Address       := 'Address';
-   str_net_LANSearch     := 'Search for LAN servers';
-   str_net_ServerLANVis  := 'LAN Advertise';
-   str_net_ConnectedToDed:= '- connected to dedicated server -';
+   str_net_Ready                 := 'Ready';
+   str_net_UDPPort               := 'UDP port';
+   str_net_ServerStart           := 'Start server';
+   str_net_ServerStop            := 'Stop server';
+   str_net_Connect               := 'Connect';
+   str_net_Disconnect            := 'Disconnect';
+   str_net_Quality               := 'Units update rate';
+   str_net_Address               := 'Address';
+   str_net_LANSearch             := 'Search for LAN servers';
+   str_net_ServerLANVis          := 'LAN Advertise';
+   str_net_ConnectedToDed        := '- connected to dedicated server -';
 
    str_ability_name[uab_Teleport        ]:='Teleportation';
    str_ability_name[uab_UACScan         ]:='Scan';
@@ -1165,7 +1205,6 @@ begin
    str_ability_name[uab_CCFly           ]:='Flight Engines';
    str_ability_name[uab_ToUACDron       ]:='Deconstruct to Drone';
    str_ability_name[uab_Unload          ]:='Unload';
-   str_ability_reloading:='The ability is on cooldown!' ;
 
    str_SetUnitBaseHint(UID_HKeep          ,'Hell Keep'                   ,'');
    str_SetUnitBaseHint(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -1288,7 +1327,7 @@ begin
    str_SetUpgrBaseHint(upgr_uac_TerAAWeapon  ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
    str_SetUpgrBaseHint(upgr_uac_Transport    ,'Dropship Upgrade'                 ,'Increase the capacity of Dropship'                       );
    str_SetUpgrBaseHint(upgr_uac_RadarR       ,'Radar Upgrade'                    ,'Increase radar scanning radius'             );
-   str_SetUpgrBaseHint(upgr_uac_TurretPlasma ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
+   str_SetUpgrBaseHint(upgr_uac_TurretPlasma ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+tc_default+'] weapon for Anti-ground turret'  );
    str_SetUpgrBaseHint(upgr_uac_TurretArmor  ,'Additional Armoring'              ,'Additional armor for Turrets'               );
 
 
@@ -1304,7 +1343,7 @@ begin
    str_MakeActionHint(iAct_Control_UStop      ,'Stop, '  +t);
    str_MakeActionHint(iAct_Control_UPatrol    ,'Patrol, '+t);
 
-   str_MakeActionHint(iAct_Control_UProdCncl,'Cancel production');
+   str_MakeActionHint(iAct_Control_UProdCncl  ,'Cancel production');
    str_MakeActionHint(iAct_Control_UDestroy   ,'Destroy');
    str_MakeActionHint(iAct_Control_USelArmy   ,'Select all battle units');
 
@@ -1654,46 +1693,44 @@ begin
   str_hint_CanRebuildTo      := 'Можно перестроить в ';
   str_hint_UnitArming        := 'Вооружение/Способности: ';
   str_hint_hits              := 'Здоровье: ';
-  str_hint_srange            := 'Базовый радиус обзора: ';
+  str_hint_BaseSightR            := 'Базовый радиус обзора: ';
 
-  str_weapon_melee      := 'ближний бой';
-  str_weapon_ranged     := 'дальний бой';
-  str_weapon_zombie     := '+зомбификация';
-  str_weapon_ressurect  := 'воскрешение';
-  str_weapon_heal       := 'лечение/ремонт';
-  str_weapon_spawn      := 'порождение';
-  str_weapon_suicide    := 'самоубийство';
-  str_weapon_targets    := 'цели: ';
-  str_weapon_damage     := 'воздействие';
+  str_uarm_melee      := 'ближний бой';
+  str_uarm_ranged     := 'дальний бой';
+  str_uarm_zombie     := '+зомбификация';
+  str_uarm_ressurect  := 'воскрешение';
+  str_uarm_heal       := 'лечение/ремонт';
+  str_uarm_spawn      := 'порождение';
+  str_uarm_suicide    := 'самоубийство';
+  str_uarm_targets    := 'цели: ';
+  str_uarm_BaseImpact     := 'воздействие';
 
-  str_cant_land         := 'Нельзя переместиться или приземлиться здесь';
-  str_cant_build        := 'Нельзя строить здесь';
-  str_need_energy       := 'Необходимо больше энергии';
-  str_cant_prod         := 'Невоможно произвести это';
-  str_check_reqs        := 'Проверьте требования';
-  str_cant_execute      := 'Невозвможно выполнить приказ';
-  str_advanced          := 'Улучшенный ';
-  str_unit_advanced     := 'Юнит улучшен';
-  str_upgrade_complete  := 'Исследование завершено';
-  str_building_complete := 'Постройка завершена';
-  str_unit_complete     := 'Юнит готов';
-  str_unit_attacked     := 'Юнит атакован';
-  str_base_attacked     := 'База атакована';
-  str_allies_attacked   := 'Наши союзники атакованы';
-  str_maxlimit_reached  := 'Достигнут максимальный размер армии';
-  str_need_more_builders:= 'Необходимо больше строителей';
-  str_production_busy   := 'Все производства заняты';
-  str_cant_advanced     := 'Невозможно перестроить/улучшить';
-  str_NeedMoreProd      := 'Негде производить это';
-  str_MaximumReached    := 'Достигнут максимум';
-  str_mapMark           := ' поставил отметку на карте';
-  str_cpoint_captured   := 'Ключевая точка захвачена!';
-  str_cpoint_lost       := 'Ключевая точка потеряна!';
-  str_koth_control      := ' команда контролирует центр!';
-  str_ngen_captured     := 'Нейтральный генератор захвачен!';
-  str_ngen_lost         := 'Нейтральный генератор потерян!';
-  str_ngen_exh          := 'Нейтральный генератор истощился!';
-  str_invalid_target    := 'Не подходящая цель!';
+  str_warn_AbilityBadPlace         := 'Нельзя переместиться или приземлиться здесь';
+  str_warn_prod_BadPlace        := 'Нельзя строить здесь';
+  str_warn_Req_Energy       := 'Необходимо больше энергии';
+  str_warn_prod_BadOrder         := 'Невоможно произвести это';
+  str_warn_Req_Common        := 'Проверьте требования';
+  str_warn_Invalid_Order      := 'Невозвможно выполнить приказ';
+  str_warn_unit_Levelup     := 'Юнит улучшен';
+  str_warn_upgrade_complete  := 'Исследование завершено';
+  str_warn_building_complete := 'Постройка завершена';
+  str_warn_unit_complete     := 'Юнит готов';
+  str_warn_unit_attacked     := 'Юнит атакован';
+  str_warn_base_attacked     := 'База атакована';
+  str_warn_allies_attacked   := 'Наши союзники атакованы';
+  str_warn_MaxLimitReached  := 'Достигнут максимальный размер армии';
+  str_warn_NeedBuilder:= 'Необходим строитель';
+  str_warn_prod_AllBusy   := 'Все производства заняты';
+  str_warn_NeedProdUnit      := 'Негде производить это';
+  str_warn_MaxCountReached    := 'Достигнут максимум';
+  str_warn_mapMark           := ' поставил отметку на карте';
+  str_warn_kpoint_captured   := 'Ключевая точка захвачена!';
+  str_warn_kpoint_lost       := 'Ключевая точка потеряна!';
+  str_warn_koth_control      := ' команда контролирует центр!';
+  str_warn_ngen_captured     := 'Нейтральный генератор захвачен!';
+  str_warn_ngen_lost         := 'Нейтральный генератор потерян!';
+  str_warn_ngen_exh          := 'Нейтральный генератор истощился!';
+  str_warn_Invalid_Target    := 'Не подходящая цель!';
 
   str_attr_alive        := tc_lime  +'живой'         ;
   str_attr_dead         := tc_dgray +'мертвый'       ;
@@ -1712,11 +1749,11 @@ begin
   str_attr_detector     := tc_purple+'детектор'      ;
   str_attr_transport    := tc_gray  +'транспорт'     ;
 
-  str_SG_ControlPanelPos          := 'Положение игровой панели';
-  str_SG_ControlPanelPosL[0]      := tc_lime  +'слева' +tc_default;
-  str_SG_ControlPanelPosL[1]      := tc_orange+'справа'+tc_default;
-  str_SG_ControlPanelPosL[2]      := tc_yellow+'вверху'+tc_default;
-  str_SG_ControlPanelPosL[3]      := tc_aqua  +'внизу' +tc_default;
+  str_SG_ControlPanelPos             := 'Положение игровой панели';
+  str_SG_ControlPanelPosL[cpp_left  ]:= tc_lime  +'слева' +tc_default;
+  str_SG_ControlPanelPosL[cpp_right ]:= tc_orange+'справа'+tc_default;
+  str_SG_ControlPanelPosL[cpp_top   ]:= tc_yellow+'вверху'+tc_default;
+  str_SG_ControlPanelPosL[cpp_bottom]:= tc_aqua  +'внизу' +tc_default;
 
   str_SG_HealthBars             := 'Полоски здоровья';
   str_SG_HealthBarsL[0]         := tc_lime  +'выбранные'+tc_default+'+'+tc_red+'поврежденные'+tc_default;
@@ -1771,7 +1808,7 @@ begin
   str_ability_name[uab_CCFly           ]:='Двигатели для полета';
   str_ability_name[uab_ToUACDron       ]:='Разобрать в Дрона';
   str_ability_name[uab_Unload          ]:='Выгрузить';
-  str_ability_reloading:='Способность перезаряжается!';
+  str_warn_AbilityReload:='Способность перезаряжается!';
 
   str_SetUnitBaseHint(UID_HKeep           ,'Адская Крепость'            ,'');
   str_SetUnitBaseHint(UID_HAKeep          ,'Великая Адская Крепость'    ,'');
@@ -2007,35 +2044,33 @@ end;
 
 procedure WriteUnitDescriptions;
 const fname = '_strings.txt';
-var f:text;
-    u,
-    w:byte;
-tmp:shortstring;
+var
+f  :text;
+u,a:byte;
 procedure upgrLine(upid:byte;info:shortstring);
 begin
    if(upid>0)then
-    with g_upids[upid] do
-      writeln(f,'- ',upgr_txt_name,' - ',info,';');
+     with g_upids[upid] do
+       writeln(f,'- ',upgr_str_Name,' - ',info,';');
 end;
-
 begin
    assign(f,fname);
    rewrite(f);
 
    for u:=0 to 255 do
     with g_uids[u] do
-     if(length(uid_txt_NameCostHK)>0)and(uid_r>0)then
+     if(length(uid_str_NameCostHK)>0)and(uid_r>0)then
      begin
-        writeln(f,uid_txt_name);
+        writeln(f,uid_str_name);
         writeln(f);
 
         writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(uid_class)));
         writeln(f,'Categories/Attributes: ',RemoveSpecChars(str_UnitAttributes(nil,u)));
         writeln(f,'Max hits: ',uid_MaxHits1);
-        //if(_base_armor>0)then
-        //writeln(f,'Base armor: ',_base_armor);
+
         if(uid_BaseRegen>0)then
         writeln(f,'Base regeneration: ',uid_BaseRegen);
+
         writeln(f,'Limit used: ', limit2s(uid_LimitUse,ul1));
         writeln(f,'Size: ',uid_r);
         if(uid_speed>0)then
@@ -2053,21 +2088,21 @@ begin
         if(uid_ZombieUID>0)then
         if(uid_ZombieHits>0)or(uid_FastDeathHits<0)then
         begin
-        writeln(f,'Zombie: ',g_uids[uid_ZombieUID].uid_txt_name );
+        writeln(f,'Zombie: ',g_uids[uid_ZombieUID].uid_str_name );
         writeln(f,'Zombification hits: ',uid_ZombieHits);
         end;
 
-        writeln(f,RemoveSpecChars(uid_txt_Reqs));
+        writeln(f,RemoveSpecChars(uid_str_Reqs));
 
         if(uid_CanAttack)then
         begin
            writeln(f,str_hint_UnitArming);
-           for w:=0 to LastUnitArms do
-            with uid_arms[w] do
-            begin
-               tmp:=str_MakeWeaponString(u,w,true);
-               if(length(tmp)>0)then writeln(f,tmp,';');
-            end;
+
+           if(length(uid_str_ArmsCommon)>0)then
+             writeln(f,uid_str_ArmsCommon);
+
+           for a:=0 to LastUnitArms do
+             if(length(uid_str_Arms[a])>0)then writeln(f,uid_str_Arms[a],';');
         end;
 
 
@@ -2107,7 +2142,7 @@ begin
 
         writeln(f);
 
-        writeln(f,RemoveSpecChars(str_MakeUnitDefaultDescription(u,uid_txt_BaseDescript,true)));
+        writeln(f,RemoveSpecChars(str_MakeUnitDefaultDescription(u,uid_str_BaseDescript,true)));
 
         writeln(f);
         {
@@ -2121,15 +2156,15 @@ begin
 
    for u:=0 to 255 do
     with g_upids[u] do
-     if(length(upgr_txt_name)>0)then
+     if(length(upgr_str_Name)>0)then
      begin
-        writeln(f,RemoveSpecChars(str_makeUpgrBaseHint(u,255)));
-        writeln(f,RemoveSpecChars(upgr_txt_Hint));
+        writeln(f,RemoveSpecChars(str_makeUpgrINFOHint(u,255)));
+        //writeln(f,RemoveSpecChars(upgr_txt_Hint));
         writeln(f);
      end;
    writeln(f);
 {
-s1:=str_makeUpgrBaseHint(uid,upgr[uid]+1);
+s1:=str_makeUpgrINFOHint(uid,upgr[uid]+1);
 hs1:=@s1;
 hs4:=@g_upids[uid].upgr_txt_Hint;
 }

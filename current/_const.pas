@@ -171,48 +171,46 @@ MaxPlayerLog           = 255;
 log_to_all             = %11111111;
 
 {
-lmt_chat0              = 0;  = player humber
-lmt_chat1              = 1;
-lmt_chat2              = 2;
-lmt_chat3              = 3;
-lmt_chat4              = 4;
-lmt_chat5              = 5;
-lmt_chat6              = 6;
-lmt_chat7              = 7;}
-lmt_player_chat        = 8;
-lmt_game_message       = 10;
-lmt_game_end           = 11;
-lmt_player_defeated    = 12;
-lmt_player_leave       = 13;
-lmt_cant_build         = 14;
-lmt_unit_ready         = 15;
-lmt_unit_advanced      = 16;
-lmt_upgrade_complete   = 17;
-lmt_req_energy         = 18;
-lmt_req_common         = 19;
-lmt_req_ruids          = 20;
-lmt_map_mark           = 21;
-lmt_unit_attacked      = 22;
-lmt_cant_order         = 23;
-lmt_allies_attacked    = 24;
-lmt_unit_limit         = 25;
-lmt_unit_needbuilder   = 26;
-lmt_production_busy    = 27;
-lmt_MaximumLevel       = 28;
-lmt_NeedMoreProd       = 29;
-lmt_MaximumReached     = 30;
-lmt_player_surrender   = 31;
-lmt_ability_needS      = 32;
-lmt_ability_needSP     = 33;
-lmt_ability_reload     = 34;
-lmt_ability_cantland   = 35;
-lmt_kpoint_captured    = 36;
-lmt_kpoint_lost        = 37;
-lmt_ngen_exh           = 38;
-lmt_ngen_captured      = 39;
-lmt_ngen_lost          = 40;
-lmt_koth_control       = 41;
-lmt_invalid_tar        = 42;
+lmt_chat_player0       = 0;
+lmt_chat_player1       = 1;
+lmt_chat_player2       = 2;
+lmt_chat_player3       = 3;
+lmt_chat_player4       = 4;
+lmt_chat_player5       = 5;
+lmt_chat_player6       = 6;
+lmt_chat_player7       = 7;} // LaastPlayer
+lmt_chat_common        = 8;
+lmt_game_message       = 9;
+lmt_game_end           = 10;
+lmt_player_defeated    = 11;
+lmt_player_leave       = 12;
+lmt_player_surrender   = 13;
+lmt_prod_BadPlace      = 14;
+lmt_prod_BadOrder      = 15;
+lmt_prod_AllBusy       = 16;
+lmt_unit_ready         = 17;
+lmt_unit_LevelUp       = 18;
+lmt_unit_attacked      = 19;
+lmt_unit_NeedBuilder   = 20;
+lmt_upgrade_InProgress = 21;
+lmt_upgrade_complete   = 22;
+lmt_Req_Energy         = 23;
+lmt_Req_Common         = 24;
+lmt_Req_Limit          = 25;
+lmt_Req_MaxCount       = 26;
+lmt_map_mark           = 27;
+lmt_allies_attacked    = 28;
+lmt_NeedProdUnit       = 29;
+lmt_ability_reload     = 30;
+lmt_ability_BadPlace   = 31;
+lmt_kpoint_captured    = 32;
+lmt_kpoint_lost        = 33;
+lmt_ngen_exh           = 34;
+lmt_ngen_captured      = 35;
+lmt_ngen_lost          = 36;
+lmt_koth_control       = 37;
+lmt_invalid_Target     = 38;
+lmt_Invalid_Order      = 39;
 
 
 lmts_menu_chat         = [
@@ -222,13 +220,14 @@ lmts_menu_chat         = [
                           lmt_player_defeated,
                           lmt_player_leave,
                           lmt_player_surrender,
-                          lmt_player_chat
+                          lmt_chat_common
                          ];
-lmts_last_messages     = [0..255];
+lmts_last_events       = [MaxPlayers..255];
+lmts_last_chat         = [0..LastPlayer];
 
 lmt_argt_unit          = 0;
-lmt_argt_upgr          = 1;
-lmt_argt_abil          = 2;
+lmt_argt_upgrade          = 1;
+lmt_argt_ability          = 2;
 
 {
 uia_nonew              = 0;
@@ -301,32 +300,28 @@ nmid_ping_Answer          = 41;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  UNIT & UPGRADES REQUIREMENTS BITS
+//  REQUIREMENTS BITS
 //
 
-ureq_unitlimit         : cardinal = 1;
+ureq_limit             : cardinal = 1;
 ureq_ruid              : cardinal = 1 shl 1;
 ureq_rupid             : cardinal = 1 shl 2;
 ureq_energy            : cardinal = 1 shl 3;
 ureq_time              : cardinal = 1 shl 4;
 ureq_max               : cardinal = 1 shl 5;
-ureq_builders          : cardinal = 1 shl 6;  // need builders
-ureq_bld_r             : cardinal = 1 shl 7;  //
-ureq_barracks          : cardinal = 1 shl 8;  // need barracks
-ureq_smiths            : cardinal = 1 shl 9;  // need smith
-ureq_product           : cardinal = 1 shl 10; // already in production
+ureq_builders          : cardinal = 1 shl 6;
+ureq_BuildCD           : cardinal = 1 shl 7;
+ureq_barracks          : cardinal = 1 shl 8;
+ureq_smiths            : cardinal = 1 shl 9;
+ureq_InProgress        : cardinal = 1 shl 10;
 ureq_armylimit         : cardinal = 1 shl 11;
-ureq_place             : cardinal = 1 shl 12; // cant build here
-ureq_busy              : cardinal = 1 shl 13; // production is busy
-ureq_unknown           : cardinal = 1 shl 14; //
-ureq_MaxLevel          : cardinal = 1 shl 15; //
-ureq_needbuilders      : cardinal = 1 shl 16; // need more builders
-ureq_common            : cardinal = 1 shl 17; // common
-ureq_usespability      : cardinal = 1 shl 18; // need use 'special ability at point' order
-ureq_usesability       : cardinal = 1 shl 19; // need use 'special ability' order
-ureq_reloading         : cardinal = 1 shl 20; // reloading
-ureq_landplace         : cardinal = 1 shl 21; // can't land here
-ureq_invalidtar        : cardinal = 1 shl 22; // invalid target
+ureq_place             : cardinal = 1 shl 12;
+ureq_busy              : cardinal = 1 shl 13;
+ureq_other             : cardinal = 1 shl 14;
+ureq_common            : cardinal = 1 shl 15;
+ureq_reloading         : cardinal = 1 shl 16;
+ureq_landplace         : cardinal = 1 shl 17;
+ureq_InvalidTarget     : cardinal = 1 shl 18;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -356,8 +351,8 @@ co_pability            = -410;
 co_rebuild             = -411;
 co_supgrade            = -412;
 co_cupgrade            = -413;
-co_suprod              = -414;
-co_cuprod              = -415;
+co_sunit              = -414;
+co_cunit              = -415;
 co_pcancle             = -416;
 co_mmark               = -417;
 
@@ -1072,7 +1067,7 @@ iAct_UASlGroup9        = 59;
 
 iAct_Control_UAbility1 = 60;
 iAct_Control_UAbility2 = 61;
-iAct_Control_UAbility3 = 62;
+iAct_Control_Rebuild = 62;
 iAct_Control_UAMove    = 63;
 iAct_Control_UAStop    = 64;
 iAct_Control_UAPatrol  = 65;
@@ -1164,20 +1159,19 @@ iAct_test_debug0       = 225;
 iAct_test_debug1       = 226;
 
 
-k_LastCharStuckDealy   = fr_fps1 div 3;
+k_LastCharStuckDelay   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;
 
-CharSetCommon          : set of Char = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
-CharSetDigits          : set of Char = ['0'..'9'];
+CharSetCommon          = [#192..#255,'A'..'Z','a'..'z','0'..'9','"','[',']','{','}',' ','_',',','.','(',')','<','>','-','+','`','@','#','%','?',':','$'];
+CharSetDigits          = ['0'..'9'];
+CharSetAll             = CharSetCommon+CharSetDigits;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  HOTKEYS
 //
 
-_buffst                : array[false..true] of smallint = (0,ub_infinity);
-
-str_ps_sv              : char = '@';
+buff_Bool2InfTime      : array[false..true] of smallint = (0,ub_infinity);
 
 char_gen               : char = '+';
 char_kp                : char = '#';
@@ -1352,6 +1346,11 @@ vid_minh               = 600;
 vid_ab                 = 128;
 vid_MaxScreenSprites   = 1000; // max vis sprites;
 
+cpp_left               = 0;
+cpp_right              = 1;
+cpp_top                = 2;
+cpp_bottom             = 3;
+
 tab_Buildings          = 0;
 tab_Units              = 1;
 tab_Upgrades           = 2;
@@ -1376,6 +1375,7 @@ ui_CtrlPanelBW         = 3;
 ui_CtrlPanelBH         = ui_CtrlPanelBW+10;
 ui_CtrlPanelBL         = ui_CtrlPanelBH-1;
 ui_CtrlPanelW          = ui_ButtonW1*ui_CtrlPanelBW;
+ui_CtrlPanelWb         = ui_CtrlPanelW+1;
 ui_CtrlPanelH          = ui_ButtonW1*ui_CtrlPanelBH;
 ui_TabButtonW          = ui_CtrlPanelW div 4;
 
@@ -1394,6 +1394,8 @@ chat_LastMsgTime       = fr_fps1*3;
 chat_LastMsgTimeMax    = chat_LastMsgTime*6;
 
 ui_dBW                 = ui_ButtonW1-font_w1-3;
+
+ui_HintLineLen         = 47;
 
 // ui alarms
 
@@ -1430,7 +1432,7 @@ rpls_none              = 0;
 rpls_write             = 1;
 rpls_read              = 2;
 
-SvRpLen                = 15;
+MaxReplayPrefixLen     = 20;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1633,7 +1635,8 @@ menu_hh                = menu_h div 2;
 menu_logoh             = 64;
 
 menu_BaseW1            = 28;
-menu_BaseW1h           = 28+(menu_BaseW1 div 2);
+menu_BaseWh            = menu_BaseW1 div 2;
+menu_BaseW1h           = 28+menu_BaseWh;
 menu_BaseW2            = menu_BaseW1*2;
 menu_BasehW            = menu_BaseW1 div 2;
 menu_SmallW            =(menu_BaseW1 div 4)*3;
@@ -1734,8 +1737,8 @@ b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_defaul
 sep_comma              = ',';
 sep_scomma             = ', ';
 sep_sdot               = '. ';
-sep_sdots              = '; ';
-sep_wdash              = tc_white+'-';
+//sep_sdots              = '; ';
+//sep_wdash              = tc_white+'-';
 
 MaxChatStringLength    = 200;
 

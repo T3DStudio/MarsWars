@@ -578,13 +578,15 @@ procedure D_Menu;
 var tx,ty:integer;
 begin
    D_MenuMessage(@menu_NetMsg);
-   if(menu_redraw)then
+   if(menu_redraw_pause>0)then menu_redraw_pause-=1;
+   if(menu_redraw)and(menu_redraw_pause=0)then
    begin
       PlayersUpdateColorSchema(LocalPlayer);
 
       d_MenuUpdate(menu_Surface);
       vid_MakeBigMenu;
       menu_redraw:=false;
+      menu_redraw_pause:=fr_fpss;
    end;
 
    draw_sdlsurface(vid_screen,menu_sc_x,menu_sc_y,menu_SurfaceSC);

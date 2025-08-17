@@ -222,7 +222,7 @@ begin
    with pu^ do
    begin
       if(uid<>nil)then
-        pfzone:=map_GetZone(x,y,uid^.uid_r);
+        mapZone:=map_GetZone(x,y,uid^.uid_r);
       {$IFDEF _FULLGAME}
       unit_MiniMapXY(pu);
       unit_UpdateFogXY(pu);
@@ -319,14 +319,14 @@ var i:integer;
 begin
    for i:=0 to MaxUnits do
      with g_missiles[i] do
-       if(vstep>0)and(tar=u)then
+       if(m_vstep>0)and(m_tar=u)then
        begin
-          tar:=0;
+          m_tar:=0;
           if(ResetTarget)then
           begin
-             x:=vx;
-             y:=vy;
-             vstep:=1;
+             m_x:=m_vx;
+             m_y:=m_vy;
+             m_vstep:=1;
           end;
        end;
 end;
@@ -391,7 +391,7 @@ end;
 
 function unit_ability_UACScan(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
-   unit_ability_UACScan:=ureq_unknown;
+   unit_ability_UACScan:=ureq_other;
    with pu^ do
     if(iscomplete)and(rld<=0)then
     begin
@@ -423,7 +423,7 @@ begin
    // tu - target
    with pu^ do
    begin
-      unit_ability_HInvuln:=ureq_unknown;
+      unit_ability_HInvuln:=ureq_other;
       if(not iscomplete)
       or(hits<=0)then exit;
 
@@ -431,7 +431,7 @@ begin
       if(rld>0)then exit;
    end;
 
-   unit_ability_HInvuln:=ureq_invalidtar;
+   unit_ability_HInvuln:=ureq_InvalidTarget;
    if(not IsUnitRange(taru,@tu))
    then exit;
 
@@ -469,7 +469,7 @@ end;
 function unit_ability_UACStrike(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 var p:byte;
 begin
-   unit_ability_UACStrike:=ureq_unknown;
+   unit_ability_UACStrike:=ureq_other;
    with pu^ do
      if(iscomplete)and(rld<=0)then
        with player^ do
@@ -884,7 +884,7 @@ begin
    with uid^ do
    with player^ do
    begin
-      unit_ability_HKeepBlink:=ureq_unknown;
+      unit_ability_HKeepBlink:=ureq_other;
       if(hits<=0)
       or(not iscomplete)then exit;
 
@@ -924,7 +924,7 @@ begin
    with uid^ do
    with player^ do
    begin
-      unit_ability_HTowerBlink:=ureq_unknown;
+      unit_ability_HTowerBlink:=ureq_other;
       if(hits<=0)
       or(not iscomplete)then exit;
 
@@ -1258,17 +1258,17 @@ function unit_ProdStartUnitLine(uBarrack:PTUnit;puid,pn:byte;check:boolean):card
 begin
    unit_ProdStartUnitLine:=0;
    if(pn>LastUnitLevel)
-   then unit_ProdStartUnitLine:=ureq_unknown
+   then unit_ProdStartUnitLine:=ureq_other
    else
      with uBarrack^ do
      with uid^ do
-       if(uprod_r[pn]>0)
-       then unit_ProdStartUnitLine:=ureq_busy
-       else
-       begin
-          unit_ProdStartUnitLine:=CheckUnitReqs(player,puid);
-          if(unit_ProdStartUnitLine=0)then
-            with player^ do
+     with player^ do
+     begin
+        unit_ProdStartUnitLine:=CheckUnitReqs(player,puid);
+        if(unit_ProdStartUnitLine=0)then
+          if(uprod_r[pn]>0)
+          then unit_ProdStartUnitLine:=ureq_busy
+          else
             with g_upids[puid] do
             begin
                if(check)then exit;
@@ -1281,7 +1281,7 @@ begin
                uprod_u[pn]:=puid;
                uprod_r[pn]:=g_uids[puid].uid_ProdTick;
             end;
-       end;
+     end;
 end;
 function unit_ProdStartUnit(uBarrack:PTUnit;puid:byte;check:boolean):cardinal;  // main function
 var pn:byte;
@@ -1289,7 +1289,7 @@ begin
    with uBarrack^ do
    with uid^ do
    begin
-      unit_ProdStartUnit:=ureq_unknown;
+      unit_ProdStartUnit:=ureq_other;
       if(puid=255)
       or(puid=0  )
       or(hits<=0)
@@ -1312,7 +1312,7 @@ end;
 /// Stop unit prod
 function unit_ProdStopUnitLine(uBarrack:PTUnit;puid,pn:byte;check:boolean):cardinal;
 begin
-   unit_ProdStopUnitLine:=ureq_unknown;
+   unit_ProdStopUnitLine:=ureq_other;
    with uBarrack^ do
    with uid^ do
      if(pn<=LastUnitLevel)then
@@ -1339,7 +1339,7 @@ begin
    with uBarrack^ do
    with uid^ do
    begin
-      unit_ProdStopUnit:=ureq_unknown;
+      unit_ProdStopUnit:=ureq_other;
       if(puid=0 )
       or(hits<=0)
       or(not iscomplete)
@@ -1362,17 +1362,18 @@ function unit_ProdStartUpgradeLine(uSmith:PTUnit;upid,pn:byte;check:boolean):car
 begin
    unit_ProdStartUpgradeLine:=0;
    if(pn>LastUnitLevel)
-   then unit_ProdStartUpgradeLine:=ureq_unknown
+   then unit_ProdStartUpgradeLine:=ureq_other
    else
      with uSmith^ do
      with uid^ do
-       if(pprod_r[pn]>0)
-       then unit_ProdStartUpgradeLine:=ureq_busy
-       else
-       begin
-          unit_ProdStartUpgradeLine:=CheckUpgradeReqs(player,upid);
-          if(unit_ProdStartUpgradeLine=0)then
-            with player^ do
+     with player^ do
+     begin
+        unit_ProdStartUpgradeLine:=CheckUpgradeReqs(player,upid);
+        if(unit_ProdStartUpgradeLine=0)then
+          if(pprod_r[pn]>0)
+          then unit_ProdStartUpgradeLine:=ureq_busy
+          else
+
             with g_upids[upid] do
             begin
                if(check)then exit;
@@ -1384,7 +1385,7 @@ begin
                pprod_r[pn]:=GetUpgradeTime(upid,upgr[upid]+1);
                pprod_u[pn]:=upid;
             end;
-       end;
+     end;
 end;
 function unit_ProdStartUpgrade(uSmith:PTUnit;upid:integer;check:boolean):cardinal;
 var pn:byte;
@@ -1392,7 +1393,7 @@ begin
    with uSmith^ do
    with uid^ do
    begin
-      unit_ProdStartUpgrade:=ureq_unknown;
+      unit_ProdStartUpgrade:=ureq_other;
       if(upid=255)
       or(upid=0  )
       or(hits<=0)
@@ -1414,7 +1415,7 @@ begin
 end;
 function unit_ProdStopUpgradeLine(uSmith:PTUnit;upid:byte;pn:integer;check:boolean):cardinal;
 begin
-   unit_ProdStopUpgradeLine:=ureq_unknown;
+   unit_ProdStopUpgradeLine:=ureq_other;
    with uSmith^ do
    with uid^ do
      if(pn<=LastUnitLevel)then
@@ -1439,7 +1440,7 @@ begin
    with uSmith^ do
    with uid^ do
    begin
-      unit_ProdStopUpgrade:=ureq_unknown;
+      unit_ProdStopUpgrade:=ureq_other;
       if(upid=0 )
       or(hits<=0)
       or(not iscomplete)
@@ -1912,7 +1913,7 @@ uab_CCFly         : if(level>0)then
                          begin
                             level:=1;
                             buffs[ub_CCast]:=fr_fps2;
-                            PlayerSetProdError(playeri,lmt_argt_abil,255,ureq_landplace,pu);
+                            GameLogBits2Message(playeri,uid_ability,lmt_argt_ability,ureq_landplace,x,y);
                          end;
                     end;
       end;

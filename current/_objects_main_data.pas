@@ -1224,8 +1224,8 @@ begin
    uid_req_uid1     := UID_UWeaponFactory;
    uid_req_uid2     := UID_UACommandCenter;
    uid_FastDeathHits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0          ,0,0,0,upgr_uac_RepairTools ,BaseRepairBonus1,wtrset_repair     ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsh,MID_Bullet ,0,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0          ,0,0,0,upgr_uac_RepairTools,BaseRepairBonus1,wtrset_repair            ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsh,MID_Bullet ,0,0,0,upgr_uac_DistDamage ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits,0,0);
 end;
 UID_Medic:
 begin
@@ -1242,8 +1242,8 @@ begin
    uid_req_uid1     := UID_UWeaponFactory;
    uid_req_uid2     := UID_UACommandCenter;
    uid_FastDeathHits:=fdead_hits_border;
-   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsh,0          ,0,0,0,upgr_uac_RepairTools ,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
-   _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsh,MID_Bullet ,0,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits      ,0,0);
+   _weapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsh,0          ,0,0,0,upgr_uac_RepairTools,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
+   _weapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsh,MID_Bullet ,0,0,0,upgr_uac_DistDamage ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_hits,0,0);
 end;
 UID_UACDron:
 begin
@@ -1477,7 +1477,7 @@ begin
    begin
       mid_size      := 0;
       mid_homing    := mh_magnetic;
-      mid_teamdamage:= true;
+      mid_TeamDamage:= true;
 
 // speed
 case m of
@@ -1533,13 +1533,13 @@ end;
 
 // splash R
 case m of
-MID_Blizzard       : mid_base_splashr:=blizzard_sr;
-MID_Mine           : mid_base_splashr:=mine_sr;
-MID_HRocket        : mid_base_splashr:=rocket_sr;
+MID_Blizzard       : mid_base_SplashR:=blizzard_sr;
+MID_Mine           : mid_base_SplashR:=mine_sr;
+MID_HRocket        : mid_base_SplashR:=rocket_sr;
 MID_URocketS,
 MID_ArchFire,
-MID_Tank           : mid_base_splashr:=tank_sr;
-MID_BFG            : mid_base_splashr:=bfg_sr;
+MID_Tank           : mid_base_SplashR:=tank_sr;
+MID_BFG            : mid_base_SplashR:=bfg_sr;
 end;
 
 // homing
@@ -1552,14 +1552,14 @@ end;
 
 // nodamage uids
 case m of
-MID_Imp            : mid_nodamage    :=[UID_Imp        ];
-MID_Cacodemon      : mid_nodamage    :=[UID_Cacodemon  ];
-MID_Baron          : mid_nodamage    :=[UID_Knight,
+MID_Imp            : mid_ImmuneUnits    :=[UID_Imp        ];
+MID_Cacodemon      : mid_ImmuneUnits    :=[UID_Cacodemon  ];
+MID_Baron          : mid_ImmuneUnits    :=[UID_Knight,
                                         UID_Baron      ];
-MID_Revenant       : mid_nodamage    :=[UID_Revenant   ];
-MID_Mancubus       : mid_nodamage    :=[UID_Mancubus   ];
-MID_YPlasma        : mid_nodamage    :=[UID_Arachnotron];
-MID_Mine           : mid_nodamage    :=[UID_UMine      ];
+MID_Revenant       : mid_ImmuneUnits    :=[UID_Revenant   ];
+MID_Mancubus       : mid_ImmuneUnits    :=[UID_Mancubus   ];
+MID_YPlasma        : mid_ImmuneUnits    :=[UID_Arachnotron];
+MID_Mine           : mid_ImmuneUnits    :=[UID_UMine      ];
 end;
 
 // other
@@ -1568,10 +1568,10 @@ MID_Granade        : mid_ystep       :=3;
 MID_Mine           : mid_size        :=25;
 MID_URocketS,
 MID_BFG            : begin
-                     mid_teamdamage  :=false;
-                     mid_noflycheck  :=true;
+                     mid_TeamDamage  :=false;
+                     mid_noFlyCheck  :=true;
                      end;
-MID_Blizzard       : mid_noflycheck  :=true;
+MID_Blizzard       : mid_noFlyCheck  :=true;
 end;
    end;
 end;

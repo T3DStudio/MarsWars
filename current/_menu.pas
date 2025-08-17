@@ -3,7 +3,7 @@ var i:byte;
     c:char;
 begin
    StringApplyInput:=s;
-   if(InputActionPressed(iAct_backspace))then
+   if(InputActionPressed(iAct_backspace,true))then
    begin
       if(length(s)>0)then setlength(s,length(s)-1);
    end
@@ -26,6 +26,14 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   MENU ACTIONS
+
+procedure menu_ControlPanelPosScroll(forward:boolean);
+begin
+   ScrollByte(@ui_ControlPanelPos,forward,0,vid_MaxControlPanelPos);
+   vid_RemakeScreenSurfaces;
+   theme_map_pTerrain:=255;
+   gfx_MapMakeTerrain;
+end;
 
 procedure menu_Message(pMMsg:pTMenuMessage;caption,message,hint:shortstring;time:integer=fr_fps4);
 begin
@@ -579,13 +587,12 @@ begin
 
    menu_page_BottomButtons(btns[0],btns[1],btns[2],btns[3],btns[4],btns[5]);
 
-
    // PLAYERS BLOCK
-   menu_page_Scirmish_Players (menu_BaseW1,menu_BaseW1+menu_PlayersW,menu_underCaptionY);
+   menu_page_Scirmish_Players (menu_BaseW1h,menu_BaseW1h+menu_PlayersW,menu_underCaptionY);
 
    // MAP BLOCK
    with menu_items[mi_Players_Panel] do
-   menu_page_Scirmish_Map     (mi_x1+menu_BaseW1,mi_x1+menu_BaseW1*15,menu_underCaptionY);
+   menu_page_Scirmish_Map     (mi_x1+menu_BaseW1,mi_x1+menu_BaseW1*14,menu_underCaptionY);
 
    // GAME OPTIONS BLOCK
    with menu_items[mi_Map_Panel] do
@@ -711,13 +718,7 @@ mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(item,@ui_CamSpeed,
 mi_SG_MouseScroll      : if(not check)then ui_MouseScroll  :=not ui_MouseScroll;
 mi_SG_PlayerName       : ;
 mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;end;
-mi_SG_ControlPanelPos  : if(not check)then
-                         begin
-                            ScrollByte(@ui_ControlPanelPos,true,0,vid_MaxControlPanelPos);
-                            vid_RemakeScreenSurfaces;
-                            theme_map_pTerrain:=255;
-                            gfx_MapMakeTerrain;
-                         end;
+mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(true);
 mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,vid_MaxPlayersColor);
 
 // SETTINGS GAME RECORDING
@@ -847,6 +848,7 @@ begin
    case item of
 mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor  ,false,0,vid_MaxPlayersColor);
 mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars    ,false,0,vid_MaxHealthBars  );
+mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(false);
 mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality     ,false,0,rpls_MaxQuality    );
 mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
 
@@ -911,7 +913,7 @@ begin
    menu_Controls_Text:=true;
    case item of
 mi_SG_PlayerName   : if(not check)then PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen   ,changed);
-mi_SR_RecordPrefix : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,SvRpLen            ,changed);
+mi_SR_RecordPrefix : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,MaxReplayPrefixLen ,changed);
 
 mi_SV_ResolutionW  : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,changed));
 mi_SV_ResolutionH  : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,changed));
@@ -921,8 +923,8 @@ mi_SaveLoad_fname  : if(not check)then svld_str_fname    :=    StringApplyInput(
 mi_Map_Seed        : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,changed);
 
 mi_MP_ServerPort   : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,changed);
-mi_MP_ClientAddress: if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,30                 ,changed);
-mi_MP_Chat         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,255                ,changed);
+mi_MP_ClientAddress: if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                 ,changed);
+mi_MP_Chat         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                ,changed);
    else
       menu_Controls_Text:=false;
    end;
@@ -986,7 +988,7 @@ begin
    menu_ItemActs:=0;
 
 ///////////////////////////////////   text input
-  case(length(k_KeyboardString)>0)of
+  case(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace,true))of
   true : begin
             SetSelectedItem(mi_SaveLoad_fname);
             SetSelectedItem(mi_MP_Chat);

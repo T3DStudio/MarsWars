@@ -162,6 +162,8 @@ TInputKey = record
    ik_timer_pressed
             : integer;
    ik_depend: byte;
+
+   ik_str_HK: shortstring;
 end;
 
 TReplayPos = record
@@ -215,6 +217,24 @@ end;
 //   GAME
 //
 
+TUnitAbilityType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_unit);
+
+TUnitAbility = record
+   ua_type    : TUnitAbilityType;
+   ua_rebuild_uid,
+   ua_rupgr,
+   ua_rupgrl,
+   ua_ruid    : byte;
+   ua_reload  : integer;
+   {$IFDEF _FULLGAME}
+   ua_mbrush_c: cardinal;
+   ua_mbrush_r: integer;
+   ua_btn     : PTMWTexture;
+   ua_str_name,
+   ua_str_Descript: shortstring;
+   {$ENDIF}
+end;
+
 TDamageMod = array[0..LastDamageModFactor] of record
   dm_factor : integer;  // 100 = x1
   dm_flags  : cardinal;
@@ -222,46 +242,47 @@ end;
 
 TMID = record
    mid_base_damage,
-   mid_base_splashr,
+   mid_base_SplashR,
    mid_size,
-   mid_speed       : integer;
-   mid_noflycheck,
-   mid_teamdamage  : boolean;
+   mid_speed        : integer;
+   mid_noFlyCheck,
+   mid_TeamDamage   : boolean;
    mid_ystep,
-   mid_homing      : byte;
-   mid_nodamage    : TSoB;
+   mid_homing       : byte;
+   mid_ImmuneUnits  : TSoB;
 
    {$IFDEF _FULLGAME}
-   ms_smodel       : PTMWSModel;
-   ms_eid_fly_st   : integer;
-   ms_eid_target_eff,
-   ms_eid_fly,
-   ms_eid_decal    : byte;
-   ms_eid_death,
-   ms_eid_death_cnt,
-   ms_eid_death_r,
-   ms_snd_death_ch : array[false..true] of byte;
-   ms_snd_death    : array[false..true] of PTSoundSet;
+   mid_SpriteModel  : PTMWSModel;
+   mid_eid_FlyStep  : integer;
+   mid_eid_target_eff,
+   mid_eid_FlyTrace,
+   mid_eid_Decal    : byte;
+   mid_eid_death,
+   mid_eid_DeathN,
+   mid_eid_DeathR,
+   mid_snd_DeathSkip: array[false..true] of byte;
+   mid_snd_death    : array[false..true] of PTSoundSet;
    {$ENDIF}
 end;
 
 TMissile = record
-   x,y,
-   vx,vy,
-   damage,
-   vstep,hvstep,
-   tar,
-   dir,
-   mtars,
-   dtars    : integer;
-   player,
-   homing,
-   dmod,
-   mid      : byte;
-   fake,
-   mfe,mfs  : boolean;
+   m_x,m_y,
+   m_vx,m_vy,
+   m_damage,
+   m_vstep,m_hvstep,
+   m_tar,
+   m_dir,
+   m_mtars,
+   m_dtars    : integer;
+   m_playeri,
+   m_homing,
+   m_dmod,
+   m_mid      : byte;
+   m_fake,
+   m_mfe,
+   m_mfs      : boolean;
    {$IFDEF _FULLGAME}
-   ms_eid_bio_death: boolean;
+   m_eid_DeathType: boolean; // true = bio
    {$ENDIF}
 end;
 
@@ -276,21 +297,21 @@ TUnitArms = record
   aw_rupgr_l,
   aw_ruid,
   aw_dupgr,
-  aw_oid   : byte;
-  aw_uids  : TSob;
+  aw_oid      : byte;
+  aw_uids     : TSob;
   aw_tarf,
-  aw_reqf  : cardinal;
+  aw_reqf     : cardinal;
   aw_x,
   aw_y,
   aw_dupgr_s,
   aw_max_range,
   aw_min_range,
-  aw_count : integer;
+  aw_count    : integer;
   aw_dmod,
-  aw_rld   : byte;
-  aw_rld_s : TSoB;
+  aw_rld      : byte;
+  aw_rld_s    : TSoB;
   {$IFDEF _FULLGAME}
-  aw_rld_a : TSoB;
+  aw_rld_a    : TSoB;
   aw_snd_target,
   aw_snd_shot,
   aw_snd_start: PTSoundSet;
@@ -403,13 +424,16 @@ TUID = record
    {$ENDIF}
    uid_SpriteModel  : array[0..LastUnitLevel] of pTMWSModel;
 
-   uid_txt_name,
-   uid_txt_BaseDescript,
-   uid_txt_FullDescript,
-   uid_txt_NameCostHK,
-   uid_txt_Weapons,
-   uid_txt_Reqs,
-   uid_txt_Prod     : shortstring;
+   uid_str_name,
+   uid_str_BaseDescript,
+   uid_str_FullDescript,
+   uid_str_NameCostHK,
+   uid_str_DefaultAttr,
+   uid_str_RebuildHint,
+   uid_str_ArmsCommon,
+   uid_str_Reqs,
+   uid_str_Prod     : shortstring;
+   uid_str_Arms     : array[0..LastUnitArms] of shortstring;
 
    uid_AnimBuildMode,
    uid_eid_bcrater
@@ -453,9 +477,10 @@ TUPID = record  // upgrade
 
    {$IFDEF _FULLGAME}
    upgr_btn      : TMWTexture;
-   upgr_txt_name,
-   upgr_txt_Descript,
-   upgr_txt_Hint : shortstring;
+
+   upgr_str_Name,
+   upgr_str_Descript,
+   upgr_str_Reqs : shortstring;
    {$ENDIF}
 end;
 
@@ -506,8 +531,8 @@ TPlayer = record
    defeated,
    ready   : boolean;
 
-   o_id    : byte;
-o_a0,
+   o_id,
+o_a0       : byte;
 o_x0,o_y0,
 o_x1,o_y1  : integer;
 
@@ -591,12 +616,6 @@ o_x1,o_y1  : integer;
    n_smiths
            : integer;
 
-   prod_error_cndt: cardinal;
-   prod_error_utp,
-   prod_error_uid : byte;
-   prod_error_x,
-   prod_error_y   : integer;
-
    log_l   : array[0..MaxPlayerLog] of TLogMes;
    log_i,
    log_n,
@@ -631,7 +650,7 @@ TUnit = record
    speed,dir,
    rld,vstp,
    unum     : integer;
-   pfzone   : word;
+   mapZone  : word;
 
    level,
    cycle_order,

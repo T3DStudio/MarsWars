@@ -10,7 +10,6 @@ Base vision range: 250
 Build time: 60
 Energy required: 900
 
-Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +18;
@@ -31,7 +30,6 @@ Size: 66
 Base vision range: 250
 Build time: 60
 Energy required: 300
-
 
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
@@ -54,7 +52,6 @@ Base vision range: 120
 Build time: 40
 Energy required: 300
 
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -74,7 +71,6 @@ Base vision range: 44
 Build time: 20
 Energy required: 50
 
-Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -93,7 +89,6 @@ Size: 22
 Base vision range: 44
 Build time: 20
 Energy required: 0
-
 
 Upgrades:
 - Stone Walls - armor +18;
@@ -114,7 +109,6 @@ Base vision range: 44
 Build time: 20
 Energy required: 0
 
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -134,7 +128,6 @@ Base vision range: 44
 Build time: 20
 Energy required: 0
 
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -155,7 +148,6 @@ Base vision range: 106
 Build time: 40
 Energy required: 300
 
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -175,9 +167,8 @@ Base vision range: 300
 Build time: 25
 Energy required: 200
 
-Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive] except [Imp], impact 52*3, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, max. range: sight range, targets: [alive] except [Imp], base impact 52*3, target priority: [unit,biological,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +18;
@@ -199,7 +190,6 @@ Base vision range: 100
 Build time: 40
 Energy required: 400
 Requirements: Great Hell Keep
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -219,7 +209,6 @@ Base vision range: 300
 Build time: 60
 Energy required: 100
 
-Constructed by: Hell Keep,Great Hell Keep,Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Evil Eye Upgrade - vision range +50;
 - Stone Walls - armor +18;
@@ -241,7 +230,6 @@ Base vision range: 130
 Build time: 100
 Energy required: 1200
 Requirements: Infernal Pools
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -262,7 +250,6 @@ Base vision range: 130
 Build time: 100
 Energy required: 1200
 Requirements: Infernal Pools
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -282,9 +269,9 @@ Base vision range: 300
 Build time: 40
 Energy required: 400
 Requirements: Castle of Damned
-
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive], impact 312*0.5, splash damage radius: 20, target priority: lowest hits;
+bonus anti-unit range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 312*0.5, splash damage radius: 20, target priority: lowest hits;
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +18;
@@ -306,7 +293,6 @@ Base vision range: 100
 Build time: 200
 Energy required: 2000
 Requirements: Pentagram of Death,Monastery of Despair,Castle of Damned
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -327,7 +313,6 @@ Base vision range: 172
 Build time: 100
 Energy required: 1200
 Requirements: Infernal Pools
-Constructed by: Hell Keep,Great Hell Keep
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -347,9 +332,8 @@ Base vision range: 300
 Build time: 60
 Energy required: 900
 
-Constructed by: Hell Command Center,Advanced Hell Command Center
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: vision range, targets: [alive] except [Imp], impact 52*2, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive] except [Imp], base impact 52*2, target priority: [unit,biological,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +18;
@@ -370,9 +354,8 @@ Base vision range: 300
 Build time: 60
 Energy required: 300
 
-
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: vision range, targets: [alive] except [Imp], impact 52*2, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive] except [Imp], base impact 52*2, target priority: [unit,biological,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +18;
@@ -393,7 +376,6 @@ Base vision range: 120
 Build time: 40
 Energy required: 300
 
-Constructed by: Hell Command Center,Advanced Hell Command Center
 Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
@@ -415,9 +397,8 @@ Build time: 10
 Energy required: 100
 PainState base threshold: 1
 
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- melee attack, targets: [alive], impact 17*1, target priority: [bio], upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
+- melee attack, max. range: 8, targets: [alive], base impact 17*1, target priority: [biological], upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -441,10 +422,9 @@ Build time: 20
 Energy required: 200
 PainState base threshold: 1
 
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- melee attack, +zombification, targets: [ground,flying], impact 17*1, target priority: distance, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
-- melee attack, targets: [alive], impact 17*1, target priority: [bio], upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
+- melee attack, max. range: 8, +zombification, targets: [ground,flying], base impact 17*1, target priority: nearest, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
+- melee attack, max. range: 8, targets: [alive], base impact 17*1, target priority: [biological], upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -469,10 +449,10 @@ Energy required: 200
 PainState base threshold: 2
 Places in transport: 1
 
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive] except [Imp], impact 52*1, target priority: [unit,bio,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
-- melee attack, targets: [Imp], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+bonus anti-fly range: -50
+- ranged attack, max. range: sight range, targets: [alive] except [Imp], base impact 52*1, target priority: [unit,biological,heavy], upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- melee attack, max. range: 8, targets: [Imp], base impact 52*1, target priority: nearest, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -497,9 +477,8 @@ Energy required: 300
 PainState base threshold: 8
 Places in transport: 2
 
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- melee attack, targets: [alive,ground], impact 52*1.5, target priority: distance, upgrade: Claws and Teeth(+7), factor: x2 [unit,biological,heavy];
+- melee attack, max. range: 8, targets: [alive,ground], base impact 52*1.5, target priority: nearest, upgrade: Claws and Teeth(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -523,10 +502,10 @@ Build time: 25
 Energy required: 250
 PainState base threshold: 8
 Requirements: Infernal Pools,Great Hell Keep
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: +50, targets: [alive] except [Cacodemon], impact 52*1, target priority: [unit,mech], upgrade: Hell Firepower(+7), factor: x2 [unit,mechanical];
-- melee attack, targets: [Cacodemon], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+bonus anti-fly range: +50
+- ranged attack, max. range: sight range, targets: [alive] except [Cacodemon], base impact 52*1, target priority: [unit,mechanical], upgrade: Hell Firepower(+7), factor: x2 [unit,mechanical];
+- melee attack, max. range: 8, targets: [Cacodemon], base impact 52*1, target priority: nearest, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -551,10 +530,9 @@ Energy required: 300
 PainState base threshold: 10
 Places in transport: 3
 Requirements: Infernal Pools
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 78*1, target priority: [unit,light], upgrade: Hell Firepower(+7), factor: x2 [unit,light];
-- melee attack, targets: [Hell Knight,Baron of Hell], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 78*1, target priority: [unit,light], upgrade: Hell Firepower(+7), factor: x2 [unit,light];
+- melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 52*1, target priority: nearest, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -579,10 +557,9 @@ Energy required: 500
 PainState base threshold: 10
 Places in transport: 3
 Requirements: Infernal Pools
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground] except [Hell Knight,Baron of Hell], impact 78*1, target priority: [unit,light], upgrade: Hell Firepower(+7), factor: x2 [unit,light];
-- melee attack, targets: [Hell Knight,Baron of Hell], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 78*1, target priority: [unit,light], upgrade: Hell Firepower(+7), factor: x2 [unit,light];
+- melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 52*1, target priority: nearest, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -607,9 +584,9 @@ Energy required: 1200
 PainState base threshold: 10
 Places in transport: 12
 Requirements: Pentagram of Death
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-building range: +50, targets: [alive], impact 260*1, splash damage radius: 40, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+bonus anti-building range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 260*1, splash damage radius: 40, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -634,9 +611,9 @@ Energy required: 1200
 PainState base threshold: 10
 Places in transport: 12
 Requirements: Pentagram of Death
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 104*3, target priority: [bio], upgrade: Demon`s Weapons(+7), factor: x2 [biological],x0.5 [building];
+bonus anti-unit range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 104*3, target priority: [biological], upgrade: Demon`s Weapons(+7), factor: x2 [biological],x0.5 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -660,10 +637,9 @@ Build time: 40
 Energy required: 500
 PainState base threshold: 3
 Requirements: Monastery of Despair,Great Hell Keep
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- spawn "Phantom", max. range: vision range+50, targets: [alive], impact *0.5, target priority: distance, {Req.: "Phantoms"};
-- spawn "Lost Soul", max. range: vision range+50, targets: [alive], impact *0.5, target priority: distance;
+- spawn "Phantom", max. range: sight range+50, targets: [alive], base impact *0.5, target priority: nearest, {Req.: "Phantoms"};
+- spawn "Lost Soul", max. range: sight range+50, targets: [alive], base impact *0.5, target priority: nearest;
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -688,10 +664,10 @@ Energy required: 300
 PainState base threshold: 5
 Places in transport: 2
 Requirements: Infernal Pools
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: +100, targets: [alive] except [Revenant], impact 78*1, target priority: [fly], upgrade: Demon`s Weapons(+7), factor: x2 [flying];
-- melee attack, targets: [Revenant], impact 52*1, target priority: distance, upgrade: Claws and Teeth(+7);
+bonus anti-fly range: +100
+- ranged attack, max. range: sight range, targets: [alive] except [Revenant], base impact 78*1, target priority: [flying], upgrade: Demon`s Weapons(+7), factor: x2 [flying];
+- melee attack, max. range: 8, targets: [Revenant], base impact 52*1, target priority: nearest, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -716,9 +692,9 @@ Energy required: 500
 PainState base threshold: 7
 Places in transport: 4
 Requirements: Monastery of Despair
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-building range: +50, targets: [alive] except [Mancubus], impact 52x2*1.2, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+bonus anti-building range: +50
+- ranged attack, max. range: sight range, targets: [alive] except [Mancubus], base impact 52x2*1.2, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -743,9 +719,9 @@ Energy required: 500
 PainState base threshold: 7
 Places in transport: 4
 Requirements: Monastery of Despair
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive] except [Arachnotron], impact 104*1.5, target priority: [unit,mech], upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
+bonus anti-unit range: +50
+- ranged attack, max. range: sight range, targets: [alive] except [Arachnotron], base impact 104*1.5, target priority: [unit,mechanical], upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -770,10 +746,10 @@ Energy required: 700
 PainState base threshold: 12
 Places in transport: 4
 Requirements: Monastery of Despair
-Produced by: Demon`s Gate
 Arming/Abilities: 
-- resurrection, targets: [dead,demons&zombies] except [Cyberdemon,Spider Mastermind,Arch-Vile], impact *2, target priority: distance, {Req.: "Resurrection"};
-- ranged attack, max. range: vision range, targets: [alive], impact 312*0.5, splash damage radius: 20, target priority: lowest hits;
+bonus anti-unit range: +50
+- resurrection, max. range: 8, targets: [dead,demons&zombies] except [Cyberdemon,Spider Mastermind,Arch-Vile], base impact *2, target priority: nearest, {Req.: "Resurrection"};
+- ranged attack, max. range: sight range, targets: [alive], base impact 312*0.5, splash damage radius: 20, target priority: lowest hits;
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -798,10 +774,9 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,biological], impact 26*2, target priority: lowest hits;
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 26*2, target priority: lowest hits, upgrade: Demon`s Weapons(+7);
+- heal/repair, max. range: 64, targets: [alive,biological], base impact 26*2, target priority: lowest hits;
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 26*2, target priority: lowest hits, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -826,10 +801,9 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,mechanical], impact 26*2, target priority: lowest hits;
-- ranged attack, max. range: vision range, targets: [alive], impact 26*2, target priority: lowest hits, upgrade: Demon`s Weapons(+7);
+- heal/repair, max. range: 64, targets: [alive,mechanical], base impact 26*2, target priority: lowest hits;
+- ranged attack, max. range: sight range, targets: [alive], base impact 26*2, target priority: lowest hits, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -854,9 +828,8 @@ Energy required: 200
 PainState base threshold: 2
 Places in transport: 1
 Requirements: Zombie Barracks(x3)
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 52*1, target priority: [unit,bio,heavy], upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 52*1, target priority: [unit,biological,heavy], upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -881,9 +854,8 @@ Energy required: 250
 PainState base threshold: 2
 Places in transport: 1
 Requirements: Zombie Barracks(x3)
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 156*0.67, target priority: [unit,bio,heavy], upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 156*0.67, target priority: [unit,biological,heavy], upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -908,9 +880,9 @@ Energy required: 200
 PainState base threshold: 4
 Places in transport: 1
 Requirements: Zombie Barracks(x3)
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive], impact 52*1, target priority: [unit,bio,light], upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,light];
+bonus anti-fly range: -50
+- ranged attack, max. range: sight range, targets: [alive], base impact 52*1, target priority: [unit,biological,light], upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -935,9 +907,9 @@ Energy required: 200
 PainState base threshold: 4
 Places in transport: 1
 Requirements: Zombie Barracks(x3)
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-fly range: +75, targets: [alive], impact 52*1, splash damage radius: 20, target priority: [fly], upgrade: Demon`s Weapons(+7), factor: x2 [flying];
+bonus anti-fly range: +75
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive], base impact 52*1, splash damage radius: 20, target priority: [flying], upgrade: Demon`s Weapons(+7), factor: x2 [flying];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -962,9 +934,8 @@ Energy required: 200
 PainState base threshold: 5
 Places in transport: 1
 Requirements: Zombie Barracks(x3)
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, targets: [alive,ground], impact 52*1, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 52*1, target priority: buildings, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -988,9 +959,9 @@ Build time: 20
 Energy required: 250
 PainState base threshold: 5
 Requirements: Zombie Barracks(x3),Advanced Hell Command Center
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: +50, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
+bonus anti-fly range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 52*2, target priority: [unit,mechanical], upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1015,9 +986,9 @@ Energy required: 600
 PainState base threshold: 5
 Places in transport: 2
 Requirements: Zombie Barracks(x4),Advanced Hell Command Center(x2)
-Produced by: Zombie Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 312*0.5, splash damage radius: 160, factor: x0.5 [building];
+bonus anti-unit range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 312*0.5, splash damage radius: 160, factor: x0.5 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1041,9 +1012,8 @@ Energy required: 900
 Zombie: Hell Command Center
 Zombification hits: 3750
 
-Constructed by: Command Center,Advanced Command Center
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: vision range, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive], base impact 52*2, target priority: [unit,mechanical], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
 - Command Center Range Upgrade - vision range +50;
 - Concrete Walls - armor +18;
@@ -1065,9 +1035,8 @@ Energy required: 300
 Zombie: Advanced Hell Command Center
 Zombification hits: 3750
 
-
 Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: vision range, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive], base impact 52*2, target priority: [unit,mechanical], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
 - Command Center Range Upgrade - vision range +50;
 - Concrete Walls - armor +18;
@@ -1089,7 +1058,6 @@ Energy required: 300
 Zombie: Zombie Barracks
 Zombification hits: 2500
 
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1108,7 +1076,6 @@ Base vision range: 120
 Build time: 40
 Energy required: 300
 Requirements: Weapon Factory
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1127,7 +1094,6 @@ Base vision range: 76
 Build time: 20
 Energy required: 100
 
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1145,7 +1111,6 @@ Size: 38
 Base vision range: 76
 Build time: 20
 Energy required: 0
-
 
 Upgrades:
 - Concrete Walls - armor +18;
@@ -1165,7 +1130,6 @@ Base vision range: 76
 Build time: 20
 Energy required: 0
 
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1184,7 +1148,6 @@ Base vision range: 76
 Build time: 20
 Energy required: 0
 
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1203,7 +1166,6 @@ Base vision range: 124
 Build time: 40
 Energy required: 300
 
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1222,7 +1184,6 @@ Base vision range: 300
 Build time: 40
 Energy required: 200
 Requirements: Weapon Factory
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Radar Upgrade - vision range +25;
 - Concrete Walls - armor +18;
@@ -1242,7 +1203,6 @@ Base vision range: 80
 Build time: 200
 Energy required: 2000
 Requirements: Science Facility,Computer Station
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1261,7 +1221,6 @@ Base vision range: 172
 Build time: 100
 Energy required: 1200
 Requirements: Weapon Factory
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1280,10 +1239,9 @@ Base vision range: 300
 Build time: 20
 Energy required: 250
 
-Constructed by: Command Center,Advanced Command Center
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,unit,mechanical,ground], impact 52*3, target priority: lowest hits, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Anti-ground Plasmagun"};
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 52*3, target priority: [unit,bio,light], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
+- ranged attack, max. range: sight range, targets: [alive,unit,mechanical,ground], base impact 52*3, target priority: lowest hits, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Anti-ground Plasmagun"};
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 52*3, target priority: [unit,biological,light], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Spotlights - vision range +25;
 - Additional Armoring - armor +18;
@@ -1304,9 +1262,8 @@ Base vision range: 300
 Build time: 20
 Energy required: 250
 
-Constructed by: Command Center,Advanced Command Center
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,flying], impact 52*3, target priority: lowest hits, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
+- ranged attack, max. range: sight range, targets: [alive,flying], base impact 52*3, target priority: lowest hits, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
 Upgrades:
 - Spotlights - vision range +25;
 - Additional Armoring - armor +18;
@@ -1327,7 +1284,6 @@ Base vision range: 140
 Build time: 100
 Energy required: 1200
 Requirements: Weapon Factory
-Constructed by: Command Center,Advanced Command Center
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1346,9 +1302,8 @@ Base vision range: 100
 Build time: 5
 Energy required: 50
 
-
 Arming/Abilities: 
-- suicide, targets: [alive,ground], impact 520*1, splash damage radius: 80, target priority: distance;
+- suicide, max. range: 24, targets: [alive,ground], base impact 520*1, splash damage radius: 80, target priority: nearest;
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1367,7 +1322,6 @@ Base vision range: 300
 Build time: 100
 Energy required: 2000
 
-
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1386,7 +1340,6 @@ Base vision range: 200
 Build time: 100
 Energy required: 1000
 
-
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1404,7 +1357,6 @@ Size: 100
 Base vision range: 200
 Build time: 100
 Energy required: 1000
-
 
 Upgrades:
 - Concrete Walls - armor +18;
@@ -1424,7 +1376,6 @@ Base vision range: 110
 Build time: 40
 Energy required: 500
 
-
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1443,7 +1394,6 @@ Base vision range: 200
 Build time: 100
 Energy required: 1000
 
-
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1462,7 +1412,6 @@ Base vision range: 200
 Build time: 100
 Energy required: 1000
 
-
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1480,7 +1429,6 @@ Size: 100
 Base vision range: 200
 Build time: 100
 Energy required: 1000
-
 
 Upgrades:
 - Concrete Walls - armor +18;
@@ -1571,7 +1519,6 @@ Size: 150
 Base vision range: 300
 Build time: 100
 Energy required: 2000
-
 
 Upgrades:
 - Concrete Walls - armor +18;
@@ -1595,10 +1542,9 @@ Places in transport: 1
 Zombie: Zombie Engineer
 Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
-Produced by: Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,mechanical], impact 26*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
-- ranged attack, max. range: vision range, targets: [alive], impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
+- heal/repair, max. range: 64, targets: [alive,mechanical], base impact 26*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1623,10 +1569,9 @@ Places in transport: 1
 Zombie: Zombie Medic
 Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
-Produced by: Barracks
 Arming/Abilities: 
-- heal/repair, targets: [alive,biological], impact 26*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
+- heal/repair, max. range: 64, targets: [alive,biological], base impact 26*2, target priority: lowest hits, upgrade: Advanced Tools(+14);
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 26*2, target priority: lowest hits, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1651,9 +1596,8 @@ Places in transport: 1
 Zombie: Zombie Shotguner
 Zombification hits: 0
 
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 52*1, target priority: [unit,bio,heavy], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy];
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 52*1, target priority: [unit,biological,heavy], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1678,9 +1622,8 @@ Places in transport: 1
 Zombie: Zombie SuperShotguner
 Zombification hits: 0
 
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 156*0.67, target priority: [unit,bio,heavy], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 156*0.67, target priority: [unit,biological,heavy], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1705,9 +1648,9 @@ Places in transport: 1
 Zombie: Zombie Commando
 Zombification hits: 0
 Requirements: Weapon Factory
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, targets: [alive], impact 52*1, target priority: [unit,bio,light], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
+bonus anti-fly range: -50
+- ranged attack, max. range: sight range, targets: [alive], base impact 52*1, target priority: [unit,biological,light], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1732,9 +1675,9 @@ Places in transport: 1
 Zombie: Zombie Antiaircrafter
 Zombification hits: 0
 Requirements: Weapon Factory
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-fly range: +75, targets: [alive], impact 52*1, target priority: [fly], upgrade: Weapons Upgrade(+7), factor: x2 [flying];
+bonus anti-fly range: +75
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive], base impact 52*1, target priority: [flying], upgrade: Weapons Upgrade(+7), factor: x2 [flying];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1759,9 +1702,8 @@ Places in transport: 1
 Zombie: Zombie Siege Marine
 Zombification hits: 0
 Requirements: Weapon Factory
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, targets: [alive,ground], impact 52*1, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 52*1, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1783,9 +1725,9 @@ Base vision range: 200
 Build time: 25
 Energy required: 250
 Requirements: Weapon Factory,Advanced Command Center
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: +50, targets: [alive], impact 52*2, target priority: [unit,mech], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
+bonus anti-fly range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 52*2, target priority: [unit,mechanical], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1810,9 +1752,9 @@ Places in transport: 2
 Zombie: Zombie BFG Marine
 Zombification hits: 0
 Requirements: Science Facility,Computer Station
-Produced by: Barracks
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +50, targets: [alive], impact 312*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+7), factor: x0.5 [building];
+bonus anti-unit range: +50
+- ranged attack, max. range: sight range, targets: [alive], base impact 312*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+7), factor: x0.5 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1835,7 +1777,6 @@ Build time: 20
 Energy required: 200
 Base transport capacity: 8
 Requirements: Advanced Command Center
-Produced by: Vehicle Factory
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1858,9 +1799,8 @@ Build time: 20
 Energy required: 400
 Places in transport: 3
 
-Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, max. range: vision range, targets: [alive,ground], impact 52*2, target priority: [unit,mech], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 52*2, target priority: [unit,mechanical], upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1883,10 +1823,10 @@ Build time: 30
 Energy required: 500
 Places in transport: 4
 Requirements: Science Facility
-Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,ground], impact 52*4, target priority: [unit,bio], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological];
-- ranged attack, max. range: vision range, bonus anti-fly range: -50, bonus anti-unit range: +50, targets: [alive,flying], impact 52*1.5, target priority: lowest hits, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
+bonus anti-fly range: -50, bonus anti-unit range: +50
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 52*4, target priority: [unit,biological], upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological];
+- ranged attack, max. range: sight range, targets: [alive,flying], base impact 52*1.5, target priority: lowest hits, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1909,9 +1849,9 @@ Build time: 40
 Energy required: 600
 Places in transport: 6
 Requirements: Science Facility
-Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: vision range, bonus anti-building range: +50, targets: [alive,ground], impact 52x2*1.5, splash damage radius: 20, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
+bonus anti-building range: +50
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 52x2*1.5, splash damage radius: 20, target priority: buildings, upgrade: Weapons Upgrade(+7), factor: x4 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1933,9 +1873,9 @@ Base vision range: 275
 Build time: 40
 Energy required: 600
 Requirements: Science Facility,Advanced Command Center
-Produced by: Vehicle Factory
 Arming/Abilities: 
-- ranged attack, max. range: vision range, bonus anti-unit range: +25, targets: [alive], impact 104*2, target priority: [ground,light], upgrade: Weapons Upgrade(+7), factor: x2 [light,ground];
+bonus anti-unit range: +25
+- ranged attack, max. range: sight range, targets: [alive], base impact 104*2, target priority: [ground,light], upgrade: Weapons Upgrade(+7), factor: x2 [light,ground];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1959,7 +1899,6 @@ Energy required: 200
 Places in transport: 10
 Base transport capacity: 4
 
-Produced by: Vehicle Factory
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1972,212 +1911,86 @@ Special ability: "Unload". Immune to splash damage.
 
 Hell Firepower (R,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
-Increase the damage of ranged attacks for T1 units and defensive structures.
-
-
 Combat Flesh (T,600/1300/2000/2700/3400,60/95/130/165/200,x5)
-
-Increase the armor of all Hell units.
-
 
 Stone Walls (Y,600/1400/2200/3000/3800,60/80/100/120/140,x5)
 
-Increase the armor of all Hell buildings.
-
-
 Claws and Teeth (F,600/1000/1400/1800/2200,60/90/120/150/180,x5)
-
-Increase the damage of melee attacks.
-
 
 Flesh Regeneration (G,300/600,60/90,x2)
 
-Health regeneration for all Hell units.
-
-
 Pain Threshold (H,300/600,60/60,x2)
-
-Hell units can take more hits before being stunned by pain.
-
 
 Hell Keep Range Upgrade (V,600/600,60/75,x2)
 
-Increase Hell Keep`s range of vision.
-
-
 Hell Keep Blink Charge (B,600,90,x1)
-
-Charge for Hell Keep`s ability.
-
 
 Decay Aura (N,600,60,x1)
 
-Hell Keep start damage all enemies around. Decay Aura damage ignores unit armor.
-Requirements: Great Hell Keep
-
 Demonic Spirits (U,600/900,60/75,x2)
-
-Increase the range of defensive structures.
-Requirements: Great Hell Keep
 
 Specters (I,600,60,x1)
 
-Pinky Demon becomes invisible.
-Requirements: Great Hell Keep
-
 Hell Sight (O,600/900,60/90,x2)
-
-Increase the sight range of all Hell units.
-Requirements: Monastery of Despair
 
 Phantoms (J,600,60,x1)
 
-Pain Elemental spawns Phantoms instead of Lost Soul.
-Requirements: Monastery of Despair
-
 Demon`s Weapons (K,600/1300/2000/2700/3400,60/95/130/165/200,x5)
-
-Increase the damage of ranged attacks for T2 units and defensive structures.
-Requirements: Monastery of Despair
 
 Resurrection (L,600,60,x1)
 
-ArchVile`s ability.
-Requirements: Monastery of Despair
-
 Teleport Upgrade (Ctrl+R,400/600,60/90,x2)
-
-Reduced cooldown on Teleport ability.
-Requirements: Castle of Damned
 
 Recall (Ctrl+T,600,60,x1)
 
-The Teleport can recall units.
-Requirements: Castle of Damned
-
 Evil Eye Upgrade (Ctrl+Y,300/600/900,60/60/60,x3)
-
-Increase the sight range of Evil Eye.
-Requirements: Castle of Damned
 
 Totem of Horror Invisibility (Ctrl+F,600,60,x1)
 
-Totem of Horror becomes invisible.
-Requirements: Castle of Damned
-
 Building Restoration (Ctrl+G,600/900/1200/1500/1800,60/60/60/60/60,x5)
-
-Health regeneration for all Hell buildings.
-Requirements: Castle of Damned
 
 Tower Teleportation Charge (Ctrl+H,600,60,x1)
 
-Charges for ability of Guard Tower and Totem of Horror.
-Requirements: Castle of Damned
-
 Weapons Upgrade (R,600/1300/2000/2700/3400,60/95/130/165/200,x5)
-
-Increase the damage of ranged attacks for all UAC units and defensive structures.
-
 
 Infantry Combat Armor Upgrade (T,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
-Increase the armor of all Barrack`s units.
-
-
 Concrete Walls (Y,600/1400/2200/3000/3800,60/95/130/165/200,x5)
-
-Increase the armor of all UAC buildings.
-
 
 Advanced Tools (F,600/1000,60/90,x2)
 
-Increase repair/healing efficiency of Engineers/Medics.
-
-
 Lightweight Armor (G,600,60,x1)
-
-Increase the movement speed of all Barrack`s units.
-
 
 Expansive bullets (H,300,60,x1)
 
-Attacks of Shotguner, SuperShotguner and Terminator are more likely to cause a pain state.
-
-
 Command Center Range Upgrade (V,600/600,60/75,x2)
-
-Increase Command Center`s range of vision.
-
 
 Command Center Flight Engines (B,600,120,x1)
 
-Command Center gains ability to fly.
-
-
 Command Center Turret (N,600,120,x1)
-
-Plasma turret for Command Center.
-Requirements: Advanced Command Center
 
 Spotlights (U,600/900,60/75,x2)
 
-Increase the range of defensive structures.
-Requirements: Advanced Command Center
-
 Drone Transformation Protocol (I,600,60,x1)
-
-Drone can rebuild to Anti-ground turret.
-Requirements: Advanced Command Center
 
 Light Amplification Visors (O,600/900,60/90,x2)
 
-Increase the sight range of all UAC units.
-Requirements: Science Facility
-
 Stealth Technology (J,600,60,x1)
-
-Commando becomes invisible.
-Requirements: Science Facility
 
 Fragmentation Missiles (K,600,60,x1)
 
-Anti-air missiles do extra damage around the target.
-Requirements: Science Facility
-
 Advanced Engines (L,600/900,60/75,x2)
-
-Increase the movement speed of all Factory`s units.
-Requirements: Science Facility
 
 Mech Combat Armor Upgrade (Ctrl+R,600/1300/2000/2700/3400,60/95/130/165/200,x5)
 
-Increase the armor of all Factory`s units.
-Requirements: Science Facility
-
 Anti-air Weapon (Ctrl+T,600,60,x1)
-
-Anti-air weapon for Terminator.
-Requirements: Science Facility
 
 Dropship Upgrade (Ctrl+Y,600,60,x1)
 
-Increase the capacity of Dropship.
-Requirements: Science Facility
-
 Radar Upgrade (Ctrl+F,300/600/900,60/60/60,x3)
-
-Increase radar scanning radius.
-Requirements: Computer Station
 
 Anti-ground Plasmagun (Ctrl+G,600,60,x1)
 
-Anti-[mechanical] weapon for Anti-ground turret.
-Requirements: Computer Station
-
 Additional Armoring (Ctrl+H,600,60,x1)
-
-Additional armor for Turrets.
-Requirements: Computer Station
 
 

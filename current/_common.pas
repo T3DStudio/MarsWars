@@ -4,11 +4,11 @@
 //   FORWARD Declarations
 //
 
-procedure unit_damage(pu:PTUnit;damage,pain_f:integer;pl:byte;IgnoreArmor:boolean);forward;
+procedure unit_damage(pu:PTUnit;damage:integer;pl:byte;IgnoreArmor:boolean);forward;
 procedure unit_Bonuses (pu:PTUnit);forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function unit_sability (pCaster:PTUnit;check:boolean):cardinal;      forward;
+function unit_sability (pCaster:PTUnit;check:boolean):cardinal; forward;
 function unit_pability (pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
 function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;
 function unit_CheckTransport(uTransport,uTarget:PTUnit):boolean;forward;
@@ -472,32 +472,6 @@ begin
        end;
 end;
 
-function PlayerSetProdError(player,utp,uid:byte;cndt:cardinal;pu:PTUnit):boolean;
-begin
-   PlayerSetProdError:=false;
-   if(player<=LastPlayer)then
-   with g_gplayers[player] do
-   if(cndt>0)then
-   begin
-      prod_error_cndt:=cndt;
-      if(pu<>nil)then
-      begin
-         prod_error_x:=mm3i(1,pu^.x,map_Size);
-         prod_error_y:=mm3i(1,pu^.y,map_Size);
-         if(utp=lmt_argt_abil)then
-           if(uid=0)or(uid=254)or(uid=255)then uid:=pu^.uid^.uid_ability;
-      end
-      else
-      begin
-         prod_error_x:=-1;
-         prod_error_y:=-1;
-      end;
-      prod_error_utp :=utp;
-      prod_error_uid :=uid;
-      PlayerSetProdError:=true;
-   end;
-end;
-
 function PlayerLogCheckNearEvent(playeri:byte;tickDiff:cardinal;x,y:integer;mtypes:TSoB):boolean;
 var ln,li:cardinal;
 begin
@@ -541,7 +515,7 @@ begin
      begin
         case amtype of
 0..LastPlayer,
-lmt_player_chat,
+lmt_chat_common,
 lmt_player_defeated,
 lmt_player_leave,
 lmt_player_surrender,
@@ -549,7 +523,7 @@ lmt_game_end,
 lmt_game_message     :;
 lmt_unit_attacked,
 lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[lmt_unit_attacked,lmt_allies_attacked]))then exit;
-lmt_unit_advanced    : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]))then exit;
+lmt_unit_LevelUp    : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]))then exit;
         else
            with log_l[log_i] do
              if(tick<=g_tick)then
@@ -614,7 +588,7 @@ begin
    if(targets>0)then
      if(sender<=LastPlayer)
      then PlayersAddToLog(sender,targets,sender         ,0,0,g_gplayers[sender].name+': '+message,0,0)
-     else PlayersAddToLog(sender,targets,lmt_player_chat,0,0,message                             ,0,0);
+     else PlayersAddToLog(sender,targets,lmt_chat_common,0,0,message                             ,0,0);
 end;
 procedure GameLogCommon(sender,targets:byte;message:shortstring);
 begin
@@ -651,7 +625,7 @@ begin
    if(pu=nil)or(not ServerSide)then exit;
 
    with pu^ do
-    PlayersAddToLog(playeri,0,lmt_unit_advanced,0,uidi,'',x,y);
+    PlayersAddToLog(playeri,0,lmt_unit_LevelUp,0,uidi,'',x,y);
 end;
 procedure GameLogUpgradeComplete(pl,upid:byte;x,y:integer);
 begin
@@ -659,9 +633,11 @@ begin
 
    PlayersAddToLog(pl,0,lmt_upgrade_complete,0,upid,'',x,y);
 end;
-procedure GameLogBits2Message(playerN,auid,atype:byte;bits:cardinal;x,y:integer);
+function GameLogBits2Message(playerN,auid,atype:byte;bits:cardinal;x,y:integer):boolean;
 var bt:byte;
 begin
+   GameLogBits2Message:=false;
+   if(PlayerN=LocalPlayer)then writeln(bits);
    if(playerN>LastPlayer)or(bits=0)then exit;
 
    with g_gplayers[playerN] do
@@ -671,56 +647,50 @@ begin
       if(auid>0)and(atype=lmt_argt_unit)then
         if(a_units[auid]<=0)and(uid_e[auid]<=0)then exit;
    end;
+   GameLogBits2Message:=true;
 
-   if((bits and ureq_usespability)>0)
-   then bt:=lmt_ability_needSP
+   if((bits and ureq_place)>0)
+   then bt:=lmt_prod_BadPlace
    else
-     if((bits and ureq_usesability)>0)
-     then bt:=lmt_ability_needS
+     if((bits and ureq_landplace)>0)
+     then bt:=lmt_ability_BadPlace
      else
-       if((bits and ureq_place)>0)
-       then bt:=lmt_cant_build
+       if((bits and ureq_ruid )>0)
+       or((bits and ureq_rupid)>0)
+       then bt:=lmt_Req_Common
        else
-         if((bits and ureq_landplace)>0)
-         then bt:=lmt_ability_cantland
+         if((bits and ureq_reloading)>0)
+         then bt:=lmt_ability_reload
          else
-           if((bits and ureq_ruid )>0)
-           or((bits and ureq_rupid)>0)
-           then bt:=lmt_req_ruids
+           if((bits and ureq_InProgress)>0)
+           then bt:=lmt_upgrade_InProgress
            else
-             if((bits and ureq_reloading)>0)
-             then bt:=lmt_ability_reload
+             if((bits and ureq_max )>0)
+             then bt:=lmt_Req_MaxCount
              else
-               if((bits and ureq_max )>0)
-               then bt:=lmt_MaximumReached
+               if((bits and ureq_armylimit )>0)
+               or((bits and ureq_limit )>0)
+               then bt:=lmt_Req_Limit
                else
-                 if((bits and ureq_armylimit )>0)
-                 or((bits and ureq_unitlimit )>0)
-                 then bt:=lmt_unit_limit
+                 if((bits and ureq_energy)>0)
+                 then bt:=lmt_Req_Energy
                  else
-                   if((bits and ureq_energy)>0)
-                   then bt:=lmt_req_energy
+                   if((bits and ureq_smiths  )>0)
+                   or((bits and ureq_barracks)>0)
+                   then bt:=lmt_NeedProdUnit
                    else
-                     if((bits and ureq_smiths  )>0)
-                     or((bits and ureq_barracks)>0)
-                     then bt:=lmt_NeedMoreProd
+                     if((bits and ureq_builders    )>0)
+                     then bt:=lmt_unit_NeedBuilder
                      else
-                       if((bits and ureq_needbuilders)>0)
-                       or((bits and ureq_builders    )>0)
-                       then bt:=lmt_unit_needbuilder
+                       if((bits and ureq_busy)>0)
+                       then bt:=lmt_prod_AllBusy
                        else
-                         if((bits and ureq_busy)>0)
-                         then bt:=lmt_production_busy
+                         if((bits and ureq_InvalidTarget)>0)
+                         then bt:=lmt_invalid_Target
                          else
-                           if((bits and ureq_MaxLevel)>0)
-                           then bt:=lmt_MaximumLevel
-                           else
-                             if((bits and ureq_invalidtar)>0)
-                             then bt:=lmt_invalid_tar
-                             else
-                               if((bits and ureq_unknown   )>0)
-                               then bt:=lmt_cant_order
-                               else bt:=lmt_req_common;
+                           if((bits and ureq_other   )>0)
+                           then bt:=lmt_Invalid_Order
+                           else bt:=lmt_prod_BadOrder;
 
    PlayersAddToLog(playerN,0,bt,atype,auid,'',x,y);
 end;
@@ -996,44 +966,45 @@ end;
 //   UID/UPID Checks
 //
 
-function _uid_player_limit(pl:PTPlayer;uid:byte):boolean;
+function _uid_player_limit(player:PTPlayer;uid:byte):boolean;
 begin
-   with pl^ do
+   with player^ do
     with g_uids[uid] do
      if(uid_ukbuilding)and(menergy<=0)
      then _uid_player_limit:=false
      else _uid_player_limit:=((uid_e[uid]+uprodu[uid])<a_units[uid])and((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+uid_LimitUse)<=MaxPlayerLimit);
 end;
 
-function CheckUnitReqs(pl:PTPlayer;uid:byte;forRebuildCheck:boolean=false):cardinal;
-procedure setr(ni:cardinal;b:boolean);
+function CheckUnitReqs(player:PTPlayer;uid:byte;forRebuildCheck:boolean=false):cardinal;
+procedure AddBits(ni:cardinal;b:boolean);
 begin if(b)then CheckUnitReqs:=CheckUnitReqs or ni;end;
 begin
    CheckUnitReqs:=0;
-   with pl^ do
+   with player^ do
    with g_uids[uid] do
    begin
       if(not forRebuildCheck)then
       begin
-      setr(ureq_unitlimit ,(army     +uproda          )>=MaxPlayerUnits);
-      setr(ureq_armylimit ,(armylimit+uprodl+uid_LimitUse)> MaxPlayerLimit);
+      AddBits(ureq_limit     ,(army     +uproda             )>=MaxPlayerUnits);
+      AddBits(ureq_armylimit ,(armylimit+uprodl+uid_LimitUse)> MaxPlayerLimit);
       end;
-      setr(ureq_ruid      ,(uid_req_uid1>0)and(uid_eb[uid_req_uid1]<uid_req_uid1n));
-      setr(ureq_ruid      ,(uid_req_uid2>0)and(uid_eb[uid_req_uid2]<uid_req_uid2n));
-      setr(ureq_ruid      ,(uid_req_uid3>0)and(uid_eb[uid_req_uid3]<uid_req_uid3n));
-      setr(ureq_rupid     ,(uid_req_upgr>0)and(upgr  [uid_req_upgr]<uid_req_upgrl));
-      setr(ureq_energy    , cenergy<uid_EnergyReq                     );
-      setr(ureq_time      , uid_ProdTimeSec<=0                            );
+      AddBits(ureq_ruid      ,(uid_req_uid1>0)and(uid_eb[uid_req_uid1]<uid_req_uid1n));
+      AddBits(ureq_ruid      ,(uid_req_uid2>0)and(uid_eb[uid_req_uid2]<uid_req_uid2n));
+      AddBits(ureq_ruid      ,(uid_req_uid3>0)and(uid_eb[uid_req_uid3]<uid_req_uid3n));
+      AddBits(ureq_rupid     ,(uid_req_upgr>0)and(upgr  [uid_req_upgr]<uid_req_upgrl));
+      AddBits(ureq_energy    , cenergy<uid_EnergyReq);
+      AddBits(ureq_time      , uid_ProdTimeSec<=0   );
+
       if(not forRebuildCheck)then
-      setr(ureq_max       ,((uid_e[uid]+uprodu[uid])>=a_units[uid])or
-                           ((uid_isbuilder)and(e_builders>=PlayerMaxBuilders)));
+      AddBits(ureq_max       ,((uid_e[uid]+uprodu[uid])>=a_units[uid])or
+                              ((uid_isbuilder)and(e_builders>=PlayerMaxBuilders)));
 
       case uid_ukbuilding of
 true  : begin
-           setr(ureq_builders ,n_builders<=0);
-           setr(ureq_bld_r    ,build_cd  > 0);
+           AddBits(ureq_builders ,n_builders<=0);
+           AddBits(ureq_BuildCD  ,build_cd  > 0);
         end;
-false : setr(ureq_barracks    ,n_barracks<=0);
+false : AddBits(ureq_barracks    ,n_barracks<=0);
       end;
    end;
 end;
@@ -1066,22 +1037,45 @@ begin
      end;
 end;
 
-function CheckUpgradeReqs(pl:PTPlayer;up:byte):cardinal;
-procedure setr(ni:cardinal;b:boolean);
+function CheckUpgradeReqs(player:PTPlayer;up:byte):cardinal;
+procedure AddBits(ni:cardinal;b:boolean);
 begin if(b)then CheckUpgradeReqs:=CheckUpgradeReqs or ni;end;
 begin
    CheckUpgradeReqs:=0;
-   with pl^ do
+   with player^ do
    with g_upids[up] do
    begin
-      setr(ureq_ruid   ,(upgr_ruid >0)and(uid_eb[upgr_ruid ]=0)  );
-      setr(ureq_rupid  ,(upgr_rupgr>0)and(upgr  [upgr_rupgr]=0)  );
-      setr(ureq_energy , cenergy<GetUpgradeEnergy(up,upgr[up]+1)   );
-      setr(ureq_time   , upgr_time<=0                           );
-      setr(ureq_max    ,(integer(upgr[up]+upprodu[up])>=min2i(upgr_max,a_upgrs[up])));
-      setr(ureq_product,(upgr_mfrg=false)and(upprodu[up]>0)     );
-      setr(ureq_smiths , n_smiths<=0                           );
+      AddBits(ureq_ruid      ,(upgr_ruid >0)and(uid_eb[upgr_ruid ]=0)  );
+      AddBits(ureq_rupid     ,(upgr_rupgr>0)and(upgr  [upgr_rupgr]=0)  );
+      AddBits(ureq_energy    , cenergy<GetUpgradeEnergy(up,upgr[up]+1) );
+      AddBits(ureq_time      , upgr_time<=0                            );
+      AddBits(ureq_max       ,(integer(upgr[up]+upprodu[up])>=min2i(upgr_max,a_upgrs[up])));
+      AddBits(ureq_InProgress,(not upgr_mfrg)and(upprodu[up]>0)        );
+      AddBits(ureq_smiths    , n_smiths<=0                             );
    end;
+end;
+
+function UnitOrderCheckSmith(pu:pTunit;oid:byte):boolean;
+begin
+   UnitOrderCheckSmith:=true;
+   with pu^     do
+   with uid^    do
+   with player^ do
+     if(uid_issmith)then
+       if(oid in uid_prod_Upgrades)then
+         if(s_smiths<=0)or(isselected)then exit;
+   UnitOrderCheckSmith:=false;
+end;
+function UnitOrderCheckBarrack(pu:pTunit;oid:byte):boolean;
+begin
+   UnitOrderCheckBarrack:=true;
+   with pu^     do
+   with uid^    do
+   with player^ do
+     if(uid_isbarrack)then
+       if(oid in uid_prod_Units)then
+         if(s_barracks<=0)or(isselected)then exit;
+   UnitOrderCheckBarrack:=false;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1381,9 +1375,11 @@ function InputAction(iact:byte):boolean;
 begin
    InputAction:=input_actions[iact].ik_timer_pressed>0;
 end;
-function InputActionPressed(iact:byte):boolean;
+function InputActionPressed(iact:byte;stuckCheck:boolean=false):boolean;
 begin
    InputActionPressed:=input_actions[iact].ik_timer_pressed=1;
+   if(stuckCheck)and(not InputActionPressed)then
+   InputActionPressed:=input_actions[iact].ik_timer_pressed>k_LastCharStuckDelay;
 end;
 function InputActionReleased(iact:byte):boolean;
 begin
@@ -1492,11 +1488,7 @@ begin
       MainMenu     :=false;
       ui_update_now:=false;
       menu_update  :=true;
-      menu_ItemSelected  :=0;
-      {if(net_status=ns_none)and(g_Status<=LastPlayer)then
-        if(MainMenu)
-        then g_Status:=LocalPlayer
-        else g_Status:=gs_running;     }
+      menu_ItemSelected:=0;
    end;
 end;
 procedure GameOpenMenu;
@@ -1505,11 +1497,9 @@ begin
 
    MainMenu   :=true;
    menu_update:=true;
+   menu_redraw_pause:=0;
+   ui_update_timer:=0;
    menu_ItemSelected:=0;
-   {if(net_status=ns_none)and(g_Status<=LastPlayer)then
-     if(MainMenu)
-     then g_Status:=LocalPlayer
-     else g_Status:=gs_running; }
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1803,151 +1793,132 @@ end;
 
 
 function ParseLogMessage(ptlog:PTLogMes;mcolor:pcardinal):shortstring;
+procedure AddArgName;
+begin
+   with ptlog^ do
+     if(argx>0)then
+       case argt of
+       lmt_argt_unit   : with g_uids [argx] do ParseLogMessage+=' ('+uid_str_name +')';
+       lmt_argt_upgrade: with g_upids[argx] do ParseLogMessage+=' ('+upgr_str_Name+')';
+       lmt_argt_ability:                       ParseLogMessage+=' ('+str_ability_name[argx]+')';
+       end;
+end;
 begin
    ParseLogMessage:='';
    mcolor^:=c_white;
    with ptlog^ do
-    case mtype of
+     case mtype of
 0..LastPlayer        : if(length(str)>0)then
                        begin
                           //mtype = sender
                           mcolor^:=PlayerGetColor(mtype,false);
                           ParseLogMessage:=str;
                        end;
-lmt_req_ruids,
-lmt_req_common,
-lmt_req_energy,
-lmt_cant_build       : begin
+lmt_chat_common      : ParseLogMessage:=str;
+lmt_Req_Limit        : ParseLogMessage:=str_warn_MaxLimitReached;
+lmt_Req_MaxCount     : ParseLogMessage:=str_warn_MaxCountReached;
+lmt_Req_Common,
+lmt_Req_Energy,
+lmt_prod_BadOrder,
+lmt_prod_BadPlace    : begin
                           case mtype of
-                          lmt_req_ruids : ParseLogMessage:=str_check_reqs;
-                          lmt_req_common: ParseLogMessage:=str_cant_prod;
-                          lmt_req_energy: ParseLogMessage:=str_need_energy;
-                          lmt_cant_build: ParseLogMessage:=str_cant_build;
+                          lmt_Req_Common   : ParseLogMessage:=str_warn_Req_Common;
+                          lmt_Req_Energy   : ParseLogMessage:=str_warn_Req_Energy;
+                          lmt_prod_BadOrder: ParseLogMessage:=str_warn_prod_BadOrder;
+                          lmt_prod_BadPlace: ParseLogMessage:=str_warn_prod_BadPlace;
                           end;
-                          if(argx>0)then
-                            case argt of
-                          lmt_argt_unit: with g_uids [argx] do ParseLogMessage+=' ('+uid_txt_name+')';
-                          lmt_argt_upgr: with g_upids[argx] do ParseLogMessage+=' ('+upgr_txt_name   +')';
-                          {lmt_argt_abil: case argx of
-                                         254 : ParseLogMessage+=' ('+str_sability+')';
-                                         255 : ParseLogMessage+=' ('+str_spability+')';
-                                         else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
-                                         end;  }
-                            end;
+                          AddArgName;
                        end;
-lmt_player_chat,
-lmt_game_message,
+lmt_prod_AllBusy     : ParseLogMessage:=str_warn_prod_AllBusy;
+
 lmt_player_surrender,
-lmt_player_leave     : ParseLogMessage:=str;//if(argx<=LastPlayer)then ParseLogMessage:=g_gplayers[argx].name+str_gmsg_PlayerLeft;
+lmt_player_leave,
+lmt_game_message     : ParseLogMessage:=str;
 lmt_game_end         : if(argx<=LastPlayer)and(UIPlayer<=LastPlayer)then
                          if(argx=g_gplayers[UIPlayer].team)
                          then ParseLogMessage:=str_gstat_Win
                          else ParseLogMessage:=str_gstat_Lose;
 lmt_player_defeated  : if(argx<=LastPlayer)then ParseLogMessage:=g_gplayers[argx].name+str_gmsg_PlayerDefeat;
+lmt_upgrade_InProgress: ParseLogMessage:=str_warn_upgrade_InProgress;
 lmt_upgrade_complete : begin
-                       with g_upids[argx] do ParseLogMessage:=str_upgrade_complete+' ('+upgr_txt_name+')';
+                       with g_upids[argx] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
                        mcolor^:=c_yellow;
                        end;
 lmt_unit_ready       : begin
                        with g_uids[argx] do
                          case argt of
                          lmt_argt_unit : if(uid_ukbuilding)
-                                         then ParseLogMessage:=str_building_complete+' ('+uid_txt_name+')'
-                                         else ParseLogMessage:=str_unit_complete    +' ('+uid_txt_name+')';
+                                         then ParseLogMessage:=str_warn_building_complete+' ('+uid_str_name+')'
+                                         else ParseLogMessage:=str_warn_unit_complete    +' ('+uid_str_name+')';
                          end;
                        mcolor^:=c_green;
                        end;
-lmt_unit_advanced    : begin
-                       with g_uids[argx] do ParseLogMessage:=str_unit_advanced+' ('+uid_txt_name+')';
+lmt_unit_LevelUp     : begin
+                       with g_uids[argx] do ParseLogMessage:=str_warn_unit_Levelup+' ('+uid_str_name+')';
                        mcolor^:=c_aqua;
                        end;
 lmt_allies_attacked  : begin
                        with g_uids[argx] do
-                         ParseLogMessage:=str_allies_attacked+' ('+uid_txt_name+')';
+                         ParseLogMessage:=str_warn_allies_attacked+' ('+uid_str_name+')';
                        mcolor^:=c_orange;
                        end;
 lmt_unit_attacked    : begin
                        with g_uids[argx] do
-                        if(uid_ukbuilding)
-                        then ParseLogMessage:=str_base_attacked+' ('+uid_txt_name+')'
-                        else ParseLogMessage:=str_unit_attacked+' ('+uid_txt_name+')';
+                         if(uid_ukbuilding)
+                         then ParseLogMessage:=str_warn_base_attacked+' ('+uid_str_name+')'
+                         else ParseLogMessage:=str_warn_unit_attacked+' ('+uid_str_name+')';
                        mcolor^:=c_red;
                        end;
 lmt_kpoint_captured  : begin
-                       ParseLogMessage:=str_cpoint_captured;
+                       ParseLogMessage:=str_warn_kpoint_captured;
                        mcolor^:=c_dred;
                        end;
 lmt_kpoint_lost      : begin
-                       ParseLogMessage:=str_cpoint_lost;
+                       ParseLogMessage:=str_warn_kpoint_lost;
                        mcolor^:=c_dred;
                        end;
 lmt_koth_control     : begin
-                       ParseLogMessage:=b2s(argx)+str_koth_control;
+                       ParseLogMessage:=b2s(argx)+str_warn_koth_control;
                        mcolor^:=c_dred;
                        end;
 lmt_ngen_exh         : begin
-                       ParseLogMessage:=str_ngen_exh;
+                       ParseLogMessage:=str_warn_ngen_exh;
                        mcolor^:=c_dyellow;
                        end;
 lmt_ngen_captured    : begin
-                       ParseLogMessage:=str_ngen_captured;
+                       ParseLogMessage:=str_warn_ngen_captured;
                        mcolor^:=c_dyellow;
                        end;
 lmt_ngen_lost        : begin
-                       ParseLogMessage:=str_ngen_lost;
+                       ParseLogMessage:=str_warn_ngen_lost;
                        mcolor^:=c_dyellow;
                        end;
-lmt_ability_cantland : begin
-                       ParseLogMessage:=str_cant_land;
-                        {if(argx>0)then
-                          case argt of
-                        lmt_argt_abil: case argx of
-                                       //254 : ParseLogMessage+=' ('+str_sability+')';
-                                       //255 : ParseLogMessage+=' ('+str_spability+')';
-                                       else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
-                                       end;
-                          end;}
+lmt_ability_BadPlace : begin
+                       ParseLogMessage:=str_warn_AbilityBadPlace;
+                       AddArgName;
                        end;
 lmt_ability_reload   : begin
-                       ParseLogMessage:=str_ability_reloading;
-                       { if(argx>0)then
-                          case argt of
-                        lmt_argt_abil: case argx of
-                                       //254 : ParseLogMessage+=' ('+str_sability+')';
-                                      // 255 : ParseLogMessage+=' ('+str_spability+')';
-                                       else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
-                                       end;
-                          end; }
+                       ParseLogMessage:=str_warn_AbilityReload;
+                       AddArgName;
                        end;
-//lmt_ability_needS    : ParseLogMessage:=str_use_sability;
-//lmt_ability_needSP   : ParseLogMessage:=str_use_spability;
-lmt_invalid_tar      : ParseLogMessage:=str_invalid_target;
-lmt_cant_order       : begin
-                       ParseLogMessage:=str_cant_execute;
-                       if(argx>0)then
-                         case argt of
-                       lmt_argt_unit: with g_uids [argx] do ParseLogMessage+=' ('+uid_txt_name+')';
-                       lmt_argt_upgr: with g_upids[argx] do ParseLogMessage+=' ('+upgr_txt_name   +')';
-                       {lmt_argt_abil: case argx of
-                                      //254 : ParseLogMessage+=' ('+str_sability+')';
-                                      //255 : ParseLogMessage+=' ('+str_spability+')';
-                                      else  ParseLogMessage+=' ('+str_ability_name[argx]+')';
-                                      end; }
-                         end;
+lmt_invalid_Target   : ParseLogMessage:=str_warn_Invalid_Target;
+lmt_Invalid_Order    : begin
+                       ParseLogMessage:=str_warn_Invalid_Order;
+                       AddArgName;
                        end;
-lmt_MaximumReached   : ParseLogMessage:=str_MaximumReached;
-lmt_NeedMoreProd     : ParseLogMessage:=str_NeedMoreProd;
-lmt_MaximumLevel      : ParseLogMessage:=str_cant_advanced;
-lmt_production_busy  : ParseLogMessage:=str_production_busy;
-lmt_unit_needbuilder : ParseLogMessage:=str_need_more_builders;
-lmt_unit_limit       : ParseLogMessage:=str_maxlimit_reached;
+
+lmt_NeedProdUnit     : ParseLogMessage:=str_warn_NeedProdUnit;
+lmt_unit_NeedBuilder : ParseLogMessage:=str_warn_NeedBuilder;
+
+
 lmt_map_mark         : begin
                        mcolor^:=c_gray;
                        if(argx<=LastPlayer)then
-                         with g_gplayers[argx] do ParseLogMessage:=name+str_mapMark;
+                         with g_gplayers[argx] do ParseLogMessage:=name+str_warn_mapMark;
                        end;
-    else               ParseLogMessage:='UNKNOWN MESSAGE TYPE'; mcolor^:=c_purple;
-    end;
+     else              ParseLogMessage:='UNKNOWN MESSAGE TYPE';
+                       mcolor^:=c_purple;
+     end;
 end;
 
 procedure MakeLogListForDraw(playern:byte;widthChars,listHeight:integer;logTypes:TSoB);

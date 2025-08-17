@@ -17,12 +17,11 @@ begin
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
 
-procedure d_AddObjSprites(noanim:boolean);
+procedure d_MakeSpriteList(noanim:boolean);
 begin
   doodads_sprites(noanim);
      unit_sprites(noanim);
-  effects_sprites(noanim,vid_draw);
-   if(not vid_draw)then exit;
+  effects_sprites(noanim);
  missiles_sprites;
 keyPoints_sprites;
 end;
@@ -34,13 +33,13 @@ begin
 
    ui_DrawEdges:=ui_MouseBrushNeedDrawEdges;
 
-   D_AddObjSprites(G_Status<>gs_running);
+   d_MakeSpriteList(G_Status<>gs_running);
 
-   D_terrain   (vid_screen,ui_mapx,ui_mapy);
-   D_SpriteList(vid_screen,ui_mapx,ui_mapy);
-   D_Fog       (vid_screen,ui_mapx,ui_mapy);
-   D_UnitsInfo (vid_screen,ui_mapx,ui_mapy);
-   D_ui        (vid_screen,ui_mapx,ui_mapy);
+   D_LayerTerrain   (vid_screen);
+   D_LayerSpriteList(vid_screen);
+   D_LayerFog       (vid_screen);
+   D_LayerUnitsInfo (vid_screen);
+   d_LayerUI        (vid_screen);
 
    if(TestMode>1)and(net_status=0)then _draw_dbg;
 end;
@@ -84,8 +83,8 @@ begin
      for i:=0 to LastPlayer do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then n+=1;  }
-
-   draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-10,
+  {
+   draw_text(vid_screen,ui_cam_w,ui_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
    ' '+b2c[ui_uibtn_sabilityu=nil]+
    ' '+b2c[ui_uibtn_pabilityu=nil]+
@@ -100,15 +99,18 @@ begin
    ,
    ta_RU,255, c_white);
 
-   draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-20,
+   draw_text(vid_screen,ui_cam_w,ui_cam_h-20,
        i2s(mouse_map_x)+
    ' '+i2s(mouse_map_y),
-   ta_RU,255, c_white);
+   ta_RU,255, c_white);    }
 
-   draw_text(vid_screen,ui_cam_w+ui_mapx,ui_cam_h-30,
+  { draw_text(vid_screen,ui_cam_w,ui_cam_h-30,
        i2s(rpls_pstate)+
    ' '+i2s(rpls_fstate),
-   ta_RU,255, c_white);
+   ta_RU,255, c_white);   }
+
+  { circleColor(vid_screen,ui_UIPortX0,ui_UIPortY0,10,c_lime);
+   circleColor(vid_screen,ui_UIPortX1,ui_UIPortY1,10,c_aqua); }
    end;
 
    sdl_flip(vid_screen);

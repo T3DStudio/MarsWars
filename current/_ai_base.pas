@@ -328,7 +328,7 @@ begin
       begin
          x   :=tu^.x;
          y   :=tu^.y;
-         zone:=tu^.pfzone;
+         zone:=tu^.mapZone;
       end;
       ai_alarm_x   :=x;
       ai_alarm_y   :=y;
@@ -501,7 +501,7 @@ begin
         if(aia_enemy_limit>0)then
          if(ukfly)
          or(ukfloater)
-         or(aia_zone=pfzone)
+         or(aia_zone=mapZone)
          or(uid^.uid_isbarrack)then ai_Global_SetCurrentAlarm(nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y),aia_zone);
 
       // nearest point/generator
@@ -537,7 +537,7 @@ begin
 
             d:=point_dist_int(kpx,kpy,x,y);
 
-            if(d>kpCaptureR)and(pfzone<>kpzone)then
+            if(d>kpCaptureR)and(mapZone<>kpzone)then
               if not( ukfly
                    or ukfloater
                    or uid_isbarrack)
@@ -743,7 +743,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      pfcheck:=(ukfly)or(ukfloater)or(pfzone=tu^.pfzone);
+      pfcheck:=(ukfly)or(ukfloater)or(mapZone=tu^.mapZone);
       if(tu^.hits>0)then                         // alive
       begin
          if(tu_transport=nil)then                // not in transportU
@@ -811,7 +811,7 @@ begin
 
                // teleporter beacon
                if(tu^.aiu_alarm_d<base_1r)then
-                 if(not map_IfObstacleZone(tu^.pfzone))then
+                 if(not map_IfObstacleZone(tu^.mapZone))then
                    if(ai_teleporter_beacon_u=nil)
                    then ai_teleporter_beacon_u:=tu
                    else
