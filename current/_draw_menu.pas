@@ -66,7 +66,7 @@ end;
 procedure d_MenuItemPanel(tar:pSDL_Surface;mi,border:byte);
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
         boxColor(tar,mi_x0,mi_y0,mi_x1,mi_y1,c_black);
         draw_rectw(tar,mi_x0+1,mi_y0+1,mi_x1-1,mi_y1-1,border,-1,c_ltgray);
@@ -77,11 +77,12 @@ procedure d_MenuItemCaption(tar:pSDL_Surface;mi:byte;text:shortstring);
 var color:cardinal;
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
-        if(mi_state=1)
-        then color:=c_gray
-        else color:=c_white;
+        case mi_state of
+        as_disabled: color:=c_gray;
+        as_enabled : color:=c_white;
+        end;
 
         rectangleColor(tar,mi_xc-menu_ItemCaptionhW,mi_y0,
                            mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonhH,c_ltgray);
@@ -89,17 +90,19 @@ begin
      end;
 end;
 
-procedure d_menu_ScrollBar(tar:pSDL_Surface;mi:byte;scrolli,scrolls,scrollmax:integer);
+procedure d_menu_ScrollBar(tar:pSDL_Surface;mi:byte;scrolli,listH,listSize:integer;reverse:boolean=false);
 var posCY,
     barh:integer;
 begin
    with menu_items[mi] do
    begin
       barh :=(mi_y1-mi_y0);
-      if(scrolls<scrollmax)then
+      if(listH<listSize)then
       begin
-         barh :=mm3i(1,round((mi_y1-mi_y0)*(scrolls/scrollmax)),barh);
-         posCY:=mi_y0+round((mi_y1-mi_y0-barh)*(scrolli/(scrollmax-scrolls)));
+         barh :=mm3i(1,round((mi_y1-mi_y0)*(listH/listSize)),barh);
+         if(reverse)
+         then posCY:=mi_y1-round((mi_y1-mi_y0-barh)*(scrolli/(listSize-listH)))-barh
+         else posCY:=mi_y0+round((mi_y1-mi_y0-barh)*(scrolli/(listSize-listH)));
       end
       else posCY:=mi_y0;
 
@@ -112,7 +115,7 @@ var
 t,i,y:integer;
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
         if(listH<=0)then exit;
 
@@ -126,7 +129,7 @@ begin
               if(i=selected)then
                 boxColor(tar,mi_x0+1,y+1,mi_x1-1,y+lineH-2,c_dgray);
 
-              draw_text(tar,mi_x0+font_wh,y+font_wh,str_Trim(b2s(i+1)+'] '+plist^[i],lineWChars),ta_LU,255,mic(mi_state>1,i=selected));
+              draw_text(tar,mi_x0+font_wh,y+font_wh,str_Trim(b2s(i+1)+'] '+plist^[i],lineWChars),ta_LU,255,mic(mi_state=as_enabled,i=selected));
 
               if(mi_y0<y)then
               hlineColor(tar,mi_x0+1,mi_x1-1,y,c_gray);
@@ -143,24 +146,19 @@ end;
 
 procedure d_menuMultiplayerChat(tar:pSDL_Surface;mi:byte);
 var
-i,y,
-listh:integer;
+i,y:integer;
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
-        draw_text(tar,mi_x0+font_wq,mi_y1,net_chat_str+chat_type[false],ta_chat,mi_charw,c_white);
-        hlineColor(tar,mi_x0,mi_x1,mi_y1-txt_line_h1,c_white);
-
-        listh:=((mi_y1-mi_y0) div txt_line_h1)-2;
-        if(listh<=0)then exit;
-        MakeLogListForDraw(LocalPlayer,mi_charw,listh,lmts_menu_chat);
-        y:=mi_y1-font_wh-txt_line_h1*2;
+        d_menu_ScrollBar(tar,mi,menu_ChatScroll,menu_ChatListH,menu_ChatSize,true);
+        MakeLogListForDraw(LocalPlayer,mi_charw,menu_ChatListH,menu_ChatScroll,lmts_menu_chat);
+        y:=mi_y1-font_wh-font_wq;
         if(ui_log_n>0)then
           for i:=0 to ui_log_n-1 do
             if(ui_log_color[i]>0)then
             begin
-               draw_text(tar,mi_x0+font_wq,y,ui_log_lines[i],ta_LU,255,ui_log_color[i]);
+               draw_text(tar,mi_x0+font_wq,y,ui_log_lines[i],ta_LB,255,ui_log_color[i]);
                y-=txt_line_h1;
             end;
      end;
@@ -172,11 +170,12 @@ color:cardinal;
 y    :integer;
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
-        if(mi_state=1)
-        then color:=c_gray
-        else color:=c_white;
+        case mi_state of
+        as_disabled: color:=c_gray;
+        as_enabled : color:=c_white;
+        end;
 
         draw_text(tar,mi_x0+font_wh,mi_y0+menu_BigButtonH,text1,ta_LU,mi_charw,color,@y);
         if(length(text2)>0)then
@@ -186,7 +185,7 @@ end;
 procedure d_MenuItemTextC(tar:pSDL_Surface;mi,pos:byte;text:shortstring;color:cardinal);
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
         case pos of
         ta_LU  : draw_text(tar,mi_x0+font_wh,mi_y0+font_wh,text,pos,mi_charw,color);
@@ -208,9 +207,9 @@ procedure d_MenuItemText(tar:pSDL_Surface;mi,pos:byte;text:shortstring;selectedV
 var color:cardinal;
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
-        if(mi_state=1)
+        if(mi_state=as_disabled)
         then color:=c_gray
         else
           if(selectedVal=mi)
@@ -223,13 +222,13 @@ end;
 procedure d_menuItemText1(tar:pSDL_Surface;mi:byte;text:shortstring;selectedVal:byte);
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
        d_MenuItemText(tar,mi,ta_MM,text,selectedVal);
 end;
 procedure d_menuItemText2(tar:pSDL_Surface;mi:byte;text1,text2:shortstring;selectedVal:byte);
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
         d_MenuItemText(tar,mi,ta_LM,text1,selectedVal);
         d_MenuItemText(tar,mi,ta_RM,text2,selectedVal);
@@ -240,7 +239,7 @@ procedure d_MenuItemTextBar(tar:pSDL_Surface;mi:byte;text:shortstring;vcur,vmin,
 var tx:integer;
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
+     if(mi_state>as_off)then
      begin
         d_MenuItemText(tar,mi,ta_LM  ,text     ,selectedVal);
 
@@ -271,7 +270,7 @@ begin
    draw_text(tar,menu_w,menu_h,str_ver,ta_RB,255,c_white);
 
    if(TestMode>0)then
-   draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode)    ,ta_MU,255,c_white);
+   draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
 
    draw_text(tar,menu_hw,menu_h, str_cprt         ,ta_MB,255,c_white);
 
@@ -299,13 +298,13 @@ mi_caption_SVSearch : d_MenuItemPanel(tar,i,3);
 
    /////////////////////////////////////////////////////////////////////////////
    // Captions
-   d_menuItemText1(tar,mi_caption_Campaings ,str_menu_Campaings     ,255);
-   d_menuItemText1(tar,mi_caption_Replays   ,str_menu_Replays       ,255);
-   d_menuItemText1(tar,mi_caption_Settings  ,str_menu_Settings      ,255);
-   d_menuItemText1(tar,mi_caption_SVSearch  ,str_Caption_NetSVSearch,255);
+   d_menuItemText1(tar,mi_caption_Campaings  ,str_menu_Campaings     ,255);
+   d_menuItemText1(tar,mi_caption_Replays    ,str_menu_Replays       ,255);
+   d_menuItemText1(tar,mi_caption_Settings   ,str_menu_Settings      ,255);
+   d_menuItemText1(tar,mi_caption_SVSearch   ,str_Caption_NetSVSearch,255);
 
    if(rpls_pstate=rpls_read)
-   then d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Playback   ,255)
+   then d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Playback    ,255)
    else
      case net_status of
      ns_none  : d_menuItemText1(tar,mi_caption_Scirmish,str_menu_Scirmish,255);
@@ -319,30 +318,30 @@ mi_caption_SVSearch : d_MenuItemPanel(tar,i,3);
 
    /////////////////////////////////////////////////////////////////////////////
    // Main buttons
-   d_MenuItemText1(tar,mi_Campaings         ,str_menu_Campaings  ,0);
-   d_menuItemText1(tar,mi_Scirmish          ,str_menu_Scirmish   ,0);
+   d_MenuItemText1(tar,mi_Campaings          ,str_menu_Campaings    ,0);
+   d_menuItemText1(tar,mi_Scirmish           ,str_menu_Scirmish     ,0);
 
    if(g_started)
-then d_menuItemText1(tar,mi_SaveLoad        ,str_menu_SaveLoad   ,0)
-else d_menuItemText1(tar,mi_SaveLoad        ,str_menu_LoadGame   ,0);
+then d_menuItemText1(tar,mi_SaveLoad         ,str_menu_SaveLoad     ,0)
+else d_menuItemText1(tar,mi_SaveLoad         ,str_menu_LoadGame     ,0);
 
-   d_menuItemText1(tar,mi_Replays           ,str_menu_Replays    ,0);
-   d_menuItemText1(tar,mi_Settings          ,str_menu_Settings   ,0);
+   d_menuItemText1(tar,mi_Replays            ,str_menu_Replays      ,0);
+   d_menuItemText1(tar,mi_Settings           ,str_menu_Settings     ,0);
 
    if(rpls_pstate=rpls_read)
-then d_menuItemText1(tar,mi_Break           ,str_menu_PlaybackStop,0)
-else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
+then d_menuItemText1(tar,mi_Break            ,str_menu_PlaybackStop ,0)
+else d_menuItemText1(tar,mi_Break            ,str_menu_Break        ,0);
 
-   d_menuItemText1(tar,mi_Back              ,str_menu_Back       ,0);
-   d_menuItemText1(tar,mi_Exit              ,str_menu_Exit       ,0);
-   d_menuItemText1(tar,mi_Start             ,str_menu_Start      ,0);
-   d_menuItemText1(tar,mi_Surrender         ,str_menu_Surrender  ,0);
+   d_menuItemText1(tar,mi_Back               ,str_menu_Back         ,0);
+   d_menuItemText1(tar,mi_Exit               ,str_menu_Exit         ,0);
+   d_menuItemText1(tar,mi_Start              ,str_menu_Start        ,0);
+   d_menuItemText1(tar,mi_Surrender          ,str_menu_Surrender    ,0);
 
    // SETTINGS LIST
-   d_menuItemText1(tar,mi_settings_Game     ,str_S_Game    ,menu_SettingsPage);
-   d_menuItemText1(tar,mi_settings_Record   ,str_S_Replay  ,menu_SettingsPage);
-   d_menuItemText1(tar,mi_settings_Video    ,str_S_Video   ,menu_SettingsPage);
-   d_menuItemText1(tar,mi_settings_Sound    ,str_S_Sound   ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Game      ,str_S_Game            ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Record    ,str_S_Replay          ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Video     ,str_S_Video           ,menu_SettingsPage);
+   d_menuItemText1(tar,mi_settings_Sound     ,str_S_Sound           ,menu_SettingsPage);
 
    // SETTINGS  GAME
 
@@ -377,8 +376,8 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemTextBar(tar,mi_SS_SoundVolume   ,str_SS_SoundVolume,snd_SoundVolume,0,snd_MaxSoundVolume,0);
    d_MenuItemTextBar(tar,mi_SS_MusicVolume   ,str_SS_MusicVolume,snd_MusicVolume,0,snd_MaxSoundVolume,0);
 
-   d_menuItemText1(tar,mi_SS_PlayerNext      ,str_SS_NextTrack  ,0);
-   d_menuItemText1(tar,mi_SS_ReloadPlaylist  ,str_SS_ReloadMusic,0);
+   d_menuItemText1(tar,mi_SS_PlayerNext      ,str_SS_NextTrack      ,0);
+   d_menuItemText1(tar,mi_SS_ReloadPlaylist  ,str_SS_ReloadMusic    ,0);
 
    d_menuItemText2(tar,mi_SS_PlaylistSize    ,str_SS_MusicListSize  ,b2s(snd_musicListSize),0);
 
@@ -389,9 +388,9 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemInfo   (tar,mi_SaveLoad_info,svld_str_info1,svld_str_info2);
 
    d_menuItemText (tar,mi_SaveLoad_fname,ta_LM,svld_str_fname+vc(mi_SaveLoad_fname),menu_ItemSelected);
-   d_menuItemText1(tar,mi_SaveLoad_save      ,str_FileSave  ,0);
-   d_menuItemText1(tar,mi_SaveLoad_load      ,str_FileLoad  ,0);
-   d_menuItemText1(tar,mi_SaveLoad_delete    ,str_FileDelete,0);
+   d_menuItemText1(tar,mi_SaveLoad_save       ,str_FileSave  ,0);
+   d_menuItemText1(tar,mi_SaveLoad_load       ,str_FileLoad  ,0);
+   d_menuItemText1(tar,mi_SaveLoad_delete     ,str_FileDelete,0);
 
    // REPLAYS
    d_MenuItemList(tar,mi_Replays_list,@rpls_list,rpls_list_size,rpls_list_scroll,rpls_list_sel,menu_ListLineH,menu_ListLineWChars,menu_BaseList1H);
@@ -418,9 +417,9 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
        begin
           if(p=LocalPlayer)
           then color:=c_yellow
-          else color:=mic(menu_items[mi_Players_Player0+p].mi_state>1,false);
+          else color:=mic(menu_items[mi_Players_Player0+p].mi_state=as_enabled,false);
 
-          if(state=ps_AI)and(menu_items[mi_Players_State0 +p].mi_state>1)
+          if(state=ps_AI)and(menu_items[mi_Players_State0 +p].mi_state=as_enabled)
      then d_MenuItemTextC(tar,mi_Players_State0 +p,ta_MM,'-'+str_ps_AI       ,color)
      else d_MenuItemTextC(tar,mi_Players_State0 +p,ta_MM,PlayerStateString(p),color);
           d_MenuItemTextC(tar,mi_Players_Player0+p,ta_LM,name                ,color);
@@ -428,20 +427,20 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
           if(observer)or(p>=map_MaxPlayers)then
           begin
           d_MenuItemTextC(tar,mi_Players_Race0  +p,ta_MM,str_observer       ,c_gray);
-          d_MenuItemTextC(tar,mi_Players_Team0  +p,ta_MM,'-'                ,mic((menu_items[mi_Players_Team0 +p].mi_state>1)and(p<map_MaxPlayers),false        ));
+          d_MenuItemTextC(tar,mi_Players_Team0  +p,ta_MM,'-'                ,mic((menu_items[mi_Players_Team0 +p].mi_state=as_enabled)and(p<map_MaxPlayers),false        ));
           end
           else
           begin
-          d_MenuItemTextC(tar,mi_Players_Race0  +p,ta_MM,str_race[mrace]    ,mic( menu_items[mi_Players_Race0 +p].mi_state>1,false        ));
+          d_MenuItemTextC(tar,mi_Players_Race0  +p,ta_MM,str_race[mrace]    ,mic( menu_items[mi_Players_Race0 +p].mi_state=as_enabled,false        ));
           if(map_scenario in mc_fixed_teams)
      then d_MenuItemTextC(tar,mi_Players_Team0  +p,ta_MM,
-                                 b2s(PlayerGetFixedTeams(map_scenario,p)+1) ,mic( menu_items[mi_Players_Team0 +p].mi_state>1,false        ))
-     else d_MenuItemTextC(tar,mi_Players_Team0  +p,ta_MM,b2s(team+1)        ,mic( menu_items[mi_Players_Team0 +p].mi_state>1,false        ));
+                                 b2s(PlayerGetFixedTeams(map_scenario,p)+1) ,mic( menu_items[mi_Players_Team0 +p].mi_state=as_enabled,false        ))
+     else d_MenuItemTextC(tar,mi_Players_Team0  +p,ta_MM,b2s(team+1)        ,mic( menu_items[mi_Players_Team0 +p].mi_state=as_enabled,false        ));
           end;
 
           if(defeated)and(G_Started)then
             with menu_items[mi_Players_Player0+p] do
-              if(mi_state>0)then
+              if(mi_state>as_off)then
                 hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
        end
        else
@@ -457,14 +456,14 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
           end;
           if(p>=map_MaxPlayers)then d_MenuItemTextC(tar,mi_Players_Race0+p,ta_MM,str_observer       ,c_gray);
           if(not g_started)and(p<map_MaxPlayers)then
-            if(menu_items[mi_Players_State0+p].mi_state>1)then
+            if(menu_items[mi_Players_State0+p].mi_state=as_enabled)then
               d_MenuItemTextC(tar,mi_Players_State0+p,ta_MM,'+'+str_ps_AI,c_white);
        end;
 
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
      with menu_items[mi_Players_Ping0+p] do
-       if(mi_state>0)then
+       if(mi_state>as_off)then
          if(net_status=ns_none)or(state<>ps_Human)
          then boxColor(tar,mi_x0+font_wh,mi_y0+font_wh,
                            mi_x1-font_wh,mi_y1-font_wh,PlayerGetColor(p,false))
@@ -481,14 +480,14 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
    d_MenuItemCaption(tar,mi_Map_Panel,str_Caption_Map);
 
    with menu_items[mi_Map_Map] do
-   if(mi_state>0)then
+   if(mi_state>as_off)then
    draw_sdlsurface(tar,mi_x0+1,mi_y0+1,ui_mminimap);
 
    d_menuItemText2(tar,mi_Map_Scenario  ,str_map_Scenario  ,str_map_ScenarioL[map_scenario]    ,0);
    d_menuItemText2(tar,mi_Map_Generators,str_map_Generators,str_map_GeneratorsL[map_generators],0);
    d_menuItemText2(tar,mi_Map_Seed      ,str_map_Seed      ,menu_mseed+vc(mi_Map_Seed)         ,menu_ItemSelected);
    d_menuItemText2(tar,mi_Map_Size      ,str_map_Size      ,i2s(map_Size)                      ,0);
-   d_menuItemText2(tar,mi_Map_Obstacles ,str_map_Obstacles ,strMX(map_ObstaclesF)               ,0);
+   d_menuItemText2(tar,mi_Map_Obstacles ,str_map_Obstacles ,strMX(map_ObstaclesF)              ,0);
    d_menuItemText2(tar,mi_Map_Symmetry  ,str_map_Symmetry  ,b2cc[map_Symmetry]                 ,0);
 
    d_menuItemText1(tar,mi_Map_Theme     ,theme_name[theme_i],0);
@@ -512,12 +511,12 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
               d_menuItemText1  (tar,mi_MP_ClientLANSearch,str_net_LANSearch      ,0);
               end;
    ns_server: begin
-              d_MenuItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer+': '+str_Caption_Server     );
+              d_MenuItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer+': '+str_Caption_Server);
               d_menuItemText1  (tar,mi_MP_ServerToggle   ,str_net_ServerStop     ,0);
 
               end;
    ns_client: begin
-              d_MenuItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer+': '+str_Caption_Client     );
+              d_MenuItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer+': '+str_Caption_Client);
 
               d_menuItemText2  (tar,mi_MP_ClientQuality  ,str_net_Quality        ,str_NetQualityL[net_cl_Quality],0);
 
@@ -526,12 +525,15 @@ else d_menuItemText1(tar,mi_Break           ,str_menu_Break      ,0);
               end;
    end;
 
-   d_menuItemText1(tar,mi_MP_Disconnect   ,str_net_DisConnect,0);
+   d_menuItemText1(tar,mi_MP_Disconnect   ,str_net_DisConnect  ,0);
    d_menuItemText2(tar,mi_MP_ServerPort   ,str_net_UDPPort     ,menu_ServerPort   +vc(mi_MP_ServerPort   ),menu_ItemSelected);
    d_menuItemText2(tar,mi_MP_ServerLANVis ,str_net_ServerLANVis,b2cc[net_svLanAdv],0);
    d_menuItemText2(tar,mi_MP_ClientAddress,str_net_Address     ,menu_ClientAddress+vc(mi_MP_ClientAddress),menu_ItemSelected);
    d_MenuItemText2(tar,mi_Players_Ready   ,str_net_Ready       ,b2cc[PlayerReady ],0);
-   d_menuMultiplayerChat(tar,mi_MP_Chat);
+
+   d_menuMultiplayerChat(tar,mi_MP_ChatList);
+   with menu_items[mi_MP_ChatLine] do
+   d_menuItemText2(tar,mi_MP_ChatLine     ,str_CutLast(net_chat_str+chat_type[false],mi_charw),'',0);
 
    // Net search
    d_MenuItemList(tar,mi_NetSearch_List ,@net_svsearch_lists,net_svsearch_size,net_svsearch_scroll,net_svsearch_sel,menu_ListLineH2,menu_ListLineWChars2,menu_SvSearchListH);

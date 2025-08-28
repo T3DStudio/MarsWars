@@ -50,6 +50,9 @@ function menu_MouseXY2Item:byte; forward;
 function menu_ReadyButtonEnabled:boolean;forward;
 function PlayerNameChangeble  :boolean;forward;
 
+function menu_ChatSize:integer;  forward;
+
+
 function PlayerGetColor  (player:byte;shadow:boolean):cardinal;  forward;
 function PlayerAIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
 function PlayerRaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
@@ -59,12 +62,15 @@ function saveload_Save  (check:boolean):boolean;forward;
 function saveload_Load  (check:boolean):boolean;forward;
 function saveload_Delete(check:boolean):boolean;forward;
 
-procedure replay_SavePlayPosition;forward;
+procedure replay_SavePlayPosition; forward;
 function replay_Delete(check:boolean):boolean;forward;
 function replay_Play  (check:boolean):boolean;forward;
 function replay_Pause (check:boolean):boolean;forward;
-function replay_IsPaused:boolean;forward;
+function replay_IsPaused:boolean;  forward;
 function replay_GetProgress:single;forward;
+procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
+function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
+
 
 function Float2Str(s:single):shortstring;
 var l:byte;
@@ -168,6 +174,9 @@ function max2i(x1,x2   :integer):integer;begin if(x1>x2)then max2i:=x1 else max2
 function max3i(x1,x2,x3:integer):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
 function min2i(x1,x2   :integer):integer;begin if(x1<x2)then min2i:=x1 else min2i:=x2;end;
 function min3i(x1,x2,x3:integer):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
+
+function min2c(x1,x2   :cardinal):cardinal;begin if(x1<x2)then min2c:=x1 else min2c:=x2;end;
+function min3c(x1,x2,x3:cardinal):cardinal;begin min3c:=min2c(min2c(x1,x2),x3);end;
 
 function mm3i(mnx,x,mxx:integer):integer;begin mm3i:=min2i(mxx,max2i(x,mnx)); end;
 
@@ -523,7 +532,7 @@ lmt_game_end,
 lmt_game_message     :;
 lmt_unit_attacked,
 lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[lmt_unit_attacked,lmt_allies_attacked]))then exit;
-lmt_unit_LevelUp    : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]))then exit;
+lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]))then exit;
         else
            with log_l[log_i] do
              if(tick<=g_tick)then
@@ -534,7 +543,7 @@ lmt_unit_LevelUp    : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype])
                 if((g_tick-tick)<fr_fps3)then exit;
         end;
 
-      if(ServerSide)then log_n+=1;
+      log_n+=1;
 
       log_i+=1;
       if(log_i>MaxPlayerLog)then log_i:=0;
@@ -558,7 +567,9 @@ lmt_unit_LevelUp    : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype])
       else POVPlayer:=UIPlayer;
       if(ptarget=POVPlayer)then
       begin
-         net_chat_shlm:=min2i(net_chat_shlm+chat_LastMsgTime,chat_LastMsgTimeMax);
+         if(amtype in lmts_last_events)then
+           ui_log_LastTimer :=min2i(ui_log_LastTimer +ui_log_TimeLast ,ui_log_TimeMax );
+
          menu_update:=true;
 
          if(LogMes2UIAlarm)then SoundLogUIPlayer(POVPlayer);
@@ -633,11 +644,10 @@ begin
 
    PlayersAddToLog(pl,0,lmt_upgrade_complete,0,upid,'',x,y);
 end;
-function GameLogBits2Message(playerN,auid,atype:byte;bits:cardinal;x,y:integer):boolean;
+function GameLogBits2Message(playerN,auid,atype:byte;bits:cardinal;x,y:integer;check:boolean=false):boolean;
 var bt:byte;
 begin
    GameLogBits2Message:=false;
-   if(PlayerN=LocalPlayer)then writeln(bits);
    if(playerN>LastPlayer)or(bits=0)then exit;
 
    with g_gplayers[playerN] do
@@ -648,6 +658,8 @@ begin
         if(a_units[auid]<=0)and(uid_e[auid]<=0)then exit;
    end;
    GameLogBits2Message:=true;
+
+   if(check)then exit;
 
    if((bits and ureq_place)>0)
    then bt:=lmt_prod_BadPlace
@@ -773,11 +785,11 @@ begin
    end;
 end;
 
-{procedure PlayersClearLog;
+procedure PlayersClearLog;
 var p:byte;
 begin
    for p:=0 to LastPlayer do PlayerClearLog(p);
-end;}
+end;
 
 function PlayersAllReady:boolean;
 var p,
@@ -1062,7 +1074,7 @@ begin
    with uid^    do
    with player^ do
      if(uid_issmith)then
-       if(oid in uid_prod_Upgrades)then
+       if(oid in uid_prod_Upgrades)or(oid=255)then
          if(s_smiths<=0)or(isselected)then exit;
    UnitOrderCheckSmith:=false;
 end;
@@ -1073,7 +1085,7 @@ begin
    with uid^    do
    with player^ do
      if(uid_isbarrack)then
-       if(oid in uid_prod_Units)then
+       if(oid in uid_prod_Units)or(oid=255)then
          if(s_barracks<=0)or(isselected)then exit;
    UnitOrderCheckBarrack:=false;
 end;
@@ -1223,9 +1235,27 @@ begin
        end;
 end;
 
-function ui_ability(pu:PTUnit;pability:boolean):boolean;
+function ui_HaveAttack(pu:PTunit):boolean;
+var w:byte;
 begin
-   ui_ability:=false;
+   ui_HaveAttack:=false;
+   with pu^.uid^ do
+   with pu^.player^ do
+     if(uid_CanAttack)then
+       for w:=0 to LastUnitArms do
+         with uid_arms[w] do
+           if(aw_rld>0)then
+           begin
+              if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0         )then continue;
+              if(aw_rupgr>0)and(upgr  [aw_rupgr]< aw_rupgr_l)then continue;
+              ui_HaveAttack:=true;
+              break;
+           end;
+end;
+
+function ui_HaveAbility(pu:PTUnit;pability:boolean):boolean;
+begin
+   ui_HaveAbility:=false;
 
    if(pu=nil)then exit;
    with pu^ do
@@ -1243,12 +1273,12 @@ begin
       end;
    end;
 
-   ui_ability:=true;
+   ui_HaveAbility:=true;
 end;
 
-function ui_rebuild(pu:PTUnit):boolean;
+function ui_Haverebuild(pu:PTUnit):boolean;
 begin
-   ui_rebuild:=false;
+   ui_Haverebuild:=false;
 
    if(pu=nil)then exit;
 
@@ -1263,7 +1293,7 @@ begin
       if not(uid_rebuild_uid in player^.a_rebuild)then exit;
    end;
 
-   ui_rebuild:=true;
+   ui_Haverebuild:=true;
 end;
 
 {$IFDEF _FULLGAME}
@@ -1317,6 +1347,15 @@ begin
       end;
    end;
    str_Trim:=s;
+end;
+
+function str_CutLast(s:shortstring;l:byte):shortstring;
+var t:byte;
+begin
+   t:=length(s);
+   if(t<=l)
+   then str_CutLast:=s
+   else str_CutLast:=copy(s,t-l+1,l);
 end;
 
 function str_GTick2Time(gtick:cardinal):shortstring;
@@ -1373,22 +1412,36 @@ end;
 
 function InputAction(iact:byte):boolean;
 begin
-   InputAction:=input_actions[iact].ik_timer_pressed>0;
+   with input_actions[iact] do
+     InputAction:=ik_timer_pressed>0;
 end;
 function InputActionPressed(iact:byte;stuckCheck:boolean=false):boolean;
 begin
-   InputActionPressed:=input_actions[iact].ik_timer_pressed=1;
-   if(stuckCheck)and(not InputActionPressed)then
-   InputActionPressed:=input_actions[iact].ik_timer_pressed>k_LastCharStuckDelay;
+   with input_actions[iact] do
+   begin
+      InputActionPressed:=ik_timer_pressed=1;
+      if(stuckCheck)and(not InputActionPressed)then
+      InputActionPressed:=ik_timer_pressed>k_LastCharStuckDelay;
+   end;
 end;
 function InputActionReleased(iact:byte):boolean;
 begin
-   InputActionReleased:=input_actions[iact].ik_timer_pressed=-1;
+   with input_actions[iact] do
+     InputActionReleased:=ik_timer_pressed=-1;
 end;
 function InputActionDPressed(iact:byte):boolean;
 begin
    with input_actions[iact] do
-   InputActionDPressed:=(ik_timer_pressed=1)and(ik_timer_twice>0);
+     InputActionDPressed:=(ik_timer_pressed=1)and(ik_timer_twice>0);
+end;
+
+function iActOn(iact:byte):boolean;
+begin
+   iActOn:=input_actions[iact].ik_astate>as_off;
+end;
+function iActEnabled(iact:byte):boolean;
+begin
+   iActEnabled:=input_actions[iact].ik_astate=as_enabled;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1409,11 +1462,11 @@ begin
       if(pstr<>nil)and(pcol<>nil)then
         case G_status of
 0..LastPlayer : begin
-                   pstr^:=str_gstat_Paused+g_gplayers[G_status].name;
+                   pstr^:=str_gstat_GamePaused+g_gplayers[G_status].name;
                    pcol^:=PlayerGetColor(G_status,false);
                 end;
 gs_replayerror: begin
-                   pstr^:=str_gstat_ReplayError;
+                   pstr^:=str_gstat_ReplayError+rpls_file_LastErrS;
                    pcol^:=c_white;
                 end;
 gs_replayend  : begin
@@ -1425,7 +1478,7 @@ gs_waitserver : begin
                    pcol^:=PlayerGetColor(net_cl_Hoster,false);
                 end;
 gs_replaypause: begin
-                   pstr^:=str_gstat_Paused;
+                   pstr^:=str_gstat_ReplayPaused;
                    pcol^:=c_white;
                 end;
 gs_win_team0..
@@ -1582,6 +1635,25 @@ begin
        else GetKeyPointColor:=PlayerGetColor(kpOwnerPlayer     ,shadow);
 end;
 
+function ui_SetPlayer(NewPlayerN:byte;check:boolean):boolean;
+begin
+   ui_SetPlayer:=false;
+
+   if(NewPlayerN<>255)then
+   begin
+      if(NewPlayerN>=map_MaxPlayers)
+      or(NewPlayerN>LastPlayer)then exit;
+
+      with g_gplayers[NewPlayerN] do
+        if(observer)and(not defeated)then exit;
+   end;
+   ui_SetPlayer:=true;
+
+   if(check)then exit;
+
+   UIPlayer:=NewPlayerN;
+end;
+
 function ui_ControlTabType:TTabControlContent;
 begin
    ui_ControlTabType:=tcc_none;
@@ -1723,20 +1795,34 @@ begin
 end;
 
 procedure ui_Camera_Bounds;
+var
+bx0,bx1,
+by0,by1:integer;
 begin
-   ui_cam_x  :=mm3i(0,ui_cam_x,map_Size-ui_cam_w);
-   ui_cam_y  :=mm3i(0,ui_cam_y,map_Size-ui_cam_h);
+   bx0:=0;
+   by0:=0;
+   bx1:=map_Size-ui_cam_w;
+   by1:=map_Size-ui_cam_h;
+   case ui_ControlPanelPos of
+   cpp_left  : bx0-=ui_UIPanelW;
+   cpp_right : bx1+=ui_UIPanelW;
+   cpp_top   : by0-=ui_UIPanelH;
+   cpp_bottom: by1+=ui_UIPanelH;
+   end;
 
-   ui_cam_cx := ui_cam_x+ui_cam_hw;
-   ui_cam_cy := ui_cam_y+ui_cam_hh;
+   ui_cam_x  :=mm3i(bx0,ui_cam_x,bx1);
+   ui_cam_y  :=mm3i(by0,ui_cam_y,by1);
+
+   ui_cam_cx :=ui_cam_x+ui_cam_hw;
+   ui_cam_cy :=ui_cam_y+ui_cam_hh;
    ui_cam_mmx:=round(ui_cam_x*map_mmcx);
    ui_cam_mmy:=round(ui_cam_y*map_mmcx);
-   ui_cam_fx :=(ui_cam_x mod fog_cw);
-   ui_cam_fy :=(ui_cam_y mod fog_cw);
-   ui_fog_sx := ui_cam_x div fog_cw;
-   ui_fog_sy := ui_cam_y div fog_cw;
-   ui_fog_ex := ui_fog_sx+ui_fog_gridw;
-   ui_fog_ey := ui_fog_sy+ui_fog_gridh;
+   ui_cam_fx :=ui_cam_x mod fog_cw;
+   ui_cam_fy :=ui_cam_y mod fog_cw;
+   ui_fog_sx :=ui_cam_x div fog_cw;
+   ui_fog_sy :=ui_cam_y div fog_cw;
+   ui_fog_ex :=ui_fog_sx+ui_fog_gridw;
+   ui_fog_ey :=ui_fog_sy+ui_fog_gridh;
 end;
 
 procedure ui_Camera_MoveToPoint(mx,my:integer);
@@ -1907,9 +1993,14 @@ lmt_Invalid_Order    : begin
                        AddArgName;
                        end;
 
-lmt_NeedProdUnit     : ParseLogMessage:=str_warn_NeedProdUnit;
-lmt_unit_NeedBuilder : ParseLogMessage:=str_warn_NeedBuilder;
-
+lmt_NeedProdUnit     : begin
+                       ParseLogMessage:=str_warn_NeedProdUnit;
+                       AddArgName;
+                       end;
+lmt_unit_NeedBuilder : begin
+                       ParseLogMessage:=str_warn_NeedBuilder;
+                       AddArgName;
+                       end;
 
 lmt_map_mark         : begin
                        mcolor^:=c_gray;
@@ -1921,7 +2012,7 @@ lmt_map_mark         : begin
      end;
 end;
 
-procedure MakeLogListForDraw(playern:byte;widthChars,listHeight:integer;logTypes:TSoB);
+procedure MakeLogListForDraw(playern:byte;widthChars,listHeight,listScroll:integer;logTypes:TSoB);
 var
 lineL :byte;
 n,i   :cardinal;
@@ -1955,6 +2046,13 @@ begin
      begin
         widthChars+=1;
         i:=log_i;
+        while(listScroll>0)do
+        begin
+           if(i=0)
+           then i:=MaxPlayerLog
+           else i-=1;
+           listScroll-=1;
+        end;
         n:=listHeight;
 
         while(n>0)do

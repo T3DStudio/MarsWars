@@ -14,7 +14,7 @@ begin
    i:=0;
    repeat
       i+=1;
-      s:=str_screenshot+i2s(i)+'.bmp';
+      s:=str_ScreenShotPrefix+i2s(i)+'.bmp';
    until not FileExists(s);
    s:=s+#0;
    sdl_saveBMP(vid_screen,@s[1]);
@@ -148,14 +148,14 @@ var i:integer;
 begin
    for i:=0 to fextn do
    begin
-      gfx_LoadSDLSurface:=gfx_LoadSDLSurfaceEXT(str_f_grp+fn+fexts[i]);
+      gfx_LoadSDLSurface:=gfx_LoadSDLSurfaceEXT(folder_graphic+fn+fexts[i]);
       if(gfx_LoadSDLSurface<>spr_empty)then
       begin
          if(transparent)then SDL_SetColorKey(gfx_LoadSDLSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL, sdl_getpixel(gfx_LoadSDLSurface,0,0));
          break;
       end
       else
-        if(i=fextn)and(log)then WriteLog(str_f_grp+fn);
+        if(i=fextn)and(log)then WriteLog(folder_graphic+fn);
    end;
 end;
 
@@ -574,7 +574,8 @@ begin
    spr_b_apatrol  := gfx_LoadButton('b_apatrol',ui_ButtonW1);
    spr_b_stop     := gfx_LoadButton('b_stop'   ,ui_ButtonW1);
    spr_b_hold     := gfx_LoadButton('b_hold'   ,ui_ButtonW1);
-   spr_b_selall   := gfx_LoadButton('b_selall' ,ui_ButtonW1);
+   spr_b_f1       := gfx_LoadButton('tabs0'    ,ui_ButtonW1);
+   spr_b_f2       := gfx_LoadButton('b_selall' ,ui_ButtonW1);
    spr_b_cancel   := gfx_LoadButton('b_cancle' ,ui_ButtonW1);
    spr_b_rfast    := gfx_LoadButton('b_rfast'  ,ui_ButtonW1);
    spr_b_rforw1   := gfx_LoadButton('b_rforw1' ,ui_ButtonW1);
@@ -608,165 +609,165 @@ begin
    spr_c_phobos   := gfx_LoadSDLSurface('M_PHOBOS' ,false,true);
    spr_c_deimos   := gfx_LoadSDLSurface('M_DEIMOS' ,false,true);
 
-   gfx_LoadMWSModel(@spr_lostsoul       ,race_units[r_hell]+'h_u0_'        ,smt_lost     );
-   gfx_LoadMWSModel(@spr_phantom        ,race_units[r_hell]+'h_u0a_'       ,smt_lost     );
-   gfx_LoadMWSModel(@spr_imp            ,race_units[r_hell]+'h_u1_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_demon          ,race_units[r_hell]+'h_u2_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_cacodemon      ,race_units[r_hell]+'h_u3_'        ,smt_caco     );
-   gfx_LoadMWSModel(@spr_knight         ,race_units[r_hell]+'h_u4k_'       ,smt_imp      );
-   gfx_LoadMWSModel(@spr_baron          ,race_units[r_hell]+'h_u4_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_cyberdemon     ,race_units[r_hell]+'h_u5_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_mastermind     ,race_units[r_hell]+'h_u6_'        ,smt_mmind    );
-   gfx_LoadMWSModel(@spr_pain           ,race_units[r_hell]+'h_u7_'        ,smt_pain     );
-   gfx_LoadMWSModel(@spr_revenant       ,race_units[r_hell]+'h_u8_'        ,smt_revenant );
-   gfx_LoadMWSModel(@spr_mancubus       ,race_units[r_hell]+'h_u9_'        ,smt_mancubus );
-   gfx_LoadMWSModel(@spr_arachnotron    ,race_units[r_hell]+'h_u10_'       ,smt_archno   );
-   gfx_LoadMWSModel(@spr_archvile       ,race_units[r_hell]+'h_u11_'       ,smt_arch     );
+   gfx_LoadMWSModel(@spr_lostsoul       ,folder_RaceUnits[r_hell]+'h_u0_'        ,smt_lost     );
+   gfx_LoadMWSModel(@spr_phantom        ,folder_RaceUnits[r_hell]+'h_u0a_'       ,smt_lost     );
+   gfx_LoadMWSModel(@spr_imp            ,folder_RaceUnits[r_hell]+'h_u1_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_demon          ,folder_RaceUnits[r_hell]+'h_u2_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_cacodemon      ,folder_RaceUnits[r_hell]+'h_u3_'        ,smt_caco     );
+   gfx_LoadMWSModel(@spr_knight         ,folder_RaceUnits[r_hell]+'h_u4k_'       ,smt_imp      );
+   gfx_LoadMWSModel(@spr_baron          ,folder_RaceUnits[r_hell]+'h_u4_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_cyberdemon     ,folder_RaceUnits[r_hell]+'h_u5_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_mastermind     ,folder_RaceUnits[r_hell]+'h_u6_'        ,smt_mmind    );
+   gfx_LoadMWSModel(@spr_pain           ,folder_RaceUnits[r_hell]+'h_u7_'        ,smt_pain     );
+   gfx_LoadMWSModel(@spr_revenant       ,folder_RaceUnits[r_hell]+'h_u8_'        ,smt_revenant );
+   gfx_LoadMWSModel(@spr_mancubus       ,folder_RaceUnits[r_hell]+'h_u9_'        ,smt_mancubus );
+   gfx_LoadMWSModel(@spr_arachnotron    ,folder_RaceUnits[r_hell]+'h_u10_'       ,smt_archno   );
+   gfx_LoadMWSModel(@spr_archvile       ,folder_RaceUnits[r_hell]+'h_u11_'       ,smt_arch     );
 
-   gfx_LoadMWSModel(@spr_ZFormer        ,race_units[r_hell]+'h_z0_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZEngineer      ,race_units[r_hell]+'h_z0s_'       ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZSergant       ,race_units[r_hell]+'h_z1_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZSSergant      ,race_units[r_hell]+'h_z1s_'       ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZCommando      ,race_units[r_hell]+'h_z2_'        ,smt_zcommando);
-   gfx_LoadMWSModel(@spr_ZAntiaircrafter,race_units[r_hell]+'h_zr_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZSiege         ,race_units[r_hell]+'h_z3_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZFMajor        ,race_units[r_hell]+'h_z4j_'       ,smt_fmajor   );
-   gfx_LoadMWSModel(@spr_ZBFG           ,race_units[r_hell]+'h_z5_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZFormer        ,folder_RaceUnits[r_hell]+'h_z0_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZEngineer      ,folder_RaceUnits[r_hell]+'h_z0s_'       ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZSergant       ,folder_RaceUnits[r_hell]+'h_z1_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZSSergant      ,folder_RaceUnits[r_hell]+'h_z1s_'       ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZCommando      ,folder_RaceUnits[r_hell]+'h_z2_'        ,smt_zcommando);
+   gfx_LoadMWSModel(@spr_ZAntiaircrafter,folder_RaceUnits[r_hell]+'h_zr_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZSiege         ,folder_RaceUnits[r_hell]+'h_z3_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZFMajor        ,folder_RaceUnits[r_hell]+'h_z4j_'       ,smt_fmajor   );
+   gfx_LoadMWSModel(@spr_ZBFG           ,folder_RaceUnits[r_hell]+'h_z5_'        ,smt_imp      );
 
-   gfx_LoadMWSModel(@spr_Medic          ,race_units[r_uac ]+'u_u0_'        ,smt_medic    );
-   gfx_LoadMWSModel(@spr_Engineer       ,race_units[r_uac ]+'u_u1_'        ,smt_marine0  );
-   gfx_LoadMWSModel(@spr_Scout          ,race_units[r_uac ]+'u_u1s_'       ,smt_imp      );
-   gfx_LoadMWSModel(@spr_Sergant        ,race_units[r_uac ]+'u_u2_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_SSergant       ,race_units[r_uac ]+'u_u2s_'       ,smt_imp      );
-   gfx_LoadMWSModel(@spr_Commando       ,race_units[r_uac ]+'u_u3_'        ,smt_zcommando);
-   gfx_LoadMWSModel(@spr_Antiaircrafter ,race_units[r_uac ]+'u_u4r_'       ,smt_imp      );
-   gfx_LoadMWSModel(@spr_Siege          ,race_units[r_uac ]+'u_u4_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_FMajor         ,race_units[r_uac ]+'u_u5j_'       ,smt_fmajor   );
-   gfx_LoadMWSModel(@spr_BFG            ,race_units[r_uac ]+'u_u6_'        ,smt_imp      );
-   gfx_LoadMWSModel(@spr_FAPC           ,race_units[r_uac ]+'u_u8_'        ,smt_transport);
-   gfx_LoadMWSModel(@spr_APC            ,race_units[r_uac ]+'uac_tank_'    ,smt_apc      );
-   gfx_LoadMWSModel(@spr_Terminator     ,race_units[r_uac ]+'u_u9_'        ,smt_terminat );
-   gfx_LoadMWSModel(@spr_Tank           ,race_units[r_uac ]+'u_u10_'       ,smt_tank     );
-   gfx_LoadMWSModel(@spr_Flyer          ,race_units[r_uac ]+'u_u11_'       ,smt_flyer    );
-   gfx_LoadMWSModel(@spr_Transport      ,race_units[r_uac ]+'transport'    ,smt_transport);
-   gfx_LoadMWSModel(@spr_UACBot         ,race_units[r_uac ]+'uacd'         ,smt_flyer    );
+   gfx_LoadMWSModel(@spr_Medic          ,folder_RaceUnits[r_uac ]+'u_u0_'        ,smt_medic    );
+   gfx_LoadMWSModel(@spr_Engineer       ,folder_RaceUnits[r_uac ]+'u_u1_'        ,smt_marine0  );
+   gfx_LoadMWSModel(@spr_Scout          ,folder_RaceUnits[r_uac ]+'u_u1s_'       ,smt_imp      );
+   gfx_LoadMWSModel(@spr_Sergant        ,folder_RaceUnits[r_uac ]+'u_u2_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_SSergant       ,folder_RaceUnits[r_uac ]+'u_u2s_'       ,smt_imp      );
+   gfx_LoadMWSModel(@spr_Commando       ,folder_RaceUnits[r_uac ]+'u_u3_'        ,smt_zcommando);
+   gfx_LoadMWSModel(@spr_Antiaircrafter ,folder_RaceUnits[r_uac ]+'u_u4r_'       ,smt_imp      );
+   gfx_LoadMWSModel(@spr_Siege          ,folder_RaceUnits[r_uac ]+'u_u4_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_FMajor         ,folder_RaceUnits[r_uac ]+'u_u5j_'       ,smt_fmajor   );
+   gfx_LoadMWSModel(@spr_BFG            ,folder_RaceUnits[r_uac ]+'u_u6_'        ,smt_imp      );
+   gfx_LoadMWSModel(@spr_FAPC           ,folder_RaceUnits[r_uac ]+'u_u8_'        ,smt_transport);
+   gfx_LoadMWSModel(@spr_APC            ,folder_RaceUnits[r_uac ]+'uac_tank_'    ,smt_apc      );
+   gfx_LoadMWSModel(@spr_Terminator     ,folder_RaceUnits[r_uac ]+'u_u9_'        ,smt_terminat );
+   gfx_LoadMWSModel(@spr_Tank           ,folder_RaceUnits[r_uac ]+'u_u10_'       ,smt_tank     );
+   gfx_LoadMWSModel(@spr_Flyer          ,folder_RaceUnits[r_uac ]+'u_u11_'       ,smt_flyer    );
+   gfx_LoadMWSModel(@spr_Transport      ,folder_RaceUnits[r_uac ]+'transport'    ,smt_transport);
+   gfx_LoadMWSModel(@spr_UACBot         ,folder_RaceUnits[r_uac ]+'uacd'         ,smt_flyer    );
 
 
-   gfx_LoadMWSModel(@spr_HKeep          ,race_buildings[r_hell]+'h_b0_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HAKeep         ,race_buildings[r_hell]+'h_b0a_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HGate1         ,race_buildings[r_hell]+'h_b1a'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HGate2         ,race_buildings[r_hell]+'h_b1b'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HGate3         ,race_buildings[r_hell]+'h_b1c'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HGate4         ,race_buildings[r_hell]+'h_b1d'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol1       ,race_buildings[r_hell]+'h_b2_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol2       ,race_buildings[r_hell]+'h_b2a'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol3       ,race_buildings[r_hell]+'h_b2b'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol4       ,race_buildings[r_hell]+'h_b2c'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HPools1        ,race_buildings[r_hell]+'h_b3_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HPools2        ,race_buildings[r_hell]+'h_b3a'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HPools3        ,race_buildings[r_hell]+'h_b3b'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HPools4        ,race_buildings[r_hell]+'h_b3c'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HTower         ,race_buildings[r_hell]+'h_b4_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HTeleport      ,race_buildings[r_hell]+'h_b5_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HMonastery     ,race_buildings[r_hell]+'h_b6_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HTotem         ,race_buildings[r_hell]+'h_b7_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HAltar         ,race_buildings[r_hell]+'h_b8_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HFortress      ,race_buildings[r_hell]+'h_b9_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HPentagram     ,race_buildings[r_hell]+'h_b10_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HCommandCenter ,race_buildings[r_hell]+'h_hcc_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HACommandCenter,race_buildings[r_hell]+'h_hcca_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HBarracks1     ,race_buildings[r_hell]+'h_hbar_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HBarracks2     ,race_buildings[r_hell]+'h_hbara'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HBarracks3     ,race_buildings[r_hell]+'h_hbarb'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HBarracks4     ,race_buildings[r_hell]+'h_hbarc'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HEyeNest       ,race_buildings[r_hell]+'heyenest_',smt_buiding  );
+   gfx_LoadMWSModel(@spr_HKeep          ,folder_RaceBuildings[r_hell]+'h_b0_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HAKeep         ,folder_RaceBuildings[r_hell]+'h_b0a_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HGate1         ,folder_RaceBuildings[r_hell]+'h_b1a'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HGate2         ,folder_RaceBuildings[r_hell]+'h_b1b'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HGate3         ,folder_RaceBuildings[r_hell]+'h_b1c'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HGate4         ,folder_RaceBuildings[r_hell]+'h_b1d'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HSymbol1       ,folder_RaceBuildings[r_hell]+'h_b2_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HSymbol2       ,folder_RaceBuildings[r_hell]+'h_b2a'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HSymbol3       ,folder_RaceBuildings[r_hell]+'h_b2b'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HSymbol4       ,folder_RaceBuildings[r_hell]+'h_b2c'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HPools1        ,folder_RaceBuildings[r_hell]+'h_b3_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HPools2        ,folder_RaceBuildings[r_hell]+'h_b3a'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HPools3        ,folder_RaceBuildings[r_hell]+'h_b3b'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HPools4        ,folder_RaceBuildings[r_hell]+'h_b3c'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HTower         ,folder_RaceBuildings[r_hell]+'h_b4_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HTeleport      ,folder_RaceBuildings[r_hell]+'h_b5_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HMonastery     ,folder_RaceBuildings[r_hell]+'h_b6_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HTotem         ,folder_RaceBuildings[r_hell]+'h_b7_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HAltar         ,folder_RaceBuildings[r_hell]+'h_b8_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HFortress      ,folder_RaceBuildings[r_hell]+'h_b9_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HPentagram     ,folder_RaceBuildings[r_hell]+'h_b10_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HCommandCenter ,folder_RaceBuildings[r_hell]+'h_hcc_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HACommandCenter,folder_RaceBuildings[r_hell]+'h_hcca_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HBarracks1     ,folder_RaceBuildings[r_hell]+'h_hbar_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HBarracks2     ,folder_RaceBuildings[r_hell]+'h_hbara'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HBarracks3     ,folder_RaceBuildings[r_hell]+'h_hbarb'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HBarracks4     ,folder_RaceBuildings[r_hell]+'h_hbarc'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HEyeNest       ,folder_RaceBuildings[r_hell]+'heyenest_',smt_buiding  );
 
-   gfx_LoadMWSModel(@spr_UCommandCenter ,race_buildings[r_uac ] +'u_b0_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UACommandCenter,race_buildings[r_uac ] +'u_b0a_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UBarracks1     ,race_buildings[r_uac ] +'u_b1_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UBarracks2     ,race_buildings[r_uac ] +'u_b1a'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UBarracks3     ,race_buildings[r_uac ] +'u_b1b'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UBarracks4     ,race_buildings[r_uac ] +'u_b1c'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator1    ,race_buildings[r_uac ] +'u_b2_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator2    ,race_buildings[r_uac ] +'u_b2b_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator3    ,race_buildings[r_uac ] +'u_b2c_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator4    ,race_buildings[r_uac ] +'u_b2d_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UWeaponFactory1,race_buildings[r_uac ] +'u_b3_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UWeaponFactory2,race_buildings[r_uac ] +'u_b3a'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UWeaponFactory3,race_buildings[r_uac ] +'u_b3b'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UWeaponFactory4,race_buildings[r_uac ] +'u_b6_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UTurret        ,race_buildings[r_uac ] +'u_b4_'   ,smt_turret   );
-   gfx_LoadMWSModel(@spr_URadar         ,race_buildings[r_uac ] +'u_b5_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UTechCenter    ,race_buildings[r_uac ] +'u_b13_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UPTurret       ,race_buildings[r_uac ] +'u_b7_'   ,smt_turret   );
-   gfx_LoadMWSModel(@spr_URocketL       ,race_buildings[r_uac ] +'u_b8_'   ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_URTurret       ,race_buildings[r_uac ] +'u_b9_'   ,smt_turret2  );
-   gfx_LoadMWSModel(@spr_UNuclearPlant  ,race_buildings[r_uac ] +'u_b10_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UFactory1      ,race_buildings[r_uac ] +'u_b11_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UFactory2      ,race_buildings[r_uac ] +'u_b12_'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UFactory3      ,race_buildings[r_uac ] +'u_b12a'  ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UFactory4      ,race_buildings[r_uac ] +'u_b12b'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UCommandCenter ,folder_RaceBuildings[r_uac ] +'u_b0_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UACommandCenter,folder_RaceBuildings[r_uac ] +'u_b0a_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UBarracks1     ,folder_RaceBuildings[r_uac ] +'u_b1_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UBarracks2     ,folder_RaceBuildings[r_uac ] +'u_b1a'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UBarracks3     ,folder_RaceBuildings[r_uac ] +'u_b1b'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UBarracks4     ,folder_RaceBuildings[r_uac ] +'u_b1c'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UGenerator1    ,folder_RaceBuildings[r_uac ] +'u_b2_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UGenerator2    ,folder_RaceBuildings[r_uac ] +'u_b2b_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UGenerator3    ,folder_RaceBuildings[r_uac ] +'u_b2c_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UGenerator4    ,folder_RaceBuildings[r_uac ] +'u_b2d_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UWeaponFactory1,folder_RaceBuildings[r_uac ] +'u_b3_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UWeaponFactory2,folder_RaceBuildings[r_uac ] +'u_b3a'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UWeaponFactory3,folder_RaceBuildings[r_uac ] +'u_b3b'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UWeaponFactory4,folder_RaceBuildings[r_uac ] +'u_b6_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UTurret        ,folder_RaceBuildings[r_uac ] +'u_b4_'   ,smt_turret   );
+   gfx_LoadMWSModel(@spr_URadar         ,folder_RaceBuildings[r_uac ] +'u_b5_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UTechCenter    ,folder_RaceBuildings[r_uac ] +'u_b13_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UPTurret       ,folder_RaceBuildings[r_uac ] +'u_b7_'   ,smt_turret   );
+   gfx_LoadMWSModel(@spr_URocketL       ,folder_RaceBuildings[r_uac ] +'u_b8_'   ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_URTurret       ,folder_RaceBuildings[r_uac ] +'u_b9_'   ,smt_turret2  );
+   gfx_LoadMWSModel(@spr_UNuclearPlant  ,folder_RaceBuildings[r_uac ] +'u_b10_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UFactory1      ,folder_RaceBuildings[r_uac ] +'u_b11_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UFactory2      ,folder_RaceBuildings[r_uac ] +'u_b12_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UFactory3      ,folder_RaceBuildings[r_uac ] +'u_b12a'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UFactory4      ,folder_RaceBuildings[r_uac ] +'u_b12b'  ,smt_buiding  );
 
-   gfx_LoadMWSModel(@spr_Mine           ,race_buildings[r_uac ] +'u_mine0'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_portal         ,race_buildings[r_uac ] +'u_portal0' ,smt_buiding);
-   gfx_LoadMWSModel(@spr_starport       ,race_buildings[r_uac ] +'u_starport',smt_buiding);
-   gfx_LoadMWSModel(@spr_ubase0         ,race_buildings[r_uac ] +'u_base00'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubase1         ,race_buildings[r_uac ] +'u_base10'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubase2         ,race_buildings[r_uac ] +'u_base20'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubase3         ,race_buildings[r_uac ] +'u_base30'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubase4         ,race_buildings[r_uac ] +'u_base40'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubase5         ,race_buildings[r_uac ] +'u_base50'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild0        ,race_buildings[r_uac ] +'build00'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild1        ,race_buildings[r_uac ] +'build10'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild2        ,race_buildings[r_uac ] +'build20'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild3        ,race_buildings[r_uac ] +'build30'   ,smt_buiding);
+   gfx_LoadMWSModel(@spr_Mine           ,folder_RaceBuildings[r_uac ] +'u_mine0'   ,smt_buiding);
+   gfx_LoadMWSModel(@spr_portal         ,folder_RaceBuildings[r_uac ] +'u_portal0' ,smt_buiding);
+   gfx_LoadMWSModel(@spr_starport       ,folder_RaceBuildings[r_uac ] +'u_starport',smt_buiding);
+   gfx_LoadMWSModel(@spr_ubase0         ,folder_RaceBuildings[r_uac ] +'u_base00'  ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubase1         ,folder_RaceBuildings[r_uac ] +'u_base10'  ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubase2         ,folder_RaceBuildings[r_uac ] +'u_base20'  ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubase3         ,folder_RaceBuildings[r_uac ] +'u_base30'  ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubase4         ,folder_RaceBuildings[r_uac ] +'u_base40'  ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubase5         ,folder_RaceBuildings[r_uac ] +'u_base50'  ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubuild0        ,folder_RaceBuildings[r_uac ] +'build00'   ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubuild1        ,folder_RaceBuildings[r_uac ] +'build10'   ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubuild2        ,folder_RaceBuildings[r_uac ] +'build20'   ,smt_buiding);
+   gfx_LoadMWSModel(@spr_ubuild3        ,folder_RaceBuildings[r_uac ] +'build30'   ,smt_buiding);
 
-   gfx_LoadMWSModel(@spr_db_h0          ,race_dir[r_hell]+'db_h0'        ,smt_effect );
-   gfx_LoadMWSModel(@spr_db_h1          ,race_dir[r_hell]+'db_h1'        ,smt_effect );
-   gfx_LoadMWSModel(@spr_db_u0          ,race_dir[r_uac ]+'db_u0'        ,smt_effect );
-   gfx_LoadMWSModel(@spr_db_u1          ,race_dir[r_uac ]+'db_u1'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_db_h0          ,folder_Race[r_hell]+'db_h0'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_db_h1          ,folder_Race[r_hell]+'db_h1'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_db_u0          ,folder_Race[r_uac ]+'db_u0'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_db_u1          ,folder_Race[r_uac ]+'db_u1'        ,smt_effect );
 
-   gfx_LoadMWSModel(@spr_h_p0           ,race_missiles[r_hell]+'h_p0_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_h_p1           ,race_missiles[r_hell]+'h_p1_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_h_p2           ,race_missiles[r_hell]+'h_p2_'   ,smt_missile);
-   gfx_LoadMWSModel(@spr_h_p3           ,race_missiles[r_hell]+'h_p3_'   ,smt_missile);
-   gfx_LoadMWSModel(@spr_h_p4           ,race_missiles[r_hell]+'h_p4_'   ,smt_missile);
-   gfx_LoadMWSModel(@spr_h_p5           ,race_missiles[r_hell]+'h_p5_'   ,smt_missile);
-   gfx_LoadMWSModel(@spr_h_p6           ,race_missiles[r_hell]+'h_p6_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_h_p7           ,race_missiles[r_hell]+'h_p7_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_u_p0           ,race_missiles[r_uac ]+'u_p0_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_u_p1           ,race_missiles[r_uac ]+'u_p1_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_u_p2           ,race_missiles[r_uac ]+'u_p2_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_u_p3           ,race_missiles[r_uac ]+'u_p3_'   ,smt_effect );
-   gfx_LoadMWSModel(@spr_u_p8           ,race_missiles[r_uac ]+'u_p8_'   ,smt_missile);
-   gfx_LoadMWSModel(@spr_u_p9           ,race_missiles[r_uac ]+'b'       ,smt_missile);
+   gfx_LoadMWSModel(@spr_h_p0           ,folder_RaceMissiles[r_hell]+'h_p0_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_h_p1           ,folder_RaceMissiles[r_hell]+'h_p1_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_h_p2           ,folder_RaceMissiles[r_hell]+'h_p2_'   ,smt_missile);
+   gfx_LoadMWSModel(@spr_h_p3           ,folder_RaceMissiles[r_hell]+'h_p3_'   ,smt_missile);
+   gfx_LoadMWSModel(@spr_h_p4           ,folder_RaceMissiles[r_hell]+'h_p4_'   ,smt_missile);
+   gfx_LoadMWSModel(@spr_h_p5           ,folder_RaceMissiles[r_hell]+'h_p5_'   ,smt_missile);
+   gfx_LoadMWSModel(@spr_h_p6           ,folder_RaceMissiles[r_hell]+'h_p6_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_h_p7           ,folder_RaceMissiles[r_hell]+'h_p7_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_u_p0           ,folder_RaceMissiles[r_uac ]+'u_p0_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_u_p1           ,folder_RaceMissiles[r_uac ]+'u_p1_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_u_p2           ,folder_RaceMissiles[r_uac ]+'u_p2_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_u_p3           ,folder_RaceMissiles[r_uac ]+'u_p3_'   ,smt_effect );
+   gfx_LoadMWSModel(@spr_u_p8           ,folder_RaceMissiles[r_uac ]+'u_p8_'   ,smt_missile);
+   gfx_LoadMWSModel(@spr_u_p9           ,folder_RaceMissiles[r_uac ]+'b'       ,smt_missile);
 
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do sm_kind:=smt_effect2;
 
-   gfx_LoadMWSModel(@spr_eff_bfg        ,effects_folder+'ef_bfg_'        ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_eb         ,effects_folder+'ef_eb'          ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_ebb        ,effects_folder+'ef_ebb'         ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_gtel       ,effects_folder+'ef_gt_'         ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_tel        ,effects_folder+'ef_tel_'        ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_exp        ,effects_folder+'ef_exp_'        ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_exp2       ,effects_folder+'exp2_'          ,smt_effect );
-   gfx_LoadMWSModel(@spr_eff_g          ,effects_folder+'g_'             ,smt_effect );
-   gfx_LoadMWSModel(@spr_blood          ,effects_folder+'blood'          ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_bfg        ,folder_effects+'ef_bfg_'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_eb         ,folder_effects+'ef_eb'          ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_ebb        ,folder_effects+'ef_ebb'         ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_gtel       ,folder_effects+'ef_gt_'         ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_tel        ,folder_effects+'ef_tel_'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_exp        ,folder_effects+'ef_exp_'        ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_exp2       ,folder_effects+'exp2_'          ,smt_effect );
+   gfx_LoadMWSModel(@spr_eff_g          ,folder_effects+'g_'             ,smt_effect );
+   gfx_LoadMWSModel(@spr_blood          ,folder_effects+'blood'          ,smt_effect );
 
-   gfx_LoadMWTexture(@spr_RallyPoint[r_hell],race_dir[r_hell]+'h_mp'        ,true);
-   gfx_LoadMWTexture(@spr_RallyPoint[r_uac ],race_dir[r_uac ]+'u_mp'        ,true);
-   gfx_LoadMWTexture(@spr_ptur              ,race_dir[r_uac ]+'ptur'        ,true);
+   gfx_LoadMWTexture(@spr_RallyPoint[r_hell],folder_Race[r_hell]+'h_mp'        ,true);
+   gfx_LoadMWTexture(@spr_RallyPoint[r_uac ],folder_Race[r_uac ]+'u_mp'        ,true);
+   gfx_LoadMWTexture(@spr_ptur              ,folder_Race[r_uac ]+'ptur'        ,true);
 
-   gfx_LoadMWTexture(@spr_b4_a              ,race_buildings[r_uac ]+'u_b4_a',true);
-   gfx_LoadMWTexture(@spr_b7_a              ,race_buildings[r_uac ]+'u_b7_a',true);
-   gfx_LoadMWTexture(@spr_b9_a              ,race_buildings[r_uac ]+'u_b9_a',true);
+   gfx_LoadMWTexture(@spr_b4_a              ,folder_RaceBuildings[r_uac ]+'u_b4_a',true);
+   gfx_LoadMWTexture(@spr_b7_a              ,folder_RaceBuildings[r_uac ]+'u_b7_a',true);
+   gfx_LoadMWTexture(@spr_b9_a              ,folder_RaceBuildings[r_uac ]+'u_b9_a',true);
 
-   gfx_LoadMWTexture(@spr_stun              ,effects_folder+'stun'          ,true);
-   gfx_LoadMWTexture(@spr_effect_Invuln     ,effects_folder+'invuln'        ,true);
-   gfx_LoadMWTexture(@spr_effect_HVision    ,effects_folder+'hvision'       ,true);
-   gfx_LoadMWTexture(@spr_effect_Scan       ,effects_folder+'scan'          ,true);
-   gfx_LoadMWTexture(@spr_effect_Decay      ,effects_folder+'decay'         ,true);
+   gfx_LoadMWTexture(@spr_stun              ,folder_effects+'stun'          ,true);
+   gfx_LoadMWTexture(@spr_effect_Invuln     ,folder_effects+'invuln'        ,true);
+   gfx_LoadMWTexture(@spr_effect_HVision    ,folder_effects+'hvision'       ,true);
+   gfx_LoadMWTexture(@spr_effect_Scan       ,folder_effects+'scan'          ,true);
+   gfx_LoadMWTexture(@spr_effect_Decay      ,folder_effects+'decay'         ,true);
 
 
    gfx_LoadMWTexture(@spr_cp_koth   ,'cp_koth',true);
@@ -776,7 +777,7 @@ begin
    for r:=1 to r_cnt do
    with spr_b_Upgrades[r,x] do
    begin
-      surf:= gfx_LoadButton(race_upgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
+      surf:= gfx_LoadButton(folder_RaceUpgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
       w   := surf^.w;h    := w;
       hw  := w div 2;hh   := hw;
    end;
@@ -875,80 +876,63 @@ begin
    ui_vmb_y1     := vid_vh-ui_vmb_y0;
    ui_UIPortXC   := ui_UIPortX0+ui_cam_hw;
 
-   if(ui_ControlPanelPos=cpp_top)
-   then ui_timerX:= ui_UIPanelX
-   else ui_timerX:= ui_UIPortX0+font_wh;
+   // timer
+   ui_timerX     := ui_UIPortX0+font_wh;
    ui_timerY     := ui_UIPortY0+font_wh;
 
-   ui_uiuphy     := ui_timerY+font_w3;
+   // game status, POV player
+   ui_PovPlayerY := ui_UIPortY0+txt_line_h1*5;
+   ui_GameStatusX:= vid_vw div 2;
+   ui_GameStatusY:= ui_PovPlayerY+txt_line_h3;
 
-   // hint position
+   // Objectives
+   ui_objectivesx:= ui_timerX;
+   ui_objectivesy:= ui_timerY+txt_line_h3;
+
+   // mouse hint position
    case ui_ControlPanelPos of
    cpp_left  : begin
-               ui_PanelHintX:=ui_UIPanelW+font_wh;
-               ui_PanelHintY:=ui_UIPanelW+ui_ButtonW1;
+               ui_MouseHintX:=ui_UIPanelW+font_wh;
+               ui_MouseHintY:=ui_UIPanelW+ui_ButtonW1;
                end;
    cpp_right : begin
-               ui_PanelHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLen*font_w1;
-               ui_PanelHintY:=ui_UIPanelW+ui_ButtonW1;
+               ui_MouseHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLen*font_w1;
+               ui_MouseHintY:=ui_UIPanelW+ui_ButtonW1;
                end;
    cpp_top   : begin
-               ui_PanelHintX:=ui_UIPanelX+ui_UIPanelH;
-               ui_PanelHintY:=ui_UIPanelY1+txt_line_h2*2;
+               ui_MouseHintX:=ui_UIPanelX+ui_UIPanelH;
+               ui_MouseHintY:=ui_UIPanelY1+txt_line_h2*2;
                end;
    cpp_bottom: begin
-               ui_PanelHintX:=ui_UIPanelX+ui_UIPanelH;
-               ui_PanelHintY:=ui_UIPanelY-font_w5;
+               ui_MouseHintX:=ui_UIPanelX+ui_UIPanelH;
+               ui_MouseHintY:=ui_UIPanelY-font_w5;
                end;
    end;
 
-   // chat line
+   // last events list & chat
    case ui_ControlPanelPos of
    cpp_left  : begin
-                  ui_chatx:=ui_UIPanelW+font_wh;
-                  ui_chaty:=vid_vh-font_wh;
-                  ui_chat_LineLen:=(vid_vw-ui_chatx-font_w1) div font_w1;
+                  ui_logx:=ui_UIPanelX+ui_UIPanelW+font_wh;
+                  ui_logy:=vid_vh-ui_ReplayBarH-txt_line_h1;
+                  ui_log_LineLen:=byte(min2c(MaxChatStringLength,(vid_vw-font_w1-ui_UIPanelW) div font_w1));
                end;
    cpp_right : begin
-                  ui_chatx:=font_wh;
-                  ui_chaty:=vid_vh-font_wh;
-                  ui_chat_LineLen:=(vid_vw-ui_UIPanelW-font_w1) div font_w1;
+                  ui_logx:=font_wh;
+                  ui_logy:=vid_vh-ui_ReplayBarH-txt_line_h1;
+                  ui_log_LineLen:=byte(min2c(MaxChatStringLength,(vid_vw-font_w1-ui_UIPanelW) div font_w1));
                end;
    cpp_top   : begin
-                  ui_chatx:=font_wh;
-                  ui_chaty:=vid_vh-font_wh;
-                  ui_chat_LineLen:=(vid_vw-font_w1) div font_w1;
+                  ui_logx:=font_wh;
+                  ui_logy:=vid_vh-ui_ReplayBarH-txt_line_h1;
+                  ui_log_LineLen:=byte(min2c(MaxChatStringLength,(vid_vw-font_w1) div font_w1));
                end;
    cpp_bottom: begin
-                  ui_chatx:=font_wh;
-                  ui_chaty:=ui_UIPanelY-font_wh;
-                  ui_chat_LineLen:=(vid_vw-font_w1) div font_w1;
+                  ui_logx:=font_wh;
+                  ui_logy:=ui_UIPortY1-ui_ReplayBarH-txt_line_h1;
+                  ui_log_LineLen:=byte(min2c(MaxChatStringLength,(vid_vw-font_w1) div font_w1));
                end;
    end;
-
-   // log list
-   case ui_ControlPanelPos of
-   cpp_left  : begin
-                  ui_logx:=ui_UIPanelX +ui_UIPanelW+font_wh;
-                  ui_logy:=min2i(ui_UIPanelY1,vid_vh)-font_w1h;
-                  ui_loga:=ta_LU;
-               end;
-   cpp_right : begin
-                  ui_logx:=ui_UIPanelX -font_wh;
-                  ui_logy:=min2i(ui_UIPanelY1,vid_vh)-font_w1h;
-                  ui_loga:=ta_RU;
-               end;
-   cpp_top   : begin
-                  ui_logx:=vid_vw div 2;
-                  ui_logy:=vid_vh-font_w3;
-                  ui_loga:=ta_MU;
-               end;
-   cpp_bottom: begin
-                  ui_logx:=vid_vw div 2;
-                  ui_logy:=ui_UIPanelY-font_w3;
-                  ui_loga:=ta_MU;
-               end;
-   end;
+   ui_log_ListSize:=((ui_UIPortY1-ui_UIPortY0)-ui_CtrlPanelW-ui_ReplayBarH-txt_line_h1) div txt_line_h2;
 
    // hotkey groups icons
    ui_groupX     := ui_UIPortX0+ui_cam_w-font_w1;
@@ -956,43 +940,43 @@ begin
    then ui_groupY:= 0
    else ui_groupY:= ui_UIPortY0;
 
-   ui_fpsx       := ui_UIPortX1-(font_w1*font_w1h);
+   // FPS
+   ui_FPSX       := ui_UIPortX1-(font_w1*font_w1h);
    if(ui_ControlPanelPos=cpp_top)
-   then ui_fpsy  := font_wh
-   else ui_fpsy  := ui_timerY;
+   then ui_FPSY  := font_wh
+   else ui_FPSY  := ui_timerY;
 
    // Replay progress bar
    ui_ReplayBarY := ui_UIPortY1;
    if(ui_ControlPanelPos=cpp_bottom)
-   then ui_ReplayBarw:=ui_UIPanelW
-   else ui_ReplayBarw:=vid_vw;
+   then ui_ReplayBarW:=ui_UIPanelW
+   else ui_ReplayBarW:=vid_vw;
    case ui_ControlPanelPos of
    cpp_left  : begin
                if((ui_UIPanelY1+ui_ReplayBarH)<vid_vh)
                then ui_ReplayBarX:=0
-               else ui_ReplayBarX:=ui_UIPanelW;
-               ui_ReplayBarw-=ui_UIpanelW;
+               else
+               begin
+                  ui_ReplayBarX:=ui_UIPanelW;
+                  ui_ReplayBarW-=ui_UIpanelW;
+               end;
                end;
    cpp_right : begin
                ui_ReplayBarX:=0;
                if((ui_UIPanelY1+ui_ReplayBarH)>=vid_vh)
-               then ui_ReplayBarw-=ui_UIpanelW;
+               then ui_ReplayBarW-=ui_UIpanelW;
                end;
    cpp_top   : ui_ReplayBarX:=0;
    cpp_bottom: ui_ReplayBarX:=ui_UIPanelX;
    end;
-
-
-   ui_uiplayery := ui_uiuphy+font_w1h;
-   ui_game_log_height:=(ui_PanelHintY-font_w5) div font_w1h;
 
    ui_EnergyX   := ui_UIPortXC-font_w2;
    ui_EnergyY   := ui_timerY;
    ui_ArmyX     := ui_UIPortXC;
    ui_ArmyY     := ui_timerY;
 
-   ui_apmx      := ui_fpsx;
-   ui_apmy      := ui_fpsy+txt_line_h2;
+   ui_Apmx      := ui_FPSX;
+   ui_Apmy      := ui_FPSY+txt_line_h2;
 
    ui_fog_gridw :=(ui_cam_w div fog_cw)+2;
    ui_fog_gridh :=(ui_cam_h div fog_cw)+2;

@@ -108,8 +108,10 @@ begin
                 net_svsearch :=false;
                 net_cl_Hoster:=255;
                 net_cl_svttl :=ServerTTL;
+                net_cl_log_n :=net_cl_log_n.MaxValue;
                 PlayerReady  :=false;
                 menu_NetMessage(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
+                PlayersClearLog;
              end
              else menu_NetMessage(str_menuMsg_Error,str_Caption_Client+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
           end;
@@ -194,21 +196,21 @@ bstartX,
 bendX  :integer;
 begin
    with menu_items[mi] do
-     if(mi_state>1)and(mi_y0<=mouse_y)and(mouse_y<=mi_y1)then
+     if(mi_state=as_enabled)and(mi_y0<=mouse_y)and(mouse_y<=mi_y1)then
      begin
         bendX  :=mi_x1-menu_BarStepX;
         bstartX:=bendX-(vmax-vmin);
 
         if(bendX<=mouse_x)and(mouse_x<=mi_x1)then
           case ClickOutSetMax of
-          true : vvar^:=vmax;
-          false: if(vvar^<vmax)then vvar^+=1;
+          false: vvar^:=vmax;
+          true : if(vvar^<vmax)then vvar^+=1;
           end
         else
           if(mi_x0<=mouse_x)and(mouse_x<=bstartX)then
             case ClickOutSetMax of
-            true : vvar^:=vmin;
-            false: if(vvar^>vmin)then vvar^-=1;
+            false: vvar^:=vmin;
+            true : if(vvar^>vmin)then vvar^-=1;
             end
           else vvar^:=(mouse_x-bstartX)+vmin;
      end;
@@ -229,7 +231,7 @@ begin
 
    for i:=0 to 255 do
      with menu_items[i] do
-       if(mi_state>1)then // 0 - no existed, 1 - disabled, 2 - enabled
+       if(mi_state=as_enabled)then
          if(mi_x0<mouse_x)and(mouse_x<mi_x1)and(mi_y0<mouse_y)and(mouse_y<mi_y1)then
            menu_MouseXY2Item:=i;
 end;
@@ -255,21 +257,27 @@ begin
       mi_x1:=max2i(x0,x1);
       mi_y1:=max2i(y0,y1);
 
-      mi_xc:=(mi_x0+mi_x1) div 2;
-      mi_yc:=(mi_y0+mi_y1) div 2;
+      mi_xc:= (mi_x0+mi_x1) div 2;
+      mi_yc:=((mi_y0+mi_y1) div 2)+1;
 
       if(maxChars>0)
       then mi_charw:=maxChars
       else mi_charw:=(mi_x1-mi_x0-font_w1) div font_w1;
 
-      mi_state:=1+byte(enabled);
+      case enabled of
+      false: mi_state:=as_disabled;
+      true : mi_state:=as_enabled;
+      end;
    end;
 end;
 procedure menu_item_setEnabled(mi:byte;enabled:boolean);
 begin
    with menu_items[mi] do
-     if(mi_state>0)then
-       mi_state:=1+byte(enabled);
+     if(mi_state>as_off)then
+       case enabled of
+       false: mi_state:=as_disabled;
+       true : mi_state:=as_enabled;
+       end;
 end;
 
 procedure menu_page_BottomButtons(b1,b2,b3,b4,b5,b6:byte);
@@ -545,7 +553,10 @@ begin
                    menu_Item_Set(mi_MP_ServerLANVis   ,cx  ,mty0,mtx1,mty0+menu_ListLineH,true                      );mty0+=menu_ListLineH;
                    menu_Item_Set(mi_MP_ServerToggle   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServer(false,true ));mty0+=menu_ListLineH;
                    with menu_items[mi_MP_Panel] do
-                   menu_Item_Set(mi_MP_Chat           ,mi_x0,mty0,mi_x1,mi_y1,true);
+                   begin
+                   menu_Item_Set(mi_MP_ChatList       ,mi_x0,mty0,mi_x1,mi_y1-txt_line_h1,true);
+                   menu_Item_Set(mi_MP_ChatLine       ,mi_x0,mi_y1-txt_line_h1,mi_x1,mi_y1,true);
+                   end;
                 end;
    ns_client  : begin
                    mty0-=menu_ListLineH;
@@ -553,9 +564,15 @@ begin
 
                    menu_Item_Set(mi_MP_ClientQuality  ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true                      );mty0+=menu_ListLineH;
                    with menu_items[mi_MP_Panel] do
-                   menu_Item_Set(mi_MP_Chat           ,mi_x0,mty0,mi_x1,mi_y1,true);
+                   begin
+                   menu_Item_Set(mi_MP_ChatList       ,mi_x0,mty0,mi_x1,mi_y1-txt_line_h1,true);
+                   menu_Item_Set(mi_MP_ChatLine       ,mi_x0,mi_y1-txt_line_h1,mi_x1,mi_y1,true);
+                   end;
                 end;
    end;
+
+   with menu_items[mi_MP_ChatList] do
+   menu_ChatListH:=(mi_y1-mi_y0-font_wh) div txt_line_h1;
 end;
 
 procedure menu_page_Scirmish;
@@ -625,6 +642,8 @@ begin
    menu_item_setEnabled(mi_NetSearch_Connect,GameNetServerConnect(true));
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+
 procedure menu_Rebuild;
 begin
    FillChar(menu_items,SizeOf(Menu_items),0);
@@ -666,7 +685,7 @@ mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
                      else GameMapSetSeed(LocalPlayer,s2c(menu_mseed),false);
 mi_MP_ServerPort   : menu_GetServerPort;
 mi_MP_ClientAddress: menu_GetClientAddress;
-mi_MP_Chat         : if(EnterKey)then
+mi_MP_ChatList     : if(EnterKey)then
                      begin
                         if(length(net_chat_str)>0)then
                         begin
@@ -834,7 +853,6 @@ function menu_Controls_DMLB(item:byte;check:boolean):boolean;
 begin
    menu_Controls_DMLB:=true;
    case item of
-//mi_SaveLoad_list  : if(not check)then Saveload_Load  (false);
 mi_Replays_list   : if(not check)then replay_Play  (false);
 mi_NetSearch_List : if(not check)then GameNetServerConnect(false);
    else
@@ -884,13 +902,22 @@ mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,false,0,ne
    end;
 end;
 
+function menu_ChatSize:integer;
+begin
+   with g_gplayers[LocalPlayer] do
+     if(log_n<MaxPlayerLog)
+     then menu_ChatSize:=integer(log_n)
+     else menu_ChatSize:=MaxPlayerLog;
+end;
+
 function menu_Controls_MWD(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MWD:=true;
    case item of
 mi_NetSearch_List      : if(not check)then ScrollInt(@net_svsearch_scroll, 10,0,net_svsearch_size-menu_SvSearchListH,false);
-mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   , 10,0,svld_list_size   -menu_BaseList1H,false);
-mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   , 10,0,rpls_list_size   -menu_BaseList1H,false);
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   , 10,0,svld_list_size   -menu_BaseList1H   ,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   , 10,0,rpls_list_size   -menu_BaseList1H   ,false);
+mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    ,-2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
    else
       menu_Controls_MWD:=false;
    end;
@@ -901,8 +928,9 @@ begin
    menu_Controls_MWU:=true;
    case item of
 mi_NetSearch_List      : if(not check)then ScrollInt(@net_svsearch_scroll,-10,0,net_svsearch_size-menu_SvSearchListH,false);
-mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   ,-10,0,svld_list_size   -menu_BaseList1H,false);
-mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   ,-10,0,rpls_list_size   -menu_BaseList1H,false);
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   ,-10,0,svld_list_size   -menu_BaseList1H   ,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   ,-10,0,rpls_list_size   -menu_BaseList1H   ,false);
+mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    , 2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
    else
       menu_Controls_MWU:=false;
    end;
@@ -912,19 +940,20 @@ function menu_Controls_Text(item:byte;check:boolean;changed:pboolean):boolean;
 begin
    menu_Controls_Text:=true;
    case item of
-mi_SG_PlayerName   : if(not check)then PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen   ,changed);
-mi_SR_RecordPrefix : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,MaxReplayPrefixLen ,changed);
+mi_SG_PlayerName       : if(not check)then PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen   ,changed);
+mi_SR_RecordPrefix     : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,MaxReplayPrefixLen ,changed);
 
-mi_SV_ResolutionW  : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,changed));
-mi_SV_ResolutionH  : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,changed));
+mi_SV_ResolutionW      : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,changed));
+mi_SV_ResolutionH      : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,changed));
 
-mi_SaveLoad_fname  : if(not check)then svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars,changed);
+mi_SaveLoad_fname      : if(not check)then svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars,changed);
 
-mi_Map_Seed        : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,changed);
+mi_Map_Seed            : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,changed);
 
-mi_MP_ServerPort   : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,changed);
-mi_MP_ClientAddress: if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                 ,changed);
-mi_MP_Chat         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                ,changed);
+mi_MP_ServerPort       : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,changed);
+mi_MP_ClientAddress    : if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                 ,changed);
+mi_MP_ChatList         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                ,changed);
+mi_MP_ChatLine         : ;
    else
       menu_Controls_Text:=false;
    end;
@@ -939,7 +968,7 @@ clickSound:boolean;
 procedure SetSelectedItem(newItem:byte);
 begin
    if(menu_ItemSelected=0)then
-     if(menu_items[newItem].mi_state>0)then
+     if(menu_items[newItem].mi_state>as_off)then
        menu_ItemSelected:=newItem;
 end;
 begin
@@ -991,7 +1020,7 @@ begin
   case(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace,true))of
   true : begin
             SetSelectedItem(mi_SaveLoad_fname);
-            SetSelectedItem(mi_MP_Chat);
+            SetSelectedItem(mi_MP_ChatList);
 
             if(menu_Controls_Text(menu_ItemSelected,false,@changed))then
             begin
@@ -1041,8 +1070,10 @@ begin
    case InputActionPressed(iact_MWD) of
    true : begin
              SetSelectedItem(mi_NetSearch_List);
-             SetSelectedItem(mi_SaveLoad_list);
-             SetSelectedItem(mi_Replays_list );
+             SetSelectedItem(mi_SaveLoad_list );
+             SetSelectedItem(mi_Replays_list  );
+             SetSelectedItem(mi_MP_ChatList);
+
              if(menu_Controls_MWD(menu_ItemSelected,false))then
              begin
                 SetBBit(@menu_ItemActs,miat_MWhell,true);
@@ -1057,8 +1088,9 @@ begin
    case InputActionPressed(iact_MWU) of
    true : begin
              SetSelectedItem(mi_NetSearch_List);
-             SetSelectedItem(mi_SaveLoad_list);
-             SetSelectedItem(mi_Replays_list );
+             SetSelectedItem(mi_SaveLoad_list );
+             SetSelectedItem(mi_Replays_list  );
+             SetSelectedItem(mi_MP_ChatList);
              if(menu_Controls_MWU(menu_ItemSelected,false))then
              begin
                 SetBBit(@menu_ItemActs,miat_MWhell,true);

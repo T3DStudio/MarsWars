@@ -123,6 +123,8 @@ var puid   : PTUID;
 aTeamDetection,
 aTeamVision: TUnitVisionData;
 aselect    : boolean;
+auo_x,
+auo_y      : integer;
 begin
    unit_morph:=0;
    with pu^     do
@@ -138,6 +140,8 @@ begin
       aTeamDetection:=TeamDetection;
       aTeamVision   :=TeamVision;
       aselect:=isselected;
+      auo_x  :=uo_x;
+      auo_y  :=uo_y;
 
       if(a_units[ouid]<=0)then
       begin
@@ -186,6 +190,11 @@ begin
    if(LastCreatedUnitP<>nil)then
      with LastCreatedUnitP^ do
      begin
+        if(UnitHaveRPoint(uidi))then
+        begin
+           uo_x:=auo_x;
+           uo_y:=auo_y;
+        end;
         TeamDetection:=aTeamDetection;
         TeamVision:=aTeamVision;
         if(bhits>0)then
@@ -443,8 +452,8 @@ begin
 wpt_resurect : if(not unit_StartResurrection(pAttacker,pTarget,true))then exit;
 wpt_heal     : if(pTarget^.hits<=0)
                or(pTarget^.hits>=pTarget^.uid^.uid_MaxHits1)
-               or(pTarget^.iscomplete=false     )
-               or(pTarget^.buffs[ub_Heal]>0      )then exit;
+               or(not pTarget^.iscomplete  )
+               or(pTarget^.buffs[ub_Heal]>0)then exit;
       end;
 
       // transportU check
@@ -1199,7 +1208,7 @@ begin
       if(IsUnitRange(uo_tar,@tu))then
       begin
          if(IsUnitRange(tu^.transportU,nil))
-         or(CheckUnitTeamVision(player^.team,tu,false)=false)then
+         or(not CheckUnitTeamVision(player^.team,tu,false))then
          begin
             uo_tar:=0;
             uo_id :=ua_amove;
@@ -1240,11 +1249,11 @@ uab_Teleport     : if(unit_ability_teleport(pu,tu,td))then exit;//team
          end;
 
          if(player=tu^.player)and(tu^.ukfly)then
-          if(unit_CheckTransport(tu,pu))and(not IsUnitRange(tu^.uo_tar,nil))and(tu^.uo_x=tu^.x)and(tu^.uo_y=tu^.y)then
-          begin
-             tu^.uo_x:=x;
-             tu^.uo_y:=y;
-          end;
+           if(unit_CheckTransport(tu,pu))and(not IsUnitRange(tu^.uo_tar,nil))and(tu^.uo_x=tu^.x)and(tu^.uo_y=tu^.y)then
+           begin
+              tu^.uo_x:=x;
+              tu^.uo_y:=y;
+           end;
 
          uo_x:=tu^.vx;
          uo_y:=tu^.vy;
@@ -1684,14 +1693,13 @@ uab_RebuildInPoint: if(speed<=0)
    end;
 end;
 
-procedure unit_SetDefaultUO(pu:PTUnit;aid,atar,ax,ay,apx,apy:integer;atarz,nospeedcheck:boolean);
+procedure unit_SetDefaultUO(pu:PTUnit;aid,atar,ax,ay,apx,apy:integer;aResetatar,nospeedcheck:boolean);
 begin
    with pu^ do
    begin
       uo_id :=aid;
       uo_tar:=atar;
-      if(atarz)
-      then a_tar:=0;
+      if(aResetatar)then a_tar:=0;
       if(speed>0)or(nospeedcheck)then
       begin
          uo_x  :=ax;
@@ -1706,7 +1714,7 @@ function unit_rebuild(pu:PTUnit;check:boolean):cardinal;
 begin
    unit_rebuild:=ureq_other;
 
-   if(not ui_rebuild(pu))then exit;
+   if(not ui_Haverebuild(pu))then exit;
 
    with pu^ do
    with uid^ do
@@ -1762,7 +1770,7 @@ function unit_sability(pCaster:PTUnit;check:boolean):cardinal;
 begin
    unit_sability:=ureq_other;
 
-   if(not ui_ability(pCaster,false)) then exit;
+   if(not ui_HaveAbility(pCaster,false)) then exit;
 
    unit_sability:=unit_AbilityBasicChecks(pCaster);
    if(unit_sability>0)then exit;
@@ -1807,7 +1815,7 @@ function unit_pability(pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):card
 begin
    unit_pability:=ureq_other;
 
-   if(not ui_ability(pCaster,true )) then exit;
+   if(not ui_HaveAbility(pCaster,true )) then exit;
 
    unit_pability:=unit_AbilityBasicChecks(pCaster);
    if(unit_pability>0)then exit;

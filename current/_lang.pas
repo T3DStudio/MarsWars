@@ -268,12 +268,12 @@ begin
     begin
        if(not for_doc)then
        STRADD(@str_MakeUnitDefaultDescription,str_hint_hits+i2s(uid_MaxHits1),sep_sdot);
-       //STRADD(@str_MakeUnitDefaultDescription,str_hint_BaseSightR+i2s(uid_SightR),sep_sdot);
+       STRADD(@str_MakeUnitDefaultDescription,str_hint_BaseSightR+i2s(uid_SightR),sep_sdot);
 
        if(uid_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_builder,sep_sdot);
        if(uid_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
        if(uid_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_hint_smith  ,sep_sdot);
-       if(uid_EnergyGen    >0)then STRADD(@str_MakeUnitDefaultDescription,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_sdot);
+       if(uid_EnergyGen  >0)then STRADD(@str_MakeUnitDefaultDescription,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_sdot);
        if(uid_rebuild_uid>0)and(uid_ability<>uab_RebuildInPoint)then
        begin
           STRADD(@str_MakeUnitDefaultDescription,
@@ -472,8 +472,8 @@ begin
         with g_mids[uid_DeathMissile] do
           if(mid_base_SplashR>0)then  STRADD(@str_MakeWeaponString,str_uarm_SplashDamageR+i2s(mid_base_SplashR),sep_scomma);
 
-      if(length(str_uarm_PriorityL[aw_tarprior])>0)then
-        STRADD(@str_MakeWeaponString,str_uarm_Priority+str_uarm_PriorityL[aw_tarprior],sep_scomma);
+      //if(length(str_uarm_PriorityL[aw_tarprior])>0)then
+     //   STRADD(@str_MakeWeaponString,str_uarm_Priority+str_uarm_PriorityL[aw_tarprior],sep_scomma);
 
       if(aw_dupgr>0)then
         STRADD(@str_MakeWeaponString,str_uarm_Upgrade+g_upids[aw_dupgr].upgr_str_Name+'('+i2sSign(aw_dupgr_s)+')',sep_scomma);
@@ -956,21 +956,21 @@ begin
    str_map_Symmetry              := 'Symmetric';
    str_map_Random                := 'Random map';
    str_map_Scenario              := 'Scenario';
-   str_map_ScenarioL[mc_ffa3    ]:= tc_lime  +'FFA(3)'      +tc_default;
-   str_map_ScenarioL[mc_ffa4    ]:= tc_lime  +'FFA(4)'      +tc_default;
-   str_map_ScenarioL[mc_ffa5    ]:= tc_lime  +'FFA(5)'      +tc_default;
-   str_map_ScenarioL[mc_ffa6    ]:= tc_lime  +'FFA(6)'      +tc_default;
-   str_map_ScenarioL[mc_ffa7    ]:= tc_lime  +'FFA(7)'      +tc_default;
-   str_map_ScenarioL[mc_ffa8    ]:= tc_lime  +'FFA(8)'      +tc_default;
-   str_map_ScenarioL[mc_1x1     ]:= tc_yellow+'1x1'         +tc_default;
-   str_map_ScenarioL[mc_2x2     ]:= tc_yellow+'2x2'         +tc_default;
-   str_map_ScenarioL[mc_3x3     ]:= tc_yellow+'3x3'         +tc_default;
-   str_map_ScenarioL[mc_4x4     ]:= tc_yellow+'4x4'         +tc_default;
-   str_map_ScenarioL[mc_2x2x2   ]:= tc_orange+'2x2x2'       +tc_default;
-   str_map_ScenarioL[mc_2x2x2x2 ]:= tc_orange+'2x2x2x2'     +tc_default;
-   str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Key points'  +tc_default;
-   str_map_ScenarioL[mc_KotH    ]:= tc_aqua  +'KotH'        +tc_default;
-   str_map_ScenarioL[mc_royale  ]:= tc_red   +'Royal Battle'+tc_default;
+   str_map_ScenarioL[mc_ffa3     ]:= tc_lime  +'FFA(3)'      +tc_default;
+   str_map_ScenarioL[mc_ffa4     ]:= tc_lime  +'FFA(4)'      +tc_default;
+   str_map_ScenarioL[mc_ffa5     ]:= tc_lime  +'FFA(5)'      +tc_default;
+   str_map_ScenarioL[mc_ffa6     ]:= tc_lime  +'FFA(6)'      +tc_default;
+   str_map_ScenarioL[mc_ffa7     ]:= tc_lime  +'FFA(7)'      +tc_default;
+   str_map_ScenarioL[mc_ffa8     ]:= tc_lime  +'FFA(8)'      +tc_default;
+   str_map_ScenarioL[mc_1x1      ]:= tc_yellow+'1x1'         +tc_default;
+   str_map_ScenarioL[mc_2x2      ]:= tc_yellow+'2x2'         +tc_default;
+   str_map_ScenarioL[mc_3x3      ]:= tc_yellow+'3x3'         +tc_default;
+   str_map_ScenarioL[mc_4x4      ]:= tc_yellow+'4x4'         +tc_default;
+   str_map_ScenarioL[mc_2x2x2    ]:= tc_orange+'2x2x2'       +tc_default;
+   str_map_ScenarioL[mc_2x2x2x2  ]:= tc_orange+'2x2x2x2'     +tc_default;
+   str_map_ScenarioL[mc_KeyPoints]:= tc_aqua  +'Key points'  +tc_default;
+   str_map_ScenarioL[mc_KotH     ]:= tc_aqua  +'KotH'        +tc_default;
+   str_map_ScenarioL[mc_royale   ]:= tc_red   +'Royal Battle'+tc_default;
    for i:=0 to mc_Last do
    str_replay_ScenarioL[i]:=RemoveSpecChars(str_map_ScenarioL[i]);
    str_map_Generators            := 'Generators';
@@ -1018,8 +1018,8 @@ begin
    str_race[r_random]            := tc_default+'RANDOM'+tc_default;
    str_race[r_hell  ]            := tc_orange +'HELL'  +tc_default;
    str_race[r_uac   ]            := tc_lime   +'UAC'   +tc_default;
-
    str_observer                  := 'OBSERVER';
+
    str_Players                   := 'Players';
    str_all                       := 'All';
 
@@ -1031,9 +1031,10 @@ begin
 
    str_gstat_Win                 := 'VICTORY!';
    str_gstat_Lose                := 'DEFEAT!';
-   str_gstat_Paused              := 'Paused by ';
+   str_gstat_GamePaused          := 'Paused by ';
    str_gstat_ReplayEnd           := 'Replay ended!';
    str_gstat_ReplayError         := 'Read file error!';
+   str_gstat_ReplayPaused        := 'Playback paused';
    str_gstat_WaitForServer       := 'Awaiting server...';
    str_gstat_Unknown             := 'Unknown status!';
 
@@ -1049,45 +1050,8 @@ begin
    str_gmsg_ServerFull           := 'Server full!';
    str_gmsg_GameStarted          := 'Game started!';
    str_gmsg_RecordStart          := 'Start recording: ';
+   str_gmsg_RecordError          := 'Recording error: ';
    str_gmsg_RecordStop           := 'Stop recording: ';
-
-   str_ui_time                   := 'Time: ';
-   str_ui_menu                   := 'Menu';
-   str_ui_UnitGroups             := 'Unit groups: ';
-   str_ui_KothTime               := 'Center capture time left: ';
-   str_ui_KotHTime_act           := 'Time left until center area is active: ';
-   str_ui_KotHWinner             := ' is King of the Hill!';
-   str_ui_ChatAll                := 'ALL:';
-   str_ui_ChatAllies             := 'ALLIES:';
-   str_ui_Tab[tab_Buildings]     := 'Buildings';
-   str_ui_Tab[tab_Units    ]     := 'Units';
-   str_ui_Tab[tab_Upgrades ]     := 'Researches';
-   str_ui_Tab[tab_Controls ]     := 'Controls';
-   str_ui_army                   := 'Army: ';
-   str_ui_energy                 := 'Energy: ';
-
-   str_hint_menu                 := 'Menu (' +tc_lime+'Esc'+tc_default+')';
-   str_hint_pause                := 'Pause ('+tc_lime+'Pause/Break'+tc_default+')';
-   str_hint_requirements         := 'Requirements: ';
-   str_hint_req                  := 'Req.: ';
-   str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
-   str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
-   str_hint_Ability              := 'Special ability: ';
-   str_hint_TransformTo          := 'transformation to ';
-   str_hint_UpgradesLvl          := 'Upgrades: ';
-   str_hint_Demons               := 'demons&zombies';
-   str_hint_Except               := 'except';
-   str_hint_SplashResist         := 'Immune to splash damage';
-   str_hint_TargetLimit          := 'target limit';
-   str_hint_builder              := 'Builder';
-   str_hint_barrack              := 'Unit production';
-   str_hint_smith                := 'Researches and upgrades facility';
-   str_hint_IncEnergyLevel       := 'Increase energy level';
-   str_hint_CanRebuildTo         := 'Can be rebuilt into ';
-   str_hint_UnitArming           := 'Arming/Abilities: ';
-   str_hint_hits                 := 'Hits: ';
-   str_hint_SightR               := 'sight range';
-   str_hint_BaseSightR           := 'Base '+str_hint_SightR+': ';
 
    str_warn_AbilityBadPlace      := 'Invalid landing/teleporting location';
    str_warn_prod_BadPlace        := 'Invalid building location';
@@ -1117,6 +1081,48 @@ begin
    str_warn_Invalid_Target       := 'Invalid target';
    str_warn_Invalid_Order        := 'Invalid order';
    str_warn_AbilityReload        :='The ability is on cooldown!' ;
+
+   str_ui_time                   := 'Time: ';
+   str_ui_menu                   := 'Menu';
+   str_ui_UnitGroups             := 'Unit groups: ';
+   str_ui_KothTime               := 'Center capture time left: ';
+   str_ui_KotHTime_act           := 'Time left until center area is active: ';
+   str_ui_KotHWinner             := ' is King of the Hill!';
+   str_ui_ChatAll                := 'ALL:';
+   str_ui_ChatAllies             := 'ALLIES:';
+   str_ui_Tab[tab_Buildings]     := 'Buildings';
+   str_ui_Tab[tab_Units    ]     := 'Units';
+   str_ui_Tab[tab_Upgrades ]     := 'Researches';
+   str_ui_Tab[tab_Controls ]     := 'Controls';
+   str_ui_army                   := 'Army: ';
+   str_ui_energy                 := 'Energy: ';
+   str_ui_objectives             := 'Objectives:';
+
+   str_objective_Scirmish        := '-Destroy all enemy players';
+   str_objective_RoyalBattle     := '-Stay alive';
+   str_objective_KotH            := '-Keep central area';
+   str_objective_KeyPoints       := '-Capture 4 key points';
+
+   str_hint_requirements         := 'Requirements: ';
+   str_hint_req                  := 'Req.: ';
+   str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
+   str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
+   str_hint_Ability              := 'Special ability: ';
+   str_hint_TransformTo          := 'transformation to ';
+   str_hint_UpgradesLvl          := 'Upgrades: ';
+   str_hint_Demons               := 'demons&zombies';
+   str_hint_Except               := 'except';
+   str_hint_SplashResist         := 'Immune to splash damage';
+   str_hint_TargetLimit          := 'target limit';
+   str_hint_builder              := 'Builder';
+   str_hint_barrack              := 'Unit production';
+   str_hint_smith                := 'Researches and upgrades facility';
+   str_hint_IncEnergyLevel       := 'Increase energy level';
+   str_hint_CanRebuildTo         := 'Can be rebuilt into ';
+   str_hint_UnitArming           := 'Arming/Abilities: ';
+   str_hint_hits                 := 'Hits: ';
+   str_hint_SightR               := 'sight range';
+   str_hint_BaseSightR           := 'Base '+str_hint_SightR+': ';
 
    str_attr_alive                := tc_lime  +'alive'       ;
    str_attr_dead                 := tc_dgray +'dead'        ;
@@ -1347,6 +1353,9 @@ begin
    str_MakeActionHint(iAct_Control_UDestroy   ,'Destroy');
    str_MakeActionHint(iAct_Control_USelArmy   ,'Select all battle units');
 
+   str_MakeActionHint(iAct_InGamePause        ,'Pause');
+   str_MakeActionHint(iAct_InGameMenu         ,'Menu' );
+
    str_MakeActionHint(iAct_Replay_Fast        ,'Faster game speed');
    str_MakeActionHint(iAct_Replay_Pause       ,'Pause');
    str_MakeActionHint(iAct_Replay_Back2       ,'Rewind 2 seconds');
@@ -1574,21 +1583,21 @@ begin
   str_map_Random        := 'Случайная карта';
 
   str_map_Scenario              := 'Сценарий';
-  str_map_ScenarioL[mc_ffa3    ]:= tc_lime  +'Схватка(3)'       +tc_default;
-  str_map_ScenarioL[mc_ffa4    ]:= tc_lime  +'Схватка(4)'       +tc_default;
-  str_map_ScenarioL[mc_ffa5    ]:= tc_lime  +'Схватка(5)'       +tc_default;
-  str_map_ScenarioL[mc_ffa6    ]:= tc_lime  +'Схватка(6)'       +tc_default;
-  str_map_ScenarioL[mc_ffa7    ]:= tc_lime  +'Схватка(7)'       +tc_default;
-  str_map_ScenarioL[mc_ffa8    ]:= tc_lime  +'Схватка(8)'       +tc_default;
-  str_map_ScenarioL[mc_1x1     ]:= tc_yellow+'1x1'              +tc_default;
-  str_map_ScenarioL[mc_2x2     ]:= tc_yellow+'2x2'              +tc_default;
-  str_map_ScenarioL[mc_3x3     ]:= tc_yellow+'3x3'              +tc_default;
-  str_map_ScenarioL[mc_4x4     ]:= tc_yellow+'4x4'              +tc_default;
-  str_map_ScenarioL[mc_2x2x2   ]:= tc_orange+'2x2x2'            +tc_default;
-  str_map_ScenarioL[mc_2x2x2x2 ]:= tc_orange+'2x2x2x2'          +tc_default;
-  str_map_ScenarioL[mc_capture ]:= tc_aqua  +'Захват точек'     +tc_default;
-  str_map_ScenarioL[mc_KotH    ]:= tc_aqua  +'Царь горы'        +tc_default;
-  str_map_ScenarioL[mc_royale  ]:= tc_red   +'Королевская битва'+tc_default;
+  str_map_ScenarioL[mc_ffa3     ]:= tc_lime  +'Схватка(3)'       +tc_default;
+  str_map_ScenarioL[mc_ffa4     ]:= tc_lime  +'Схватка(4)'       +tc_default;
+  str_map_ScenarioL[mc_ffa5     ]:= tc_lime  +'Схватка(5)'       +tc_default;
+  str_map_ScenarioL[mc_ffa6     ]:= tc_lime  +'Схватка(6)'       +tc_default;
+  str_map_ScenarioL[mc_ffa7     ]:= tc_lime  +'Схватка(7)'       +tc_default;
+  str_map_ScenarioL[mc_ffa8     ]:= tc_lime  +'Схватка(8)'       +tc_default;
+  str_map_ScenarioL[mc_1x1      ]:= tc_yellow+'1x1'              +tc_default;
+  str_map_ScenarioL[mc_2x2      ]:= tc_yellow+'2x2'              +tc_default;
+  str_map_ScenarioL[mc_3x3      ]:= tc_yellow+'3x3'              +tc_default;
+  str_map_ScenarioL[mc_4x4      ]:= tc_yellow+'4x4'              +tc_default;
+  str_map_ScenarioL[mc_2x2x2    ]:= tc_orange+'2x2x2'            +tc_default;
+  str_map_ScenarioL[mc_2x2x2x2  ]:= tc_orange+'2x2x2x2'          +tc_default;
+  str_map_ScenarioL[mc_KeyPoints]:= tc_aqua  +'Захват точек'     +tc_default;
+  str_map_ScenarioL[mc_KotH     ]:= tc_aqua  +'Царь горы'        +tc_default;
+  str_map_ScenarioL[mc_royale   ]:= tc_red   +'Королевская битва'+tc_default;
 
   str_map_Generators            := 'Генераторы';
   str_map_GeneratorsL[0]        := 'свои';
@@ -1617,7 +1626,7 @@ begin
 
   str_race[r_random]    := tc_white+'ЛЮБАЯ'  +tc_default;
   str_observer          := 'ЗРИТЕЛЬ';
-  str_gstat_Paused             := 'Пауза';
+  str_gstat_GamePaused             := 'Пауза';
   str_gstat_Win               := 'ПОБЕДА!';
   str_gstat_Lose              := 'ПОРАЖЕНИЕ!';
   str_gstat_Unknown         := 'Неизвестный статус!';
@@ -1789,9 +1798,6 @@ begin
   str_ui_Tab[1]         := 'Юниты';
   str_ui_Tab[2]         := 'Исследования';
   str_ui_Tab[3]         := 'Запись';
-
-  str_hint_menu         := 'Меню (' +tc_lime+'Esc'        +tc_default+')';
-  str_hint_pause         := 'Пауза ('+tc_lime+'Pause/Break'+tc_default+')';
 
   str_ui_army         := 'Армия: ';
   str_ui_energy       := 'Энергия: ';

@@ -1077,7 +1077,7 @@ var w:integer;
    tu:PTUnit;
 begin
    if(map_scenario=mc_KotH    )
-   or(map_scenario=mc_capture )
+   or(map_scenario=mc_KeyPoints)
    or(map_scenario=mc_royale  )then exit;
 
    with pu^ do

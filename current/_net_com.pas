@@ -72,28 +72,31 @@ end;
 
 // READ   //////////////////////////////////////////////////////////////////
 
-procedure net_buff(w:boolean;vs:integer;p:pointer);
+function net_BufferBlock(wrt:boolean;count:integer;pResult:pointer):boolean;
 begin
-   if(net_bufpos>MaxNetBuffer)then exit;
-   if((MaxNetBuffer-net_bufpos)<vs)then exit;
-   if(w=false)and((net_buffer^.len-net_bufpos)<vs)then exit;
+   net_BufferBlock:=false;
+   if(net_bufpos>=MaxNetBuffer)then exit;
+   if((MaxNetBuffer-net_bufpos)<count)then exit;
+   if(not wrt)then
+     if((net_buffer^.len-net_bufpos)<count)then exit;
 
-   if(w)
-   then move(p^,(net_buffer^.data+net_bufpos)^,     vs)
-   else move(   (net_buffer^.data+net_bufpos)^, p^, vs);
-   inc(net_bufpos,vs);
+   net_BufferBlock:=true;
+   if(wrt)
+   then move(pResult^,(net_buffer^.data+net_bufpos)^, count)
+   else move((net_buffer^.data+net_bufpos)^, pResult^,count);
+   net_bufpos+=count;
 end;
 
 function net_readbyte:byte;
 begin
    net_readbyte:=0;
-   net_buff(false,SizeOf(net_readbyte),@net_readbyte);
+   net_BufferBlock(false,SizeOf(net_readbyte),@net_readbyte);
 end;
 
 function net_readsint:shortint;
 begin
    net_readsint:=0;
-   net_buff(false,SizeOf(net_readsint),@net_readsint);
+   net_BufferBlock(false,SizeOf(net_readsint),@net_readsint);
 end;
 
 function net_readchar:char;
@@ -109,25 +112,25 @@ end;
 function net_readint:integer;
 begin
    net_readint:=0;
-   net_buff(false,SizeOf(net_readint),@net_readint);
+   net_BufferBlock(false,SizeOf(net_readint),@net_readint);
 end;
 
 function net_readword:word;
 begin
    net_readword:=0;
-   net_buff(false,SizeOf(net_readword),@net_readword);
+   net_BufferBlock(false,SizeOf(net_readword),@net_readword);
 end;
 
 function net_readcard:cardinal;
 begin
    net_readcard:=0;
-   net_buff(false,SizeOf(net_readcard),@net_readcard);
+   net_BufferBlock(false,SizeOf(net_readcard),@net_readcard);
 end;
 
 function net_readsingle:single;
 begin
    net_readsingle:=0;
-   net_buff(false,SizeOf(net_readsingle),@net_readsingle);
+   net_BufferBlock(false,SizeOf(net_readsingle),@net_readsingle);
 end;
 
 function net_readstring:shortstring;
@@ -146,14 +149,14 @@ end;
 
 // WRITE       /////////////////////////////////////////////////////////////////
 
-procedure net_writebyte  (b:byte    );begin net_buff(true,SizeOf(b),@b);end;
-procedure net_writesint  (b:shortint);begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writebyte  (b:byte    );begin net_BufferBlock(true,SizeOf(b),@b);end;
+procedure net_writesint  (b:shortint);begin net_BufferBlock(true,SizeOf(b),@b);end;
 procedure net_writechar  (b:char    );begin net_writebyte(ord (b));end;
 procedure net_writebool  (b:boolean );begin net_writebyte(byte(b));end;
-procedure net_writeint   (b:integer );begin net_buff(true,SizeOf(b),@b);end;
-procedure net_writeword  (b:word    );begin net_buff(true,SizeOf(b),@b);end;
-procedure net_writecard  (b:cardinal);begin net_buff(true,SizeOf(b),@b);end;
-procedure net_writesingle(b:single  );begin net_buff(true,SizeOf(b),@b);end;
+procedure net_writeint   (b:integer );begin net_BufferBlock(true,SizeOf(b),@b);end;
+procedure net_writeword  (b:word    );begin net_BufferBlock(true,SizeOf(b),@b);end;
+procedure net_writecard  (b:cardinal);begin net_BufferBlock(true,SizeOf(b),@b);end;
+procedure net_writesingle(b:single  );begin net_BufferBlock(true,SizeOf(b),@b);end;
 
 procedure net_writestring(s:shortstring);
 var sl,x:byte;

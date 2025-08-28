@@ -13,7 +13,7 @@ begin
 
    if(length(rpls_list[rpls_list_sel])=0)then exit;
 
-   fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
+   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
    if(not FileExists(fn))then
    begin
       rpls_str_info1:=str_FileError_NExists;
@@ -49,6 +49,39 @@ begin
    close(f);
 end;
 
+procedure replay_WriteBlock(count:cardinal;pData:pointer);
+begin
+   if(rpls_file_LastErr<>0)then exit;
+   rpls_file_LastErr:=0;
+   IOResult;
+   {$I-}
+   BlockWrite(rpls_file,pData^,count);
+   {$I+}
+   rpls_file_LastErr:=IOResult;
+   if(rpls_file_LastErr<>0)then exit;
+
+   rpls_file_pos+=count;
+end;
+
+function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;
+begin
+   replay_ReadBlock:=false;
+   if(rpls_file_pos>=rpls_file_Size)then exit;
+   if((rpls_file_Size-rpls_file_pos)<count)then exit;
+   if(rpls_file_LastErr<>0)then exit;
+
+   rpls_file_LastErr:=0;
+   IOResult;
+   {$I-}
+   BlockRead(rpls_file,byte(pResult^),count);
+   {$I+}
+   rpls_file_LastErr:=IOResult;
+   if(rpls_file_LastErr<>0)then exit;
+
+   rpls_file_pos+=count;
+   replay_ReadBlock:=true;
+end;
+
 procedure replay_MakeReplayHeaderData;
 var p:byte;
 procedure AddItem(pdata:pointer;sdata:cardinal);
@@ -72,7 +105,7 @@ begin
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
    AddItem(@map_Size            ,SizeOf(map_Size         ));
-   AddItem(@map_ObstaclesF       ,SizeOf(map_ObstaclesF    ));
+   AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
@@ -99,13 +132,18 @@ begin
 
    if(rpls_pstate=rpls_read)and(rpls_fstate=rpls_read)and(rpls_file_size>0)then
    begin
-      replay_GetProgress:=FilePos(rpls_file)/rpls_file_size;
+      {$I-}
+      if(rpls_file_pos>=rpls_file_size)
+      then replay_GetProgress:=1
+      else replay_GetProgress:=rpls_file_pos/rpls_file_size;
+      {$I+}
       if(replay_GetProgress>1)then replay_GetProgress:=1;
       if(replay_GetProgress<0)then replay_GetProgress:=0;
    end;
 end;
 
 procedure replay_SavePlayPosition;
+var fpos:int64;
 begin
    if(rpls_fstate<>rpls_read)
    or(rpls_pstate<>rpls_read)then exit;
@@ -117,15 +155,21 @@ begin
         if((g_tick -rp_gtick)<fr_fps2)then exit;
      end;
 
+   IOResult;
+   {$I-}
+   fpos:=FilePos(rpls_file);
+   {$I+}
+   if(IOResult<>0)then exit;
+
    rpls_ReadPosN+=1;
    setlength(rpls_ReadPosL,rpls_ReadPosN);
    with rpls_ReadPosL[rpls_ReadPosN-1] do
    begin
       rp_gtick:=g_tick;
-      rp_fpos :=FilePos(rpls_file);
+      rp_fpos :=fpos;
    end;
 end;
-function replay_SetPlayPosition(timetick,mindist:int64):boolean;
+function replay_SetPlayPosition(target_Tick,minGap:int64;check:boolean):boolean;
 var ni,i :cardinal;
     vi,vt:int64;
 begin
@@ -134,22 +178,31 @@ begin
    or(rpls_fstate<>rpls_read)
    or(rpls_pstate<>rpls_read)then exit;
 
-   if(timetick<g_Tick)then
+   if(target_Tick<g_Tick)then
    begin
       with rpls_ReadPosL[0] do
-        if(timetick<rp_gtick)then timetick:=rp_gtick;
+        if(target_Tick<rp_gtick)then target_Tick:=rp_gtick;
       with rpls_ReadPosL[rpls_ReadPosN-1] do
-        if(rp_gtick<timetick)then timetick:=rp_gtick;
+        if(rp_gtick<target_Tick)then target_Tick:=rp_gtick;
+   end
+   else
+     if(g_Tick<target_Tick)then
+       if(rpls_file_pos>=rpls_file_size)then exit;
+
+   if(check)then
+   begin
+      replay_SetPlayPosition:=true;
+      exit;
    end;
 
    ni:=cardinal.MaxValue;
    vi:=0;
    for i:=0 to rpls_ReadPosN-1 do
      with rpls_ReadPosL[i] do
-       if(rp_gtick<=timetick)then
+       if(rp_gtick<=target_Tick)then
        begin
-          vt:=abs(rp_gtick-timetick);
-          if(mindist<0)or(vt<=mindist)then
+          vt:=abs(rp_gtick-target_Tick);
+          if(minGap<0)or(vt<=minGap)then
             if(vt<vi)or(ni=cardinal.MaxValue)then
             begin
                ni:=i;
@@ -157,14 +210,31 @@ begin
             end;
        end;
 
-   if(ni=cardinal.MaxValue)then exit;
+   if(ni=cardinal.MaxValue)then
+   begin
+      if(target_Tick>g_Tick)then
+      begin
+         vi:=(target_Tick-g_Tick) div 2;
+         if(vi>rpls_ForwardSkip.MaxValue)
+         then rpls_ForwardSkip:=rpls_ForwardSkip.MaxValue
+         else rpls_ForwardSkip:=integer(vi);
+      end;
+      exit;
+   end;
 
    replay_SetPlayPosition:=true;
 
    with rpls_ReadPosL[ni] do
    begin
-      g_tick:=rp_gtick;
+      IOResult;
+      {$I-}
       Seek(rpls_file,rp_fpos);
+      {$I+}
+
+      if(IOResult<>0)then exit;
+
+      g_tick:=rp_gtick;
+      rpls_file_pos:=rp_fpos;
    end;
    rpls_ForwardSkip:=2;
    for i:=1 to MaxUnits do
@@ -185,7 +255,9 @@ begin
    if(rpls_fstate>rpls_none)then
    begin
       close(rpls_file);
-      rpls_fstate:=rpls_none;
+      rpls_fstate   :=rpls_none;
+      rpls_file_Pos :=0;
+      rpls_file_Size:=0;
    end;
    rpls_str_path:='';
    rpls_pstate  :=rpls_none;
@@ -199,7 +271,7 @@ var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=str_f_rpls+rpls_NamePrefix+'_'+str_replay_ScenarioL[map_scenario]+'_'+str_DateTime+str_e_rpls;
+   rpls_str_path:=folder_replay+rpls_NamePrefix+'_'+str_replay_ScenarioL[map_scenario]+'_'+str_DateTime+fileExt_Replay;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -213,28 +285,30 @@ begin
    end
    else
    begin
+      rpls_file_Pos :=0;
+      rpls_file_Size:=0;
+      rpls_file_LastErr:=0;
+
       rpls_fstate :=rpls_write;
       rpls_pstate :=rpls_write;
       rpls_u      :=0;
       rpls_player :=LocalPlayer;
       rpls_log_c  :=0;
-      rpls_POVRecorder:=false;
       rpls_ticks  :=0;
+      rpls_POVRecorder:=false;
 
-      {$I-}
       if(rpls_head_itemn>0)then
         for p:=0 to rpls_head_itemn-1 do
           with rpls_head_items[p] do
-            BlockWrite(rpls_file,data_p^,data_s);
-      {$I+}
+            replay_WriteBlock(data_s,data_p);
 
-      if(ioresult<>0)then
+      if(rpls_file_LastErr<>0)then
       begin
          replay_Abort;
          rpls_pstate:=rpls_none;
-      end;
-
-      GameLogCommon(0,255,str_gmsg_RecordStart+rpls_str_path);
+         GameLogCommon(0,255,str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS);
+      end
+      else GameLogCommon(0,255,str_gmsg_RecordStart+rpls_str_path);
    end;
 end;
 
@@ -256,27 +330,24 @@ begin
 
    if((i and %11000000)>0)or(gs=gs_running)then
    begin
-      {$I-}
-      BlockWrite(rpls_file,i,sizeof(i));
-      {$I+}
+      wudata_byte(i,true);
       if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_c,true);
       if((i and %01000000)>0)then
       begin
          rpls_vidx:=camx;
          rpls_vidy:=camy;
-         {$I-}
-         BlockWrite(rpls_file,rpls_vidx,sizeof(rpls_vidx));
-         BlockWrite(rpls_file,rpls_vidy,sizeof(rpls_vidy));
-         {$I+}
+         wudata_byte(rpls_vidx,true);
+         wudata_byte(rpls_vidy,true);
       end;
 
       if(gs=gs_running)then wclinet_gframe(rpls_player,true);
    end;
 
-   if(ioresult<>0)then
+   if(rpls_file_LastErr<>0)then
    begin
       replay_Abort;
       rpls_pstate:=rpls_none;
+      GameLogCommon(0,255,str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS);
    end;
 end;
 
@@ -295,7 +366,7 @@ begin
       exit;
    end;
 
-   rpls_str_path:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
+   rpls_str_path:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
 
    if(not FileExists(rpls_str_path))then
    begin
@@ -315,31 +386,34 @@ begin
    begin
       replay_Abort;
       g_started     :=false;
+      menu_page     :=mi_replays;
       rpls_str_info1:=str_FileError_Open;
       rpls_str_info2:='';
    end
    else
    begin
+      rpls_file_LastErr:=0;
+      rpls_file_pos :=0;
       rpls_file_size:=FileSize(rpls_file);
 
       if(rpls_file_size<rpls_file_head_size)then
       begin
          replay_Abort;
          g_started     :=false;
+         menu_page     :=mi_replays;
          rpls_str_info1:=str_FileError_WData;
          rpls_str_info2:='';
          exit;
       end;
 
       i:=0;
-      {$I-}
-      BlockRead(rpls_file,i,SizeOf(g_version));
-      {$I+}
+      replay_ReadBlock(rpls_head_items[0].data_s,@i);
 
       if(i<>g_version)then
       begin
          replay_Abort;
          g_started     :=false;
+         menu_page     :=mi_replays;
          rpls_str_info1:=str_FileError_WVer;
          rpls_str_info2:='';
       end
@@ -347,17 +421,17 @@ begin
       begin
          GameDefaultAll;
 
-         {$I-}
          if(rpls_head_itemn>1)then
           for p:=1 to rpls_head_itemn-1 do
            with rpls_head_items[p] do
-            BlockRead(rpls_file,byte(data_p^),data_s);
-         {$I+}
+            replay_ReadBlock(data_s,data_p);
 
-         if(ioresult<>0)then
+         if(rpls_file_LastErr<>0)then
          begin
             replay_Abort;
-            rpls_str_info1:=str_FileError_WVer;
+            g_started     :=false;
+            menu_page     :=mi_replays;
+            rpls_str_info1:=str_FileError_WVer+rpls_file_LastErrS;
             rpls_str_info2:='';
             GameDefaultAll;
             exit;
@@ -370,7 +444,8 @@ begin
          or(rpls_player>LastPlayer)then
          begin
             replay_Abort;
-            g_started:=false;
+            g_started     :=false;
+            menu_page     :=mi_replays;
             rpls_str_info1:=str_FileError_WVer;
             rpls_str_info2:='';
             GameDefaultAll;
@@ -386,6 +461,8 @@ begin
              or(team >LastPlayer)then
              begin
                 replay_Abort;
+                g_started     :=false;
+                menu_page     :=mi_replays;
                 rpls_str_info1:=str_FileError_WVer;
                 rpls_str_info2:='';
                 GameDefaultAll;
@@ -420,24 +497,23 @@ procedure replay_ReadGameFrame;
 var
 i,gs: byte;
 begin
-   if(eof(rpls_file))then
+   if(rpls_file_pos>=rpls_file_size)then
    begin
       G_Status        :=gs_replayend;
       sys_uncappedFPS :=false;
       rpls_ForwardSkip:=0;
-      ioresult; // clear error
       exit;
    end;
 
-   if(ioresult<>0)then
+   if(rpls_file_LastErr<>0)then
    begin
-      replay_Abort;
-      G_Status   :=gs_replayerror;
-      sys_uncappedFPS:=false;
+      rpls_file_LastErrS:='('+w2s(rpls_file_LastErr)+')';
+      G_Status        :=gs_replayerror;
+      sys_uncappedFPS :=false;
+      rpls_ForwardSkip:=0;
       exit;
    end;
 
-   //gs_replaypause
    gs:=G_Status;
    if(rpls_ForwardSkip>1)then rpls_FastSkip:=true;
    if(rpls_ForwardSkip<=0)and(G_Status=gs_running)and(not MainMenu)then rpls_ForwardSkip:=1;
@@ -445,19 +521,14 @@ begin
    begin
       replay_SavePlayPosition;
 
-      i:=0;
-      {$I-}
-      BlockRead(rpls_file,i,SizeOf(i));
-      {$I+}
+      i:=rudata_byte(true,0);
       G_Status:=i and %00111111;
 
       if((i and %10000000)>0)then rudata_log(rpls_player,true);
       if((i and %01000000)>0)then
       begin
-         {$I-}
-         BlockRead(rpls_file,rpls_vidx,sizeof(rpls_vidx));
-         BlockRead(rpls_file,rpls_vidy,sizeof(rpls_vidy));
-         {$I+}
+         rpls_vidx:=rudata_byte(true,0);
+         rpls_vidy:=rudata_byte(true,0);
       end;
 
       if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_FastSkip);
@@ -531,10 +602,10 @@ begin
    rpls_list_scroll:=0;
    rpls_list_size  :=0;
    setlength(rpls_list,0);
-   if(FindFirst(str_f_rpls+'*'+str_e_rpls,faReadonly,info)=0)then
+   if(FindFirst(folder_replay+'*'+fileExt_Replay,faReadonly,info)=0)then
      repeat
         s:=info.Name;
-        delete(s,length(s)-(length(str_e_rpls)-1),length(str_e_rpls));
+        delete(s,length(s)-(length(fileExt_Replay)-1),length(fileExt_Replay));
         if(length(s)>0)then
         begin
            rpls_list_size+=1;
@@ -577,10 +648,12 @@ begin
    replay_Delete:=true;
    if(check)then exit;
 
-   fn:=str_f_rpls+rpls_list[rpls_list_sel]+str_e_rpls;
+   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
+      if(rpls_list_size>1)then
+        if(rpls_list_sel=(rpls_list_size-1))then rpls_list_sel-=1;
       replay_MakeFolderList;
    end;
 end;
@@ -612,5 +685,6 @@ begin
         rpls_ForwardSkip:=0;
      end;
 end;
+
 
 

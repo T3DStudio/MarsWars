@@ -313,7 +313,7 @@ begin
    uid_MaxHits1     := 4000;
    uid_EnergyReq   := 400;
    uid_r         := 20;
-   uid_SightR    := 300;
+   uid_SightR    := 350;
    uid_class       := 7;
    uid_ProdTimeSec     := ptime2;
    uid_req_uid1     := UID_HFortress;
@@ -326,7 +326,6 @@ begin
    uid_upgr_SightR     :=upgr_hell_TowerR;
    uid_SightRUpgrStep:=25;
    uid_rebuild_uid :=UID_HTower;
-   uid_arms_BonusAntiUnitRange:=50;
    _weapon(0,wpt_missle,aw_fsr,0,0,fr_fps2,MID_ArchFire,0,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,wtp_hits,0,0);
 end;
 UID_HEyeNest:
@@ -614,9 +613,8 @@ begin
    uid_LimitUse  := ul4;
    uid_CanAttack    := true;
    uid_uklight   := true;
-   uid_arms_BonusAntiUnitRange:=50;
    _weapon(0,wpt_resurect,aw_dmelee,0,3  ,fr_fpsh,0           ,0,upgr_hell_Resurrect,1,0,0,wtrset_resurect   ,wpr_any,uids_arch_res,[             ],0,0,wtp_distance   ,0,0);
-   _weapon(1,wpt_missle  ,aw_fsr   ,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
+   _weapon(1,wpt_missle  ,aw_fsr+50,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,wtp_nolost_hits,0,0);
 end;
 
 UID_Phantom,

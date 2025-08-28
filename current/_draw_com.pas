@@ -67,45 +67,21 @@ begin
    lines_epos:='';
    lines_endc:='';
    lines_len :='';
-   if(alignment=ta_chat)then
-   begin
-      if(strLen>MaxLineChars)then
-      begin
-         lines_spos:=chr(strLen-MaxLineChars);
-         lines_epos:=chr(strLen);
-         lines_len :=chr(MaxLineChars);
-         textW:=MaxLineChars*font_w1;
-      end
-      else
-      begin
-         lines_spos:=#1;
-         lines_epos:=chr(strLen);
-         lines_len :=chr(strLen);
-         textW:=strLen*font_w1;
-      end;
-      lines_endc:=#0;
-      lines_n:=1;
-      textH:=font_w1;
-      ix:=x;
-      y :=y-font_w1;
-   end
-   else
-   begin
-      textW:=0;
-      textH:=0;
-      str_analize(@str,@lines_spos,@lines_epos,@lines_endc,@lines_len,@textH,@lines_n,nil,MaxLineChars);
 
-      case alignment of
-      ta_LU,
-      ta_MU,
-      ta_RU  : ;
-      ta_LM,
-      ta_MM,
-      ta_RM  : y-=(textH div 2);
-      ta_LB,
-      ta_MB,
-      ta_RB  : y-= textH;
-      end;
+   textW:=0;
+   textH:=0;
+   str_analize(@str,@lines_spos,@lines_epos,@lines_endc,@lines_len,@textH,@lines_n,nil,MaxLineChars);
+
+   case alignment of
+   ta_LU,
+   ta_MU,
+   ta_RU  : ;
+   ta_LM,
+   ta_MM,
+   ta_RM  : y-=(textH div 2);
+   ta_LB,
+   ta_MB,
+   ta_RB  : y-= textH;
    end;
 
    color:=BaseColor;
@@ -239,13 +215,13 @@ begin
    sdl_FillRect(ui_minimap,nil,0);
    map_MinimapUpdateBackground;
    draw_sdlsurface(ui_minimap ,0,0,ui_bminimap);
-   draw_sdlsurface(ui_mminimap,0,0,ui_minimap);
+   draw_sdlsurface(ui_mminimap,0,0,ui_minimap );
    map_MinimapPlayerStarts(ui_mminimap);
    map_MinimapKeyPoints   (ui_mminimap);
    menu_update:=menu_update or MainMenu;
 end;
 
-procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;ta:byte;str:shortstring;color:cardinal);
+procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;talign,tlength:byte;str:shortstring;color:cardinal;lastLineY:pinteger=nil);
 var m,s,h:cardinal;
     hs,ms,ss:shortstring;
 begin
@@ -262,7 +238,7 @@ begin
    if(m<10)then ms:='0'+c2s(m) else ms:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
    str:=str+ms+':'+ss;
-   draw_text(tar,x,y,str,ta,255,color);
+   draw_text(tar,x,y,str,talign,tlength,color,lastLineY);
 end;
 
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;

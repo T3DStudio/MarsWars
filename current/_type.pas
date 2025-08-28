@@ -141,13 +141,14 @@ TSoundSet = record
    sndps: integer;
 end;
 PTSoundSet = ^TSoundSet;
+PPTSoundSet = ^PTSoundSet;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   OTHER
 //
 
-TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_CtrlPanel);
+TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_CtrlPanel,mf_MenuPause);
 
 TTabControlContent = (tcc_none=0,tcc_controls,tcc_observer,tcc_replay);
 
@@ -155,15 +156,17 @@ TInputKeyType = (ikt_keyboard=0,ikt_mouseb,ikt_mousew);
 
 TTabBTNClickType = (pct_Left=0,pct_Right,pct_DLeft);
 
+TActState = (as_off=0,as_disabled,as_enabled);
+
 TInputKey = record
-   ik_type  : TInputKeyType;
-   ik_value : cardinal;
+   ik_type   : TInputKeyType;
+   ik_value  : cardinal;
    ik_timer_twice,
    ik_timer_pressed
-            : integer;
-   ik_depend: byte;
-
-   ik_str_HK: shortstring;
+             : integer;
+   ik_astate : TActState;
+   ik_depend : byte;
+   ik_str_HK : shortstring;
 end;
 
 TReplayPos = record
@@ -177,9 +180,9 @@ TMenuItem = record
    mi_x1,
    mi_y1,
    mi_xc,
-   mi_yc   :integer;
-   mi_charw:byte;
-   mi_state:byte;
+   mi_yc   : integer;
+   mi_charw: byte;
+   mi_state: TActState;
 end;
 
 TMenuMessage = record
@@ -286,7 +289,7 @@ TMissile = record
    {$ENDIF}
 end;
 
-TWUDataTime  = array[1..MaxUnits] of cardinal;
+TWUDataTime  = array[1..MaxUnits    ] of cardinal;
 TWCPDataTime = array[0..LastKeyPoint] of byte;
 
 TUnitArms = record
@@ -420,7 +423,7 @@ TUID = record
    uid_BTNBig,
    uid_BTNSmall     : TMWTexture;
    {$IFDEF UNITDATA}
-   un_btn2      : TMWTexture;
+   un_btn2          : TMWTexture;
    {$ENDIF}
    uid_SpriteModel  : array[0..LastUnitLevel] of pTMWSModel;
 

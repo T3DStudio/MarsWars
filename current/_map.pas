@@ -323,20 +323,20 @@ begin
    KeyPoints_Clear;
 
    case map_scenario of
-mc_KotH   : with g_KeyPoints[0] do
-            begin
-               kpx:=map_hSize;
-               kpy:=map_hSize;
-               kpCaptureR   :=base_1r;
-               kpCaptureTime:=ptime3*fr_fps1;
+mc_KotH     : with g_KeyPoints[0] do
+              begin
+                 kpx:=map_hSize;
+                 kpy:=map_hSize;
+                 kpCaptureR   :=base_1r;
+                 kpCaptureTime:=ptime3*fr_fps1;
 
-               {$IFDEF _FULLGAME}
-               kpmmx:=round(kpx*map_mmcx);
-               kpmmy:=round(kpy*map_mmcx);
-               kpmmr:=round(kpCaptureR*map_mmcx)+1;
-               {$ENDIF}
-            end;
-mc_capture: map_KeyPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0);
+                 {$IFDEF _FULLGAME}
+                 kpmmx:=round(kpx*map_mmcx);
+                 kpmmy:=round(kpy*map_mmcx);
+                 kpmmr:=round(kpCaptureR*map_mmcx)+1;
+                 {$ENDIF}
+              end;
+mc_KeyPoints: map_KeyPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0);
    end;
 
    if(map_generators>0)then
@@ -541,17 +541,18 @@ end;
 //
 
 
-function map_TryAddObstacle(di:byte;ix,iy:integer;doodad_r:integer):boolean;
+function map_TryAddObstacle(di:byte;ix,iy:integer;obstacleGapR:integer):boolean;
 begin
-   if(map_IfSomethingHere(di,ix,iy,doodad_r+DID_R[di]))
-   then map_TryAddObstacle:=false
-   else
-   begin
-      map_addObstacle(ix,iy,di);
-      if(map_Symmetry)then
-        map_addObstacle(map_Size-ix,map_Size-iy,di);
-      map_TryAddObstacle:=true;
-   end;
+   map_TryAddObstacle:=false;
+   if (map_ObstaclesGap<(ix-DID_R[di]))and((ix+DID_R[di])<(map_size-map_ObstaclesGap))
+   and(map_ObstaclesGap<(iy-DID_R[di]))and((iy+DID_R[di])<(map_size-map_ObstaclesGap))then
+     if(not map_IfSomethingHere(di,ix,iy,obstacleGapR+DID_R[di]))then
+     begin
+        map_addObstacle(ix,iy,di);
+        if(map_Symmetry)then
+          map_addObstacle(map_Size-ix,map_Size-iy,di);
+        map_TryAddObstacle:=true;
+     end;
 end;
 
 function map_PickAndAddObstacle(ix,iy:integer;lqs,rks:pinteger;obstacleGapR:integer):boolean;

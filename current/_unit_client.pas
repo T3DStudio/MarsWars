@@ -8,97 +8,103 @@ kpdata_pmask  = %00001111;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-
-procedure wudata_string(s:shortstring;rpl:boolean);
-var sl,x:byte;
-       c:char;
-begin
-   if(rpl=false)
-   then net_writestring(s)
-   else
-   begin
-      sl:=length(s);
-      {$I-}
-      BlockWrite(rpls_file,sl,SizeOf(sl));
-      {$I+}
-      for x:=1 to sl do
-      begin
-         c:=s[x];
-         {$I-}
-         BlockWrite(rpls_file,c,SizeOf(c));
-         {$I+}
-      end;
-   end;
-end;
+//
+//   WRITE GAME DATA
+//
 
 procedure wudata_byte(bt:byte;rpl:boolean);
 begin
-   if(rpl=false)
-   then net_writebyte(bt)
-   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(SizeOf(bt),@bt);
+   {$ENDIF}
+   false: net_BufferBlock(true,SizeOf(bt),@bt);
+   end;
 end;
 
 procedure wudata_word(bt:word;rpl:boolean);
 begin
-   if(rpl=false)
-   then net_writeword(bt)
-   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(SizeOf(bt),@bt);
+   {$ENDIF}
+   false: net_BufferBlock(true,SizeOf(bt),@bt);
+   end;
 end;
 
 procedure wudata_sint(bt:shortint;rpl:boolean);
 begin
-   if(rpl=false)
-   then net_writesint(bt)
-   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(SizeOf(bt),@bt);
+   {$ENDIF}
+   false: net_BufferBlock(true,SizeOf(bt),@bt);
+   end;
 end;
 
 procedure wudata_int(bt:integer;rpl:boolean);
 begin
-   if(rpl=false)
-   then net_writeint(bt)
-   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(SizeOf(bt),@bt);
+   {$ENDIF}
+   false: net_BufferBlock(true,SizeOf(bt),@bt);
+   end;
 end;
 
 procedure wudata_card(bt:cardinal;rpl:boolean);
 begin
-   if(rpl=false)
-   then net_writecard(bt)
-   else begin {$I-} BlockWrite(rpls_file,bt,SizeOf(bt)); {$I+} end;
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(SizeOf(bt),@bt);
+   {$ENDIF}
+   false: net_BufferBlock(true,SizeOf(bt),@bt);
+   end;
 end;
 
-function wudata_log(p:byte;clog_n:pcardinal;rpl:boolean):boolean;
-var t,s:integer;
-      i:cardinal;
-      b:byte;
+procedure wudata_string(s:shortstring;rpl:boolean);
+begin
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(length(s)+1,@s);
+   {$ENDIF}
+   false: net_BufferBlock(true,length(s)+1,@s);
+   end;
+end;
+
+function wudata_log(p:byte;plog_n_cl:pcardinal;rpl:boolean):boolean;
+var
+t,s,
+i  :cardinal;
+b  :byte;
 begin
    wudata_log:=false;
    if(p<=LastPlayer)then
      with g_gplayers[p] do
      begin
         s:=0;
-
-        i:=log_i;
         if(not rpl)then
         begin
-           if(log_n<clog_n^)then
-             if(log_n=0)
-             then clog_n^:=0
-             else clog_n^:=log_n-1;
-           if(log_n>clog_n^)then
+           if(log_n<plog_n_cl^)then
            begin
-              s:=min3i(log_n,log_n-clog_n^,MaxPlayerLog);
-              clog_n^:=log_n;
+              plog_n_cl^:=log_n;
+              s:=1;
+           end;
+           if(log_n>plog_n_cl^)then
+           begin
+              s:=min3c(log_n,log_n-plog_n_cl^,MaxPlayerLog);
+              plog_n_cl^:=log_n;
            end;
         end
         else
         begin
-           s:=min2i(clog_n^,MaxPlayerLog);
-           clog_n^:=0;
+           s:=min2c(plog_n_cl^,MaxPlayerLog);
+           plog_n_cl^:=0;
         end;
 
+        //writeln(s,' ',log_n,plog_n_cl^);
+
+        i:=log_i;
         if(s>0)then
         begin
            if(s>1)then
@@ -133,7 +139,7 @@ begin
               else i+=1;
               s-=1;
            end;
-           if(not rpl)then wudata_card(clog_n^,rpl);
+           if(not rpl)then wudata_card(plog_n_cl^,rpl);
            wudata_log:=true;
            exit;
         end;
@@ -390,7 +396,6 @@ begin
 
      wudata_byte(b,rpl);
      wudata_reload(integer(kplifetime div 5),rpl);
-     writeln(kpi,' ',integer(kplifetime div 5));
    end;
 end;
 
@@ -446,7 +451,7 @@ begin
      with g_gplayers[POVPlayer] do wudata_reload(build_cd,rpl);
 
    if(wtickb0)then
-     if(map_scenario=mc_capture)
+     if(map_scenario=mc_KeyPoints)
      or(map_scenario=mc_KotH)
      or(map_generators>0)then
        for i:=0 to LastKeyPoint do
@@ -893,63 +898,66 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-function rudata_string(rpl:boolean):shortstring;
-var sl,x:byte;
-       c:char;
-begin
-   if(not rpl)
-   then rudata_string:=net_readstring
-   else
-   begin
-      sl:=0;
-      rudata_string:='';
-      {$I-}
-      BlockRead(rpls_file,sl,SizeOf(sl));
-      {$I+}
-      for x:=1 to sl do
-      begin
-         c:=#0;
-         {$I-}
-         BlockRead(rpls_file,c,SizeOf(c));
-         {$I+}
-         rudata_string:=rudata_string+c;
-      end;
-   end;
-end;
-
 function rudata_byte(rpl:boolean;def:byte):byte;
 begin
-   if(not rpl)
-   then rudata_byte:=net_readbyte
-   else begin {$I-} BlockRead(rpls_file,rudata_byte,SizeOf(rudata_byte));{$I+}if(ioresult<>0)then rudata_byte:=def;  end;
+   rudata_byte:=def;
+   case rpl of
+   true : replay_ReadBlock(SizeOf(rudata_byte),@rudata_byte);
+   false: net_BufferBlock(false,SizeOf(rudata_byte),@rudata_byte);
+   end;
 end;
 
 function rudata_word(rpl:boolean;def:word):word;
 begin
-   if(not rpl)
-   then rudata_word:=net_readword
-   else begin {$I-} BlockRead(rpls_file,rudata_word,SizeOf(rudata_word));{$I+}if(ioresult<>0)then rudata_word:=def;  end;
+   rudata_word:=def;
+   case rpl of
+   true : replay_ReadBlock(SizeOf(rudata_word),@rudata_word);
+   false: net_BufferBlock(false,SizeOf(rudata_word),@rudata_word);
+   end;
 end;
 
 function rudata_sint(rpl:boolean;def:shortint):shortint;
 begin
-   if(not rpl)
-   then rudata_sint:=net_readsint
-   else begin {$I-} BlockRead(rpls_file,rudata_sint,SizeOf(rudata_sint));{$I+}if(ioresult<>0)then rudata_sint:=def;  end;
+   rudata_sint:=def;
+   case rpl of
+   true : replay_ReadBlock(SizeOf(rudata_sint),@rudata_sint);
+   false: net_BufferBlock(false,SizeOf(rudata_sint),@rudata_sint);
+   end;
 end;
 
 function rudata_int(rpl:boolean;def:integer):integer;
 begin
-   if(not rpl)
-   then rudata_int:=net_readint
-   else begin {$I-} BlockRead(rpls_file,rudata_int ,SizeOf(rudata_int ));{$I+}if(ioresult<>0)then rudata_int :=def;  end;
+   rudata_int:=def;
+   case rpl of
+   true : replay_ReadBlock(SizeOf(rudata_int),@rudata_int);
+   false: net_BufferBlock(false,SizeOf(rudata_int),@rudata_int);
+   end;
 end;
 
 function rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
+   rudata_card:=def;
+   case rpl of
+   true : replay_ReadBlock(SizeOf(rudata_card),@rudata_card);
+   false: net_BufferBlock(false,SizeOf(rudata_card),@rudata_card);
+   end;
+end;
+
+function rudata_string(rpl:boolean):shortstring;
+var sl:byte;
+begin
+   rudata_string:='';
    if(not rpl)
-   then rudata_card:=net_readcard
-   else begin {$I-} BlockRead(rpls_file,rudata_card,SizeOf(rudata_card));{$I+}if(ioresult<>0)then rudata_card:=def;  end;
+   then rudata_string:=net_readstring
+   else
+   begin
+      sl:=rudata_byte(rpl,0);
+      while(sl>0)do
+      begin
+         rudata_string+=chr(rudata_byte(rpl,0));
+         sl-=1;
+      end;
+   end;
 end;
 
 function byte2s(b:byte):shortstring;
@@ -966,12 +974,13 @@ begin
 end;
 
 procedure  rudata_log(p:byte;rpl:boolean);
-var s,b,
+var
+s,b,
 mtype,
 argt,
 argx,
-x,y    :byte;
-    str:shortstring;
+x,y  :byte;
+str  :shortstring;
 begin
    s:=rudata_byte(rpl,0);
    if(s>0)then
@@ -1004,7 +1013,7 @@ begin
       end;
       if(not rpl)then
       begin
-         net_log_n:=rudata_card(rpl,net_log_n);
+         net_cl_log_n:=rudata_card(rpl,net_cl_log_n);
          menu_update:=true;
       end;
    end;
@@ -1305,7 +1314,6 @@ begin
                       end;
         kpdata_life : begin
                          rudata_reload(@i,rpl);
-                         writeln(kpi,' ',i);
                          kplifetime:=i*5;
                       end;
         end;
@@ -1339,7 +1347,7 @@ begin
        rudata_reload(@build_cd,rpl);
 
    if(wtickb0)then
-     if(map_scenario=mc_capture)
+     if(map_scenario=mc_KeyPoints)
      or(map_scenario=mc_KotH)
      or(map_generators>0)then
        for i:=0 to LastKeyPoint do

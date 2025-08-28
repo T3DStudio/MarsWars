@@ -19,6 +19,8 @@ begin
             net_ping     :=0;
             n_u          :=0;
             state        :=ps_human;
+            PlayerClearLog(p);
+            PlayerSetDefault(p);
             {$IFNDEF _FULLGAME}
             GameLogCommon(p,0,'MarsWars dedicated server, '+str_ver);
             {$ENDIF}
@@ -312,7 +314,6 @@ begin
          if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
             case G_Started of
-            //false: if(net_period=0)then net_SendGameInfo(pid);
             true : if(every2t)then
                    begin
                       net_clearbuffer;
@@ -360,6 +361,9 @@ begin
      else net_svLanAdv_timer-=1;
 end;
 
+
+{$IFDEF _FULLGAME}
+
 procedure GameResetNetGame;
 begin
    net_dispose;
@@ -367,8 +371,6 @@ begin
    g_started :=false;
    net_status:=ns_none;
 end;
-
-{$IFDEF _FULLGAME}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -500,7 +502,7 @@ nmid_NotConnected: begin
                    end;
 nmid_LogUpdate   : begin
                       rudata_log(LocalPlayer,false);
-                      net_chat_shlm:=chat_LastMsgTime;
+                      //net_chat_shlm:=ui_chat_TimeLast;
                       net_period:=0;
                    end;
 nmid_ping_Request: begin
@@ -568,7 +570,7 @@ nmid_snapshot    : if(G_Started)then
       begin
          net_writebyte(nmid_ClientData);
          net_writebyte(Quality2Units[net_cl_Quality]);
-         net_writecard(net_log_n);
+         net_writecard(net_cl_log_n);
       end
       else
       begin
@@ -577,7 +579,7 @@ nmid_snapshot    : if(G_Started)then
          net_writestring(PlayerName );
          net_writebool  (PlayerReady);
          net_writebyte  (Quality2Units[net_cl_Quality]);
-         net_writecard  (net_log_n  );
+         net_writecard  (net_cl_log_n);
       end;
       net_send(net_cl_svip,net_cl_svport);
    end;

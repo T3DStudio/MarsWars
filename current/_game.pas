@@ -113,24 +113,38 @@ begin
          unit_kill(g_punits[u],instant,true,false,true,true);
 end;
 
+procedure PlayerSetDefault(p:byte);
+begin
+   with g_gplayers[p] do
+   begin
+      ai_skill :=player_default_ai_level;
+      race     :=r_random;
+      mrace    :=r_random;
+      team     :=p;
+      ready    :=false;
+      pnum     :=p;
+      observer :=false;
+      defeated :=false;
+      revealed :=false;
+      log_n    :=0;
+      log_n_cl :=0;
+   end;
+end;
+
 procedure PlayersSetDefault;
 var p:byte;
 begin
-   FillChar(g_gplayers,SizeOf(TPList),0);
+   FillChar(g_gplayers,SizeOf(TPList    ),0);
    FillChar(g_nplayers,SizeOf(g_nplayers),0);
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
      begin
-        ai_skill :=player_default_ai_level;
-        race     :=r_random;
-        team     :=p;
-        ready    :=false;
-        pnum     :=p;
+        PlayerSetDefault(p);
         PlayerSetState(p,ps_None);
         PlayerSetSkirmishTech(p);
         PlayerClearLog(p);
         log_EnergyCheck:=0;
-    end;
+     end;
 
    FillChar(_playerAPM,SizeOf(_playerAPM),0);
 
@@ -230,7 +244,8 @@ begin
    ui_umark_u:=0;
    ui_umark_t:=0;
 
-   mouse_select_x0:=-1;
+   mouse_select_xs0:=NOTSET;
+   mouse_select_ys0:=NOTSET;
    m_brush:=co_empty;
 
    ui_fog   :=true;
@@ -251,7 +266,9 @@ begin
    begin
       ui_tab  :=tab_controls;
       UIPlayer:=255;
-   end;
+   end
+   else UIPlayer :=LocalPlayer;
+   ui_log_LastTimer:=0;
    rpls_RecordTryPause:=0;
 end;
 
@@ -445,7 +462,6 @@ begin
 
    MainMenu :=false;
    G_Started:=true;
-   UIPlayer :=LocalPlayer;
    ui_blink_timer1:=1;
    menu_ItemSelected:=0;
 end;
@@ -460,6 +476,15 @@ begin
    GameBreak:=true;
 
    if(check)then exit;
+
+   case rpls_pstate of
+   rpls_read : begin
+                  replay_Abort;
+                  menu_page:=mi_replays;
+                  g_type:=0;
+               end;
+   rpls_write: replay_Abort;
+   end;
 
    menu_ItemSelected:=0;
    G_Started:=false;
@@ -781,7 +806,7 @@ begin
 
    case random(7) of
    0:   map_scenario:=mc_royale;
-   1:   map_scenario:=mc_capture;
+   1:   map_scenario:=mc_KeyPoints;
    2:   map_scenario:=mc_KotH;
    else map_scenario:=mc_ffa8;
    end;
@@ -888,10 +913,10 @@ uo_build   : if(o_a0>0)then GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit,unit_
                                                 then uo_id:=ua_amove
                                                 else uo_id:=ua_move;
                                              end;
-                               co_stand    : unit_SetDefaultUO(pu,ua_hold, 0   ,x      ,y,-1,-1,true ,false);
+                               co_stand    : unit_SetDefaultUO(pu,ua_hold, 0   ,x   ,  y ,-1,-1,true ,false);
                                co_move     : unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,true ,false);
                                co_patrol   : unit_SetDefaultUO(pu,ua_move ,0   ,o_x1,o_y1, x, y,true ,false);
-                               co_astand   : unit_SetDefaultUO(pu,ua_amove,0   ,x      ,y,-1,-1,false,false);
+                               co_astand   : unit_SetDefaultUO(pu,ua_amove,0   ,x   ,  y ,-1,-1,true ,false);
                                co_amove    : if(IsUnitRange(o_y0,nil))
                                         then unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,false,false)
                                         else unit_SetDefaultUO(pu,ua_amove,0   ,o_x1,o_y1,-1,-1,false,false);
@@ -1358,12 +1383,11 @@ begin
      else net_Client;
    replay_Code;
 
+   if(g_Started)and(net_status=ns_none)and(MainMenu)then exit;
    {$ELSE}
    Dedicated_Code;
    Dedicated_Screen;
    {$ENDIF}
-
-   if(g_Started)and(net_status=ns_none)and(MainMenu)then exit;
 
    PlayersCycle;
 
@@ -1388,7 +1412,7 @@ begin
                                 if(g_royal_r>0)then g_royal_r-=1;
                               Scenario_DefaultEndConditions;
                            end;
-            mc_capture,
+            mc_KeyPoints,
             mc_KotH      : Scenario_DefaultDefeatConditions;
             else           Scenario_DefaultEndConditions;
             end;

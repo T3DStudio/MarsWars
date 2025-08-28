@@ -67,7 +67,7 @@ mc_3x3                 = 8;
 mc_4x4                 = 9;
 mc_2x2x2               = 10;
 mc_2x2x2x2             = 11;
-mc_capture             = 12;
+mc_KeyPoints           = 12;
 mc_KotH                = 13;
 mc_royale              = 14;
 
@@ -222,12 +222,11 @@ lmts_menu_chat         = [
                           lmt_player_surrender,
                           lmt_chat_common
                          ];
-lmts_last_events       = [MaxPlayers..255];
-lmts_last_chat         = [0..LastPlayer];
+lmts_last_events       = [0..255];
 
 lmt_argt_unit          = 0;
-lmt_argt_upgrade          = 1;
-lmt_argt_ability          = 2;
+lmt_argt_upgrade       = 1;
+lmt_argt_ability       = 2;
 
 {
 uia_nonew              = 0;
@@ -248,7 +247,7 @@ ClientTTL                 = fr_fps1*10;
 ServerTTL                 = fr_fps1;
 
 net_PingTime              = fr_fps2;
-net_PeriodTime            = fr_fpsh;
+net_PeriodTime            = fr_fpsq;
 
 NetTickN                  = 2;
 MaxNetBuffer              = 4096;
@@ -1018,7 +1017,7 @@ iAct_backspace         = 15;
 
 iAct_ScreenShot        = 16;
 iAct_Tab               = 17;
-iAct_Pause             = 18;
+
 iAct_LastEvent         = 19;
 
 iAct_USetGroup0        = 20;
@@ -1139,6 +1138,8 @@ iAct_SProd24           = 164;
 iAct_InGameChat        = 200;
 iAct_InGameChatAll     = 201;
 iAct_InGameChatAllies  = 202;
+iAct_InGamePause       = 203;
+iAct_InGameMenu        = 204;
 
 iAct_test_FastTime     = 210;
 iAct_test_InstaProd    = 211;
@@ -1157,7 +1158,6 @@ iAct_test_BePlayer6    = 223;
 iAct_test_BePlayer7    = 224;
 iAct_test_debug0       = 225;
 iAct_test_debug1       = 226;
-
 
 k_LastCharStuckDelay   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;
@@ -1302,7 +1302,7 @@ uinfo_text             = 6;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  TEXT
+//  FONT
 //
 
 ta_LU                  = 0;
@@ -1314,7 +1314,6 @@ ta_MB                  = 5;
 ta_RU                  = 6;
 ta_RM                  = 7;
 ta_RB                  = 8;
-ta_chat                = 9;
 
 font_w1                = 8;
 font_wh                = font_w1 div 2;
@@ -1322,15 +1321,13 @@ font_wq                = font_w1 div 4;
 font_w2                = font_w1*2;
 font_w3                = font_w1*3;
 font_w5                = font_w1*5;
+font_w6                = font_w1*6;
 font_wi                = font_w1-1;
 font_w1h               = font_w1+(font_w1 div 2);
 
 txt_line_h1            = font_w1+font_wq;
 txt_line_h2            = font_w1+font_wh+1;
 txt_line_h3            = font_w1+font_w2+1;
-
-chat_all               = 255;
-chat_allies            = 254;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1390,12 +1387,13 @@ ui_hwp                 = ui_CtrlPanelW div 2;
 ui_ButtonsNum          = (ui_CtrlPanelBH-ui_CtrlPanelBW-2)*ui_CtrlPanelBW-1;
 
 chat_type              : array[false..true] of char = ('|',' ');
-chat_LastMsgTime       = fr_fps1*3;
-chat_LastMsgTimeMax    = chat_LastMsgTime*6;
 
-ui_dBW                 = ui_ButtonW1-font_w1-3;
+ui_log_TimeLast        = fr_fps1*3;
+ui_log_TimeMax         = ui_log_TimeLast*8;
 
-ui_HintLineLen         = 47;
+ui_Objectives_LineLen  = 27;
+
+ui_HintLineLen         = 50;
 
 // ui alarms
 
@@ -1611,10 +1609,11 @@ mi_MP_Disconnect       = 195;
 mi_MP_ClientAddress    = 196;
 mi_MP_ClientQuality    = 197;
 mi_MP_ClientLANSearch  = 198;
-mi_MP_Chat             = 199;
+mi_MP_ChatList         = 199;
+mi_MP_ChatLine         = 200;
 
-mi_NetSearch_List      = 200;
-mi_NetSearch_Connect   = 201;
+mi_NetSearch_List      = 201;
+mi_NetSearch_Connect   = 202;
 
 //// SCIRMISH REPLAY INFO
 mi_SubCaptionInfoLine  = 210;
@@ -1680,29 +1679,31 @@ CMPMaxSkills           = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  BASE STRINGS
+//  BASE STRING/TEXT
 //
 
-str_ConfigFName        : shortstring = 'marswars.cfg';
-str_screenshot         : shortstring = 'MVSCR_';
 str_loading_gfx        : shortstring = 'LOADING GRAPHICS...'+#0;
 str_loading_sfx        : shortstring = 'LOADING SOUNDS...'+#0;
 str_loading_msc        : shortstring = 'LOADING MUSIC...'+#0;
-str_f_grp              : shortstring = 'graphic\';
-str_f_map              : shortstring = 'map\';
-str_f_snd              : shortstring = 'sound\';
-str_f_svld             : shortstring = 'save\';
-str_e_svld             : shortstring = '.mws';
-str_f_rpls             : shortstring = 'replay\';
-str_e_rpls             : shortstring = '.mwr';
 
-race_dir               : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
-race_units             : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
-race_buildings         : array[1..r_cnt] of shortstring = ('hell\buildings\','uac\buildings\');
-race_upgrades          : array[1..r_cnt] of shortstring = ('hell\upgrades\' ,'uac\upgrades\' );
-race_missiles          : array[1..r_cnt] of shortstring = ('hell\missiles\' ,'uac\missiles\' );
-effects_folder         : shortstring = 'effs\';
-missiles_folder        : shortstring = 'missiles\';
+str_ConfigFName        : shortstring = 'marswars.cfg';
+str_ScreenShotPrefix   : shortstring = 'MVSCR_';
+
+fileExt_save           : shortstring = '.mws';
+fileExt_Replay         : shortstring = '.mwr';
+
+folder_Race            : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
+folder_RaceUnits       : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
+folder_RaceBuildings   : array[1..r_cnt] of shortstring = ('hell\buildings\','uac\buildings\');
+folder_RaceUpgrades    : array[1..r_cnt] of shortstring = ('hell\upgrades\' ,'uac\upgrades\' );
+folder_RaceMissiles    : array[1..r_cnt] of shortstring = ('hell\missiles\' ,'uac\missiles\' );
+folder_graphic         : shortstring = 'graphic\';
+folder_map             : shortstring = 'map\';
+folder_sound           : shortstring = 'sound\';
+folder_save            : shortstring = 'save\';
+folder_replay          : shortstring = 'replay\';
+folder_effects         : shortstring = 'effs\';
+folder_missiles        : shortstring = 'missiles\';
 
 ui_limitstr            : shortstring = '125';
 
@@ -1714,9 +1715,9 @@ tc_player4             = #4;
 tc_player5             = #5;
 tc_player6             = #6;}
 tc_player7             = #7;
-tc_nl1                 = #11;
-tc_nl2                 = #12;
-tc_nl3                 = #13;
+tc_nl1                 = #8;
+tc_nl2                 = #9;
+tc_nl3                 = #10;
 tc_purple              = #14;
 tc_red                 = #15;
 tc_orange              = #16;
@@ -1737,10 +1738,13 @@ b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_defaul
 sep_comma              = ',';
 sep_scomma             = ', ';
 sep_sdot               = '. ';
-//sep_sdots              = '; ';
-//sep_wdash              = tc_white+'-';
+sep_wdash              = '-';
 
-MaxChatStringLength    = 200;
+MaxChatStringLength    = 220;
+
+
+chat_all               = 255;
+chat_allies            = 254;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

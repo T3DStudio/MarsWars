@@ -203,12 +203,12 @@ procedure InitThemes;
 var o:integer;
 begin
    // load graph
-   LPTUSpriteL(@theme_spr_decals  , str_f_map+'decals\adt'      , @theme_spr_decaln  );
-   LPTUSpriteL(@theme_spr_decors  , str_f_map+'decors\dec_'     , @theme_spr_decorn  );
-   LPTUSpriteL(@theme_spr_srocks  , str_f_map+'srocks\rocks'    , @theme_spr_srockn  );
-   LPTUSpriteL(@theme_spr_brocks  , str_f_map+'brocks\rockb'    , @theme_spr_brockn  );
-   LPTUSpriteL(@theme_spr_liquids , str_f_map+'liquids\liquid_' , @theme_spr_liquidn );
-   LPTUSpriteL(@theme_spr_terrains, str_f_map+'terrains\ter'    , @theme_spr_terrainn);
+   LPTUSpriteL(@theme_spr_decals  , folder_map+'decals\adt'      , @theme_spr_decaln  );
+   LPTUSpriteL(@theme_spr_decors  , folder_map+'decors\dec_'     , @theme_spr_decorn  );
+   LPTUSpriteL(@theme_spr_srocks  , folder_map+'srocks\rocks'    , @theme_spr_srockn  );
+   LPTUSpriteL(@theme_spr_brocks  , folder_map+'brocks\rockb'    , @theme_spr_brockn  );
+   LPTUSpriteL(@theme_spr_liquids , folder_map+'liquids\liquid_' , @theme_spr_liquidn );
+   LPTUSpriteL(@theme_spr_terrains, folder_map+'terrains\ter'    , @theme_spr_terrainn);
 
    // transparent
    ThemeSetTrans(@theme_spr_decals,@theme_spr_decaln,'0_20,23_34');

@@ -112,8 +112,8 @@ begin
      begin
         vid_ScreenSpritesS-=1;
 
-        x-=xo+sprite^.hw;
-        y-=yo+sprite^.hh;
+        x-=-xo+sprite^.hw;
+        y-=-yo+sprite^.hh;
 
         if(shadowz>-fly_hz)then
         begin
@@ -495,15 +495,20 @@ end;
 //
 
 procedure D_LayerTerrain(tar:pSDL_Surface);
-var i,t,
-  ix,iy,s:integer;
-    vx,vy:integer;
-    spr  :PTMWTexture;
+var
+i,t,s,
+ix,iy,
+cx,cy,
+vx,vy:integer;
+spr  :PTMWTexture;
 begin
-   draw_sdlsurface(tar,
-   -ui_cam_x mod map_ter_w,
-   -ui_cam_y mod map_ter_h,
-   map_terrain);
+   cx:=-ui_cam_x mod map_ter_w;
+   cy:=-ui_cam_y mod map_ter_h;
+
+   if(ui_cam_x<0)then cx-=map_ter_w;
+   if(ui_cam_y<0)then cy-=map_ter_w;
+
+   draw_sdlsurface(tar,cx,cy,map_terrain);
 
    vx:=ui_cam_x-vid_ab;
    vy:=ui_cam_y-vid_ab;
@@ -611,28 +616,51 @@ cx,cy,
 ssx,ssy,
 sty:integer;
 fcell:pboolean;
+temp:boolean;
 begin
    if(not ui_fog)
    or(ui_fog_gridw<=0)
    or(ui_fog_gridh<=0)then exit;
 
-   ssx:=-ui_cam_fx;
-   sty:=-ui_cam_fy;
+   ssx :=-ui_cam_fx-fog_cw;
+   sty :=-ui_cam_fy-fog_cw;
+   temp:=false;
 
-   for cx:=0 to ui_fog_gridw-1 do
+   for cx:=-1 to ui_fog_gridw-1 do
    begin
       ssy:=sty;
-      for cy:=0 to ui_fog_gridh-1 do
+      for cy:=-1 to ui_fog_gridh-1 do
       begin
-         fcell:=@ui_fog_fgrid[cx,cy];
-         if(not fcell^)then
-           draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, ui_fog_surf);
-         ui_fog_pgrid[cx,cy]:=fcell^;
+         if(cx>=0)and(cy>=0)then
+         begin
+            fcell:=@ui_fog_fgrid[cx,cy];
+            ui_fog_pgrid[cx,cy]:=fcell^;
+         end
+         else fcell:=@temp;
+
+         if(not fcell^)
+         or((ui_cam_x+ssx)<0)
+         or((ui_cam_y+ssy)<0)
+         then draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, ui_fog_surf);
+
          fcell^:=false;
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
    end;
+
+   {ssx:=-ui_cam_fx;
+   while(ssx<ui_cam_w)do
+   begin
+      vlineColor(tar,ssx,0,ui_cam_h,c_ltgray);
+      ssx+=fog_cw;
+   end;
+   ssy:=-ui_cam_fy;
+   while(ssy<ui_cam_h)do
+   begin
+      hlineColor(tar,0,ui_cam_w,ssy,c_ltgray);
+      ssy+=fog_cw;
+   end; }
 end;
 
 procedure _draw_dbg;

@@ -12,7 +12,7 @@ begin
 
    if(length(svld_str_fname)=0)then exit;
 
-   fn:=str_f_svld+svld_str_fname+str_e_svld;
+   fn:=folder_save+svld_str_fname+fileExt_save;
 
    if(not FileExists(fn))then
    begin
@@ -109,10 +109,10 @@ begin
    svld_list_scroll:=0;
    svld_list_size  :=0;
    setlength(svld_list,0);
-   if(FindFirst(str_f_svld+'*'+str_e_svld,faReadonly,info)=0)then
+   if(FindFirst(folder_save+'*'+fileExt_save,faReadonly,info)=0)then
      repeat
         s:=info.Name;
-        delete(s,length(s)-(length(str_e_svld)-1),length(str_e_svld));
+        delete(s,length(s)-(length(fileExt_save)-1),length(fileExt_save));
         if(length(s)>0)then
         begin
            svld_list_size+=1;
@@ -220,7 +220,7 @@ begin
 
    if(check)then exit;
 
-   assign(f,str_f_svld+svld_str_fname+str_e_svld);
+   assign(f,folder_save+svld_str_fname+fileExt_save);
    {$I-}
    rewrite(f,1);
    {$I+}
@@ -257,7 +257,7 @@ begin
 
    if(check)then exit;
 
-   fn:=str_f_svld+svld_str_fname+str_e_svld;
+   fn:=folder_save+svld_str_fname+fileExt_save;
    if(FileExists(fn))then
    begin
       assign(f,fn);
@@ -333,7 +333,7 @@ begin
 
    if(check)then exit;
 
-   fn:=str_f_svld+svld_str_fname+str_e_svld;
+   fn:=folder_save+svld_str_fname+fileExt_save;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);

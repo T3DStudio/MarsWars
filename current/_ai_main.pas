@@ -1273,7 +1273,7 @@ UID_Medic    : if(CheckReparTargets(ai_urepair_u,ai_urepair_d))then exit;
                                                 ai_abase_u^.aiu_alarm_y),false,false,2);
 
       if(ai_kpoint_d<NOTSET)then
-        with ai_kpoint_kp^ do SetNearestTarget(nil,kpx,kpy,ai_kpoint_d,kpzone,ai_kpoint_d>base_3r,(ai_kpoint_d>base_3r)and(not ai_kpoint_koth),byte(ai_kpoint_koth or(map_scenario=mc_capture)));
+        with ai_kpoint_kp^ do SetNearestTarget(nil,kpx,kpy,ai_kpoint_d,kpzone,ai_kpoint_d>base_3r,(ai_kpoint_d>base_3r)and(not ai_kpoint_koth),byte(ai_kpoint_koth or(map_scenario=mc_KeyPoints)));
 
       if(ai_generator_d<NOTSET)then
         with ai_generator_cp^ do

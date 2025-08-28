@@ -185,6 +185,7 @@ end;
 procedure ui_counters(pu:PTUnit);
 var i:byte;
     t:integer;
+HaveAttack:boolean;
 function LowerReload(pu1,pu2:PTUnit):PTUnit;
 begin
    if(pu1<>nil)and(pu2=nil)then
@@ -266,12 +267,15 @@ uab_CCFly         : begin
 
          if(isselected)then
          begin
-            if(speed  >0)then ui_uibtn_move  +=1;
-            if(uid_CanAttack  )then ui_uibtn_attack+=1;
+            HaveAttack:=ui_HaveAttack(pu);
+            if (speed   >0)then ui_uibtn_move  +=1;
+            if (HaveAttack)then ui_uibtn_attack+=1;
+            if (speed   >0)
+            and(HaveAttack)then ui_uibtn_apatrol+=1;
 
-            if(ui_ability(pu,false))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,(unit_sability(pu       ,true)=0)and((uo_id<>ua_psability)or(s_all=1)),false,true);
-            if(ui_ability(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x  ,mouse_y  ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,(unit_pability(pu,-1,0,0,true)=0)and((uo_id<>ua_psability)or(s_all=1)),false,true);
-            if(ui_rebuild(pu      ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds , unit_rebuild(pu        ,true)=0,true ,true);
+            if(ui_HaveAbility(pu,false))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,(unit_sability(pu       ,true)=0)and((uo_id<>ua_psability)or(s_all=1)),false,true);
+            if(ui_HaveAbility(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x  ,mouse_y  ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,(unit_pability(pu,-1,0,0,true)=0)and((uo_id<>ua_psability)or(s_all=1)),false,true);
+            if(ui_Haverebuild(pu      ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds , unit_rebuild(pu        ,true)=0,true ,true);
          end;
       end
       else
@@ -591,6 +595,8 @@ begin
    ui_uibtn_rebuildd :=integer.MaxValue;
    ui_uibtn_rebuilds :=false;
    ui_uibtn_move     :=0;
+   ui_uibtn_attack   :=0;
+   ui_uibtn_apatrol  :=0;
    ui_bprod_possible :=[];
    ui_bprod_first    :=0;
    ui_bprod_all      :=0;

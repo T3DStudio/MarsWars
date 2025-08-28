@@ -79,7 +79,6 @@ DID_Square        : array[0..MaxDIDs] of longint;
 net_status        : byte = 0;
 net_ServerPort    : word = 10666;
 net_period        : byte = 0;
-net_log_n         : word = 0;
 net_svLanAdv      : boolean = true;
 net_svLanAdv_timer: integer = 0;
 net_ping_timer    : integer = 0;
@@ -263,7 +262,7 @@ ui_UnitSelectedn  : byte = 0;
 ui_tab            : byte = 0;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ButtonsNum] of byte;
-ui_panel_CtrlActs : array[TTabControlContent,0..ui_ButtonsNum] of byte;
+ui_panel_CTabIActs: array[TTabControlContent,0..ui_ButtonsNum] of byte;
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -289,6 +288,7 @@ ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_attack   : integer = 0;   // ui attack buttons
+ui_uibtn_apatrol  : integer = 0;   // ui apatrol button
 ui_uibtn_sabilityu: PTUnit  = nil; // ui self ability order unit
 ui_uibtn_sabilityd: integer = integer.MaxValue;
 ui_uibtn_sabilitys: boolean = false;
@@ -314,40 +314,43 @@ ui_groupX         : integer = 0;  // order icons screen X
 ui_groupY         : integer = 0;  // order icons screen Y
 
 ui_UIPortXC       : integer = 0;
-ui_uiuphy         : integer = 0;
-ui_uiplayery      : integer = 0;
+ui_PovPlayerY      : integer = 0;
 ui_timerX         : integer = 0;
 ui_timerY         : integer = 0;
-ui_PanelHintX     : integer = 0;
-ui_PanelHintY     : integer = 0;
-ui_PanelHintN     : integer = 0;
-ui_PanelHintW     : byte = 0;
-ui_PanelHintL     : TStringList;
+ui_MouseHintX     : integer = 0;
+ui_MouseHintY     : integer = 0;
+ui_MouseHintN     : integer = 0;
+ui_MouseHintW     : byte = 0;
+ui_MouseHintL     : TStringList;
 
 ui_ReplayBarW     : integer = 0;
 ui_ReplayBarH     : integer = font_w2;
 ui_ReplayBarX     : integer = 0;
 ui_ReplayBarY     : integer = 0;
-ui_energyX        : integer = 0;
-ui_energyY        : integer = 0;
-ui_armyX          : integer = 0;
-ui_armyY          : integer = 0;
-ui_apmx           : integer = 0;
-ui_apmy           : integer = 0;
-ui_fpsx           : integer = 0;
-ui_fpsy           : integer = 0;
-ui_game_log_height: integer = 0;
+ui_GameStatusX    : integer = 0;
+ui_GameStatusY    : integer = 0;
+ui_EnergyX        : integer = 0;
+ui_EnergyY        : integer = 0;
+ui_ArmyX          : integer = 0;
+ui_ArmyY          : integer = 0;
+ui_Apmx           : integer = 0;
+ui_Apmy           : integer = 0;
+ui_FPSX           : integer = 0;
+ui_FPSY           : integer = 0;
+
+ui_objectivesx    : integer = 0;
+ui_objectivesy    : integer = 0;
+
 
 ui_logx           : integer = 0;  // LOG screen X
 ui_logy           : integer = 0;  // LOG screen Y
-ui_loga           : byte = 0;
-ui_chatx          : integer = 0;  // chat screen X
-ui_chaty          : integer = 0;  // chat screen Y
-ui_chat_LineLen   : byte = 0;
+ui_log_LineLen    : byte = 0;
+ui_log_ListSize   : integer = 0;
 ui_log_lines      : array of shortstring;
 ui_log_type       : array of byte;
 ui_log_color      : array of cardinal;
 ui_log_n          : integer = 0;
+ui_log_LastTimer  : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -385,6 +388,9 @@ menu_ClientAddress: shortstring = '127.0.0.1:10666';
 
 menu_scale        : boolean = true;
 menu_ScaleSmooth  : boolean = false;
+
+menu_ChatListH    : integer = 0;
+menu_ChatScroll   : integer = 0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -428,7 +434,7 @@ net_cl_svport     : word = 10666;
 net_cl_svttl      : integer = 0;
 net_cl_Hoster     : byte = 0;
 net_cl_Quality    : byte = 4;
-net_chat_shlm     : integer = 0;
+net_cl_log_n      : cardinal = 0;
 net_chat_str      : shortstring = '';
 
 net_svsearch      : boolean = false;
@@ -461,7 +467,7 @@ svld_file_size    : cardinal = 0;
 
 rpls_Record       : boolean = true;
 rpls_RecordTryPause:integer = 0;
-rpls_fstate      : byte = 0;     // file status (none,write,read)
+rpls_fstate       : byte = 0;     // file status (none,write,read)
 rpls_pnu          : integer = 0; // quality
 rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
@@ -487,6 +493,9 @@ rpls_head_itemn   : integer = 0;
 rpls_file_head_size
                   : cardinal = 0;
 rpls_file_size    : cardinal = 0;
+rpls_file_Pos     : cardinal = 0;
+rpls_file_LastErr : word = 0;
+rpls_file_LastErrS: shortstring = '';
 rpls_log_c        : cardinal = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -494,8 +503,8 @@ rpls_log_c        : cardinal = 0;
 //  INPUT
 //
 
-mouse_select_x0,
-mouse_select_y0,
+mouse_select_xs0,
+mouse_select_ys0,
 mouse_map_x,
 mouse_map_y,
 mouse_x,
@@ -826,7 +835,8 @@ spr_b_patrol,
 spr_b_apatrol,
 spr_b_stop,
 spr_b_hold,
-spr_b_selall,
+spr_b_f1,
+spr_b_f2,
 spr_b_cancel,
 spr_b_delete,
 spr_mback,
@@ -943,8 +953,6 @@ str_hint_UpgradesLvl,
 str_hint_Demons,
 str_hint_Except,
 str_hint_UnitArming,
-str_hint_menu,
-str_hint_pause,
 str_hint_SplashResist,
 str_hint_hits,
 str_hint_BaseSightR,
@@ -982,6 +990,7 @@ str_uarm_Upgrade,
 str_uarm_Factor,
 
 str_gmsg_RecordStart,
+str_gmsg_RecordError,
 str_gmsg_RecordStop,
 str_gmsg_PlayerPaused,
 str_gmsg_PlayerResumed,
@@ -999,7 +1008,8 @@ str_gstat_WaitForServer,
 str_gstat_Unknown,
 str_gstat_ReplayEnd,
 str_gstat_ReplayError,
-str_gstat_Paused,
+str_gstat_ReplayPaused,
+str_gstat_GamePaused,
 str_gstat_Win,
 str_gstat_Lose,
 
@@ -1068,6 +1078,12 @@ str_ui_KotHTime_act,
 str_ui_KotHWinner,
 str_ui_army,
 str_ui_energy,
+str_ui_objectives,
+
+str_objective_Scirmish,
+str_objective_RoyalBattle,
+str_objective_KotH,
+str_objective_KeyPoints,
 
 str_Camp_Difficulty,
 str_cmp_unk,
@@ -1377,7 +1393,7 @@ snd_mapmark,
 snd_capture,
 snd_cplost,
 snd_hell
-       : PTSoundSet;
+              : PTSoundSet;
 
 
 {$ELSE}
