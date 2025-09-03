@@ -5,7 +5,7 @@ begin
      with pu^  do
      with uid^ do
      begin
-        if(uid^.uid_ukbuilding)and(mmr>0)
+        if(uid^.uid_isbuilding)and(mmr>0)
         then rectangleColor(ui_minimap,mmx-mmr,mmy-mmr,
                                        mmx+mmr,mmy+mmr,PlayerGetColor(player^.pnum,false))
         else pixelColor    (ui_minimap,mmx,mmy,        PlayerGetColor(player^.pnum,false));
@@ -44,7 +44,7 @@ UID_HSymbol4,
 UID_HAltar,
 UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
     else
-      if(uid^.uid_ukbuilding)and(iscomplete=false)
+      if(uid^.uid_isbuilding)and(iscomplete=false)
       then unit_SpriteDepth:=sd_build+vy
       else
         if(hits>0)or(buffs[ub_Resurect]>0)
@@ -178,7 +178,7 @@ begin
       end;
       ugroup_n+=1;
       with g_uids[uidi] do
-        ugroup_uids[uid_ukbuilding]+=[uidi];
+        ugroup_uids[uid_isbuilding]+=[uidi];
    end;
 end;
 
@@ -212,7 +212,7 @@ begin
       if(UnitF2Select(pu)    )then ui_IncGroupCounter(@ui_group_f2      ,x,y,uidi); // all battle units
       if(UnitF1Select(pu)    )then ui_IncGroupCounter(@ui_group_f1      ,x,y,uidi); // all builders
 
-      if(uid_ukbuilding)then
+      if(uid_isbuilding)then
       begin
          if(iscomplete)then
          begin
@@ -250,7 +250,7 @@ uab_RebuildInPoint: begin
                     if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
                     if(ui_DrawEdges)then UnitsInfoAddCircle(uo_x,uo_y,g_uids[uid_rebuild_uid].uid_r,ui_blink2_color_BY);
                     end;
-uab_CCFly         : begin
+uab_UACCCLand         : begin
                     SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,uid2spr(uidi,270,0),128);
                     if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[ui_blink2_colorb]);
                     if(ui_DrawEdges)then UnitsInfoAddCircle(uo_x,uo_y+fly_hz,uid_r,ui_blink2_color_BY);
@@ -262,7 +262,7 @@ uab_CCFly         : begin
       if(iscomplete)then
       begin
          if(rld<ui_uid_reload [uidi])or(ui_uid_reload [uidi]<0)then ui_uid_reload [uidi]:=rld;
-         if(uid_ukbuilding)then
+         if(uid_isbuilding)then
            if(rld<ui_bucl_reload[uid_class])or(ui_bucl_reload[uid_class]<0)then ui_bucl_reload[uid_class]:=rld;
 
          if(isselected)then
@@ -275,13 +275,13 @@ uab_CCFly         : begin
 
             if(ui_HaveAbility(pu,false))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,(unit_sability(pu       ,true)=0)and((uo_id<>ua_psability)or(s_all=1)),false,true);
             if(ui_HaveAbility(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x  ,mouse_y  ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,(unit_pability(pu,-1,0,0,true)=0)and((uo_id<>ua_psability)or(s_all=1)),false,true);
-            if(ui_Haverebuild(pu      ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds , unit_rebuild(pu        ,true)=0,true ,true);
+            if(ui_HaveRebuild(pu      ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds , unit_rebuild(pu        ,true)=0,true ,true);
          end;
       end
       else
       begin
          t:=min2i(uid_ProdTimeSec,((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2);
-         if(uid_ukbuilding)then
+         if(uid_isbuilding)then
          begin
             if(t>0)then
             begin
@@ -352,12 +352,12 @@ begin
       if(buffs[ub_Detect  ]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
-      if(not uid_ukbuilding)or(uid_isbarrack)or(uid_issmith)then
-       case level of
-       1: lvlstr_l:='>';
-       2: lvlstr_l:='||';
-       3: lvlstr_l:='* * *';
-       end;
+      if(not uid_isbuilding)or(uid_isbarrack)or(uid_issmith)then
+        case level of
+        1: lvlstr_l:=tc_RaceRank[uid_race];//'>';
+        2: lvlstr_l:=tc_RaceRank[uid_race]+tc_RaceRank[uid_race];//'||';
+        3: lvlstr_l:=tc_RaceRank[uid_race]+tc_RaceRank[uid_race]+tc_RaceRank[uid_race];//'* * *';
+        end;
       //else
       //  if(level>0)then lvlstr_b+=char_advanced;
 
@@ -372,35 +372,35 @@ begin
       atset   :=[];
       for i:=0 to LastUnitArms do
        with uid_arms[i] do
-        if(aw_rld>0)then
+        if(aw_reload>0)then
         begin
-           if(aw_dupgr>0)then WeaponUpgrInc(aw_dupgr);
-           if(aw_rupgr>0)and(upgr[aw_rupgr]>=aw_rupgr_l)then sl+=1;
+           if(aw_impact_upgr>0)then WeaponUpgrInc(aw_impact_upgr);
+           if(aw_req_upgr>0)and(upgr[aw_req_upgr]>0)then sl+=1;
         end;
       lvlstr_w:=i2s6(wl,uid_CanAttack);
       if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w;
 
       // armor
       al:=upgr[uid_upgr_Armor];
-      if(uid_ukbuilding)then
+      if(uid_isbuilding)then
       begin
          if(iscomplete)then
            al+=upgr[upgr_race_armor_build[uid_race]]
       end
       else
-        if(uid_ukmech)
+        if(uid_ismech)
         then al+=upgr[upgr_race_armor_mech[uid_race]]
         else al+=upgr[upgr_race_armor_bio [uid_race]];
       lvlstr_a:=tc_lime+i2s6(al,true);
 
       // other
       sl+=integer(upgr[uid_upgr_Regen]+upgr[uid_upgr_SightR]);
-      if(uid_ukbuilding)
+      if(uid_isbuilding)
       then sl+=integer(upgr[upgr_race_regen_build[uid_race]])
       else
       begin
          sl+=upgr[upgr_race_unit_srange[uid_race]];
-         if(uid_ukmech)
+         if(uid_ismech)
          then sl+=integer(upgr[upgr_race_regen_mech [uid_race]]+upgr[upgr_race_mspeed_mech[uid_race]])
          else
          begin
@@ -441,7 +441,7 @@ begin
 /////////      Visible in fog of war
       unit_DrawMiniMap(pu);
 
-      if(uid_ability=uab_HKeepBlink)then
+      if(uid_ability=uab_HKeepShift)then
         if(buffs[ub_CCast]>0)then exit;
 
       wanim:=false;
@@ -488,7 +488,7 @@ begin
       if(uidi=UID_UACDron)and(not iscomplete)
       then SpriteListAddEffect(vx,vy,sd_liquid+y,0,@spr_UTurret.sm_spritesL[0],255);
 
-      if(uid_ukbuilding)then
+      if(uid_isbuilding)then
         if(iscomplete)then
         begin
            if(a_rld<=0)and(not noanim)then

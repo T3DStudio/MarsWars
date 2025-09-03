@@ -90,10 +90,13 @@ begin
    InitRX2Y;
    lng_eng;
    SwitchLanguage;
-   InitUIDDataCL;
+   InitGameClientData;
    InitMIDDataCL;
    gfx_MakeUnitIcons;
-   gfx_MakeAbilityIcons;
+   //gfx_MakeAbilityIcons;
+   SetAbilityIcons;
+
+   //gfx_SaveUnitIcons;
 
    {$ENDIF}
 

@@ -406,7 +406,7 @@ begin
         if(ui_DrawEdges)then
           UnitsInfoAddCircle(x,y,uid_r,ui_blink2_color_BY);
 
-      if(srect)and(uid_ukbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
+      if(srect)and(uid_isbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
 
       //ub_Scaned
       case ui_blink3 of
@@ -415,7 +415,7 @@ begin
       2:;
       end;
 
-      pain:=(buffs[ub_Pain]>0)and(uid_ukmech)and(not uid_ukbuilding);
+      pain:=(buffs[ub_Pain]>0)and(uid_ismech)and(not uid_isbuilding);
       buffx:=0;
       if(buffs[ub_HVision]>0)then buffx+=1;
       if(buffs[ub_Invuln ]>0)then buffx+=1;
@@ -426,7 +426,7 @@ begin
       buffx-=1;
       buffx:=vx-((buffx*buff_sprite_w) div 2);
 
-      if(uid_ukbuilding)
+      if(uid_isbuilding)
       then buffy:=vy
       else buffy:=vy-sm_SelectionHH-font_w1;
 

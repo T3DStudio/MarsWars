@@ -129,7 +129,7 @@ MID_SSShot   : begin
    missiles_UIDsBioEff:=[];
    for m:=0 to 255 do
      with g_uids[m] do
-       if(not uid_ukmech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then missiles_UIDsBioEff+=[m];
+       if(not uid_ismech)or(m in [UID_Cyberdemon,UID_Mastermind,UID_Arachnotron])then missiles_UIDsBioEff+=[m];
 end;
 
 {$ENDIF}
@@ -141,9 +141,9 @@ begin
    if(tu<>nil)then
      for i:=0 to LastDamageModFactor do
       with g_DamageMods[dmod][i] do
-       if(dm_flags>0)then
-        if(CheckUnitBaseFlags(tu,dm_flags))then
-         case dm_factor of
+       if(dm_TargetFlags>0)then
+        if(CheckUnitBaseFlags(tu,dm_TargetFlags))then
+         case dm_Factor of
        0   : ApplyDamageMod:=0;
        25  : ApplyDamageMod:=               (ApplyDamageMod div 4);
        50  : ApplyDamageMod:=               (ApplyDamageMod div 2);
@@ -156,7 +156,7 @@ begin
        300 : ApplyDamageMod:=ApplyDamageMod* 3;
        400 : ApplyDamageMod:=ApplyDamageMod* 4;
        500 : ApplyDamageMod:=ApplyDamageMod* 5;
-         else ApplyDamageMod:=round(ApplyDamageMod/100*dm_factor);
+         else ApplyDamageMod:=round(ApplyDamageMod/100*dm_Factor);
          end;
 end;
 
@@ -271,7 +271,7 @@ begin
            then unit_damage(tu,rdamage,m_playeri,false);
         end
         else
-          if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ukmech)then // splash m_damage
+          if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ismech)then // splash m_damage
           begin
              {$IFDEF _FULLGAME}
              if(mid_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_SpriteDepth(tu^.vy+1,tu^.ukfly),mid_eid_target_eff);

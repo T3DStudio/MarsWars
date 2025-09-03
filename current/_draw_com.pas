@@ -105,29 +105,37 @@ begin
          charc:=str[i];
 
          case charc of
-         tc_player0..
-         tc_player7  : begin color:=PlayerGetColor(ord(charc),false);if(i<strLen)then continue;end;
          tc_nl1..
-         tc_nl2      : ;
-         tc_purple   : begin color:=c_purple ;if(i<strLen)then continue;end;
-         tc_red      : begin color:=c_red    ;if(i<strLen)then continue;end;
-         tc_orange   : begin color:=c_orange ;if(i<strLen)then continue;end;
-         tc_yellow   : begin color:=c_yellow ;if(i<strLen)then continue;end;
-         tc_lime     : begin color:=c_lime   ;if(i<strLen)then continue;end;
-         tc_aqua     : begin color:=c_aqua   ;if(i<strLen)then continue;end;
-         tc_blue     : begin color:=c_blue   ;if(i<strLen)then continue;end;
-         tc_gray     : begin color:=c_gray   ;if(i<strLen)then continue;end;
-         tc_dgray    : begin color:=c_dgray  ;if(i<strLen)then continue;end;
-         tc_white    : begin color:=c_white  ;if(i<strLen)then continue;end;
-         tc_green    : begin color:=c_green  ;if(i<strLen)then continue;end;
-         tc_default  : begin color:=BaseColor;if(i<strLen)then continue;end;
+         tc_nl3      : ;
+         tc_UACRank  : begin
+                       draw_sdlsurface(sur,ix,y,spr_RaceRank[r_uac ]);
+                       ix+= font_w1;
+                       end;
+         tc_HellRank : begin
+                       draw_sdlsurface(sur,ix,y,spr_RaceRank[r_hell]);
+                       ix+= font_w1;
+                       end;
+         tc_player0..
+         tc_player7  : color:=PlayerGetColor(ord(charc),false);
+         tc_purple   : color:=c_purple ;
+         tc_red      : color:=c_red    ;
+         tc_orange   : color:=c_orange ;
+         tc_yellow   : color:=c_yellow ;
+         tc_lime     : color:=c_lime   ;
+         tc_aqua     : color:=c_aqua   ;
+         tc_blue     : color:=c_blue   ;
+         tc_gray     : color:=c_gray   ;
+         tc_dgray    : color:=c_dgray  ;
+         tc_white    : color:=c_white  ;
+         tc_green    : color:=c_green  ;
+         tc_default  : color:=BaseColor;
          else
             case charc of
-            char_detect  : boxColor(sur,ix,y,ix+font_wi,y+font_wi,c_purple );
-            char_advanced: boxColor(sur,ix,y,ix+font_wi,y+font_wi,c_white  );
-            ',',';','[',']','{','}'
-                         : boxColor(sur,ix,y,ix+font_wi,y+font_wi,BaseColor);
-            else           boxColor(sur,ix,y,ix+font_wi,y+font_wi,color    );
+            char_detect: boxColor(sur,ix,y,ix+font_wi,y+font_wi,c_purple );
+            ',',';',
+            '[',']',
+            '{','}'    : boxColor(sur,ix,y,ix+font_wi,y+font_wi,BaseColor);
+            else         boxColor(sur,ix,y,ix+font_wi,y+font_wi,color    );
             end;
 
             draw_mwtexture(sur,ix,y,@font_1[charc]);
@@ -308,14 +316,14 @@ begin
        with log_l[log_i] do
          case mtype of
 lmt_unit_LevelUp    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
-lmt_unit_ready       : if(g_uids[argx].uid_ukbuilding)
+lmt_unit_ready       : if(g_uids[argx].uid_isbuilding)
                        then ui_AddMarker(xi,yi,aummat_created_b ,true)
                        else ui_AddMarker(xi,yi,aummat_created_u ,true);
 lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade   ,true);
 lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info      ,true);
 lmt_allies_attacked,
 lmt_unit_attacked    : begin
-                       if(g_uids[argx].uid_ukbuilding)
+                       if(g_uids[argx].uid_isbuilding)
                        then ui_AddMarker(xi,yi,aummat_attacked_b,false)
                        else ui_AddMarker(xi,yi,aummat_attacked_u,false);
 

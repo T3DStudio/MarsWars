@@ -106,7 +106,6 @@ begin
       end
       else posCY:=mi_y0;
 
-      //barh-=2;
       boxColor(tar,mi_x0+1,posCY,mi_x0+2,posCY+barh,c_lime);
    end;
 end;
@@ -264,8 +263,8 @@ begin
    vc:=chat_type[menu_ItemSelected<>mi];
 end;
 begin
-   draw_sdlsurface(tar,0,0,spr_mback);
-   draw_sdlsurface(tar,menu_hw-(spr_mlogo^.w div 2),0,spr_mlogo);
+   draw_sdlsurface(tar,0,0,spr_MenuBackground);
+   draw_sdlsurface(tar,menu_hw-(spr_MenuLogo^.w div 2),0,spr_MenuLogo);
 
    draw_text(tar,menu_w,menu_h,str_ver,ta_RB,255,c_white);
 

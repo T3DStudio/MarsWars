@@ -220,27 +220,26 @@ end;
 //   GAME
 //
 
-TUnitAbilityType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_unit);
+TUnitAbilityTargetType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_UnitAny,uat_UnitAlly,uat_UnitOwn);
 
 TUnitAbility = record
-   ua_type    : TUnitAbilityType;
-   ua_rebuild_uid,
-   ua_rupgr,
-   ua_rupgrl,
-   ua_ruid    : byte;
-   ua_reload  : integer;
+   ua_type        : TUnitAbilityTargetType;
+   ua_req_upgr,
+   ua_req_uid     : byte;
+   ua_reload      : integer;
+   ua_reload_upgr : byte;
+   ua_reload_upgrS: integer;
    {$IFDEF _FULLGAME}
-   ua_mbrush_c: cardinal;
-   ua_mbrush_r: integer;
-   ua_btn     : PTMWTexture;
+   ua_mbrush_r    : integer;
+   ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Descript: shortstring;
    {$ENDIF}
 end;
 
 TDamageMod = array[0..LastDamageModFactor] of record
-  dm_factor : integer;  // 100 = x1
-  dm_flags  : cardinal;
+  dm_Factor     : integer;  // 100 = x1
+  dm_TargetFlags: cardinal;
 end;
 
 TMID = record
@@ -294,27 +293,33 @@ TWCPDataTime = array[0..LastKeyPoint] of byte;
 
 TUnitArms = record
   aw_type,
-  aw_tarprior,
-  aw_fakeshots,
-  aw_rupgr,
-  aw_rupgr_l,
-  aw_ruid,
-  aw_dupgr,
-  aw_oid      : byte;
-  aw_uids     : TSob;
-  aw_tarf,
-  aw_reqf     : cardinal;
-  aw_x,
-  aw_y,
-  aw_dupgr_s,
+  aw_reload,
+  aw_FakeShotsN  : byte;
+  aw_ShotPoints  : TSoB;
+
+  aw_object_id   : byte;
+  aw_object_count: integer;
+
+  aw_req_upgr,
+  aw_req_uid     : byte;
+  aw_req_flags   : cardinal;
+
+  aw_tar_prior   : byte;
+  aw_tar_uids    : TSob;
+  aw_tar_Flags   : cardinal;
+
+  aw_impact_dmod,
+  aw_impact_upgr : byte;
+  aw_impact_upgrStep
+                 : integer;
+
+  aw_offset_x,
+  aw_offset_y,
   aw_max_range,
-  aw_min_range,
-  aw_count    : integer;
-  aw_dmod,
-  aw_rld      : byte;
-  aw_rld_s    : TSoB;
+  aw_min_range   : integer;
+
   {$IFDEF _FULLGAME}
-  aw_rld_a    : TSoB;
+  aw_AnimPoints  : TSoB;
   aw_snd_target,
   aw_snd_shot,
   aw_snd_start: PTSoundSet;
@@ -332,7 +337,7 @@ TUID = record
    uid_MaxHits1,
    uid_MaxHitsh,
    uid_MaxHitsq     : longint;
-   uid_speed,
+   uid_BaseSpeed,
    uid_r,
    uid_missileR,
    uid_SightR,
@@ -362,7 +367,6 @@ TUID = record
    uid_rebuild_uid,
    uid_rebuild_ruid,
    uid_rebuild_rupgr,
-   uid_rebuild_rupgrl,
    uid_DeathMissile,
    uid_DeathMissile_dmod,
    uid_DeathUID,
@@ -375,8 +379,7 @@ TUID = record
    uid_req_uid2n,
    uid_req_uid3,
    uid_req_uid3n,
-   uid_req_upgr,
-   uid_req_upgrl    : byte;
+   uid_req_upgr     : byte;
 
    uid_CanAttack    : boolean;
    uid_arms_BonusAntiFlyRange,
@@ -390,26 +393,28 @@ TUID = record
 
    uid_ability_ReqNoObstacles
                     : boolean;
+   uid_ability1,
+   uid_ability2,
+   uid_ability3,
    uid_ability,
    uid_ability_ReqUpgr,
-   uid_ability_ReqUpgrl,
    uid_ability_ReqUID
                     : byte;
 
    uid_OutUnitsTeleBuff,
    uid_SlowTurn,
-   uid_ukbuilding,
-   uid_ukmech,
-   uid_uklight,
-   uid_detector,
+   uid_SplashResist,
+   uid_isbuilding,
+   uid_ismech,
+   uid_islight,
+   uid_isdetector,
    uid_isbuilder,
    uid_issmith,
    uid_isbarrack,
    uid_issolid,
-   uid_ukfly,
-   uid_SplashResist : boolean;
-   uid_FastDeathHits
-                    : integer;
+   uid_isfly
+                    : boolean;
+   uid_FastDeathHits: integer;
 
    uid_prod_Buildings,
    uid_prod_Units,

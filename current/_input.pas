@@ -629,8 +629,8 @@ begin
                   else
                     case ui_uibtn_pabilityu^.uid^.uid_ability of
                     uab_Teleport,
-                    uab_HInvulnerability,
-                    uab_HellVision      :;
+                    uab_SphereInvuln,
+                    uab_HEyeVision      :;
                     else exit;
                     end;
      end;
@@ -657,8 +657,8 @@ begin
           co_pability: if(pUIPlayer<>nil)then
                          case ui_uibtn_pabilityu^.uid^.uid_ability of
                          uab_Teleport        : if(player      <>pUIPlayer      )then continue;
-                         uab_HInvulnerability,
-                         uab_HellVision      : if(player^.team<>pUIPlayer^.team)then continue;
+                         uab_SphereInvuln,
+                         uab_HEyeVision      : if(player^.team<>pUIPlayer^.team)then continue;
                          else continue;
                          end;
           end;
@@ -728,9 +728,9 @@ begin
                               else
                                 with uid^ do
                                   case uid_ability of
-                                  uab_HKeepBlink,
+                                  uab_HKeepShift,
                                   uab_HTowerBlink,
-                                  uab_CCFly         : math_push_out(mouse_map_x,mouse_map_y,uid_r                        ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                  uab_UACCCLand         : math_push_out(mouse_map_x,mouse_map_y,uid_r                        ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
                                   uab_RebuildInPoint: math_push_out(mouse_map_x,mouse_map_y,g_uids[uid_rebuild_uid].uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
                                   end;
      co_move            : if(not iActEnabled(iAct_Control_UMove   ))then m_brush:=co_empty;
@@ -1174,40 +1174,44 @@ begin
    if(not m_DragCamMove)and(not rpls_POVRecorder)then GameControlsCameraMove;
 
    // Chat
-   if(InputActionPressed(iAct_InGameChat))then
-     if(ui_InGameChat>0)then
-     begin
-        if(length(net_chat_str)>0)then
+   if(rpls_pstate=rpls_read)or(net_status=ns_none)
+   then ui_InGameChat:=0
+   else
+   begin
+      if(InputActionPressed(iAct_InGameChat))then
+        if(ui_InGameChat>0)then
         begin
-           case ui_InGameChat of
-           chat_all   : ui_InGameChat:=255;
-           chat_allies: if(PlayerGetAlliesByte(LocalPlayer,false)>0)then
-                          ui_InGameChat:=PlayerGetAlliesByte(LocalPlayer,true);
-           else         ui_InGameChat:=0;
+           if(length(net_chat_str)>0)then
+           begin
+              case ui_InGameChat of
+              chat_all   : ui_InGameChat:=255;
+              chat_allies: if(PlayerGetAlliesByte(LocalPlayer,false)>0)then
+                             ui_InGameChat:=PlayerGetAlliesByte(LocalPlayer,true);
+              else         ui_InGameChat:=0;
+              end;
+
+              if(ui_InGameChat>0)then
+                if(net_status=ns_client)
+                then net_send_chat(            ui_InGameChat,net_chat_str)
+                else GameLogChat  (LocalPlayer,ui_InGameChat,net_chat_str);
+              net_chat_str:='';
            end;
-
-           if(ui_InGameChat>0)then
-             if(net_status=ns_client)
-             then net_send_chat(            ui_InGameChat,net_chat_str)
-             else GameLogChat  (LocalPlayer,ui_InGameChat,net_chat_str);
-           net_chat_str:='';
-        end;
-        ui_InGameChat:=0;
-     end
-     else
-       if(PlayerGetAlliesByte(LocalPlayer,false)>0)
-       then ui_InGameChat:=chat_allies
-       else ui_InGameChat:=chat_all;
-   if(InputActionPressed(iAct_InGameChatAllies))then
-     if(ui_InGameChat=0)then
-       if(PlayerGetAlliesByte(LocalPlayer,false)>0)then ui_InGameChat:=chat_allies;
-   if(InputActionPressed(iAct_InGameChatAll   ))then
-     if(ui_InGameChat=0)then ui_InGameChat:=chat_all;
-
-   // Chat text input
-   if(ui_InGameChat>0)then
-     if(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))then
-       net_chat_str:=StringApplyInput(net_chat_str,CharSetCommon,MaxChatStringLength,nil);
+           ui_InGameChat:=0;
+        end
+        else
+          if(PlayerGetAlliesByte(LocalPlayer,false)>0)
+          then ui_InGameChat:=chat_allies
+          else ui_InGameChat:=chat_all;
+      if(InputActionPressed(iAct_InGameChatAllies))then
+        if(ui_InGameChat=0)then
+          if(PlayerGetAlliesByte(LocalPlayer,false)>0)then ui_InGameChat:=chat_allies;
+      if(InputActionPressed(iAct_InGameChatAll   ))then
+        if(ui_InGameChat=0)then ui_InGameChat:=chat_all;
+      // Chat text input
+      if(ui_InGameChat>0)then
+        if(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))then
+          net_chat_str:=StringApplyInput(net_chat_str,CharSetCommon,MaxChatStringLength,nil);
+   end;
 
    // Escape
    if(InputActionPressed(iact_Esc))then

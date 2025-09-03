@@ -555,7 +555,7 @@ upgr_hell_MeleeDamage  = 4;  // melee attack damage
 upgr_hell_Regeneration = 5;  // regeneration
 upgr_hell_PainFactor   = 6;  // pain state
 upgr_hell_BuilderR     = 7;  // main range
-upgr_hell_HKTeleport   = 8;  // HK teleportation
+upgr_hell_HKeepShift   = 8;  // HK teleportation
 upgr_hell_DecayAura    = 9;  // decay aura
 upgr_hell_TowerR       = 10; // towers range
 
@@ -865,20 +865,31 @@ uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep,UID_UACommand
 //
 
 uab_Teleport           = 1;
-uab_UACScan            = 2;
-uab_HTowerBlink        = 3;
+uab_Recall             = 2;
+uab_UACScan            = 3;
 uab_UACStrike          = 4;
-uab_HKeepBlink         = 5;
-uab_RebuildInPoint     = 6;
-uab_HInvulnerability   = 7;
-uab_SpawnLost          = 8;
-uab_HellVision         = 9;
-uab_CCFly              = 10;
-uab_ToUACDron          = 11;
-uab_Unload             = 12;
+uab_HEyeBlink          = 5;
+uab_HTowerBlink        = 6;
+uab_HKeepShift         = 7;
+uab_SphereInvuln       = 8;
+uab_SpawnLost          = 9;
+uab_SpawnLostTo        = 10;
+uab_HEyeVision         = 11;
+uab_UACCCLand          = 12;
+uab_UACCCLandTo        = 13;
+uab_ToUACDron          = 14;
+uab_Unload             = 15;
+uab_UnloadTo           = 16;
+
+uab_RebuildInPoint     = 17;
+uab_UACProdLevelUp     = 18;
+uab_HellProdLevelUp    = 19;
+
+uab_ToUGTurret         = 20;
+uab_ToUATurret         = 21;
 
 client_rld_abils       = [
-                         uab_Teleport,uab_HellVision,uab_HInvulnerability,uab_HKeepBlink,uab_HTowerBlink
+                         uab_Teleport,uab_HEyeVision,uab_SphereInvuln,uab_HKeepShift,uab_HTowerBlink
                          ];
 client_rld_uids        = [];
 client_cast_abils      = [
@@ -886,10 +897,10 @@ client_cast_abils      = [
                          uab_UACStrike
                          ];
 
-uab_sabilityOrder       = [uab_SpawnLost,uab_CCFly,uab_ToUACDron,uab_Unload];
-uab_pabilityOrder       = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
-                           uab_HKeepBlink,uab_RebuildInPoint,uab_HInvulnerability,
-                           uab_SpawnLost,uab_HellVision,uab_CCFly,uab_Unload];
+uab_sabilityOrder      = [uab_SpawnLost,uab_UACCCLand,uab_ToUACDron,uab_Unload];
+uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
+                          uab_HKeepShift,uab_RebuildInPoint,uab_SphereInvuln,
+                          uab_SpawnLost,uab_HEyeVision,uab_UACCCLand,uab_Unload];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1180,7 +1191,6 @@ char_koth              : char = '=';
 
 dead_time              = -dead_hits;
 char_detect            = #7;
-char_advanced          = #10;
 
 spr_upgrade_icons      = 20;
 
@@ -1272,7 +1282,7 @@ EID_BBExp              = 202;
 EID_Teleport           = 203;
 EID_Exp                = 204;
 EID_Exp2               = 205;
-EID_Gavno              = 206;
+EID_InfantryGibs              = 206;
 EID_HKeep_H            = 207;
 EID_HKeep_S            = 208;
 EID_HAKeep_H           = 209;
@@ -1693,6 +1703,7 @@ fileExt_save           : shortstring = '.mws';
 fileExt_Replay         : shortstring = '.mwr';
 
 folder_Race            : array[1..r_cnt] of shortstring = ('hell\'          ,'uac\'          );
+folder_RaceUI          : array[1..r_cnt] of shortstring = ('hell\ui\'       ,'uac\ui\'       );
 folder_RaceUnits       : array[1..r_cnt] of shortstring = ('hell\units\'    ,'uac\units\'    );
 folder_RaceBuildings   : array[1..r_cnt] of shortstring = ('hell\buildings\','uac\buildings\');
 folder_RaceUpgrades    : array[1..r_cnt] of shortstring = ('hell\upgrades\' ,'uac\upgrades\' );
@@ -1704,6 +1715,7 @@ folder_save            : shortstring = 'save\';
 folder_replay          : shortstring = 'replay\';
 folder_effects         : shortstring = 'effs\';
 folder_missiles        : shortstring = 'missiles\';
+folder_ui              : shortstring = 'ui\';
 
 ui_limitstr            : shortstring = '125';
 
@@ -1730,8 +1742,12 @@ tc_white               = #22;
 tc_green               = #23;
 tc_dgray               = #24;
 tc_default             = #25;
+tc_UACRank             = #176;
+tc_HellRank            = #177;
 
 tc_SpecChars           = [tc_player0..tc_default];
+
+tc_RaceRank            : array[1..r_cnt] of char = (tc_HellRank,tc_UACRank);
 
 b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
 

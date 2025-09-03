@@ -460,9 +460,9 @@ begin
    else exit;
    end;
 
+   ui_update_now:=true;
    MainMenu :=false;
    G_Started:=true;
-   ui_blink_timer1:=1;
    menu_ItemSelected:=0;
 end;
 
@@ -530,7 +530,7 @@ begin
         with g_punits[u]^ do
          if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
           with uid^ do
-           if(not uid_ukbuilding)then
+           if(not uid_isbuilding)then
              if((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
             and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))then
              begin
@@ -551,7 +551,7 @@ begin
                 with uid^ do
                   isselected:=((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
                     and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))
-                    and(SelectBuildings or not uid_ukbuilding);
+                    and(SelectBuildings or not uid_isbuilding);
 
           if(wassel<>isselected)then
             if(isselected)then
@@ -703,13 +703,7 @@ begin
    end;
 end;
 
-procedure save_surf(fname:shortstring;surf:pSDL_Surface);
-begin
-   if(surf=nil)then exit;
-   fname:='temp\'+fname+'.bmp'+#0;
-   sdl_saveBMP(surf,@fname[1]);
-   sdl_freesurface(surf);
-end;
+
 
 procedure test_UnitsSpec;
 var

@@ -66,10 +66,10 @@ begin
       begin
          armor:=0;//_base_armor;
          with player^ do
-           if(uid_ukbuilding)
+           if(uid_isbuilding)
            then armor+=integer(upgr[uid_upgr_Armor]+upgr[upgr_race_armor_build[uid_race]])*UpgradeBuildArmorBonus
            else
-             if(uid_ukmech)
+             if(uid_ismech)
              then armor+=integer(upgr[uid_upgr_Armor]+upgr[upgr_race_armor_mech[uid_race]])*UpgradeUnitArmorBonus
              else armor+=integer(upgr[uid_upgr_Armor]+upgr[upgr_race_armor_bio [uid_race]])*UpgradeUnitArmorBonus;
 
@@ -94,7 +94,7 @@ begin
          else
            if(buffs[ub_Pain]<=0)then exit;
 
-         if(not uid_ukbuilding)and(not uid_ukmech)then
+         if(not uid_isbuilding)and(not uid_ismech)then
            if(uid_PainC>0)then
            begin
               if(pains>0)then pains-=1;
@@ -153,7 +153,7 @@ begin
          unit_morph:=ureq_armylimit;
          exit;
       end;
-      if(not obld)or(puid^.uid_ukbuilding)then
+      if(not obld)or(puid^.uid_isbuilding)then
         if(menergy<=0)then
         begin
            unit_morph:=ureq_energy;
@@ -171,7 +171,7 @@ begin
             unit_morph:=ureq_energy;
             exit;
          end;
-         if(CheckCollisionR(x,y,puid^.uid_r,unum,puid^.uid_ukbuilding,puid^.uid_ukfly,true )>0)then
+         if(CheckCollisionR(x,y,puid^.uid_r,unum,puid^.uid_isbuilding,puid^.uid_isfly,true )>0)then
          begin
             unit_morph:=ureq_place;
             exit;
@@ -220,7 +220,7 @@ begin
       else uds-=tu^.uid^.uid_r+uid_r;
       ud:=round(uds);
 
-      dirTurn:=(a_rld<=0)and((tu^.speed<=0)or(not tu^.iscomplete)or(tu^.uid^.uid_ukbuilding)or((tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)) );
+      dirTurn:=(a_rld<=0)and((tu^.speed<=0)or(not tu^.iscomplete)or(tu^.uid^.uid_isbuilding)or((tu^.x=tu^.uo_x)and(tu^.y=tu^.uo_y)) );
 
       if(uds<0)then
       begin
@@ -355,9 +355,9 @@ begin
           else
           begin
              with uid^ do
-              if(not uid_ukbuilding)then
+              if(not uid_isbuilding)then
                with player^ do
-                if(uid_ukmech)
+                if(uid_ismech)
                 then ss+=upgr[upgr_race_mspeed_mech[uid_race]]*2
                 else ss+=upgr[upgr_race_mspeed_bio [uid_race]]*2;
 
@@ -419,7 +419,7 @@ begin
    begin
       buffs[ub_Resurect]:=fr_fps2;
       zfall:=-uid^.uid_zfall;
-      ukfly:= uid^.uid_ukfly;
+      ukfly:= uid^.uid_isfly;
    end;
 end;
 
@@ -445,14 +445,14 @@ begin
    with player^ do
    with uid_arms[cw] do
    begin
-      if(aw_rld=0)then exit;
+      if(aw_reload=0)then exit;
 
       // Weapon type requirements
       case aw_type of
 wpt_resurect : if(not unit_StartResurrection(pAttacker,pTarget,true))then exit;
 wpt_heal     : if(pTarget^.hits<=0)
                or(pTarget^.hits>=pTarget^.uid^.uid_MaxHits1)
-               or(not pTarget^.iscomplete  )
+               or(not pTarget^.iscomplete)
                or(pTarget^.buffs[ub_Heal]>0)then exit;
       end;
 
@@ -478,27 +478,28 @@ wpt_heal     : if(pTarget^.hits<=0)
 
       // UID and UPID requirements
 
-      if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0         )then exit;
-      if(aw_rupgr>0)and(upgr  [aw_rupgr]< aw_rupgr_l)then exit;
+      if(aw_req_uid >0)and(uid_eb[aw_req_uid ]<=0)then exit;
+      if(aw_req_upgr>0)and(upgr  [aw_req_upgr] =0)then exit;
 
       // requirements to attacker and some flags
 
-      if not(pTarget^.uidi in aw_uids)then exit;
+      if not(pTarget^.uidi in aw_tar_uids)then exit;
 
-      if((aw_reqf and wpr_air   )>0)then
-       if(ukfly=uf_ground)or(pTarget^.ukfly=uf_ground)then exit;
-      if((aw_reqf and wpr_ground)>0)then
-       if(ukfly=uf_fly   )or(pTarget^.ukfly=uf_fly   )then exit;
-      if((aw_reqf and wpr_reload)>0)then
-       if(rld>0)then exit;
+      if((aw_req_flags and wpr_air   )>0)then
+        if(ukfly=uf_ground)or(pTarget^.ukfly=uf_ground)then exit;
+      if((aw_req_flags and wpr_ground)>0)then
+        if(ukfly=uf_fly   )or(pTarget^.ukfly=uf_fly   )then exit;
+      if((aw_req_flags and wpr_reload)>0)then
+        if(rld>0)then exit;
 
       if(aw_type=wpt_directdmgZ)then
       begin
          if(pTarget^.iscomplete=false)
          or(pTarget^.uid^.uid_ZombieUID =0)
          or(pTarget^.uid^.uid_ZombieHits<pTarget^.hits)
-         or(pTarget^.hits<=fdead_hits          )then exit;
-         if(pTarget^.player^.team=team)and(pTarget^.hits>0)then exit;
+         or(pTarget^.hits<=fdead_hits)then exit;
+         if (pTarget^.player^.team=team)
+         and(pTarget^.hits>0)then exit;
 
          if((armylimit-uid_LimitUse+pTarget^.uid^.uid_LimitUse+uprodl)>MaxPlayerLimit)then exit;
          if((menergy-uid_EnergyGen+pTarget^.uid^.uid_EnergyGen)<=0)then exit;
@@ -507,25 +508,25 @@ wpt_heal     : if(pTarget^.hits<=0)
 
       // requirements to target
 
-      if((aw_tarf and wtr_owner_p  )=0)and(pTarget^.playeri      =playeri       )then exit;
-      if((aw_tarf and wtr_owner_a  )=0)and(pTarget^.player^.team =team          )then exit;
-      if((aw_tarf and wtr_owner_e  )=0)and(pTarget^.player^.team<>team          )then exit;
+      if((aw_tar_Flags and wtr_owner_p  )=0)and(pTarget^.playeri      =playeri       )then exit;
+      if((aw_tar_Flags and wtr_owner_a  )=0)and(pTarget^.player^.team =team          )then exit;
+      if((aw_tar_Flags and wtr_owner_e  )=0)and(pTarget^.player^.team<>team          )then exit;
 
-      if((aw_tarf and wtr_hits_h   )=0)and((0<pTarget^.hits)
-                                       and(pTarget^.hits< pTarget^.uid^.uid_MaxHits1 ))then exit;
-      if((aw_tarf and wtr_hits_d   )=0)and(pTarget^.hits<=0                     )then exit;
-      if((aw_tarf and wtr_hits_a   )=0)and(pTarget^.hits =pTarget^.uid^.uid_MaxHits1  )then exit;
+      if((aw_tar_Flags and wtr_hits_h   )=0)and((0<pTarget^.hits)
+                                      and(pTarget^.hits< pTarget^.uid^.uid_MaxHits1 ))then exit;
+      if((aw_tar_Flags and wtr_hits_d   )=0)and(pTarget^.hits<=0                     )then exit;
+      if((aw_tar_Flags and wtr_hits_a   )=0)and(pTarget^.hits =pTarget^.uid^.uid_MaxHits1)then exit;
 
-      if((aw_tarf and wtr_complete )=0)and(pTarget^.iscomplete                  )then exit;
-      if((aw_tarf and wtr_ncomplete)=0)and(pTarget^.iscomplete =false           )then exit;
+      if((aw_tar_Flags and wtr_complete )=0)and(    pTarget^.iscomplete              )then exit;
+      if((aw_tar_Flags and wtr_ncomplete)=0)and(not pTarget^.iscomplete              )then exit;
 
-      if(not pTarget^.uid^.uid_ukbuilding  )then
+      if(not pTarget^.uid^.uid_isbuilding  )then
       begin
-      if((aw_tarf and wtr_stun     )=0)and(pTarget^.buffs[ub_Pain]> 0           )then exit;
-      if((aw_tarf and wtr_nostun   )=0)and(pTarget^.buffs[ub_Pain]<=0           )then exit;
+      if((aw_tar_Flags and wtr_stun     )=0)and(pTarget^.buffs[ub_Pain]> 0           )then exit;
+      if((aw_tar_Flags and wtr_nostun   )=0)and(pTarget^.buffs[ub_Pain]<=0           )then exit;
       end;
 
-      if(not CheckUnitBaseFlags(pTarget,aw_tarf))then exit;
+      if(not CheckUnitBaseFlags(pTarget,aw_tar_Flags))then exit;
 
       // Distance requirements
       if(aw_max_range=aw_srange) // = srange
@@ -541,7 +542,7 @@ wpt_heal     : if(pTarget^.hits<=0)
       if(pTarget^.ukfly)
       then awr-=uid_arms_BonusAntiFlyRange
       else awr-=uid_arms_BonusAntiGroundRange;
-      if(pTarget^.uid^.uid_ukbuilding)
+      if(pTarget^.uid^.uid_isbuilding)
       then awr-=uid_arms_BonusAntiBuildingRange
       else awr-=uid_arms_BonusAntiUnitRange;
 
@@ -607,44 +608,44 @@ begin
    with uid^ do
    case priorset of
 wtp_building         : begin
-                       incPrio(    uid_ukbuilding   );
+                       incPrio(    uid_isbuilding   );
                        incPrio(uid_EnergyGen>0);
                        incPrio(not iscomplete    );
                        end;
 wtp_BuildingHeavy    : begin
-                       incPrio((   uid_ukbuilding  )
-                            and(not uid_uklight    ));
+                       incPrio((   uid_isbuilding  )
+                            and(not uid_islight    ));
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitBioLight     : begin
-                       incPrio((not uid_ukbuilding )
-                            and(not uid_ukmech     )
-                            and(    uid_uklight    ));
+                       incPrio((not uid_isbuilding )
+                            and(not uid_ismech     )
+                            and(    uid_islight    ));
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitBioHeavy     : begin
-                       incPrio((not uid_ukbuilding )
-                            and(not uid_ukmech     )
-                            and(not uid_uklight    ));
+                       incPrio((not uid_isbuilding )
+                            and(not uid_ismech     )
+                            and(not uid_islight    ));
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitMech         : begin
-                       incPrio(not uid_ukbuilding   );
-                       incPrio(    uid_ukmech       );
+                       incPrio(not uid_isbuilding   );
+                       incPrio(    uid_ismech       );
                        incPrio(not iscomplete    );
                        end;
 wtp_UnitBio          : begin
-                       incPrio(not uid_ukbuilding   );
-                       incPrio(not uid_ukmech       );
+                       incPrio(not uid_isbuilding   );
+                       incPrio(not uid_ismech       );
                        incPrio(not iscomplete    );
                        end;
 wtp_Bio              : begin
-                       incPrio(not uid_ukmech       );
-                       incPrio((not uid_ukbuilding)or(not iscomplete));
+                       incPrio(not uid_ismech       );
+                       incPrio((not uid_isbuilding)or(not iscomplete));
                        end;
-wtp_Light            : incPrio(    uid_uklight      );
+wtp_Light            : incPrio(    uid_islight      );
 wtp_GroundLight      : begin
-                       incPrio((    uid_uklight    )
+                       incPrio((    uid_islight    )
                             and(not ukfly       ));
                        incPrio(uid_EnergyGen        >0);
                        end;
@@ -654,11 +655,11 @@ wtp_Fly              : begin
                        end;
 wtp_nolost_hits      : ;
 wtp_UnitLight        : begin
-                       incPrio(not uid_ukbuilding   );
-                       incPrio(    uid_uklight      );
+                       incPrio(not uid_isbuilding   );
+                       incPrio(    uid_islight      );
                        incPrio(not iscomplete    );
                        end;
-wtp_limit            : incPrio(not uid_ukbuilding   );
+wtp_limit            : incPrio(not uid_isbuilding   );
 wtp_limitaround      : GetWeaponPriority+=pTarget^.aiu_limitaround_ally div ul1;
 wtp_Scout            : begin
                        incPrio(uid_LimitUse<ul3);
@@ -692,19 +693,19 @@ begin
       else
        with uid_arms[tw] do
         if(tw<t_weap^)
-        then n_prio:=GetWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu))
+        then n_prio:=GetWeaponPriority(tu,aw_tar_prior,ai_HighPriorityTarget(player,tu))
         else
         begin
-           n_prio:=GetWeaponPriority(tu,aw_tarprior,ai_HighPriorityTarget(player,tu));
+           n_prio:=GetWeaponPriority(tu,aw_tar_prior,ai_HighPriorityTarget(player,tu));
 
-           case aw_tarprior of
+           case aw_tar_prior of
            //wtp_heal      : if(tu<>pu)then n_prio+=1;
            wtp_limit     : n_prio+=tu^.uid^.uid_LimitUse;
            end;
 
            //if(n_prio>t_prio^)then ;
            if(n_prio=t_prio^)then
-           case aw_tarprior of
+           case aw_tar_prior of
 wtp_max_hits          : if(tu^.hits       <a_tarp^^.hits       )
                         then exit
                         else
@@ -759,7 +760,7 @@ begin
    case uidi of
 UID_HAKeep,
 UID_HKeep     : if(ud<srange)
-               and(not pTarget^.uid^.uid_ukbuilding)
+               and(not pTarget^.uid^.uid_isbuilding)
                and(pTarget^.iscomplete)
                and(team<>pTarget^.player^.team)then
                   if(pTarget^.buffs[ub_Decay]<=fr_fpsh)and(upgr[upgr_hell_DecayAura]>0)then
@@ -832,7 +833,7 @@ begin
          end;
       end;
 
-      if(uid_ukbuilding)and(menergy<=0)then
+      if(uid_isbuilding)and(menergy<=0)then
       begin
          unit_kill(pu,false,false,true,false,true);
          exit;
@@ -1044,7 +1045,7 @@ begin
    if(not IsUnitRange(tar,@tu))then exit;
    with tu^ do
    with uid^ do
-     if(uid_ukbuilding)
+     if(uid_isbuilding)
      or(not iscomplete)
      or(ukfly)
      or(hits<=0)
@@ -1084,7 +1085,7 @@ begin
    unit_ability_teleport:=false;
    with pu^  do
     with uid^ do
-      if(not uid_ukbuilding)and(iscomplete)and(ukfly=false)and(tu^.hits>0)and(tu^.iscomplete)then
+      if(not uid_isbuilding)and(iscomplete)and(ukfly=false)and(tu^.hits>0)and(tu^.iscomplete)then
        if(playeri=tu^.playeri)and(buffs[ub_Teleport]<=0)then
         if(td<=tu^.uid^.uid_r)then
         begin
@@ -1369,14 +1370,6 @@ begin
    with uid^ do
    with uid_arms[a_weap] do
    begin
-      {if((aw_reqf and wpr_avis)>0)then
-      begin
-         AddToInt(@pTarget^.TeamVision[player^.team],MinVisionTime);
-         {$IFDEF _FULLGAME}
-         if not(a_rld in aw_rld_a)then
-           if(AddToInt(@pTarget^.buffs[ub_ArchFire ],fr_fps1))then SoundPlayUnit(snd_archvile_fire,pTarget,@vis_Target);
-         {$ENDIF}
-      end; }
       AddToInt(@TeamVision[pTarget^.player^.team],a_rld+1);
       AddToInt(@TeamVision[pTarget^.player^.team],MinVisionTime);
       for i:=0 to LastPlayer do
@@ -1433,7 +1426,7 @@ begin
 
          with uid^ do
            with uid_arms[a_weap] do
-             attackinmove:=(aw_reqf and wpr_move)>0;
+             attackinmove:=(aw_req_flags and wpr_move)>0;
 
          case a of
          wmove_closer : begin
@@ -1478,7 +1471,7 @@ begin
 
          with uid^ do
            with uid_arms[a_weap] do
-             attackinmove:=(aw_reqf and wpr_move)>0;
+             attackinmove:=(aw_req_flags and wpr_move)>0;
       end;
 
       if(not unit_canAttack(pAttacker,true))then
@@ -1500,15 +1493,15 @@ begin
          if(a_rld<=0)then
          begin
             a_shots  +=1;
-            a_rld    :=aw_rld;
+            a_rld    :=aw_reload;
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
 
-            if(ServerSide)and(not uid_ukbuilding)then
+            if(ServerSide)and(not uid_isbuilding)then
               if((aw_max_range<0)and(aw_type=wpt_directdmg))
               or(aw_type=wpt_heal)
-              then unit_AddExp(pAttacker,aw_rld*2)
-              else unit_AddExp(pAttacker,aw_rld  );
+              then unit_AddExp(pAttacker,aw_reload*2)
+              else unit_AddExp(pAttacker,aw_reload  );
             if(not attackinmove)then
             begin
                if(x<>pTarget^.x)
@@ -1536,11 +1529,11 @@ begin
            end;
          {$ENDIF}
 
-         if(a_rld in aw_rld_s)then
+         if(a_rld in aw_ShotPoints)then
          begin
-            if(aw_fakeshots=0)
+            if(aw_FakeShotsN=0)
             then fakemissile:=false
-            else fakemissile:=(a_shots mod aw_fakeshots)>0;
+            else fakemissile:=(a_shots mod aw_FakeShotsN)>0;
             {$IFDEF _FULLGAME}
             effect_UnitAttack(pAttacker,false,@vis_Attacker);
             if(vis_Target)then
@@ -1552,34 +1545,34 @@ begin
                 SoundPlayUnit(aw_snd_target,pTarget,@vis_Target);
              end;
             {$ENDIF}
-            if(aw_dupgr>0)and(aw_dupgr_s>0)then upgradd:=player^.upgr[aw_dupgr]*aw_dupgr_s;
-            if(level>0)and(not uid_ukbuilding)then upgradd+=level*uid_LevelBonusDamage;
+            if(aw_impact_upgr>0)and(aw_impact_upgrStep>0)then upgradd:=player^.upgr[aw_impact_upgr]*aw_impact_upgrStep;
+            if(level>0)and(not uid_isbuilding)then upgradd+=level*uid_LevelBonusDamage;
             if(not attackinmove)then
               if(x<>pTarget^.x)
               or(y<>pTarget^.y)then dir:=point_dir(x,y,pTarget^.x,pTarget^.y);
             case aw_type of
-wpt_missle     : if(aw_oid>0)then
-                  if(aw_count=0)
-                  then missile_add(pTarget^.x,pTarget^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_dmod)
+wpt_missle     : if(aw_object_id>0)then
+                  if(aw_object_count=0)
+                  then missile_add(pTarget^.x,pTarget^.y,vx+aw_offset_x,vy+aw_offset_y,a_tar,aw_object_id,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_impact_dmod)
                   else
-                    if(aw_count>0)
-                    then for c:=1 to aw_count do missile_add(pTarget^.x,pTarget^.y,vx+aw_x,vy+aw_y,a_tar,aw_oid,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_dmod)
+                    if(aw_object_count>0)
+                    then for c:=1 to aw_object_count do missile_add(pTarget^.x,pTarget^.y,vx+aw_offset_x,vy+aw_offset_y,a_tar,aw_object_id,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_impact_dmod)
                     else
-                      if(aw_count<0)then
+                      if(aw_object_count<0)then
                       begin
-                         missile_add(pTarget^.x,pTarget^.y,vx-aw_count+aw_x,vy-aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_dmod);
-                         missile_add(pTarget^.x,pTarget^.y,vx+aw_count+aw_x,vy+aw_count+aw_y,a_tar,aw_oid,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_dmod);
+                         missile_add(pTarget^.x,pTarget^.y,vx-aw_object_count+aw_offset_x,vy-aw_object_count+aw_offset_y,a_tar,aw_object_id,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_impact_dmod);
+                         missile_add(pTarget^.x,pTarget^.y,vx+aw_object_count+aw_offset_x,vy+aw_object_count+aw_offset_y,a_tar,aw_object_id,playeri,ukfly,pTarget^.ukfly,fakemissile,upgradd,aw_impact_dmod);
                       end;
-wpt_unit       : if(not fakemissile)then ability_unit_spawn(pAttacker,aw_oid);
-wpt_directdmg  : if(not fakemissile)and(aw_count>0)then
+wpt_unit       : if(not fakemissile)then ability_unit_spawn(pAttacker,aw_object_id);
+wpt_directdmg  : if(not fakemissile)and(aw_object_count>0)then
                  begin
-                    damage:=ApplyDamageMod(pTarget,aw_dmod,aw_count+upgradd);
+                    damage:=ApplyDamageMod(pTarget,aw_impact_dmod,aw_object_count+upgradd);
                     unit_damage(pTarget,damage,playeri,false);
                  end;
-wpt_directdmgZ : if(not fakemissile)and(aw_count>0)then
+wpt_directdmgZ : if(not fakemissile)and(aw_object_count>0)then
                   if(not unit_TryZombification(pAttacker,pTarget))then
                   begin
-                     damage:=ApplyDamageMod(pTarget,aw_dmod,aw_count+upgradd);
+                     damage:=ApplyDamageMod(pTarget,aw_impact_dmod,aw_object_count+upgradd);
                      unit_damage(pTarget,damage,playeri,false);
                   end;
 wpt_suicide    : if(ServerSide)then unit_kill(pAttacker,false,true,true,false,true);
@@ -1588,11 +1581,11 @@ wpt_suicide    : if(ServerSide)then unit_kill(pAttacker,false,true,true,false,tr
                 case aw_type of
 wpt_resurect    : begin
                      unit_StartResurrection(pAttacker,pTarget,false);
-                     if((aw_reqf and wpr_reload)>0)then rld:=max2i(0,aw_count*fr_fps1);
+                     if((aw_req_flags and wpr_reload)>0)then rld:=max2i(0,aw_object_count*fr_fps1);
                   end;
 wpt_heal        : begin
-                     pTarget^.hits:=mm3i(1,pTarget^.hits+aw_count+upgradd,pTarget^.uid^.uid_MaxHits1);
-                     pTarget^.buffs[ub_Heal]:=aw_rld;
+                     pTarget^.hits:=mm3i(1,pTarget^.hits+aw_object_count+upgradd,pTarget^.uid^.uid_MaxHits1);
+                     pTarget^.buffs[ub_Heal]:=aw_reload;
                   end;
                 end;
             end;
@@ -1643,7 +1636,7 @@ uab_SpawnLost     : begin
                        unit_sability(pu,false);
                        uo_id:=ua_psability;
                     end;
-uab_CCFly         : if(x=uo_x)and(y=uo_y)then
+uab_UACCCLand         : if(x=uo_x)and(y=uo_y)then
                     begin
                        uo_id:=ua_amove;
                        unit_sability(pu,false);
@@ -1714,7 +1707,7 @@ function unit_rebuild(pu:PTUnit;check:boolean):cardinal;
 begin
    unit_rebuild:=ureq_other;
 
-   if(not ui_Haverebuild(pu))then exit;
+   if(not ui_HaveRebuild(pu))then exit;
 
    with pu^ do
    with uid^ do
@@ -1725,8 +1718,8 @@ begin
       if(uid_rebuild_ruid>0)then
         if(uid_eb[uid_rebuild_ruid]<=0)then unit_rebuild:=ureq_ruid;
 
-      if(uid_rebuild_rupgr>0)and(uid_rebuild_rupgrl>0)then
-        if(upgr[uid_rebuild_rupgr]<uid_rebuild_rupgrl)then unit_rebuild:=ureq_rupid;
+      if(uid_rebuild_rupgr>0)then
+        if(upgr[uid_rebuild_rupgr]<=0)then unit_rebuild:=ureq_rupid;
 
       if(unit_rebuild>0)then exit;
 
@@ -1759,10 +1752,10 @@ begin
         if(map_IfObstacleZone(mapZone))then AddUREQ(ureq_place);
 
       if(uid_ability_ReqUID>0)then
-       if(uid_eb[uid_ability_ReqUID]<=0)then AddUREQ(ureq_ruid);
+        if(uid_eb[uid_ability_ReqUID]<=0)then AddUREQ(ureq_ruid);
 
-      if(uid_ability_ReqUpgr>0)and(uid_ability_ReqUpgrl>0)then
-       if(upgr[uid_ability_ReqUpgr]<uid_ability_ReqUpgrl)then AddUREQ(ureq_rupid);
+      if(uid_ability_ReqUpgr>0)then
+        if(upgr[uid_ability_ReqUpgr]=0)then AddUREQ(ureq_rupid);
    end;
 end;
 
@@ -1781,7 +1774,7 @@ begin
    case uid_ability of
    uab_SpawnLost       : if(buffs[ub_Cast]>0)
                          or(buffs[ub_CCast]>0)then unit_sability:=ureq_reloading;
-   uab_CCFly           : if(zfall<>0)
+   uab_UACCCLand           : if(zfall<>0)
                          or(buffs[ub_CCast]>0)then unit_sability:=ureq_reloading;
    uab_ToUACDron       : unit_sability:=unit_morph(pCaster,uid_UACDron,false,g_uids[uid_UACDron].uid_MaxHitsh,0,true);
    uab_Unload          : if(transportC=0)
@@ -1803,7 +1796,7 @@ begin
                             then ability_unit_spawn(pCaster,UID_Phantom )
                             else ability_unit_spawn(pCaster,UID_LostSoul);
                          end;
-   uab_CCFly           : if(level>0)
+   uab_UACCCLand           : if(level>0)
                          then level:=0
                          else level:=1;
    uab_ToUACDron       : unit_morph(pCaster,uid_UACDron,false,g_uids[uid_UACDron].uid_MaxHitsh,0,false);
@@ -1829,12 +1822,12 @@ begin
    uab_UACScan         : unit_pability:=unit_ability_UACScan    (pCaster,tarx,tary  ,true);
    uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pCaster,tarx,tary  ,true);
    uab_HTowerBlink     : ;
-   uab_HKeepBlink      :;
+   uab_HKeepShift      :;
    uab_RebuildInPoint  :;
-   uab_HInvulnerability:;
+   uab_SphereInvuln:;
    uab_SpawnLost       :;
-   uab_HellVision      :;
-   uab_CCFly           :;
+   uab_HEyeVision      :;
+   uab_UACCCLand           :;
    uab_Unload          : if(transportC=0)
                          or(transportM=0)then unit_pability:=ureq_other;
    else  unit_pability:=ureq_other;
@@ -1851,10 +1844,10 @@ begin
    uab_UACScan         : unit_pability:=unit_ability_UACScan    (pCaster,tarx,tary  ,false);
    uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pCaster,tarx,tary  ,false);
    uab_HTowerBlink     : unit_pability:=unit_ability_HTowerBlink(pCaster,tarx,tary  ,false);
-   uab_HKeepBlink      : unit_pability:=unit_ability_HKeepBlink (pCaster,tarx,tary  ,false);
-   uab_HInvulnerability: unit_pability:=unit_ability_HInvuln    (pCaster,taru       ,false);
-   uab_HellVision      : unit_pability:=unit_ability_HellVision (pCaster,taru       ,false);
-   uab_CCFly           : if(speed>0)
+   uab_HKeepShift      : unit_pability:=unit_ability_HKeepBlink (pCaster,tarx,tary  ,false);
+   uab_SphereInvuln: unit_pability:=unit_ability_HInvuln    (pCaster,taru       ,false);
+   uab_HEyeVision      : unit_pability:=unit_ability_HellVision (pCaster,taru       ,false);
+   uab_UACCCLand           : if(speed>0)
                          then unit_SetDefaultUO(pCaster,ua_psability,0,tarx,tary-fly_hz,-1,-1,true ,false)
                          else
                          begin
@@ -1886,17 +1879,17 @@ begin
       unit_end_pprod(pu);
 
       uXCheck(@uid_x[            uidi]);
-      uXCheck(@ucl_x[uid_ukbuilding,uid_class]);
+      uXCheck(@ucl_x[uid_isbuilding,uid_class]);
 
       // REGENERATION
       if(cycle_order=g_cycle_regen)then
        if(buffs[ub_Damaged]<=0)and(hits<uid_MaxHits1)then
        begin
           i:=upgr[uid_upgr_Regen];
-          if(uid_ukbuilding)
+          if(uid_isbuilding)
           then i+=upgr[upgr_race_regen_build[uid_race]]
           else
-            if(uid_ukmech)
+            if(uid_ismech)
             then i+=upgr[upgr_race_regen_mech[uid_race]]
             else i+=upgr[upgr_race_regen_bio [uid_race]];
           i:=(i*BaseArmorBonus1)+uid_BaseRegen;

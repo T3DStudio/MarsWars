@@ -194,7 +194,7 @@ var i: byte;
 begin
    with pu^ do
    with uid^ do
-     if(uid_ukbuilding)and(iscomplete)then
+     if(uid_isbuilding)and(iscomplete)then
        for i:=0 to LastUnitLevel do
        begin
           if(i>level)then break;
@@ -537,9 +537,9 @@ begin
    begin
       army+=1;
       armylimit+=uid_LimitUse;
-      ucl_e[uid_ukbuilding,uid_class]+=1;
-      ucl_c[uid_ukbuilding     ]+=1;
-      ucl_l[uid_ukbuilding     ]+=uid_LimitUse;
+      ucl_e[uid_isbuilding,uid_class]+=1;
+      ucl_c[uid_isbuilding     ]+=1;
+      ucl_l[uid_isbuilding     ]+=uid_LimitUse;
       uid_e[uidi            ]+=1;
       if(uid_isbuilder)then e_builders+=1;
 
@@ -555,7 +555,7 @@ begin
          begin
             unit_bld_inc_cntrs(pu);
 
-            p:=@ucl_x[uid_ukbuilding,uid_class];
+            p:=@ucl_x[uid_isbuilding,uid_class];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
@@ -605,9 +605,9 @@ begin
    begin
       army-=1;
       armylimit-=uid_LimitUse;
-      ucl_e[uid_ukbuilding,uid_class]-=1;
-      ucl_c[uid_ukbuilding     ]-=1;
-      ucl_l[uid_ukbuilding     ]-=uid_LimitUse;
+      ucl_e[uid_isbuilding,uid_class]-=1;
+      ucl_c[uid_isbuilding     ]-=1;
+      ucl_l[uid_isbuilding     ]-=uid_LimitUse;
       uid_e[uidi            ]-=1;
       if(uid_isbuilder)then e_builders-=1;
 
@@ -624,8 +624,8 @@ begin
             cenergy-=uid_EnergyGen;
             menergy-=uid_EnergyGen;
             uid_eb[uidi]-=1;
-            ucl_eb[uid_ukbuilding,uid_class]-=1;
-            if(ucl_x[uid_ukbuilding,uid_class]=unum)then ucl_x[uid_ukbuilding,uid_class]:=0;
+            ucl_eb[uid_isbuilding,uid_class]-=1;
+            if(ucl_x[uid_isbuilding,uid_class]=unum)then ucl_x[uid_isbuilding,uid_class]:=0;
             if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
 
             unit_done_dec_cntrs(pu);
@@ -675,7 +675,7 @@ begin
    begin
       vx:=x;
       vy:=y;
-      if(uid^.uid_ability=uab_HKeepBlink)then
+      if(uid^.uid_ability=uab_HKeepShift)then
       begin
          case uidi of
 UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_cube    );
@@ -775,7 +775,7 @@ begin
                 if(buffs[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
                 with uid^ do
-                  if(uid_ukbuilding)and(uid_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                  if(uid_isbuilding)and(uid_ability<>uab_HEyeVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                 effect_UnitDeath(uu,true,@vis);
              end;
           end;
@@ -837,7 +837,7 @@ begin
                                      else ability_unit_spawn(pu,UID_LostSoul);
                    end;
 
-                  if(uid^.uid_ukbuilding=false)then
+                  if(uid^.uid_isbuilding=false)then
                   begin
                      if(pu^.level<level)then effect_LevelUp(uu,0,@vis);
 
@@ -856,7 +856,7 @@ begin
               if(pu^.hits>0)and(hits<=0)and(buffs[ub_Resurect]=0)then  // death
               begin
                  with uid^ do
-                   if(uid_ukbuilding)and(uid_ability<>uab_HellVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                   if(uid_isbuilding)and(uid_ability<>uab_HEyeVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(uu,hits<=fdead_hits,@vis);
 
                  with uid^ do
@@ -1085,7 +1085,7 @@ var i: byte;
 begin
    with uu^ do
    with uid^ do
-     if(uid_ukbuilding)and(iscomplete)then
+     if(uid_isbuilding)and(iscomplete)then
        for i:=0 to LastUnitLevel do
          if(i<=level)then
          begin

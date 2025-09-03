@@ -65,6 +65,7 @@
     <CodeGeneration>
       <SmartLinkUnit Value="True"/>
       <RelocatableUnit Value="True"/>
+      <TargetOS Value="win32"/>
     </CodeGeneration>
     <Linking>
       <Debugging>

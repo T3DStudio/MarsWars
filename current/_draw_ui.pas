@@ -153,8 +153,8 @@ begin
                                         DrawNoBuildAreas(g_uids[uid_rebuild_uid].uid_r);
                                         end;
                     uab_HTowerBlink,
-                    uab_HKeepBlink,
-                    uab_CCFly         : begin
+                    uab_HKeepShift,
+                    uab_UACCCLand     : begin
                                         spr:=uid2spr(ui_uibtn_pabilityu^.uidi,270,0);
                                         SDL_SetAlpha(spr^.surf,SDL_SRCALPHA,128);
                                         draw_sdlsurface(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
@@ -278,10 +278,9 @@ bx1,by1:integer;
 begin
    ui_Panel_ButtonXY(@bx0,@by0,@bx1,@by1,bi,3,ui_TabButtonW,ui_ButtonW1);
 
-   if(selected)then draw_rectw(tar,bx0,by0,bx1,by1,-2,0,c_lime);
-
    draw_sdlsurface(tar,((bx0+bx1)div 2)-(btn^.w div 2),
                        ((by0+by1)div 2)-(btn^.h div 2),btn);
+   if(selected)then draw_rectw(tar,bx0,by0,bx1,by1,-2,0,c_lime);
 end;
 
 procedure d_TabButtonText(tar:pSDL_Surface;bi,
@@ -312,7 +311,7 @@ end;
 
 function GetRebuildIco(pu:PTUnit):pSDL_Surface;
 begin
-   GetRebuildIco:=spr_b_rebuild;
+   GetRebuildIco:=spr_uibtn_Rebuild;
    if(pu<>nil)then
      if(pu^.uid^.uid_rebuild_uid>0)then
        GetRebuildIco:=g_uids[pu^.uid^.uid_rebuild_uid].uid_BTNBig.surf;
@@ -326,7 +325,7 @@ begin
      with POVPlayer^ do
        with g_uids[uid] do
          if (uid_e[uid]<=0)
-         and(ucl_e[uid_ukbuilding,uid_class]<=0)
+         and(ucl_e[uid_isbuilding,uid_class]<=0)
          and(a_units[uid]<=0)then exit;
    ui_PanelBTNUnit:=true;
 end;
@@ -341,20 +340,15 @@ begin
 end;
 
 
-procedure d_Panel(tar:pSDL_Surface;POVPlayer:byte);
+procedure d_Panel(tar:pSDL_Surface;PVisPlayer:PTPlayer);
 var
 ucl,p,
 uid,
 ux,uy:integer;
-PVisPlayer:PTPlayer;
 begin
-   if(POVPlayer>LastPlayer)
-   then PVisPlayer:=nil
-   else PVisPlayer:=@g_gplayers[POVPlayer];
-
    draw_sdlsurface(tar,0,0,ui_UIPanelTemplate);
-   for ucl:=0 to 3 do d_TabButtonSprite(tar,spr_tabs[ucl],ucl,ucl=ui_tab);
 
+   for ucl:=0 to 3 do d_TabButtonSprite(tar,spr_uibtn_Tabs[ucl],ucl,ucl=ui_tab);
    if(PVisPlayer<>nil)then
      with PVisPlayer^ do
        for ucl:=0 to 3 do
@@ -369,7 +363,7 @@ begin
    if(iActOn(iAct_InGamePause))then d_ButtonSText(tar,2,ui_CtrlPanelBL,ta_MM,@str_menu_Pause,PlayerGetColor(g_status,false),false,false);
 
 {
-drawButtonS(tar,ux,uy,spr_b_mmark  ,false   ,false              );
+drawButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
 }
    case ui_tab of
    tab_buildings,
@@ -416,7 +410,7 @@ drawButtonS(tar,ux,uy,spr_b_mmark  ,false   ,false              );
                        case uid of
                        iAct_Control_UAbility1 : if(ui_uibtn_sabilityu<>nil)then
                                                 begin
-                                                drawButtonS(tar,ux,uy,spr_b_ab[ui_uibtn_sabilityu^.uid^.uid_ability],false,not iActEnabled(uid));
+                                                drawButtonS(tar,ux,uy,g_aids[ui_uibtn_sabilityu^.uid^.uid_ability].ua_btn,false,not iActEnabled(uid));
                                                 if(ui_uibtn_sabilityu^.rld>0)then
                                                 drawButtonT(tar,ux,uy,'','','','',ir2s(ui_uibtn_sabilityu^.rld),0 ,0 ,0 ,0 ,c_aqua,'');
                                                 end;
@@ -424,25 +418,25 @@ drawButtonS(tar,ux,uy,spr_b_mmark  ,false   ,false              );
                                                 begin
                                                 if(ui_uibtn_pabilityu^.uid^.uid_ability=uab_RebuildInPoint)
                                                 then drawButtonS(tar,ux,uy,GetRebuildIco(ui_uibtn_pabilityu)             ,false,not iActEnabled(uid))
-                                                else drawButtonS(tar,ux,uy,spr_b_ab[ui_uibtn_pabilityu^.uid^.uid_ability],false,not iActEnabled(uid));
+                                                else drawButtonS(tar,ux,uy,g_aids[ui_uibtn_pabilityu^.uid^.uid_ability].ua_btn,false,not iActEnabled(uid));
                                                 if(ui_uibtn_pabilityu^.rld>0)then
                                                 drawButtonT(tar,ux,uy,'','','','',ir2s(ui_uibtn_pabilityu^.rld),0 ,0 ,0 ,0 ,c_aqua,'');
                                                 end;
                        iAct_Control_Rebuild   : if(ui_uibtn_rebuildu<>nil)then
                                                 drawButtonS(tar,ux,uy,GetRebuildIco(ui_uibtn_rebuildu),false,not iActEnabled(uid));
-                       iAct_Control_UAMove    : drawButtonS(tar,ux,uy,spr_b_attack ,false,not iActEnabled(uid));
-                       iAct_Control_UAStop    : drawButtonS(tar,ux,uy,spr_b_stop   ,false,not iActEnabled(uid));
-                       iAct_Control_UAPatrol  : drawButtonS(tar,ux,uy,spr_b_apatrol,false,not iActEnabled(uid));
-                       iAct_Control_UMove     : drawButtonS(tar,ux,uy,spr_b_move   ,false,not iActEnabled(uid));
-                       iAct_Control_UStop     : drawButtonS(tar,ux,uy,spr_b_hold   ,false,not iActEnabled(uid));
-                       iAct_Control_UPatrol   : drawButtonS(tar,ux,uy,spr_b_patrol ,false,not iActEnabled(uid));
-                       iAct_Control_UProdCncl : drawButtonS(tar,ux,uy,spr_b_cancel ,false,not iActEnabled(uid));
-                       iAct_Control_UDestroy  : drawButtonS(tar,ux,uy,spr_b_delete ,false,not iActEnabled(uid));
-                       iAct_Control_USelBase  : drawButtonS(tar,ux,uy,spr_b_f1     ,false,not iActEnabled(uid));
-                       iAct_Control_USelArmy  : drawButtonS(tar,ux,uy,spr_b_f2     ,false,not iActEnabled(uid));
+                       iAct_Control_UAMove    : drawButtonS(tar,ux,uy,spr_uibtn_Attack    ,false,not iActEnabled(uid));
+                       iAct_Control_UAStop    : drawButtonS(tar,ux,uy,spr_uibtn_Stop      ,false,not iActEnabled(uid));
+                       iAct_Control_UAPatrol  : drawButtonS(tar,ux,uy,spr_uibtn_APatrol   ,false,not iActEnabled(uid));
+                       iAct_Control_UMove     : drawButtonS(tar,ux,uy,spr_uibtn_Move      ,false,not iActEnabled(uid));
+                       iAct_Control_UStop     : drawButtonS(tar,ux,uy,spr_uibtn_Hold      ,false,not iActEnabled(uid));
+                       iAct_Control_UPatrol   : drawButtonS(tar,ux,uy,spr_uibtn_Patrol    ,false,not iActEnabled(uid));
+                       iAct_Control_UProdCncl : drawButtonS(tar,ux,uy,spr_uibtn_ProdCancel,false,not iActEnabled(uid));
+                       iAct_Control_UDestroy  : drawButtonS(tar,ux,uy,spr_uibtn_Delete    ,false,not iActEnabled(uid));
+                       iAct_Control_USelBase  : drawButtonS(tar,ux,uy,spr_uibtn_F1        ,false,not iActEnabled(uid));
+                       iAct_Control_USelArmy  : drawButtonS(tar,ux,uy,spr_uibtn_F2        ,false,not iActEnabled(uid));
 
                        iAct_Replay_Fog,
-                       iAct_Observer_Fog      : drawButtonS(tar,ux,uy,spr_b_rfog  ,ui_fog,not iActEnabled(uid));
+                       iAct_Observer_Fog      : drawButtonS(tar,ux,uy,spr_uibtn_ReplayFog  ,ui_fog,not iActEnabled(uid));
 
                        iAct_Replay_PlayerAll,
                        iAct_Observer_PlayerAll: d_ButtonSText(tar,ux,uy,ta_MM,@str_all,c_white,UIPlayer>LastPlayer,not iActEnabled(uid));
@@ -460,16 +454,16 @@ drawButtonS(tar,ux,uy,spr_b_mmark  ,false   ,false              );
                                                    with g_gplayers[p] do
                                                      d_ButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColor(p,false),UIPlayer=p,not iActEnabled(uid));
                                                 end;
-                       iAct_Replay_Log        : drawButtonS(tar,ux,uy,spr_b_rlog  ,rpls_showlog     ,not iActEnabled(uid));
-                       iAct_Replay_POV        : drawButtonS(tar,ux,uy,spr_b_rvis  ,rpls_POVRecorder ,not iActEnabled(uid));
-                       iAct_Replay_Fast       : drawButtonS(tar,ux,uy,spr_b_rfast ,sys_uncappedFPS  ,not iActEnabled(uid));
-                       iAct_Replay_Pause      : drawButtonS(tar,ux,uy,spr_b_rstop ,replay_IsPaused  ,not iActEnabled(uid));
-                       iAct_Replay_Back60     : drawButtonS(tar,ux,uy,spr_b_rback3,false            ,not iActEnabled(uid));
-                       iAct_Replay_Back10     : drawButtonS(tar,ux,uy,spr_b_rback2,false            ,not iActEnabled(uid));
-                       iAct_Replay_Back2      : drawButtonS(tar,ux,uy,spr_b_rback1,false            ,not iActEnabled(uid));
-                       iAct_Replay_Forward2   : drawButtonS(tar,ux,uy,spr_b_rforw1,false            ,not iActEnabled(uid));
-                       iAct_Replay_Forward10  : drawButtonS(tar,ux,uy,spr_b_rforw2,false            ,not iActEnabled(uid));
-                       iAct_Replay_Forward60  : drawButtonS(tar,ux,uy,spr_b_rforw3,false            ,not iActEnabled(uid));
+                       iAct_Replay_Log        : drawButtonS(tar,ux,uy,spr_uibtn_ReplayLog  ,rpls_showlog     ,not iActEnabled(uid));
+                       iAct_Replay_POV        : drawButtonS(tar,ux,uy,spr_uibtn_ReplayPOV  ,rpls_POVRecorder ,not iActEnabled(uid));
+                       iAct_Replay_Fast       : drawButtonS(tar,ux,uy,spr_uibtn_ReplayFast ,sys_uncappedFPS  ,not iActEnabled(uid));
+                       iAct_Replay_Pause      : drawButtonS(tar,ux,uy,spr_uibtn_ReplayPause,replay_IsPaused  ,not iActEnabled(uid));
+                       iAct_Replay_Back60     : drawButtonS(tar,ux,uy,spr_uibtn_ReplayBack3,false            ,not iActEnabled(uid));
+                       iAct_Replay_Back10     : drawButtonS(tar,ux,uy,spr_uibtn_ReplayBack2,false            ,not iActEnabled(uid));
+                       iAct_Replay_Back2      : drawButtonS(tar,ux,uy,spr_uibtn_ReplayBack1,false            ,not iActEnabled(uid));
+                       iAct_Replay_Forward2   : drawButtonS(tar,ux,uy,spr_uibtn_ReplayForw1,false            ,not iActEnabled(uid));
+                       iAct_Replay_Forward10  : drawButtonS(tar,ux,uy,spr_uibtn_ReplayForw2,false            ,not iActEnabled(uid));
+                       iAct_Replay_Forward60  : drawButtonS(tar,ux,uy,spr_uibtn_ReplayForw3,false            ,not iActEnabled(uid));
                        end;
                   end;
    end;
@@ -697,7 +691,7 @@ begin
    if(GameGetStatus(@str,@col,UIPlayer))then draw_text(tar,ui_GameStatusX,ui_GameStatusY,str,ta_MU,255,col);
 
    // POV PLAYER
-   if(rpls_pstate>=rpls_read)or(g_gplayers[LocalPlayer].observer)then
+   if(rpls_pstate=rpls_read)or(g_gplayers[LocalPlayer].observer)then
      if(UIPlayer<=LastPlayer)
      then draw_text(tar,ui_GameStatusX,ui_PovPlayerY,g_gplayers[UIPlayer].name,ta_MU,255,PlayerGetColor(UIPlayer,false))
      else draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_all                  ,ta_MU,255,c_white                       );
@@ -761,33 +755,47 @@ begin
 end;
 
 procedure d_UIMouseCursor(tar:pSDL_Surface);   //cursor/brash
-var c:cardinal;
 begin
-   c:=0;
+   draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
    case m_brush of
-co_move,
-co_patrol   : c:=c_lime;
-co_amove,
-co_apatrol  : c:=c_red;
-co_pability : c:=c_aqua;
-co_mmark    : c:=c_white;
-   else draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
-   end;
-   if(c<>0)then
-   begin
-      circleColor(tar,mouse_x   ,mouse_y,10,           c);
-      hlineColor (tar,mouse_x-12,mouse_x+12,mouse_y   ,c);
-      vlineColor (tar,mouse_x   ,mouse_y-12,mouse_y+12,c);
+   co_empty :;
+   co_move,
+   co_patrol   : draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubG);
+   co_amove,
+   co_apatrol  : draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubR);
+   else          draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubA);
    end;
 end;
 
 procedure d_LayerUI(tar:pSDL_Surface);
+var
+ux,uy:integer;
+PVisPlayer:pTPlayer;
 begin
+   if(UIPlayer>LastPlayer)
+   then PVisPlayer:=nil
+   else PVisPlayer:=@g_gplayers[UIPlayer];
+
    d_MapMouse(tar);
-   if(ui_update_timer=0)then d_MiniMap(ui_UIPanelTemplate);
+
    if(ui_update_timer=0)or(ui_update_now)then
    begin
-      d_Panel(ui_UIPanel,UIPlayer);
+      d_MiniMap(ui_UIPanelTemplate);
+
+      // update panel template
+      if(PVisPlayer<>nil)then
+        with PVisPlayer^ do
+          if(race>r_random)and(ui_panel_race<>race)then
+          begin
+             ui_panel_race:=race;
+             for ux:=0 to ui_CtrlPanelBW-1 do
+             for uy:=ui_CtrlPanelBW+1 to ui_CtrlPanelBL do
+               if(ui_ControlPanelPos<2)// left-right
+               then draw_sdlsurface(ui_UIPanelTemplate,ux*ui_ButtonW1+1,uy*ui_ButtonW1+1,spr_uipanel_EmptyBTN[race])
+               else draw_sdlsurface(ui_UIPanelTemplate,uy*ui_ButtonW1+1,ux*ui_ButtonW1+1,spr_uipanel_EmptyBTN[race]);
+          end;
+
+      d_Panel(ui_UIPanel,PVisPlayer);
       ui_update_now:=false;
    end;
    d_UIText(tar);

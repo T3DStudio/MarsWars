@@ -160,7 +160,7 @@ begin
       end
       else
       begin
-         effect_add(vx+aw_x,vy+aw_y,draw_SpriteDepth(vy+1,ukfly),aw_eid_shot );
+         effect_add(vx+aw_offset_x,vy+aw_offset_y,draw_SpriteDepth(vy+1,ukfly),aw_eid_shot );
          SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
@@ -187,9 +187,9 @@ begin
           then exit
           else
             with uid_arms[a_weap_cl] do
-              if((aw_reqf and wpr_move)=0)then exit;
+              if((aw_req_flags and wpr_move)=0)then exit;
 
-        if(not uid_ukbuilding)then
+        if(not uid_isbuilding)then
           if(buffs[ub_Pain]>0)
           or(buffs[ub_Cast]>0)then exit;
 
@@ -208,7 +208,7 @@ begin
       or(not uid_CanAttack)then exit;
 
       if(check_buffs)then
-        if(not uid_ukbuilding)then
+        if(not uid_isbuilding)then
           if(buffs[ub_Pain]>0)
           or(buffs[ub_Cast]>0)then exit;
 
@@ -611,7 +611,7 @@ begin
    for u:=1 to MaxUnits do
     with g_units[u] do
      with uid^ do
-      if(hits>0)and(ukfly=uid_ukfly)and(unum<>ignore_unum)then
+      if(hits>0)and(ukfly=uid_isfly)and(unum<>ignore_unum)then
        if(speed<=0)or(not iscomplete)then
         if(not IsUnitRange(transportU,nil))then
         begin
@@ -639,7 +639,7 @@ begin
                          d:=point_dist_int(uo_x,uo_y,tx,ty);
                          add(uo_x,uo_y,d-o,o);
                          end;
-           uab_CCFly   : begin
+           uab_UACCCLand   : begin
                          o:=tr+uid_r;
                          d:=point_dist_int(uo_x,uo_y+fly_hz,tx,ty);
                          add(uo_x,uo_y+fly_hz,d-o,o);
@@ -674,7 +674,7 @@ u,sr,dr :integer;
 begin
    with g_uids[buid] do
    begin
-      aukfly:=uid_ukfly;
+      aukfly:=uid_isfly;
       with g_gplayers[pl] do
         math_push_out(tx,ty,uid_r,0,@tx,@ty,aukfly,true,UnitObsTeamVis);
    end;
@@ -860,7 +860,7 @@ begin
    end;
 
    with g_uids[buid] do
-    i:=CheckCollisionR(tx,ty,tr+uid_r,uskip,uid_ukbuilding,uid_ukfly,true);
+    i:=CheckCollisionR(tx,ty,tr+uid_r,uskip,uid_isbuilding,uid_isfly,true);
    if(i>0)then CheckBuildPlace:=1;
 end;
 
@@ -900,7 +900,7 @@ begin
       unit_ability_HKeepBlink:=0;
       if(check)then exit;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_ukbuilding,ukfly, true,pu)>0)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly, true,pu)>0)then
       begin
          unit_ability_HKeepBlink:=ureq_landplace;
          rld:=fr_fps1*2;
@@ -943,7 +943,7 @@ begin
       unit_ability_HTowerBlink:=0;
       if(check)then exit;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_ukbuilding,ukfly,true,pu )>0)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly,true,pu )>0)then
       begin
          unit_ability_HTowerBlink:=ureq_landplace;
          rld:=fr_fps1*2;
@@ -1052,8 +1052,8 @@ begin
    with player^ do
    begin
       if(uid_x[uidi            ]<=0)then uid_x[uidi            ]:=unum;
-      if(ucl_x[uid_ukbuilding,uid_class]<=0)then ucl_x[uid_ukbuilding,uid_class]:=unum;
-      ucl_eb[uid_ukbuilding,uid_class]+=1;
+      if(ucl_x[uid_isbuilding,uid_class]<=0)then ucl_x[uid_isbuilding,uid_class]:=unum;
+      ucl_eb[uid_isbuilding,uid_class]+=1;
       uid_eb[uidi            ]+=1;
       menergy+=uid_EnergyGen;
       cenergy+=uid_EnergyGen;
@@ -1069,9 +1069,9 @@ begin
    begin
       army+=1;
       armylimit+=uid_LimitUse;
-      ucl_e[uid_ukbuilding,uid_class]+=1;
-      ucl_c[uid_ukbuilding     ]+=1;
-      ucl_l[uid_ukbuilding     ]+=uid_LimitUse;
+      ucl_e[uid_isbuilding,uid_class]+=1;
+      ucl_c[uid_isbuilding     ]+=1;
+      ucl_l[uid_isbuilding     ]+=uid_LimitUse;
       uid_e[uidi            ]+=1;
       if(uid_isbuilder)then e_builders+=1;
 
@@ -1188,7 +1188,7 @@ end;
 
 function barrack_out_r(pu:PTUnit;_uid:byte):integer;
 begin
-   if(g_uids[_uid].uid_ukfly=uf_fly)
+   if(g_uids[_uid].uid_isfly=uf_fly)
    then barrack_out_r:=0
    else barrack_out_r:=pu^.uid^.uid_r;//+g_uids[_uid].uid_r;
 end;
@@ -1295,7 +1295,7 @@ begin
       or(hits<=0)
       or(not iscomplete)
       or(not uid_isbarrack)
-      or(not uid_ukbuilding)then exit;
+      or(not uid_isbuilding)then exit;
 
       unit_ProdStartUnit:=ureq_barracks;
       if not(puid in uid_prod_Units)
@@ -1344,7 +1344,7 @@ begin
       or(hits<=0)
       or(not iscomplete)
       or(not uid_isbarrack)
-      or(not uid_ukbuilding)then exit;
+      or(not uid_isbuilding)then exit;
    end;
 
    for pn:=LastUnitLevel downto 0 do
@@ -1399,7 +1399,7 @@ begin
       or(hits<=0)
       or(not iscomplete)
       or(not uid_issmith)
-      or(not uid_ukbuilding)then exit;
+      or(not uid_isbuilding)then exit;
 
       unit_ProdStartUpgrade:=ureq_smiths;
       if not(upid in uid_prod_Upgrades)
@@ -1445,7 +1445,7 @@ begin
       or(hits<=0)
       or(not iscomplete)
       or(not uid_issmith)
-      or(not uid_ukbuilding)then exit;
+      or(not uid_isbuilding)then exit;
    end;
 
    for pn:=LastUnitLevel downto 0 do
@@ -1462,8 +1462,8 @@ begin
    with uid^ do
    with player^ do
    begin
-      ucl_s [uid_ukbuilding,uid_class]+=1;
-      ucl_cs[uid_ukbuilding     ]+=1;
+      ucl_s [uid_isbuilding,uid_class]+=1;
+      ucl_cs[uid_isbuilding     ]+=1;
       uid_s [uidi            ]+=1;
       if(uid_isbuilder)then s_builders+=1;
       if(uid_isbarrack)then s_barracks+=1;
@@ -1477,8 +1477,8 @@ begin
    with uid^ do
    with player^ do
    begin
-      ucl_s [uid_ukbuilding,uid_class]-=1;
-      ucl_cs[uid_ukbuilding     ]-=1;
+      ucl_s [uid_isbuilding,uid_class]-=1;
+      ucl_cs[uid_isbuilding     ]-=1;
       uid_s [uidi            ]-=1;
       if(uid_isbuilder)then s_builders-=1;
       if(uid_isbarrack)then s_barracks-=1;
@@ -1521,7 +1521,7 @@ begin
          unit_ProdStopUnit   (pu,255,true,false);
          unit_ProdStopUpgrade(pu,255,true,false);
 
-         ucl_eb[uid_ukbuilding,uid_class]-=1;
+         ucl_eb[uid_isbuilding,uid_class]-=1;
          uid_eb[uidi            ]-=1;
          menergy-=uid_EnergyGen;
          cenergy-=uid_EnergyGen;
@@ -1529,7 +1529,7 @@ begin
          unit_done_dec_cntrs(pu);
       end;
 
-      if(ucl_x[uid_ukbuilding,uid_class]=unum)then ucl_x[uid_ukbuilding,uid_class]:=0;
+      if(ucl_x[uid_isbuilding,uid_class]=unum)then ucl_x[uid_isbuilding,uid_class]:=0;
       if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
    end;
 end;
@@ -1542,9 +1542,9 @@ begin
    begin
       army     -=1;
       armylimit-=uid_LimitUse;
-      ucl_e[uid_ukbuilding,uid_class]-=1;
-      ucl_c[uid_ukbuilding     ]-=1;
-      ucl_l[uid_ukbuilding     ]-=uid_LimitUse;
+      ucl_e[uid_isbuilding,uid_class]-=1;
+      ucl_c[uid_isbuilding     ]-=1;
+      ucl_l[uid_isbuilding     ]-=uid_LimitUse;
       uid_e[uidi            ]-=1;
       if(uid_isbuilder)then e_builders-=1;
    end;
@@ -1762,7 +1762,7 @@ begin
      begin
         if(not instant)then
         begin
-           with uid^ do fastdeath:=(fastdeath)or(uid_FastDeathHits>=0)or(uid_ukbuilding);
+           with uid^ do fastdeath:=(fastdeath)or(uid_FastDeathHits>=0)or(uid_isbuilding);
            buffs[ub_Pain]:=fr_fps1; // prevent fast resurrecting
 
            if(not suicide)then GameLogUnitAttacked(pu);
@@ -1779,8 +1779,8 @@ begin
 
         with uid^ do
         begin
-           if(uid_ukbuilding)and(buildcd)then
-             if(uid_ability<>uab_HellVision)or(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+           if(uid_isbuilding)and(buildcd)then
+             if(uid_ability<>uab_HEyeVision)or(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
            zfall:=uid_zfall;
         end;
 
@@ -1877,11 +1877,11 @@ begin
    with player^ do
    if(iscomplete)and(hits>0)then
    begin
-      speed:=uid_speed;
+      speed:=uid_BaseSpeed;
       // ABILITIES
       case uid_ability of
 uab_Teleport      : level:=byte(upgr[upgr_hell_Recall]>0);
-uab_CCFly         : if(level>0)then
+uab_UACCCLand         : if(level>0)then
                     begin
                        if(ukfly<>uf_fly)then
                        begin
@@ -1909,7 +1909,7 @@ uab_CCFly         : if(level>0)then
                        speed:=0;
 
                        if(ServerSide)and(zfall<>0)then
-                         if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_ukbuilding,false,true,pu )>0)then
+                         if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,pu )>0)then
                          begin
                             level:=1;
                             buffs[ub_CCast]:=fr_fps2;
@@ -1919,7 +1919,7 @@ uab_CCFly         : if(level>0)then
       end;
 
       // DETECTION
-      if(uid_detector)or(buffs[ub_HVision]>0)
+      if(uid_isdetector)or(buffs[ub_HVision]>0)
       then buffs[ub_Detect]:=ub_infinity
       else buffs[ub_Detect]:=0;
 
@@ -1939,7 +1939,7 @@ UID_LostSoul      : begin
                        tu:=nil;
                        if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_CCast]:=fr_fpsh;
                        if(buffs[ub_pain]<=0)then
-                         if(buffs[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_ukfly;
+                         if(buffs[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_isfly;
                        ukfloater:=not ukfly;
                     end;
 UID_UTransport    : begin level:=min2i(upgr[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+4*level;end;
@@ -1951,7 +1951,7 @@ UID_APC           : begin level:=min2i(upgr[upgr_uac_Transport],LastUnitLevel);t
       t:=uid_SightR;
       if(uid_upgr_SightR>0)and(uid_SightRUpgrStep>0)
       then t+=upgr[uid_upgr_SightR]*uid_SightRUpgrStep;
-      if(not uid_ukbuilding)
+      if(not uid_isbuilding)
       then t+=upgr[upgr_race_unit_srange[uid_race]]*upgr_race_srange_unit_bonus[uid_race];
       SetSRange(t);
    end;

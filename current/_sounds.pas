@@ -470,7 +470,7 @@ begin
 
       with g_units[ui_UnitSelectedNU] do
        with uid^ do
-        if(uid_ukbuilding)and(iscomplete=false)
+        if(uid_isbuilding)and(iscomplete=false)
         then SoundPlayUnitCommand(snd_building[uid_race])
         else
          if(ui_UnitSelectedn<annoystart)
@@ -508,7 +508,7 @@ lmt_prod_BadPlace        : SoundPlayAnoncer(snd_cannot_build    [race],true,fals
 lmt_map_mark,
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
 lmt_unit_attacked     : with g_uids[argx] do
-                        SoundPlayMMapAlarm(snd_under_attack[uid_ukbuilding,race],true);
+                        SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
 // Key Point Events
 lmt_Req_Energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control,

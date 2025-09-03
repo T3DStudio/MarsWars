@@ -982,7 +982,7 @@ function _uid_player_limit(player:PTPlayer;uid:byte):boolean;
 begin
    with player^ do
     with g_uids[uid] do
-     if(uid_ukbuilding)and(menergy<=0)
+     if(uid_isbuilding)and(menergy<=0)
      then _uid_player_limit:=false
      else _uid_player_limit:=((uid_e[uid]+uprodu[uid])<a_units[uid])and((army+uproda)<MaxPlayerUnits)and((armylimit+uprodl+uid_LimitUse)<=MaxPlayerLimit);
 end;
@@ -1003,7 +1003,7 @@ begin
       AddBits(ureq_ruid      ,(uid_req_uid1>0)and(uid_eb[uid_req_uid1]<uid_req_uid1n));
       AddBits(ureq_ruid      ,(uid_req_uid2>0)and(uid_eb[uid_req_uid2]<uid_req_uid2n));
       AddBits(ureq_ruid      ,(uid_req_uid3>0)and(uid_eb[uid_req_uid3]<uid_req_uid3n));
-      AddBits(ureq_rupid     ,(uid_req_upgr>0)and(upgr  [uid_req_upgr]<uid_req_upgrl));
+      AddBits(ureq_rupid     ,(uid_req_upgr>0)and(upgr  [uid_req_upgr]=0            ));
       AddBits(ureq_energy    , cenergy<uid_EnergyReq);
       AddBits(ureq_time      , uid_ProdTimeSec<=0   );
 
@@ -1011,7 +1011,7 @@ begin
       AddBits(ureq_max       ,((uid_e[uid]+uprodu[uid])>=a_units[uid])or
                               ((uid_isbuilder)and(e_builders>=PlayerMaxBuilders)));
 
-      case uid_ukbuilding of
+      case uid_isbuilding of
 true  : begin
            AddBits(ureq_builders ,n_builders<=0);
            AddBits(ureq_BuildCD  ,build_cd  > 0);
@@ -1160,7 +1160,7 @@ begin
       or(IsUnitRange(transportU,nil))then exit;
 
       if(speed          <=0)then exit;
-      if(uid_ukbuilding       )then exit;
+      if(uid_isbuilding       )then exit;
       if(not uid_CanAttack       )then exit;
       if(uo_id=ua_psability)
       or(uo_id=ua_hold     )
@@ -1183,14 +1183,14 @@ function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal):boolean;
 begin
    CheckUnitBaseFlags:=false;
 
-   if((flags and wtr_unit    )=0)and(not tu^.uid^.uid_ukbuilding   )then exit;
-   if((flags and wtr_building)=0)and(    tu^.uid^.uid_ukbuilding   )then exit;
+   if((flags and wtr_unit    )=0)and(not tu^.uid^.uid_isbuilding   )then exit;
+   if((flags and wtr_building)=0)and(    tu^.uid^.uid_isbuilding   )then exit;
 
-   if((flags and wtr_bio     )=0)and(not tu^.uid^.uid_ukmech       )then exit;
-   if((flags and wtr_mech    )=0)and(    tu^.uid^.uid_ukmech       )then exit;
+   if((flags and wtr_bio     )=0)and(not tu^.uid^.uid_ismech       )then exit;
+   if((flags and wtr_mech    )=0)and(    tu^.uid^.uid_ismech       )then exit;
 
-   if((flags and wtr_light   )=0)and    (tu^.uid^.uid_uklight      )then exit;
-   if((flags and wtr_heavy   )=0)and not(tu^.uid^.uid_uklight      )then exit;
+   if((flags and wtr_light   )=0)and    (tu^.uid^.uid_islight      )then exit;
+   if((flags and wtr_heavy   )=0)and not(tu^.uid^.uid_islight      )then exit;
 
    if((flags and wtr_ground  )=0)and(tu^.ukfly = uf_ground      )then exit;
    if((flags and wtr_fly     )=0)and(tu^.ukfly = uf_fly         )then exit;
@@ -1244,10 +1244,10 @@ begin
      if(uid_CanAttack)then
        for w:=0 to LastUnitArms do
          with uid_arms[w] do
-           if(aw_rld>0)then
+           if(aw_reload>0)then
            begin
-              if(aw_ruid >0)and(uid_eb[aw_ruid ]<=0         )then continue;
-              if(aw_rupgr>0)and(upgr  [aw_rupgr]< aw_rupgr_l)then continue;
+              if(aw_req_uid >0)and(uid_eb[aw_req_uid ]<=0)then continue;
+              if(aw_req_upgr>0)and(upgr  [aw_req_upgr] =0)then continue;
               ui_HaveAttack:=true;
               break;
            end;
@@ -1276,9 +1276,9 @@ begin
    ui_HaveAbility:=true;
 end;
 
-function ui_Haverebuild(pu:PTUnit):boolean;
+function ui_HaveRebuild(pu:PTUnit):boolean;
 begin
-   ui_Haverebuild:=false;
+   ui_HaveRebuild:=false;
 
    if(pu=nil)then exit;
 
@@ -1293,7 +1293,7 @@ begin
       if not(uid_rebuild_uid in player^.a_rebuild)then exit;
    end;
 
-   ui_Haverebuild:=true;
+   ui_HaveRebuild:=true;
 end;
 
 {$IFDEF _FULLGAME}
@@ -1470,7 +1470,7 @@ gs_replayerror: begin
                    pcol^:=c_white;
                 end;
 gs_replayend  : begin
-                   pstr^:=str_gstat_ReplayEnd;
+                   pstr^:='';
                    pcol^:=c_white;
                 end;
 gs_waitserver : begin
@@ -1496,6 +1496,8 @@ gs_win_team7  : if(POVPlayer>LastPlayer)
                      pcol^:=c_red;
                   end;
         end;
+
+      if(rpls_pstate=rpls_read)and(rpls_file_pos>=rpls_file_size)then pstr^+=tc_nl2+tc_white+str_gstat_ReplayEnd;
    end;
 end;
 
@@ -1687,7 +1689,7 @@ begin
      ui_UnitNeedDrawRange:=(uid_CanAttack)
                          or(uid_isbuilder and not ukfly)
                          or(uid_ability=uab_UACScan)
-                         or(uid_ability=uab_HellVision);
+                         or(uid_ability=uab_HEyeVision);
 end;
 
 function ui_MouseBrushNeedDrawEdges:boolean;
@@ -1698,9 +1700,9 @@ begin
    co_pability: if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^.uid_ability of
                   uab_HTowerBlink,
-                  uab_HKeepBlink,
+                  uab_HKeepShift,
                   uab_RebuildInPoint,
-                  uab_CCFly         : exit;
+                  uab_UACCCLand         : exit;
                   end;
    end;
    ui_MouseBrushNeedDrawEdges:=false;
@@ -1933,7 +1935,7 @@ lmt_upgrade_complete : begin
 lmt_unit_ready       : begin
                        with g_uids[argx] do
                          case argt of
-                         lmt_argt_unit : if(uid_ukbuilding)
+                         lmt_argt_unit : if(uid_isbuilding)
                                          then ParseLogMessage:=str_warn_building_complete+' ('+uid_str_name+')'
                                          else ParseLogMessage:=str_warn_unit_complete    +' ('+uid_str_name+')';
                          end;
@@ -1950,7 +1952,7 @@ lmt_allies_attacked  : begin
                        end;
 lmt_unit_attacked    : begin
                        with g_uids[argx] do
-                         if(uid_ukbuilding)
+                         if(uid_isbuilding)
                          then ParseLogMessage:=str_warn_base_attacked+' ('+uid_str_name+')'
                          else ParseLogMessage:=str_warn_unit_attacked+' ('+uid_str_name+')';
                        mcolor^:=c_red;

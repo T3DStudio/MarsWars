@@ -35,6 +35,7 @@ g_uids            : array[byte] of TUID;
 g_upids           : array[byte] of TUPID;
 g_mids            : array[byte] of TMID;
 g_DamageMods      : array[byte] of TDamageMod;
+g_aids            : array[byte] of TUnitAbility;
 
 g_random_i        : word    = 0;
 g_random_p        : byte    = 0;
@@ -199,6 +200,8 @@ ui_blink2_color_BG,
 ui_blink2_color_BY: cardinal;
 ui_blink3         : byte;
 ui_mm_ScanBlink   : boolean = false;
+
+ui_panel_race     : byte = r_random;
 
 ui_UIPanelTemplate,
 ui_UIPanel,
@@ -467,13 +470,13 @@ svld_file_size    : cardinal = 0;
 
 rpls_Record       : boolean = true;
 rpls_RecordTryPause:integer = 0;
-rpls_fstate       : byte = 0;     // file status (none,write,read)
-rpls_pnu          : integer = 0; // quality
+rpls_fstate       : byte = 0;         // file status (none,write,read)
+rpls_pstate       : byte = rpls_none; // player/recorder status
+rpls_pnu          : integer = 0;      // quality
 rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
-rpls_pstate       : byte = rpls_none;
 rpls_list         : TStringList;
 rpls_list_size    : integer = 0;
 rpls_list_sel     : integer = 0;
@@ -807,51 +810,66 @@ spr_effect_HVision,
 spr_stun          : TMWTexture;
 
 
-spr_c_mars,
-spr_c_hell,
-spr_c_earth,
-spr_c_phobos,
-spr_c_deimos ,
-spr_b_mmark,
-spr_b_rfast,
-spr_b_rforw1,
-spr_b_rforw2,
-spr_b_rforw3,
-spr_b_rback1,
-spr_b_rback2,
-spr_b_rback3,
-spr_b_rfog,
-spr_b_rlog,
-spr_b_rstop,
-spr_b_rvis,
-spr_b_action,
-spr_b_paction,
-spr_b_invuln,
-spr_b_rstrike,
-spr_b_attack,
-spr_b_rebuild,
-spr_b_move,
-spr_b_patrol,
-spr_b_apatrol,
-spr_b_stop,
-spr_b_hold,
-spr_b_f1,
-spr_b_f2,
-spr_b_cancel,
-spr_b_delete,
-spr_mback,
-spr_mlogo,
+spr_camp_mars,
+spr_camp_hell,
+spr_camp_earth,
+spr_camp_phobos,
+spr_camp_deimos ,
+spr_uibtn_mmark,
+spr_uibtn_ReplayFast,
+spr_uibtn_ReplayForw1,
+spr_uibtn_ReplayForw2,
+spr_uibtn_ReplayForw3,
+spr_uibtn_ReplayBack1,
+spr_uibtn_ReplayBack2,
+spr_uibtn_ReplayBack3,
+spr_uibtn_ReplayFog,
+spr_uibtn_ReplayLog,
+spr_uibtn_ReplayPause,
+spr_uibtn_ReplayPOV,
+spr_uibtn_AbilityInvuln,
+spr_uibtn_AbilityUACStrike,
+spr_uibtn_AbilityUACScan,
+spr_uibtn_AbilityBlink,
+spr_uibtn_AbilitySpawnLost,
+spr_uibtn_AbilitySpawnLostTo,
+spr_uibtn_AbilityHVision,
+spr_uibtn_AbilityUnload,
+spr_uibtn_AbilityUnloadTo,
+spr_uibtn_AbilityCCLand,
+spr_uibtn_AbilityCCLandTo,
+spr_uibtn_Attack,
+spr_uibtn_Rebuild,
+spr_uibtn_Move,
+spr_uibtn_Patrol,
+spr_uibtn_APatrol,
+spr_uibtn_Stop,
+spr_uibtn_Hold,
+spr_uibtn_F1,
+spr_uibtn_F2,
+spr_uibtn_ProdCancel,
+spr_uibtn_Delete,
+spr_MenuBackground,
+spr_MenuLogo,
 spr_cursor,
-spr_CursorHint_Edit: pSDL_Surface;
+spr_cursorSubR,
+spr_cursorSubG,
+spr_cursorSubA,
+spr_CursorHint_Edit  : pSDL_Surface;
 spr_CursorHint_MLB,
 spr_CursorHint_MRB,
-spr_CursorHint_MMB : array[boolean] of pSDL_Surface;
-spr_b_Upgrades     : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
-spr_b_ab           : array[byte] of pSDL_Surface;
-spr_tabs           : array[0..3] of pSDL_Surface;
+spr_CursorHint_MMB   : array[boolean ] of pSDL_Surface;
+spr_RaceRank,
+spr_uipanel_EmptyBTN : array[1..r_cnt] of pSDL_Surface;
+spr_uibtn_Upgrades   : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
+spr_b_ab             : array[byte] of pSDL_Surface;
+spr_uibtn_Tabs       : array[0..3] of pSDL_Surface;
 spr_cp_koth,
 spr_cp_out,
 spr_cp_gen         : TMWTexture;
+
+spr_cursorWh,
+spr_cursorHh       : integer;
 
 //spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
 

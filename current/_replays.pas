@@ -499,7 +499,8 @@ i,gs: byte;
 begin
    if(rpls_file_pos>=rpls_file_size)then
    begin
-      G_Status        :=gs_replayend;
+      if(G_Status=gs_running)then
+        G_Status:=gs_replayend;
       sys_uncappedFPS :=false;
       rpls_ForwardSkip:=0;
       exit;

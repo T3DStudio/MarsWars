@@ -549,7 +549,7 @@ r_hell: begin
         begin
         //if(map_generators=0)then
         MakeUpgr(upgr_hell_BuilderR    ,2);
-        MakeUpgr(upgr_hell_HKTeleport,1);
+        MakeUpgr(upgr_hell_HKeepShift,1);
         MakeUpgr(upgr_hell_Spectre   ,1);
         MakeUpgr(upgr_hell_DecayAura     ,1);
         MakeUpgr(upgr_hell_Resurrect ,1);
@@ -1553,7 +1553,7 @@ begin
       uo_id :=ua_amove;
       uo_tar:=0;
 
-      if(uid_ukbuilding)then ai_buildings(pu);
+      if(uid_isbuilding)then ai_buildings(pu);
 
       if(hits<=0)then exit;
 
@@ -1562,8 +1562,8 @@ begin
       if(ai_enemy_d>srange)then ai_PlayerSetAlarm(player,x,y,0,alarmr,false,0);
       if(ai_enemy_d<NOTSET)then
         if(ai_enemy_d<=srange)
-        then ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_limitaround_enemy     ,alarmr,ai_enemy_u^.uid^.uid_ukbuilding,ai_enemy_u^.mapZone)
-        else ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,ai_enemy_u^.uid^.uid_LimitUse,alarmr,ai_enemy_u^.uid^.uid_ukbuilding,ai_enemy_u^.mapZone);
+        then ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,aiu_limitaround_enemy     ,alarmr,ai_enemy_u^.uid^.uid_isbuilding,ai_enemy_u^.mapZone)
+        else ai_PlayerSetAlarm(player,ai_enemy_u^.x,ai_enemy_u^.y,ai_enemy_u^.uid^.uid_LimitUse,alarmr,ai_enemy_u^.uid^.uid_isbuilding,ai_enemy_u^.mapZone);
 
       if(not iscomplete)then exit;
 
@@ -1580,7 +1580,7 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
          begin
             case uid_ability of
 uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
-uab_HInvulnerability : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
+uab_SphereInvuln : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
 uab_UACStrike        : if(ai_strike_tar_u<>nil)then unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y,false);
 uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgr[upgr_hell_Phantoms]>0)then
                          if(srange<u_royal_d)or(g_royal_r<srange)then unit_sability(pu,false);
@@ -1596,8 +1596,8 @@ UID_UACDron           : if(ai_uab_Rebuild2Turret(pu))then
          // MAIN relocation ability
          if((player^.ai_flags and aif_ability_mainsave)>0)then
            case uid_ability of
-   uab_CCFly       : ai_SaveMain_CC(pu);
-   uab_HKeepBlink  : ai_SaveMain_HK(pu);
+   uab_UACCCLand       : ai_SaveMain_CC(pu);
+   uab_HKeepShift  : ai_SaveMain_HK(pu);
            end;
       end;
 
@@ -1617,11 +1617,11 @@ uab_UACScan          : begin
                            if(ai_choosen)or(ai_ReadyForAttack)then
                             if(unit_ability_UACScan(pu,g_random(map_Size),g_random(map_Size),false)=0)then ai_detection_pause:=fr_fps1;
                        end;
-uab_HellVision       : if(ai_need_heye_u<>nil)then
+uab_HEyeVision       : if(ai_need_heye_u<>nil)then
                          if(unit_ability_HellVision(pu,ai_need_heye_u^.unum,false)=0)then ai_detection_pause:=fr_fps1;
             end;
 
-      if(speed<=0)or(uid_ukbuilding)then exit;
+      if(speed<=0)or(uid_isbuilding)then exit;
 
       ai_UnitBehaviour(pu,(player^.ai_flags and aif_army_smart_micro)>0);
 

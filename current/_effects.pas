@@ -70,7 +70,7 @@ begin
                             smask :=c_awhite;
                             end;
         EID_Teleport      : setEID(@spr_eff_tel        ,sms_death);
-        EID_Gavno         : setEID(@spr_eff_g          ,sms_death);
+        EID_InfantryGibs         : setEID(@spr_eff_g          ,sms_death);
         MID_Mine,
         MID_Blizzard,
         EID_BExp          : setEID(@spr_eff_eb         ,sms_death);
@@ -195,7 +195,7 @@ EID_ULevelUp,
 EID_HVision,
 EID_Invuln,
 EID_Teleport      : setEff(10,0 ,-1 ,-1       ,true ,0 );
-EID_Gavno         : setEff(7 ,0 ,-1 ,dead_time,true ,0 );
+EID_InfantryGibs         : setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
 MID_Mine,
 EID_BExp          : setEff(5 ,0 ,-1 ,-1       ,true ,0 );

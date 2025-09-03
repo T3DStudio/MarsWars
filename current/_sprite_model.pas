@@ -314,14 +314,14 @@ begin
    with pu^   do
    with uid^  do
    begin
-      if(_wanim_)or(uid_ukbuilding)
+      if(_wanim_)or(uid_isbuilding)
       then _unit2SMAnimK:=sms_walk
       else _unit2SMAnimK:=sms_stand;
 
       if(hits          <=0)then begin _unit2SMAnimK:=sms_death;exit;end;
       if(not iscomplete   )then begin _unit2SMAnimK:=sms_build;exit;end;
 
-      if(not uid_ukbuilding)then
+      if(not uid_isbuilding)then
       begin
       if(buffs[ub_Pain  ]>0)then begin _unit2SMAnimK:=sms_pain ;exit;end;
       if(buffs[ub_Cast  ]>0)then begin _unit2SMAnimK:=sms_cast ;exit;end;
@@ -331,7 +331,7 @@ begin
        with uid_arms[a_weap_cl] do
         if(aw_max_range>=0)then
         begin
-           if not(a_rld in aw_rld_a)
+           if not(a_rld in aw_AnimPoints)
            then _unit2SMAnimK:=sms_dready
            else
              if(aw_AnimStay>0)
@@ -339,7 +339,7 @@ begin
              else _unit2SMAnimK:=sms_dattack;
         end
         else
-           if(a_rld in aw_rld_a)then _unit2SMAnimK:=sms_mattack;
+           if(a_rld in aw_AnimPoints)then _unit2SMAnimK:=sms_mattack;
    end
 end;
 
@@ -361,7 +361,7 @@ begin
          case ak of
 sms_walk:    if(animw>0)then
              begin
-                if(wanim)or(uid_ukbuilding)then
+                if(wanim)or(uid_isbuilding)then
                 begin
                    anim+=animw;
                    if(anim<0)then anim:=0;
@@ -371,7 +371,7 @@ sms_walk:    if(animw>0)then
              else unit_GetSprite:=_sm2s(smodel,ak,dir,0,nil);
 sms_dattack,
 sms_mattack: if(a_weap<=LastUnitArms)
-             then unit_GetSprite:=_sm2s(smodel,ak,dir,byte(a_rld in uid_arms[a_weap].aw_rld_a),nil)
+             then unit_GetSprite:=_sm2s(smodel,ak,dir,byte(a_rld in uid_arms[a_weap].aw_AnimPoints),nil)
              else unit_GetSprite:=_sm2s(smodel,ak,dir,0                                      ,nil);
 sms_death:   begin
                 anim:=abs(hits);
