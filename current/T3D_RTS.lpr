@@ -3,6 +3,8 @@ program T3D_RTS;
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
+// add ifopt
+
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE DEBUG0}

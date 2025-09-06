@@ -246,7 +246,7 @@ begin
         y0:=mm3i(ui_cam_y+font_wh,y0,ui_cam_y+ui_cam_h-font_w1);
      end;
 end;
-procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6);
+procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6;abcolor:cardinal=0);
 begin
    if(UnitsInfoNew)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -280,6 +280,7 @@ begin
 
         sprite  :=aspr;
         color   :=acolor;
+        bcolor  :=abcolor;
         text_lt :=slt;
         text_lt2:=slt2;
         text_rt :=srt;
@@ -463,6 +464,9 @@ begin
            end;
         end;
 
+        if(bcolor>0)then
+          boxColor(tar,x0,y0,x1,y1,bcolor);
+
         if(sprite<>nil)then
           with sprite^ do draw_sdlsurface(tar,x0,y0,surf);
 
@@ -470,10 +474,10 @@ begin
 
         if(color>0)then
           case kind of
-uinfo_line   : lineColor     (tar,x0,y0,x1,y1,color);
-uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1,color);
-uinfo_box    : boxColor      (tar,x0,y0,x1,y1,color);
-uinfo_circle : circleColor   (tar,x0,y0,x1,   color);
+uinfo_line   : lineColor     (tar,x0,y0,x1,y1, color);
+uinfo_rect   : rectangleColor(tar,x0,y0,x1,y1, color);
+uinfo_box    : boxColor      (tar,x0,y0,x1,y1, color);
+uinfo_circle : circleColor   (tar,x0,y0,x1,    color);
 uinfo_text   : begin
                draw_text(tar,x0,y0,text_lt,ta_MM,255,color);
                continue;
@@ -514,30 +518,30 @@ begin
    vy:=ui_cam_y-vid_ab;
 
    if(theme_decaln>0)then
-    for i:=1 to map_ter_decaln do
-     with map_ter_decalL[i-1] do
-     begin
-        ix:=decal_x-vx+ui_mwa;
-        iy:=decal_y-vy+ui_mha;
+     for i:=0 to map_ter_decaln-1 do
+       with map_ter_decalL[i] do
+       begin
+          ix:=decal_x-vx+ui_mwa;
+          iy:=decal_y-vy+ui_mha;
 
-        s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decaln;
+          s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decaln;
 
-        t:=theme_decals[s];
-        if(t<0)
-        then spr:=@spr_crater[-t]
-        else spr:=@theme_spr_decals[t];
+          t:=theme_decals[s];
+          if(t<0)
+          then spr:=@spr_crater[-t]
+          else spr:=@theme_spr_decals[t];
 
-        ix:=ix mod ui_mwa;
-        iy:=iy mod ui_mha;
+          ix:=ix mod ui_mwa;
+          iy:=iy mod ui_mha;
 
-        if(ix<0)then ix:=ui_mwa+ix;
-        if(iy<0)then iy:=ui_mha+iy;
+          if(ix<0)then ix:=ui_mwa+ix;
+          if(iy<0)then iy:=ui_mha+iy;
 
-        ix-=vid_ab;
-        iy-=vid_ab;
+          ix-=vid_ab;
+          iy-=vid_ab;
 
-        with spr^ do draw_sdlsurface(tar,ix-hw,iy-hh,spr^.surf);
-     end;
+          with spr^ do draw_sdlsurface(tar,ix-hw,iy-hh,spr^.surf);
+       end;
 end;
 
 
@@ -614,14 +618,10 @@ procedure D_LayerFog(tar:pSDL_Surface);
 var
 cx,cy,
 ssx,ssy,
-sty:integer;
-fcell:pboolean;
-temp:boolean;
+sty    : integer;
+fcell  : pboolean;
+temp   : boolean;
 begin
-   if(not ui_fog)
-   or(ui_fog_gridw<=0)
-   or(ui_fog_gridh<=0)then exit;
-
    ssx :=-ui_cam_fx-fog_cw;
    sty :=-ui_cam_fy-fog_cw;
    temp:=false;
@@ -663,7 +663,7 @@ begin
    end; }
 end;
 
-procedure _draw_dbg;
+procedure draw_debug;
 var u,ix,iy:integer;
     c:cardinal;
 begin
@@ -718,7 +718,7 @@ begin
            if(isselected)then
            begin
               //lineColor(vid_screen,ix,iy,ui_mapx+pf_mv_nx-ui_cam_x  ,ui_mapy+pf_mv_ny-ui_cam_y  ,c_red );
-              //lineColor(vid_screen,ix,iy,ui_mapx+mv_x    -ui_cam_x+1,ui_mapy+mv_y    -ui_cam_y+1,c_lime);
+              //lineColor(vid_screen,ix,iy,ui_mapx+move_x    -ui_cam_x+1,ui_mapy+move_y    -ui_cam_y+1,c_lime);
 
               //ix:=(((x-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_x+ui_mapx;
               //iy:=(((y-_rx2y_r*ugrid_cellw) div ugrid_cellw)*ugrid_cellw)-ui_cam_y+ui_mapy;

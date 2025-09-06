@@ -679,12 +679,12 @@ begin
        if(not defeated)and(not observer)then
        begin
           limit:=armylimit+uprodl;
-          draw_text(tar,ui_EnergyX,ui_EnergyY            ,tc_aqua  +str_ui_energy+tc_default+i2s(cenergy               )+tc_white+' / '+tc_aqua  +i2s(menergy)
-                                                                                                                                     ,ta_RU,255,ui_cenergy[cenergy<=0]);
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY              ,tc_orange+str_ui_army  +tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr
-                                                                                                                                     ,ta_LU,255,ui_limit[limit>=MaxPlayerLimit]);
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY+txt_line_h2  ,tc_red +str_ui_Tab[0]+tc_default+': '+limit2s(ucl_l[true ]       ,MinUnitLimit),ta_LU,255,c_white);
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY+txt_line_h2*2,tc_gray+str_ui_Tab[1]+tc_default+': '+limit2s(ucl_l[false]+uprodl,MinUnitLimit),ta_LU,255,c_white);
+          draw_text(tar,ui_EnergyX,ui_EnergyY            ,str_ui_EnergyLevel   +tc_default+i2s(cenergy               )+tc_white+' / '+tc_aqua  +i2s(menergy)
+                                                                                                                         ,ta_RU,255,ui_cenergy[cenergy<=0]         );
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY              ,str_ui_LimitArmy     +tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr
+                                                                                                                         ,ta_LU,255,ui_limit[limit>=MaxPlayerLimit]);
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY+txt_line_h2  ,str_ui_LimitUnits    +limit2s(ucl_l[true ]       ,MinUnitLimit),ta_LU,255,c_white);
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY+txt_line_h2*2,str_ui_LimitBuildings+limit2s(ucl_l[false]+uprodl,MinUnitLimit),ta_LU,255,c_white);
        end;
 
    // GAME STATUS VICTORY/DEFEAT/PAUSE/REPLAY END
@@ -778,10 +778,10 @@ begin
 
    d_MapMouse(tar);
 
+   if(ui_update_timer=0)then d_MiniMap(ui_UIPanelTemplate);
+
    if(ui_update_timer=0)or(ui_update_now)then
    begin
-      d_MiniMap(ui_UIPanelTemplate);
-
       // update panel template
       if(PVisPlayer<>nil)then
         with PVisPlayer^ do

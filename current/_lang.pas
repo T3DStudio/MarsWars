@@ -1094,8 +1094,10 @@ begin
    str_ui_Tab[tab_Units    ]     := 'Units';
    str_ui_Tab[tab_Upgrades ]     := 'Researches';
    str_ui_Tab[tab_Controls ]     := 'Controls';
-   str_ui_army                   := 'Army: ';
-   str_ui_energy                 := 'Energy: ';
+   str_ui_LimitArmy              := tc_orange+'Army limit'  +tc_white+': ';
+   str_ui_LimitBuildings         := tc_red   +'Units'       +tc_white+': ';
+   str_ui_LimitUnits             := tc_gray  +'Buildings'   +tc_white+': ';
+   str_ui_EnergyLevel            := tc_aqua  +'Energy level'+tc_white+': ';
    str_ui_objectives             := 'Objectives:';
 
    str_objective_Scirmish        := '-Destroy all enemy players';
@@ -1799,8 +1801,8 @@ begin
   str_ui_Tab[2]         := 'Исследования';
   str_ui_Tab[3]         := 'Запись';
 
-  str_ui_army         := 'Армия: ';
-  str_ui_energy       := 'Энергия: ';
+  str_ui_LimitArmy         := 'Армия: ';
+  str_ui_EnergyLevel       := 'Энергия: ';
 
   str_ability_name[uab_Teleport        ]:='Призыв';
   str_ability_name[uab_UACScan         ]:='Сканирование';

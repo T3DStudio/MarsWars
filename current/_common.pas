@@ -11,7 +11,7 @@ function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function unit_sability (pCaster:PTUnit;check:boolean):cardinal; forward;
 function unit_pability (pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
 function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;
-function unit_CheckTransport(uTransport,uTarget:PTUnit):boolean;forward;
+function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
 
 procedure ai_Local_InitVars(pu:PTUnit);forward;
 procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
@@ -691,7 +691,7 @@ begin
                    or((bits and ureq_barracks)>0)
                    then bt:=lmt_NeedProdUnit
                    else
-                     if((bits and ureq_builders    )>0)
+                     if((bits and ureq_builders)>0)
                      then bt:=lmt_unit_NeedBuilder
                      else
                        if((bits and ureq_busy)>0)
@@ -1103,7 +1103,7 @@ begin
    if(h<=ndead_hits                 )then hits_li2si:=-128 else
    if(fdead_hits<h)and(h<0          )then hits_li2si:=mm3i(-125,h div _d2shi,-1  ) else
    if( dead_hits<h)and(h<=fdead_hits)then hits_li2si:=-126 else
-                                          hits_li2si:=mm3i(   1,trunc(h/s)  ,_mms);
+                                          hits_li2si:=mm3i(   1,trunc(h/s)  ,sintMaxHits);
 end;
 
 function ai_name(ain:byte):shortstring;
@@ -1160,8 +1160,8 @@ begin
       or(IsUnitRange(transportU,nil))then exit;
 
       if(speed          <=0)then exit;
-      if(uid_isbuilding       )then exit;
-      if(not uid_CanAttack       )then exit;
+      if(uid_isbuilding    )then exit;
+      if(not uid_CanAttack )then exit;
       if(uo_id=ua_psability)
       or(uo_id=ua_hold     )
       or(uo_bx>0           )then exit;
@@ -1183,14 +1183,14 @@ function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal):boolean;
 begin
    CheckUnitBaseFlags:=false;
 
-   if((flags and wtr_unit    )=0)and(not tu^.uid^.uid_isbuilding   )then exit;
-   if((flags and wtr_building)=0)and(    tu^.uid^.uid_isbuilding   )then exit;
+   if((flags and wtr_unit    )=0)and(not tu^.uid^.uid_isbuilding)then exit;
+   if((flags and wtr_building)=0)and(    tu^.uid^.uid_isbuilding)then exit;
 
-   if((flags and wtr_bio     )=0)and(not tu^.uid^.uid_ismech       )then exit;
-   if((flags and wtr_mech    )=0)and(    tu^.uid^.uid_ismech       )then exit;
+   if((flags and wtr_bio     )=0)and(not tu^.uid^.uid_ismech    )then exit;
+   if((flags and wtr_mech    )=0)and(    tu^.uid^.uid_ismech    )then exit;
 
-   if((flags and wtr_light   )=0)and    (tu^.uid^.uid_islight      )then exit;
-   if((flags and wtr_heavy   )=0)and not(tu^.uid^.uid_islight      )then exit;
+   if((flags and wtr_light   )=0)and    (tu^.uid^.uid_islight   )then exit;
+   if((flags and wtr_heavy   )=0)and not(tu^.uid^.uid_islight   )then exit;
 
    if((flags and wtr_ground  )=0)and(tu^.ukfly = uf_ground      )then exit;
    if((flags and wtr_fly     )=0)and(tu^.ukfly = uf_fly         )then exit;

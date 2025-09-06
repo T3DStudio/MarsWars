@@ -725,7 +725,7 @@ begin
      if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
      begin
         unit_SetDefaults(uu,true);
-        unit_reveal     (uu,true);
+        unit_TeamReveal     (uu,true);
         vx:=x;
         vy:=y;
         vis:=ui_CheckUnitUIPlayerVision(uu,true);
@@ -872,8 +872,8 @@ begin
 
             if(speed>0)then
             begin
-               mv_x:=pu^.x;
-               mv_y:=pu^.y;
+               move_x:=pu^.x;
+               move_y:=pu^.y;
             end;
 
             if(pu^.x<>x)or(pu^.y<>y)then
@@ -883,7 +883,7 @@ begin
                if(speed>0)then
                begin
                   vstp:=UnitStepTicks;
-                  dir :=point_dir(mp_x,mp_y,x,y);
+                  dir :=point_dir(move_px,move_py,x,y);
                end;
                if(speed<=0)or(buffs[ub_Teleport]>0)then
                begin

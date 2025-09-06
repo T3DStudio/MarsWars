@@ -1568,11 +1568,11 @@ begin
       if(not iscomplete)then exit;
 
       // abilities
-      case uid_ability of
-uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
-                       then uo_tar:=ai_teleporter_beacon_u^.unum
-                       else uo_tar:=0;
-      end;
+      if(uid_ability_isteleport)then
+        if(ai_teleporter_beacon_u<>nil)
+        then uo_tar:=ai_teleporter_beacon_u^.unum
+        else uo_tar:=0;
+
       if(unit_sability(pu,true)=0)or(unit_pability(pu,0,0,0,true)=0)then
       begin
          // other ability
@@ -1580,7 +1580,7 @@ uab_Teleport         : if(ai_teleporter_beacon_u<>nil)
          begin
             case uid_ability of
 uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
-uab_SphereInvuln : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
+uab_SphereInvuln     : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
 uab_UACStrike        : if(ai_strike_tar_u<>nil)then unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y,false);
 uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgr[upgr_hell_Phantoms]>0)then
                          if(srange<u_royal_d)or(g_royal_r<srange)then unit_sability(pu,false);

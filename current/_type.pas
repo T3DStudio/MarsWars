@@ -71,6 +71,7 @@ TVisPrim = record
    cx,cy,
    x0,y0,
    x1,y1    : integer;
+   bcolor,
    color    : cardinal;
    text_lt,
    text_lt2,
@@ -220,6 +221,8 @@ end;
 //   GAME
 //
 
+TUnitActionMode = (uam_have=0,uam_check,uam_exec);
+
 TUnitAbilityTargetType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_UnitAny,uat_UnitAlly,uat_UnitOwn);
 
 TUnitAbility = record
@@ -234,6 +237,7 @@ TUnitAbility = record
    ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Descript: shortstring;
+   ua_str_UnitHint: byte;
    {$ENDIF}
 end;
 
@@ -400,6 +404,8 @@ TUID = record
    uid_ability_ReqUpgr,
    uid_ability_ReqUID
                     : byte;
+   uid_ability_isteleport
+                    : boolean;
 
    uid_OutUnitsTeleBuff,
    uid_SlowTurn,
@@ -682,8 +688,8 @@ TUnit = record
    a_tar,
    a_tar_cl,
 
-   mv_x,mv_y,
-   mp_x,mp_y,
+   move_x ,move_y,
+   move_px,move_py,
 
    uo_bx,uo_by,
    uo_tar,

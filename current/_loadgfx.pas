@@ -637,13 +637,17 @@ begin
    spr_uibtn_AbilityUnloadTo   := gfx_ButtonLoad(folder_ui+'b_unloadto'   ,ui_ButtonW1);
    spr_uibtn_AbilityCCLand     := gfx_ButtonLoad(folder_ui+'b_CCland'     ,ui_ButtonW1);
    spr_uibtn_AbilityCCLandTo   := gfx_ButtonLoad(folder_ui+'b_CClandTo'   ,ui_ButtonW1);
+   spr_uibtn_AbilityUACLvlUp   := gfx_ButtonLoad(folder_ui+'b_UACProdUp'  ,ui_ButtonW1);
+   spr_uibtn_AbilityHellLvlUp  := gfx_ButtonLoad(folder_ui+'b_HellProdUp' ,ui_ButtonW1);
 
-
-   for x:=0 to 3 do spr_uibtn_Tabs[x]:=gfx_ButtonLoad(folder_ui+'tabs'+b2s(x),ui_TabButtonW-2,false);
+  spr_uibtn_Tabs[0]:=gfx_ButtonLoad(folder_ui+'b_F1'        ,ui_TabButtonW-2,false);
+  spr_uibtn_Tabs[1]:=gfx_ButtonLoad(folder_ui+'b_F2'        ,ui_TabButtonW-2,false);
+  spr_uibtn_Tabs[2]:=gfx_ButtonLoad(folder_ui+'tab_upgrades',ui_TabButtonW-2,false);
+  spr_uibtn_Tabs[3]:=gfx_ButtonLoad(folder_ui+'tab_controls',ui_TabButtonW-2,false);
 
    for r:=1 to r_cnt do
    begin
-      spr_RaceRank[r]:=gfx_LoadSDLSurface(folder_RaceUI[r]+'rank',false,true);
+      spr_RaceRank[r]:=gfx_LoadSDLSurface(folder_RaceUI[r]+'rank',true,true);
       spr_uipanel_EmptyBTN[r]:=gfx_ResizeSurfaceCMask(gfx_LoadSDLSurface(folder_RaceUI[r]+'EmptyBTN',false,true),ui_ButtonW1-2,gfx_rgba2c(0,0,0,160));
    end;
 

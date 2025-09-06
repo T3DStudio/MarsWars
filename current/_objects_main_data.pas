@@ -102,7 +102,7 @@ begin
       uid_ismech       := false;
       uid_islight      := false;
 
-      uid_isdetector     := false;
+      uid_isdetector   := false;
 
       uid_isbuilder    := false;
       uid_issmith      := false;
@@ -1296,7 +1296,7 @@ begin
    uid_req_uid1     := UID_UTechCenter;
    uid_FastDeathHits:=1;
    uid_islight   := false;
-   uid_arms_BonusAntiFlyRange:=-50;
+   uid_arms_BonusAntiFlyRange :=-50;
    uid_arms_BonusAntiUnitRange:=50;
    _weapon(0,wpt_missle,aw_srange,0,0,fr_fpsq ,MID_SShot  ,0,0                   ,upgr_uac_DistDamage,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBio    ,0,dm_AntiUnitBio2);
    _weapon(1,wpt_missle,aw_srange,0,0,fr_fpst2,MID_URocket,0,upgr_uac_TerAAWeapon,upgr_uac_DistDamage,BaseDamageBonus1 ,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,0,wtp_nolost_hits,0,0    );
@@ -1431,15 +1431,15 @@ end;
       if(uid_PainCUpgrStep=0)
       then uid_PainCUpgrStep:=(uid_PainC div 2)+(uid_PainC mod 2);
 
-      uid_missileR:=trunc(uid_r/1.4);
+      uid_missileR:=trunc(uid_r/1.41);
       if(uid_MaxHits1<1)then uid_MaxHits1:=1;
       uid_MaxHitsh := uid_MaxHits1 div 2; if(uid_MaxHitsh <1)then uid_MaxHitsh :=1;
       uid_MaxHitsq:=uid_MaxHitsh div 2; if(uid_MaxHitsq<1)then uid_MaxHitsq:=1;
 
       if(uid_issmith)and(uid_prod_Upgrades=[])then
-       for u:=1 to 255 do
-        with g_upids[u] do
-         if(upgr_time>0)and(uid_race=upgr_race)then uid_prod_Upgrades+=[u];
+        for u:=1 to 255 do
+          with g_upids[u] do
+            if(upgr_time>0)and(uid_race=upgr_race)then uid_prod_Upgrades+=[u];
 
       if(uid_isbuilding)then
       begin
@@ -1453,11 +1453,25 @@ end;
       uid_LevelBonusArmor :=round(BaseArmorLevel1 *uid_LimitUse/ul1);
       end;
 
-      uid_hits_li2si:=uid_MaxHits1/_mms;
+      uid_hits_li2si:=uid_MaxHits1/sintMaxHits;
 
       if(uid_ProdTimeSec> 0)then uid_ProdHitStep:=round((uid_MaxHits1/2)/uid_ProdTimeSec);
       if(uid_ProdHitStep<=0)then uid_ProdHitStep:=1;
       uid_ProdTick:=uid_ProdTimeSec*fr_fps1;
+
+      uid_CanAttack:=false;
+      for u:=0 to LastUnitArms do
+        with uid_arms[u] do
+          if(aw_reload>0)then
+          begin
+             uid_CanAttack:=true;
+             break;
+          end;
+
+      uid_ability_isteleport:=(uid_ability =uab_Teleport)
+                            or(uid_ability1=uab_Teleport)
+                            or(uid_ability2=uab_Teleport)
+                            or(uid_ability3=uab_Teleport);
    end;
 end;
 
@@ -1778,11 +1792,11 @@ uab_UnloadTo        : begin
                          ua_type    := uat_Point;
                       end;
 
-uab_UACProdLevelUp  : begin
+uab_UACProdLvlUp  : begin
                          ua_type    := uat_NoTarget;
                          ua_req_upgr:= UID_UComputerStation;
                       end;
-uab_HellProdLevelUp : begin
+uab_HellProdLvlUp : begin
                          ua_type    := uat_NoTarget;
                          ua_req_upgr:= UID_HFortress;
                       end;
@@ -1795,6 +1809,13 @@ uab_ToUGTurret      : begin
                       end;
 uab_ToUATurret      : begin
                          ua_type    := uat_Point;
+                      end;
+
+uab_ToHTotem        : begin
+                         ua_type    := uat_NoTarget;
+                      end;
+uab_ToHTower        : begin
+                         ua_type    := uat_NoTarget;
                       end;
 
       end;

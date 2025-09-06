@@ -1011,9 +1011,7 @@ begin
    begin
       ua_btn     :=spr_empty;
       ua_mbrush_r:=0;
-
-      {spr_b_ab[uab_RebuildInPoint]:=spr_uibtn_paction;
-       spr_b_ab[uab_ToUACDron     ]:=g_uids[UID_UACDron].uid_BTNBig.surf; }
+      ua_str_UnitHint:=0;
 
       case a of
 uab_Teleport     : ua_btn:=spr_uibtn_Upgrades[r_hell,8 ].surf;
@@ -1039,23 +1037,34 @@ uab_SpawnLostTo  : ua_btn:=spr_uibtn_AbilitySpawnLostTo;
 
 uab_Unload       : ua_btn:=spr_uibtn_AbilityUnload;
 uab_UnloadTo     : ua_btn:=spr_uibtn_AbilityUnloadTo;
+
+uab_UACProdLvlUp : ua_btn:=spr_uibtn_AbilityUACLvlUp;
+uab_HellProdLvlUp: ua_btn:=spr_uibtn_AbilityHellLvlUp;
+
+uab_ToUACDron    : begin
+                   ua_str_UnitHint:=UID_UACDron;
+                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
+                   end;
+uab_ToUGTurret   : begin
+                   ua_str_UnitHint:=UID_UGTurret;
+                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
+                   end;
+uab_ToUATurret   : begin
+                   ua_str_UnitHint:=UID_UATurret;
+                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
+                   end;
+uab_ToHTotem     : begin
+                   ua_str_UnitHint:=UID_HTotem;
+                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
+                   end;
+uab_ToHTower     : begin
+                   ua_str_UnitHint:=UID_HTower;
+                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
+                   end;
+
       end;
 
    end;
-{
-
-uab_HEyeVision         = 11;
-
-uab_ToUACDron          = 14;
-
-
-uab_RebuildInPoint     = 17;
-uab_UACProdLevelUp     = 18;
-uab_HellProdLevelUp    = 19;
-
-uab_ToUGTurret         = 20;
-uab_ToUATurret         = 21;
-}
 end;
 
 

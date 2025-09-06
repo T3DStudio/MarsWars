@@ -88,6 +88,7 @@ begin
 
    input_SetAction(iAct_Control_UAbility1 ,ikt_keyboard,0           ,SDLK_Q           );
    input_SetAction(iAct_Control_UAbility2 ,ikt_keyboard,0           ,SDLK_W           );
+   input_SetAction(iAct_Control_UAbility3 ,ikt_keyboard,0           ,SDLK_E           );
    input_SetAction(iAct_Control_Rebuild   ,ikt_keyboard,0           ,SDLK_E           );
    input_SetAction(iAct_Control_UAMove    ,ikt_keyboard,0           ,SDLK_A           );
    input_SetAction(iAct_Control_UAStop    ,ikt_keyboard,0           ,SDLK_S           );
@@ -257,7 +258,7 @@ begin
 
    ui_panel_CTabIActs[tcc_controls,0 ]:=iAct_Control_UAbility1;
    ui_panel_CTabIActs[tcc_controls,1 ]:=iAct_Control_UAbility2;
-   ui_panel_CTabIActs[tcc_controls,2 ]:=iAct_Control_Rebuild;
+   ui_panel_CTabIActs[tcc_controls,2 ]:=iAct_Control_Rebuild; // iAct_Control_UAbility3
    ui_panel_CTabIActs[tcc_controls,3 ]:=iAct_Control_UAMove;
    ui_panel_CTabIActs[tcc_controls,4 ]:=iAct_Control_UAStop;
    ui_panel_CTabIActs[tcc_controls,5 ]:=iAct_Control_UAPatrol;
@@ -690,7 +691,7 @@ begin
      case m_brush of
      1..255             : if not(m_brush in ui_bprod_possible)then
                           begin
-                             if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_common,-1,-1);
+                             if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_builders,-1,-1);
                              m_brush:=co_empty;
                           end
                           else
@@ -730,7 +731,7 @@ begin
                                   case uid_ability of
                                   uab_HKeepShift,
                                   uab_HTowerBlink,
-                                  uab_UACCCLand         : math_push_out(mouse_map_x,mouse_map_y,uid_r                        ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                  uab_UACCCLand     : math_push_out(mouse_map_x,mouse_map_y,uid_r                        ,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
                                   uab_RebuildInPoint: math_push_out(mouse_map_x,mouse_map_y,g_uids[uid_rebuild_uid].uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
                                   end;
      co_move            : if(not iActEnabled(iAct_Control_UMove   ))then m_brush:=co_empty;

@@ -37,11 +37,16 @@ begin
 
    D_LayerTerrain   (vid_screen);
    D_LayerSpriteList(vid_screen);
+
+   if (ui_fog)
+   and(ui_fog_gridw>0)
+   and(ui_fog_gridh>0)then
    D_LayerFog       (vid_screen);
+
    D_LayerUnitsInfo (vid_screen);
    d_LayerUI        (vid_screen);
 
-   if(TestMode>1)and(net_status=0)then _draw_dbg;
+   if(TestMode>1)and(net_status=0)then draw_debug;
 end;
 
 

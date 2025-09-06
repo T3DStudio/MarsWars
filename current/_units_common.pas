@@ -173,7 +173,7 @@ begin
    with pu^ do
    with uid^ do
      if(not ServerSide)and(speed>0)
-     then unit_canMove:=(x<>mv_x)or(y<>mv_y)
+     then unit_canMove:=(x<>move_x)or(y<>move_y)
      else
      begin
         unit_canMove:=false;
@@ -262,8 +262,8 @@ mvxy_strict  : begin
    end;
 end;
 
-procedure unit_reveal(pu:PTUnit;reset:boolean);
-var t:byte;
+procedure unit_TeamReveal(pu:PTUnit;reset:boolean);
+var p:byte;
 begin
    with pu^ do
    with player^ do
@@ -277,10 +277,10 @@ begin
       AddToInt(@TeamDetection[team],MinVisionTime);
 
       if(revealed)then
-        for t:=0 to LastPlayer do
+        for p:=0 to LastPlayer do
         begin
-           AddToInt(@TeamVision   [t],fr_fps1);
-           AddToInt(@TeamDetection[t],fr_fps1);
+           AddToInt(@TeamVision   [p],fr_fps1);
+           AddToInt(@TeamDetection[p],fr_fps1);
         end;
    end;
 end;
@@ -1153,8 +1153,8 @@ begin
             uo_y    := y;
             uo_bx   := -1;
             uo_by   := -1;
-            mv_x    := x;
-            mv_y    := y;
+            move_x  := x;
+            move_y  := y;
             isselected:= false;
             transportC:= 0;
 
@@ -1167,7 +1167,7 @@ begin
             level:=Ulevel;
 
             unit_SetDefaults(LastCreatedUnitP,false);
-            unit_reveal     (LastCreatedUnitP,false);
+            unit_TeamReveal     (LastCreatedUnitP,false);
             unit_ApplyUID   (LastCreatedUnitP);
             unit_inc_cntrs  (LastCreatedUnitP,Ucomplete,Usummoned);
             unit_UpdateXY   (LastCreatedUnitP);
@@ -1661,21 +1661,20 @@ begin
 end;
 
 
-function unit_CheckTransport(uTransport,uTarget:PTUnit):boolean;
+function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;
 begin
    unit_CheckTransport:=false;
-   if(uTarget^.ukfly=uf_fly)or(uTransport=uTarget)then exit;
+   if(pPassenger^.ukfly=uf_fly)or(pTransport=pPassenger)then exit;
 
-   if(uTransport^.player<>uTarget^.player)then
-    if(uTransport^.player^.team<>uTarget^.player^.team)
-    then exit;
+   if(pTransport^.player<>pPassenger^.player)then
+     if(pTransport^.player^.team<>pPassenger^.player^.team)then exit;
 
-   if((uTransport^.transportM-uTransport^.transportC)>=uTarget^.uid^.uid_TransportSize)then
-    if(uTarget^.uidi in uTransport^.uid^.ups_TransportUIDs)then unit_CheckTransport:=true;
+   if((pTransport^.transportM-pTransport^.transportC)>=pPassenger^.uid^.uid_TransportSize)then
+     if(pPassenger^.uidi in pTransport^.uid^.ups_TransportUIDs)then unit_CheckTransport:=true;
 end;
 
 
-procedure unit_counters(pu:PTUnit);
+procedure unit_BaseTimers(pu:PTUnit);
 var i:byte;
 begin
    with pu^ do
@@ -1791,8 +1790,8 @@ begin
         uo_bx  :=-1;
         uo_by  :=-1;
         uo_tar :=0;
-        mv_x   :=x;
-        mv_y   :=y;
+        move_x :=x;
+        move_y :=y;
         a_tar  :=0;
         rld    :=0;
 
@@ -1880,8 +1879,7 @@ begin
       speed:=uid_BaseSpeed;
       // ABILITIES
       case uid_ability of
-uab_Teleport      : level:=byte(upgr[upgr_hell_Recall]>0);
-uab_UACCCLand         : if(level>0)then
+uab_UACCCLand     : if(buffs[ub_Cast]>0)then
                     begin
                        if(ukfly<>uf_fly)then
                        begin
@@ -1911,8 +1909,8 @@ uab_UACCCLand         : if(level>0)then
                        if(ServerSide)and(zfall<>0)then
                          if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,pu )>0)then
                          begin
-                            level:=1;
-                            buffs[ub_CCast]:=fr_fps2;
+                            buffs[ub_Cast]:=ub_infinity;
+                            rld:=fr_fps2;
                             GameLogBits2Message(playeri,uid_ability,lmt_argt_ability,ureq_landplace,x,y);
                          end;
                     end;

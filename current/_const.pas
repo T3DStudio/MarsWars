@@ -864,29 +864,41 @@ uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep,UID_UACommand
 //  UNIT ABILITIES
 //
 
-uab_Teleport           = 1;
-uab_Recall             = 2;
-uab_UACScan            = 3;
-uab_UACStrike          = 4;
-uab_HEyeBlink          = 5;
-uab_HTowerBlink        = 6;
-uab_HKeepShift         = 7;
-uab_SphereInvuln       = 8;
-uab_SpawnLost          = 9;
-uab_SpawnLostTo        = 10;
-uab_HEyeVision         = 11;
-uab_UACCCLand          = 12;
-uab_UACCCLandTo        = 13;
-uab_ToUACDron          = 14;
-uab_Unload             = 15;
-uab_UnloadTo           = 16;
+uab_astand             = 0;
+uab_amove              = 1;
+uab_apatrol            = 2;
+uab_stand              = 3;
+uab_move               = 4;
+uab_patrol             = 5;
+//uab_destroy            = 6;
 
-uab_RebuildInPoint     = 17;
-uab_UACProdLevelUp     = 18;
-uab_HellProdLevelUp    = 19;
+uab_Teleport           = 7;
+uab_Recall             = 8;
+uab_UACScan            = 9;
+uab_UACStrike          = 10;
+uab_HEyeBlink          = 11;
+uab_HTowerBlink        = 12;
+uab_HKeepShift         = 13;
+uab_SphereInvuln       = 14;
+uab_SpawnLost          = 15;
+uab_SpawnLostTo        = 16;
+uab_HEyeVision         = 17;
+uab_UACCCLand          = 18;
+uab_UACCCLandTo        = 19;
+uab_Unload             = 20;
+uab_UnloadTo           = 21;
 
-uab_ToUGTurret         = 20;
-uab_ToUATurret         = 21;
+uab_UACProdLvlUp       = 22;
+uab_HellProdLvlUp      = 23;
+
+uab_ToUACDron          = 24;
+uab_ToUGTurret         = 25;
+uab_ToUATurret         = 26;
+uab_ToHTotem           = 27;
+uab_ToHTower           = 28;
+
+uab_RebuildInPoint     = 29;
+
 
 client_rld_abils       = [
                          uab_Teleport,uab_HEyeVision,uab_SphereInvuln,uab_HKeepShift,uab_HTowerBlink
@@ -983,7 +995,7 @@ blizzard_sr            = mine_sr;
 
 bld_dec_mr             = 6;
 player_default_ai_level= 7;
-_mms                   = 126;
+sintMaxHits            = 126;
 _d2shi                 = abs(dead_hits div 125)+1;   // 5
 
 gm_cptp_gtime          = fr_fps1*ptimeq;
@@ -1077,17 +1089,18 @@ iAct_UASlGroup9        = 59;
 
 iAct_Control_UAbility1 = 60;
 iAct_Control_UAbility2 = 61;
-iAct_Control_Rebuild = 62;
-iAct_Control_UAMove    = 63;
-iAct_Control_UAStop    = 64;
-iAct_Control_UAPatrol  = 65;
-iAct_Control_UMove     = 66;
-iAct_Control_UStop     = 67;
-iAct_Control_UPatrol   = 68;
-iAct_Control_UProdCncl  =69;
-iAct_Control_UDestroy  = 70;
-iAct_Control_USelBase  = 71;
-iAct_Control_USelArmy  = 72;
+iAct_Control_UAbility3 = 62;
+iAct_Control_Rebuild   = 63;
+iAct_Control_UAMove    = 64;
+iAct_Control_UAStop    = 65;
+iAct_Control_UAPatrol  = 66;
+iAct_Control_UMove     = 67;
+iAct_Control_UStop     = 68;
+iAct_Control_UPatrol   = 69;
+iAct_Control_UProdCncl  =70;
+iAct_Control_UDestroy  = 71;
+iAct_Control_USelBase  = 72;
+iAct_Control_USelArmy  = 73;
 
 iAct_Replay_Fast       = 110;
 iAct_Replay_Back2      = 111;

@@ -447,7 +447,7 @@ begin
       wanim:=false;
       if(G_Status=gs_running)then
         if(unit_canMove(pu))then
-          wanim:=(x<>mv_x)or(y<>mv_y)or(x<>vx)or(y<>vy);
+          wanim:=(x<>move_x)or(y<>move_y)or(x<>vx)or(y<>vy);
 
       spr:=unit_GetSprite(pu);
 
@@ -502,8 +502,8 @@ begin
            begin
               for t:=0 to LastUnitLevel do
               begin
-                 if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]]. uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','');
-                 if(uid_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn,i2s(it2s(pprod_r[t])),'','','','');
+                 if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
+                 if(uid_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
               end;
            end;
 
