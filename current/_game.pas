@@ -7,9 +7,11 @@ begin
                                       UID_LostSoul      ..UID_ZBFGMarine,
                                       UID_UCommandCenter..UID_UComputerStation,
                                       UID_Engineer      ..UID_Flyer  ],
-                                      MaxUnits,true);
+                                    MaxUnits,true);
 
-      PlayerSetAllowedUnits(playerN,[ UID_LostSoul, UID_Phantom ],20,false);
+      PlayerSetAllowedUnits(playerN,[ UID_LostSoul,
+                                      UID_Phantom ],
+                                    20,false);
 
       if(map_generators>0)then
       PlayerSetAllowedUnits(playerN,[ UID_HSymbol1..UID_HSymbol4,
@@ -25,7 +27,7 @@ end;
 
 function PlayersSwap(pSlot,pTarget:byte;Check:boolean):boolean;
 var
-  tgp:TPlayer;
+  tgp:TPlayerGameData;
   tnp:TPlayerNetData;
 t0,t1:byte;
 begin
@@ -76,8 +78,8 @@ begin
    g_gplayers[pSlot  ].pnum:=pSlot;
    g_gplayers[pTarget].pnum:=pTarget;
 
-   g_gplayers[pSlot  ].observer:=t1>LastPlayer;
-   g_gplayers[pTarget].observer:=t0>LastPlayer;
+   g_gplayers[pSlot  ].isobserver:=t1>LastPlayer;
+   g_gplayers[pTarget].isobserver:=t0>LastPlayer;
 
    g_gplayers[pSlot  ].team:=PlayerValidateTeam(pSlot,t1);
    g_gplayers[pTarget].team:=PlayerValidateTeam(pTarget,t0);
@@ -94,10 +96,10 @@ begin
    with g_gplayers[playerN] do
    begin
       case newState of
-ps_None : begin ready:=false;if(not g_started)then
+ps_None : begin isready:=false;if(not g_started)then
                              name :=str_ps_none;      end;
-ps_AI   : begin ready:=true; name :=ai_name(ai_skill);observer:=false;end;
-ps_human: begin ready:=false;name :='';               end;
+ps_AI   : begin isready:=true; name :=ai_name(ai_skill);isobserver:=false;end;
+ps_human: begin isready:=false;name :='';               end;
       end;
       team:=PlayerValidateTeam(playerN,team);
       state:=newState;
@@ -121,11 +123,11 @@ begin
       race     :=r_random;
       mrace    :=r_random;
       team     :=p;
-      ready    :=false;
+      isready    :=false;
       pnum     :=p;
-      observer :=false;
-      defeated :=false;
-      revealed :=false;
+      isobserver :=false;
+      isdefeated :=false;
+      isrevealed :=false;
       log_n    :=0;
       log_n_cl :=0;
    end;
@@ -143,10 +145,8 @@ begin
         PlayerSetState(p,ps_None);
         PlayerSetSkirmishTech(p);
         PlayerClearLog(p);
-        log_EnergyCheck:=0;
+        log_EnergyCheckTime:=0;
      end;
-
-   FillChar(_playerAPM,SizeOf(_playerAPM),0);
 
    {$IFDEF _FULLGAME}
    LocalPlayer:=0;
@@ -195,7 +195,7 @@ begin
    for u:=0 to MaxUnits do
      with g_units[u] do
      begin
-        hits  :=dead_hits;
+        hits  :=hits_dead;
         player:=@g_gplayers[playeri];
         uid   :=@g_units  [uidi   ];
      end;
@@ -262,7 +262,7 @@ end;
 procedure GameLocalStart;
 begin
    ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer] , map_PlayerStartY[LocalPlayer]);
-   if(g_gplayers[LocalPlayer].observer)then
+   if(g_gplayers[LocalPlayer].isobserver)then
    begin
       ui_tab  :=tab_controls;
       UIPlayer:=255;
@@ -290,9 +290,9 @@ begin
    with g_gplayers[pid] do
      if(state<>ps_Human)
      or(armylimit<=0)
-     or(army<=0)
-     or(defeated)
-     or(observer)then exit;
+     or(units_all_e<=0)
+     or(isdefeated)
+     or(isobserver)then exit;
 
    {$IFDEF _FULLGAME}
    if (net_status=ns_client)
@@ -363,11 +363,11 @@ begin
 
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
-       if(p>=map_MaxPlayers)then observer:=true;
+       if(p>=map_MaxPlayers)then isobserver:=true;
 
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
-       if(observer)then
+       if(isobserver)then
        begin
           team:=0;
           race:=r_hell;
@@ -395,7 +395,7 @@ begin
        begin
           PlayerSetSkirmishTech(p);
           ai_PlayerSetSkirmishSettings(p);
-          if(not observer)then
+          if(not isobserver)then
              if(map_generators>0)
              then GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_abase[race],p,1)
              else GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],p,0);
@@ -412,10 +412,14 @@ begin
    GamePauseToggle:=false;
 
    case net_status of
-   ns_client  : begin
-                   GamePauseToggle:=true;
-                   if(check)then exit;
-                   net_pause;
+   ns_client  : case G_Status of
+                gs_running,
+                gs_paused0..
+                gs_paused7  : begin
+                              GamePauseToggle:=true;
+                              if(check)then exit;
+                              net_pause;
+                              end;
                 end;
    ns_server  : case G_Status of
                 gs_running  : begin
@@ -501,8 +505,8 @@ begin
    ui_GameControlsEnabled:=false;
    with g_gplayers[LocalPlayer] do
      if(UIPlayer<>LocalPlayer)
-     or(observer)
-     or(defeated)
+     or(isobserver)
+     or(isdefeated)
      or(rpls_pstate=rpls_read)then exit;
    if(g_status<>gs_running)then exit;
    ui_GameControlsEnabled:=true;
@@ -523,7 +527,7 @@ begin
 
    SelectBuildings:=true;
    if(add)
-   then SelectBuildings:=(g_gplayers[LocalPlayer].ucl_cs[false]=0)
+   then SelectBuildings:=(g_gplayers[LocalPlayer].units_bld_s[false]=0)
    else
      if(fuid=255)then
        for u:=1 to MaxUnits do
@@ -581,8 +585,8 @@ begin
             case fgroup of
             1..
             MaxUnitGroups: isselected:=group=fgroup;
-            255          : isselected:=UnitF2Select(g_punits[u]);
-            254          : isselected:=UnitF1Select(g_punits[u]);
+            255          : isselected:=unit_F2SelectFilter(g_punits[u]);
+            254          : isselected:=unit_F1SelectFilter(g_punits[u]);
             end;
 
           if(wassel<>isselected)then
@@ -596,20 +600,20 @@ end;
 procedure units_Grouping(add:boolean;fgroup:byte);
 var u:integer;
 begin
-   if(not ui_GameControlsEnabled)then exit;
+   if(not ui_GameControlsEnabled)
+   or(fgroup>MaxUnitGroups)then exit;
 
-   if(fgroup<=MaxUnitGroups)then
-     for u:=1 to MaxUnits do
-       with g_punits[u]^ do
-         if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
-           case add of
-           false: if(isselected)
-                  then group:=fgroup
-                  else
-                    if(group=fgroup)then group:=0;
-           true : if(isselected)
-                  then group:=fgroup;
-           end;
+   for u:=1 to MaxUnits do
+     with g_punits[u]^ do
+       if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
+         case add of
+         false: if(isselected)
+                then group:=fgroup
+                else
+                  if(group=fgroup)then group:=0;
+         true : if(isselected)
+                then group:=fgroup;
+         end;
 end;
 
 
@@ -847,11 +851,10 @@ tar_d : integer;
 tar_ex: boolean;
 begin
    with g_gplayers[tPlayer] do
-   if(o_id>0)and(army>0)then
+   if(o_id>0)and(units_all_e>0)then
    begin
-
       case o_id of
-uo_build   : if(o_a0>0)then GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit,unit_start_build(o_x0,o_y0,o_a0,tPlayer),-1,-1);
+      uo_build   : if(o_a0>0)then GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit,unit_start_build(o_x0,o_y0,o_a0,tPlayer),-1,-1);
       else
          tar_d :=tar_d.MaxValue;
          tar_u :=nil;
@@ -862,92 +865,91 @@ uo_build   : if(o_a0>0)then GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit,unit_
             pu:=g_punits[u];
             with pu^ do
             with uid^ do
-             if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transportU,nil))then
-             begin
-                if(o_id=uo_corder)then
-                  case o_x0 of
-                  co_supgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0      ,true)=0,true,true );
-                  co_cupgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true,false);
+              if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transportU,nil))then
+              begin
+                 if(o_id=uo_corder)then
+                   case o_x0 of
+                   co_supgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0      ,true)=0,true,true );
+                   co_cupgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true,false);
 
-                  co_sunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0      ,true)=0,true,true );
-                  co_cunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true,false);
-                  co_pcancle  : if(isselected)then
-                                begin
-                                if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit   (pu,o_a0,false,true)=0,true,false);
-                                if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade(pu,o_a0,false,true)=0,true,false);
-                                end;
-                  end;
-
-                if(isselected)then
-                begin
-                   case o_id of
-               uo_corder     : case o_x0 of
-                               // TO ONE
-                               co_sability,
-                               co_pability : if(uid_ability=o_a0)then
-                                               if(uo_id<>ua_psability)or(s_all=1)then
-                                                 case o_x0 of
-                                                 co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
-                                                 co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
-                                                 end;
-                               co_rebuild  : if(uid_rebuild_uid=o_a0)then
-                                               UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
-
-                               // TO ALL
-                               co_destroy  : unit_kill(pu,false,false,true,false,true);
-                               co_rcamove,
-                               co_rcmove   : begin     // right click
-                                                uo_tar:=0;
-                                                uo_x  :=o_x1;
-                                                uo_y  :=o_y1;
-                                                uo_bx :=-1;
-
-                                                if(o_y0<>unum)then uo_tar:=o_y0;
-                                                if(o_x0<>co_rcmove)or(speed<=0)
-                                                then uo_id:=ua_amove
-                                                else uo_id:=ua_move;
-                                             end;
-                               co_stand    : unit_SetDefaultUO(pu,ua_hold, 0   ,x   ,  y ,-1,-1,true ,false);
-                               co_move     : unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,true ,false);
-                               co_patrol   : unit_SetDefaultUO(pu,ua_move ,0   ,o_x1,o_y1, x, y,true ,false);
-                               co_astand   : unit_SetDefaultUO(pu,ua_amove,0   ,x   ,  y ,-1,-1,true ,false);
-                               co_amove    : if(IsUnitRange(o_y0,nil))
-                                        then unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,false,false)
-                                        else unit_SetDefaultUO(pu,ua_amove,0   ,o_x1,o_y1,-1,-1,false,false);
-                               co_apatrol  : unit_SetDefaultUO(pu,ua_amove,0   ,o_x1,o_y1, x, y,false,false);
-                               end;
+                   co_sunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0      ,true)=0,true,true );
+                   co_cunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true,false);
+                   co_pcancle  : if(isselected)then
+                                 begin
+                                 if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true,false);
+                                 if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true,false);
+                                 end;
                    end;
-                end;
-             end;
+
+                 if(isselected)and(o_id=uo_corder)then
+                   case o_x0 of
+                   // TO ONE
+                   co_ability,
+                   co_sability,
+                   co_pability : if(uid_ability =o_a0)
+                                 or(uid_ability1=o_a0)
+                                 or(uid_ability2=o_a0)
+                                 or(uid_ability3=o_a0)then
+                                   if(ui_ReadyForAbility(pu))then
+                                     case o_x0 of
+                                     co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
+                                     co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
+                                     end;
+                   co_rebuild  : if(uid_rebuild_uid=o_a0)then
+                                   UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
+
+                   // TO ALL
+                   co_destroy  : unit_kill(pu,false,false,true,false,true);
+                   co_rcamove,
+                   co_rcmove   : if(uid_HaveRallyPoint)then // right click
+                                 begin
+                                    rpoint_tar:=o_y0;
+                                    rpoint_x  :=o_x1;
+                                    rpoint_y  :=o_y1;
+                                 end
+                                 else
+                                   if(o_x0<>co_rcmove)or((speed<=0)and uid_CanAttack)
+                                   then unit_SetDefaultUO(pu,ua_amove,o_y0,o_x1,o_y1,-1,-1,false,false)
+                                   else unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,true ,false);
+                   co_stand    : unit_SetDefaultUO(pu,ua_hold, 0   ,x   ,  y ,-1,-1,true ,false);
+                   co_move     : unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,true ,false);
+                   co_patrol   : unit_SetDefaultUO(pu,ua_move ,0   ,o_x1,o_y1, x, y,true ,false);
+                   co_astand   : unit_SetDefaultUO(pu,ua_amove,0   ,x   ,  y ,-1,-1,true ,false);
+                   co_amove    : if(IsUnitRange(o_y0,nil))
+                            then unit_SetDefaultUO(pu,ua_move ,o_y0,o_x1,o_y1,-1,-1,false,false)
+                            else unit_SetDefaultUO(pu,ua_amove,0   ,o_x1,o_y1,-1,-1,false,false);
+                   co_apatrol  : unit_SetDefaultUO(pu,ua_amove,0   ,o_x1,o_y1, x, y,false,false);
+                   end;
+              end;
          end;
 
          if(o_id=uo_corder)then
            if(tar_u<>nil)then
              with tar_u^ do
                case o_x0 of
-         co_supgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0          ,false),x,y);
-         co_cupgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y);
-         co_sunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0          ,false),x,y);
-         co_cunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
+               co_supgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0          ,false),x,y);
+               co_cupgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y);
+               co_sunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0          ,false),x,y);
+               co_cunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
 
-         co_pcancle :
-                   if(GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y))then
-                      GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
+               co_pcancle :
+                         if(GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y))then
+                            GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
 
-         co_sability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_sability        (tar_u               ,false),x,y);
-         co_pability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_pability        (tar_u,o_y0,o_x1,o_y1,false),x,y);
-         co_rebuild : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_rebuild         (tar_u               ,false),x,y);
+               co_sability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_sability        (tar_u               ,false),x,y);
+               co_pability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_pability        (tar_u,o_y0,o_x1,o_y1,false),x,y);
+               co_rebuild : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_rebuild         (tar_u               ,false),x,y);
                end
            else
              case o_x0 of
-          co_supgrade,
-          co_cupgrade : GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,ureq_smiths  ,-1,-1);
-          co_sunit,
-          co_cunit    : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
-          co_pcancle  : GameLogBits2Message(tPlayer,0   ,255             ,ureq_other ,-1,-1);
-          co_sability,
-          co_pability : GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,ureq_other ,-1,-1);
-          co_rebuild  : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_other ,-1,-1);
+             co_supgrade,
+             co_cupgrade : GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,ureq_smiths  ,-1,-1);
+             co_sunit,
+             co_cunit    : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
+             co_pcancle  : GameLogBits2Message(tPlayer,0   ,255             ,ureq_other   ,-1,-1);
+             co_sability,
+             co_pability : GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,ureq_other   ,-1,-1);
+             co_rebuild  : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_other   ,-1,-1);
              end;
 
       end;
@@ -967,7 +969,7 @@ begin
    FillChar(teams_army,SizeOf(teams_army),0);
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
-       teams_army[team]+=army;
+       teams_army[team]+=units_all_e;
 
    for p:=0 to LastPlayer do
      if(teams_army[p]>0)then
@@ -983,7 +985,7 @@ procedure Scenario_DefaultDefeatConditions;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-     if(g_gplayers[p].army>0)then exit;
+     if(g_gplayers[p].units_all_e>0)then exit;
    Game_SetStatusWinnerTeam(255);
 end;
 
@@ -1012,32 +1014,30 @@ begin
           end;
           if(net_logsend_pause>0)then net_logsend_pause-=1;
 
-          if(ServerSide)and(G_Started)and(G_Status=gs_running)and(not observer)and(not defeated)then
+          if(ServerSide)and(G_Started)and(G_Status=gs_running)and(not isobserver)and(not isdefeated)then
           begin
              if(build_cd>0)then build_cd-=1;
 
-             revealed:=false;
-             if(e_builders=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then revealed:=true;
+             isrevealed:=false;
+             if(units_builders_e=0){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then isrevealed:=true;
 
              PlayerExecuteOrder(p);
 
              if(state=ps_AI)
              then ai_player_code(p)
              else
-               if(log_EnergyCheck>0)
-               then log_EnergyCheck-=1
+               if(log_EnergyCheckTime>0)
+               then log_EnergyCheckTime-=1
                else
-                 if(cenergy>=0)
-                 then log_EnergyCheck:=1
+                 if(energyl_cur>=0)
+                 then log_EnergyCheckTime:=1
                  else
                  begin
-                    log_EnergyCheck:=fr_fps6;
+                    log_EnergyCheckTime:=fr_fps6;
                     PlayersAddToLog(p,0,lmt_Req_Energy,0,0,'',-1,-1);
                  end;
           end;
        end;
-
-   for p:=0 to LastPlayer do PlayerAPMUpdate(p);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1199,22 +1199,22 @@ begin
         {$ENDIF}
 
         case (map_scenario in mc_fixed_teams) of
-        true : observer:=not observer;
+        true : isobserver:=not isobserver;
         false: if(state=ps_AI)
                then ScrollByte(@team,forward,0,LastPlayer)
                else
-                 if(observer)then
+                 if(isobserver)then
                  begin
-                    observer:=false;
+                    isobserver:=false;
                     ScrollByte(@team,forward,0,LastPlayer);
                  end
                  else
                  begin
                     case forward of
-                    true : if(team=LastPlayer)then observer:=true;
-                    false: if(team=0         )then observer:=true;
+                    true : if(team=LastPlayer)then isobserver:=true;
+                    false: if(team=0         )then isobserver:=true;
                     end;
-                    if(not observer)then ScrollByte(@team,forward,0,LastPlayer);
+                    if(not isobserver)then ScrollByte(@team,forward,0,LastPlayer);
                  end;
         end;
      end;
@@ -1228,7 +1228,7 @@ begin
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
      with g_gplayers[PlayerTarget] do
-      if(not observer)and(state<>ps_None)then
+      if(not isobserver)and(state<>ps_None)then
       begin
          if(state=ps_None)then exit;
 
@@ -1371,13 +1371,15 @@ begin
    {$IFDEF _FULLGAME}
    SoundControl;
 
-   if(net_status=ns_client)then
-     if(net_svsearch)
-     then net_Discowering
-     else net_Client;
+   case net_status of
+   ns_client: if(net_svsearch)
+              then net_Discowering
+              else net_Client;
+   ns_none  : if(g_Started)and(MainMenu)then exit;
+   end;
+
    replay_Code;
 
-   if(g_Started)and(net_status=ns_none)and(MainMenu)then exit;
    {$ELSE}
    Dedicated_Code;
    Dedicated_Screen;

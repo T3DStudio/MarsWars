@@ -134,13 +134,13 @@ begin
         // tutorial stages, subtasks
         with g_gplayers[LocalPlayer] do
         begin
-           {if(menergy<2000)
+           {if(energyl_max<2000)
            then cmp_data_b1:=1
            else
-             if(menergy<2000)}
+             if(energyl_max<2000)}
 
         end;
-        if(g_gplayers[4].ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_gplayers[LocalPlayer].team);
+        if(g_gplayers[4].units_ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_gplayers[LocalPlayer].team);
 
      end;
    end;

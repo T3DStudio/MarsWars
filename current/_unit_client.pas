@@ -118,19 +118,19 @@ begin
            begin
               with log_l[i] do
               begin
-                 wudata_byte  (mtype,rpl);
-                 b:=argt and %00000011;
-                 if(argx       >0)then b:=b or %00000100;
-                 if(length(str)>0)then b:=b or %00001000;
-                 if(xi         >0)then b:=b or %00010000;
+                 wudata_byte  (lm_type,rpl);
+                 b:=lm_data_t and %00000011;
+                 if(lm_data_u       >0)then b:=b or %00000100;
+                 if(length(lm_string)>0)then b:=b or %00001000;
+                 if(lm_x         >0)then b:=b or %00010000;
                  wudata_byte  (b,rpl);
 
-                 if((b and %00000100)>0)then wudata_byte  (argx ,rpl);
-                 if((b and %00001000)>0)then wudata_string(str  ,rpl);
+                 if((b and %00000100)>0)then wudata_byte  (lm_data_u ,rpl);
+                 if((b and %00001000)>0)then wudata_string(lm_string  ,rpl);
                  if((b and %00010000)>0)then
                  begin
-                    wudata_byte(byte(xi shr 5),rpl);
-                    wudata_byte(byte(yi shr 5),rpl);
+                    wudata_byte(byte(lm_x shr 5),rpl);
+                    wudata_byte(byte(lm_y shr 5),rpl);
                  end;
               end;
 
@@ -159,21 +159,22 @@ begin
       byte1:=0;
       byte2:=0;
 
-      SetBBit(@byte2,0, buffs[ub_Resurect    ]>0);
-      SetBBit(@byte2,1, buffs[ub_Summoned    ]>0);
-      SetBBit(@byte2,2, buffs[ub_Invuln      ]>0);
-      SetBBit(@byte2,3, buffs[ub_Teleport    ]>0);
-      SetBBit(@byte2,4, buffs[ub_HVision     ]>0);
-      SetBBit(@byte2,5, buffs[ub_Cast        ]>0);
-      SetBBit(@byte2,6, buffs[ub_Scaned      ]>0);
+      SetBBit(@byte2,0, buffs[ub_Resurect   ]>0);
+      SetBBit(@byte2,1, buffs[ub_Summoned   ]>0);
+      SetBBit(@byte2,2, buffs[ub_Invuln     ]>0);
+      SetBBit(@byte2,3, buffs[ub_Teleport   ]>0);
+      SetBBit(@byte2,4, buffs[ub_HVision    ]>0);
+      SetBBit(@byte2,5, buffs[ub_Cast       ]>0);
+      SetBBit(@byte2,6, buffs[ub_Scaned     ]>0);
+      SetBBit(@byte2,7, buffs[ub_AltMode    ]>0);
 
       SetBBit(@byte1,0, iscomplete             );
-      SetBBit(@byte1,1, transportU>0            );
+      SetBBit(@byte1,1, transportU>0           );
       SetBBit(@byte1,2, (level and %01)      >0);
       SetBBit(@byte1,3, (level and %10)      >0);
       SetBBit(@byte1,4, buffs[ub_Pain        ]>0);
       SetBBit(@byte1,5,(a_tar_cl>0)and(a_rld>0));
-      SetBBit(@byte1,6, isselected                    );
+      SetBBit(@byte1,6, isselected             );
       SetBBit(@byte1,7, byte2>0                );
 
       wudata_byte(byte1,rpl);
@@ -248,15 +249,15 @@ begin
         or(uidi     in client_rld_uids )then wudata_reload(rld,rpl);
 
       wudata_prod(pu,rpl);
-
+                              //    or(uo=ua_psability)
       if(isselected or not rpl)then
-        if(UnitHaveRPoint(pu^.uidi))or(uo=ua_psability)then
-          if(IsUnitRange(uo_tar,nil))
-          then wudata_int(-uo_tar,rpl)
+        if(uid_HaveRallyPoint)then
+          if(IsUnitRange(rpoint_tar,nil))
+          then wudata_int(-rpoint_tar,rpl)
           else
           begin
-             wudata_int(uo_x,rpl);
-             wudata_int(uo_y,rpl);
+             wudata_int(rpoint_x,rpl);
+             wudata_int(rpoint_y,rpl);
           end;
    end;
 end;
@@ -269,7 +270,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(g_gplayers[POVPlayer].team,pu,true))or(rpl)or(g_gplayers[POVPlayer].observer)
+      if(CheckUnitTeamVision(g_gplayers[POVPlayer].team,pu,true))or(rpl)or(g_gplayers[POVPlayer].isobserver)
       then hits_si:=hits_li2si(hits,uid_MaxHits1,uid_hits_li2si)
       else hits_si:=-128;
 
@@ -311,7 +312,7 @@ begin
                  wudata_byte(byte(uo_y shr 5),rpl);
               end;
 
-            if(playeri=POVPlayer)or(g_gplayers[POVPlayer].observer)then wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)or(g_gplayers[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
@@ -322,7 +323,7 @@ var p,n,bp,bv:byte;
 begin
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
-       if(not observer)and(not defeated)then
+       if(not isobserver)and(not isdefeated)then
        begin
           bp:=0;
 
@@ -330,11 +331,11 @@ begin
             if(race=g_upids[n].upgr_race)then
               case bp of
                 0: begin
-                      bv:=upgr[n];
+                      bv:=upgrs_cur[n];
                       bp:=1;
                    end;
                 1: begin
-                      bv:=bv or (upgr[n] shl 4);
+                      bv:=bv or (upgrs_cur[n] shl 4);
                       wudata_byte(bv,rpl);
                       bp:=0;
                       bv:=0;
@@ -482,10 +483,10 @@ mc_royale   : wudata_int(g_royal_r,rpl);
      with g_gplayers[i] do
        if(state>ps_None)then
        begin
-          if(observer)then SetBBit(@bs_observer,i,true);
-          if(defeated)then SetBBit(@bs_defeated,i,true);
-          if(revealed)then SetBBit(@bs_revealed,i,true);
-          if(not defeated)and(not observer)then
+          if(isobserver)then SetBBit(@bs_observer,i,true);
+          if(isdefeated)then SetBBit(@bs_defeated,i,true);
+          if(isrevealed)then SetBBit(@bs_revealed,i,true);
+          if(not isdefeated)and(not isobserver)then
           begin
              SetBBit(@bs_alive,i,true);
              units_ingame+=MaxPlayerUnits;
@@ -535,13 +536,13 @@ begin
    with uid^ do
    with player^ do
    begin
-      army+=1;
+      units_all_e+=1;
       armylimit+=uid_LimitUse;
-      ucl_e[uid_isbuilding,uid_class]+=1;
-      ucl_c[uid_isbuilding     ]+=1;
-      ucl_l[uid_isbuilding     ]+=uid_LimitUse;
-      uid_e[uidi            ]+=1;
-      if(uid_isbuilder)then e_builders+=1;
+      units_ucl_e[uid_isbuilding,uid_class]+=1;
+      units_bld_e[uid_isbuilding     ]+=1;
+      units_bld_l[uid_isbuilding     ]+=uid_LimitUse;
+      units_uid_e[uidi            ]+=1;
+      if(uid_isbuilder)then units_builders_e+=1;
 
       ptransport:=nil;
       if(IsUnitRange(transportU,@ptransport))then ptransport^.transportC+=uid_TransportSize;
@@ -550,18 +551,18 @@ begin
       begin
          if(isselected)and(rpl)then unit_counters_inc_select(pu);
          if(not iscomplete)
-         then cenergy-=uid_EnergyReq
+         then energyl_cur-=uid_EnergyReq
          else
          begin
             unit_bld_inc_cntrs(pu);
 
-            p:=@ucl_x[uid_isbuilding,uid_class];
+            p:=@units_ucl_u[uid_isbuilding,uid_class];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
                   if(g_units[p^].uid^.uid_class<>uid_class)then p^:=unum;
 
-            p:=@uid_x[uidi];
+            p:=@units_uid_u[uidi];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
@@ -573,11 +574,11 @@ begin
               begin
                  _puid:=uprod_u[i];
 
-                 uprodl+=g_uids[_puid].uid_LimitUse;
-                 uproda+=1;
-                 uprodc[g_uids[_puid].uid_class]+=1;
-                 uprodu[      _puid      ]+=1;
-                 cenergy-=g_uids[_puid].uid_EnergyReq;
+                 prod_unit_Limit+=g_uids[_puid].uid_LimitUse;
+                 prod_unit_Now+=1;
+                 prod_unit_ucl[g_uids[_puid].uid_class]+=1;
+                 prod_unit_uid[      _puid      ]+=1;
+                 energyl_cur-=g_uids[_puid].uid_EnergyReq;
               end;
             if(uid_issmith)then
              for i:=0 to LastUnitLevel do
@@ -585,10 +586,10 @@ begin
               begin
                  _puid:=pprod_u[i] ;
 
-                 upproda+=1;
-                 upprodu[_puid]+=1;
-                 pprod_e[i]:=GetUpgradeEnergy(_puid,upgr[_puid]+1);
-                 cenergy-=pprod_e[i];
+                 prod_upgr_Now+=1;
+                 prod_upgr_upid[_puid]+=1;
+                 pprod_e[i]:=GetUpgradeEnergy(_puid,upgrs_cur[_puid]+1);
+                 energyl_cur-=pprod_e[i];
               end;
          end;
       end;
@@ -603,13 +604,13 @@ begin
    with uid^ do
    with player^ do
    begin
-      army-=1;
+      units_all_e-=1;
       armylimit-=uid_LimitUse;
-      ucl_e[uid_isbuilding,uid_class]-=1;
-      ucl_c[uid_isbuilding     ]-=1;
-      ucl_l[uid_isbuilding     ]-=uid_LimitUse;
-      uid_e[uidi            ]-=1;
-      if(uid_isbuilder)then e_builders-=1;
+      units_ucl_e[uid_isbuilding,uid_class]-=1;
+      units_bld_e[uid_isbuilding     ]-=1;
+      units_bld_l[uid_isbuilding     ]-=uid_LimitUse;
+      units_uid_e[uidi            ]-=1;
+      if(uid_isbuilder)then units_builders_e-=1;
 
       ptransport:=nil;
       if(IsUnitRange(transportU,@ptransport))then ptransport^.transportC-=uid_TransportSize;
@@ -618,15 +619,15 @@ begin
       begin
          if(isselected)and(rpl)then unit_counters_dec_select(pu);
          if(not iscomplete)
-         then cenergy+=uid_EnergyReq
+         then energyl_cur+=uid_EnergyReq
          else
          begin
-            cenergy-=uid_EnergyGen;
-            menergy-=uid_EnergyGen;
-            uid_eb[uidi]-=1;
-            ucl_eb[uid_isbuilding,uid_class]-=1;
-            if(ucl_x[uid_isbuilding,uid_class]=unum)then ucl_x[uid_isbuilding,uid_class]:=0;
-            if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
+            energyl_cur-=uid_EnergyGen;
+            energyl_max-=uid_EnergyGen;
+            units_uid_c[uidi]-=1;
+            units_ucl_c[uid_isbuilding,uid_class]-=1;
+            if(units_ucl_u[uid_isbuilding,uid_class]=unum)then units_ucl_u[uid_isbuilding,uid_class]:=0;
+            if(units_uid_u[uidi            ]=unum)then units_uid_u[uidi            ]:=0;
 
             unit_done_dec_cntrs(pu);
 
@@ -636,11 +637,11 @@ begin
               begin
                  _puid:=uprod_u[i];
 
-                 uprodl-=g_uids[_puid].uid_LimitUse;
-                 uproda-=1;
-                 uprodc[g_uids[_puid].uid_class]-=1;
-                 uprodu[      _puid      ]-=1;
-                 cenergy+=g_uids[_puid].uid_EnergyReq;
+                 prod_unit_Limit-=g_uids[_puid].uid_LimitUse;
+                 prod_unit_Now-=1;
+                 prod_unit_ucl[g_uids[_puid].uid_class]-=1;
+                 prod_unit_uid[      _puid      ]-=1;
+                 energyl_cur+=g_uids[_puid].uid_EnergyReq;
               end;
             if(uid_issmith)then
              for i:=0 to LastUnitLevel do
@@ -648,10 +649,10 @@ begin
               begin
                  _puid:=pprod_u[i];
 
-                 upproda-=1;
-                 upprodu[_puid]-=1;
-                 //pprod_e[i]:=GetUpgradeEnergy(_puid,upgr[_puid]+1);
-                 cenergy+=pprod_e[i];
+                 prod_upgr_Now-=1;
+                 prod_upgr_upid[_puid]-=1;
+                 //pprod_e[i]:=GetUpgradeEnergy(_puid,upgrs_cur[_puid]+1);
+                 energyl_cur+=pprod_e[i];
               end;
          end;
       end;
@@ -722,7 +723,7 @@ begin
 
    with uu^ do
    with player^ do
-     if(pu^.hits<=dead_hits)and(hits>dead_hits)then // create unit
+     if(pu^.hits<=hits_dead)and(hits>hits_dead)then // create unit
      begin
         unit_SetDefaults(uu,true);
         unit_TeamReveal     (uu,true);
@@ -760,7 +761,7 @@ begin
         client_UnitCountersInc(uu,rpl);
      end
      else
-       if(pu^.hits>dead_hits)and(hits<=dead_hits)then // remove unit
+       if(pu^.hits>hits_dead)and(hits<=hits_dead)then // remove unit
        begin
           unit_Bonuses(pu);
 
@@ -770,7 +771,7 @@ begin
 
           if(pu^.hits>0)and(vis)then
           begin
-             if(hits>ndead_hits)and(transportU=0)then
+             if(hits>hits_ndead)and(transportU=0)then
              begin
                 if(buffs[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
 
@@ -788,7 +789,7 @@ begin
           client_UnitCountersDec(pu,rpl);
        end
        else
-         if(pu^.hits>dead_hits)and(hits>dead_hits)then
+         if(pu^.hits>hits_dead)and(hits>hits_dead)then
          begin
             if(pu^.uidi<>uidi)then
             begin
@@ -832,9 +833,9 @@ begin
                                      then SoundPlayUnit(snd_radar,nil,nil)
                                      else
                                        if(team=g_gplayers[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
-                   uab_SpawnLost   : if(upgr[upgr_hell_Phantoms]>0)
-                                     then ability_unit_spawn(pu,UID_Phantom )
-                                     else ability_unit_spawn(pu,UID_LostSoul);
+                   uab_SpawnLost   : if(upgrs_cur[upgr_hell_Phantoms]>0)
+                                     then unit_ArmSpawnUnit(pu,UID_Phantom )
+                                     else unit_ArmSpawnUnit(pu,UID_LostSoul);
                    end;
 
                   if(uid^.uid_isbuilding=false)then
@@ -857,7 +858,7 @@ begin
               begin
                  with uid^ do
                    if(uid_isbuilding)and(uid_ability<>uab_HEyeVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
-                 effect_UnitDeath(uu,hits<=fdead_hits,@vis);
+                 effect_UnitDeath(uu,hits<=hits_fdead,@vis);
 
                  with uid^ do
                    if(uid_DeathMissile>0)
@@ -1039,8 +1040,7 @@ begin
       if(GetBBit(@byte1,3))then level+=%10;
       buffs[ub_Pain]:=buff_Bool2InfTime[GetBBit(@byte1,4)];
       if(GetBBit(@byte1,5))then a_tar:=-1 else a_tar:=0;
-      if(rpl)then
-        isselected:=GetBBit(@byte1,6);
+      if(rpl)then isselected:=GetBBit(@byte1,6);
       if(GetBBit(@byte1,7))
       then byte2:=rudata_byte(rpl,0)
       else byte2:=0;
@@ -1055,6 +1055,7 @@ begin
          buffs[ub_HVision ]:=buff_Bool2InfTime[GetBBit(@byte2,4)];
          buffs[ub_Cast    ]:=buff_Bool2InfTime[GetBBit(@byte2,5)];
          buffs[ub_Scaned  ]:=buff_Bool2InfTime[GetBBit(@byte2,6)];
+         buffs[ub_AltMode ]:=buff_Bool2InfTime[GetBBit(@byte2,7)];
       end
       else
       begin
@@ -1064,9 +1065,10 @@ begin
          buffs[ub_HVision ]:=0;
          buffs[ub_Cast    ]:=0;
          buffs[ub_Scaned  ]:=0;
+         buffs[ub_AltMode ]:=0;
       end;
 
-      if(not rpl)and(not g_gplayers[POVPlayer].observer)then
+      if(not rpl)and(not g_gplayers[POVPlayer].isobserver)then
         with g_gplayers[POVPlayer] do
           AddToInt(@TeamVision[team],MinVisionTime);
    end;
@@ -1102,9 +1104,10 @@ begin
 end;
 
 procedure rudata_OwnerUData(uu:PTUnit;rpl:boolean);
-var puo,
-    b : byte;
-    tu: PTUnit;
+var
+puo,
+b : byte;
+tu: PTUnit;
 begin
    with uu^  do
    with uid^ do
@@ -1132,20 +1135,21 @@ begin
 
       rudata_prod(uu,rpl);
 
+      // or(uo_id=ua_psability)
       if(isselected or not rpl)then
-        if(UnitHaveRPoint(uidi))or(uo_id=ua_psability)then
+        if(uid_HaveRallyPoint)then
         begin
-           uo_x:=rudata_int(rpl,0);
-           if(IsUnitRange(-uo_x,@tu))then
+           rpoint_x:=rudata_int(rpl,0);
+           if(IsUnitRange(-rpoint_x,@tu))then
            begin
-              uo_tar:=-uo_x;
-              uo_x  :=tu^.vx;
-              uo_y  :=tu^.vy;
+              rpoint_tar:=-rpoint_x;
+              rpoint_x  :=tu^.vx;
+              rpoint_y  :=tu^.vy;
            end
            else
            begin
-              uo_tar:=0;
-              uo_y  :=rudata_int(rpl,0);
+              rpoint_tar:=0;
+              rpoint_y  :=rudata_int(rpl,0);
            end;
         end;
    end;
@@ -1173,7 +1177,7 @@ begin
       if(not DEAD)
       then sh:=rudata_sint(rpl,-128)
       else
-        if(hits<dead_hits)
+        if(hits<hits_dead)
         then sh:=-128
         else sh:=-127;
 
@@ -1224,13 +1228,13 @@ begin
                  uo_y:=integer(rudata_byte(rpl,0) shl 5);
               end;
 
-            if(playeri=POVPlayer)or(g_gplayers[POVPlayer].observer)then rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)or(g_gplayers[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
          end;
       end
       else
         case sh of
-        -127: hits:=dead_hits;
-        -128: hits:=ndead_hits;
+        -127: hits:=hits_dead;
+        -128: hits:=hits_ndead;
         end;
       if(fasst_skip)then
       begin
@@ -1256,7 +1260,7 @@ var p,n,bp,bv:byte;
 begin
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
-       if(not observer)and(not defeated)then
+       if(not isobserver)and(not isdefeated)then
        begin
           bp:=0;
 
@@ -1266,11 +1270,11 @@ begin
               case bp of
               0: begin
                     bv:=rudata_byte(rpl,0);
-                    upgr[n]:=min2i(upgr_max,bv and %00001111);
+                    upgrs_cur[n]:=min2i(upgr_max,bv and %00001111);
                     bp:=1;
                  end;
               1: begin
-                    upgr[n]:=min2i(upgr_max,bv shr 4);
+                    upgrs_cur[n]:=min2i(upgr_max,bv shr 4);
                     bp:=0;
                  end;
               end;
@@ -1362,17 +1366,17 @@ mc_royale   : g_royal_r:=rudata_int(rpl,0);
    for i:=0 to LastPlayer do
      with g_gplayers[i] do
        if(state>ps_None)then
-         observer:=GetBBit(@bs,i);
+         isobserver:=GetBBit(@bs,i);
    bs:=rudata_byte(rpl,0);
    for i:=0 to LastPlayer do
      with g_gplayers[i] do
        if(state>ps_None)then
-         defeated:=GetBBit(@bs,i);
+         isdefeated:=GetBBit(@bs,i);
    bs_alive:=0;
    units_ingame:=0;
    for i:=0 to LastPlayer do
      with g_gplayers[i] do
-       if(state>ps_None)and(not observer)and(not defeated)then
+       if(state>ps_None)and(not isobserver)and(not isdefeated)then
        begin
           SetBBit(@bs_alive,i,true);
           units_ingame+=MaxPlayerUnits;
@@ -1400,7 +1404,7 @@ mc_royale   : g_royal_r:=rudata_int(rpl,0);
          bs:=rudata_byte(rpl,0);
          for i:=0 to LastPlayer do
            with g_gplayers[i] do
-             revealed:=GetBBit(@bs,i);
+             isrevealed:=GetBBit(@bs,i);
       end;
 
       lastUnit:=rudata_int(rpl,0);

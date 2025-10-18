@@ -84,13 +84,13 @@ begin
     else
     begin
        with pu^.player^ do
-        if(uid_e[b0]<b0c)
+        if(units_uid_e[b0]<b0c)
         then SetBTA:=SetBT(b0)
         else
-          if(uid_e[b1]<=0)
+          if(units_uid_e[b1]<=0)
           then SetBTA:=SetBT(b1)
           else
-            if(uid_e[b1]<(uid_e[b0] div b01c))then SetBTA:=SetBT(b1);
+            if(units_uid_e[b1]<(units_uid_e[b0] div b01c))then SetBTA:=SetBT(b1);
        if(not SetBTA)then SetBTA:=SetBT(b0);
        if(not SetBTA)then SetBTA:=SetBT(b1);
     end;
@@ -241,7 +241,7 @@ begin
     then BuildTech  (1)
     else BuildMain  (ai_builders_need);
          BuildSpec1 (ai_maxcount_spec1 );
-         if(map_pf_lastZone>1)or(race<>r_hell)or(upgr[upgr_hell_Recall]>0)
+         if(map_pf_lastZone>1)or(race<>r_hell)or(upgrs_cur[upgr_hell_Recall]>0)
     then BuildSpec2 (ai_maxcount_spec2 );
          BuildMain  (ai_builders_need);
          skip_energy_check:=true;
@@ -322,7 +322,7 @@ begin
    tryTransport:=false;
    with pu^ do
     with player^ do
-     if(unum=uid_x[uidi])then
+     if(unum=units_uid_u[uidi])then
       if(CheckReq(UID_UTransport)and(ai_transport_cur<ai_transport_need))then
        tryTransport:=ai_UnitProduction(pu,UID_UTransport,ai_max_specialist);
 end;
@@ -341,7 +341,7 @@ begin
 
    with pu^     do
    with player^ do
-   if((ai_armylimit_alive_u+uprodl)<ai_maxlimit_blimit)then
+   if((ai_armylimit_alive_u+prod_unit_Limit)<ai_maxlimit_blimit)then
    begin
       case uclass of
 uprod_smart: begin
@@ -496,14 +496,14 @@ uprod_antiair
 1..255     : ut:=uclass;
       end;
 
-      up_n:=uid_e[ut]+uprodu[ut];
+      up_n:=units_uid_e[ut]+prod_unit_uid[ut];
 
       if(up_n>=count)then exit;
 
       case ut of
 UID_Mastermind,
-UID_Cyberdemon   : up_m:=ai_max_specialist-(uid_e[UID_Mastermind]+uprodu[UID_Mastermind]
-                                           +uid_e[UID_Cyberdemon]+uprodu[UID_Cyberdemon]);
+UID_Cyberdemon   : up_m:=ai_max_specialist-(units_uid_e[UID_Mastermind]+prod_unit_uid[UID_Mastermind]
+                                           +units_uid_e[UID_Cyberdemon]+prod_unit_uid[UID_Cyberdemon]);
 UID_APC,
 UID_UTransport,
 UID_Pain,
@@ -535,7 +535,7 @@ begin
     with pu^     do
      with player^ do
      begin
-        uip:=upgr[upid]+upprodu[upid];
+        uip:=upgrs_cur[upid]+prod_upgr_upid[upid];
         if(uip<lvl)and(uip<ai_maxcount_upgrlvl)then unit_ProdStartUpgrade(pu,upid,false);
      end;
 end;
@@ -633,8 +633,8 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(cenergy<0)then
-       if(upproda<=0)and(uproda<=0)and(not iscomplete)then exit;
+      if(energyl_cur<0)then
+       if(prod_upgr_Now<=0)and(prod_unit_Now<=0)and(not iscomplete)then exit;
 
       if((ai_inprogress_uid=0)and(    iscomplete))
       or((ai_inprogress_uid>0)and(not iscomplete))then
@@ -646,15 +646,15 @@ UID_HSymbol4,
 UID_UGenerator1,
 UID_UGenerator2,
 UID_UGenerator3,
-UID_UGenerator4: if(cenergy>uid_EnergyGen)and(armylimit>ai_GeneratorsDestoryLimit)and(menergy>ai_GeneratorsDestroyEnergy)then exit; // ai_enrg_cur
+UID_UGenerator4: if(energyl_cur>uid_EnergyGen)and(armylimit>ai_GeneratorsDestoryLimit)and(energyl_max>ai_GeneratorsDestroyEnergy)then exit; // ai_enrg_cur
       else
-        if(uid_eb[uidi]>1)then
+        if(units_uid_c[uidi]>1)then
          if(uid_isbarrack)or(uid_issmith)then
           if(ai_isnoprod(pu))then
           begin
              i:=level+1;
 
-             if(uid_isbarrack)and(ai_unitp_cur>2)and(uid_eb[uidi]>1)then
+             if(uid_isbarrack)and(ai_unitp_cur>2)and(units_uid_c[uidi]>1)then
               if(ai_unitp_cur_na<=0)or((level=0)and(ai_unitp_cur_na>0))then
                if((ai_unitp_cur-i-5)>=ai_unitp_need)then exit;
              if(uid_issmith  )and(ai_upgrp_cur>1)then
@@ -669,7 +669,7 @@ UID_UGenerator4: if(cenergy>uid_EnergyGen)and(armylimit>ai_GeneratorsDestoryLimi
 UID_HTower,
 UID_HTotem         : if(ai_need_suicide_tower(pu))then exit;
 UID_UGTurret,
-UID_UATurret       : if(upgr[upgr_uac_DronTurret]=0)then
+UID_UATurret       : if(upgrs_cur[upgr_uac_DronTurret]=0)then
                        if(ai_need_suicide_tower(pu))then exit;
       end;
    end;
@@ -690,10 +690,10 @@ UID_UGTurret      : if(ai_towers_near_air=0)then exit;
 UID_UATurret      : if(ai_towers_near_grd=0)then exit;
         end;
 
-     if(ai_enemy_d>base_2r)and(buffs[ub_Damaged]<=0)and(a_rld<=0)and(uid_e[uidi]>1)then
+     if(ai_enemy_d>base_2r)and(buffs[ub_Damaged]<=0)and(a_rld<=0)and(units_uid_e[uidi]>1)then
       case uidi of
-UID_HTower        : if((uid_e[uidi]-uid_e[UID_HTotem])>1)then exit;
-UID_HTotem        : if((uid_e[uidi]-uid_e[UID_HTower])>1)then exit;
+UID_HTower        : if((units_uid_e[uidi]-units_uid_e[UID_HTotem])>1)then exit;
+UID_HTotem        : if((units_uid_e[uidi]-units_uid_e[UID_HTower])>1)then exit;
       end;
 
      case uidi of
@@ -704,19 +704,19 @@ UID_UCommandCenter:
                       if((race=r_uac)and(u_royal_d>base_3r))
                       or(map_scenario<>mc_royale)
                       or((race=r_hell)and(u_royal_d>base_5r))then
-                        if(ai_inprogress_auid<2)and(ai_inprogress_uid=0)and(n_builders>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
+                        if(ai_inprogress_auid<2)and(ai_inprogress_uid=0)and(units_builders_ec>1)and(ai_enemy_d>base_2r)and(ai_unitp_cur>0)and(ai_enrg_cur>=1800)then exit;
                     end;
 UID_HSymbol1,
 UID_UGenerator1,
 UID_HSymbol2,
 UID_UGenerator2,
 UID_HSymbol3,
-UID_UGenerator3   : if(cenergy>=300)or((uprodm=uproda)and(upprodm=upproda))then exit;
+UID_UGenerator3   : if(energyl_cur>=300)or((prod_unit_Max=prod_unit_Now)and(prod_upgr_Max=prod_upgr_Now))then exit;
       else
          if(uid_isbarrack)or(uid_issmith)then
            if(level<1)or((level>=1)and(ai_ReadyForAttack))then
-             if((uid_e[uidi]-uid_eb[uidi])<uid_eb[uidi])then
-               if(level<LastUnitLevel)and(cenergy>=600)and(ai_isnoprod(pu))then exit;
+             if((units_uid_e[uidi]-units_uid_c[uidi])<units_uid_c[uidi])then
+               if(level<LastUnitLevel)and(energyl_cur>=600)and(ai_isnoprod(pu))then exit;
       end;
    end;
    ai_buildings_need_rebuild:=false;
@@ -740,20 +740,20 @@ begin
    begin
       group:=0;
 
-      ai_builders_count:=uid_e[aiucl_main0 [race]]
-                        +uid_e[aiucl_main0A[race]]
-                        +uid_e[aiucl_main1 [race]]
-                        +uid_e[aiucl_main1A[race]];
-      ai_tech0_cur     :=uid_e[aiucl_tech0 [race]];
-      ai_tech1_cur     :=uid_e[aiucl_tech1 [race]];
-      ai_tech2_cur     :=uid_e[aiucl_tech2 [race]];
-      ai_detect_cur    :=uid_e[aiucl_detect[race]]*g_uids[aiucl_detect[race]].uid_LimitUse;
-      ai_spec1_cur     :=uid_e[aiucl_spec1 [race]];
-      ai_spec2_cur     :=uid_e[aiucl_spec2 [race]];
+      ai_builders_count:=units_uid_e[aiucl_main0 [race]]
+                        +units_uid_e[aiucl_main0A[race]]
+                        +units_uid_e[aiucl_main1 [race]]
+                        +units_uid_e[aiucl_main1A[race]];
+      ai_tech0_cur     :=units_uid_e[aiucl_tech0 [race]];
+      ai_tech1_cur     :=units_uid_e[aiucl_tech1 [race]];
+      ai_tech2_cur     :=units_uid_e[aiucl_tech2 [race]];
+      ai_detect_cur    :=units_uid_e[aiucl_detect[race]]*g_uids[aiucl_detect[race]].uid_LimitUse;
+      ai_spec1_cur     :=units_uid_e[aiucl_spec1 [race]];
+      ai_spec2_cur     :=units_uid_e[aiucl_spec2 [race]];
 
       if(_N(@ai_builders_need,ai_maxcount_mains ))then ai_builders_need:=ai_builders_count+1;
 
-      prods:=(menergy div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
+      prods:=(energyl_max div 500)-1+ai_builders_count+ai_tech1_cur+ai_tech2_cur;
       if(map_generators>0)or((ai_tech2_cur>0)and ai_advanced_bld)then prods+=2;
       if(_N(@ai_upgrp_need   ,ai_maxcount_upgrps))then ai_upgrp_need   :=mm3i(1,prods div 4        ,ai_maxcount_upgrps);
       if(_N(@ai_unitp_need   ,ai_maxcount_unitps))then ai_unitp_need   :=mm3i(1,prods-ai_upgrp_need,ai_maxcount_unitps);
@@ -769,7 +769,7 @@ begin
       begin
          if(map_generators>0)then
          begin
-            ai_towers_need :=min2i(ucl_c[false],ai_maxcount_towers);
+            ai_towers_need :=min2i(units_bld_e[false],ai_maxcount_towers);
             ai_towers_needx:=random(map_Size);
             ai_towers_needy:=random(map_Size);
             ai_towers_needl:=srange;
@@ -829,12 +829,12 @@ begin
 
       if(hits<=0)or(not iscomplete)then exit;
 
-      if(n_builders>0)and(ai_nearest_builder_u<>nil)then ai_builder(ai_nearest_builder_u);
+      if(units_builders_ec>0)and(ai_nearest_builder_u<>nil)then ai_builder(ai_nearest_builder_u);
 
       // production
       if(uid_isbarrack)then
       begin
-         if(cenergy<0)
+         if(energyl_cur<0)
          then unit_ProdStopUnit(pu,255,false,false)
          else
            if((ai_flags and aif_army_smart_order)>0)
@@ -843,12 +843,12 @@ begin
 
          if(aiu_alarm_d<NOTSET)and(speed<=0)then
          begin
-            uo_x:=aiu_alarm_x;
-            uo_y:=aiu_alarm_y;
+            rpoint_x:=aiu_alarm_x;
+            rpoint_y:=aiu_alarm_y;
          end;
       end;
       if(uid_issmith  )then
-        if(cenergy<0)and(uproda<=0)
+        if(energyl_cur<0)and(prod_unit_Now<=0)
         then unit_ProdStopUpgrade(pu,255,false,false)
         else ai_UpgrProduction(pu);
    end;
@@ -936,27 +936,27 @@ begin
 end;
 
 
-function ai_TryTeleportF(pu,target:PTUnit):boolean;
+function ai_TryTeleportF(pTarget,pTBeacon:PTUnit):boolean;
 var tt,td:integer;
 begin
    ai_TryTeleportF:=false;
    if(ai_teleport_use)and(ai_teleporterF_u<>nil)then
      with ai_teleporterF_u^ do
      begin
-        pu^.uo_x:=x;
-        pu^.uo_y:=y;
-        td:=point_dist_int(pu^.x,pu^.y,x,y);
+        pTarget^.uo_x:=x;
+        pTarget^.uo_y:=y;
+        td:=point_dist_int(pTarget^.x,pTarget^.y,x,y);
         ai_TryTeleportF:=true;
         if(td<uid^.uid_r)then
-          if(target<>nil)then
+          if(pTBeacon<>nil)then
           begin
-             tt:=uo_tar;
-             uo_tar:=target^.unum;
-             unit_ability_teleport(pu,ai_teleporterF_u,td);
-             uo_tar:=tt;
+             tt:=rpoint_tar;
+             rpoint_tar:=pTBeacon^.unum;
+             unit_ability_teleport(pTarget,ai_teleporterF_u,td);
+             rpoint_tar:=tt;
           end
           else
-            if(IsUnitRange(uo_tar,nil))then unit_ability_teleport(pu,ai_teleporterF_u,td);
+            if(IsUnitRange(rpoint_tar,nil))then unit_ability_teleport(pTarget,ai_teleporterF_u,td);
      end;
 end;
 function ai_TryTeleportR(pu:PTUnit):boolean;
@@ -964,7 +964,7 @@ begin
    ai_TryTeleportR:=false;
    if(ai_teleport_use)and(ai_teleporterR_u<>nil)then
      with ai_teleporterR_u^ do
-       if(rld<=0)and(player^.upgr[upgr_hell_Recall]>0)then
+       if(rld<=0)and(player^.upgrs_cur[upgr_hell_Recall]>0)then
        begin
           ai_TryTeleportR:=true;
           unit_ability_teleport(pu,ai_teleporterR_u,NOTSET);
@@ -1168,7 +1168,7 @@ UID_Cyberdemon : if(srange<ai_enemy_build_d)and(ai_enemy_build_d<base_1rh)then
         or(ai_kpoint_d   <200)
         or(ai_generator_d<200)
         or(ai_alarm_d    <200)
-        or(ai_enemy_d    <200)then uo_id:=ua_unload;
+        or(ai_enemy_d    <200)then uo_id:=ua_sability;
 
       if(transportC<=0)then
       begin
@@ -1570,8 +1570,8 @@ begin
       // abilities
       if(uid_ability_isteleport)then
         if(ai_teleporter_beacon_u<>nil)
-        then uo_tar:=ai_teleporter_beacon_u^.unum
-        else uo_tar:=0;
+        then rpoint_tar:=ai_teleporter_beacon_u^.unum
+        else rpoint_tar:=0;
 
       if(unit_sability(pu,true)=0)or(unit_pability(pu,0,0,0,true)=0)then
       begin
@@ -1582,7 +1582,7 @@ begin
 uab_HTowerBlink      : ai_uab_HTowerBlink(pu);
 uab_SphereInvuln     : if(ai_invuln_tar_u<>nil)then unit_ability_HInvuln  (pu,ai_invuln_tar_u^.unum,false);
 uab_UACStrike        : if(ai_strike_tar_u<>nil)then unit_ability_UACStrike(pu,ai_strike_tar_u^.x,ai_strike_tar_u^.y,false);
-uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgr[upgr_hell_Phantoms]>0)then
+uab_SpawnLost        : if(ai_ZombieTarget_d<srange)and(player^.upgrs_cur[upgr_hell_Phantoms]>0)then
                          if(srange<u_royal_d)or(g_royal_r<srange)then unit_sability(pu,false);
 uab_ToUACDron        : if(ai_need_suicide_tower(pu))then
                          if(unit_sability(pu,false)=0)then exit;

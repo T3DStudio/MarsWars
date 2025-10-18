@@ -182,45 +182,60 @@ lmt_chat_player7       = 7;} // LaastPlayer
 lmt_chat_common        = 8;
 lmt_game_message       = 9;
 lmt_game_end           = 10;
-lmt_player_defeated    = 11;
-lmt_player_leave       = 12;
-lmt_player_surrender   = 13;
-lmt_prod_BadPlace      = 14;
-lmt_prod_BadOrder      = 15;
-lmt_prod_AllBusy       = 16;
-lmt_unit_ready         = 17;
-lmt_unit_LevelUp       = 18;
-lmt_unit_attacked      = 19;
-lmt_unit_NeedBuilder   = 20;
-lmt_upgrade_InProgress = 21;
-lmt_upgrade_complete   = 22;
-lmt_Req_Energy         = 23;
-lmt_Req_Common         = 24;
-lmt_Req_Limit          = 25;
-lmt_Req_MaxCount       = 26;
-lmt_map_mark           = 27;
-lmt_allies_attacked    = 28;
-lmt_NeedProdUnit       = 29;
-lmt_ability_reload     = 30;
-lmt_ability_BadPlace   = 31;
-lmt_kpoint_captured    = 32;
-lmt_kpoint_lost        = 33;
-lmt_ngen_exh           = 34;
-lmt_ngen_captured      = 35;
-lmt_ngen_lost          = 36;
-lmt_koth_control       = 37;
-lmt_invalid_Target     = 38;
-lmt_Invalid_Order      = 39;
+lmt_game_PlayersReady  = 11;
+lmt_game_StartsIn      = 12;
+lmt_player_defeated    = 13;
+lmt_player_leave       = 14;
+lmt_player_surrender   = 15;
+lmt_player_ready       = 16;
+lmt_player_nready      = 17;
+lmt_prod_BadPlace      = 18;
+lmt_prod_BadOrder      = 19;
+lmt_prod_AllBusy       = 20;
+lmt_unit_ready         = 21;
+lmt_unit_LevelUp       = 22;
+lmt_unit_attacked      = 23;
+lmt_unit_NeedBuilder   = 24;
+lmt_unit_resurrected   = 25;
+lmt_upgrade_InProgress = 26;
+lmt_upgrade_complete   = 27;
+lmt_Req_Energy         = 28;
+lmt_Req_Common         = 29;
+lmt_Req_Limit          = 30;
+lmt_Req_MaxCount       = 31;
+lmt_map_mark           = 32;
+lmt_allies_attacked    = 33;
+lmt_NeedProdUnit       = 34;
+lmt_ability_reload     = 35;
+lmt_ability_BadPlace   = 36;
+lmt_kpoint_captured    = 37;
+lmt_kpoint_lost        = 38;
+lmt_ngen_exh           = 39;
+lmt_ngen_captured      = 40;
+lmt_ngen_lost          = 41;
+lmt_koth_control       = 42;
+lmt_invalid_Target     = 43;
+lmt_Invalid_Order      = 44;
+lmt_replay_RecStart    = 45;
+lmt_replay_RecStop     = 46;
+lmt_replay_RecError    = 47;
 
 
 lmts_menu_chat         = [
                           0..LastPlayer,
                           lmt_game_message,
                           lmt_game_end,
+                          lmt_game_PlayersReady,
+                          lmt_game_StartsIn,
                           lmt_player_defeated,
                           lmt_player_leave,
                           lmt_player_surrender,
-                          lmt_chat_common
+                          lmt_player_ready,
+                          lmt_player_nready,
+                          lmt_chat_common,
+                          lmt_replay_RecStart,
+                          lmt_replay_RecStop,
+                          lmt_replay_RecError
                          ];
 lmts_last_events       = [0..255];
 
@@ -345,28 +360,16 @@ co_patrol              = -405;
 co_astand              = -406;
 co_amove               = -407;
 co_apatrol             = -408;
-co_sability            = -409;
-co_pability            = -410;
-co_rebuild             = -411;
-co_supgrade            = -412;
-co_cupgrade            = -413;
-co_sunit              = -414;
-co_cunit              = -415;
-co_pcancle             = -416;
-co_mmark               = -417;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  UNIT ACTIONS
-//
-
-ua_move                = 1;
-ua_hold                = 2;
-ua_amove               = 3;
-ua_unload              = 4;
-ua_psability           = 5;
-
-ua_patrol              = 6; // only for client data transfer
+co_ability             = -409;
+co_sability            = -410;
+co_pability            = -411;
+co_rebuild             = -415;
+co_supgrade            = -416;
+co_cupgrade            = -417;
+co_sunit               = -418;
+co_cunit               = -419;
+co_pcancle             = -420;
+//co_mmark               = -418;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -496,7 +499,7 @@ LastUnitBuff           = MaxUnitBuffs-1;
 ub_Pain                = 0;
 ub_Resurect            = 1;
 ub_Cast                = 2;
-ub_Slow                = 3;
+ub_AltMode             = 3;
 ub_CCast               = 4;
 ub_Invis               = 5;
 ub_Detect              = 6;
@@ -716,7 +719,7 @@ mvxy_none              = 0;
 mvxy_relative          = 1;
 mvxy_strict            = 2;
 
-BaseDamage1            = 52;
+BaseDamage1            = 48;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamaget            = BaseDamage1 div 3;
 BaseDamageq            = BaseDamage1 div 4;
@@ -734,13 +737,15 @@ BaseDamageLevel1       = 2;
 BaseArmorBonus1        = 7;
 BaseArmorLevel1        = 2;
 
+BaseRegen1             = BaseDamage1 div 10;
+
 UpgradeUnitArmorBonus  = BaseArmorBonus1;
 UpgradeBuildArmorBonus = BaseArmorBonus1*2+round(BaseArmorBonus1/2);
 
-BaseHeal1              = BaseDamage1 div 2;
-BaseHealBonus1         = BaseDamageBonus1*2;
-BaseRepair1            = BaseDamage1 div 2;
-BaseRepairBonus1       = BaseDamageBonus1*2;
+BaseHeal1              = BaseRegen1*2;
+BaseHealBonus1         = BaseHeal1 div 2;
+BaseRepair1            = BaseRegen1*2;
+BaseRepairBonus1       = BaseHeal1 div 2;
 
 DecayAuraDamage        = BaseDamageBonus1;
 
@@ -763,7 +768,7 @@ UID_HSymbol4           = 7;
 UID_HPools             = 8;
 UID_HTower             = 9;
 UID_HTeleport          = 10;
-UID_HEyeNest           = 11;
+UID_HEye           = 11;
 UID_HMonastery         = 12;
 UID_HPentagram         = 13;
 UID_HTotem             = 14;
@@ -859,45 +864,67 @@ uids_all               = [0..255];
 uid_race_start_fbase   : array[1..r_cnt] of smallint = (UID_HKeep ,UID_UCommandCenter );
 uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep,UID_UACommandCenter);
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  UNIT ACTIONS
+//
+
+ua_move                = 0;
+ua_hold                = 1;
+ua_amove               = 2;
+ua_sability            = 3;
+ua_psability           = 4;
+                             // ???
+ua_ability1            = 4;
+ua_ability2            = 5;
+ua_ability3            = 6;
+
+ua_patrol              = 7; // only for client data transfer
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UNIT ABILITIES
 //
 
-uab_astand             = 0;
-uab_amove              = 1;
-uab_apatrol            = 2;
-uab_stand              = 3;
-uab_move               = 4;
-uab_patrol             = 5;
-//uab_destroy            = 6;
+uab_Teleport           = 1;
+uab_Recall             = 2;
+uab_UACScan            = 3;
+uab_UACStrike          = 4;
+uab_HEyeBlink          = 5;
+uab_HTowerBlink        = 6;
+uab_HKeepShift         = 7;
+uab_HKeepAura          = 8;
+uab_SphereInvuln       = 9;
+uab_SpawnLost          = 10;
+uab_SpawnLostTo        = 11;
+uab_HEyeVision         = 12;
+uab_UACCCLand          = 13;
+uab_UACCCLandTo        = 14;
+uab_Unload             = 15;
+uab_UnloadTo           = 16;
 
-uab_Teleport           = 7;
-uab_Recall             = 8;
-uab_UACScan            = 9;
-uab_UACStrike          = 10;
-uab_HEyeBlink          = 11;
-uab_HTowerBlink        = 12;
-uab_HKeepShift         = 13;
-uab_SphereInvuln       = 14;
-uab_SpawnLost          = 15;
-uab_SpawnLostTo        = 16;
-uab_HEyeVision         = 17;
-uab_UACCCLand          = 18;
-uab_UACCCLandTo        = 19;
-uab_Unload             = 20;
-uab_UnloadTo           = 21;
+uab_ToNextForm         = 17;
+uab_ToNextFormTUAC     = 18;
+uab_ToNextFormTHell    = 19;
 
-uab_UACProdLvlUp       = 22;
-uab_HellProdLvlUp      = 23;
+uab_ProdLvlUp          = 20;
+uab_UACProdLvlUp       = 21;
+uab_HellProdLvlUp      = 22;
 
-uab_ToUACDron          = 24;
-uab_ToUGTurret         = 25;
-uab_ToUATurret         = 26;
-uab_ToHTotem           = 27;
-uab_ToHTower           = 28;
+uab_ToGreatHKeep       = 23;
+uab_ToAdvCC            = 24;
 
-uab_RebuildInPoint     = 29;
+uab_ToUACDron          = 25;
+uab_ToUGTurret         = 26;
+uab_ToUATurret         = 27;
+uab_ToHTotem           = 28;
+uab_ToHTower           = 29;
+
+uab_ToUGTurretTo       = 30;
+uab_ToUATurretTo       = 31;
+
+uab_RebuildInPoint     = 32;
 
 
 client_rld_abils       = [
@@ -921,7 +948,7 @@ uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike
 
 PlayerMaxBuilders      = 4;
 
-g_step_koth_pause      = fr_fps1*120;
+g_step_koth_pause      = fr_fps1*180;
 
 fr_mancubus_rld        = fr_fps2+fr_fpsh;  //2.5
 fr_mancubus_rld_s1     = fr_fps2-fr_fpss;
@@ -932,11 +959,13 @@ fr_archvile_s          = fr_fps1+fr_fpss;
 
 MaxPlayerNameLen       = 13;
 
-dead_hits              = -ptime1*fr_fps1;
-fdead_hits             = dead_hits+fr_fps3;
-ndead_hits             = dead_hits-1;
+hits_dead              = -ptime1*fr_fps1;
+hits_fdead             = hits_dead+fr_fps3;
+hits_ndead             = hits_dead-1;
 
-fdead_hits_border      = -BaseDamage1*3;
+hits_resurrected       = -(fr_fps1+fr_fpsh);
+
+hits_fdead_border      = -BaseDamage1*3;
 
 base_1r                = 350;
 base_hr                = base_1r div 2;
@@ -996,7 +1025,7 @@ blizzard_sr            = mine_sr;
 bld_dec_mr             = 6;
 player_default_ai_level= 7;
 sintMaxHits            = 126;
-_d2shi                 = abs(dead_hits div 125)+1;   // 5
+_d2shi                 = abs(hits_dead div 125)+1;   // 5
 
 gm_cptp_gtime          = fr_fps1*ptimeq;
 gm_cptp_time           = fr_fps1*ptimeh;
@@ -1005,7 +1034,7 @@ gm_cptp_gr             = gm_cptp_r-(gm_cptp_r div 3);
 
 fly_z                  = 80;
 fly_hz                 = fly_z div 2;
-fly_height             : array[false..true] of smallint = (1,fly_z);
+fly_height             : array[false..true] of integer = (1,fly_z);
 
 pain_time              = fr_fps1;
 
@@ -1065,27 +1094,27 @@ iAct_UAddGroup7        = 37;
 iAct_UAddGroup8        = 38;
 iAct_UAddGroup9        = 39;
 
-iAct_USelGroup0        = 40;
-iAct_USelGroup1        = 41;
-iAct_USelGroup2        = 42;
-iAct_USelGroup3        = 43;
-iAct_USelGroup4        = 44;
-iAct_USelGroup5        = 45;
-iAct_USelGroup6        = 46;
-iAct_USelGroup7        = 47;
-iAct_USelGroup8        = 48;
-iAct_USelGroup9        = 49;
+iAct_UASlGroup0        = 40;
+iAct_UASlGroup1        = 41;
+iAct_UASlGroup2        = 42;
+iAct_UASlGroup3        = 43;
+iAct_UASlGroup4        = 44;
+iAct_UASlGroup5        = 45;
+iAct_UASlGroup6        = 46;
+iAct_UASlGroup7        = 47;
+iAct_UASlGroup8        = 48;
+iAct_UASlGroup9        = 49;
 
-iAct_UASlGroup0        = 50;
-iAct_UASlGroup1        = 51;
-iAct_UASlGroup2        = 52;
-iAct_UASlGroup3        = 53;
-iAct_UASlGroup4        = 54;
-iAct_UASlGroup5        = 55;
-iAct_UASlGroup6        = 56;
-iAct_UASlGroup7        = 57;
-iAct_UASlGroup8        = 58;
-iAct_UASlGroup9        = 59;
+iAct_USelGroup0        = 50;
+iAct_USelGroup1        = 51;
+iAct_USelGroup2        = 52;
+iAct_USelGroup3        = 53;
+iAct_USelGroup4        = 54;
+iAct_USelGroup5        = 55;
+iAct_USelGroup6        = 56;
+iAct_USelGroup7        = 57;
+iAct_USelGroup8        = 58;
+iAct_USelGroup9        = 59;
 
 iAct_Control_UAbility1 = 60;
 iAct_Control_UAbility2 = 61;
@@ -1198,11 +1227,11 @@ CharSetAll             = CharSetCommon+CharSetDigits;
 buff_Bool2InfTime      : array[false..true] of smallint = (0,ub_infinity);
 
 char_gen               : char = '+';
-char_kp                : char = '#';
-char_koth              : char = '=';
+char_kp                : char = #0;
+char_koth              : char = ' ';
 
 
-dead_time              = -dead_hits;
+dead_time              = -hits_dead;
 char_detect            = #7;
 
 spr_upgrade_icons      = 20;
@@ -1295,7 +1324,7 @@ EID_BBExp              = 202;
 EID_Teleport           = 203;
 EID_Exp                = 204;
 EID_Exp2               = 205;
-EID_InfantryGibs              = 206;
+EID_InfantryGibs       = 206;
 EID_HKeep_H            = 207;
 EID_HKeep_S            = 208;
 EID_HAKeep_H           = 209;
@@ -1685,10 +1714,12 @@ menu_BarStepX          = font_w1h;
 
 menu_BaseList1H        = 16;
 menu_SvSearchListH     = 10;
-menu_ListLineWChars    = 40;
-menu_ListLineWChars2   = menu_ListLineWChars*2;
-menu_ListW             = menu_ListLineWChars*font_w1+font_w1;
-menu_ListhW            = menu_ListW div 2;
+menu_ListLineWChars1   = 40;
+menu_ListLineWCharsh   = menu_ListLineWChars1 div 2;
+menu_ListLineWChars2   = menu_ListLineWChars1*2;
+menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
+menu_ListWh            = menu_ListW1 div 2;
+menu_ListWq            = menu_ListWh div 2;
 
 menu_PlayersNameW      = font_w3+MaxPlayerNameLen*font_w1;
 menu_PlayersStateW     = font_w1h+menu_ListLineH;
@@ -1755,12 +1786,18 @@ tc_white               = #22;
 tc_green               = #23;
 tc_dgray               = #24;
 tc_default             = #25;
-tc_UACRank             = #176;
-tc_HellRank            = #177;
+
+tc_RankUAC             = #176;
+tc_RankHell            = #177;
 
 tc_SpecChars           = [tc_player0..tc_default];
 
-tc_RaceRank            : array[1..r_cnt] of char = (tc_HellRank,tc_UACRank);
+str_UnitLevel1         : array[1..r_cnt] of shortstring = (tc_RankHell,
+                                                           tc_RankUAC);
+str_UnitLevel2         : array[1..r_cnt] of shortstring = (tc_RankHell+tc_RankHell,
+                                                           tc_RankUAC +tc_RankUAC);
+str_UnitLevel3         : array[1..r_cnt] of shortstring = (tc_RankHell+tc_RankHell+tc_RankHell,
+                                                           tc_RankUAC +tc_RankUAC +tc_RankUAC);
 
 b2cc                   : array[false..true] of string[3] = (tc_red+'-'+tc_default,tc_lime+'+'+tc_default);
 
@@ -1798,6 +1835,7 @@ theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH B
 
 {$ELSE }
 
+ded_GameStartTime        = fr_fps1*5+fr_fps1-1;
 
 str_GameLobby            : shortstring = 'Lobby';
 str_GameStarted          : shortstring = 'Run';

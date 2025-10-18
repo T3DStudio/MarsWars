@@ -117,7 +117,7 @@ begin
         AddItem(@name    ,SizeOf(name    ));
         AddItem(@mrace   ,SizeOf(mrace   ));
         AddItem(@team    ,SizeOf(team    ));
-        AddItem(@observer,SizeOf(observer));
+        AddItem(@isobserver,SizeOf(isobserver));
      end;
 
    for p:=0 to LastPlayer do
@@ -250,7 +250,7 @@ begin
    if(length(rpls_str_path)>0)then
    begin
       if(rpls_pstate=rpls_write)
-      or(rpls_fstate=rpls_write)then GameLogCommon(0,255,str_gmsg_RecordStop+rpls_str_path);
+      or(rpls_fstate=rpls_write)then GameLogRecStop(rpls_str_path);
    end;
    if(rpls_fstate>rpls_none)then
    begin
@@ -306,9 +306,9 @@ begin
       begin
          replay_Abort;
          rpls_pstate:=rpls_none;
-         GameLogCommon(0,255,str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS);
+         GameLogRecError(rpls_str_path+rpls_file_LastErrS);
       end
-      else GameLogCommon(0,255,str_gmsg_RecordStart+rpls_str_path);
+      else GameLogRecStart(rpls_str_path);
    end;
 end;
 
@@ -347,7 +347,7 @@ begin
    begin
       replay_Abort;
       rpls_pstate:=rpls_none;
-      GameLogCommon(0,255,str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS);
+      GameLogRecError(rpls_str_path+rpls_file_LastErrS);
    end;
 end;
 

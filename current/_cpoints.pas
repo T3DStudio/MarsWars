@@ -22,8 +22,8 @@ begin
         begin
            with g_gplayers[kpOwnerPlayer] do
            begin
-              cenergy-=kpEnergy;
-              menergy-=kpEnergy;
+              energyl_cur-=kpEnergy;
+              energyl_max-=kpEnergy;
            end;
            if(log)then GameLogKeyPointLost(kpOwnerPlayer,i);
         end;
@@ -37,8 +37,8 @@ begin
         begin
            with g_gplayers[kpOwnerPlayer] do
            begin
-              cenergy+=kpEnergy;
-              menergy+=kpEnergy;
+              energyl_cur+=kpEnergy;
+              energyl_max+=kpEnergy;
            end;
            if(log)then GameLogKeyPointCaptured(kpOwnerPlayer,i);
         end;

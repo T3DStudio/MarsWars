@@ -12,7 +12,7 @@ aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFac
 aiucl_tech0      : array[1..r_cnt] of byte = (UID_HPentagram     ,UID_UComputerStation);
 aiucl_tech1      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter     );
 aiucl_tech2      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UComputerStation);
-aiucl_detect     : array[1..r_cnt] of byte = (UID_HEyeNest       ,UID_URadar          );
+aiucl_detect     : array[1..r_cnt] of byte = (UID_HEye       ,UID_URadar          );
 aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation      );
 aiucl_spec2      : array[1..r_cnt] of byte = (UID_HTeleport      ,0                   );
 aiucl_twr_air1   : array[1..r_cnt] of byte = (UID_HTower         ,UID_UATurret        );
@@ -150,7 +150,7 @@ ai_limitaround_grd   : longint;
 
 
 
-procedure ai_PlayerSetAlarm(pplayer:PTPlayer;ax,ay:integer;alimit:longint;arange:integer;abase:boolean;apfzone:word);
+procedure ai_PlayerSetAlarm(pplayer:PTPlayerGameData;ax,ay:integer;alimit:longint;arange:integer;abase:boolean;apfzone:word);
 var a,
 anobase,
 afree  :byte;
@@ -240,8 +240,8 @@ begin
    with g_gplayers[p] do
    begin
       case ai_skill of
-      //              energ buil uprod  pprod tech0 tech1 tech2 radar rsta    telepo  min    max    attack attack     max           upgr first
-      //                    ders                                heye  altar           towers towers limit  delay      army          lvl  targets
+      //              energ buil uprod  pprod tech0 tech1 tech2 radar rsta    telepo  min    max    attack attack     max           upgrs_cur first
+      //                    ders                                heye  altar           towers towers limit  delay      units_all_e          lvl  targets
       //                                                        limit
       0  : SetBaseOpt(0    ,0   ,0     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
       1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
@@ -289,28 +289,28 @@ begin
                     +aif_army_smart_prio; //all
       end;
       case ai_skill of
-      8 : upgr[upgr_AI_FogVision  ]:=1;
+      8 : upgrs_cur[upgr_AI_FogVision  ]:=1;
       9 : begin
-          upgr[upgr_AI_FogVision  ]:=1;
-          upgr[upgr_mult_product]:=1;
+          upgrs_cur[upgr_AI_FogVision  ]:=1;
+          upgrs_cur[upgr_mult_product]:=1;
           end;
       10: begin
-          upgr[upgr_AI_FogVision  ]:=1;
-          upgr[upgr_mult_product]:=1;
-          upgr[upgr_fast_product]:=1;
+          upgrs_cur[upgr_AI_FogVision  ]:=1;
+          upgrs_cur[upgr_mult_product]:=1;
+          upgrs_cur[upgr_fast_product]:=1;
           end;
       11: begin
-          upgr[upgr_AI_FogVision  ]:=1;
-          upgr[upgr_mult_product]:=1;
-          upgr[upgr_fast_product]:=1;
-          upgr[upgr_fast_build  ]:=1;
+          upgrs_cur[upgr_AI_FogVision  ]:=1;
+          upgrs_cur[upgr_mult_product]:=1;
+          upgrs_cur[upgr_fast_product]:=1;
+          upgrs_cur[upgr_fast_build  ]:=1;
           end;
       end;
    end;
    ai_MakeScirmishStartAlarms(p);
 end;
 
-function ai_HighPriorityTarget(player:PTPlayer;tu:PTUnit):boolean;
+function ai_HighPriorityTarget(player:PTPlayerGameData;tu:PTUnit):boolean;
 begin
    ai_HighPriorityTarget:=false;
    if(player^.state=ps_AI)then
@@ -411,8 +411,8 @@ begin
    begin
       ai_advanced_bld    :=(ai_flags and aif_base_advance )>0;
       ai_teleport_use    :=(ai_flags and aif_army_teleport)>0;
-      ai_choosen         :=(uid_eb[uidi]>ai_MinChoosenCount)and(unum=uid_x[uidi]);
-      ai_anydetectors    := uid_e[UID_HEyeNest]+uid_e[UID_URadar];
+      ai_choosen         :=(units_uid_c[uidi]>ai_MinChoosenCount)and(unum=units_uid_u[uidi]);
+      ai_anydetectors    := units_uid_e[UID_HEye]+units_uid_e[UID_URadar];
    end;
 
    ai_limitaround_own      := 0;
@@ -432,16 +432,16 @@ begin
     with player^ do
      for i:=1 to 255 do
      begin
-        if(uprodu[i]>0)then
+        if(prod_unit_uid[i]>0)then
           with g_uids[i] do
           begin
              // transportU in production
-             if(uid_isfly)and(not uid_isbuilding)and(uid_TransportMax>0)then ai_transport_cur+=uid_TransportMax*uprodu[i];
+             if(uid_isfly)and(not uid_isbuilding)and(uid_TransportMax>0)then ai_transport_cur+=uid_TransportMax*prod_unit_uid[i];
              if(i in siedge_uids)then ai_armylimit_siedge+=uid_LimitUse;
           end;
-        if(uid_eb[i]>0)then
+        if(units_uid_c[i]>0)then
           if(i in siedge_uids)then
-            with g_uids[i] do ai_armylimit_siedge+=uid_LimitUse*uid_eb[i];
+            with g_uids[i] do ai_armylimit_siedge+=uid_LimitUse*units_uid_c[i];
      end;
    //if(pu^.isselected)then writeln(ai_armylimit_siedge);
 
@@ -689,7 +689,7 @@ begin
            end
            else
              if(CheckUnitTeamVision(team,tu,ai_anyDetectors>0))
-             or(upgr[upgr_AI_FogVision]>0)then  // enemy in vision
+             or(upgrs_cur[upgr_AI_FogVision]>0)then  // enemy in vision
                if(tu^.buffs[ub_invuln]<=0)then
                begin
                   ai_Global_SetCurrentAlarm(tu,0,0,ud,0);
@@ -804,7 +804,7 @@ begin
                end;
                if (not tu^.uid^.uid_CanAttack   )
                and(tu^.uid^.uid_isbuilding   )
-               and(tu^.uidi<>UID_HEyeNest )
+               and(tu^.uidi<>UID_HEye )
                and(tu^.aiu_alarm_d<base_1rh)then
                  if((tu^.aiu_limitaround_enemy-tu^.aiu_limitaround_ally)>=0)
                  then _setNearestTarget(@ai_abase_u,@ai_abase_d,ud);
@@ -830,7 +830,7 @@ begin
             end
             else
              if(CheckUnitTeamVision(team,tu,false))
-             or(upgr[upgr_AI_FogVision]>0)then  // enemy in vision
+             or(upgrs_cur[upgr_AI_FogVision]>0)then  // enemy in vision
              begin
                 if(tu^.buffs[ub_invuln]<=0)then
                 begin
@@ -838,7 +838,7 @@ begin
                    _setNearestTarget(@ai_enemy_u,@ai_enemy_d,ud);
                    if(tu^.ukfly)
                    and(tu^.uidi<>UID_LostSoul)
-                   and(tu^.uidi<>UID_Phantom)then
+                   and(tu^.uidi<>UID_Phantom )then
                    begin
                       _setNearestTarget(@ai_enemy_air_u,@ai_enemy_air_d,ud);
                       if(ud<base_1rh)and(tu^.uid^.uid_CanAttack)then ai_limitaround_enemy_fly+=tu^.uid^.uid_LimitUse;
@@ -864,12 +864,12 @@ begin
 
                 // nearest phantom
                 if(not ai_PhantomWantZombieMe)and(uid_ZombieUID>0)then
-                 if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then
-                  if((ud-uid_r-tu^.uid^.uid_r)<=melee_r)then ai_PhantomWantZombieMe:=true;
+                  if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then
+                    if((ud-uid_r-tu^.uid^.uid_r)<=melee_r)then ai_PhantomWantZombieMe:=true;
              end
              else
                if(CheckUnitTeamVision(team,tu,true))
-               or(upgr[upgr_AI_FogVision]>0)then
+               or(upgrs_cur[upgr_AI_FogVision]>0)then
                begin
                   // invisible enemy unit
                   if(tu^.a_rld>0)or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)then
@@ -922,7 +922,7 @@ begin
                end;
 
                // nearest base
-               if (tu^.uidi<>UID_HEyeNest)
+               if (tu^.uidi<>UID_HEye)
                and(tu^.aiu_alarm_d>base_2r)
                and(tu^.uid^.uid_isbuilding)
                and(tu^.speed<=0)
@@ -935,7 +935,7 @@ begin
             if(tu^.uid^.uid_rebuild_uid>0)and(ai_advanced_bld)then
             begin
                if(not tu^.uid^.uid_isbuilder)
-               or((tu^.uid^.uid_isbuilder)and(n_builders>1))
+               or((tu^.uid^.uid_isbuilder)and(units_builders_ec>1))
                then ai_enrg_pot+=g_uids[tu^.uid^.uid_rebuild_uid].uid_EnergyGen;
             end
             else ai_enrg_pot+=tu^.uid^.uid_EnergyGen;
@@ -1002,7 +1002,7 @@ begin
       end;
 
       if(tu^.uid^.uid_ZombieUID>0)and(pfcheck)then
-        if(fdead_hits<tu^.hits)and(tu^.hits<=tu^.uid^.uid_ZombieHits)then _setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
+        if(hits_fdead<tu^.hits)and(tu^.hits<=tu^.uid^.uid_ZombieHits)then _setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
    end;
 end;
 
@@ -1059,8 +1059,8 @@ begin
            else ai_timer(@ai_scout_timer,0);
 
          ai_ReadyForAttack:=(armylimit>=ai_limit_border)
-                          or((ucl_l[false]+uprodl)>=ai_maxlimit_blimit)
-                          or(ucl_l[true]<=0);
+                          or((units_bld_l[false]+prod_unit_Limit)>=ai_maxlimit_blimit)
+                          or(units_bld_l[true]<=0);
 
          if(not ai_ReadyForAttack)
          then ai_attack_timer:=0

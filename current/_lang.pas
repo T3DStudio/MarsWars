@@ -87,6 +87,15 @@ begin
    else str_ProductionHotKey:='';
 end;
 
+procedure str_SetAbilityBaseHint(aid:byte;NAME,DESCR:shortstring);
+begin
+  with g_aids[aid] do
+  begin
+     ua_str_name    :=NAME;
+     ua_str_Descript:=DESCR;
+  end;
+end;
+
 procedure str_SetUnitBaseHint(uid:byte;NAME,DESCR:shortstring);
 begin
    with g_uids[uid] do
@@ -162,7 +171,7 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(hits>fdead_hits)then
+      if(hits>hits_fdead)then
        if(hits>0)
        then STRADD(@str_UnitAttributes,str_attr_alive    ,sep_comma)
        else STRADD(@str_UnitAttributes,str_attr_dead     ,sep_comma);
@@ -260,15 +269,19 @@ begin
   if(quotes)then str_RebuildName:='"'+str_RebuildName+'"';
 end;
 
-function str_MakeUnitDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
+function str_GetAbilityShortDescript(aid:byte):shortstring;
+begin
+   str_GetAbilityShortDescript:='';
+end;
 
+function str_MakeUnitDefaultDescription(uid:byte;basedesc:shortstring;for_doc:boolean):shortstring;
 begin
    str_MakeUnitDefaultDescription:='';
     with g_uids[uid] do
     begin
        if(not for_doc)then
        STRADD(@str_MakeUnitDefaultDescription,str_hint_hits+i2s(uid_MaxHits1),sep_sdot);
-       STRADD(@str_MakeUnitDefaultDescription,str_hint_BaseSightR+i2s(uid_SightR),sep_sdot);
+       STRADD(@str_MakeUnitDefaultDescription,str_hint_BaseSightR+i2s(uid_BaseSightR),sep_sdot);
 
        if(uid_isbuilder    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_builder,sep_sdot);
        if(uid_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
@@ -281,14 +294,15 @@ begin
           str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,true)+
           AddReq(uid_rebuild_ruid,uid_rebuild_rupgr),sep_sdot );
        end;
-       if(uid_ability>0)then
+       //ua_str_name
+       {if(uid_ability>0)then
        begin
           if(uid_ability=uab_RebuildInPoint)and(uid_rebuild_uid>0)
           then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+str_hint_TransformTo+str_RebuildName(uid_rebuild_uid,uid=uid_rebuild_uid,true)+AddReq(uid_rebuild_ruid,uid_rebuild_rupgr),sep_sdot)
           else
             if(length(str_ability_name[uid_ability])>0)
             then STRADD(@str_MakeUnitDefaultDescription,str_hint_Ability+'"'+str_ability_name[uid_ability]+'"'+AddReq(uid_ability_ReqUID,uid_ability_ReqUpgr),sep_sdot);
-       end;
+       end;}
 
        if(uid_SplashResist)or(uid_ismech)then STRADD(@str_MakeUnitDefaultDescription,str_hint_SplashResist,sep_sdot);
 
@@ -495,16 +509,14 @@ begin
    end;
 end;
 
-function str_makeUpgrINFOHint(upid,curlvl:byte):shortstring;
-var HK,
-    ENRG,
+function str_makeUpgrCostHint(upid,curlvl:byte):shortstring;
+var ENRG,
     TIME,
     INFO:shortstring;
     i   :byte;
 begin
   with g_upids[upid] do
   begin
-     HK  :=str_ProductionHotKey(upgr_btni);
      ENRG:='';
      TIME:='';
      INFO:='';
@@ -514,7 +526,6 @@ begin
      else
        if(curlvl>upgr_max)and(curlvl<255)then curlvl:=upgr_max;
 
-     HK:=str_ProductionHotKey(upgr_btni);
      if(upgr_renerg>0)then
        if(curlvl<255)
        then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
@@ -533,13 +544,14 @@ begin
             for i:=1 to upgr_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
             TIME:=tc_white+TIME+tc_default;
          end;
-     if(length(HK  )>0)then STRADD(@INFO,HK  ,sep_comma);
      if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
      if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
      STRADD(@INFO,tc_orange+'x'+i2s(upgr_max)+tc_default,sep_comma);
      if(upgr_max>1)and(upgr_mfrg)then STRADD(@INFO,tc_red+'*'+tc_default,sep_comma);
 
-     str_makeUpgrINFOHint:=upgr_str_Name+' ('+INFO+')';
+     if(length(INFO)>0)
+     then str_makeUpgrCostHint:='('+INFO+')'
+     else str_makeUpgrCostHint:='';
   end;
 end;
 
@@ -578,7 +590,6 @@ procedure str_makeHints;
 var
 uid,arm: byte;
 IENRG,
-IHK,
 ILIMIT,
 ITIME,
 ITEMP  : shortstring;
@@ -596,15 +607,19 @@ begin
         ILIMIT:='';
         ITEMP :='';
 
-        IHK:=str_ProductionHotKey(uid_class);
+        ITEMP:=str_ProductionHotKey(uid_class);
+        if(length(ITEMP)>0)
+        then uid_str_NameHK:=uid_str_Name+' ('+ITEMP+')'
+        else uid_str_NameHK:=uid_str_Name;
+        ITEMP :='';
+
         if(uid_EnergyReq  >0)then IENRG:=tc_aqua +i2s(uid_EnergyReq  )+tc_default;
         if(uid_ProdTimeSec>0)then ITIME:=tc_white+i2s(uid_ProdTimeSec)+tc_default;
         ILIMIT:=tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default;
-        if(length(IHK   )>0)then STRADD(@ITEMP,IHK   ,sep_comma);
         if(length(IENRG )>0)then STRADD(@ITEMP,IENRG ,sep_comma);
         if(length(ILIMIT)>0)then STRADD(@ITEMP,ILIMIT,sep_comma);
         if(length(ITIME )>0)then STRADD(@ITEMP,ITIME ,sep_comma);
-        uid_str_NameCostHK  :=uid_str_name+' ('+ITEMP+')';
+        uid_str_CostLimit   :='('+ITEMP+')';
         uid_str_DefaultAttr :=str_UnitAttributes(nil,uid);
 
         uid_str_Prod:='';
@@ -645,7 +660,11 @@ begin
    for uid:=0 to 255 do
      with g_upids[uid] do
      begin
-        upgr_str_Reqs:='';
+        ITEMP:=str_ProductionHotKey(upgr_btni);
+        if(length(ITEMP)>0)
+        then upgr_str_NameHK:=upgr_str_Name+' ('+ITEMP+')'
+        else upgr_str_NameHK:=upgr_str_Name;
+
         ITEMP:='';
         if(upgr_ruid  >0)then STRADD(@ITEMP,g_uids [upgr_ruid ].uid_str_name ,sep_comma);
         if(upgr_rupgr >0)then STRADD(@ITEMP,g_upids[upgr_rupgr].upgr_str_Name,sep_comma);
@@ -881,13 +900,18 @@ begin
 
    str_menu_Start                := 'START';
    str_menu_Surrender            := 'SURRENDER';
-   str_menu_Break                := 'BREAK MISSION';
+   str_menu_Abort                := 'ABORT MISSION';
    str_menu_PlaybackStop         := 'STOP PLAYBACK';
    str_menu_Exit                 := 'EXIT';
    str_menu_Back                 := 'BACK';
 
    str_menu_chat                 := 'CHAT(ALL PLAYERS)';
    str_menu_Pause                := 'Pause';
+
+   str_lobby_PlayerReady[false]  := ' is '+tc_red +'not ready';
+   str_lobby_PlayerReady[true ]  := ' is '+tc_lime+'ready';
+   str_lobby_AllPReady           := 'All players are ready!';
+   str_lobby_GameStartIn         := 'Game starts in ';
 
    str_menuMsg_Error             := '! ERROR !';
    str_menuMsg_HintDefault       := '- press any key to close message -';
@@ -981,6 +1005,11 @@ begin
    str_map_GeneratorsL[mapg_20 ] := '20 min';
    str_map_GeneratorsL[mapg_inf] := 'infinity';
 
+   str_objective_Scirmish        := '-Destroy all enemy players';
+   str_objective_RoyalBattle     := '-Stay alive';
+   str_objective_KotH            := '-Keep central area';
+   str_objective_KeyPoints       := '-Capture all key points';
+
    str_FileError_NExists         := 'File not exists!';
    str_FileError_Open            := 'Can`t open file!';
    str_FileError_WData           := 'Wrong file data!';
@@ -1062,6 +1091,7 @@ begin
    str_warn_unit_Levelup         := 'Unit promoted';
    str_warn_unit_complete        := 'Unit ready';
    str_warn_unit_attacked        := 'Unit is under attack';
+   str_warn_unit_resurrected     := 'Unit was resurrected';
    str_warn_upgrade_InProgress   := 'Already in progress';
    str_warn_upgrade_complete     := 'Upgrade complete';
    str_warn_building_complete    := 'Construction complete';
@@ -1099,11 +1129,6 @@ begin
    str_ui_LimitUnits             := tc_gray  +'Buildings'   +tc_white+': ';
    str_ui_EnergyLevel            := tc_aqua  +'Energy level'+tc_white+': ';
    str_ui_objectives             := 'Objectives:';
-
-   str_objective_Scirmish        := '-Destroy all enemy players';
-   str_objective_RoyalBattle     := '-Stay alive';
-   str_objective_KotH            := '-Keep central area';
-   str_objective_KeyPoints       := '-Capture 4 key points';
 
    str_hint_requirements         := 'Requirements: ';
    str_hint_req                  := 'Req.: ';
@@ -1183,7 +1208,7 @@ begin
    str_uarm_PriorityL[wtp_GroundLight  ]:='['+str_attr_ground+','+str_attr_light+']';
 
    str_Camp_Difficulty           := 'Difficulty';
-   str_Camp_DifficultyL[0]       := tc_aqua  +'I`m too young to die'+tc_default;
+   str_Camp_DifficultyL[0]       := tc_aqua  +'I`m too young to die'+tc_default; // It's my first RTS
    str_Camp_DifficultyL[1]       := tc_lime  +'Hey, not too rough'  +tc_default;
    str_Camp_DifficultyL[2]       := tc_yellow+'Hurt me plenty'      +tc_default;
    str_Camp_DifficultyL[3]       := tc_orange+'Ultra-Violence'      +tc_default;
@@ -1201,18 +1226,35 @@ begin
    str_net_ServerLANVis          := 'LAN Advertise';
    str_net_ConnectedToDed        := '- connected to dedicated server -';
 
-   str_ability_name[uab_Teleport        ]:='Teleportation';
-   str_ability_name[uab_UACScan         ]:='Scan';
-   str_ability_name[uab_HTowerBlink     ]:='Blink';
-   str_ability_name[uab_UACStrike       ]:='Missile Strike';
-   str_ability_name[uab_HKeepShift      ]:='Blink';
-   str_ability_name[uab_RebuildInPoint  ]:='';
-   str_ability_name[uab_SphereInvuln]:='Invulnerability';
-   str_ability_name[uab_SpawnLost       ]:='Spawn LostSoul';
-   str_ability_name[uab_HEyeVision      ]:='Hell Vision';
-   str_ability_name[uab_UACCCLand           ]:='Flight Engines';
-   str_ability_name[uab_ToUACDron       ]:='Deconstruct to Drone';
-   str_ability_name[uab_Unload          ]:='Unload';
+   {
+   uab_RebuildInPoint     = 27;
+   }
+   str_SetAbilityBaseHint(uab_Teleport      ,'Teleportation'           ,'');
+   str_SetAbilityBaseHint(uab_Recall        ,'Recall'                  ,'');
+   str_SetAbilityBaseHint(uab_UACScan       ,'Scan'                    ,'');
+   str_SetAbilityBaseHint(uab_HEyeBlink     ,'Blink of the Eye'        ,'');
+   str_SetAbilityBaseHint(uab_HEyeVision    ,'Hell Vision'             ,'');
+   str_SetAbilityBaseHint(uab_HTowerBlink   ,'Planar Jump'             ,'');
+   str_SetAbilityBaseHint(uab_HKeepShift    ,'Dimension Dhift'         ,'');
+   str_SetAbilityBaseHint(uab_HKeepAura     ,'Decay Aura'              ,'');
+   str_SetAbilityBaseHint(uab_SphereInvuln  ,'Invulnerability sphere'  ,'');
+   str_SetAbilityBaseHint(uab_SpawnLost     ,'Spawn Lost Soul'         ,'');
+   str_SetAbilityBaseHint(uab_SpawnLostTo   ,'Spawn Lost Soul to point','');
+   str_SetAbilityBaseHint(uab_UACCCLand     ,'Land/Take off'           ,'');
+   str_SetAbilityBaseHint(uab_UACCCLandTo   ,'Land/Take off to point'  ,'');
+   str_SetAbilityBaseHint(uab_Unload        ,'Unload'                  ,'');
+   str_SetAbilityBaseHint(uab_UnloadTo      ,'Unload to point'         ,'');
+   str_SetAbilityBaseHint(uab_ProdLvlUp     ,'Upgrade'                 ,'');
+   str_SetAbilityBaseHint(uab_UACProdLvlUp  ,'Upgrade'                 ,'');
+   str_SetAbilityBaseHint(uab_HellProdLvlUp ,'Upgrade'                 ,'');
+   str_SetAbilityBaseHint(uab_ToUACDron     ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_ToUGTurret    ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_ToUATurret    ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_ToHTotem      ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_ToHTower      ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_ToUGTurretTo  ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_ToUATurretTo  ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_RebuildInPoint,'Transform to '           ,'');
 
    str_SetUnitBaseHint(UID_HKeep          ,'Hell Keep'                   ,'');
    str_SetUnitBaseHint(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -1222,17 +1264,17 @@ begin
    str_SetUnitBaseHint(UID_HSymbol3       ,'Unholy Symbol level 3'       ,'');
    str_SetUnitBaseHint(UID_HSymbol4       ,'Unholy Symbol level 4'       ,'');
    str_SetUnitBaseHint(UID_HPools         ,'Infernal Pools'              ,'');
-   str_SetUnitBaseHint(UID_HTeleport      ,'Teleport'                    ,'Base teleportation cooldown is '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[limit of teleported unit]');
+   str_SetUnitBaseHint(UID_HTeleport      ,'Teleport'                    ,'');
    str_SetUnitBaseHint(UID_HPentagram     ,'Pentagram of Death'          ,'');
    str_SetUnitBaseHint(UID_HMonastery     ,'Monastery of Despair'        ,'');
    str_SetUnitBaseHint(UID_HFortress      ,'Castle of Damned'            ,'');
    str_SetUnitBaseHint(UID_HTower         ,'Guard Tower'                 ,'Basic defensive structure'        );
    str_SetUnitBaseHint(UID_HTotem         ,'Totem of Horror'             ,'Advanced defensive structure'     );
-   str_SetUnitBaseHint(UID_HAltar         ,'Altar of Pain'               ,'The duration of the "'+str_ability_name[uab_SphereInvuln]+'" effect is '+i2s(invuln_time_sec)+' sec., the ability reload time is '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' sec');
+   str_SetUnitBaseHint(UID_HAltar         ,'Altar of Pain'               ,'');
    str_SetUnitBaseHint(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
    str_SetUnitBaseHint(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
    str_SetUnitBaseHint(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
-   str_SetUnitBaseHint(UID_HEyeNest       ,'Evil Eye Nest'               ,'Detection structure. Reload time of the ability is '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' sec'   );
+   str_SetUnitBaseHint(UID_HEye       ,'Evil Eye Nest'               ,'Detection structure.');
 
    str_SetUnitBaseHint(UID_LostSoul       ,'Lost Soul'                   ,'');
    str_SetUnitBaseHint(UID_Phantom        ,'Phantom'                     ,'');
@@ -1296,7 +1338,7 @@ begin
    str_SetUnitBaseHint(UID_UTechCenter      ,'Science Facility'              ,'');
    str_SetUnitBaseHint(UID_UComputerStation ,'Computer Station'              ,'');
    str_SetUnitBaseHint(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
-   str_SetUnitBaseHint(UID_URMStation       ,'Rocket Launcher Station'       ,'The "'+str_ability_name[uab_UACStrike]+'" impact is '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', the ability reload time is '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' sec');
+   str_SetUnitBaseHint(UID_URMStation       ,'Rocket Launcher Station'       ,'');
    str_SetUnitBaseHint(UID_UMine            ,'Mine'                          ,'');
 
    str_SetUnitBaseHint(UID_Sergant          ,'Shotguner'                     ,'');
@@ -1555,7 +1597,7 @@ begin
 
   str_menu_Start                := 'НАЧАТЬ';
   str_menu_Surrender            := 'СДАТЬСЯ';
-  str_menu_Break                := 'ПРЕРВАТЬ МИССИЮ';
+  str_menu_Abort                := 'ПРЕРВАТЬ МИССИЮ';
   str_menu_PlaybackStop         := 'ПРЕРВАТЬ';
   str_menu_Exit                 := 'ВЫХОД';
   str_menu_Back                 := 'НАЗАД';
@@ -1804,7 +1846,7 @@ begin
   str_ui_LimitArmy         := 'Армия: ';
   str_ui_EnergyLevel       := 'Энергия: ';
 
-  str_ability_name[uab_Teleport        ]:='Призыв';
+ { str_ability_name[uab_Teleport        ]:='Призыв';
   str_ability_name[uab_UACScan         ]:='Сканирование';
   str_ability_name[uab_HTowerBlink     ]:='Скачок';
   str_ability_name[uab_UACStrike       ]:='Ракетный удар';
@@ -1815,7 +1857,7 @@ begin
   str_ability_name[uab_HEyeVision      ]:='Адское зрение';
   str_ability_name[uab_UACCCLand           ]:='Двигатели для полета';
   str_ability_name[uab_ToUACDron       ]:='Разобрать в Дрона';
-  str_ability_name[uab_Unload          ]:='Выгрузить';
+  str_ability_name[uab_Unload          ]:='Выгрузить';  }
   str_warn_AbilityReload:='Способность перезаряжается!';
 
   str_SetUnitBaseHint(UID_HKeep           ,'Адская Крепость'            ,'');
@@ -1826,17 +1868,17 @@ begin
   str_SetUnitBaseHint(UID_HSymbol3        ,'Нечестивый Символ 3 уровня' ,'');
   str_SetUnitBaseHint(UID_HSymbol4        ,'Нечестивый Символ 4 уровня' ,'');
   str_SetUnitBaseHint(UID_HPools          ,'Инфернальные Омуты'         ,'');
-  str_SetUnitBaseHint(UID_HTeleport       ,'Телепорт'                   ,'Базовая перезарядка телепортации - '+tc_aqua+i2s(hteleport_rldPerLimit)+tc_default+'*[лимит перемещаемого юнита]');
+  str_SetUnitBaseHint(UID_HTeleport       ,'Телепорт'                   ,'');
   str_SetUnitBaseHint(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
   str_SetUnitBaseHint(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
   str_SetUnitBaseHint(UID_HFortress       ,'Замок Проклятых'            ,'');
   str_SetUnitBaseHint(UID_HTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
   str_SetUnitBaseHint(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
-  str_SetUnitBaseHint(UID_HAltar          ,'Алтарь Боли'                ,'Длительность эффекта "'+str_ability_name[uab_SphereInvuln]+'" - '+i2s(invuln_time_sec)+' сек., перезарядка способности - '+tc_aqua+i2s(haltar_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_HAltar          ,'Алтарь Боли'                ,'');
   str_SetUnitBaseHint(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
   str_SetUnitBaseHint(UID_HACommandCenter ,'Продвинутый Проклятый Командный Центр','');
   str_SetUnitBaseHint(UID_HBarracks       ,'Казармы Зомби'              ,''          );
-  str_SetUnitBaseHint(UID_HEyeNest        ,'Гнездо Ока Зла'             ,'Обнаружение невидимых войск. Перезарядка способности - '+tc_aqua+i2s(hell_vision_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_HEye        ,'Гнездо Ока Зла'             ,'Обнаружение невидимых войск.');
 
   str_SetUnitBaseHint(UID_ZMedic          ,'Зомби Медик'                ,'');
   str_SetUnitBaseHint(UID_ZEngineer       ,'Зомби Инженер'              ,'');
@@ -1885,8 +1927,8 @@ begin
   str_SetUnitBaseHint(UID_UATurret        ,'Анти-воздушная Турель'      ,'Анти-воздушное защитное сооружение');
   str_SetUnitBaseHint(UID_UTechCenter     ,'Научный Центр'              ,'');
   str_SetUnitBaseHint(UID_UComputerStation,'Компьютерная Станция'       ,'');
-  str_SetUnitBaseHint(UID_URadar          ,'Радар'                      ,'Разведует карту. Перезарядка способности - '+tc_aqua+i2s(radar_reload_sec)+tc_default+' сек');
-  str_SetUnitBaseHint(UID_URMStation      ,'Станция Ракетного Залпа'    ,'Урон "'+str_ability_name[uab_UACStrike]+'" - '+tc_red+i2s(g_mids[MID_Blizzard].mid_base_damage)+tc_default+': ' +str_DamageHint(dm_RSMShot)+', перезарядка способности '+tc_aqua+i2s(mstrike_reload_sec)+tc_default+' сек');
+  str_SetUnitBaseHint(UID_URadar          ,'Радар'                      ,'');
+  str_SetUnitBaseHint(UID_URMStation      ,'Станция Ракетного Залпа'    ,'');
   str_SetUnitBaseHint(UID_UMine           ,'Мина'                       ,'');
 
   str_SetUnitBaseHint(UID_Sergant         ,'Сержант'                ,'');
@@ -2067,7 +2109,7 @@ begin
 
    for u:=0 to 255 do
     with g_uids[u] do
-     if(length(uid_str_NameCostHK)>0)and(uid_r>0)then
+     if(length(uid_str_Name)>0)and(uid_r>0)then
      begin
         writeln(f,uid_str_name);
         writeln(f);
@@ -2083,7 +2125,7 @@ begin
         writeln(f,'Size: ',uid_r);
         if(uid_BaseSpeed>0)then
         writeln(f,'Base movement speed: ' , uid_BaseSpeed);
-        writeln(f,'Base vision range: ', uid_SightR);
+        writeln(f,'Base vision range: ', uid_BaseSightR);
         writeln(f,'Build time: ' , uid_ProdTimeSec);
         writeln(f,'Energy required: ' , uid_EnergyReq);
         if(uid_PainC>0)then
@@ -2115,7 +2157,7 @@ begin
 
 
         writeln(f,'Upgrades:');
-        upgrLine(uid_upgr_SightR,'vision range '+i2sSign(uid_SightRUpgrStep));
+        upgrLine(uid_upgr_SightR,'vision range '+i2sSign(uid_upgr_SightStep));
         if(not uid_isbuilding)then
         upgrLine(upgr_race_unit_srange[uid_race],'vision range '+i2sSign(upgr_race_srange_unit_bonus[uid_race]));
 
@@ -2166,13 +2208,13 @@ begin
     with g_upids[u] do
      if(length(upgr_str_Name)>0)then
      begin
-        writeln(f,RemoveSpecChars(str_makeUpgrINFOHint(u,255)));
+        writeln(f,RemoveSpecChars(str_makeUpgrCostHint(u,255)));
         //writeln(f,RemoveSpecChars(upgr_txt_Hint));
         writeln(f);
      end;
    writeln(f);
 {
-s1:=str_makeUpgrINFOHint(uid,upgr[uid]+1);
+s1:=str_makeUpgrCostHint(uid,upgr[uid]+1);
 hs1:=@s1;
 hs4:=@g_upids[uid].upgr_txt_Hint;
 }

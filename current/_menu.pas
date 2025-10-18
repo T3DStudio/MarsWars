@@ -3,7 +3,8 @@ var i:byte;
     c:char;
 begin
    StringApplyInput:=s;
-   if(InputActionPressed(iAct_backspace,true))then
+   if(InputActionPressed(iAct_backspace))
+   or(InputActionStuck  (iAct_backspace))then
    begin
       if(length(s)>0)then setlength(s,length(s)-1);
    end
@@ -35,20 +36,23 @@ begin
    gfx_MapMakeTerrain;
 end;
 
-procedure menu_Message(pMMsg:pTMenuMessage;caption,message,hint:shortstring;time:integer=fr_fps4);
+procedure menu_msgBox_Set(pMMsg:pTMenuMessage;str_caption,str_body,str_btn1,str_btn2:shortstring;btn1,btn2:byte;time:integer=fr_fps4);
 begin
    with pMMsg^ do
    begin
-      mm_time   :=time;
-      mm_Caption:=Caption;
-      mm_Message:=Message;
-      mm_Hint   :=Hint;
+      mm_time       :=time;
+      mm_str_Caption:=str_Caption;
+      mm_str_Body   :=str_body;
+      mm_str_Btn1   :=str_Btn1;
+      mm_str_Btn2   :=str_Btn2;
+      mm_btn1       :=btn1;
+      mm_btn2       :=btn2;
    end;
 end;
 
-procedure menu_NetMessage(caption,message,hint:shortstring;time:integer=fr_fps4);
+procedure menu_msgBox_Net(caption,body,btn1:shortstring;time:integer=fr_fps4);
 begin
-   menu_Message(@menu_NetMsg,caption,message,hint,time);
+   menu_msgBox_Set(@menu_msg_Net,caption,body,btn1,'',0,0,time);
 end;
 
 function PlayerNameChangeble:boolean;
@@ -77,7 +81,7 @@ begin
                 net_status:=ns_server;
                 PlayersSetDefault;
              end
-             else menu_NetMessage(str_menuMsg_Error,str_Caption_Server+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
+             else menu_msgBox_Net(str_menuMsg_Error,str_Caption_Server+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
           end;
    false: begin   // stop
              if(net_status<>ns_server)then exit;
@@ -110,10 +114,10 @@ begin
                 net_cl_svttl :=ServerTTL;
                 net_cl_log_n :=net_cl_log_n.MaxValue;
                 PlayerReady  :=false;
-                menu_NetMessage(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
+                menu_msgBox_Net(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
                 PlayersClearLog;
              end
-             else menu_NetMessage(str_menuMsg_Error,str_Caption_Client+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
+             else menu_msgBox_Net(str_menuMsg_Error,str_Caption_Client+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
           end;
    false: begin   // disconnect
              if(net_status<>ns_client)then exit;
@@ -144,7 +148,7 @@ begin
                 net_status:=ns_client;
                 net_svsearch:=true;
              end
-             else menu_NetMessage(str_menuMsg_Error,str_net_LANSearch+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
+             else menu_msgBox_Net(str_menuMsg_Error,str_net_LANSearch+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
           end;
    false: begin
              if(not net_svsearch)
@@ -325,7 +329,7 @@ begin
    menu_page_TopCaption(mi_caption_SaveLoad);
 
    mtx0:=menu_border1;
-   mtx1:=mtx0+menu_ListW;
+   mtx1:=mtx0+menu_ListW1;
    mty0:=menu_ListLineH*menu_BaseList1H;
 
    menu_Item_Set(mi_SaveLoad_list   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true);
@@ -351,7 +355,7 @@ begin
    menu_page_TopCaption(mi_caption_Replays);
 
    mtx0:=menu_border1;
-   mtx1:=mtx0+menu_ListW;
+   mtx1:=mtx0+menu_ListW1;
    mty0:=menu_ListLineH*menu_BaseList1H;
 
    menu_Item_Set(mi_Replays_list    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true);
@@ -634,8 +638,8 @@ procedure net_LANSearch;
 begin
    menu_page_TopCaption(mi_caption_SVSearch);
 
-   menu_Item_Set(mi_NetSearch_List,menu_hw-menu_ListW,menu_underCaptionY,
-                                   menu_hw+menu_ListW,menu_underCaptionY+menu_ListLineH2*menu_SvSearchListH,true);
+   menu_Item_Set(mi_NetSearch_List,menu_hw-menu_ListW1,menu_underCaptionY,
+                                   menu_hw+menu_ListW1,menu_underCaptionY+menu_ListLineH2*menu_SvSearchListH,true);
 
    menu_page_BottomButtons(mi_back,mi_NetSearch_Connect,0,0,0,0);
 
@@ -946,7 +950,7 @@ mi_SR_RecordPrefix     : if(not check)then rpls_NamePrefix   :=    StringApplyIn
 mi_SV_ResolutionW      : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,changed));
 mi_SV_ResolutionH      : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,changed));
 
-mi_SaveLoad_fname      : if(not check)then svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars,changed);
+mi_SaveLoad_fname      : if(not check)then svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars1,changed);
 
 mi_Map_Seed            : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,changed);
 
@@ -957,6 +961,28 @@ mi_MP_ChatLine         : ;
    else
       menu_Controls_Text:=false;
    end;
+end;
+
+function menu_msgBox(pMMsg:pTMenuMessage):boolean;
+begin
+   menu_msgBox:=false;
+   with pMMsg^ do
+     if(mm_time>0)then
+     begin
+        mm_time-=1;
+        if(mm_time>0)then
+          if(InputActionPressed(iAct_any))then
+          begin
+             mm_time:=0;
+             GameResetNetGame;
+          end;
+
+        menu_ItemTarget  :=0;
+        menu_ItemSelected:=0;
+        if(mm_time=0)then menu_update:=true;
+
+        menu_msgBox:=true;
+     end;
 end;
 
 procedure menu_Controls;
@@ -980,25 +1006,19 @@ begin
    clickSound:=false;
    changed:=false;
 
-   // forced menu error states
+   // force menu msg box error
    if(net_status=ns_client)and(not net_svsearch)and(net_cl_svttl>=ServerTTL)and(not g_started)then
-     menu_NetMessage(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
+     menu_msgBox_Net(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
 
-   with menu_NetMsg do
-     if(mm_time>0)then
+   if(menu_msgBox(@menu_msg_DelFile))then
+   begin
+      mouse_x:=mnx;
+      mouse_y:=mny;
+      exit;
+   end
+   else
+     if(menu_msgBox(@menu_msg_Net))then
      begin
-        mm_time-=1;
-        if(mm_time>0)then
-          if(InputActionPressed(iAct_any))then
-          begin
-             mm_time:=0;
-             GameResetNetGame;
-          end;
-
-        menu_ItemTarget  :=0;
-        menu_ItemSelected:=0;
-        if(mm_time=0)then menu_update:=true;
-
         mouse_x:=mnx;
         mouse_y:=mny;
         exit;
@@ -1017,7 +1037,7 @@ begin
    menu_ItemActs:=0;
 
 ///////////////////////////////////   text input
-  case(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace,true))of
+  case(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))or(InputActionStuck(iAct_backspace))of
   true : begin
             SetSelectedItem(mi_SaveLoad_fname);
             SetSelectedItem(mi_MP_ChatList);

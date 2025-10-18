@@ -68,12 +68,10 @@ map_pf_lastZone   : word = 0;
 
 ServerSide        : boolean = true; // only server side code
 
-UnitStepTicks     : byte = 8;
+UnitStepTicks     : byte = 10;
 
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
-
-_playerAPM        : array[0..LastPlayer] of TAPMCounter;
 
 DID_Square        : array[0..MaxDIDs] of longint;
 
@@ -259,6 +257,8 @@ ui_fog_ey         : integer = 0;
 
 ui_language       : boolean = false;
 
+ui_CommandercPU   : PTUnit = nil;
+ui_CommanderpPU   : PTUnit = nil;
 ui_UnitSelectedNU : integer = 0;
 ui_UnitSelectedpU : integer = 0;
 ui_UnitSelectedn  : byte = 0;
@@ -298,6 +298,12 @@ ui_uibtn_sabilitys: boolean = false;
 ui_uibtn_pabilityu: PTUnit  = nil; // ui point ability order unit
 ui_uibtn_pabilityd: integer = integer.MaxValue;
 ui_uibtn_pabilitys: boolean = false;
+
+ui_uibtn_abilityu : PTUnit  = nil; // ui ability1 order unit
+ui_uibtn_abilityd : integer = integer.MaxValue;
+ui_uibtn_abilitys : boolean = false;
+
+
 ui_uibtn_rebuildu : PTUnit  = nil; // ui rebuild button
 ui_uibtn_rebuildd : integer = integer.MaxValue;
 ui_uibtn_rebuilds : boolean = false;
@@ -380,7 +386,9 @@ menu_items        : array[byte] of TMenuItem;
 menu_update       : boolean = true;
 menu_redraw       : boolean = true;
 menu_redraw_pause : integer = 0;
-menu_NetMsg       : TMenuMessage;
+menu_msg_Net      : TMenuMessage;
+menu_msg_DelFile  : TMenuMessage;
+menu_msg_Box      : TMenuMessage;
 
 menu_ResolutionWi,
 menu_ResolutionHi : integer;
@@ -838,6 +846,7 @@ spr_uibtn_AbilityUnload,
 spr_uibtn_AbilityUnloadTo,
 spr_uibtn_AbilityCCLand,
 spr_uibtn_AbilityCCLandTo,
+spr_uibtn_AbilityLvlUp,
 spr_uibtn_AbilityUACLvlUp,
 spr_uibtn_AbilityHellLvlUp,
 spr_uibtn_Attack,
@@ -881,15 +890,18 @@ spr_cursorHh       : integer;
 //  TEXT
 //
 
-str_ability_name  : array[byte      ] of shortstring;
-str_race          : array[0..r_cnt  ] of shortstring;
+str_race            : array[0..r_cnt  ] of shortstring;
 str_map_ScenarioL,
-str_replay_ScenarioL
-                  : array[0..mc_Last] of shortstring;
+str_replay_ScenarioL: array[0..mc_Last] of shortstring;
 
 str_ps_AI,
 str_ps_Hum,
-str_ps_Host       : string4;
+str_ps_Host         : string4;
+
+str_lobby_PlayerReady: array[false..true] of shortstring;
+
+str_lobby_GameStartIn,
+str_lobby_AllPReady : shortstring;
 
 str_menu_Campaings,
 str_menu_Scirmish,
@@ -901,7 +913,7 @@ str_menu_Settings,
 
 str_menu_Start,
 str_menu_Surrender,
-str_menu_Break,
+str_menu_Abort,
 str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
@@ -1057,6 +1069,7 @@ str_warn_Req_Common,
 str_warn_unit_Levelup,
 str_warn_unit_complete,
 str_warn_unit_attacked,
+str_warn_unit_resurrected,
 str_warn_upgrade_complete,
 str_warn_building_complete,
 str_warn_base_attacked,
@@ -1420,8 +1433,9 @@ snd_hell
 
 {$ELSE}
 
-menu_update   : boolean = true;
-consoley        : integer = 0;
+menu_update       : boolean = true;
+console_y         : integer = 0;
+ded_GameStartTimer: integer = 0;
 
 {$ENDIF}
 

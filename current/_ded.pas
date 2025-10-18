@@ -16,10 +16,27 @@ begin
    case G_Started of
 false: if(PlayersAllReady)then
        begin
+          if(ded_GameStartTimer=0)then
+          begin
+             ded_GameStartTimer:=ded_GameStartTime;
+             GameLogPlayersReady;
+          end;
+          if(ded_GameStartTimer>0)then
+          begin
+             ded_GameStartTimer-=1;
+             if(ded_GameStartTimer>0)then
+             begin
+                if((ded_GameStartTimer mod fr_fps1)=0)then
+                  GameLogStartsIn(ded_GameStartTimer div fr_fps1);
+                exit;
+             end;
+          end;
+
           menu_update:=true;
-          G_Started:=true;
+          G_Started  :=true;
           GameStartSkirmish;
-       end;
+       end
+       else ded_GameStartTimer:=0;
 true : if(PlayerAllOut)then
        begin
           G_Started:=false;
@@ -60,7 +77,7 @@ begin
    writeln(s);
 end;
 
-procedure ps(p:byte);
+procedure PlayerDataLine(p:byte);
 begin
    with g_gplayers[p] do
      if(state=ps_none)
@@ -77,10 +94,11 @@ begin
    then SVGameStatus:=str_GameStarted
    else SVGameStatus:=str_GameLobby;
    case G_status of
-gs_running    : ;
-0..LastPlayer : SVGameStatus:=str_GamePaused+b2s(G_Status+1);
-gs_win_team0..
-gs_win_team7  : SVGameStatus:=str_GameEnded+b2s(G_Status-gs_win_team0);
+   gs_running    : ;
+   0..LastPlayer : SVGameStatus:=str_GamePaused+b2s(G_Status+1);
+   gs_win_team0..
+   gs_win_team7  : SVGameStatus:=str_GameEnded+b2s(G_Status-gs_win_team0);
+   else            SVGameStatus:='UNKNOWN STATUS';
    end;
 end;
 
@@ -89,13 +107,13 @@ begin
    if(menu_update)then
    begin
       clrscr;
-      consoley:=0;
+      console_y:=0;
       menu_update:=false;
    end;
 
-   if(consoley<=fr_fps1)then
+   if(console_y<=fr_fps1)then
    begin
-      case consoley of
+      case console_y of
       0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_ServerPort);
       1 : writeln(str_GameStatus, SVGameStatus);
       2 : writeln(str_GameOptions);
@@ -107,17 +125,17 @@ begin
       14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size ,45, str_map_Obstacles    ,55, str_map_Symmetry ,70);
       16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_size),45, strMX(map_ObstaclesF),55, b2c[map_symmetry],70);
       18: writeln;
-      20: Dedicated_screenLine(str_PlayerState,1,str_Player,7,str_srace,25,str_team ,35, '',0, '',0);   // captions
-      22: ps(0);
-      24: ps(1);
-      26: ps(2);
-      28: ps(3);
-      30: ps(4);
-      32: ps(5);
-      34: ps(6);
-      36: ps(7);
+      20: Dedicated_screenLine(str_PlayerState                ,1, str_Player,7,str_srace,25,str_team ,35, '',0, '',0);   // captions
+      22: PlayerDataLine(0);
+      24: PlayerDataLine(1);
+      26: PlayerDataLine(2);
+      28: PlayerDataLine(3);
+      30: PlayerDataLine(4);
+      32: PlayerDataLine(5);
+      34: PlayerDataLine(6);
+      36: PlayerDataLine(7);
       end;
 
-      consoley+=1;
+      console_y+=1;
    end;
 end;

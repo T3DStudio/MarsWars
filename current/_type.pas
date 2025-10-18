@@ -157,7 +157,8 @@ TInputKeyType = (ikt_keyboard=0,ikt_mouseb,ikt_mousew);
 
 TTabBTNClickType = (pct_Left=0,pct_Right,pct_DLeft);
 
-TActState = (as_off=0,as_disabled,as_enabled);
+TActAState = (as_off=0,as_disabled,as_enabled);
+TActKState = (ks_none=0,ks_pressed,ks_released,ks_both,ks_hold);
 
 TInputKey = record
    ik_type   : TInputKeyType;
@@ -165,14 +166,15 @@ TInputKey = record
    ik_timer_twice,
    ik_timer_pressed
              : integer;
-   ik_astate : TActState;
+   ik_astate : TActAState;
+   ik_kstate : TActKState;
    ik_depend : byte;
    ik_str_HK : shortstring;
 end;
 
 TReplayPos = record
-   rp_fpos : int64;
-   rp_gtick: cardinal;
+   rp_fpos   : int64;
+   rp_gtick  : cardinal;
 end;
 
 TMenuItem = record
@@ -183,14 +185,17 @@ TMenuItem = record
    mi_xc,
    mi_yc   : integer;
    mi_charw: byte;
-   mi_state: TActState;
+   mi_state: TActAState;
 end;
 
 TMenuMessage = record
    mm_time     : integer;
-   mm_Caption,
-   mm_Message,
-   mm_Hint     : shortstring;
+   mm_btn1,
+   mm_btn2     : byte;
+   mm_str_Caption,
+   mm_str_Body,
+   mm_str_Btn1,
+   mm_str_Btn2 : shortstring;
 end;
 pTMenuMessage = ^TMenuMessage;
 
@@ -223,7 +228,7 @@ end;
 
 TUnitActionMode = (uam_have=0,uam_check,uam_exec);
 
-TUnitAbilityTargetType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_UnitAny,uat_UnitAlly,uat_UnitOwn);
+TUnitAbilityTargetType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_UnitAny,uat_UnitOwn,uat_UnitAlly,uat_UnitEnemy);
 
 TUnitAbility = record
    ua_type        : TUnitAbilityTargetType;
@@ -234,10 +239,11 @@ TUnitAbility = record
    ua_reload_upgrS: integer;
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
+   ua_mbrush_uid  : byte;
    ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Descript: shortstring;
-   ua_str_UnitHint: byte;
+   ua_str_UIDHint: byte;
    {$ENDIF}
 end;
 
@@ -344,13 +350,13 @@ TUID = record
    uid_BaseSpeed,
    uid_r,
    uid_missileR,
-   uid_SightR,
-   uid_SightRUpgrStep,
+   uid_BaseSightR,
+   uid_upgr_SightStep,
    uid_EnergyReq,
    uid_EnergyGen,
    uid_ProdTimeSec,
+   uid_ProdTimeTick,
    uid_ProdHitStep,
-   uid_ProdTick,
    uid_PainC,
    uid_PainCUpgrStep,
    uid_zfall,
@@ -371,6 +377,7 @@ TUID = record
    uid_rebuild_uid,
    uid_rebuild_ruid,
    uid_rebuild_rupgr,
+   uid_nextForm,
    uid_DeathMissile,
    uid_DeathMissile_dmod,
    uid_DeathUID,
@@ -404,9 +411,13 @@ TUID = record
    uid_ability_ReqUpgr,
    uid_ability_ReqUID
                     : byte;
-   uid_ability_isteleport
+   uid_ability_isradar,
+   uid_ability_isteleport,
+   uid_ability_isCanLiftUp
                     : boolean;
 
+   uid_HaveRallyPoint,
+   uid_HaveAbility,
    uid_OutUnitsTeleBuff,
    uid_SlowTurn,
    uid_SplashResist,
@@ -427,9 +438,9 @@ TUID = record
    uid_prod_Upgrades,
    ups_TransportUIDs: TSoB;
    {$IFDEF _FULLGAME}
-   uid_AnimStepWalk,
-   uid_AnimStepDeath,
    uid_AnimStepFoot,
+   uid_AnimStepDeath,
+   uid_AnimStepWalk,
    uid_FogcR        : integer;
    uid_BTNBig,
    uid_BTNSmall     : TMWTexture;
@@ -441,7 +452,8 @@ TUID = record
    uid_str_name,
    uid_str_BaseDescript,
    uid_str_FullDescript,
-   uid_str_NameCostHK,
+   uid_str_NameHK,
+   uid_str_CostLimit,
    uid_str_DefaultAttr,
    uid_str_RebuildHint,
    uid_str_ArmsCommon,
@@ -449,23 +461,24 @@ TUID = record
    uid_str_Prod     : shortstring;
    uid_str_Arms     : array[0..LastUnitArms] of shortstring;
 
-   uid_AnimBuildMode,
+   uid_eid_BuildHellType
+                    : boolean;
    uid_eid_bcrater
                     : byte;
    uid_eid_bcrater_y: integer;
 
    uid_eid_SummonSpr: array[0..LastUnitLevel] of PTMWTexture;
    uid_eid_Summon,
-   uid_eid_Death,
+   uid_eid_DeathSlow,
    uid_eid_DeathFast,
-   uid_eid_pain
+   uid_eid_Pain
                     : array[0..LastUnitLevel] of byte;
 
-   uid_eid_snd_foot,
-   uid_eid_snd_summon,
-   uid_eid_snd_death,
-   uid_eid_snd_fdeath,
-   uid_eid_snd_pain,
+   uid_snd_Foot,
+   uid_snd_Summon,
+   uid_snd_DeathSlow,
+   uid_snd_DeathFast,
+   uid_snd_Pain,
 
    uid_snd_ready, //command sounds
    uid_snd_move,
@@ -493,16 +506,10 @@ TUPID = record  // upgrade
    upgr_btn      : TMWTexture;
 
    upgr_str_Name,
+   upgr_str_NameHK,
    upgr_str_Descript,
    upgr_str_Reqs : shortstring;
    {$ENDIF}
-end;
-
-TAPMCounter = record
-   APM_Time,
-   APM_Current,
-   APM_New       : cardinal;
-   APM_Str       : shortstring;
 end;
 
 TAIAlarm = record
@@ -516,70 +523,95 @@ TAIAlarm = record
 end;
 
 TLogMes = record
-   mtype,
-   argt,
-   argx         : byte;
-   str          : shortstring;
-   xi,yi        : integer;
-   tick         : cardinal;
+   lm_type,
+   lm_data_t,
+   lm_data_u    : byte;
+   lm_string    : shortstring;
+   lm_x,
+   lm_y         : integer;
+   lm_tick      : cardinal;
 end;
 PTLogMes = ^TLogMes;
 
-TPlayer = record
-   name    : shortstring;
+TPlayerGameData = record
+   name            : shortstring;
 
    team,
    race,mrace,
    state,
-   pnum    : byte;
+   pnum            : byte;
 
    build_cd,
-   army,
-   cenergy,
-   menergy : integer;
+   energyl_cur,
+   energyl_max     : integer;
    armylimit
-           : longint;
+                   : longint;
 
-   observer,
-   revealed,
-   defeated,
-   ready   : boolean;
+   isobserver,
+   isrevealed,
+   isdefeated,
+   isready         : boolean;
 
    o_id,
-o_a0       : byte;
-o_x0,o_y0,
-o_x1,o_y1  : integer;
+   o_a0            : byte;
+   o_x0,o_y0,
+   o_x1,o_y1       : integer;
 
-   ucl_e,                                        // existed class
-   ucl_eb,                                       // existed class bld=true and hits>0
-   ucl_s,                                        // selected
-   ucl_x   : array[false..true,byte] of integer; // first unit class
+                   // units by class [building,ucl]
+   units_ucl_e,    // existed
+   units_ucl_c,    // completed
+   units_ucl_s,    // selected
+   units_ucl_u     // one of
+                   : array[false..true,byte] of integer;
 
-   uid_e,
-   uid_eb,
-   uid_s,
-   uid_x   : array[byte] of integer;
+                   // units by uid   [uid]
+   units_uid_e,    // existed
+   units_uid_c,    // completed
+   units_uid_s,    // selected
+   units_uid_u,    // one of
+   units_uid_m     // max
+                   : array[byte] of integer;
 
-   ucl_c,                                        // count buildings/units
-   ucl_cs  : array[false..true] of integer;      // count selected buildings/units
-   ucl_l   : array[false..true] of longint;      // limit buildings/units
+                   // units by isbuilding [building]
+   units_bld_e,    // existed
+   units_bld_s     : array[false..true] of integer; // selected
+   units_bld_l     : array[false..true] of longint; // limit
 
-   uprodl  : longint;                            // current limit in production
-   uprodm,                                       // current max unit productions
-   uproda  : integer;                            // current productions
-   uprodc  : array[byte] of integer;
-   uprodu  : array[byte] of integer;
+   units_all_e,
+   units_all_s,
+   units_builders_e,
+   units_builders_ec,
+   units_builders_s,
+   units_unitProds_ec,// 'barracks'
+   units_unitProds_s,
+   units_upgrProds_ec,// 'smiths'
+   units_upgrProds_s
+                   : integer;
 
-   upprodm,
-   upproda : integer;
-   upprodu,
-   upgr    : array[byte] of byte;
+   upgrs_cur,
+   upgrs_max        : array[byte] of byte;
+
+   prod_unit_Limit : longint;                           // current limit in production
+   prod_unit_Max,                                       // current max unit productions
+   prod_unit_Now   : integer;                           // current productions
+   prod_unit_ucl,
+   prod_unit_uid   : array[byte] of integer;
+
+   prod_upgr_Max,
+   prod_upgr_Now   : integer;
+   prod_upgr_upid  : array[byte] of byte;
 
    a_rebuild,
-   a_ability: TSoB;
+   a_ability       : TSoB;
 
-   a_upgrs,
-   a_units : array[byte] of integer;
+   log_l           : array[0..MaxPlayerLog] of TLogMes;
+   log_i,
+   log_n,
+   log_n_cl
+                   : cardinal;
+
+   log_EnergyCheckTime
+                   : integer;
 
 
    ai_max_ulimit,
@@ -603,44 +635,18 @@ o_x1,o_y1  : integer;
    ai_scout_u_cur_w,
    ai_scout_u_new,
    ai_scout_u_new_w,
-   ai_detection_pause
-           : integer;
-   ai_maxcount_upgrlvl
-           : byte;
-   ai_hptargets
-           : TSoB;
-   ai_skill: byte;
-   ai_flags: cardinal;
-   ai_alarms
-           : array[0..LastPlayer] of TAIAlarm;
+   ai_detection_pause  : integer;
+   ai_maxcount_upgrlvl : byte;
+   ai_hptargets        : TSoB;
+   ai_skill            : byte;
+   ai_flags            : cardinal;
+   ai_alarms           : array[0..LastPlayer] of TAIAlarm;
    ai_attack_timer,
-   ai_scout_timer
-           : integer;
-   ai_ReadyForAttack
-           : boolean;
-
-
-   s_all,
-   e_builders,
-   s_builders,
-   s_barracks,
-   s_smiths,
-   n_builders,
-   n_barracks,
-   n_smiths
-           : integer;
-
-   log_l   : array[0..MaxPlayerLog] of TLogMes;
-   log_i,
-   log_n,
-   log_n_cl
-           : cardinal;
-
-   log_EnergyCheck
-           : integer;
+   ai_scout_timer      : integer;
+   ai_ReadyForAttack   : boolean;
 end;
-PTPlayer = ^TPlayer;
-TPList = array[0..LastPlayer] of TPLayer;
+PTPlayerGameData = ^TPlayerGameData;
+TPList = array[0..LastPlayer] of TPlayerGameData;
 
 TPlayerNetData = record
    PNU     : byte;
@@ -691,11 +697,17 @@ TUnit = record
    move_x ,move_y,
    move_px,move_py,
 
-   uo_bx,uo_by,
-   uo_tar,
-   uo_x,uo_y
+   uo_x,
+   uo_y,
+   uo_bx,
+   uo_by,
+   uo_tar
             : integer;
    uo_id    : byte;
+
+   rpoint_tar,
+   rpoint_x,
+   rpoint_y : integer;
 
    pains,
    transportU,
@@ -733,7 +745,7 @@ TUnit = record
    mmx,mmy,mmr,
    fx,fy,fsr,
    anim,animf,
-   shadow
+   shadowz
             : integer;
    lvlstr_w,  // weapon upgrades
    lvlstr_r,  // reload
@@ -744,7 +756,7 @@ TUnit = record
             : string6;
    {$ENDIF}
 
-   player   : PTPlayer;
+   player   : PTPlayerGameData;
    uid      : PTUID;
 end;
 PTUnit = ^TUnit;

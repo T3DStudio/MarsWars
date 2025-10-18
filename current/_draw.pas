@@ -12,7 +12,7 @@ begin
 end;
 begin
    d_UpdateUIPlayer:=false;
-   if(not g_gplayers[LocalPlayer].observer)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
+   if(not g_gplayers[LocalPlayer].isobserver)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
    then UIPlayer:=LocalPlayer
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -56,7 +56,7 @@ begin
    ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod ui_blink_period1;
    ui_blink_timer2+=1;ui_blink_timer2:=ui_blink_timer2 mod ui_blink_period2;
 
-   ui_update_timer+=1;ui_update_timer:=ui_update_timer mod ui_update_period1;
+   //ui_update_timer+=1;ui_update_timer:=ui_update_timer mod ui_update_period1;
 
    if(ui_blink_timer1=0)then
    begin

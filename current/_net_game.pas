@@ -19,6 +19,7 @@ begin
             net_ping     :=0;
             n_u          :=0;
             state        :=ps_human;
+            isready        :=false;
             PlayerClearLog(p);
             PlayerSetDefault(p);
             {$IFNDEF _FULLGAME}
@@ -62,9 +63,13 @@ begin
       if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
       if(oldname<>name)then menu_update:=true;
 
-      i    :=byte(ready);
-      ready:=net_readbool;
-      if((i>0)<>ready)then menu_update:=true;
+      i    :=byte(isready);
+      isready:=net_readbool;
+      if((i>0)<>isready)then
+      begin
+         GameLogPlayerReady(pid);
+         menu_update:=true;
+      end;
 
       PNU     :=net_readbyte;
       log_n_cl:=net_readcard;
@@ -93,12 +98,12 @@ begin
      with g_nplayers[p] do
      begin
         net_writestring(name );
-        if(observer)
+        if(isobserver)
    then net_writebyte(255  )
    else net_writebyte(team );
         net_writebyte(mrace);
         net_writebyte(state);
-        net_writebool(ready);
+        net_writebool(isready);
         net_writeword(net_ttl );
         net_writeword(net_ping);
         if(G_Started)then
@@ -380,7 +385,7 @@ end;
 procedure net_ClientError(msg:shortstring);
 begin
    menu_update:=true;
-   menu_NetMessage(str_menuMsg_Error,msg,str_menuMsg_HintDefault);
+   menu_msgBox_Net(str_menuMsg_Error,msg,str_menuMsg_HintDefault);
    GameResetNetGame;
 end;
 
@@ -439,10 +444,10 @@ begin
       i      :=team;
       team   :=net_readbyte;
       if(i<>team)then menu_update:=true;
-      i:=integer(observer);
-      observer:=(team>LastPlayer);
-      if(observer)then team:=0;
-      if(i<>integer(observer))then menu_update:=true;
+      i:=integer(isobserver);
+      isobserver:=(team>LastPlayer);
+      if(isobserver)then team:=0;
+      if(i<>integer(isobserver))then menu_update:=true;
 
       i      :=mrace;
       mrace  :=net_readbyte;
@@ -452,9 +457,9 @@ begin
       state  :=net_readbyte;
       if(i<>state)then menu_update:=true;
 
-      i      :=byte(ready);
-      ready  :=net_readbool;
-      if(i<>byte(ready))then menu_update:=true;
+      i      :=byte(isready);
+      isready  :=net_readbool;
+      if(i<>byte(isready))then menu_update:=true;
 
       w      :=net_ttl;
       net_ttl:=net_readword;
@@ -513,7 +518,7 @@ nmid_ping_Request: begin
                       net_send(net_cl_svip,net_cl_svport);
                    end;
 nmid_GameInfo    : begin
-                      menu_NetMsg.mm_time:=0;
+                      menu_msg_Net.mm_time:=0;
                       svstarted:=net_readbool;
 
                       for i:=0 to LastPlayer do
@@ -554,7 +559,7 @@ nmid_GameInfo    : begin
                    end;
 nmid_snapshot    : if(G_Started)then
                    begin
-                      menu_NetMsg.mm_time:=0;
+                      menu_msg_Net.mm_time:=0;
                       G_Status:=net_readbyte;
                       if(G_Status=gs_running)then
                         rclinet_gframe(LocalPlayer,false,false);

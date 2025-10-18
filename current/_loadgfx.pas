@@ -457,9 +457,7 @@ begin
      gfx_SetTransparent(gfx_ButtonLoad);
 end;
 
-
-
-function gfx_ButtonMakeFromSurface(ts:pSDl_Surface;bw:integer;blackrect:byte=3):pSDL_Surface;
+function gfx_ButtonMakeFromSurface(ts:pSDl_Surface;bw:integer;blackrect:byte=3;transparent:boolean=true):pSDL_Surface;
 var tst:pSDL_Surface;
    coff:single;
     hwb:integer;
@@ -490,7 +488,8 @@ begin
       rectangleColor(gfx_ButtonMakeFromSurface,blackrect,blackrect,gfx_ButtonMakeFromSurface^.w-blackrect-1,gfx_ButtonMakeFromSurface^.h-blackrect-1,c_black);
    end;
    SDL_FreeSurface(tst);
-   gfx_SetTransparent(gfx_ButtonMakeFromSurface);
+   if(transparent)then
+     gfx_SetTransparent(gfx_ButtonMakeFromSurface);
 end;
 
 function gfx_ResizeSurfaceCMask(src:pSDL_Surface;newSize:integer;applyMask:cardinal):pSDL_Surface;
@@ -637,6 +636,7 @@ begin
    spr_uibtn_AbilityUnloadTo   := gfx_ButtonLoad(folder_ui+'b_unloadto'   ,ui_ButtonW1);
    spr_uibtn_AbilityCCLand     := gfx_ButtonLoad(folder_ui+'b_CCland'     ,ui_ButtonW1);
    spr_uibtn_AbilityCCLandTo   := gfx_ButtonLoad(folder_ui+'b_CClandTo'   ,ui_ButtonW1);
+   spr_uibtn_AbilityLvlUp      := gfx_ButtonLoad(folder_ui+'b_ProdUp'     ,ui_ButtonW1);
    spr_uibtn_AbilityUACLvlUp   := gfx_ButtonLoad(folder_ui+'b_UACProdUp'  ,ui_ButtonW1);
    spr_uibtn_AbilityHellLvlUp  := gfx_ButtonLoad(folder_ui+'b_HellProdUp' ,ui_ButtonW1);
 
@@ -652,8 +652,6 @@ begin
    end;
 
    spr_cursor               := gfx_LoadSDLSurface('cursor'   ,true ,true);
-   spr_cursorWh             := spr_cursor^.w div 2;
-   spr_cursorHh             := spr_cursor^.h div 2;
    spr_CursorHint_Edit      := gfx_LoadSDLSurface('h_Edit'   ,false,true);
    spr_CursorHint_MLB[false]:= gfx_LoadSDLSurface('h_MLB0'   ,true ,true);
    spr_CursorHint_MLB[true ]:= gfx_LoadSDLSurface('h_MLB1'   ,true ,true);
@@ -678,6 +676,10 @@ begin
    boxColor(spr_cursorSubA,0,0,tst^.w,tst^.h,gfx_rgba2c(0  ,255,255,200));
    gfx_SetTransparent(spr_cursorSubA);
    gfx_FreeSDLSurface(tst);
+
+   spr_cursorWh             := (spr_cursor^.w div 2)-(spr_cursorSubR^.w div 2);
+   spr_cursorHh             := (spr_cursor^.h div 2)-(spr_cursorSubR^.h div 2);
+
 
    spr_camp_earth           := gfx_LoadSDLSurface('M_EARTH'  ,false,true);
    spr_camp_mars            := gfx_LoadSDLSurface('M_MARS'   ,false,true);
@@ -882,8 +884,8 @@ begin
       with uid_BTNSmall do
       begin
          case uid_race of
-         r_hell: surf:= gfx_ButtonMakeFromSurface(uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1 );
-         r_uac : surf:= gfx_ButtonMakeFromSurface(uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1 );
+         r_hell: surf:= gfx_ButtonMakeFromSurface(uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1,false);
+         r_uac : surf:= gfx_ButtonMakeFromSurface(uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1,false);
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -971,11 +973,11 @@ begin
    case ui_ControlPanelPos of
    cpp_left  : begin
                ui_MouseHintX:=ui_UIPanelW+font_wh;
-               ui_MouseHintY:=ui_UIPanelW+ui_ButtonW1;
+               ui_MouseHintY:=ui_UIPanelW;
                end;
    cpp_right : begin
                ui_MouseHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLen*font_w1;
-               ui_MouseHintY:=ui_UIPanelW+ui_ButtonW1;
+               ui_MouseHintY:=ui_UIPanelW;
                end;
    cpp_top   : begin
                ui_MouseHintX:=ui_UIPanelX+ui_UIPanelH;
@@ -1012,17 +1014,25 @@ begin
    end;
    ui_log_ListSize:=((ui_UIPortY1-ui_UIPortY0)-ui_CtrlPanelW-ui_ReplayBarH-txt_line_h1) div txt_line_h2;
 
-   // hotkey groups icons
-   ui_groupX     := ui_UIPortX0+ui_cam_w-font_w1;
-   if(ui_ControlPanelPos=cpp_top)
-   then ui_groupY:= 0
-   else ui_groupY:= ui_UIPortY0;
-
    // FPS
    ui_FPSX       := ui_UIPortX1-(font_w1*font_w1h);
    if(ui_ControlPanelPos=cpp_top)
    then ui_FPSY  := font_wh
    else ui_FPSY  := ui_timerY;
+
+   // hotkey groups icons
+   case ui_ControlPanelPos of
+   cpp_top,
+   cpp_bottom,
+   cpp_left  : begin
+               ui_groupX:=vid_vw-font_w1;
+               ui_groupY:=ui_FPSY+txt_line_h1;
+               end;
+   cpp_right : begin
+               ui_groupX:=ui_UIPanelX-font_w1;
+               ui_groupY:=ui_FPSY+txt_line_h1;
+               end;
+   end;
 
    // Replay progress bar
    ui_ReplayBarY := ui_UIPortY1;

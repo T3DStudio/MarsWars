@@ -28,64 +28,64 @@ procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardina
 begin
    slatemp:=SpriteListAdd;
    if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-ui_cam_x;
-       y      := ay-ui_cam_y;
-       depth  := adepth;
-       shadowz:= ashadowz;
-       shadowc:= ashadowc;
-       sprite := aspr;
-       aura   := aaura;
-       alpha  := aalpha;
-    end;
+     with slatemp^ do
+     begin
+        x      := ax-ui_cam_x;
+        y      := ay-ui_cam_y;
+        depth  := adepth;
+        shadowz:= ashadowz;
+        shadowc:= ashadowc;
+        sprite := aspr;
+        aura   := aaura;
+        alpha  := aalpha;
+     end;
 end;
 procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte;axo,ayo:integer);
 begin
    slatemp:=SpriteListAdd;
    if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-ui_cam_x;
-       y      := ay-ui_cam_y;
-       depth  := adepth;
-       shadowz:= ashadowz;
-       shadowc:= c_ablack;
-       sprite := aspr;
-       alpha  := aalpha;
-       xo     := axo;
-       yo     := ayo;
-    end;
+     with slatemp^ do
+     begin
+        x      := ax-ui_cam_x;
+        y      := ay-ui_cam_y;
+        depth  := adepth;
+        shadowz:= ashadowz;
+        shadowc:= c_ablack;
+        sprite := aspr;
+        alpha  := aalpha;
+        xo     := axo;
+        yo     := ayo;
+     end;
 end;
 procedure SpriteListAddMarker(ax,ay:integer;aspr:PTMWTexture);
 begin
    slatemp:=SpriteListAdd;
    if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-ui_cam_x;
-       y      := ay-ui_cam_y;
-       depth  :=  sd_marker;
-       shadowz:= -32000;
-       sprite := aspr;
-       alpha  := 255;
-       yo     := -aspr^.hh;
-    end;
+     with slatemp^ do
+     begin
+        x      := ax-ui_cam_x;
+        y      := ay-ui_cam_y;
+        depth  :=  sd_marker;
+        shadowz:= shadowz.MinValue;
+        sprite := aspr;
+        alpha  := 255;
+        yo     := -aspr^.hh;
+     end;
 end;
 procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
    slatemp:=SpriteListAdd;
    if(slatemp<>nil)then
-    with slatemp^ do
-    begin
-       x      := ax-ui_cam_x;
-       y      := ay-ui_cam_y;
-       depth  := adepth;
-       shadowz:= -32000;
-       sprite := aspr;
-       aura   := aaura;
-       alpha  := aalpha;
-    end;
+     with slatemp^ do
+     begin
+        x      := ax-ui_cam_x;
+        y      := ay-ui_cam_y;
+        depth  := adepth;
+        shadowz:= shadowz.MinValue;
+        sprite := aspr;
+        aura   := aaura;
+        alpha  := aalpha;
+     end;
 end;
 
 procedure SpriteListSort;
@@ -485,11 +485,11 @@ uinfo_text   : begin
           else
           end;
 
-        if(length(text_lt )>0)then draw_text(tar,x0+1,y0+1       ,text_lt ,ta_LU,255,c_white);
-        if(length(text_lt2)>0)then draw_text(tar,x0+1,y0+font_w1h,text_lt2,ta_LU,255,c_white);
+        if(length(text_lt )>0)then draw_text(tar,x0+2,y0+1       ,text_lt ,ta_LU,255,c_white);
+        if(length(text_lt2)>0)then draw_text(tar,x0+2,y0+font_w1h,text_lt2,ta_LU,255,c_white);
         if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1       ,text_rt ,ta_RU,255,c_white);
         if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1       ,text_rd ,ta_RB,255,c_white);
-        if(length(text_ld )>0)then draw_text(tar,x0+1,y1-1       ,text_ld ,ta_LB,255,c_white);
+        if(length(text_ld )>0)then draw_text(tar,x0+2,y1-1       ,text_ld ,ta_LB,255,c_white);
      end;
 end;
 
@@ -686,16 +686,16 @@ begin
 
          c:=PlayerGetColor(u,false);
 
-         draw_text(vid_screen,ix,80,b2s(ucl_cs[false]), ta_MU,255, c);
+         draw_text(vid_screen,ix,80,b2s(units_bld_s[false]), ta_MU,255, c);
 
-         draw_text(vid_screen,ix,90,b2s(army)+' '+b2s(ucl_c[false]) , ta_MU,255, c);
+         draw_text(vid_screen,ix,90,b2s(units_all_e)+' '+b2s(units_bld_e[false]) , ta_MU,255, c);
 
          //draw_text(vid_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_MU,255, c);
-         draw_text(vid_screen,ix,110,b2s(cenergy  )+' '+b2s(menergy) , ta_MU,255, c);
+         draw_text(vid_screen,ix,110,b2s(energyl_cur  )+' '+b2s(energyl_max) , ta_MU,255, c);
 
 
-         for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(ucl_e[true ,iy])+'/'+b2s(ucl_eb[true ,iy])+' '+b2s(ucl_s[true ,iy])+' '+i2s(ucl_x[true,iy]), ta_LU,255, c);
-         for iy:=0 to 11 do draw_text(vid_screen,ix,230+iy*10,b2s(ucl_e[false,iy])+' '+b2s(ucl_s [false,iy]), ta_LU,255, c);
+         for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(units_ucl_e[true ,iy])+'/'+b2s(units_ucl_c[true ,iy])+' '+b2s(units_ucl_s[true ,iy])+' '+i2s(units_ucl_u[true,iy]), ta_LU,255, c);
+         for iy:=0 to 11 do draw_text(vid_screen,ix,230+iy*10,b2s(units_ucl_e[false,iy])+' '+b2s(units_ucl_s [false,iy]), ta_LU,255, c);
       end;
 
    if(InputAction(iact_Control))then
@@ -703,7 +703,7 @@ begin
     with g_units[u] do
     with player^ do
     with uid^ do
-     if(hits>dead_hits)or(u=ai_scout_u_cur)then
+     if(hits>hits_dead)or(u=ai_scout_u_cur)then
      begin
         ix:=x-ui_cam_x;
         iy:=y-ui_cam_y;
@@ -735,7 +735,7 @@ begin
            draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
            draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColor(playeri,false));
-           //draw_text(vid_screen,ix,iy+30,b2c[ukfly], ta_LU,255, PlayerGetColor(playeri));
+           draw_text(vid_screen,ix,iy+30,b2c[ukfly], ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));

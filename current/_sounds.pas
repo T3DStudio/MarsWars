@@ -487,27 +487,32 @@ begin
    if(PListener<=LastPlayer)then
      with g_gplayers[PListener] do
        with log_l[log_i] do
-         case mtype of
-0..LastPlayer         : if(mtype<>PListener)then SoundPlayUI(snd_chat);
+         case lm_type of
+0..LastPlayer         : if(lm_type<>PListener)then SoundPlayUI(snd_chat);
+lmt_player_ready,
+lmt_player_nready,
 lmt_player_leave,
 lmt_player_surrender,
 lmt_chat_common,
+lmt_game_PlayersReady,
+lmt_game_StartsIn,
 lmt_game_message      : SoundPlayUI(snd_chat);
 // Basic
-lmt_game_end          : if(argx<=LastPlayer)then
-                          if(argx=team)
+lmt_game_end          : if(lm_data_u<=LastPlayer)then
+                          if(lm_data_u=team)
                           then SoundPlayAnoncer(snd_victory[race],false,true)
                           else SoundPlayAnoncer(snd_defeat [race],false,true);
-lmt_player_defeated   : if(argx<=LastPlayer)and(g_status=gs_running)
-                        then SoundPlayAnoncer(snd_player_defeated[race],true,false);
-lmt_unit_LevelUp     : SoundPlayAnoncer(snd_unit_promoted   [race],true,false);
-lmt_unit_ready        : with g_uids[argx] do
+lmt_player_defeated   : if(lm_data_u<=LastPlayer)and(g_status=gs_running)then
+                        SoundPlayAnoncer(snd_player_defeated[race],true,false);
+lmt_unit_LevelUp      : SoundPlayAnoncer(snd_unit_promoted  [race],true,false);
+lmt_unit_resurrected,
+lmt_unit_ready        : with g_uids[lm_data_u] do
                         SoundPlayUnitCommand(uid_snd_ready);
 lmt_upgrade_complete  : SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
-lmt_prod_BadPlace        : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
+lmt_prod_BadPlace     : SoundPlayAnoncer(snd_cannot_build    [race],true,false);
 lmt_map_mark,
 lmt_allies_attacked   : SoundPlayAnoncer(snd_mapmark,false,false);
-lmt_unit_attacked     : with g_uids[argx] do
+lmt_unit_attacked     : with g_uids[lm_data_u] do
                         SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
 // Key Point Events
 lmt_Req_Energy        : SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
@@ -529,7 +534,12 @@ lmt_Req_Common,
 lmt_prod_AllBusy,
 lmt_upgrade_InProgress,
 lmt_prod_BadOrder,
-lmt_Invalid_Order        : SoundPlayAnoncer(snd_cant_order[race],true,false);
+lmt_Invalid_Order     : SoundPlayAnoncer(snd_cant_order[race],true,false);
+
+
+lmt_replay_RecStart,
+lmt_replay_RecStop,
+lmt_replay_RecError    :;  // no sound
 
          end;
 end;

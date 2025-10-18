@@ -41,13 +41,13 @@ MID_HRocket,
 MID_URocketS,
 MID_URocket,
 MID_Revenant : begin
-               mid_eid_FlyTrace   :=MID_Bullet;
-               mid_eid_FlyStep:=4;
+               mid_eid_FlyTrace:=MID_Bullet;
+               mid_eid_FlyStep :=4;
                end;
 MID_Blizzard : begin
-               mid_eid_FlyTrace   :=MID_Granade;
-               mid_eid_FlyStep:=1;
-               mid_eid_Decal :=EID_db_h1;
+               mid_eid_FlyTrace:=MID_Granade;
+               mid_eid_FlyStep :=1;
+               mid_eid_Decal   :=EID_db_h1;
                end;
       end;
 
@@ -72,7 +72,7 @@ MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot   : begin
-               mid_snd_death   [false]:=snd_rico;
+               mid_snd_death    [false]:=snd_rico;
                mid_snd_DeathSkip[false]:=5;
                end;
 MID_BFG      : begin
@@ -81,23 +81,23 @@ MID_BFG      : begin
                end;
 MID_Flyer    : mid_snd_death[false]:=snd_flyer_a;
       end;
-      mid_snd_death[true ]:=mid_snd_death[false];
-      mid_eid_death    [false]:=m;
-      mid_eid_death    [true ]:=m;
+      mid_snd_death [true ]:=mid_snd_death[false];
+      mid_eid_death [false]:=m;
+      mid_eid_death [true ]:=m;
       mid_eid_DeathN[false]:=1;
       mid_eid_DeathN[true ]:=1;
-      mid_eid_DeathR  [false]:=0;
-      mid_eid_DeathR  [true ]:=0;
+      mid_eid_DeathR[false]:=0;
+      mid_eid_DeathR[true ]:=0;
 
       // death sound and effect
       case m of
 MID_URocketS : begin
-                  mid_snd_death    [true ]:=snd_exp;
+                  mid_snd_death [true ]:=snd_exp;
                   mid_eid_DeathN[true ]:=4;
-                  mid_eid_DeathR  [true ]:=20;
-                  mid_snd_death    [false]:=snd_exp;
+                  mid_eid_DeathR[true ]:=20;
+                  mid_snd_death [false]:=snd_exp;
                   mid_eid_DeathN[false]:=4;
-                  mid_eid_DeathR  [false]:=20;
+                  mid_eid_DeathR[false]:=20;
                end;
 MID_Bullet,
 MID_SChaingun,
@@ -105,23 +105,23 @@ MID_Chaingun,
 MID_SShot,
 MID_SSShot   : begin
                   mid_snd_death    [true]:=nil;
-                  mid_snd_DeathSkip [true]:=0;
+                  mid_snd_DeathSkip[true]:=0;
                   mid_eid_death    [true]:=eid_blood;
-                  mid_eid_DeathN[true]:=0;
+                  mid_eid_DeathN   [true]:=0;
                end;
       end;
       case m of
 MID_SShot    : begin
                   mid_eid_DeathN[false]:=2;
                   mid_eid_DeathN[true ]:=2;
-                  mid_eid_DeathR  [false]:=5;
-                  mid_eid_DeathR  [true ]:=5;
+                  mid_eid_DeathR[false]:=5;
+                  mid_eid_DeathR[true ]:=5;
                end;
 MID_SSShot   : begin
                   mid_eid_DeathN[false]:=4;
                   mid_eid_DeathN[true ]:=4;
-                  mid_eid_DeathR  [false]:=12;
-                  mid_eid_DeathR  [true ]:=12;
+                  mid_eid_DeathR[false]:=12;
+                  mid_eid_DeathR[true ]:=12;
                end;
       end;
    end;
@@ -174,7 +174,7 @@ begin
            m_vy     := mvy;
            m_tar    := mtar;
            m_mid    := msid;
-           m_playeri := mpl;
+           m_playeri:= mpl;
            m_mfs    := mfst; // start floor
            m_mfe    := mfet; // end floor
            m_fake   := mfake;
@@ -193,7 +193,7 @@ begin
            m_damage:=adddmg;
            if(m_playeri<=LastPlayer)and(tu<>nil)then
              with g_gplayers[m_playeri] do
-               if(m_mid=MID_URocket)and(tu^.ukfly)and(upgr[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
+               if(m_mid=MID_URocket)and(tu^.ukfly)and(upgrs_cur[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
 
            with g_mids[m_mid] do
            begin

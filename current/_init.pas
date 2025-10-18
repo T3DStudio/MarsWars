@@ -75,7 +75,7 @@ begin
 
    {$IFDEF _FULLGAME}
 
-   FillChar(menu_NetMsg,SizeOf(menu_NetMsg),0);
+   FillChar(menu_msg_Net,SizeOf(menu_msg_Net),0);
    input_InitDefaultActionHotkeys;
    ui_InitControlPanelBTNActions;
 

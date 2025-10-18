@@ -8,12 +8,11 @@ un_eid_snd_set:boolean;
 
 //local funcs
 procedure setMWSModel(level:byte;mwsm:PTMWSModel);
-var l:byte;
 begin
    with g_uids[u] do
      if(level<=LastUnitLevel)then
-       for l:=level to LastUnitLevel do
-         uid_SpriteModel[l]:=mwsm;
+       for level:=level to LastUnitLevel do
+         uid_SpriteModel[level]:=mwsm;
 end;
 
 procedure setCommandSND(asnd_ready,asnd_move,asnd_attack,asnd_annoy,asnd_select:PTSoundSet); // command sounds
@@ -64,7 +63,7 @@ end;
 procedure setBuildingSND(s:PTSoundSet);
 begin setCommandSND(nil,s,s,s,s);end;
 
-procedure setEffectEID(aa,aeid_summon,aeid_death,aeid_fdeath,aeid_pain:byte);
+procedure setEffectEID(aa,aeid_summon,aeid_deathSlow,aeid_deathFast,aeid_pain:byte);
 begin
    with g_uids[u] do
      if(aa<=LastUnitLevel)then
@@ -72,9 +71,9 @@ begin
          with uid_arms[aa] do
          begin
             uid_eid_Summon   [aa]:=aeid_summon;
-            uid_eid_Death    [aa]:=aeid_death;
-            uid_eid_DeathFast[aa]:=aeid_fdeath;
-            uid_eid_pain     [aa]:=aeid_pain;
+            uid_eid_DeathSlow[aa]:=aeid_deathSlow;
+            uid_eid_DeathFast[aa]:=aeid_deathFast;
+            uid_eid_Pain     [aa]:=aeid_pain;
          end;
 end;
 procedure setEffectEID2(aa:byte;summonspr:PTMWTexture);
@@ -85,23 +84,23 @@ begin
          with uid_arms[aa] do
            uid_eid_SummonSpr[aa]:=summonspr;
 end;
-procedure setEffectSND(asnd_summon,asnd_death,asnd_fdeath,asnd_pain:PTSoundSet);
+procedure setEffectSND(asnd_summon,asnd_deathSlow,asnd_deathFast,asnd_pain:PTSoundSet);
 begin
    with g_uids[u] do
    begin
-      uid_eid_snd_summon:=asnd_summon;
-      uid_eid_snd_death :=asnd_death;
-      uid_eid_snd_fdeath:=asnd_fdeath;
-      uid_eid_snd_pain  :=asnd_pain;
+      uid_snd_Summon   :=asnd_summon;
+      uid_snd_DeathSlow:=asnd_deathSlow;
+      uid_snd_DeathFast:=asnd_deathFast;
+      uid_snd_Pain     :=asnd_pain;
    end;
    un_eid_snd_set:=true;
 end;
 
-procedure setFOOT(footsnd:PTSoundSet;footanim:integer);
+procedure setFootSND(footsnd:PTSoundSet;footanim:integer);
 begin
    with g_uids[u] do
    begin
-      uid_eid_snd_foot:=footsnd;
+      uid_snd_Foot    :=footsnd;
       uid_AnimStepFoot:=footanim;
    end;
 end;
@@ -175,24 +174,25 @@ begin
 
       case u of
 UID_LostSoul,
-UID_Phantom:
+UID_Phantom :
 begin
-   if(u=UID_Phantom)
-   then setMWSModel(0,@spr_phantom )
-   else setMWSModel(0,@spr_lostsoul);
+   case u of
+   UID_LostSoul: setMWSModel(0,@spr_lostsoul);
+   UID_Phantom : setMWSModel(0,@spr_phantom );
+   end;
    setCommandSND(snd_lost_move,snd_hell_move,snd_lost_move,snd_hell_pain,snd_hell_move);
-   setEffectEID (0,0,0,u,0);
-   setEffectSND (    nil,snd_pexp ,snd_pexp,snd_hell_pain);
-   setWeaponESND(0  ,nil,snd_lost_move,0,0);
+   setEffectEID (0,0  ,0       ,u       ,0            );
+   setEffectSND (  nil,snd_pexp,snd_pexp,snd_hell_pain);
+   setWeaponESND(0,nil,snd_lost_move,0,0);
 end;
 UID_Imp:
 begin
    uid_AnimStepWalk :=12;
    uid_AnimStepDeath:=8;
    setMWSModel  (0,@spr_imp);
-   setCommandSND(snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain,snd_imp_move);
-   setEffectEID (0            ,0           ,0            ,EID_InfantryGibs,0                );
-   setEffectSND (  nil,snd_imp_death,snd_meat ,snd_zimba_pain);
+   setCommandSND(snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain  ,snd_imp_move);
+   setEffectEID (0,0  ,0            ,EID_InfantryGibs,0             );
+   setEffectSND (  nil,snd_imp_death,snd_meat        ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_hell_attack,0,0);
    setWeaponESND(1,nil,snd_hell_melee ,0,0);
 end;
@@ -202,8 +202,8 @@ begin
    uid_AnimStepDeath:=9;
    setMWSModel  (0,@spr_demon);
    setCommandSND(snd_demon_ready,snd_hell_move,snd_demon_ready,snd_hell_pain,snd_hell_move);
-   setEffectEID (0,0,0,0,0);
-   setEffectSND (  nil,snd_demon_death,nil,snd_hell_pain );
+   setEffectEID (0,0  ,0              ,0  ,0            );
+   setEffectSND (  nil,snd_demon_death,nil,snd_hell_pain);
    setWeaponESND(0,nil,snd_demon_melee,0,0);
 end;
 UID_Cacodemon:
@@ -245,7 +245,7 @@ begin
    setCommandSND(snd_cyber_ready,snd_hell_move,snd_cyber_ready,snd_hell_pain,snd_hell_move);
    setEffectEID (0,0,0,0,0);
    setEffectSND (  nil,snd_cyber_death,nil,snd_hell_pain );
-   setFOOT      (snd_cyber_foot,25); //30
+   setFootSND   (snd_cyber_foot,25);
    setWeaponESND(0,nil,snd_launch,0,0);
 end;
 UID_Mastermind:
@@ -256,7 +256,7 @@ begin
    setCommandSND(snd_mastermind_ready,snd_hell_move,snd_mastermind_ready,snd_hell_pain,snd_hell_move);
    setEffectEID (0,0,0,0,0);
    setEffectSND (  nil,snd_mastermind_death,nil,snd_hell_pain );
-   setFOOT      (snd_mastermind_foot,18);  //22
+   setFootSND   (snd_mastermind_foot,18);
    setWeaponESND(0,nil,snd_shotgun,0,0);
 end;
 UID_Pain:
@@ -264,7 +264,7 @@ begin
    uid_AnimStepWalk:=7;
    setMWSModel  (0,@spr_pain);
    setCommandSND(snd_pain_ready,snd_hell_move,snd_hell_move,snd_pain_pain,snd_hell_move);
-   setEffectEID (0,0,0,0,0);
+   setEffectEID (0,0,0,u,0);
    setEffectSND (  nil,snd_pain_death,snd_pain_death,snd_pain_pain );
 end;
 UID_Revenant:
@@ -296,7 +296,7 @@ begin
    setCommandSND(snd_arachno_ready,snd_arachno_move,snd_arachno_ready,snd_hell_pain,snd_arachno_move);
    setEffectEID (0,0,0,0,0);
    setEffectSND (  nil,snd_arachno_death,nil,snd_hell_pain );
-   setFOOT      (snd_arachno_foot,26);
+   setFootSND   (snd_arachno_foot,26);
    setWeaponESND(0,nil,snd_plasma,0,0);
 end;
 UID_Archvile:
@@ -501,7 +501,7 @@ begin
    setMWSModel(0,@spr_HFortress);
    setBuildingSND(snd_hell_hfort);
 end;
-UID_HEyeNest:
+UID_HEye:
 begin
    setMWSModel(0,@spr_HEyeNest);
    setBuildingSND(snd_hell_eye);
@@ -658,7 +658,7 @@ begin
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (  nil,snd_exp ,snd_exp ,nil);
    setWeaponESND(0    ,nil,snd_plasma,0,0);
-   //uid_eid_bcrater:=UID_UGturret;
+   uid_eid_bcrater:=UID_UGturret;
 end;
 UID_Terminator:
 begin
@@ -883,7 +883,7 @@ end;
                       if(uid_r>42)
                       then uid_eid_bcrater:=EID_db_h0
                       else uid_eid_bcrater:=EID_db_h1;
-                      if(uid_AnimBuildMode=0)then uid_AnimBuildMode:=1;
+                      uid_eid_BuildHellType:=true;
                    end;
            r_uac : begin
                       if(uid_r<20)
@@ -1011,56 +1011,98 @@ begin
    begin
       ua_btn     :=spr_empty;
       ua_mbrush_r:=0;
-      ua_str_UnitHint:=0;
+      ua_str_UIDHint:=0;
+      {
+      ua_mbrush_r    : integer;
+      ua_mbrush_uid  : byte;
+      }
 
       case a of
-uab_Teleport     : ua_btn:=spr_uibtn_Upgrades[r_hell,8 ].surf;
-uab_Recall       : ua_btn:=spr_uibtn_Upgrades[r_hell,14].surf;
-uab_UACScan      : ua_btn:=spr_uibtn_AbilityUACScan;
-uab_UACStrike    : begin
-                   ua_btn:=spr_uibtn_AbilityUACStrike;
-                   ua_mbrush_r:=blizzard_sr;
-                   end;
-uab_UACCCLand    : ua_btn:=spr_uibtn_AbilityCCLand;
-uab_UACCCLandTo  : ua_btn:=spr_uibtn_AbilityCCLandTo;
+uab_Teleport       : ua_btn:=spr_uibtn_Upgrades[r_hell,8 ].surf;
+uab_Recall         : ua_btn:=spr_uibtn_Upgrades[r_hell,14].surf;
+uab_UACScan        : ua_btn:=spr_uibtn_AbilityUACScan;
+uab_UACStrike      : begin
+                     ua_btn:=spr_uibtn_AbilityUACStrike;
+                     ua_mbrush_r:=blizzard_sr;
+                     end;
+uab_UACCCLand      : begin
+                     ua_btn:=spr_uibtn_AbilityCCLand;
+                     ua_mbrush_uid:=255;
+                     end;
+uab_UACCCLandTo    : begin
+                     ua_btn:=spr_uibtn_AbilityCCLandTo;
+                     ua_mbrush_uid:=255;
+                     end;
+uab_HEyeVision     : ua_btn:=spr_uibtn_AbilityHVision;
+uab_HEyeBlink      : ua_btn:=spr_uibtn_AbilityBlink;
 
-uab_HEyeVision   : ua_btn:=spr_uibtn_AbilityHVision;
+uab_HTowerBlink    : ua_btn:=spr_uibtn_Upgrades[r_hell,18].surf;
 
-uab_HEyeBlink    : ua_btn:=spr_uibtn_AbilityBlink;
-uab_HTowerBlink  : ua_btn:=spr_uibtn_Upgrades[r_hell,18].surf;
-uab_HKeepShift   : ua_btn:=spr_uibtn_Upgrades[r_hell,9 ].surf;
+uab_HKeepShift     : ua_btn:=spr_uibtn_Upgrades[r_hell,9 ].surf;
+uab_HKeepAura      : ua_btn:=spr_uibtn_Upgrades[r_hell,10].surf;
 
-uab_SphereInvuln : ua_btn:=spr_uibtn_AbilityInvuln;
+uab_SphereInvuln   : ua_btn:=spr_uibtn_AbilityInvuln;
 
-uab_SpawnLost    : ua_btn:=spr_uibtn_AbilitySpawnLost;
-uab_SpawnLostTo  : ua_btn:=spr_uibtn_AbilitySpawnLostTo;
+uab_SpawnLost      : ua_btn:=spr_uibtn_AbilitySpawnLost;
+uab_SpawnLostTo    : ua_btn:=spr_uibtn_AbilitySpawnLostTo;
 
-uab_Unload       : ua_btn:=spr_uibtn_AbilityUnload;
-uab_UnloadTo     : ua_btn:=spr_uibtn_AbilityUnloadTo;
+uab_Unload         : ua_btn:=spr_uibtn_AbilityUnload;
+uab_UnloadTo       : ua_btn:=spr_uibtn_AbilityUnloadTo;
 
-uab_UACProdLvlUp : ua_btn:=spr_uibtn_AbilityUACLvlUp;
-uab_HellProdLvlUp: ua_btn:=spr_uibtn_AbilityHellLvlUp;
+uab_ToNextForm     : ;
+uab_ToNextFormTUAC : ;
+uab_ToNextFormTHell: ;
 
-uab_ToUACDron    : begin
-                   ua_str_UnitHint:=UID_UACDron;
-                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
-                   end;
-uab_ToUGTurret   : begin
-                   ua_str_UnitHint:=UID_UGTurret;
-                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
-                   end;
-uab_ToUATurret   : begin
-                   ua_str_UnitHint:=UID_UATurret;
-                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
-                   end;
-uab_ToHTotem     : begin
-                   ua_str_UnitHint:=UID_HTotem;
-                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
-                   end;
-uab_ToHTower     : begin
-                   ua_str_UnitHint:=UID_HTower;
-                   ua_btn:=g_uids[ua_str_UnitHint].uid_BTNBig.surf;
-                   end;
+uab_ProdLvlUp      : ua_btn:=spr_uibtn_AbilityLvlUp;
+uab_UACProdLvlUp   : ua_btn:=spr_uibtn_AbilityUACLvlUp;
+uab_HellProdLvlUp  : ua_btn:=spr_uibtn_AbilityHellLvlUp;
+
+uab_ToGreatHKeep   : begin
+                     ua_mbrush_uid :=UID_HAKeep;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+uab_ToAdvCC        : begin
+                     ua_mbrush_uid :=UID_UACommandCenter;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+
+uab_ToUACDron      : begin
+                     ua_mbrush_uid :=UID_UACDron;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+uab_ToUGTurret     : begin
+                     ua_mbrush_uid :=UID_UGTurret;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+uab_ToUATurret     : begin
+                     ua_mbrush_uid :=UID_UATurret;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+uab_ToHTotem       : begin
+                     ua_str_UIDHint:=UID_HTotem;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+uab_ToHTower       : begin
+                     ua_str_UIDHint:=UID_HTower;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+
+uab_ToUGTurretTo   : begin
+                     ua_mbrush_uid :=UID_UGTurret;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+uab_ToUATurretTo   : begin
+                     ua_mbrush_uid :=UID_UATurret;
+                     ua_str_UIDHint:=ua_mbrush_uid;
+                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     end;
+
 
       end;
 

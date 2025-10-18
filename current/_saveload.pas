@@ -168,7 +168,7 @@ begin
         AddItem(@name    ,SizeOf(name    ));
         AddItem(@mrace   ,SizeOf(mrace   ));
         AddItem(@team    ,SizeOf(team    ));
-        AddItem(@observer,SizeOf(observer));
+        AddItem(@isobserver,SizeOf(isobserver));
      end;
 
    // other

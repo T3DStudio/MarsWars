@@ -75,7 +75,7 @@ begin
           else
              if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-          SoundPlayUnit(uid_eid_snd_summon,nil,nil);
+          SoundPlayUnit(uid_snd_Summon,nil,nil);
           effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_Summon[level]);
 
           if(playeri=UIPlayer)then SoundPlayUnit(uid_snd_ready,nil,nil);
@@ -87,7 +87,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(not ukfly)then
+      if(not ukfly)and(uid_eid_bcrater>0)then
         effect_add(vx,vy+uid_eid_bcrater_y,sd_liquid+vy,uid_eid_bcrater);
 
       if(pUIVision<>nil)then
@@ -100,12 +100,12 @@ begin
       if(fastdeath)then
       begin
          effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_DeathFast[level]);
-         SoundPlayUnit(uid_eid_snd_fdeath,nil,nil);
+         SoundPlayUnit(uid_snd_DeathFast,nil,nil);
       end
       else
       begin
-         effect_add(vx,vy,vy+1,uid_eid_Death[level]);
-         SoundPlayUnit(uid_eid_snd_death,nil,nil);
+         effect_add(vx,vy,vy+1,uid_eid_DeathSlow[level]);
+         SoundPlayUnit(uid_snd_DeathSlow,nil,nil);
       end;
    end;
 end;
@@ -122,8 +122,8 @@ begin
       else
         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-      effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_pain[level]);
-      SoundPlayUnit(uid_eid_snd_pain,nil,nil);
+      effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_Pain[level]);
+      SoundPlayUnit(uid_snd_Pain,nil,nil);
    end;
 end;
 
@@ -248,6 +248,12 @@ begin
            uo_x:=x;
            uo_y:=y;
         end;
+         if(_px=rpoint_x)
+        and(_py=rpoint_y)then
+        begin
+           rpoint_x:=x;
+           rpoint_y:=y;
+        end;
       end;
       case movevxy of
 mvxy_relative: begin
@@ -276,7 +282,7 @@ begin
       AddToInt(@TeamVision   [team],MinVisionTime);
       AddToInt(@TeamDetection[team],MinVisionTime);
 
-      if(revealed)then
+      if(isrevealed)then
         for p:=0 to LastPlayer do
         begin
            AddToInt(@TeamVision   [p],fr_fps1);
@@ -334,7 +340,7 @@ end;
 procedure teleport_CalcReload(pTeleporter:PTUnit;limit:integer);
 begin
    with pTeleporter^ do
-     with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(hteleport_rldPerLimit-mm3i(0,upgr[upgr_hell_TeleportCD],hteleport_rldPerLimit));
+     with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(hteleport_rldPerLimit-mm3i(0,upgrs_cur[upgr_hell_TeleportCD],hteleport_rldPerLimit));
 end;
 
 procedure unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
@@ -359,61 +365,61 @@ procedure unit_zfall(pu:PTUnit);
 var st:integer;
 begin
    with pu^ do
-   if(zfall<>0)then
-   begin
-      st:=sign(zfall);
-      if(zfall>1)then st*=2;
-      zfall-=st;
-      unit_SetXY(pu,x,y+st,mvxy_relative);
-   end;
+     if(zfall<>0)then
+     begin
+        st:=sign(zfall);
+        if(zfall>1)then st*=2;
+        zfall-=st;
+        unit_SetXY(pu,x,y+st,mvxy_relative);
+     end;
 end;
 
 procedure unit_MoveVis(pu:PTUnit);
 begin
    if(ServerSide)then unit_zfall(pu);
    with pu^ do
-   if(vx<>x)or(vy<>y)then
-    if(IsUnitRange(transportU,nil))then
-    begin
-       vstp:=0;
-       vx  :=x;
-       vy  :=y;
-    end
-    else
-    begin
-       if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
-       if(vstp<=0)then vstp:=UnitStepTicks;
-       vx  +=(x-vx) div vstp;
-       vy  +=(y-vy) div vstp;
-       vstp-=1;
-    end;
+     if(vx<>x)or(vy<>y)then
+       if(IsUnitRange(transportU,nil))then
+       begin
+          vstp:=0;
+          vx  :=x;
+          vy  :=y;
+       end
+       else
+       begin
+          if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
+          if(vstp<=0)then vstp:=UnitStepTicks;
+          vx  +=(x-vx) div vstp;
+          vy  +=(y-vy) div vstp;
+          vstp-=1;
+       end;
 end;
 
 function unit_ability_UACScan(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
    unit_ability_UACScan:=ureq_other;
    with pu^ do
-    if(iscomplete)and(rld<=0)then
-    begin
-       unit_ability_UACScan:=0;
+     if(iscomplete)and(rld<=0)then
+     begin
+        unit_ability_UACScan:=0;
 
-       if(check)then exit;
+        if(check)then exit;
 
-       unit_clear_order(pu,true);
-       uo_x:=x0;
-       uo_y:=y0;
-       rld :=radar_reload;
-       buffs[ub_Cast]:=fr_fps1;
+        unit_clear_order(pu,true);
+        uo_x:=x0;
+        uo_y:=y0;
+        rld :=radar_reload;
+        buffs[ub_Cast]:=fr_fps1;
 
-       {$IFDEF _FULLGAME}
-       if(ServerSide)then
-       begin
-          if(UIPlayer<=LastPlayer)then
-            if(player^.team<>g_gplayers[UIPlayer].team)then exit;
+        {$IFDEF _FULLGAME}
+        if(ServerSide)then
+        begin
+           if(UIPlayer<=LastPlayer)then
+             if(player^.team<>g_gplayers[UIPlayer].team)then exit;
           SoundPlayUnit(snd_radar,nil,nil);
-       end;
-       {$ENDIF}
-    end;
+        end;
+        {$ENDIF}
+     end;
 end;
 
 function unit_ability_HInvuln(pu:PTUnit;taru:integer;check:boolean):cardinal;
@@ -687,7 +693,7 @@ begin
     with g_units[u] do
      with uid^ do
       if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=pl)and(uid_isbuilder)and(not ukfly)then
-       if(player^.s_builders=0)or(isselected)then
+       if(player^.units_builders_s=0)or(isselected)then
         if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
         begin
            o:=point_dist_int(x,y,tx,ty)-srange;
@@ -795,7 +801,7 @@ begin
 
    if(pl<=LastPlayer)then
      with g_gplayers[pl] do
-       if(e_builders<=0)then
+       if(units_builders_e<=0)then
        begin
           CheckInBuildArea:=1; // no builders
           exit;
@@ -826,7 +832,7 @@ begin
     with g_punits[u]^ do
      with uid^ do
       if(hits>0)and(iscomplete)and(uid_isbuilder)and(not ukfly)and(playeri=pl)then
-       if(player^.s_builders=0)or(isselected)then
+       if(player^.units_builders_s=0)or(isselected)then
         if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
          if(buid in uid_prod_Buildings)and(IsUnitRange(transportU,nil)=false)then
           if(point_dist_int(x,y,tx,ty)<srange)then
@@ -971,6 +977,8 @@ begin
       uo_tar   := 0;
       uo_x     := x;
       uo_y     := y;
+      rpoint_x := x;
+      rpoint_y := y;
       rld      := 0;
       pains    := 0;
       dir      := 270;
@@ -1012,16 +1020,16 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(uid_isbuilder  )then n_builders  +=1;
+      if(uid_isbuilder  )then units_builders_ec  +=1;
       if(uid_isbarrack  )then
       begin
-         n_barracks+=1;
-         uprodm+=level+1;
+         units_unitProds_ec+=1;
+         prod_unit_Max+=level+1;
       end;
       if(uid_issmith    )then
       begin
-         n_smiths+=1;
-         upprodm+=level+1;
+         units_upgrProds_ec+=1;
+         prod_upgr_Max+=level+1;
       end;
    end;
 end;
@@ -1031,16 +1039,16 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(uid_isbuilder  )then n_builders  -=1;
+      if(uid_isbuilder  )then units_builders_ec  -=1;
       if(uid_isbarrack  )then
       begin
-         n_barracks-=1;
-         uprodm-=level+1;
+         units_unitProds_ec-=1;
+         prod_unit_Max-=level+1;
       end;
       if(uid_issmith    )then
       begin
-         n_smiths-=1;
-         upprodm-=level+1;
+         units_upgrProds_ec-=1;
+         prod_upgr_Max-=level+1;
       end;
    end;
 end;
@@ -1051,12 +1059,12 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(uid_x[uidi            ]<=0)then uid_x[uidi            ]:=unum;
-      if(ucl_x[uid_isbuilding,uid_class]<=0)then ucl_x[uid_isbuilding,uid_class]:=unum;
-      ucl_eb[uid_isbuilding,uid_class]+=1;
-      uid_eb[uidi            ]+=1;
-      menergy+=uid_EnergyGen;
-      cenergy+=uid_EnergyGen;
+      if(units_uid_u[uidi                    ]<=0)then units_uid_u[uidi                    ]:=unum;
+      if(units_ucl_u[uid_isbuilding,uid_class]<=0)then units_ucl_u[uid_isbuilding,uid_class]:=unum;
+      units_ucl_c[uid_isbuilding,uid_class]+=1;
+      units_uid_c[uidi            ]+=1;
+      energyl_max+=uid_EnergyGen;
+      energyl_cur+=uid_EnergyGen;
       unit_done_inc_cntrs(pu);
    end;
 end;
@@ -1067,13 +1075,13 @@ begin
    with uid^    do
    with player^ do
    begin
-      army+=1;
+      units_all_e+=1;
       armylimit+=uid_LimitUse;
-      ucl_e[uid_isbuilding,uid_class]+=1;
-      ucl_c[uid_isbuilding     ]+=1;
-      ucl_l[uid_isbuilding     ]+=uid_LimitUse;
-      uid_e[uidi            ]+=1;
-      if(uid_isbuilder)then e_builders+=1;
+      units_ucl_e[uid_isbuilding,uid_class]+=1;
+      units_bld_e[uid_isbuilding          ]+=1;
+      units_bld_l[uid_isbuilding          ]+=uid_LimitUse;
+      units_uid_e[uidi                    ]+=1;
+      if(uid_isbuilder)then units_builders_e+=1;
 
       iscomplete:=ubld;
 
@@ -1082,7 +1090,7 @@ begin
       else
       begin
          hits  := 1;
-         cenergy-=uid_EnergyReq;
+         energyl_cur-=uid_EnergyReq;
          {$IFDEF _FULLGAME}
          if(playeri=UIPlayer)then SoundPlayAnoncer(snd_build_place[uid_race],false,false);
          {$ENDIF}
@@ -1098,7 +1106,7 @@ begin
    end;
 end;
 
-function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte):boolean;
+function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;
 var m,i:integer;
 procedure FindNotExistedUnit;
 begin
@@ -1107,7 +1115,7 @@ begin
    while(i<m)do
    begin
       with g_units[i] do
-        if(hits<=dead_hits)then
+        if(hits<=hits_dead)then
         begin
            LastCreatedUnit :=i;
            LastCreatedUnitP:=g_punits[i];
@@ -1127,7 +1135,7 @@ begin
       if(not IsUnitRange(Uunum,nil))
       then FindNotExistedUnit
       else
-        if(g_units[Uunum].hits>dead_hits)
+        if(g_units[Uunum].hits>hits_dead)
         then FindNotExistedUnit
         else
         begin
@@ -1146,31 +1154,32 @@ begin
             unum       := LastCreatedUnit;
 
             unit_SetXY(LastCreatedUnitP,Ux,Uy,mvxy_strict);
-            uidi    := Uuid;
-            playeri := UplayerN;
-            player  :=@g_gplayers[playeri];
-            uo_x    := x;
-            uo_y    := y;
-            uo_bx   := -1;
-            uo_by   := -1;
-            move_x  := x;
-            move_y  := y;
-            isselected:= false;
-            transportC:= 0;
+            uidi       := Uuid;
+            playeri    := UplayerN;
+            player     :=@g_gplayers[playeri];
+            uo_x       := x;
+            uo_y       := y;
+            uo_bx      := -1;
+            uo_by      := -1;
+            move_x     := x;
+            move_y     := y;
+            isselected := false;
+            transportC := 0;
 
             FillChar(buffs,sizeof(buffs),0);
             FillChar(TeamVision   ,SizeOf(TeamVision   ),0);
             FillChar(TeamDetection,SizeOf(TeamDetection),0);
 
-            if(Ulevel>LastUnitLevel)
-            then Ulevel:=LastUnitLevel;
+            if(Ulevel>LastUnitLevel)then Ulevel:=LastUnitLevel;
             level:=Ulevel;
 
             unit_SetDefaults(LastCreatedUnitP,false);
-            unit_TeamReveal     (LastCreatedUnitP,false);
+            unit_TeamReveal (LastCreatedUnitP,false);
             unit_ApplyUID   (LastCreatedUnitP);
             unit_inc_cntrs  (LastCreatedUnitP,Ucomplete,Usummoned);
             unit_UpdateXY   (LastCreatedUnitP);
+
+            if(altMode)then buffs[ub_altMode]:=ub_infinity;
          end;
       end;
    end;
@@ -1213,10 +1222,10 @@ begin
 
       if(LastCreatedUnit>0)then
       begin
-         LastCreatedUnitP^.uo_x  :=uo_x;
-         LastCreatedUnitP^.uo_y  :=uo_y;
-         LastCreatedUnitP^.uo_id :=uo_id;
-         LastCreatedUnitP^.uo_tar:=uo_tar;
+         LastCreatedUnitP^.uo_x  :=rpoint_x;
+         LastCreatedUnitP^.uo_y  :=rpoint_y;
+         LastCreatedUnitP^.uo_tar:=rpoint_tar;
+         LastCreatedUnitP^.uo_id :=ua_amove;
          LastCreatedUnitP^.dir   :=dir;
 
          if(uid_OutUnitsTeleBuff)then
@@ -1234,13 +1243,16 @@ begin
 end;
 
 procedure barrack_spawn(pu:PTUnit;_uid,count:byte);
-var sstep,i  :integer;
-    announcer:boolean;
+var
+sstep,i  :integer;
+announcer:boolean;
 begin
    with pu^ do
    with uid^ do
    begin
-      dir:=point_dir(x,y,uo_x,uo_y);
+      if(x=rpoint_x)and(y=rpoint_y)
+      then dir:=270
+      else dir:=point_dir(x,y,rpoint_x,rpoint_y);
       sstep:=barrack_out_r(pu,_uid);
 
       announcer:=false;
@@ -1273,13 +1285,13 @@ begin
             begin
                if(check)then exit;
 
-               uproda+=1;
-               uprodl+=g_uids[puid].uid_LimitUse;
-               uprodc[g_uids[puid].uid_class]+=1;
-               uprodu[puid             ]+=1;
-               cenergy-=g_uids[puid].uid_EnergyReq;
+               prod_unit_Now+=1;
+               prod_unit_Limit+=g_uids[puid].uid_LimitUse;
+               prod_unit_ucl[g_uids[puid].uid_class]+=1;
+               prod_unit_uid[puid             ]+=1;
+               energyl_cur-=g_uids[puid].uid_EnergyReq;
                uprod_u[pn]:=puid;
-               uprod_r[pn]:=g_uids[puid].uid_ProdTick;
+               uprod_r[pn]:=g_uids[puid].uid_ProdTimeTick;
             end;
      end;
 end;
@@ -1325,11 +1337,11 @@ begin
 
               puid:=uprod_u[pn];
 
-              uproda-=1;
-              uprodl-=g_uids[puid].uid_LimitUse;
-              uprodc[ g_uids[puid].uid_class]-=1;
-              uprodu[ puid           ]-=1;
-              cenergy+=g_uids[puid].uid_EnergyReq;
+              prod_unit_Now-=1;
+              prod_unit_Limit-=g_uids[puid].uid_LimitUse;
+              prod_unit_ucl[ g_uids[puid].uid_class]-=1;
+              prod_unit_uid[ puid           ]-=1;
+              energyl_cur+=g_uids[puid].uid_EnergyReq;
               uprod_r[pn]:=0;
            end;
 end;
@@ -1378,11 +1390,11 @@ begin
             begin
                if(check)then exit;
 
-               upproda+=1;
-               upprodu[upid]+=1;
-               pprod_e[pn]:=GetUpgradeEnergy(upid,upgr[upid]+1);
-               cenergy-=pprod_e[pn];
-               pprod_r[pn]:=GetUpgradeTime(upid,upgr[upid]+1);
+               prod_upgr_Now+=1;
+               prod_upgr_upid[upid]+=1;
+               pprod_e[pn]:=GetUpgradeEnergy(upid,upgrs_cur[upid]+1);
+               energyl_cur-=pprod_e[pn];
+               pprod_r[pn]:=GetUpgradeTime(upid,upgrs_cur[upid]+1);
                pprod_u[pn]:=upid;
             end;
      end;
@@ -1428,9 +1440,9 @@ begin
 
               upid:=pprod_u[pn];
 
-              upproda-=1;
-              upprodu[upid]-=1;
-              cenergy+=pprod_e[pn];
+              prod_upgr_Now-=1;
+              prod_upgr_upid[upid]-=1;
+              energyl_cur+=pprod_e[pn];
               pprod_r[pn]:=0;
            end;
 end;
@@ -1462,13 +1474,13 @@ begin
    with uid^ do
    with player^ do
    begin
-      ucl_s [uid_isbuilding,uid_class]+=1;
-      ucl_cs[uid_isbuilding     ]+=1;
-      uid_s [uidi            ]+=1;
-      if(uid_isbuilder)then s_builders+=1;
-      if(uid_isbarrack)then s_barracks+=1;
-      if(uid_issmith  )then s_smiths  +=1;
-      s_all+=1;
+      units_ucl_s [uid_isbuilding,uid_class]+=1;
+      units_bld_s[uid_isbuilding     ]+=1;
+      units_uid_s [uidi            ]+=1;
+      if(uid_isbuilder)then units_builders_s+=1;
+      if(uid_isbarrack)then units_unitProds_s+=1;
+      if(uid_issmith  )then units_upgrProds_s  +=1;
+      units_all_s+=1;
    end;
 end;
 procedure unit_counters_dec_select(pu:PTUnit);
@@ -1477,13 +1489,13 @@ begin
    with uid^ do
    with player^ do
    begin
-      ucl_s [uid_isbuilding,uid_class]-=1;
-      ucl_cs[uid_isbuilding     ]-=1;
-      uid_s [uidi            ]-=1;
-      if(uid_isbuilder)then s_builders-=1;
-      if(uid_isbarrack)then s_barracks-=1;
-      if(uid_issmith  )then s_smiths  -=1;
-      s_all-=1;
+      units_ucl_s [uid_isbuilding,uid_class]-=1;
+      units_bld_s[uid_isbuilding     ]-=1;
+      units_uid_s [uidi            ]-=1;
+      if(uid_isbuilder)then units_builders_s-=1;
+      if(uid_isbarrack)then units_unitProds_s-=1;
+      if(uid_issmith  )then units_upgrProds_s  -=1;
+      units_all_s-=1;
    end;
 end;
 
@@ -1515,22 +1527,22 @@ begin
       unit_UnSelect(pu);
 
       if(not iscomplete)
-      then cenergy+=g_uids[uidi].uid_EnergyReq
+      then energyl_cur+=g_uids[uidi].uid_EnergyReq
       else
       begin
          unit_ProdStopUnit   (pu,255,true,false);
          unit_ProdStopUpgrade(pu,255,true,false);
 
-         ucl_eb[uid_isbuilding,uid_class]-=1;
-         uid_eb[uidi            ]-=1;
-         menergy-=uid_EnergyGen;
-         cenergy-=uid_EnergyGen;
+         units_ucl_c[uid_isbuilding,uid_class]-=1;
+         units_uid_c[uidi            ]-=1;
+         energyl_max-=uid_EnergyGen;
+         energyl_cur-=uid_EnergyGen;
 
          unit_done_dec_cntrs(pu);
       end;
 
-      if(ucl_x[uid_isbuilding,uid_class]=unum)then ucl_x[uid_isbuilding,uid_class]:=0;
-      if(uid_x[uidi            ]=unum)then uid_x[uidi            ]:=0;
+      if(units_ucl_u[uid_isbuilding,uid_class]=unum)then units_ucl_u[uid_isbuilding,uid_class]:=0;
+      if(units_uid_u[uidi                    ]=unum)then units_uid_u[uidi                    ]:=0;
    end;
 end;
 
@@ -1540,18 +1552,19 @@ begin
    with uid^ do
    with player^ do
    begin
-      army     -=1;
+      units_all_e     -=1;
       armylimit-=uid_LimitUse;
-      ucl_e[uid_isbuilding,uid_class]-=1;
-      ucl_c[uid_isbuilding     ]-=1;
-      ucl_l[uid_isbuilding     ]-=uid_LimitUse;
-      uid_e[uidi            ]-=1;
-      if(uid_isbuilder)then e_builders-=1;
+      units_ucl_e[uid_isbuilding,uid_class]-=1;
+      units_bld_e[uid_isbuilding     ]-=1;
+      units_bld_l[uid_isbuilding     ]-=uid_LimitUse;
+      units_uid_e[uidi            ]-=1;
+      if(uid_isbuilder)then units_builders_e-=1;
    end;
 end;
 
 procedure unit_end_uprod(pu:PTUnit);
-var i,tuid:byte;
+var
+i,puid:byte;
 begin
    with pu^ do
    with uid^ do
@@ -1560,20 +1573,20 @@ begin
        for i:=0 to LastUnitLevel do
          if(uprod_r[i]>0)then
          begin
-            tuid:=uprod_u[i];
+            puid:=uprod_u[i];
 
-            if((army     +uproda)>MaxPlayerUnits)
-            or((armylimit+uprodl)>MaxPlayerLimit)
-            or(cenergy<0)
-            or(uid_e[tuid]>=a_units[tuid])
+            if((units_all_e+prod_unit_Now)>MaxPlayerUnits)
+            or((armylimit+prod_unit_Limit)>MaxPlayerLimit)
+            or(energyl_cur<0)
+            or(units_uid_e[puid]>=units_uid_m[puid])
             then
             else
               if(uprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
               begin
-                 barrack_spawn(pu,uprod_u[i],upgr[upgr_mult_product]);
+                 barrack_spawn(pu,uprod_u[i],upgrs_cur[upgr_mult_product]);
                  unit_ProdStopUnitLine(pu,255,i,false);
               end
-              else uprod_r[i]:=max2i(1,uprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+              else uprod_r[i]:=max2i(1,uprod_r[i]-1*(upgrs_cur[upgr_fast_product]+1) );
          end;
 end;
 
@@ -1588,18 +1601,18 @@ begin
          if(pprod_r[i]>0)then
          begin
             tuid:=pprod_u[i];
-            if(cenergy<0)
-            or(upgr[tuid]>=g_upids[tuid].upgr_max)
-            or(upgr[tuid]>=a_upgrs[tuid])
+            if(energyl_cur<0)
+            or(upgrs_cur[tuid]>=g_upids[tuid].upgr_max)
+            or(upgrs_cur[tuid]>=upgrs_max[tuid])
             then
             else
               if(pprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
               begin
-                 upgr[tuid]+=1;
+                 upgrs_cur[tuid]+=1;
                  unit_ProdStopUpgradeLine(pu,255,i,false);
                  GameLogUpgradeComplete(playeri,tuid,x,y);
               end
-              else pprod_r[i]:=max2i(1,pprod_r[i]-1*(upgr[upgr_fast_product]+1) );
+              else pprod_r[i]:=max2i(1,pprod_r[i]-1*(upgrs_cur[upgr_fast_product]+1) );
          end;
 end;
 
@@ -1624,32 +1637,37 @@ begin
             LastCreatedUnitP^.a_tar :=a_tar;
             LastCreatedUnitP^.uo_id :=uo_id;
             LastCreatedUnitP^.uo_tar:=uo_tar;
-            if(IsUnitRange(a_tar,@tu))then
+            LastCreatedUnitP^.uo_x  :=uo_x;
+            LastCreatedUnitP^.uo_y  :=uo_y;
+            {if(IsUnitRange(a_tar,@tu))then
             begin
-               LastCreatedUnitP^.uo_x :=tu^.x;
-               LastCreatedUnitP^.uo_y :=tu^.y;
+               LastCreatedUnitP^.uo_x  :=tu^.x;
+               LastCreatedUnitP^.uo_y  :=tu^.y;
+               LastCreatedUnitP^.uo_tar:=tu^.unum;
             end
             else
-             if(uo_x<>x)or(uo_y<>y)then
-             begin
-                LastCreatedUnitP^.uo_x:=uo_x;
-                LastCreatedUnitP^.uo_y:=uo_y;
-             end;
+              if(uo_x<>x)or(uo_y<>y)then
+              begin
+                 LastCreatedUnitP^.uo_x:=uo_x;
+                 LastCreatedUnitP^.uo_y:=uo_y;
+              end; }
          end
          else LastCreatedUnit:=0;
       end
       {$IFDEF _FULLGAME}
       else
-        case auid of
-UID_Phantom : effect_InPoint(tx,ty,draw_SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
-UID_LostSoul: effect_InPoint(tx,ty,draw_SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
-        end;
+        with g_uids[auid] do
+          effect_InPoint(tx,ty,draw_SpriteDepth(ty+1,ukfly),nil,uid_eid_DeathFast[0],uid_snd_DeathFast);
+
+        {case auid of
+//UID_Phantom : effect_InPoint(tx,ty,draw_SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
+UID_LostSoul:
+        end; } //
       {$ENDIF};
    end;
 end;
 
-
-procedure ability_unit_spawn(pu:PTUnit;auid:byte);
+procedure unit_ArmSpawnUnit(pu:PTUnit;auid:byte);
 var dd:integer;
 begin
    with pu^ do
@@ -1659,7 +1677,6 @@ begin
       unit_ability_spawn(pu,x+dir_stepX[dd]*uid_r,y+dir_stepY[dd]*uid_r,auid);
    end;
 end;
-
 
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;
 begin
@@ -1672,7 +1689,6 @@ begin
    if((pTransport^.transportM-pTransport^.transportC)>=pPassenger^.uid^.uid_TransportSize)then
      if(pPassenger^.uidi in pTransport^.uid^.ups_TransportUIDs)then unit_CheckTransport:=true;
 end;
-
 
 procedure unit_BaseTimers(pu:PTUnit);
 var i:byte;
@@ -1704,10 +1720,10 @@ begin
    scan_buff:=255;
    with uTarget^ do
    begin
-      if(uDetector^.player^.observer)
+      if(uDetector^.player^.isobserver)
       then td:=0
       else
-        if(uDetector^.uid^.uid_ability=uab_UACScan)and(uDetector^.rld>radar_vision_time)then
+        if(uDetector^.uid^.uid_ability_isradar)and(uDetector^.rld>radar_vision_time)then
         begin
            td:=point_dist_int(x,y,uDetector^.uo_x,uDetector^.uo_y);
            if(td<ud)
@@ -1717,20 +1733,20 @@ begin
         else td:=ud;
 
       if(td<=(uDetector^.srange+uid^.uid_r))then
-       if(buffs[ub_Invis]<=0)then
-       begin
-          AddToInt(@TeamVision[uDetector^.player^.team],MinVisionTime);
-          if(scan_buff<=LastUnitBuff)and(player^.team<>uDetector^.player^.team)
-          then AddToInt(@buffs[scan_buff],MinVisionTime);
-       end
-       else
-         if(uDetector^.buffs[ub_Detect]>0)and(uDetector^.iscomplete)and(uDetector^.hits>0)then
-         begin
-            AddToInt(@TeamVision   [uDetector^.player^.team],MinVisionTime);
-            AddToInt(@TeamDetection[uDetector^.player^.team],MinVisionTime);
-            if(scan_buff<=LastUnitBuff)and(player^.team<>uDetector^.player^.team)
-            then AddToInt(@buffs[scan_buff],MinVisionTime);
-         end;
+        if(buffs[ub_Invis]<=0)then
+        begin
+           AddToInt(@TeamVision[uDetector^.player^.team],MinVisionTime);
+           if(scan_buff<=LastUnitBuff)and(player^.team<>uDetector^.player^.team)
+           then AddToInt(@buffs[scan_buff],MinVisionTime);
+        end
+        else
+          if(uDetector^.buffs[ub_Detect]>0)and(uDetector^.iscomplete)and(uDetector^.hits>0)then
+          begin
+             AddToInt(@TeamVision   [uDetector^.player^.team],MinVisionTime);
+             AddToInt(@TeamDetection[uDetector^.player^.team],MinVisionTime);
+             if(scan_buff<=LastUnitBuff)and(player^.team<>uDetector^.player^.team)
+             then AddToInt(@buffs[scan_buff],MinVisionTime);
+          end;
    end;
 end;
 
@@ -1742,11 +1758,11 @@ begin
    begin
       unit_dec_Rcntrs(pu);
 
-      if(army<=0)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
+      if(units_all_e<=0)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
       begin
-         defeated:=true;
+         isdefeated:=true;
          GameLogPlayerDefeated(playeri);
-         if(g_DefeatedObs)and(state=ps_human)then observer:=true;
+         if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
       end;
    end;
 end;
@@ -1783,57 +1799,57 @@ begin
            zfall:=uid_zfall;
         end;
 
-        x      :=vx;
-        y      :=vy;
-        uo_x   :=x;
-        uo_y   :=y;
-        uo_bx  :=-1;
-        uo_by  :=-1;
-        uo_tar :=0;
-        move_x :=x;
-        move_y :=y;
-        a_tar  :=0;
-        rld    :=0;
+        x       :=vx;
+        y       :=vy;
+        uo_x    :=x;
+        uo_y    :=y;
+        rpoint_x:=x;
+        rpoint_y:=y+uid^.uid_r;
+        uo_bx   :=-1;
+        uo_by   :=-1;
+        uo_tar  :=0;
+        move_x  :=x;
+        move_y  :=y;
+        a_tar   :=0;
+        rld     :=0;
 
         for i:=1 to MaxUnits do
-        if(i<>unum)then
-        begin
-           tu:=@g_units[i];
-           if(tu^.hits>0)then
-           begin
-              if(tu^.uo_tar=unum)then tu^.uo_tar:=0;
-              if(transportC>0)then
-               if(tu^.transportU=unum)then
-               begin
-                  if(ukfly<>uf_ground)or(transportU>0)or(KillAllInside)
-                  then unit_kill(tu,true,false,true,KillAllInside,suicide)
-                  else
-                  begin
-                     tu^.transportU:=0;
-                     transportC-=tu^.uid^.uid_TransportSize;
-                     tu^.x+=g_randomr(uid^.uid_r);
-                     tu^.y+=g_randomr(uid^.uid_r);
-                     tu^.uo_x:=tu^.x;
-                     tu^.uo_y:=tu^.y;
-                     if(tu^.hits>apc_exp_damage)
-                     then tu^.hits-=apc_exp_damage
-                     else unit_kill(tu,true,false,true,false,suicide);
-                  end;
-               end;
-           end
-           else tu^.transportU:=0;
-        end;
+          if(i<>unum)then
+          begin
+             tu:=@g_units[i];
+             if(tu^.uo_tar    =unum)then tu^.uo_tar    :=0;
+             if(tu^.rpoint_tar=unum)then tu^.rpoint_tar:=0;
+             if(tu^.hits<=0)
+             then tu^.transportU:=0
+             else
+               if(transportC>0)and(tu^.transportU=unum)then
+                 if(ukfly<>uf_ground)or(transportU>0)or(KillAllInside)
+                   then unit_kill(tu,true,false,true,KillAllInside,suicide)
+                   else
+                   begin
+                      transportC-=tu^.uid^.uid_TransportSize;
+                      tu^.transportU:=0;
+                      tu^.x     :=x-g_randomr(uid^.uid_missileR);
+                      tu^.y     :=y-g_randomr(uid^.uid_missileR);
+                      tu^.uo_x  :=tu^.x;
+                      tu^.uo_y  :=tu^.y;
+                      tu^.uo_tar:=0;
+                      if(tu^.hits>apc_exp_damage)
+                      then tu^.hits-=apc_exp_damage
+                      else unit_kill(tu,true,false,true,false,suicide);
+                   end;
+          end;
         missiles_clear_tar(unum,false);
 
         if(instant)then
         begin
-           hits:=ndead_hits;
+           hits:=hits_ndead;
            unit_remove(pu);
         end
         else
         begin
            if(fastdeath)
-           then hits:=fdead_hits
+           then hits:=hits_fdead
            else hits:=0;
 
            with uid^ do
@@ -1848,9 +1864,9 @@ begin
         end;
      end
      else
-       if(hits>dead_hits)then
+       if(hits>hits_dead)then
        begin
-          hits:=ndead_hits;
+          hits:=hits_ndead;
           unit_remove(pu);
        end;
 end;
@@ -1878,43 +1894,7 @@ begin
    begin
       speed:=uid_BaseSpeed;
       // ABILITIES
-      case uid_ability of
-uab_UACCCLand     : if(buffs[ub_Cast]>0)then
-                    begin
-                       if(ukfly<>uf_fly)then
-                       begin
-                          {$IFDEF _FULLGAME}
-                          SoundPlayUnit(snd_CCup ,pu,nil);
-                          {$ENDIF}
-                          ukfly:=uf_fly;
-                          if(ServerSide)then zfall:=zfall-fly_hz;
-                          if(uo_id<>ua_psability)
-                          then unit_clear_order(pu,false);
-                       end;
-                       speed:=5;
-                    end
-                    else
-                    begin
-                       if(ukfly<>uf_ground)then
-                       begin
-                          {$IFDEF _FULLGAME}
-                          SoundPlayUnit(snd_transport,pu,nil);
-                          {$ENDIF}
-                          if(ServerSide)then zfall:=fly_hz;
-                          ukfly:=uf_ground;
-                          unit_clear_order(pu,false);
-                       end;
-                       speed:=0;
 
-                       if(ServerSide)and(zfall<>0)then
-                         if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,pu )>0)then
-                         begin
-                            buffs[ub_Cast]:=ub_infinity;
-                            rld:=fr_fps2;
-                            GameLogBits2Message(playeri,uid_ability,lmt_argt_ability,ureq_landplace,x,y);
-                         end;
-                    end;
-      end;
 
       // DETECTION
       if(uid_isdetector)or(buffs[ub_HVision]>0)
@@ -1923,15 +1903,14 @@ uab_UACCCLand     : if(buffs[ub_Cast]>0)then
 
       // INVIS
       case uidi of
-UID_HTotem        : buffs[ub_Invis]:=b2ib[upgr[upgr_hell_TotemInvis]>0];
-UID_Commando      : buffs[ub_Invis]:=b2ib[upgr[upgr_uac_CommandoInvis]>0];
-UID_Demon         : buffs[ub_Invis]:=b2ib[upgr[upgr_hell_Spectre]>0];
+UID_HTotem        : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_TotemInvis  ]>0];
+UID_Commando      : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_uac_CommandoInvis]>0];
+UID_Demon         : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_Spectre     ]>0];
 UID_UMine         : buffs[ub_Invis]:=ub_infinity;
       end;
 
       // OTHER
       case uidi of
-UID_UGTurret      : level:=byte(upgr[upgr_uac_TurretPlasma]>0);
 UID_Phantom,
 UID_LostSoul      : begin
                        tu:=nil;
@@ -1940,17 +1919,17 @@ UID_LostSoul      : begin
                          if(buffs[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_isfly;
                        ukfloater:=not ukfly;
                     end;
-UID_UTransport    : begin level:=min2i(upgr[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+4*level;end;
-UID_APC           : begin level:=min2i(upgr[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+2*level;end;
+//UID_UTransport    : begin level:=min2i(upgrs_cur[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+4*level;end;
+//UID_APC           : begin level:=min2i(upgrs_cur[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+2*level;end;
       end;
-      if(upgr[upgr_invuln]>0)then buffs[ub_Invuln]:=fr_fps1;
+      if(upgrs_cur[upgr_invuln]>0)then buffs[ub_Invuln]:=fr_fps1;
 
       // SRANGE
-      t:=uid_SightR;
-      if(uid_upgr_SightR>0)and(uid_SightRUpgrStep>0)
-      then t+=upgr[uid_upgr_SightR]*uid_SightRUpgrStep;
+      t:=uid_BaseSightR;
+      if(uid_upgr_SightR>0)and(uid_upgr_SightStep>0)
+      then t+=upgrs_cur[uid_upgr_SightR]*uid_upgr_SightStep;
       if(not uid_isbuilding)
-      then t+=upgr[upgr_race_unit_srange[uid_race]]*upgr_race_srange_unit_bonus[uid_race];
+      then t+=upgrs_cur[upgr_race_unit_srange[uid_race]]*upgr_race_srange_unit_bonus[uid_race];
       SetSRange(t);
    end;
 end;

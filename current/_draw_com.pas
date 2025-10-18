@@ -107,11 +107,11 @@ begin
          case charc of
          tc_nl1..
          tc_nl3      : ;
-         tc_UACRank  : begin
+         tc_RankUAC  : begin
                        draw_sdlsurface(sur,ix,y,spr_RaceRank[r_uac ]);
                        ix+= font_w1;
                        end;
-         tc_HellRank : begin
+         tc_RankHell : begin
                        draw_sdlsurface(sur,ix,y,spr_RaceRank[r_hell]);
                        ix+= font_w1;
                        end;
@@ -173,6 +173,7 @@ end;
 procedure map_minimap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
 begin
    circleColor   (tar,x  ,y  ,r  ,color);
+   if(sym<>#0)then
    characterColor(tar,x-3,y-3,sym,color);
 end;
 
@@ -204,18 +205,24 @@ begin
      end;
 end;
 
-procedure map_MinimapKeyPoints(tar:pSDL_Surface);
-var i  :byte;
+procedure map_MinimapKeyPoints(tar:pSDL_Surface;colored:boolean);
+var i:byte;
+    c:cardinal;
 begin
    for i:=0 to LastKeyPoint do
-    with g_KeyPoints[i] do
-     if(kpCaptureR>0)then
-      if((i=0)and(map_scenario=mc_KotH))
-      then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_koth,c_white)
-      else
-        if(kpEnergy<=0)
-        then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_kp ,c_white)
-        else map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_gen,c_white);
+     with g_KeyPoints[i] do
+       if(kpCaptureR>0)then
+       begin
+          if(colored)
+          then c:=GetKeyPointColor(i,false)
+          else c:=c_white;
+          if((i=0)and(map_scenario=mc_KotH))
+          then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_koth,c)
+          else
+            if(kpEnergy<=0)
+            then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_kp ,c)
+            else map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_gen,c);
+       end;
 end;
 
 procedure map_RedrawMenuMinimap;
@@ -225,7 +232,7 @@ begin
    draw_sdlsurface(ui_minimap ,0,0,ui_bminimap);
    draw_sdlsurface(ui_mminimap,0,0,ui_minimap );
    map_MinimapPlayerStarts(ui_mminimap);
-   map_MinimapKeyPoints   (ui_mminimap);
+   map_MinimapKeyPoints   (ui_mminimap,false);
    menu_update:=menu_update or MainMenu;
 end;
 
@@ -314,20 +321,20 @@ begin
    if(UIPlayer<=LastPlayer)then
      with g_gplayers[UIPlayer] do
        with log_l[log_i] do
-         case mtype of
-lmt_unit_LevelUp    :      ui_AddMarker(xi,yi,aummat_advance   ,true);
-lmt_unit_ready       : if(g_uids[argx].uid_isbuilding)
-                       then ui_AddMarker(xi,yi,aummat_created_b ,true)
-                       else ui_AddMarker(xi,yi,aummat_created_u ,true);
-lmt_upgrade_complete :      ui_AddMarker(xi,yi,aummat_upgrade   ,true);
-lmt_map_mark         :      ui_AddMarker(xi,yi,aummat_info      ,true);
+         case lm_type of
+lmt_unit_LevelUp    :      ui_AddMarker(lm_x,lm_y,aummat_advance   ,true);
+lmt_unit_ready       : if(g_uids[lm_data_u].uid_isbuilding)
+                       then ui_AddMarker(lm_x,lm_y,aummat_created_b ,true)
+                       else ui_AddMarker(lm_x,lm_y,aummat_created_u ,true);
+lmt_upgrade_complete :      ui_AddMarker(lm_x,lm_y,aummat_upgrade   ,true);
+lmt_map_mark         :      ui_AddMarker(lm_x,lm_y,aummat_info      ,true);
 lmt_allies_attacked,
 lmt_unit_attacked    : begin
-                       if(g_uids[argx].uid_isbuilding)
-                       then ui_AddMarker(xi,yi,aummat_attacked_b,false)
-                       else ui_AddMarker(xi,yi,aummat_attacked_u,false);
+                       if(g_uids[lm_data_u].uid_isbuilding)
+                       then ui_AddMarker(lm_x,lm_y,aummat_attacked_b,false)
+                       else ui_AddMarker(lm_x,lm_y,aummat_attacked_u,false);
 
-                       LogMes2UIAlarm:=not PointInCam(xi,yi);
+                       LogMes2UIAlarm:=not PointInCam(lm_x,lm_y);
                        end;
          end;
 end;
