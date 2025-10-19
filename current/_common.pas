@@ -13,7 +13,7 @@ function unit_pability (pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):car
 function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
 
-procedure ai_Local_InitVars(pu:PTUnit);forward;
+{procedure ai_Local_InitVars(pu:PTUnit);forward;
 procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_Local_Code(pu:PTUnit);forward;
 
@@ -21,7 +21,7 @@ procedure ai_Global_InitVars(pu:PTUnit);forward;
 procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure ai_Global_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_Global_ScoutPick(pu:PTUnit);forward;
-procedure ai_Global_Code(pu:PTUnit);forward;
+procedure ai_Global_Code(pu:PTUnit);forward;}
 function ai_HighPriorityTarget(player:PTPlayerGameData;tu:PTUnit):boolean;forward;
 
 function map_IfObstacleZone(zone:word):boolean;       forward;

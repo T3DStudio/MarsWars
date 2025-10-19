@@ -836,25 +836,25 @@ begin
       if(StayWaitForNewTarget>0)
       then StayWaitForNewTarget-=1;
 
-      pushout      := solid and unit_canMove(pu) and (a_rld<=0);
-      attack_target:= unit_canAttack(pu,false);
-      aicode       := (state=ps_AI);//and(isselected);
+      pushout        := solid and unit_canMove(pu) and (a_rld<=0);
+      attack_target  := unit_canAttack(pu,false);
+      aicode         := (state=ps_AI);//and(isselected);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
       NearTeleport   := false;
-      NearTeleport_tu:=nil;
+      NearTeleport_tu:= nil;
       if(IsUnitRange(uo_tar,@NearTeleport_tu))and(not aicode)then
         if (NearTeleport_tu^.player=player)
         and(NearTeleport_tu^.hits>0)
         and(NearTeleport_tu^.rld>0)
         and(NearTeleport_tu^.uid^.uid_ability_isteleport)then NearTeleport:=true;
 
-      ai_Local_InitVars(pu);
+      {ai_Local_InitVars(pu);
       if(aicode){or(isselected)}then
       begin
          ai_Global_InitVars(pu);
          ai_Global_CollectData(pu,pu,0,nil);
       end;
-      ai_Local_CollectData(pu,pu,0,nil);
+      ai_Local_CollectData(pu,pu,0,nil); }
 
       if(attack_target)then unit_target(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_prio);
 
@@ -875,8 +875,8 @@ begin
 
               if(attack_target)then unit_target(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_prio);
 
-              ai_Local_CollectData(pu,tu,udi,tu_transport);
-              if(aicode){or(isselected)}then ai_Global_CollectData(pu,tu,udi,tu_transport);
+              //ai_Local_CollectData(pu,tu,udi,tu_transport);
+              //if(aicode)then ai_Global_CollectData(pu,tu,udi,tu_transport);
 
               if(tu^.hits>0)and(tu_transport=nil)then
               begin
@@ -913,8 +913,8 @@ begin
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNewTarget:=0;
 
       {$IFNDEF DEBUG1}
-      ai_Local_Code(pu);
-      if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
+      {ai_Local_Code(pu);
+      if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);}
       {$ENDIF}
 
       if(buffs[ub_Damaged]>0)then GameLogUnitAttacked(pu);
@@ -2163,7 +2163,7 @@ begin
           then unit_Completing(pu)
           else
           begin
-             if(state=ps_AI)then ai_Global_ScoutPick(pu);
+             //if(state=ps_AI)then ai_Global_ScoutPick(pu);
 
              // unit&upgrades production
              unit_Production(pu);

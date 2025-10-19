@@ -1024,7 +1024,7 @@ begin
              PlayerExecuteOrder(p);
 
              if(state=ps_AI)
-             then ai_player_code(p)
+             then //ai_player_code(p)
              else
                if(log_EnergyCheckTime>0)
                then log_EnergyCheckTime-=1

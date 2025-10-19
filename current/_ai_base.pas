@@ -319,7 +319,7 @@ begin
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
-
+{
 procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);
 begin
    if(ud<ai_alarm_d)then
@@ -1106,5 +1106,5 @@ begin
         if(IsUnitRange(ai_scout_u_new,@tu))then
          if(pu^.speed>tu^.speed)then ai_scout_u_new:=pu^.unum;
 end;
-
+                   }
 

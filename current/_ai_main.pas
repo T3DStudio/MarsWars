@@ -1,4 +1,4 @@
-
+{
 function ai_isnoprod(pu:PTUnit):boolean;
 var i:integer;
 begin
@@ -1667,4 +1667,4 @@ begin
    UnitsInfoAddLine(x,y,ai_cpoint_x,ai_cpoint_y,c_aqua);
 end;  }
 
-
+     }

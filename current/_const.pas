@@ -737,7 +737,7 @@ BaseDamageLevel1       = 2;
 BaseArmorBonus1        = 7;
 BaseArmorLevel1        = 2;
 
-BaseRegen1             = BaseDamage1 div 10;
+BaseRegen1             = 5;
 
 UpgradeUnitArmorBonus  = BaseArmorBonus1;
 UpgradeBuildArmorBonus = BaseArmorBonus1*2+round(BaseArmorBonus1/2);

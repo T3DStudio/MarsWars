@@ -795,21 +795,21 @@ begin
 
    case i of
 UID_FPlasmagunner : begin
-                    uid_BaseSpeed:= 12;
-                    uid_class    := 5;
-                    uid_ZombieUID:= UID_ZFPlasmagunner;
-                    uid_ZombieHits:=uid_MaxHits1 div 8;
-                    uid_islight  := false;
-                    uid_req_uid1 := UID_UWeaponFactory;
-                    uid_req_uid2 := UID_UACommandCenter;
+                    uid_BaseSpeed := 12;
+                    uid_class     := 5;
+                    uid_ZombieUID := UID_ZFPlasmagunner;
+                    uid_ZombieHits:= uid_MaxHits1 div 10;
+                    uid_islight   := false;
+                    uid_req_uid1  := UID_UWeaponFactory;
+                    uid_req_uid2  := UID_UACommandCenter;
                     SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsq,MID_BPlasma,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,2,dm_AntiUnitMech2);
                     end;
 UID_ZFPlasmagunner: begin
-                    uid_BaseSpeed:= 14;
-                    uid_class    := 19;
-                    uid_PainC    := 1;
-                    uid_islight  := true;
-                    uid_req_uid2 := UID_HACommandCenter;
+                    uid_BaseSpeed := 14;
+                    uid_class     := 19;
+                    uid_PainC     := 1;
+                    uid_islight   := true;
+                    uid_req_uid2  := UID_HACommandCenter;
                     SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsq,MID_BPlasma,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,wtp_UnitMech,2,dm_AntiUnitMech2);
                     end;
    end;
@@ -1103,6 +1103,8 @@ begin
    uid_ismech          := true;
    uid_req_uid1        := UID_UWeaponFactory;
 end;
+// UAC Academy
+// Hell Energy Conductor
 
 // SPECIAL
 UID_URadar:
@@ -1115,12 +1117,14 @@ begin
    uid_ProdTimeSec     := ptime2;
    uid_LimitUse        := ul2;
    uid_ability         := uab_UACScan;
+   uid_ability1        := uab_UACScan;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isdetector      := true;
    uid_upgr_SightR     := upgr_uac_RadarR;
    uid_upgr_SightStep  := 25;
    uid_req_uid1        := UID_UWeaponFactory;
+   uid_nextForm        := i;
 end;
 UID_URMStation:
 begin
@@ -1133,51 +1137,61 @@ begin
    uid_req_uid1        := UID_UTechCenter;
    uid_req_uid2        := UID_UComputerStation;
    uid_ability         := uab_UACStrike;
+   uid_ability1        := uab_UACStrike;
    uid_isbuilding      := true;
    uid_ismech          := true;
+   uid_nextForm        := i;
 end;
 
 // STAT DEF
 UID_UGTurret:
 begin
-   uid_MaxHits1     := 6000;
-   uid_EnergyReq   := 250;
-   uid_r         := 15;
-   uid_BaseSightR    := 300;
-   uid_class       := 6;
+   uid_MaxHits1        := 6000;
+   uid_EnergyReq       := 250;
+   uid_r               := 15;
+   uid_BaseSightR      := 300;
+   uid_class           := 6;
    uid_ProdTimeSec     := ptime1;
-   uid_CanAttack    := true;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
-   uid_upgr_Armor:= upgr_uac_TurretArmor;
-   uid_islight   := true;
-   uid_ability      := uab_ToUACDron;
-   uid_ability_ReqUpgr:= upgr_uac_DronTurret;
+   uid_CanAttack       := true;
+   uid_isbuilding      := true;
+   uid_ismech          := true;
+   uid_upgr_Armor      := upgr_uac_TurretArmor;
+   uid_islight         := true;
+   uid_ability         := uab_ToUACDron;
+   uid_ability_ReqUpgr := upgr_uac_DronTurret;
+   uid_ability1        := uab_ToUATurret;
+   uid_ability2        := 0;
+   uid_ability3        := uab_ToUACDron;
+   //uid_rebuild_uid     := UID_UATurret;
+   uid_nextForm        := i;
    uid_upgr_SightR     := upgr_uac_TowerR;
-   uid_upgr_SightStep:= 25;
-   uid_rebuild_uid     := UID_UATurret;
+   uid_upgr_SightStep  := 25;
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_BPlasma ,0,upgr_uac_TurretPlasma,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground_mech,wpr_any,uids_all,[],0,-11,wtp_hits        ,2,dm_AntiUnitMech2  );
    SetWeapon(1,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_Chaingun,0,0                    ,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground     ,wpr_any,uids_all,[],0,-11,wtp_UnitBioLight,2,dm_AntiUnitBioLight2);
 end;
 UID_UATurret:
 begin
-   uid_MaxHits1     := 6000;
-   uid_EnergyReq   := 250;
-   uid_r         := 15;
-   uid_BaseSightR    := 300;
-   uid_class       := 7;
+   uid_MaxHits1        := 6000;
+   uid_EnergyReq       := 250;
+   uid_r               := 15;
+   uid_BaseSightR      := 300;
+   uid_class           := 7;
    uid_ProdTimeSec     := ptime1;
-   uid_CanAttack    := true;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
-   uid_islight   := true;
-   uid_upgr_Armor:= upgr_uac_TurretArmor;
-   uid_ability      := uab_ToUACDron;
-   uid_ability_ReqUpgr:= upgr_uac_DronTurret;
-   uid_rebuild_uid     := UID_UGTurret;
-   uid_upgr_SightR     :=upgr_uac_TowerR;
-   uid_upgr_SightStep:=25;
-   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,wtp_nolost_hits,0,dm_AntiFly2);
+   uid_CanAttack       := true;
+   uid_isbuilding      := true;
+   uid_ismech          := true;
+   uid_islight         := true;
+   uid_upgr_Armor      := upgr_uac_TurretArmor;
+   uid_ability         := uab_ToUACDron;
+   uid_ability_ReqUpgr := upgr_uac_DronTurret;
+   uid_ability1        := uab_ToUGTurret;
+   uid_ability2        := 0;
+   uid_ability3        := uab_ToUACDron;
+   //uid_rebuild_uid     := UID_UGTurret;
+   uid_nextForm        := i;
+   uid_upgr_SightR     := upgr_uac_TowerR;
+   uid_upgr_SightStep  := 25;
+   SetWeapon(0,wpt_missle,aw_fsr+25,0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,wtp_nolost_hits,0,dm_AntiFly2);
 end;
 
 // ????????
@@ -1205,41 +1219,43 @@ end;
 
 UID_UACDron:
 begin
-   uid_MaxHits1     := 2000;
-   uid_EnergyReq   := 400;
-   uid_r         := 14;
-   uid_BaseSpeed     := 15;
-   uid_BaseSightR    := 250;
-   uid_class       := 9;
+   uid_MaxHits1        := 2000;
+   uid_EnergyReq       := 400;
+   uid_r               := 14;
+   uid_BaseSpeed       := 15;
+   uid_BaseSightR      := 250;
+   uid_class           := 9;
    uid_ProdTimeSec     := ptime1;
-   uid_TransportSize:= 3;
-   uid_LimitUse  := ul2;
-   uid_CanAttack    := true;
-   uid_ismech    := true;
-   uid_islight   := true;
-   uid_ability   := uab_RebuildInPoint;
-   uid_rebuild_uid   :=UID_UGTurret;
-   uid_rebuild_rupgr :=upgr_uac_DronTurret;
-   uid_FastDeathHits:=1;
+   uid_TransportSize   := 3;
+   uid_LimitUse        := ul2;
+   uid_CanAttack       := true;
+   uid_ismech          := true;
+   uid_islight         := true;
+   uid_ability         := uab_RebuildInPoint;
+   uid_ability1        := uab_ToUGTurretTo;
+   uid_ability2        := uab_ToUATurretTo;
+   uid_rebuild_uid     := UID_UGTurret;
+   uid_rebuild_rupgr   := upgr_uac_DronTurret;
+   uid_FastDeathHits   := 1;
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsq,MID_BPlasma,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitMech,2,dm_AntiUnitMech2);
 end;
 UID_UTransport:
 begin
-   uid_MaxHits1     := 2000;
-   uid_EnergyReq   := 200;
-   uid_r         := 33;
-   uid_BaseSpeed     := 18;
-   uid_BaseSightR    := 200;
-   uid_class       := 10;
+   uid_MaxHits1        := 2000;
+   uid_EnergyReq       := 200;
+   uid_r               := 33;
+   uid_BaseSpeed       := 18;
+   uid_BaseSightR      := 200;
+   uid_class           := 10;
    uid_ProdTimeSec     := ptime1;
-   uid_TransportMax:= 8;
-   uid_TransportSize:= 8;
-   uid_isfly     := uf_fly;
-   uid_CanAttack    := false;
-   uid_ismech    := true;
-   uid_req_uid1     := UID_UACommandCenter;
-   uid_FastDeathHits:=1;
-   ups_TransportUIDs:=uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
+   uid_TransportMax    := 8;
+   uid_TransportSize   := 8;
+   uid_isfly           := uf_fly;
+   uid_CanAttack       := false;
+   uid_ismech          := true;
+   uid_req_uid1        := UID_UACommandCenter;
+   uid_FastDeathHits   := 1;
+   ups_TransportUIDs   := uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
 end;
 UID_Terminator:
 begin
@@ -1378,7 +1394,12 @@ end;
 
       uid_square:=round(pi*uid_r*uid_r);
 
-      if(uid_ability=0)and(uid_TransportMax>0)then uid_ability:=uab_Unload;
+      if(uid_ability=0)and(uid_TransportMax>0)then
+      begin
+         uid_ability :=uab_Unload;
+         uid_ability1:=uab_Unload;
+         uid_ability2:=uab_UnloadTo;
+      end;
 
       if(i in uids_hell)then uid_race:=r_hell;
       if(i in uids_uac )then uid_race:=r_uac;
@@ -1394,7 +1415,7 @@ end;
 
       uid_missileR:=trunc(uid_r/1.41);
       if(uid_MaxHits1<1)then uid_MaxHits1:=1;
-      uid_MaxHitsh := uid_MaxHits1 div 2; if(uid_MaxHitsh <1)then uid_MaxHitsh :=1;
+      uid_MaxHitsh:=uid_MaxHits1 div 2; if(uid_MaxHitsh<1)then uid_MaxHitsh:=1;
       uid_MaxHitsq:=uid_MaxHitsh div 2; if(uid_MaxHitsq<1)then uid_MaxHitsq:=1;
 
       if(uid_issmith)and(uid_prod_Upgrades=[])then

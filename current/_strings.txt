@@ -3,7 +3,7 @@ Hell Keep
 Hotkey: R
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 66
 Base vision range: 250
@@ -24,7 +24,7 @@ Great Hell Keep
 Hotkey: R
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 66
 Base vision range: 250
@@ -45,7 +45,7 @@ Demon`s Gate
 Hotkey: T
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 10000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 60
 Base vision range: 120
@@ -141,7 +141,7 @@ Infernal Pools
 Hotkey: H
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 10000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 53
 Base vision range: 106
@@ -183,7 +183,7 @@ Teleport
 Hotkey: K
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 5000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 4
 Size: 28
 Base vision range: 100
@@ -223,7 +223,7 @@ Monastery of Despair
 Hotkey: U
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 65
 Base vision range: 130
@@ -243,7 +243,7 @@ Pentagram of Death
 Hotkey: I
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 65
 Base vision range: 130
@@ -285,7 +285,7 @@ Altar of Pain
 Hotkey: L
 Categories/Attributes: [building,biological,heavy,ground]
 Max hits: 10000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 10
 Size: 50
 Base vision range: 100
@@ -305,7 +305,7 @@ Castle of Damned
 Hotkey: O
 Categories/Attributes: [building,mechanical,heavy,ground]
 Max hits: 15000
-Base regeneration: 4
+Base regeneration: 5
 Limit used: 1
 Size: 86
 Base vision range: 172
@@ -775,7 +775,7 @@ PainState base threshold: 1
 Places in transport: 1
 Requirements: Advanced Hell Command Center
 Arming/Abilities: 
-- heal/repair, max. range: 64, targets: [alive,biological], base impact 8*2;
+- heal/repair, max. range: 64, targets: [alive,biological], base impact 10*2;
 - ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -802,7 +802,7 @@ PainState base threshold: 1
 Places in transport: 1
 Requirements: Advanced Hell Command Center
 Arming/Abilities: 
-- heal/repair, max. range: 64, targets: [alive,mechanical], base impact 8*2;
+- heal/repair, max. range: 64, targets: [alive,mechanical], base impact 10*2;
 - ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
@@ -1249,7 +1249,7 @@ Upgrades:
 - Additional Armoring - armor +18;
 - Concrete Walls - armor +18;
 
-Base sight range: 300. Can be rebuilt into "Anti-air Turret". Immune to splash damage. Anti-ground defensive structure.
+Base sight range: 300. Immune to splash damage. Anti-ground defensive structure.
 
 ---------------------------
 
@@ -1265,13 +1265,13 @@ Build time: 20
 Energy required: 250
 
 Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,flying], base impact 48*3, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
+- ranged attack, max. range: sight range+25, targets: [alive,flying], base impact 48*3, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
 Upgrades:
 - Spotlights - vision range +25;
 - Additional Armoring - armor +18;
 - Concrete Walls - armor +18;
 
-Base sight range: 300. Can be rebuilt into "Anti-ground Turret". Immune to splash damage. Anti-air defensive structure.
+Base sight range: 300. Immune to splash damage. Anti-air defensive structure.
 
 ---------------------------
 
@@ -1329,7 +1329,7 @@ Zombie: Zombie Engineer
 Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
 Arming/Abilities: 
-- heal/repair, max. range: 64, targets: [alive,mechanical], base impact 8*2, upgrade: Advanced Tools(+4);
+- heal/repair, max. range: 64, targets: [alive,mechanical], base impact 10*2, upgrade: Advanced Tools(+5);
 - ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
@@ -1356,7 +1356,7 @@ Zombie: Zombie Medic
 Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
 Arming/Abilities: 
-- heal/repair, max. range: 64, targets: [alive,biological], base impact 8*2, upgrade: Advanced Tools(+4);
+- heal/repair, max. range: 64, targets: [alive,biological], base impact 10*2, upgrade: Advanced Tools(+5);
 - ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
@@ -1511,7 +1511,7 @@ Base vision range: 200
 Build time: 25
 Energy required: 250
 Zombie: Zombie Plasmaguner
-Zombification hits: 125
+Zombification hits: 100
 Requirements: Weapon Factory,Advanced Command Center
 Arming/Abilities: 
 bonus anti-fly range: +50
