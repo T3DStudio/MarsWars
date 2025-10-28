@@ -604,7 +604,6 @@ begin
 
    spr_uibtn_Delete            := gfx_ButtonLoad(folder_ui+'b_destroy'    ,ui_ButtonW1);
    spr_uibtn_Attack            := gfx_ButtonLoad(folder_ui+'b_attack'     ,ui_ButtonW1);
-   spr_uibtn_Rebuild           := gfx_ButtonLoad(folder_ui+'b_rebuild'    ,ui_ButtonW1);
    spr_uibtn_Move              := gfx_ButtonLoad(folder_ui+'b_move'       ,ui_ButtonW1);
    spr_uibtn_Patrol            := gfx_ButtonLoad(folder_ui+'b_patrol'     ,ui_ButtonW1);
    spr_uibtn_APatrol           := gfx_ButtonLoad(folder_ui+'b_apatrol'    ,ui_ButtonW1);
@@ -758,7 +757,7 @@ begin
    gfx_LoadMWSModel(@spr_HBarracks2         ,folder_RaceBuildings[r_hell]+'h_hbara'    ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HBarracks3         ,folder_RaceBuildings[r_hell]+'h_hbarb'    ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HBarracks4         ,folder_RaceBuildings[r_hell]+'h_hbarc'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HEyeNest           ,folder_RaceBuildings[r_hell]+'heyenest_'  ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HEye               ,folder_RaceBuildings[r_hell]+'heye_'      ,smt_buiding  );
 
    gfx_LoadMWSModel(@spr_UCommandCenter     ,folder_RaceBuildings[r_uac ] +'u_b0_'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UACommandCenter    ,folder_RaceBuildings[r_uac ] +'u_b0a_'    ,smt_buiding  );

@@ -287,13 +287,13 @@ begin
        if(uid_isbarrack    )then STRADD(@str_MakeUnitDefaultDescription,str_hint_barrack,sep_sdot);
        if(uid_issmith      )then STRADD(@str_MakeUnitDefaultDescription,str_hint_smith  ,sep_sdot);
        if(uid_EnergyGen  >0)then STRADD(@str_MakeUnitDefaultDescription,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_sdot);
-       if(uid_rebuild_uid>0)and(uid_ability<>uab_RebuildInPoint)then
+       {if(uid_rebuild_uid>0)and(uid_ability<>uab_RebuildInPoint)then
        begin
           STRADD(@str_MakeUnitDefaultDescription,
           str_hint_CanRebuildTo+
           str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,true)+
           AddReq(uid_rebuild_ruid,uid_rebuild_rupgr),sep_sdot );
-       end;
+       end; }
        //ua_str_name
        {if(uid_ability>0)then
        begin
@@ -570,22 +570,6 @@ begin
    if(length(str_hintUnitCost)>0)then str_hintUnitCost:='('+str_hintUnitCost+')';
 end;
 
-function str_MakeRebuildHint(uid:byte;IHK:shortstring=''):shortstring;
-var ITEMP:shortstring;
-begin
-   str_MakeRebuildHint:='';
-   with g_uids[uid] do
-     if(uid_rebuild_uid>0)then
-     begin
-        str_MakeRebuildHint:=str_RebuildName(uid_rebuild_uid,uid_rebuild_uid=uid,false);
-        ITEMP:=str_hintUnitCost(uid_rebuild_uid,@IHK);
-        if(length(ITEMP)>0)then str_MakeRebuildHint+=' '+ITEMP;
-
-        ITEMP:=AddReq(uid_rebuild_ruid,uid_rebuild_rupgr);
-        if(length(ITEMP)>0)then str_MakeRebuildHint:=str_MakeRebuildHint+tc_nl1+ITEMP;
-     end;
-end;
-
 procedure str_makeHints;
 var
 uid,arm: byte;
@@ -674,9 +658,9 @@ begin
      end;
 
    // unit rebuild hint
-   for uid:=0 to 255 do
+   {for uid:=0 to 255 do
      with g_uids[uid] do
-       uid_str_RebuildHint:=str_MakeRebuildHint(uid,input_actions[iAct_Control_Rebuild].ik_str_HK);
+       uid_str_RebuildHint:=str_MakeRebuildHint(uid,input_actions[iAct_Control_Rebuild].ik_str_HK); }
 end;
 
 function str_Center0(src:shortstring;l:byte):shortstring;
@@ -908,13 +892,15 @@ begin
    str_menu_chat                 := 'CHAT(ALL PLAYERS)';
    str_menu_Pause                := 'Pause';
 
+   str_YesNo[true ]              := tc_lime+'YES'+tc_default;
+   str_YesNo[false]              := tc_red +'NO' +tc_default;
+
    str_lobby_PlayerReady[false]  := ' is '+tc_red +'not ready';
    str_lobby_PlayerReady[true ]  := ' is '+tc_lime+'ready';
    str_lobby_AllPReady           := 'All players are ready!';
    str_lobby_GameStartIn         := 'Game starts in ';
 
-   str_menuMsg_Error             := '! ERROR !';
-   str_menuMsg_HintDefault       := '- press any key to close message -';
+   str_menuMsg_HintDefault       := '- press any key to close the message -';
    str_menuMsg_HintClient        := '- press any key to disconnect -';
 
    str_S_Game                    := 'GAME';
@@ -1057,6 +1043,7 @@ begin
    str_FileLoad                  := 'Load';
    str_FilePlay                  := 'Play';
    str_FileDelete                := 'Delete';
+   str_FileReWrite               := 'Rewrite';
 
    str_gstat_Win                 := 'VICTORY!';
    str_gstat_Lose                := 'DEFEAT!';
@@ -1072,7 +1059,7 @@ begin
    str_gmsg_PlayerDefeat         := ' was terminated!';
    str_gmsg_PlayerLeft           := ' left the game';
    str_gmsg_PlayerSurrender      := ' surrenders!';
-   str_gmsg_PortBlocked          := 'Port is blocked!';
+   str_gmsg_PortBlocked          := 'UDP Port is blocked!';
    str_gmsg_PlayerPaused         := 'player paused the game';
    str_gmsg_PlayerResumed        := 'player has resumed the game';
    str_gmsg_WrongVersion         := 'Wrong version!';
@@ -1244,9 +1231,9 @@ begin
    str_SetAbilityBaseHint(uab_UACCCLandTo   ,'Land/Take off to point'  ,'');
    str_SetAbilityBaseHint(uab_Unload        ,'Unload'                  ,'');
    str_SetAbilityBaseHint(uab_UnloadTo      ,'Unload to point'         ,'');
-   str_SetAbilityBaseHint(uab_ProdLvlUp     ,'Upgrade'                 ,'');
-   str_SetAbilityBaseHint(uab_UACProdLvlUp  ,'Upgrade'                 ,'');
-   str_SetAbilityBaseHint(uab_HellProdLvlUp ,'Upgrade'                 ,'');
+   str_SetAbilityBaseHint(uab_ToNextForm    ,'Transform to'            ,'');
+   str_SetAbilityBaseHint(uab_ToNextFormTUAC,'Transform to'            ,'');
+   str_SetAbilityBaseHint(uab_ToNextFormTHell,'Transform to'           ,'');
    str_SetAbilityBaseHint(uab_ToUACDron     ,'Transform to '           ,'');
    str_SetAbilityBaseHint(uab_ToUGTurret    ,'Transform to '           ,'');
    str_SetAbilityBaseHint(uab_ToUATurret    ,'Transform to '           ,'');
@@ -1254,7 +1241,6 @@ begin
    str_SetAbilityBaseHint(uab_ToHTower      ,'Transform to '           ,'');
    str_SetAbilityBaseHint(uab_ToUGTurretTo  ,'Transform to '           ,'');
    str_SetAbilityBaseHint(uab_ToUATurretTo  ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_RebuildInPoint,'Transform to '           ,'');
 
    str_SetUnitBaseHint(UID_HKeep          ,'Hell Keep'                   ,'');
    str_SetUnitBaseHint(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -1274,7 +1260,7 @@ begin
    str_SetUnitBaseHint(UID_HCommandCenter ,'Hell Command Center'         ,'Corrupted Command Center'         );
    str_SetUnitBaseHint(UID_HACommandCenter,'Advanced Hell Command Center','Corrupted Advanced Command Center');
    str_SetUnitBaseHint(UID_HBarracks      ,'Zombie Barracks'             ,'Corrupted Barracks'               );
-   str_SetUnitBaseHint(UID_HEye       ,'Evil Eye Nest'               ,'Detection structure.');
+   str_SetUnitBaseHint(UID_HEye           ,'Evil Eye'                    ,'Detection structure.');
 
    str_SetUnitBaseHint(UID_LostSoul       ,'Lost Soul'                   ,'');
    str_SetUnitBaseHint(UID_Phantom        ,'Phantom'                     ,'');
@@ -1602,7 +1588,6 @@ begin
   str_menu_Exit                 := '¬€’Œƒ';
   str_menu_Back                 := 'Õ¿«¿ƒ';
 
-  str_menuMsg_Error             := '! Œÿ»¡ ¿ !';
   str_menu_Pause                := 'œ‡ÛÁ‡';
 
   str_S_Game      := '»√–¿';

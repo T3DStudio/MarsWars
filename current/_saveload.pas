@@ -173,7 +173,7 @@ begin
 
    // other
    AddItem(@g_FixedPositions    ,SizeOf(g_FixedPositions   ));
-   AddItem(@g_gplayers           ,SizeOf(TPList             ));
+   AddItem(@g_gplayers          ,SizeOf(TPList             ));
    AddItem(@g_units             ,SizeOf(g_units            ));
    AddItem(@g_missiles          ,SizeOf(g_missiles         ));
    AddItem(@g_effects           ,SizeOf(g_effects          ));
@@ -206,21 +206,10 @@ begin
    saveload_Allowed:=true;
 end;
 
-function saveload_Save(check:boolean):boolean;
+procedure saveload_SaveWrite(fn:shortstring);
 var f:file;
-    i:integer;
 begin
-   saveload_Save:=false;
-
-   if(not G_Started)
-   or(not saveload_Allowed)
-   or(length(svld_str_fname)=0)then exit;
-
-   saveload_Save:=true;
-
-   if(check)then exit;
-
-   assign(f,folder_save+svld_str_fname+fileExt_save);
+   assign(f,fn);
    {$I-}
    rewrite(f,1);
    {$I+}
@@ -228,11 +217,10 @@ begin
 
    {$I-}
    if(svld_itemn>0)then
-    for i:=0 to svld_itemn-1 do
-     with svld_items[i] do
-      BlockWrite(f,data_p^,data_s);
+     for i:=0 to svld_itemn-1 do
+       with svld_items[i] do
+         BlockWrite(f,data_p^,data_s);
    {$I+}
-
    close(f);
 
    MenuBack(true,false);
@@ -240,6 +228,28 @@ begin
    saveload_MakeFolderList;
 
    GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameSaved);
+end;
+
+function saveload_Save(check:boolean):boolean;
+var i:integer;
+   fn:shortstring;
+begin
+   saveload_Save:=false;
+
+   if(not G_Started)
+   or(not saveload_Allowed)
+   or(length(svld_str_fname)=0)
+   or(menu_msg_type<>mmbt_none)then exit;
+
+   saveload_Save:=true;
+
+   if(check)then exit;
+
+   fn:=folder_save+svld_str_fname+fileExt_save;
+
+   if(FileExists(fn))
+   then menu_msgBox_Set(str_menu_SaveLoad+': '+str_FileReWrite,fn,mmbt_SaveRewrite)
+   else saveload_SaveWrite(fn);
 end;
 
 function saveload_Load(check:boolean):boolean;
@@ -251,7 +261,8 @@ begin
    saveload_Load:=false;
 
    if(not saveload_Allowed)
-   or(length(svld_str_fname)=0)then exit;
+   or(length(svld_str_fname)=0)
+   or(menu_msg_type<>mmbt_none)then exit;
 
    saveload_Load:=true;
 
@@ -321,26 +332,31 @@ begin
    end;
 end;
 
-function saveload_Delete(check:boolean):boolean;
-var fn:shortstring;
+procedure saveload_DeleteFile(fn:shortstring);
 begin
-   saveload_Delete:=false;
-
-   if(rpls_pstate<>rpls_none)
-   or(length(svld_str_fname)=0)then exit;
-
-   saveload_Delete:=true;
-
-   if(check)then exit;
-
-   fn:=folder_save+svld_str_fname+fileExt_save;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
+      if(svld_list_size>1)then
+        if(svld_list_sel=(svld_list_size-1))then svld_list_sel-=1;
       saveload_MakeFolderList;
    end;
 end;
 
+function saveload_DeleteInit(check:boolean):boolean;
+var fn:shortstring;
+begin
+   saveload_DeleteInit:=false;
 
+   if(rpls_pstate<>rpls_none)
+   or(length(svld_str_fname)=0)
+   or(menu_msg_type<>mmbt_none)then exit;
 
+   saveload_DeleteInit:=true;
+
+   if(check)then exit;
+
+   fn:=folder_save+svld_str_fname+fileExt_save;
+   menu_msgBox_Set(str_menu_SaveLoad+': '+str_FileDelete,fn,mmbt_DeleteSave);
+end;
 

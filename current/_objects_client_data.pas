@@ -503,7 +503,7 @@ begin
 end;
 UID_HEye:
 begin
-   setMWSModel(0,@spr_HEyeNest);
+   setMWSModel(0,@spr_HEye);
    setBuildingSND(snd_hell_eye);
    setEffectEID(0,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND(  nil,snd_exp,snd_exp,nil);
@@ -1009,13 +1009,9 @@ begin
    for a:=0 to 255 do
    with g_aids[a] do
    begin
-      ua_btn     :=spr_empty;
-      ua_mbrush_r:=0;
-      ua_str_UIDHint:=0;
-      {
-      ua_mbrush_r    : integer;
-      ua_mbrush_uid  : byte;
-      }
+      ua_btn       :=spr_empty;
+      ua_mbrush_r  :=0; // 0..*** - value, -255..-1 - r of UID, -256 - 'caster itself', '-257' - next form of caster
+      ua_str_UBrush:=false;
 
       case a of
 uab_Teleport       : ua_btn:=spr_uibtn_Upgrades[r_hell,8 ].surf;
@@ -1027,11 +1023,11 @@ uab_UACStrike      : begin
                      end;
 uab_UACCCLand      : begin
                      ua_btn:=spr_uibtn_AbilityCCLand;
-                     ua_mbrush_uid:=255;
+                     ua_mbrush_r:=uambt_self;
                      end;
 uab_UACCCLandTo    : begin
                      ua_btn:=spr_uibtn_AbilityCCLandTo;
-                     ua_mbrush_uid:=255;
+                     ua_mbrush_r:=uambt_self;
                      end;
 uab_HEyeVision     : ua_btn:=spr_uibtn_AbilityHVision;
 uab_HEyeBlink      : ua_btn:=spr_uibtn_AbilityBlink;
@@ -1049,58 +1045,39 @@ uab_SpawnLostTo    : ua_btn:=spr_uibtn_AbilitySpawnLostTo;
 uab_Unload         : ua_btn:=spr_uibtn_AbilityUnload;
 uab_UnloadTo       : ua_btn:=spr_uibtn_AbilityUnloadTo;
 
-uab_ToNextForm     : ;
-uab_ToNextFormTUAC : ;
-uab_ToNextFormTHell: ;
-
-uab_ProdLvlUp      : ua_btn:=spr_uibtn_AbilityLvlUp;
-uab_UACProdLvlUp   : ua_btn:=spr_uibtn_AbilityUACLvlUp;
-uab_HellProdLvlUp  : ua_btn:=spr_uibtn_AbilityHellLvlUp;
-
-uab_ToGreatHKeep   : begin
-                     ua_mbrush_uid :=UID_HAKeep;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+uab_ToNextForm     : begin
+                     ua_mbrush_r:=uambt_nform;
                      end;
-uab_ToAdvCC        : begin
-                     ua_mbrush_uid :=UID_UACommandCenter;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+uab_ToNextFormTUAC : begin
+                     ua_mbrush_r:=uambt_nform;
+                     end;
+uab_ToNextFormTHell: begin
+                     ua_mbrush_r:=uambt_nform;
                      end;
 
 uab_ToUACDron      : begin
-                     ua_mbrush_uid :=UID_UACDron;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=UID_UACDron;
                      end;
 uab_ToUGTurret     : begin
-                     ua_mbrush_uid :=UID_UGTurret;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=UID_UGTurret;
                      end;
 uab_ToUATurret     : begin
-                     ua_mbrush_uid :=UID_UATurret;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=UID_UATurret;
                      end;
 uab_ToHTotem       : begin
-                     ua_str_UIDHint:=UID_HTotem;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=UID_HTotem;
                      end;
 uab_ToHTower       : begin
-                     ua_str_UIDHint:=UID_HTower;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=UID_HTower;
                      end;
 
 uab_ToUGTurretTo   : begin
-                     ua_mbrush_uid :=UID_UGTurret;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=-UID_UGTurret;
+                     ua_str_UBrush:=true;
                      end;
 uab_ToUATurretTo   : begin
-                     ua_mbrush_uid :=UID_UATurret;
-                     ua_str_UIDHint:=ua_mbrush_uid;
-                     ua_btn:=g_uids[ua_str_UIDHint].uid_BTNBig.surf;
+                     ua_mbrush_r:=-UID_UATurret;
+                     ua_str_UBrush:=true;
                      end;
 
 

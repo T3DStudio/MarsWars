@@ -258,6 +258,8 @@ ui_fog_ey         : integer = 0;
 ui_language       : boolean = false;
 
 ui_CommandercPU   : PTUnit = nil;
+ui_CommandercD    : integer = 0;
+ui_CommandercW    : byte = 0;
 ui_CommanderpPU   : PTUnit = nil;
 ui_UnitSelectedNU : integer = 0;
 ui_UnitSelectedpU : integer = 0;
@@ -274,12 +276,14 @@ ui_mc_c           : cardinal;                            //
 
 ui_uprod_max,
 ui_uprod_cur,
-ui_uprod_first    : integer;
+ui_uprod_first,
+ui_pprod_max,
+ui_pprod_cur      : integer;
 ui_units_inapc,
 ui_uprod_uid_max,
 ui_uprod_uid_time,
-ui_pprod_max,
-ui_pprod_time     : array[byte] of integer;
+ui_pprod_upg_max,
+ui_pprod_upg_time     : array[byte] of integer;
 ui_pprod_first    : integer;
 ui_bprod_possible : TSoB;
 ui_bprod_uid_count,
@@ -292,21 +296,7 @@ ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_attack   : integer = 0;   // ui attack buttons
 ui_uibtn_apatrol  : integer = 0;   // ui apatrol button
-ui_uibtn_sabilityu: PTUnit  = nil; // ui self ability order unit
-ui_uibtn_sabilityd: integer = integer.MaxValue;
-ui_uibtn_sabilitys: boolean = false;
-ui_uibtn_pabilityu: PTUnit  = nil; // ui point ability order unit
-ui_uibtn_pabilityd: integer = integer.MaxValue;
-ui_uibtn_pabilitys: boolean = false;
 
-ui_uibtn_abilityu : PTUnit  = nil; // ui ability1 order unit
-ui_uibtn_abilityd : integer = integer.MaxValue;
-ui_uibtn_abilitys : boolean = false;
-
-
-ui_uibtn_rebuildu : PTUnit  = nil; // ui rebuild button
-ui_uibtn_rebuildd : integer = integer.MaxValue;
-ui_uibtn_rebuilds : boolean = false;
 ui_DrawEdges      : boolean = false;
 ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
@@ -323,7 +313,7 @@ ui_groupX         : integer = 0;  // order icons screen X
 ui_groupY         : integer = 0;  // order icons screen Y
 
 ui_UIPortXC       : integer = 0;
-ui_PovPlayerY      : integer = 0;
+ui_PovPlayerY     : integer = 0;
 ui_timerX         : integer = 0;
 ui_timerY         : integer = 0;
 ui_MouseHintX     : integer = 0;
@@ -386,9 +376,9 @@ menu_items        : array[byte] of TMenuItem;
 menu_update       : boolean = true;
 menu_redraw       : boolean = true;
 menu_redraw_pause : integer = 0;
-menu_msg_Net      : TMenuMessage;
-menu_msg_DelFile  : TMenuMessage;
-menu_msg_Box      : TMenuMessage;
+menu_msg_type     : TMenuMessageBoxType;
+menu_msg_Caption,
+menu_msg_Body     : shortstring;
 
 menu_ResolutionWi,
 menu_ResolutionHi : integer;
@@ -731,7 +721,7 @@ spr_HBarracks1,
 spr_HBarracks2,
 spr_HBarracks3,
 spr_HBarracks4,
-spr_HEyeNest,
+spr_HEye,
 
 spr_UCommandCenter,
 spr_UACommandCenter,
@@ -850,7 +840,6 @@ spr_uibtn_AbilityLvlUp,
 spr_uibtn_AbilityUACLvlUp,
 spr_uibtn_AbilityHellLvlUp,
 spr_uibtn_Attack,
-spr_uibtn_Rebuild,
 spr_uibtn_Move,
 spr_uibtn_Patrol,
 spr_uibtn_APatrol,
@@ -920,7 +909,6 @@ str_menu_Back,
 str_menu_Pause,
 str_menu_chat,
 
-str_menuMsg_Error,
 str_menuMsg_HintDefault,
 str_menuMsg_HintClient,
 
@@ -968,6 +956,7 @@ str_FileInfo,
 str_FileSave,
 str_FileLoad,
 str_FileDelete,
+str_FileReWrite,
 
 str_FileError_NExists,
 str_FileError_Open,
@@ -1172,6 +1161,7 @@ str_camp_map             : array[0..LastMission] of shortstring;
 str_camp_infol           : array[0..LastMission] of TStringList;
 str_camp_infon           : array[0..LastMission] of integer;
 
+str_YesNo,
 str_SG_LanguageL,
 str_SG_RightClickActL    : array[false..true] of shortstring;
 

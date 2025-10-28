@@ -166,6 +166,13 @@ begin
    end;
 end;
 
+procedure effect_ScanSound(pCaster:PTUnit);
+begin
+   if(UIPlayer<=LastPlayer)then
+     if(pCaster^.player^.team<>g_gplayers[UIPlayer].team)then exit;
+   SoundPlayUnit(snd_radar,nil,nil);
+end;
+
 {$ENDIF}
 
 function unit_canMove(pu:PTUnit):boolean;
@@ -301,16 +308,18 @@ begin
      end;
 end;
 
-procedure unit_clear_order(pu:PTUnit;clearid:boolean);
+procedure unit_OrderClear(pu:PTUnit;clearid:boolean);
 begin
    with pu^ do
    begin
-      if(clearid)
-      then uo_id :=ua_amove;
+      if(clearid)then
+      uo_id :=ua_amove;
+
       uo_tar:=0;
       uo_x  :=x;
       uo_y  :=y;
       uo_bx :=-1;
+      uo_by :=-1;
    end;
 end;
 procedure unit_clear_tar(tar:integer);
@@ -320,7 +329,7 @@ begin
      with g_punits[u]^ do
        if(uo_tar=tar)then uo_tar:=0;
 end;
-procedure missiles_clear_tar(u:integer;ResetTarget:boolean);
+procedure missiles_clear_tar(u:integer;stop:boolean);
 var i:integer;
 begin
    for i:=0 to MaxUnits do
@@ -328,7 +337,7 @@ begin
        if(m_vstep>0)and(m_tar=u)then
        begin
           m_tar:=0;
-          if(ResetTarget)then
+          if(stop)then
           begin
              m_x:=m_vx;
              m_y:=m_vy;
@@ -343,7 +352,7 @@ begin
      with player^ do rld:=integer(round(fr_fps1*limit/MinUnitLimit))*(hteleport_rldPerLimit-mm3i(0,upgrs_cur[upgr_hell_TeleportCD],hteleport_rldPerLimit));
 end;
 
-procedure unit_teleport(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
+procedure unit_Teleport2Point(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
 begin
    with pu^ do
    begin
@@ -354,7 +363,7 @@ begin
       {$ENDIF}
       buffs[ub_Teleport]:=fr_fps1;
       unit_SetXY(pu,tx,ty,mvxy_strict);
-      unit_clear_order(pu,false);
+      unit_OrderClear(pu,false);
       unit_clear_tar(unum);
       missiles_clear_tar(unum,false);
       unit_UpdateVision(pu);
@@ -379,13 +388,13 @@ begin
    if(ServerSide)then unit_zfall(pu);
    with pu^ do
      if(vx<>x)or(vy<>y)then
-       if(IsUnitRange(transportU,nil))then
+       {if(IsUnitRange(transportU,nil))then
        begin
           vstp:=0;
           vx  :=x;
           vy  :=y;
        end
-       else
+       else }
        begin
           if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
           if(vstp<=0)then vstp:=UnitStepTicks;
@@ -395,29 +404,23 @@ begin
        end;
 end;
 
-function unit_ability_UACScan(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
+function unit_ability_UACScan(pRadar:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
    unit_ability_UACScan:=ureq_other;
-   with pu^ do
-     if(iscomplete)and(rld<=0)then
+   with pRadar^ do
+     if(iscomplete)and(rld<=0)and(buffs[ub_Cast]<=0)and(uid^.uid_ability_isradar)then
      begin
         unit_ability_UACScan:=0;
 
         if(check)then exit;
 
-        unit_clear_order(pu,true);
-        uo_x:=x0;
-        uo_y:=y0;
-        rld :=radar_reload;
-        buffs[ub_Cast]:=fr_fps1;
+        rpoint_x      :=x0;
+        rpoint_y      :=y0;
+        rpoint_tar    :=0;
+        buffs[ub_Cast]:=detection_time;
 
         {$IFDEF _FULLGAME}
-        if(ServerSide)then
-        begin
-           if(UIPlayer<=LastPlayer)then
-             if(player^.team<>g_gplayers[UIPlayer].team)then exit;
-          SoundPlayUnit(snd_radar,nil,nil);
-        end;
+        effect_ScanSound(pRadar);
         {$ENDIF}
      end;
 end;
@@ -482,7 +485,7 @@ begin
        begin
           unit_ability_UACStrike:=0;
           if(check)then exit;
-          unit_clear_order(pu,true);
+          unit_OrderClear(pu,true);
           uo_x:=x0;
           uo_y:=y0;
           for p:=0 to LastPlayer do AddToInt(@TeamVision[p],fr_fps2);
@@ -633,13 +636,13 @@ begin
     with g_units[u] do
      with uid^ do
       if(hits>0)and(unum<>ignore_unum)and(iscomplete)then
-       if(not IsUnitRange(transportU,nil))then
-        if(uo_id=ua_psability)then
+       if(not IsUnitRange(transportU,nil))then ;
+        {if(uo_id=ua_psability)then  // -255..-1
         begin
            if(UnitObsTeamVis<=LastPlayer)then
              if(TeamVision[UnitObsTeamVis]<=0)then continue;
 
-           case uid_ability of
+           {case uid_ability of
      uab_RebuildInPoint: begin
                          o:=tr+g_uids[uid_rebuild_uid].uid_r;
                          d:=point_dist_int(uo_x,uo_y,tx,ty);
@@ -650,8 +653,8 @@ begin
                          d:=point_dist_int(uo_x,uo_y+fly_hz,tx,ty);
                          add(uo_x,uo_y+fly_hz,d-o,o);
                          end;
-           end;
-        end;
+           end;}
+        end; }
 
    if(nrd[1]<=-1)
    then math_2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
@@ -870,7 +873,7 @@ begin
    if(i>0)then CheckBuildPlace:=1;
 end;
 
-function unit_ability_SpecReload(pu:PTUnit;ability:byte;newReload:integer):integer;
+{function unit_ability_SpecReload(pu:PTUnit;ability:byte;newReload:integer):integer;
 var u:integer;
 begin
    unit_ability_SpecReload:=0;
@@ -882,7 +885,7 @@ begin
          else
            if(rld>0)
            then unit_ability_SpecReload:=max2i(rld,unit_ability_SpecReload);
-end;
+end;}
 
 function unit_ability_HKeepBlink(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
@@ -894,7 +897,7 @@ begin
       if(hits<=0)
       or(not iscomplete)then exit;
 
-      rld:=max2i(unit_ability_SpecReload(pu,uid_ability,-1),rld);
+      //rld:=max2i(unit_ability_SpecReload(pu,uid_ability,-1),rld);
       unit_ability_HKeepBlink:=ureq_reloading;
       if(buffs[ub_CCast]>0)
       or(rld>0)then exit;
@@ -914,11 +917,11 @@ begin
       end;
 
       buffs[ub_CCast]:=fr_fps1;
-      unit_ability_SpecReload(pu,uid_ability,hkeep_reload);
+      //unit_ability_SpecReload(pu,uid_ability,hkeep_reload);
 
       case uidi of
-      UID_HKeep : unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_cube{$ENDIF});   // нет эффекта когда телепортируемся в неразведанную область
-      UID_HAKeep: unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_cube{$ENDIF});
+      UID_HKeep : unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_cube{$ENDIF});   // нет эффекта когда телепортируемся в неразведанную область
+      UID_HAKeep: unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_cube{$ENDIF});
       end;
    end;
 end;
@@ -958,7 +961,7 @@ begin
 
       rld:=hblink_reload;
       buffs[ub_CCast]:=fr_fpsh;
-      unit_teleport(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
+      unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
    end;
 end;
 
@@ -1622,7 +1625,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      if(not _uid_player_limit(player,auid))
+      if(not player_UIDLimitCheck(player,auid))
       then LastCreatedUnit:=0
       else
         if(not ServerSide)
@@ -1723,9 +1726,9 @@ begin
       if(uDetector^.player^.isobserver)
       then td:=0
       else
-        if(uDetector^.uid^.uid_ability_isradar)and(uDetector^.rld>radar_vision_time)then
+        if(uDetector^.uid^.uid_ability_isradar)and(uDetector^.buffs[ub_Cast]>0)then
         begin
-           td:=point_dist_int(x,y,uDetector^.uo_x,uDetector^.uo_y);
+           td:=point_dist_int(x,y,uDetector^.rpoint_x,uDetector^.rpoint_y);
            if(td<ud)
            then scan_buff:=ub_Scaned
            else td:=ud;
@@ -1794,8 +1797,8 @@ begin
 
         with uid^ do
         begin
-           if(uid_isbuilding)and(buildcd)then
-             if(uid_ability<>uab_HEyeVision)or(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+           if(uid_isbuilding)and(buildcd)then   //
+             if{(uid_ability<>uab_HEyeVision)or}(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
            zfall:=uid_zfall;
         end;
 
@@ -1858,7 +1861,7 @@ begin
                 missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);
               if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
                 for i:=1 to uid_DeathUIDn do
-                  if(_uid_player_limit(player,uid_DeathUID))then
+                  if(player_UIDLimitCheck(player,uid_DeathUID))then
                     unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0);
            end;
         end;

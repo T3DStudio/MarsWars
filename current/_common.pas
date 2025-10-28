@@ -8,9 +8,9 @@ procedure unit_damage(pu:PTUnit;damage:integer;pl:byte;IgnoreArmor:boolean);forw
 procedure unit_Bonuses (pu:PTUnit);forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-function unit_sability (pCaster:PTUnit;check:boolean):cardinal; forward;
+{function unit_sability (pCaster:PTUnit;check:boolean):cardinal; forward;
 function unit_pability (pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
-function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;
+function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;      }
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
 
 {procedure ai_Local_InitVars(pu:PTUnit);forward;
@@ -45,7 +45,7 @@ function gfx_ShadowColor(c:cardinal):cardinal;forward;
 function GamePauseToggle(check:boolean):boolean;forward;
 function GameNetServerSearch(start,check:boolean):boolean;forward;
 
-procedure menu_msgBox_Net(caption,body,btn1:shortstring;time:integer=fr_fps4);forward;
+procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);forward;
 function menu_MouseXY2Item:byte; forward;
 function menu_ReadyButtonEnabled:boolean;forward;
 function PlayerNameChangeble  :boolean;forward;
@@ -60,10 +60,10 @@ function PlayerTeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolea
 
 function saveload_Save  (check:boolean):boolean;forward;
 function saveload_Load  (check:boolean):boolean;forward;
-function saveload_Delete(check:boolean):boolean;forward;
+function saveload_DeleteInit(check:boolean):boolean;forward;
 
 procedure replay_SavePlayPosition; forward;
-function replay_Delete(check:boolean):boolean;forward;
+function replay_DeleteInit(check:boolean):boolean;forward;
 function replay_Play  (check:boolean):boolean;forward;
 function replay_Pause (check:boolean):boolean;forward;
 function replay_IsPaused:boolean;  forward;
@@ -1024,13 +1024,13 @@ end;
 //   UID/UPID Checks
 //
 
-function _uid_player_limit(player:PTPlayerGameData;uid:byte):boolean;
+function player_UIDLimitCheck(player:PTPlayerGameData;uid:byte):boolean;
 begin
    with player^ do
      with g_uids[uid] do
        if(uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders)
-       then _uid_player_limit:=false
-       else _uid_player_limit:=((units_uid_e[uid]+prod_unit_uid[uid])<units_uid_m[uid])
+       then player_UIDLimitCheck:=false
+       else player_UIDLimitCheck:=((units_uid_e[uid]+prod_unit_uid[uid])<units_uid_m[uid])
                             and((units_all_e+prod_unit_Now)<MaxPlayerUnits)
                             and((armylimit+prod_unit_Limit+uid_LimitUse)<=MaxPlayerLimit);
 end;
@@ -1205,9 +1205,7 @@ begin
       if(speed          <=0)then exit;
       if(uid_isbuilding    )then exit;
       if(not uid_CanAttack )then exit;
-      if(uo_id=ua_psability)
-      or(uo_id=ua_sability )
-      or(uo_id=ua_ability1 )
+      if(uo_id=ua_ability1 )
       or(uo_id=ua_ability2 )
       or(uo_id=ua_ability3 )
       or(uo_id=ua_hold     )
@@ -1305,14 +1303,24 @@ begin
    with pu^ do
    with player^ do
    ui_ReadyForAbility:=(units_all_s=1)or
-                       ((uo_id<>ua_psability)
-                     and(uo_id<>ua_sability )
-                     and(uo_id<>ua_ability1 )
-                     and(uo_id<>ua_ability2 )
-                     and(uo_id<>ua_ability3 ));
+                       ((uo_id<>ua_ability1)
+                     and(uo_id<>ua_ability2)
+                     and(uo_id<>ua_ability3));
 end;
 
-function ui_HaveAbility(pu:PTUnit;pability:boolean):boolean;
+function unit_GetCastingAbility(pu:PTUnit):byte;
+begin
+   unit_GetCastingAbility:=0;
+   with pu^ do
+   with uid^ do
+     case uo_id of
+     ua_ability1: unit_GetCastingAbility:=uid_ability1;
+     ua_ability2: unit_GetCastingAbility:=uid_ability2;
+     ua_ability3: unit_GetCastingAbility:=uid_ability3;
+     end;
+end;
+
+{function ui_HaveAbility(pu:PTUnit;pability:boolean):boolean;
 begin
    ui_HaveAbility:=false;
 
@@ -1355,7 +1363,7 @@ begin
    end;
 
    ui_HaveRebuild:=true;
-end;
+end;   }
 
 {$IFDEF _FULLGAME}
 
@@ -1762,8 +1770,7 @@ begin
     with uid^ do
      ui_UnitNeedDrawRange:=(uid_CanAttack)
                          or(uid_isbuilder and not ukfly)
-                         or(uid_ability=uab_UACScan)
-                         or(uid_ability=uab_HEyeVision);
+                         or(uid_isdetector);
 end;
 
 function ui_MouseBrushNeedDrawEdges:boolean;
@@ -1771,15 +1778,59 @@ begin
    ui_MouseBrushNeedDrawEdges:=true;
    case m_brush of
    1..255     : exit;
-   co_pability: if(ui_uibtn_pabilityu<>nil)then
+   -255..-1   : ;
+
+
+   {co_pability: if(ui_uibtn_pabilityu<>nil)then
                   case ui_uibtn_pabilityu^.uid^.uid_ability of
                   uab_HTowerBlink,
                   uab_HKeepShift,
                   uab_RebuildInPoint,
                   uab_UACCCLand         : exit;
-                  end;
+                  end; }
    end;
    ui_MouseBrushNeedDrawEdges:=false;
+end;
+
+function ui_AbilityGetBrushR(pCaster:PTUnit;aid:byte):integer;
+begin
+   ui_AbilityGetBrushR:=0;
+   with g_aids[aid] do
+     case ua_mbrush_r of
+     -255..-1   : ui_AbilityGetBrushR:=g_uids[-ua_mbrush_r].uid_r;
+     uambt_nform: with pCaster^.uid^ do
+                    if(uid_nextForm>0)then
+                      ui_AbilityGetBrushR:=g_uids[uid_nextForm].uid_r;
+     uambt_self : ui_AbilityGetBrushR:=pCaster^.uid^.uid_r;
+     else         ui_AbilityGetBrushR:=ua_mbrush_r;
+     end;
+end;
+function ui_AbilityGetBrushSpr(pCaster:PTUnit;aid:byte):pTMWTexture;
+begin
+   ui_AbilityGetBrushSpr:=pspr_dummy;
+   with g_aids[aid] do
+     case ua_mbrush_r of
+     -255..-1   : ui_AbilityGetBrushSpr:=uid2spr(-ua_mbrush_r,270,0);
+     uambt_nform: with pCaster^.uid^ do
+                    if(uid_nextForm>0)then
+                      ui_AbilityGetBrushSpr:=uid2spr(-uid_nextForm,270,0);
+     uambt_self : ui_AbilityGetBrushSpr:=uid2spr(pCaster^.uidi,270,0);
+     end;
+end;
+function ui_AbilityGetBTN(pCaster:PTUnit;aid:byte):pSDL_Surface;
+begin
+   with g_aids[aid] do
+   begin
+      ui_AbilityGetBTN:=ua_BTN;
+      case ua_mbrush_r of
+      -255..-1   : ui_AbilityGetBTN:=g_uids[-ua_mbrush_r].uid_BTNBig.surf;
+      uambt_nform: with pCaster^.uid^ do
+                     if(uid_nextForm>0)then
+                       ui_AbilityGetBTN:=g_uids[uid_nextForm].uid_BTNBig.surf;
+      uambt_self : ui_AbilityGetBTN:=pCaster^.uid^.uid_BTNBig.surf;
+      else
+      end;
+   end;
 end;
 
 function ui_fog_CheckXY(x,y:integer):boolean;

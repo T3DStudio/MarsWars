@@ -630,26 +630,15 @@ begin
    replay_Play:=true;
    if(check)then exit;
 
-   MenuBack(true,false);
-
    g_type     :=gt_scirmish;
    rpls_pstate:=rpls_read;
    g_started  :=true;
+
+   MenuBack(true,false);
 end;
 
-function replay_Delete(check:boolean):boolean;
-var fn:shortstring;
+procedure replay_DeleteFile(fn:shortstring);
 begin
-   replay_Delete:=false;
-
-   if(g_started)
-   or(rpls_list_sel<0)
-   or(rpls_list_sel>=rpls_list_size)then exit;
-
-   replay_Delete:=true;
-   if(check)then exit;
-
-   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
@@ -657,6 +646,23 @@ begin
         if(rpls_list_sel=(rpls_list_size-1))then rpls_list_sel-=1;
       replay_MakeFolderList;
    end;
+end;
+
+function replay_DeleteInit(check:boolean):boolean;
+var fn:shortstring;
+begin
+   replay_DeleteInit:=false;
+
+   if(g_started)
+   or(rpls_list_sel<0)
+   or(rpls_list_sel>=rpls_list_size)
+   or(menu_msg_type<>mmbt_none)then exit;
+
+   replay_DeleteInit:=true;
+   if(check)then exit;
+
+   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
+   menu_msgBox_Set(str_menu_Replays+': '+str_FileDelete,fn,mmbt_DeleteReplay);
 end;
 
 function replay_IsPaused:boolean;

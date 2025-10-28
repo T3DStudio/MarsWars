@@ -74,6 +74,9 @@ begin
 end;
 procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
+   if(aspr=nil)
+   or(aspr=pspr_dummy)then exit;
+
    slatemp:=SpriteListAdd;
    if(slatemp<>nil)then
      with slatemp^ do

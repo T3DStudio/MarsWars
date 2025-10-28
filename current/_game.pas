@@ -884,20 +884,14 @@ begin
                  if(isselected)and(o_id=uo_corder)then
                    case o_x0 of
                    // TO ONE
-                   co_ability,
-                   co_sability,
-                   co_pability : if(uid_ability =o_a0)
-                                 or(uid_ability1=o_a0)
+                   co_ability  : if(uid_ability1=o_a0)
                                  or(uid_ability2=o_a0)
                                  or(uid_ability3=o_a0)then
-                                   if(ui_ReadyForAbility(pu))then
-                                     case o_x0 of
+                                   if(ui_ReadyForAbility(pu))then  ;
+                                     {case o_x0 of
                                      co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
                                      co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
-                                     end;
-                   co_rebuild  : if(uid_rebuild_uid=o_a0)then
-                                   UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_rebuild(pu,true)=0,true ,true );
-
+                                     end;}
                    // TO ALL
                    co_destroy  : unit_kill(pu,false,false,true,false,true);
                    co_rcamove,
@@ -936,9 +930,9 @@ begin
                          if(GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y))then
                             GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
 
-               co_sability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_sability        (tar_u               ,false),x,y);
+               {co_sability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_sability        (tar_u               ,false),x,y);
                co_pability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_pability        (tar_u,o_y0,o_x1,o_y1,false),x,y);
-               co_rebuild : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_rebuild         (tar_u               ,false),x,y);
+               co_rebuild : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_rebuild         (tar_u               ,false),x,y); }
                end
            else
              case o_x0 of
@@ -947,9 +941,9 @@ begin
              co_sunit,
              co_cunit    : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
              co_pcancle  : GameLogBits2Message(tPlayer,0   ,255             ,ureq_other   ,-1,-1);
-             co_sability,
+             {co_sability,
              co_pability : GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,ureq_other   ,-1,-1);
-             co_rebuild  : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_other   ,-1,-1);
+             co_rebuild  : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_other   ,-1,-1); }
              end;
 
       end;

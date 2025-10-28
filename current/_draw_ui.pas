@@ -133,7 +133,7 @@ begin
 
                    DrawNoBuildAreas(uid_r);
                 end;
-   co_pability: if(ui_uibtn_pabilityu<>nil)then
+   {co_pability: if(ui_uibtn_pabilityu<>nil)then
                   with ui_uibtn_pabilityu^.uid^ do
                     case uid_ability of
                     uab_UACStrike     : circleColor(tar,mouse_x,mouse_y,blizzard_sr               ,c_gray);
@@ -158,7 +158,7 @@ begin
                                         circleColor(tar,m_brushx,m_brushy,uid_r,c_gray);
                                         DrawNoBuildAreas(uid_r);
                                         end;
-                   end;
+                   end; }
    end;
 
    m_brushx+=ui_cam_x;
@@ -304,13 +304,13 @@ by0+=font_wh;if(i1>0)then draw_text(tar,bx0+font_wh            ,by0            ,
    end;
 end;
 
-function GetRebuildIco(pu:PTUnit):pSDL_Surface;
+{function GetRebuildIco(pu:PTUnit):pSDL_Surface;
 begin
    GetRebuildIco:=spr_uibtn_Rebuild;
    if(pu<>nil)then
      if(pu^.uid^.uid_rebuild_uid>0)then
        GetRebuildIco:=g_uids[pu^.uid^.uid_rebuild_uid].uid_BTNBig.surf;
-end;
+end; }
 
 function ui_PanelBTNUnit(POVPlayer:PTPlayerGameData;uid:byte):boolean;
 begin
@@ -340,7 +340,6 @@ var
 ucl,p,
 uid,
 ux,uy:integer;
-
 begin
    draw_sdlsurface(tar,0,0,ui_UIPanelTemplate);
 
@@ -376,21 +375,21 @@ drawButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                            tab_buildings: with g_uids[uid] do
                                           begin
                                              drawButtonS(tar,ux,uy,uid_BTNBig.surf,m_brush=uid,not iActEnabled(iAct_SProd1+ucl));
-                                             drawButtonT(tar,ux,uy,                                                                                                 //>=units_uid_m[uid]
+                                             drawButtonT(tar,ux,uy,
                                              i2s(ui_bprod_ucl_time[uid_class]),i2s(ui_bprod_ucl_count[ucl]),i2s(units_ucl_s[true,ucl]),i2s(units_ucl_e[true,ucl])                            ,ir2s(ui_bucl_reload[ucl]),
-                                             ui_cenergy[energyl_cur<0]        ,c_dyellow                   ,c_lime                    ,ui_max_color[not _uid_player_limit(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
+                                             ui_cenergy[energyl_cur<0]        ,c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
                                           end;
                            tab_units    : with g_uids[uid] do
                                           begin
                                              drawButtonS(tar,ux,uy,uid_BTNBig.surf,false,not iActEnabled(iAct_SProd1+ucl));
-                                             drawButtonT(tar,ux,uy,                                                               //units_uid_e[uid]>=units_uid_m[uid]
-                                             ir2s(ui_uprod_uid_time[uid]),i2s(prod_unit_uid[uid]),i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                          ,i2s(ui_units_inapc[uid]),
-                                             ui_cenergy[energyl_cur<0]   ,c_dyellow              ,c_lime               ,ui_max_color[not _uid_player_limit(PVisPlayer,uid)],c_purple,'');
+                                             drawButtonT(tar,ux,uy,
+                                             ir2s(ui_uprod_uid_time[uid]),i2s(prod_unit_uid[uid]),i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
+                                             ui_cenergy[energyl_cur<0]   ,c_dyellow              ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
                                           end;
                            tab_upgrades : begin
-                                             drawButtonS(tar,ux,uy,g_upids[uid].upgr_btn.surf,ui_pprod_time[uid]>0,not iActEnabled(iAct_SProd1+ucl));
+                                             drawButtonS(tar,ux,uy,g_upids[uid].upgr_btn.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(iAct_SProd1+ucl));
                                              drawButtonT(tar,ux,uy,
-                                             ir2s(ui_pprod_time[uid]),i2s(prod_upgr_upid[uid]),'',b2s(upgrs_cur[uid])                                 ,'',
+                                             ir2s(ui_pprod_upg_time[uid]),i2s(prod_upgr_upid[uid]),'',b2s(upgrs_cur[uid])                                 ,'',
                                              ui_cenergy[energyl_cur<0]   ,c_dyellow        ,0 ,ui_max_color[upgrs_cur[uid]>=g_upids[uid].upgr_max] ,0 ,'');
                                           end;
                            end;
@@ -404,22 +403,23 @@ drawButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                      uid:=ui_panel_CTabIActs[ui_ControlTabType,ucl];
                      if(iActOn(uid))then
                        case uid of
-                       iAct_Control_UAbility1 : if(ui_uibtn_sabilityu<>nil)then
+                       iAct_Control_UAbility1,
+                       iAct_Control_UAbility2,
+                       iAct_Control_UAbility3 : if(ui_CommandercPU<>nil)then
                                                 begin
-                                                drawButtonS(tar,ux,uy,g_aids[ui_uibtn_sabilityu^.uid^.uid_ability].ua_btn,false,not iActEnabled(uid));
-                                                if(ui_uibtn_sabilityu^.rld>0)then
-                                                drawButtonT(tar,ux,uy,'','','','',ir2s(ui_uibtn_sabilityu^.rld),0 ,0 ,0 ,0 ,c_aqua,'');
+                                                   p:=0;
+                                                   case uid of
+                                                   iAct_Control_UAbility1: p:=ui_CommandercPU^.uid^.uid_ability1;
+                                                   iAct_Control_UAbility2: p:=ui_CommandercPU^.uid^.uid_ability2;
+                                                   iAct_Control_UAbility3: p:=ui_CommandercPU^.uid^.uid_ability3;
+                                                   end;
+                                                   if(p>0)then
+                                                   begin
+                                                      drawButtonS(tar,ux,uy,ui_AbilityGetBTN(ui_CommandercPU,p),-m_brush=p,not iActEnabled(uid));
+                                                      drawButtonT(tar,ux,uy,'','','','',ir2s(ui_CommandercPU^.rld),
+                                                                            0 ,0 ,0 ,0 ,c_aqua                    ,'');
+                                                   end;
                                                 end;
-                       iAct_Control_UAbility2 : if(ui_uibtn_pabilityu<>nil)then
-                                                begin
-                                                if(ui_uibtn_pabilityu^.uid^.uid_ability=uab_RebuildInPoint)
-                                                then drawButtonS(tar,ux,uy,GetRebuildIco(ui_uibtn_pabilityu)                  ,false,not iActEnabled(uid))
-                                                else drawButtonS(tar,ux,uy,g_aids[ui_uibtn_pabilityu^.uid^.uid_ability].ua_btn,false,not iActEnabled(uid));
-                                                if(ui_uibtn_pabilityu^.rld>0)then
-                                                drawButtonT(tar,ux,uy,'','','','',ir2s(ui_uibtn_pabilityu^.rld),0 ,0 ,0 ,0 ,c_aqua,'');
-                                                end;
-                       iAct_Control_Rebuild   : if(ui_uibtn_rebuildu<>nil)then
-                                                drawButtonS(tar,ux,uy,g_uids[ui_uibtn_rebuildu^.uid^.uid_rebuild_uid].uid_BTNBig.surf,false,not iActEnabled(uid));
                        iAct_Control_UAMove    : drawButtonS(tar,ux,uy,spr_uibtn_Attack    ,false,not iActEnabled(uid));
                        iAct_Control_UAStop    : drawButtonS(tar,ux,uy,spr_uibtn_Stop      ,false,not iActEnabled(uid));
                        iAct_Control_UAPatrol  : drawButtonS(tar,ux,uy,spr_uibtn_APatrol   ,false,not iActEnabled(uid));
@@ -539,7 +539,6 @@ begin
                  co_apatrol,
                  co_patrol,
                  1..255     :;
-                 co_pability:;
                  -255..-1   : with g_aids[-m_brush] do
                               begin
                                  AddLine(@ua_str_name);
@@ -596,23 +595,48 @@ begin
                                      if(iActOn(uid))then
                                        case uid of
                                        0                     : ;
-                                       iAct_Control_UAbility1: if(ui_uibtn_sabilityu<>nil)then
+                                       iAct_Control_UAbility1,
+                                       iAct_Control_UAbility2,
+                                       iAct_Control_UAbility3: if(ui_CommandercPU<>nil)then
                                                                begin
-                                                                  //s1:=str_ability_name[ui_uibtn_sabilityu^.uid^.uid_ability]+' ('+input_actions[uid].ik_str_HK+')';
-                                                                  //AddLine(@s1);
+                                                                  a:=0;
+                                                                  case uid of
+                                                                  iAct_Control_UAbility1: a:=ui_CommandercPU^.uid^.uid_ability1;
+                                                                  iAct_Control_UAbility2: a:=ui_CommandercPU^.uid^.uid_ability2;
+                                                                  iAct_Control_UAbility3: a:=ui_CommandercPU^.uid^.uid_ability3;
+                                                                  end;
+                                                                  if(a>0)then
+                                                                    with g_aids[a] do
+                                                                      case ua_mbrush_r of
+                                                                      -255..-1   :;
+                                                                      uambt_nform:;
+                                                                      uambt_self :;
+                                                                      else
+                                                                      end;
+                                                                      {case ua_mbrush_uid of
+                                                                      0  : begin
+                                                                              AddLine(@ua_str_name    );
+                                                                              AddLine(@ua_str_Descript);
+                                                                           end;
+                                                                      255: if(ui_CommandercPU^.uid^.uid_nextForm=0)then
+                                                                           begin
+                                                                              AddLine(@ua_str_name    );
+                                                                              AddLine(@ua_str_Descript);
+                                                                           end
+                                                                           else
+                                                                             with g_uids[ui_CommandercPU^.uid^.uid_nextForm] do
+                                                                             begin
+                                                                                AddLine(@uid_str_Name     );
+                                                                                AddLine(@uid_str_CostLimit);
+                                                                             end;
+                                                                      else
+                                                                          with g_uids[ua_mbrush_uid] do
+                                                                          begin
+                                                                             AddLine(@uid_str_Name     );
+                                                                             AddLine(@uid_str_CostLimit);
+                                                                          end;
+                                                                      end};
                                                                end;
-                                       iAct_Control_UAbility2: if(ui_uibtn_pabilityu<>nil)then
-                                                                 with ui_uibtn_pabilityu^.uid^ do
-                                                                 begin
-                                                                    {if(uid_ability=uab_RebuildInPoint)
-                                                                    then s1:=g_uids[uid_rebuild_uid].uid_str_name
-                                                                    else s1:=str_ability_name[ui_uibtn_pabilityu^.uid^.uid_ability];
-                                                                    s1+=' ('+input_actions[uid].ik_str_HK+')';
-                                                                    AddLine(@s1);  }
-                                                                 end;
-                                       iAct_Control_UAbility3: ;
-                                       iAct_Control_Rebuild  : ;//if(ui_uibtn_rebuildu <>nil)then
-                                                               //  AddLine(@ui_uibtn_rebuildu^.uid^.uid_str_RebuildHint);
                                        else                    AddLine(@str_action_hint[uid]);
                                        end;
                                   end;

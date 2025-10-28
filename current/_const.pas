@@ -151,7 +151,7 @@ map_generators_Energy  = 900;
 //
 
 str_ver                = 'v54';
-str_wcaption           : shortstring = 'The Ultimate MarsWars '+str_ver+#0;
+str_wcaption           : shortstring = 'MarsWars: HELL vs UAC, '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_ps_ttl             : char = '?';
 str_ps_Me              : char = '>';
@@ -361,9 +361,6 @@ co_astand              = -406;
 co_amove               = -407;
 co_apatrol             = -408;
 co_ability             = -409;
-co_sability            = -410;
-co_pability            = -411;
-co_rebuild             = -415;
 co_supgrade            = -416;
 co_cupgrade            = -417;
 co_sunit               = -418;
@@ -873,12 +870,9 @@ uid_race_start_abase   : array[1..r_cnt] of smallint = (UID_HAKeep,UID_UACommand
 ua_move                = 0;
 ua_hold                = 1;
 ua_amove               = 2;
-ua_sability            = 3;
-ua_psability           = 4;
-                             // ???
-ua_ability1            = 4;
-ua_ability2            = 5;
-ua_ability3            = 6;
+ua_ability1            = 3;
+ua_ability2            = 4;
+ua_ability3            = 5;
 
 ua_patrol              = 7; // only for client data transfer
 
@@ -908,38 +902,24 @@ uab_ToNextForm         = 17;
 uab_ToNextFormTUAC     = 18;
 uab_ToNextFormTHell    = 19;
 
-uab_ProdLvlUp          = 20;
-uab_UACProdLvlUp       = 21;
-uab_HellProdLvlUp      = 22;
+uab_ToUACDron          = 20;
+uab_ToUGTurret         = 21;
+uab_ToUATurret         = 22;
+uab_ToHTotem           = 23;
+uab_ToHTower           = 24;
 
-uab_ToGreatHKeep       = 23;
-uab_ToAdvCC            = 24;
-
-uab_ToUACDron          = 25;
-uab_ToUGTurret         = 26;
-uab_ToUATurret         = 27;
-uab_ToHTotem           = 28;
-uab_ToHTower           = 29;
-
-uab_ToUGTurretTo       = 30;
-uab_ToUATurretTo       = 31;
-
-uab_RebuildInPoint     = 32;
+uab_ToUGTurretTo       = 25;
+uab_ToUATurretTo       = 26;
 
 
-client_rld_abils       = [
+{client_rld_abils       = [
                          uab_Teleport,uab_HEyeVision,uab_SphereInvuln,uab_HKeepShift,uab_HTowerBlink
                          ];
 client_rld_uids        = [];
 client_cast_abils      = [
                          uab_UACScan  ,
                          uab_UACStrike
-                         ];
-
-uab_sabilityOrder      = [uab_SpawnLost,uab_UACCCLand,uab_ToUACDron,uab_Unload];
-uab_pabilityOrder      = [uab_Teleport,uab_UACScan,uab_HTowerBlink,uab_UACStrike,
-                          uab_HKeepShift,uab_RebuildInPoint,uab_SphereInvuln,
-                          uab_SpawnLost,uab_HEyeVision,uab_UACCCLand,uab_Unload];
+                         ];  }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -982,10 +962,10 @@ order_period           = fr_fpsh+1;
 MinVisionTime          = fr_fps2;
 
 detection_time_sec     = 8;
+detection_time         = fr_fps1*detection_time_sec;
 
 radar_reload_sec       = 60;
 radar_reload           = fr_fps1*radar_reload_sec;
-radar_vision_time      = radar_reload-(fr_fps1*detection_time_sec);
 
 hell_vision_time       = fr_fps1*detection_time_sec;
 hell_vision_reload_sec = ptime3;
@@ -1119,7 +1099,6 @@ iAct_USelGroup9        = 59;
 iAct_Control_UAbility1 = 60;
 iAct_Control_UAbility2 = 61;
 iAct_Control_UAbility3 = 62;
-iAct_Control_Rebuild   = 63;
 iAct_Control_UAMove    = 64;
 iAct_Control_UAStop    = 65;
 iAct_Control_UAPatrol  = 66;
@@ -1457,6 +1436,11 @@ aummat_advance         = 5;
 aummat_upgrade         = 6;
 aummat_info            = 7;
 
+// abilities
+
+uambt_self             = -256;
+uambt_nform            = -257;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SOUND
@@ -1687,6 +1671,7 @@ menu_logoh             = 64;
 
 menu_BaseW1            = 28;
 menu_BaseWh            = menu_BaseW1 div 2;
+menu_BaseWq            = menu_BaseWh div 2;
 menu_BaseW1h           = 28+menu_BaseWh;
 menu_BaseW2            = menu_BaseW1*2;
 menu_BasehW            = menu_BaseW1 div 2;
@@ -1727,6 +1712,25 @@ menu_PlayersRaceW      = font_w1h+8*font_w1;
 menu_PlayersTeamW      = font_w1h+4*font_w1;
 menu_PlayersPingW      = font_w1h+4*font_w1;
 menu_PlayersW          = menu_PlayersNameW+menu_PlayersStateW+menu_PlayersRaceW+menu_PlayersTeamW+menu_PlayersPingW;
+
+menu_msg_x0            = menu_hw-menu_ListWh;
+menu_msg_y0            = menu_hh-menu_BaseW2;
+menu_msg_x1            = menu_hw+menu_ListWh;
+menu_msg_y1            = menu_hh+menu_BaseW2;
+menu_msg_textx         = menu_hw;
+menu_msg_captiony      = menu_hh-menu_BaseW1h;
+menu_msg_bodyy         = menu_hh;
+menu_msg_btny          = menu_hh+menu_BaseW1h;
+menu_msg_btn1x0        = menu_msg_x0;
+menu_msg_btn1y0        = menu_hh+menu_BaseW1;
+menu_msg_btn1x1        =(menu_msg_x0+menu_msg_x1)div 2;
+menu_msg_btn1y1        = menu_msg_y1;
+menu_msg_btn1tx        =(menu_msg_btn1x0+menu_msg_btn1x1)div 2;
+menu_msg_btn2x0        = menu_msg_btn1x1;
+menu_msg_btn2y0        = menu_msg_btn1y0;
+menu_msg_btn2x1        = menu_msg_x1;
+menu_msg_btn2y1        = menu_msg_y1;
+menu_msg_btn2tx        =(menu_msg_btn2x0+menu_msg_btn2x1)div 2;
 
 LastMission            = 23;
 CMPMaxSkills           = 4;

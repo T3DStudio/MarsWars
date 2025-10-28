@@ -188,16 +188,7 @@ TMenuItem = record
    mi_state: TActAState;
 end;
 
-TMenuMessage = record
-   mm_time     : integer;
-   mm_btn1,
-   mm_btn2     : byte;
-   mm_str_Caption,
-   mm_str_Body,
-   mm_str_Btn1,
-   mm_str_Btn2 : shortstring;
-end;
-pTMenuMessage = ^TMenuMessage;
+TMenuMessageBoxType = (mmbt_none,mmbt_nothing,mmbt_netPortBlock,mmbt_netWaitServer,mmbt_DeleteReplay,mmbt_DeleteSave,mmbt_SaveRewrite);
 
 TSaveLoadItem = record
    data_p:pointer;
@@ -239,11 +230,11 @@ TUnitAbility = record
    ua_reload_upgrS: integer;
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
-   ua_mbrush_uid  : byte;
    ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Descript: shortstring;
-   ua_str_UIDHint: byte;
+   ua_str_UBrush
+                  : boolean;
    {$ENDIF}
 end;
 
@@ -374,9 +365,6 @@ TUID = record
    uid_upgr_SightR,
    uid_upgr_Armor,
    uid_upgr_Regen,
-   uid_rebuild_uid,
-   uid_rebuild_ruid,
-   uid_rebuild_rupgr,
    uid_nextForm,
    uid_DeathMissile,
    uid_DeathMissile_dmod,
@@ -402,14 +390,9 @@ TUID = record
 
    uid_hits_li2si   : single;
 
-   uid_ability_ReqNoObstacles
-                    : boolean;
    uid_ability1,
    uid_ability2,
-   uid_ability3,
-   uid_ability,
-   uid_ability_ReqUpgr,
-   uid_ability_ReqUID
+   uid_ability3
                     : byte;
    uid_ability_isradar,
    uid_ability_isteleport,

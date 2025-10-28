@@ -83,7 +83,7 @@ begin
      if(state=ps_none)
      then   Dedicated_screenLine(PlayerStateString(p),1,name,7,'--'           ,25, ''         ,35, '',0, '',0)
      else
-       if(observer)
+       if(isobserver)
        then Dedicated_screenLine(PlayerStateString(p),1,name,7,str_observer   ,25, '-'        ,35, '',0, '',0)
        else Dedicated_screenLine(PlayerStateString(p),1,name,7,str_race[mrace],25, b2s(team+1),35, '',0, '',0);
 end;

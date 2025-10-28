@@ -244,9 +244,9 @@ begin
 
       wudtick^:=g_tick;
 
-      if(iscomplete)then
+     { if(iscomplete)then
         if(uid_ability in client_rld_abils)
-        or(uidi     in client_rld_uids )then wudata_reload(rld,rpl);
+        or(uidi     in client_rld_uids )then wudata_reload(rld,rpl); }
 
       wudata_prod(pu,rpl);
                               //    or(uo=ua_psability)
@@ -304,13 +304,13 @@ begin
                wudata_word(wt,rpl);
             end;
 
-            if(buffs[ub_Cast]>0)then
+            {if(buffs[ub_Cast]>0)then
              if(uid_ability in client_cast_abils)then
               if(wudata_reload(rld,rpl)>0)then
               begin
                  wudata_byte(byte(uo_x shr 5),rpl);
                  wudata_byte(byte(uo_y shr 5),rpl);
-              end;
+              end; }
 
             if(playeri=POVPlayer)or(g_gplayers[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
          end;
@@ -676,7 +676,7 @@ begin
    begin
       vx:=x;
       vy:=y;
-      if(uid^.uid_ability=uab_HKeepShift)then
+      {if(uid^.uid_ability=uab_HKeepShift)then
       begin
          case uidi of
 UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_cube    );
@@ -686,7 +686,7 @@ UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_
          buffs[ub_CCast]:=fr_fps1;
          exit;
       end // default teleport effects
-      else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
+      else} effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
    end;
 end;
 
@@ -698,54 +698,54 @@ begin
        if(a_tar=tar)then a_tar:=0;
 end;
 
-procedure client_ChangeUnitState(uu:PTUnit;rpl:boolean);
-var pu,tu:PTUnit;
+procedure client_ChangeUnitState(cu:PTUnit;rpl:boolean);
+var
+pu,tu,
+cuTransport:PTUnit;
    vis:boolean;
 begin
    // pu - previous state
-   // uu - current state
+   // cu - current state
    pu:=@g_units[0];
+   cuTransport:=nil;
+   IsUnitRange(cu^.transportU,@cuTransport);
 
    if(not rpl)then
-     if(pu^.uidi<>uu^.uidi)then
+     if(pu^.uidi<>cu^.uidi)then
      begin
         unit_UnSelect(pu);
-        uu^.group:=0;
-        uu^.isselected:=false;
+        cu^.group:=0;
+        cu^.isselected:=false;
      end
      else
-       if(uu^.hits<=0)
-       or(uu^.transportU>0)then
+       if(cu^.hits<=0)
+       or(cuTransport<>nil)then
        begin
-          unit_UnSelect(uu);
-          uu^.group:=0;
+          unit_UnSelect(cu);
+          cu^.group:=0;
        end;
 
-   with uu^ do
+   with cu^ do
    with player^ do
      if(pu^.hits<=hits_dead)and(hits>hits_dead)then // create unit
      begin
-        unit_SetDefaults(uu,true);
-        unit_TeamReveal     (uu,true);
-        vx:=x;
-        vy:=y;
-        vis:=ui_CheckUnitUIPlayerVision(uu,true);
+        unit_SetDefaults(cu,true);
+        unit_TeamReveal (cu,true);
+        vx :=x;
+        vy :=y;
+        vis:=ui_CheckUnitUIPlayerVision(cu,true);
 
-        if(IsUnitRange(transportU,@tu))then
-        begin
-           unit_InTransportCode(uu,tu);
-           vx:=x;
-           vy:=y;
-        end;
+        if(cuTransport<>nil)then
+          unit_InTransportCode(cu,cuTransport);
 
-        unit_Bonuses(uu);
+        unit_Bonuses(cu);
 
         if(hits>0)then
         begin
-           unit_CalcFogR(uu);
-           if(buffs[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
-           if(buffs[ub_Teleport]>0)then cleffect_teleport  (uu,            @vis);
-           if(buffs[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
+           unit_CalcFogR(cu);
+           if(buffs[ub_Summoned]>0)then cleffect_UnitSummon(cu,            @vis);
+           if(buffs[ub_Teleport]>0)then cleffect_teleport  (cu,            @vis);
+           if(buffs[ub_HVision ]>0)then   effect_LevelUp   (cu,EID_HVision,@vis);
 
            if(playeri=UIPlayer)then
            begin
@@ -758,7 +758,7 @@ begin
         missiles_clear_tar(unum,true);
         unit_clear_a_tar(unum);
 
-        client_UnitCountersInc(uu,rpl);
+        client_UnitCountersInc(cu,rpl);
      end
      else
        if(pu^.hits>hits_dead)and(hits<=hits_dead)then // remove unit
@@ -767,17 +767,17 @@ begin
 
           vx:=x;
           vy:=y;
-          vis:=ui_CheckUnitUIPlayerVision(uu,true);
+          vis:=ui_CheckUnitUIPlayerVision(cu,true);
 
           if(pu^.hits>0)and(vis)then
           begin
-             if(hits>hits_ndead)and(transportU=0)then
+             if(hits>hits_ndead)and(cuTransport=nil)then
              begin
-                if(buffs[ub_Teleport]>0)then cleffect_teleport(uu,@vis);
+                if(buffs[ub_Teleport]>0)then cleffect_teleport(cu,@vis);
 
                 with uid^ do
-                  if(uid_isbuilding)and(uid_ability<>uab_HEyeVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
-                effect_UnitDeath(uu,true,@vis);
+                  if(uid_isbuilding){and(uid_ability<>uab_HEyeVision)}then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                effect_UnitDeath(cu,true,@vis);
              end;
           end;
 
@@ -798,58 +798,55 @@ begin
                missiles_clear_tar(unum,true);
                unit_clear_a_tar(unum);
             end;
-            vis:=ui_CheckUnitUIPlayerVision(uu,true);
+            vis:=ui_CheckUnitUIPlayerVision(cu,true);
 
             unit_Bonuses(pu);
             client_UnitCountersDec(pu,rpl);
 
-            unit_Bonuses(uu);
-            client_UnitCountersInc(uu,rpl);
+            unit_Bonuses(cu);
+            client_UnitCountersInc(cu,rpl);
 
             if(hits>0)then
             begin
                case(speed>0)of
-               false: if(buffs[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(uu,pu);
-               true : if(pu^.buffs[ub_Teleport]<=0)and(buffs[ub_Teleport]>0)then cleffect_teleport(uu,pu);
+               false: if(buffs[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(cu,pu);
+               true : if(pu^.buffs[ub_Teleport]<=0)and(buffs[ub_Teleport]>0)then cleffect_teleport(cu,pu);
                end;
-               if(pu^.buffs[ub_Summoned]<=0)and(buffs[ub_Summoned]>0)then cleffect_UnitSummon(uu,            @vis);
-               if(pu^.buffs[ub_HVision ]<=0)and(buffs[ub_HVision ]>0)then   effect_LevelUp   (uu,EID_HVision,@vis);
-               if(pu^.buffs[ub_Pain    ]<=0)and(buffs[ub_Pain    ]>0)then   effect_UnitPain  (uu,            @vis);
+               if(pu^.buffs[ub_Summoned]<=0)and(buffs[ub_Summoned]>0)then cleffect_UnitSummon(cu,            @vis);
+               if(pu^.buffs[ub_HVision ]<=0)and(buffs[ub_HVision ]>0)then   effect_LevelUp   (cu,EID_HVision,@vis);
+               if(pu^.buffs[ub_Pain    ]<=0)and(buffs[ub_Pain    ]>0)then   effect_UnitPain  (cu,            @vis);
 
                if(pu^.iscomplete)and(not iscomplete)then
                  if(playeri=UIPlayer)then
                    with uid^ do SoundPlayAnoncer(snd_build_place[uid_race],false,false);
 
-               if(not rpl)and(pu^.isselected=false)and(isselected)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
+               if(not rpl)and(not pu^.isselected)and(isselected)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
                if(pu^.transportU<>transportU)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
 
                if(iscomplete)then
                begin
-                  if(pu^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
+                  {if(pu^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
                    case uid^.uid_ability of
                    0:;
-                   uab_UACStrike   : unit_UACStrike_missile(uu);
-                   uab_UACScan     : if(UIPlayer>LastPlayer)
-                                     then SoundPlayUnit(snd_radar,nil,nil)
-                                     else
-                                       if(team=g_gplayers[UIPlayer].team)then SoundPlayUnit(snd_radar,nil,nil);
+                   uab_UACStrike   : unit_UACStrike_missile(cu);
+                   uab_UACScan     : effect_ScanSound(cu);
                    uab_SpawnLost   : if(upgrs_cur[upgr_hell_Phantoms]>0)
                                      then unit_ArmSpawnUnit(pu,UID_Phantom )
                                      else unit_ArmSpawnUnit(pu,UID_LostSoul);
-                   end;
+                   end;}
 
-                  if(uid^.uid_isbuilding=false)then
+                  if(not uid^.uid_isbuilding)then
                   begin
-                     if(pu^.level<level)then effect_LevelUp(uu,0,@vis);
+                     if(pu^.level<level)then effect_LevelUp(cu,0,@vis);
 
-                     if(pu^.buffs[ub_Invuln]<=0)and(buffs[ub_Invuln]>0)then effect_LevelUp(uu,EID_Invuln,@vis);
+                     if(pu^.buffs[ub_Invuln]<=0)and(buffs[ub_Invuln]>0)then effect_LevelUp(cu,EID_Invuln,@vis);
                   end;
                end;
             end;
 
             if(pu^.hits<=0)and(hits>0)then  //resurrected
             begin
-               unit_CalcFogR(uu);
+               unit_CalcFogR(cu);
                vx:=x;
                vy:=y;
             end
@@ -857,8 +854,8 @@ begin
               if(pu^.hits>0)and(hits<=0)and(buffs[ub_Resurect]=0)then  // death
               begin
                  with uid^ do
-                   if(uid_isbuilding)and(uid_ability<>uab_HEyeVision)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
-                 effect_UnitDeath(uu,hits<=hits_fdead,@vis);
+                   if(uid_isbuilding){and(uid_ability<>uab_HEyeVision)}then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                 effect_UnitDeath(cu,hits<=hits_fdead,@vis);
 
                  with uid^ do
                    if(uid_DeathMissile>0)
@@ -869,7 +866,7 @@ begin
               end;
 
             if(not IsUnitRange(pu^.transportU,nil))then
-             if(IsUnitRange(transportU,@tu))then unit_InTransportCode(uu,tu);
+             if(IsUnitRange(transportU,@tu))then unit_InTransportCode(cu,tu);
 
             if(speed>0)then
             begin
@@ -879,7 +876,7 @@ begin
 
             if(pu^.x<>x)or(pu^.y<>y)then
             begin
-               unit_UpdateXY(uu);
+               unit_UpdateXY(cu);
 
                if(speed>0)then
                begin
@@ -1125,13 +1122,13 @@ begin
       end
       else uo_bx:=-1;
 
-      if(puo<>ua_psability)and(uo_id=ua_psability)then uo_x:=-1;
+      //if(puo<>ua_psability)and(uo_id=ua_psability)then uo_x:=-1;
 
       if((b and %10000000)=0)then exit;
 
-      if(iscomplete)then
+      {if(iscomplete)then
         if(uid_ability in client_rld_abils)
-        or(uidi     in client_rld_uids )then rudata_reload(@rld,rpl);
+        or(uidi     in client_rld_uids )then rudata_reload(@rld,rpl); }
 
       rudata_prod(uu,rpl);
 
@@ -1220,13 +1217,13 @@ begin
                a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
-            if(buffs[ub_Cast]>0)then
+            {if(buffs[ub_Cast]>0)then
              if(uid^.uid_ability in client_cast_abils)then
               if(rudata_reload(@rld,rpl)>0)then
               begin
                  uo_x:=integer(rudata_byte(rpl,0) shl 5);
                  uo_y:=integer(rudata_byte(rpl,0) shl 5);
-              end;
+              end;  }
 
             if(playeri=POVPlayer)or(g_gplayers[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
          end;

@@ -15,7 +15,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 250. Builder. Increase energy level(+300). Can be rebuilt into "Great Hell Keep". Immune to splash damage.
+Base sight range: 250. Builder. Increase energy level(+300). Immune to splash damage.
 
 ---------------------------
 
@@ -56,7 +56,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 120. Unit production. Can be rebuilt into "Demon`s Gate[level+1]"{Req.: "Castle of Damned"}. Immune to splash damage.
+Base sight range: 120. Unit production. Immune to splash damage.
 
 ---------------------------
 
@@ -75,7 +75,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 44. Increase energy level(+50). Can be rebuilt into "Unholy Symbol level 2". Immune to splash damage.
+Base sight range: 44. Increase energy level(+50). Immune to splash damage.
 
 ---------------------------
 
@@ -94,7 +94,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 44. Increase energy level(+100). Can be rebuilt into "Unholy Symbol level 3". Immune to splash damage.
+Base sight range: 44. Increase energy level(+100). Immune to splash damage.
 
 ---------------------------
 
@@ -113,7 +113,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 44. Increase energy level(+150). Can be rebuilt into "Unholy Symbol level 4". Immune to splash damage.
+Base sight range: 44. Increase energy level(+150). Immune to splash damage.
 
 ---------------------------
 
@@ -152,7 +152,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 106. Researches and upgrades facility. Can be rebuilt into "Infernal Pools[level+1]"{Req.: "Castle of Damned"}. Immune to splash damage.
+Base sight range: 106. Researches and upgrades facility. Immune to splash damage.
 
 ---------------------------
 
@@ -174,7 +174,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 300. Can be rebuilt into "Totem of Horror"{Req.: "Castle of Damned"}. Immune to splash damage. Basic defensive structure.
+Base sight range: 300. Immune to splash damage. Basic defensive structure.
 
 ---------------------------
 
@@ -198,7 +198,7 @@ Base sight range: 100. Immune to splash damage.
 
 ---------------------------
 
-Evil Eye Nest
+Evil Eye
 
 Hotkey: J
 Categories/Attributes: [building,biological,light,ground,detector]
@@ -276,7 +276,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 350. Can be rebuilt into "Guard Tower". Immune to splash damage. Advanced defensive structure.
+Base sight range: 350. Immune to splash damage. Advanced defensive structure.
 
 ---------------------------
 
@@ -339,7 +339,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 300. Builder. Increase energy level(+300). Can be rebuilt into "Advanced Hell Command Center". Immune to splash damage. Corrupted Command Center.
+Base sight range: 300. Builder. Increase energy level(+300). Immune to splash damage. Corrupted Command Center.
 
 ---------------------------
 
@@ -381,7 +381,7 @@ Upgrades:
 - Stone Walls - armor +18;
 - Building Restoration - hits regeneration +7;
 
-Base sight range: 120. Unit production. Can be rebuilt into "Zombie Barracks[level+1]"{Req.: "Advanced Hell Command Center"}. Immune to splash damage. Corrupted Barracks.
+Base sight range: 120. Unit production. Immune to splash damage. Corrupted Barracks.
 
 ---------------------------
 
@@ -502,7 +502,7 @@ Base vision range: 200
 Build time: 25
 Energy required: 250
 PainState base threshold: 8
-Requirements: Infernal Pools,Great Hell Keep
+Requirements: Great Hell Keep
 Arming/Abilities: 
 bonus anti-fly range: +50
 - ranged attack, max. range: sight range, targets: [alive] except [Cacodemon], base impact 48*1, upgrade: Hell Firepower(+7), factor: x2 [unit,mechanical];
@@ -530,7 +530,7 @@ Build time: 30
 Energy required: 300
 PainState base threshold: 10
 Places in transport: 2
-Requirements: Infernal Pools
+
 Arming/Abilities: 
 - ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 72*1, upgrade: Hell Firepower(+7), factor: x2 [unit,light];
 - melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 48*1, upgrade: Claws and Teeth(+7), factor: x2 [unit,light];
@@ -557,7 +557,7 @@ Build time: 30
 Energy required: 500
 PainState base threshold: 10
 Places in transport: 3
-Requirements: Infernal Pools
+
 Arming/Abilities: 
 - ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 72*1, upgrade: Hell Firepower(+7), factor: x2 [unit,light];
 - melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 48*1, upgrade: Claws and Teeth(+7), factor: x2 [unit,light];
@@ -664,7 +664,7 @@ Build time: 20
 Energy required: 300
 PainState base threshold: 5
 Places in transport: 2
-Requirements: Infernal Pools
+
 Arming/Abilities: 
 bonus anti-fly range: +100
 - ranged attack, max. range: sight range, targets: [alive] except [Revenant], base impact 72*1, upgrade: Demon`s Weapons(+7), factor: x2 [flying];
@@ -1019,7 +1019,7 @@ Upgrades:
 - Command Center Range Upgrade - vision range +50;
 - Concrete Walls - armor +18;
 
-Base sight range: 300. Builder. Increase energy level(+300). Can be rebuilt into "Advanced Command Center". Immune to splash damage.
+Base sight range: 300. Builder. Increase energy level(+300). Immune to splash damage.
 
 ---------------------------
 
@@ -1063,7 +1063,7 @@ Zombification hits: 2500
 Upgrades:
 - Concrete Walls - armor +18;
 
-Base sight range: 120. Unit production. Can be rebuilt into "Barracks[level+1]"{Req.: "Computer Station"}. Immune to splash damage.
+Base sight range: 120. Unit production. Immune to splash damage.
 
 ---------------------------
 
@@ -1077,11 +1077,11 @@ Size: 60
 Base vision range: 120
 Build time: 40
 Energy required: 300
-Requirements: Weapon Factory
+
 Upgrades:
 - Concrete Walls - armor +18;
 
-Base sight range: 120. Unit production. Can be rebuilt into "Vehicle Factory[level+1]"{Req.: "Computer Station"}. Immune to splash damage.
+Base sight range: 120. Unit production. Immune to splash damage.
 
 ---------------------------
 
@@ -1099,7 +1099,7 @@ Energy required: 100
 Upgrades:
 - Concrete Walls - armor +18;
 
-Base sight range: 76. Increase energy level(+100). Can be rebuilt into "Generator level 2". Immune to splash damage.
+Base sight range: 76. Increase energy level(+100). Immune to splash damage.
 
 ---------------------------
 
@@ -1117,7 +1117,7 @@ Energy required: 0
 Upgrades:
 - Concrete Walls - armor +18;
 
-Base sight range: 76. Increase energy level(+200). Can be rebuilt into "Generator level 3". Immune to splash damage.
+Base sight range: 76. Increase energy level(+200). Immune to splash damage.
 
 ---------------------------
 
@@ -1135,7 +1135,7 @@ Energy required: 0
 Upgrades:
 - Concrete Walls - armor +18;
 
-Base sight range: 76. Increase energy level(+300). Can be rebuilt into "Generator level 4". Immune to splash damage.
+Base sight range: 76. Increase energy level(+300). Immune to splash damage.
 
 ---------------------------
 
@@ -1171,7 +1171,7 @@ Energy required: 300
 Upgrades:
 - Concrete Walls - armor +18;
 
-Base sight range: 124. Researches and upgrades facility. Can be rebuilt into "Weapon Factory[level+1]"{Req.: "Computer Station"}. Immune to splash damage.
+Base sight range: 124. Researches and upgrades facility. Immune to splash damage.
 
 ---------------------------
 

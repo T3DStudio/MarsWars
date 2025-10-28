@@ -36,23 +36,16 @@ begin
    gfx_MapMakeTerrain;
 end;
 
-procedure menu_msgBox_Set(pMMsg:pTMenuMessage;str_caption,str_body,str_btn1,str_btn2:shortstring;btn1,btn2:byte;time:integer=fr_fps4);
+procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);
 begin
-   with pMMsg^ do
+   if(menu_msg_type<>mtype)then
    begin
-      mm_time       :=time;
-      mm_str_Caption:=str_Caption;
-      mm_str_Body   :=str_body;
-      mm_str_Btn1   :=str_Btn1;
-      mm_str_Btn2   :=str_Btn2;
-      mm_btn1       :=btn1;
-      mm_btn2       :=btn2;
+      menu_update     :=true;
+      menu_msg_type   :=mtype;
+      menu_msg_Caption:=str_caption;
+      menu_msg_Body   :=str_body;
+      menu_ItemActs   :=0;
    end;
-end;
-
-procedure menu_msgBox_Net(caption,body,btn1:shortstring;time:integer=fr_fps4);
-begin
-   menu_msgBox_Set(@menu_msg_Net,caption,body,btn1,'',0,0,time);
 end;
 
 function PlayerNameChangeble:boolean;
@@ -67,7 +60,8 @@ begin
 
    if(net_status=ns_client)
    or(rpls_pstate<>rpls_none)
-   or(G_Started)then exit;
+   or(G_Started)
+   or(menu_msg_type<>mmbt_none)then exit;
 
    case start of
    true : begin   // start
@@ -81,7 +75,7 @@ begin
                 net_status:=ns_server;
                 PlayersSetDefault;
              end
-             else menu_msgBox_Net(str_menuMsg_Error,str_Caption_Server+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Server+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
    false: begin   // stop
              if(net_status<>ns_server)then exit;
@@ -95,6 +89,8 @@ end;
 function GameNetClient(connect,check:boolean):boolean;
 begin
    GameNetClient:=false;
+
+   if(menu_msg_type<>mmbt_none)then exit;
 
    case connect of
    true : begin   // start connecting
@@ -114,10 +110,10 @@ begin
                 net_cl_svttl :=ServerTTL;
                 net_cl_log_n :=net_cl_log_n.MaxValue;
                 PlayerReady  :=false;
-                menu_msgBox_Net(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
+                menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer);
                 PlayersClearLog;
              end
-             else menu_msgBox_Net(str_menuMsg_Error,str_Caption_Client+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Client+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
    false: begin   // disconnect
              if(net_status<>ns_client)then exit;
@@ -134,7 +130,8 @@ begin
    GameNetServerSearch:=false;
 
    if(rpls_pstate<>rpls_none)
-   or(G_Started)then exit;
+   or(G_Started)
+   or(menu_msg_type<>mmbt_none)then exit;
 
    case start of
    true : begin
@@ -148,7 +145,7 @@ begin
                 net_status:=ns_client;
                 net_svsearch:=true;
              end
-             else menu_msgBox_Net(str_menuMsg_Error,str_net_LANSearch+': '+str_gmsg_PortBlocked,str_menuMsg_HintDefault);
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_net_LANSearch+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
    false: begin
              if(not net_svsearch)
@@ -347,7 +344,7 @@ begin
 
    menu_item_setEnabled(mi_SaveLoad_save  ,saveload_Save  (true));
    menu_item_setEnabled(mi_SaveLoad_load  ,saveload_Load  (true));
-   menu_item_setEnabled(mi_SaveLoad_delete,saveload_Delete(true));
+   menu_item_setEnabled(mi_SaveLoad_delete,saveload_DeleteInit(true));
 end;
 
 procedure menu_page_Replays;
@@ -367,7 +364,7 @@ begin
    menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0);
 
    menu_item_setEnabled(mi_Replays_play  ,replay_Play  (true));
-   menu_item_setEnabled(mi_Replays_delete,replay_Delete(true));
+   menu_item_setEnabled(mi_Replays_delete,replay_DeleteInit(true));
 end;
 
 procedure menu_page_Settings;
@@ -792,11 +789,11 @@ mi_SaveLoad_list       : if(not check)then
                             menu_ListMouseXY2Line(item,@svld_list_sel,svld_list_scroll,menu_ListLineH);
                             saveload_Select;
                          end;
-mi_SaveLoad_info       :;
+//mi_SaveLoad_info       :;
 mi_SaveLoad_fname      :;
 mi_SaveLoad_save       : if(not check)then saveload_Save  (false);
 mi_SaveLoad_load       : if(not check)then saveload_Load  (false);
-mi_SaveLoad_delete     : if(not check)then saveload_Delete(false);
+mi_SaveLoad_delete     : if(not check)then saveload_DeleteInit(false);
 
 // REPLAYS
 mi_Replays_list        : if(not check)then
@@ -804,9 +801,9 @@ mi_Replays_list        : if(not check)then
                             menu_ListMouseXY2Line(item,@rpls_list_sel,rpls_list_scroll,menu_ListLineH);
                             replay_Select;
                          end;
-mi_Replays_info        : ;
+//mi_Replays_info        : ;
 mi_Replays_play        : if(not check)then replay_Play  (false);
-mi_Replays_delete      : if(not check)then replay_Delete(false);
+mi_Replays_delete      : if(not check)then replay_DeleteInit(false);
 
 // SCIRMISH PLAYERS
 mi_Players_State0..
@@ -857,6 +854,10 @@ function menu_Controls_DMLB(item:byte;check:boolean):boolean;
 begin
    menu_Controls_DMLB:=true;
    case item of
+mi_SaveLoad_list  : case g_started of
+                    true : menu_Controls_DMLB:=false;
+                    false: if(not check)then saveload_Load(false);
+                    end;
 mi_Replays_list   : if(not check)then replay_Play  (false);
 mi_NetSearch_List : if(not check)then GameNetServerConnect(false);
    else
@@ -963,26 +964,40 @@ mi_MP_ChatLine         : ;
    end;
 end;
 
-function menu_msgBox(pMMsg:pTMenuMessage):boolean;
+function menu_msgBox_Code:boolean;
+procedure msgBoxOff;
 begin
-   menu_msgBox:=false;
-   with pMMsg^ do
-     if(mm_time>0)then
-     begin
-        mm_time-=1;
-        if(mm_time>0)then
-          if(InputActionPressed(iAct_any))then
-          begin
-             mm_time:=0;
-             GameResetNetGame;
-          end;
+   menu_msg_type:=mmbt_none;
+   menu_ItemTarget  :=0;
+   menu_ItemSelected:=0;
+   menu_update:=true;
+end;
+begin
+   menu_msgBox_Code:=(menu_msg_type<>mmbt_none);
 
-        menu_ItemTarget  :=0;
-        menu_ItemSelected:=0;
-        if(mm_time=0)then menu_update:=true;
-
-        menu_msgBox:=true;
-     end;
+   case menu_msg_type of
+   mmbt_nothing,
+   mmbt_netPortBlock : if(InputActionPressed(iAct_any))then msgBoxOff;
+   mmbt_netWaitServer: if(InputActionPressed(iAct_any))then
+                       begin
+                          GameResetNetGame;
+                          msgBoxOff;
+                       end;
+   mmbt_SaveRewrite,
+   mmbt_DeleteSave,
+   mmbt_DeleteReplay : begin
+                          if(InputActionPressed(iact_MLB))then
+                            if (menu_msg_btn1x0<=mouse_x)and(mouse_x<=menu_msg_btn1x1)
+                            and(menu_msg_btn1y0<=mouse_y)and(mouse_y<=menu_msg_btn1y1)then
+                              case menu_msg_type of
+                              mmbt_SaveRewrite : saveload_SaveWrite (menu_msg_Body);
+                              mmbt_DeleteSave  : saveload_DeleteFile(menu_msg_Body);
+                              mmbt_DeleteReplay:   replay_DeleteFile(menu_msg_Body);
+                              end;
+                          if(InputActionPressed(iAct_any))then
+                            msgBoxOff;
+                       end;
+   end;
 end;
 
 procedure menu_Controls;
@@ -1007,22 +1022,18 @@ begin
    changed:=false;
 
    // force menu msg box error
-   if(net_status=ns_client)and(not net_svsearch)and(net_cl_svttl>=ServerTTL)and(not g_started)then
-     menu_msgBox_Net(str_Caption_Multiplayer,str_gstat_WaitForServer,str_menuMsg_HintClient);
+   if(net_status=ns_client)and(not net_svsearch)and(not g_started)then
+     if(net_cl_svttl>=ServerTTL)
+     then menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer)
+     else
+       if(menu_msg_type=mmbt_netWaitServer)then menu_msg_type:=mmbt_none;
 
-   if(menu_msgBox(@menu_msg_DelFile))then
+   if(menu_msgBox_Code)then
    begin
       mouse_x:=mnx;
       mouse_y:=mny;
       exit;
-   end
-   else
-     if(menu_msgBox(@menu_msg_Net))then
-     begin
-        mouse_x:=mnx;
-        mouse_y:=mny;
-        exit;
-     end;
+   end;
 
    menu_ItemTarget:=menu_MouseXY2Item;
 

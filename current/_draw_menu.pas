@@ -537,32 +537,34 @@ else d_menuItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
      if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then
        d_menuItemText1(tar,mi_SubCaptionInfoLine,rpls_list[rpls_list_sel],0);
 
+   // MESSAGE BOX
+   if(menu_msg_type<>mmbt_none)then
+   begin
+      boxColor(tar,0,0,menu_w,menu_h,c_ablack);
 
-   with menu_msg_Box do
-     if(mm_time>0)then
-     begin
-        boxColor(tar,0,0,menu_w,menu_h,c_ablack);
+      boxColor      (tar,menu_msg_x0,menu_msg_y0,
+                         menu_msg_x1,menu_msg_y1,c_black);
+      rectangleColor(tar,menu_msg_x0,menu_msg_y0,
+                         menu_msg_x1,menu_msg_y1,c_white);
 
-        boxColor      (tar,menu_hw-menu_ListWh,menu_hh-menu_BaseW2,
-                           menu_hw+menu_ListWh,menu_hh+menu_BaseW2,c_black);
-        rectangleColor(tar,menu_hw-menu_ListWh,menu_hh-menu_BaseW2,
-                           menu_hw+menu_ListWh,menu_hh+menu_BaseW2,c_white);
+      draw_text(tar,menu_msg_textx,menu_msg_captiony,menu_msg_Caption,ta_MU,menu_ListLineWChars1,c_red   );
+      draw_text(tar,menu_msg_textx,menu_msg_bodyy   ,menu_msg_Body   ,ta_MM,menu_ListLineWChars1,c_yellow);
 
-        draw_text(tar,menu_hw,menu_hh-menu_BaseW1h,mm_str_Caption,ta_MU,menu_ListLineWChars1,c_red   );
-        draw_text(tar,menu_hw,menu_hh             ,mm_str_Body   ,ta_MM,menu_ListLineWChars1,c_yellow);
-
-        hlineColor(tar,menu_hw-menu_ListWh,menu_hw+menu_ListWh,menu_hh+menu_BaseWh,c_white);
-
-        if(mm_btn2>0)
-        then draw_text(tar,menu_hw,menu_hh,mm_str_Btn1,ta_MB,menu_ListLineWChars1,c_gray  )
-        else
-        begin
-           vlineColor(tar,menu_hw,menu_hw+menu_ListWh,menu_hh+menu_BaseW1h,c_white);
-           draw_text(tar,menu_hw-menu_ListWq,menu_hh+menu_BaseW1h,mm_str_Btn1,ta_MB,menu_ListLineWCharsh,c_gray);
-           draw_text(tar,menu_hw+menu_ListWq,menu_hh+menu_BaseW1h,mm_str_Btn2,ta_MB,menu_ListLineWCharsh,c_gray);
-        end;
-     end;
-
+      case menu_msg_type of
+      mmbt_none         :;
+      mmbt_nothing,
+      mmbt_netPortBlock : draw_text(tar,menu_msg_textx,menu_msg_btny,str_menuMsg_HintDefault,ta_MB,menu_ListLineWChars1,c_gray  );
+      mmbt_netWaitServer: draw_text(tar,menu_msg_textx,menu_msg_btny,str_menuMsg_HintClient ,ta_MB,menu_ListLineWChars1,c_gray  );
+      mmbt_SaveRewrite,
+      mmbt_DeleteSave,
+      mmbt_DeleteReplay : begin
+                             hlineColor(tar,menu_msg_x0,menu_msg_x1,menu_msg_btn1y0,c_white);
+                             vlineColor(tar,menu_msg_btn1x1,menu_msg_btn1y0,menu_msg_btn1y1,c_white);
+                             draw_text(tar,menu_msg_btn1tx,menu_msg_btny,str_YesNo[true ],ta_MM,menu_ListLineWCharsh,c_gray);
+                             draw_text(tar,menu_msg_btn2tx,menu_msg_btny,str_YesNo[false],ta_MM,menu_ListLineWCharsh,c_gray);
+                          end;
+      end;
+   end;
 
     {
    // replays
@@ -573,36 +575,6 @@ else d_menuItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
    if(rpls_pstate>rpls_none)and(g_cl_units>0)then
    draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_RU,255, c_white);
  }
-end;
-
-function D_MenuMessage(tar:pSDL_Surface;pMMsg:pTMenuMessage):boolean;
-begin
-   D_MenuMessage:=false;
-
-   with pMMsg^ do
-     if(mm_time>0)then
-     begin
-        D_MenuMessage:=true;
-
-        boxColor(tar,0,0,menu_w,menu_h,c_ablack);
-
-              boxColor(tar,menu_hw-menu_ListWh,menu_hh-menu_BaseW2,
-                           menu_hw+menu_ListWh,menu_hh+menu_BaseW2,c_black);
-        rectangleColor(tar,menu_hw-menu_ListWh,menu_hh-menu_BaseW2,
-                           menu_hw+menu_ListWh,menu_hh+menu_BaseW2,c_white);
-        draw_text(tar,menu_hw,menu_hh-menu_BaseW1h,mm_str_Caption,ta_MU,menu_ListLineWChars1,c_red   );
-        draw_text(tar,menu_hw,menu_hh             ,mm_str_Body   ,ta_MM,menu_ListLineWChars1,c_yellow);
-
-        if(mm_btn2>0)
-        then draw_text(tar,menu_hw,menu_hh,mm_str_Btn1,ta_MB,menu_ListLineWChars1,c_gray  )
-        else
-        begin
-           hlineColor(tar,menu_hw-menu_ListWh,menu_hw+menu_ListWh,menu_hh+menu_BaseWh,c_white);
-           vlineColor(tar,menu_hw,menu_hw+menu_ListWh,menu_hh+menu_BaseW1h,c_white);
-           draw_text(tar,menu_hw-menu_ListWq,menu_hh+menu_BaseW1h,mm_str_Btn1,ta_MB,menu_ListLineWCharsh,c_gray);
-           draw_text(tar,menu_hw+menu_ListWq,menu_hh+menu_BaseW1h,mm_str_Btn2,ta_MB,menu_ListLineWCharsh,c_gray);
-        end;
-     end;
 end;
 
 procedure D_Menu;

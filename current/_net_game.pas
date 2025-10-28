@@ -385,7 +385,7 @@ end;
 procedure net_ClientError(msg:shortstring);
 begin
    menu_update:=true;
-   menu_msgBox_Net(str_menuMsg_Error,msg,str_menuMsg_HintDefault);
+   menu_msgBox_Set(str_Caption_Multiplayer,msg,mmbt_nothing);
    GameResetNetGame;
 end;
 
@@ -507,7 +507,6 @@ nmid_NotConnected: begin
                    end;
 nmid_LogUpdate   : begin
                       rudata_log(LocalPlayer,false);
-                      //net_chat_shlm:=ui_chat_TimeLast;
                       net_period:=0;
                    end;
 nmid_ping_Request: begin
@@ -518,7 +517,6 @@ nmid_ping_Request: begin
                       net_send(net_cl_svip,net_cl_svport);
                    end;
 nmid_GameInfo    : begin
-                      menu_msg_Net.mm_time:=0;
                       svstarted:=net_readbool;
 
                       for i:=0 to LastPlayer do
@@ -559,7 +557,7 @@ nmid_GameInfo    : begin
                    end;
 nmid_snapshot    : if(G_Started)then
                    begin
-                      menu_msg_Net.mm_time:=0;
+                      //menu_msg_Net.mm_time:=0;
                       G_Status:=net_readbyte;
                       if(G_Status=gs_running)then
                         rclinet_gframe(LocalPlayer,false,false);
