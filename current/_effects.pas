@@ -21,6 +21,7 @@ begin
         UID_Pain          : setEID(@spr_pain          ,sms_death);
         UID_Phantom       : setEID(@spr_Phantom       ,sms_death);
         UID_LostSoul      : setEID(@spr_lostsoul      ,sms_death);
+        UID_HEye          : setEID(@spr_h_p2          ,sms_death);
 
         MID_BPlasma       : setEID(@spr_u_p0          ,sms_death);
         MID_SShot,
@@ -158,6 +159,7 @@ begin
 UID_Pain          : setEff(9 ,0 ,32 ,-1       ,false,0 );
 UID_Phantom,
 UID_LostSoul      : setEff(7 ,0 ,23 ,-1       ,false,0 );
+UID_HEye          : setEff(6 ,0 ,8  ,-1       ,true ,0 );
 
 MID_BPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,
@@ -170,6 +172,7 @@ MID_Flyer         : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
 MID_Imp           : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Cacodemon     : setEff(6 ,0 ,-1 ,-1       ,false,0 );
+
 MID_Baron,//         : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_URocketS,
 MID_URocket,

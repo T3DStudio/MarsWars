@@ -202,7 +202,7 @@ Evil Eye
 
 Hotkey: J
 Categories/Attributes: [building,biological,light,ground,detector]
-Max hits: 200
+Max hits: 100
 Limit used: 1
 Size: 10
 Base vision range: 300

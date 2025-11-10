@@ -183,6 +183,12 @@ begin
          end;
       end;
 
+      if(ulevel>LastUnitLevel)then
+      begin
+         unit_morph:=ureq_other;
+         exit;
+      end;
+
       if(check)then exit;
 
       vx:=x;
@@ -981,135 +987,7 @@ begin
    end;
 end;
 
-function unit_ability_HellVision(pu:PTUnit;target:integer;check:boolean):cardinal;
-var tu:PTUnit;
-begin
-   // pu - caster
-   // tu - target
-   with pu^     do
-   begin
-      unit_ability_HellVision:=ureq_other;
-      if(not iscomplete)
-      or(hits<=0)then exit;
 
-      unit_ability_HellVision:=ureq_reloading;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_HellVision:=ureq_InvalidTarget;
-   if(not IsUnitRange(target,@tu))then exit;
-
-   with tu^ do
-     if(not iscomplete)
-     or(hits<=0)
-     or(pu^.player^.team<>player^.team)
-     or(buffs[ub_HVision]>fr_fps1)
-     or(buffs[ub_Detect]>0)then exit;
-
-   with pu^     do
-   with player^ do
-   begin
-      unit_ability_HellVision:=0;
-      if(check)then exit;
-
-      tu^.buffs[ub_HVision]:=hell_vision_time;
-      rld:=hell_vision_reload;
-      {$IFDEF _FULLGAME}
-      effect_LevelUp(tu,EID_Hvision,nil);
-      {$ENDIF}
-   end;
-end;
-
-function unit_ability_Recall(pTeleporter:PTUnit;tar,tard:integer;check:boolean):cardinal;
-var pTarget:PTUnit;
-begin
-   // pTeleporter - teleporter
-
-   with pTeleporter^ do
-   begin
-      unit_ability_Recall:=ureq_other;
-      if(not iscomplete)
-      or(hits<=0)then exit;
-
-      unit_ability_Recall:=ureq_reloading;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_Recall:=ureq_rupid;
-   with pTeleporter^.player^ do
-     if(upgrs_cur[upgr_hell_Recall]<=0)
-     then exit;
-
-   unit_ability_Recall:=ureq_InvalidTarget;
-   if(not IsUnitRange(tar,@pTarget))then exit;
-   with pTarget^ do
-   with uid^ do
-     if(uid_isbuilding)
-     or(not iscomplete)
-     or(ukfly)
-     or(hits<=0)
-     or(buffs[ub_Teleport]>0)
-     or(pTeleporter^.playeri<>playeri)
-     then exit;
-
-   with pTeleporter^  do
-   with uid^ do
-   with player^ do
-   begin
-      if(tard=NOTSET)
-      or(tard<0     )then tard:=point_dist_int(x,y,pTarget^.x,pTarget^.y);
-      if(tard>base_1r)then
-      begin
-         unit_ability_Recall:=0;
-
-         if(check)then exit;
-
-         unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
-         teleport_CalcReload(pTeleporter,pTarget^.uid^.uid_LimitUse);
-         pTarget^.uo_x  :=pTarget^.x;
-         pTarget^.uo_y  :=pTarget^.y;
-         pTarget^.uo_tar:=0;
-      end;
-   end;
-end;
-
-function unit_ability_teleport(pTarget,pTeleporter:PTUnit;td:integer):boolean;
-var
-pTBeacon:PTUnit;
-      tr:integer;
-begin
-   // td = dist2(pTarget,pTeleporter)
-   if(td=NOTSET)then td:=point_dist_int(pTarget^.x,pTarget^.y,pTeleporter^.x,pTeleporter^.y);
-   unit_ability_teleport:=false;
-   with pTarget^  do
-   with uid^ do
-     if(not uid_isbuilding)and(iscomplete)and(not ukfly)and(pTeleporter^.hits>0)and(pTeleporter^.iscomplete)then
-       if(playeri=pTeleporter^.playeri)and(buffs[ub_Teleport]<=0)then
-         if(td<=pTeleporter^.uid^.uid_r)and(pTeleporter^.rld<=0)then
-         begin
-            if(not IsUnitRange(pTeleporter^.rpoint_tar,@pTBeacon))then exit;
-            if(pTeleporter^.player^.team<>pTBeacon^.player^.team)
-            or(pTBeacon^.hits<=0)then exit;
-
-            if(ukfly=uf_ground)then
-              if(map_IfObstacleZone(pTBeacon^.mapZone))then exit;
-
-            pTeleporter^.rpoint_x:=pTBeacon^.x;
-            pTeleporter^.rpoint_y:=pTBeacon^.y;
-
-            if(point_dist_int(pTeleporter^.x,
-                              pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_1r)then exit;
-
-            tr:=uid_r+pTBeacon^.uid^.uid_r;
-
-            if(ukfly=pTBeacon^.ukfly)
-            then unit_Teleport2Point(pTarget,pTeleporter^.rpoint_x+(tr*sign(x-pTeleporter^.rpoint_x)),pTeleporter^.rpoint_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF})
-            else unit_Teleport2Point(pTarget,pTeleporter^.rpoint_x                                   ,pTeleporter^.rpoint_y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
-
-            teleport_CalcReload(pTeleporter,uid_LimitUse);
-            unit_ability_teleport:=true;
-         end;
-end;
 
 function unit_Load(pTransport,pPassenger:PTUnit):boolean;
 begin
@@ -1161,45 +1039,45 @@ end;
 
 // target units
 procedure unit_uo_tar(pu:PTUnit);
-var tu: PTUnit;
-     a,
-     w: byte;
+var
+pTar  : PTUnit;
+a, w  : byte;
 td,tdm: integer;
 begin
-   tu:=nil;
+   pTar:=nil;
    with pu^  do
    with uid^ do
    if(uo_tar=unum)
    then uo_tar:=0
    else
-      if(IsUnitRange(uo_tar,@tu))then
+      if(IsUnitRange(uo_tar,@pTar))then
       begin
-         if(IsUnitRange(tu^.transportU,nil))
-         or(not CheckUnitTeamVision(player^.team,tu,false))then
+         if(IsUnitRange(pTar^.transportU,nil))
+         or(not CheckUnitTeamVision(player^.team,pTar,false))then
          begin
             uo_tar:=0;
             //uo_id :=ua_amove;
             exit;
          end;
 
-         td :=point_dist_int(x,y,tu^.x,tu^.y);
-         if(tu^.solid)
-         then tdm:=td-(uid_r+tu^.uid^.uid_r)
-         else tdm:=td- min2i(uid_r,tu^.uid^.uid_r);
+         td :=point_dist_int(x,y,pTar^.x,pTar^.y);
+         if(pTar^.solid)
+         then tdm:=td-      (uid_r+pTar^.uid^.uid_r)
+         else tdm:=td- min2i(uid_r,pTar^.uid^.uid_r);
 
          if(tdm<melee_r)then
          begin
-            if(unit_Load(pu,tu))then exit;
-            if(unit_Load(tu,pu))then exit;
+            if(unit_Load(pu,pTar))then exit;
+            if(unit_Load(pTar,pu))then exit;
          end;
 
          if(uid_ability_isteleport)then
-           if(tu^.player^.team<>player^.team )then begin uo_tar:=0;exit; end;
+           if(pTar^.player^.team<>player^.team )then begin uo_tar:=0;exit; end;
 
-         if(tu^.uid^.uid_ability_isteleport)then
-           if(unit_ability_teleport(pu,tu,td))then exit;//team
+         if(pTar^.uid^.uid_ability_isteleport)then
+           if(unit_ability_teleport(pu,pTar,td))then exit;//team
 
-         w:=unit_target2weapon(pu,tu,td,255,@a);
+         w:=unit_target2weapon(pu,pTar,td,255,@a);
          if(w<=LastUnitArms)then
          begin
             a_tar :=uo_tar;
@@ -1213,15 +1091,15 @@ begin
             exit;
          end;
 
-         if(player=tu^.player)and(tu^.ukfly)then
-           if(unit_CheckTransport(tu,pu))and(not IsUnitRange(tu^.uo_tar,nil))and(tu^.uo_x=tu^.x)and(tu^.uo_y=tu^.y)then
+         if(player=pTar^.player)and(pTar^.ukfly)then
+           if(unit_CheckTransport(pTar,pu))and(not IsUnitRange(pTar^.uo_tar,nil))and(pTar^.uo_x=pTar^.x)and(pTar^.uo_y=pTar^.y)then
            begin
-              tu^.uo_x:=x;
-              tu^.uo_y:=y;
+              pTar^.uo_x:=x;
+              pTar^.uo_y:=y;
            end;
 
-         uo_x:=tu^.vx;
-         uo_y:=tu^.vy;
+         uo_x:=pTar^.vx;
+         uo_y:=pTar^.vy;
       end;
 end;
 
@@ -1574,7 +1452,7 @@ begin
       unit_end_pprod(pu);
 
       uXCheck(@units_uid_u[               uidi     ]);
-      uXCheck(@units_ucl_u[uid_isbuilding,uid_class]);
+      uXCheck(@units_ucl_u[uid_isbuilding,uid_uibtn]);
     end;
 end;
 
@@ -1642,19 +1520,18 @@ procedure unit_SetDefaultUO(pu:PTUnit;aid,atar,ax,ay,apx,apy:integer;aResetatar,
 begin
    with pu^ do
    with uid^ do
-     if(not uid_ability_isradar)then
-     begin
-        uo_id :=aid;
-        uo_tar:=atar;
-        if(aResetatar)then a_tar:=0;
-        if(speed>0)or(nospeedcheck)then
-        begin
-           uo_x  :=ax;
-           uo_y  :=ay;
-           uo_bx :=apx;
-           uo_by :=apy;
-        end;
-     end;
+   begin
+      uo_id :=aid;
+      uo_tar:=atar;
+      if(aResetatar)then a_tar:=0;
+      if(speed>0)or(nospeedcheck)then
+      begin
+         uo_x  :=ax;
+         uo_y  :=ay;
+         uo_bx :=apx;
+         uo_by :=apy;
+      end;
+   end;
 end;
 
 {function unit_rebuild(pu:PTUnit;check:boolean):cardinal;
@@ -1798,13 +1675,13 @@ begin
    with uid^ do
    with player^ do
    case uid_ability of
-   uab_Teleport        : unit_pability:=unit_ability_Recall     (pCaster,taru,NOTSET,false);
-   uab_UACScan         : unit_pability:=unit_ability_UACScan    (pCaster,tarx,tary  ,false);
-   uab_UACStrike       : unit_pability:=unit_ability_UACStrike  (pCaster,tarx,tary  ,false);
-   uab_HTowerBlink     : unit_pability:=unit_ability_HTowerBlink(pCaster,tarx,tary  ,false);
+   uab_Teleport        :
+   uab_UACScan         :
+   uab_UACStrike       :
+   uab_HTowerBlink     :
    uab_HKeepShift      : unit_pability:=unit_ability_HKeepBlink (pCaster,tarx,tary  ,false);
    uab_SphereInvuln    : unit_pability:=unit_ability_HInvuln    (pCaster,taru       ,false);
-   uab_HEyeVision      : unit_pability:=unit_ability_HellVision (pCaster,taru       ,false);
+   uab_HEyeVision      :
    uab_UACCCLand       : if(speed>0)
                          then unit_SetDefaultUO(pCaster,ua_psability,0,tarx,tary-fly_hz,-1,-1,true ,false)
                          else
@@ -1850,6 +1727,25 @@ end;
 
 ////////   NEW
 
+function ability_CheckTarget(pCaster:PTUnit;aid:byte;tar:integer):boolean;
+var tu:PTUnit;
+begin
+   tu:=nil;
+   IsUnitRange(tar,@tu);
+   ability_CheckTarget:=false;
+   with g_aids[aid] do
+     case ua_type of
+     uat_none,
+     uat_passive,
+     uat_notarget,
+     uat_point    :;
+     uat_UnitAny  : ability_CheckTarget:=tu<>nil;
+     uat_UnitOwn  : if(tu<>nil)then ability_CheckTarget:=tu^.playeri=pCaster^.playeri;
+     uat_UnitAlly : if(tu<>nil)then ability_CheckTarget:=tu^.player^.team= pCaster^.player^.team;
+     uat_UnitEnemy: if(tu<>nil)then ability_CheckTarget:=tu^.player^.team<>pCaster^.player^.team;
+     end;
+end;
+
 function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):cardinal;
 begin
    unit_AbilityCheck:=ureq_other;
@@ -1859,7 +1755,8 @@ begin
    begin
       // HAVE ABILITY
       if(hits<=0)
-      or(not iscomplete)then exit;
+      or(not iscomplete)
+      or(aid=0)then exit;
 
       with g_aids[aid] do
         if(ua_type=uat_none)then exit;
@@ -1875,9 +1772,8 @@ begin
         if not(aid in player^.a_ability)then exit;
       end;
 
-      if(liteCheck)then exit;
-
       unit_AbilityCheck:=0;
+      if(liteCheck)then exit;
 
       // CAN CAST ABILITY
       with player^ do
@@ -1886,7 +1782,7 @@ begin
          if(ua_reload  >0)and(rld>0)then unit_AbilityCheck:=ureq_reloading;
          if(ua_req_uid >0)and(units_uid_c[ua_req_uid ]<=0)then unit_AbilityCheck:=ureq_ruid;
          if(ua_req_upgr>0)and(upgrs_cur  [ua_req_upgr]<=0)then unit_AbilityCheck:=ureq_rupid;
-         if(ua_type=uat_passive)then unit_AbilityCheck:=ureq_other;
+         if(ua_type=uat_passive)then exit;
       end;
 
       if(unit_AbilityCheck>0)then exit;
@@ -1894,26 +1790,32 @@ begin
       case aid of
       uab_Teleport,
       uab_Recall,
-      uab_UACScan,
-      uab_UACStrike,
-      uab_HEyeBlink,
-      uab_HTowerBlink,
-      uab_HKeepShift,
       uab_HKeepAura,
       uab_SphereInvuln,
       uab_SpawnLost,
       uab_SpawnLostTo,
-      uab_HEyeVision,
+
       uab_UACCCLand,
-      uab_UACCCLandTo
-                            :;
+      uab_UACCCLandTo       :;
+
+      uab_HEyeVision        : unit_AbilityCheck:=unit_ability_HellVision (pCaster,0  ,true );
+
+      uab_HEyeBlink,
+      uab_HTowerBlink       : unit_AbilityCheck:=unit_ability_HTowerBlink(pCaster,x,y,true );
+
+      uab_HKeepShift        : unit_AbilityCheck:=unit_ability_HKeepBlink (pCaster,x,y,true );
+
+      uab_UACStrike         : unit_AbilityCheck:=unit_ability_UACStrike  (pCaster,x,y,true );
+      uab_UACScan           : unit_AbilityCheck:=unit_ability_UACScan    (pCaster,x,y,true );
 
       uab_Unload,
       uab_UnloadTo          : if(transportC=0)
                               or(transportM=0)then unit_AbilityCheck:=ureq_other;
       uab_ToNextForm,
       uab_ToNextFormTUAC,
-      uab_ToNextFormTHell   : unit_AbilityCheck:=unit_morph(pCaster,uid_nextForm,false,g_uids[uid_nextForm].uid_MaxHitsh,0,true);
+      uab_ToNextFormTHell   : if(uid_nextForm<>uidi)
+                         then unit_AbilityCheck:=unit_morph(pCaster,uid_nextForm,false,1,0      ,true )
+                         else unit_AbilityCheck:=unit_morph(pCaster,uid_nextForm,false,1,level+1,true );
 
       uab_ToUACDron         : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron ,false,g_uids[uid_UACDron ].uid_MaxHitsh,0,true);
       uab_ToUGTurret,
@@ -1927,7 +1829,6 @@ begin
 end;
 
 function unit_AbilityExec(pCaster:PTUnit;aid:byte):cardinal; //new
-var tu:PTUnit;
 begin
    with pCaster^ do
    with uid^ do
@@ -1935,28 +1836,21 @@ begin
       unit_AbilityExec:=unit_AbilityCheck(pCaster,aid,false);
 
       with g_aids[aid] do
-        if(ua_type=uat_passive)and(unit_AbilityExec=0)then
-          unit_AbilityExec:=ureq_other;
-
-      if(unit_AbilityExec>0)then
-      begin
-         uo_id:=ua_amove;
-         exit;
-      end;
+        if(unit_AbilityExec>0)
+        or(ua_type=uat_passive)then
+        begin
+           uo_id:=ua_amove;
+           exit;
+        end;
 
       {
+
       // passive
-      uab_Teleport
-      uab_HKeepAura
 
       uab_UACCCLand          = 13;
       uab_UACCCLandTo        = 14;
       uab_Unload             = 15;
       uab_UnloadTo           = 16;
-
-      uab_ToNextForm         = 17;
-      uab_ToNextFormTUAC     = 18;
-      uab_ToNextFormTHell    = 19;
 
       uab_ToUACDron          = 20;
       uab_ToUGTurret         = 21;
@@ -1969,24 +1863,57 @@ begin
       }
 
       with g_aids[aid] do
-      case uo_id of
+      case aid of
       uab_Recall            : begin
                                  unit_AbilityExec:=unit_ability_Recall(pCaster,uo_tar,NOTSET,false);
                                  unit_OrderClear(pCaster,true);
-                                 if(unit_AbilityExec=0)then rld:=ua_reload;
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
                               end;
       uab_UACScan           : begin
                                  unit_AbilityExec:=unit_ability_UACScan(pCaster,uo_x,uo_y,false);
                                  unit_OrderClear(pCaster,true);
-                                 if(unit_AbilityExec=0)then rld:=ua_reload;
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                                 else rld:=ua_reload;
                               end;
-      uab_UACStrike         : ;// strike code, need instant action and dedicated strike object;
-      uab_HEyeBlink         : ;// short range blink
-      uab_HTowerBlink       : ;// short range blink
-      uab_HKeepShift        : ;// any range teleportation
+      uab_UACStrike         : begin
+                                 unit_AbilityExec:=unit_ability_UACStrike(pCaster,uo_x,uo_y,false);
+                                 unit_OrderClear(pCaster,true);
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                                 else rld:=ua_reload;
+                              end;
+      uab_HEyeVision        : begin
+                                 unit_AbilityExec:=unit_ability_HellVision(pCaster,uo_tar,false);
+                                 unit_OrderClear(pCaster,true);
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                                 else rld:=ua_reload;
+                              end;
+      uab_HEyeBlink,
+      uab_HTowerBlink       : begin
+                                 unit_AbilityExec:=unit_ability_HTowerBlink(pCaster,uo_x,uo_y,false);
+                                 unit_OrderClear(pCaster,true);
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                                 else rld:=ua_reload;
+                              end;
+      uab_HKeepShift        : begin
+                                 unit_AbilityExec:=unit_ability_HKeepBlink(pCaster,uo_x,uo_y,false);
+                                 unit_OrderClear(pCaster,true);
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                                 else
+                                   if(ua_req_upgr>0)then player^.upgrs_cur[ua_req_upgr]-=1;
+                              end;
       uab_SphereInvuln      : ;// invuln sphere
       uab_SpawnLost         : begin // spawn lost
-
+                                 unit_AbilityExec:=unit_ability_SpawnLost(pCaster,false);
+                                 //unit_OrderClear(pCaster,true);
+                                 uo_id:=ua_amove;
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
                               end;
       uab_SpawnLostTo       : begin // spawn lost to
                                  uo_tar:=0;
@@ -1995,10 +1922,9 @@ begin
                                  move_x:=x;
                                  move_y:=y;
                                  // spawn lost to uo_x,uo_y
+                                 unit_ability_SpawnLost(pCaster,false);
                               end;
-      uab_HEyeVision        : begin // hell vision cast
 
-                              end;
 
 
       uab_Unload            : begin
@@ -2006,12 +1932,16 @@ begin
                                  unit_DefaultUOMove(pCaster);
                               end;
       uab_UnloadTo          : begin
-                                 if(x=uo_x)and(y=uo_y)then uo_id:=uab_Unload;
                                  uo_tar:=0;
                                  uo_bx :=-1;
                                  uo_by :=-1;
                                  move_x:=uo_x;
                                  move_y:=uo_y;
+                                 if(x=uo_x)and(y=uo_y)then
+                                 begin
+                                    uo_id:=unit_Ability2Act(pCaster,uab_Unload);
+                                    if(uo_id=0)then unit_OrderClear(pCaster,true);
+                                 end;
                               end;
 
       uab_UACCCLand         : begin
@@ -2021,6 +1951,18 @@ begin
                                  unit_OrderClear(pCaster,false);
                                  uo_id :=ua_amove;
                               end;
+
+      uab_ToNextForm,
+      uab_ToNextFormTUAC,
+      uab_ToNextFormTHell   : begin
+                                 if(uid_nextForm<>uidi)
+                                 then unit_AbilityExec:=unit_morph(pCaster,uid_nextForm,false,1,0      ,false)
+                                 else unit_AbilityExec:=unit_morph(pCaster,uid_nextForm,false,1,level+1,false);
+                                 unit_OrderClear(pCaster,true);
+                                 if(unit_AbilityExec>0)
+                                 then GameLogBits2Message(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
+                              end;
+      else unit_OrderClear(pCaster,true);
       end;
    end;
 end;

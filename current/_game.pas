@@ -869,29 +869,23 @@ begin
               begin
                  if(o_id=uo_corder)then
                    case o_x0 of
-                   co_supgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0      ,true)=0,true,true );
-                   co_cupgrade : if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true,false);
+                   co_supgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0      ,true)=0,true ,true );
+                   co_cupgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true ,false);
 
-                   co_sunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0      ,true)=0,true,true );
-                   co_cunit    : if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true,false);
+                   co_sunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0      ,true)=0,true ,true );
+                   co_cunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true ,false);
                    co_pcancle  : if(isselected)then
                                  begin
-                                 if(UnitOrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true,false);
-                                 if(UnitOrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true,false);
+                                 if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true ,false);
+                                 if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true ,false);
                                  end;
                    end;
 
                  if(isselected)and(o_id=uo_corder)then
                    case o_x0 of
                    // TO ONE
-                   co_ability  : if(uid_ability1=o_a0)
-                                 or(uid_ability2=o_a0)
-                                 or(uid_ability3=o_a0)then
-                                   if(ui_ReadyForAbility(pu))then  ;
-                                     {case o_x0 of
-                                     co_sability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_sability(pu               ,true)=0,false,true );
-                                     co_pability: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_pability(pu,o_y0,o_x1,o_y1,true)=0,false,true );
-                                     end;}
+                   co_ability  : if(unit_OrderCheckAbility(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_AbilityCheck    (pu,o_a0     ,false)=0,false,true );
+
                    // TO ALL
                    co_destroy  : unit_kill(pu,false,false,true,false,true);
                    co_rcamove,
@@ -921,29 +915,34 @@ begin
            if(tar_u<>nil)then
              with tar_u^ do
                case o_x0 of
-               co_supgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0          ,false),x,y);
-               co_cupgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y);
-               co_sunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0          ,false),x,y);
-               co_cunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
+               co_supgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0      ,false),x,y);
+               co_cupgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,false),x,y);
+               co_sunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0      ,false),x,y);
+               co_cunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,false),x,y);
 
                co_pcancle :
-                         if(GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0    ,false,false),x,y))then
-                            GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0    ,false,false),x,y);
-
-               {co_sability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_sability        (tar_u               ,false),x,y);
-               co_pability: GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_pability        (tar_u,o_y0,o_x1,o_y1,false),x,y);
-               co_rebuild : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_rebuild         (tar_u               ,false),x,y); }
+                         if(GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,false),x,y))then
+                            GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,false),x,y);
+               co_ability :
+                     if(not GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false      ),x,y))then
+                       with g_aids[o_a0] do
+                         case ua_type of
+                         uat_notarget : uo_id:=unit_Ability2Act(tar_u,o_a0);
+                         uat_point,
+                         uat_UnitAny,
+                         uat_UnitOwn,
+                         uat_UnitAlly,
+                         uat_UnitEnemy:unit_SetDefaultUO(tar_u,unit_Ability2Act(tar_u,o_a0),o_y0,o_x1,o_y1,-1,-1,false,true);
+                         end;
                end
            else
              case o_x0 of
              co_supgrade,
-             co_cupgrade : GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,ureq_smiths  ,-1,-1);
+             co_cupgrade: GameLogBits2Message(tPlayer,o_a0,lmt_argt_upgrade,ureq_smiths  ,-1,-1);
              co_sunit,
-             co_cunit    : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
-             co_pcancle  : GameLogBits2Message(tPlayer,0   ,255             ,ureq_other   ,-1,-1);
-             {co_sability,
-             co_pability : GameLogBits2Message(tPlayer,o_a0,lmt_argt_ability,ureq_other   ,-1,-1);
-             co_rebuild  : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_other   ,-1,-1); }
+             co_cunit   : GameLogBits2Message(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
+             co_pcancle : GameLogBits2Message(tPlayer,0   ,255             ,ureq_other   ,-1,-1);
+             co_ability : ;
              end;
 
       end;

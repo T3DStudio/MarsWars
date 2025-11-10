@@ -217,8 +217,6 @@ end;
 //   GAME
 //
 
-TUnitActionMode = (uam_have=0,uam_check,uam_exec);
-
 TUnitAbilityTargetType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_UnitAny,uat_UnitOwn,uat_UnitAlly,uat_UnitEnemy);
 
 TUnitAbility = record
@@ -232,9 +230,9 @@ TUnitAbility = record
    ua_mbrush_r    : integer;
    ua_btn         : pSDl_Surface;
    ua_str_name,
+   ua_str_Reqs,
+   ua_str_Common,
    ua_str_Descript: shortstring;
-   ua_str_UBrush
-                  : boolean;
    {$ENDIF}
 end;
 
@@ -371,7 +369,7 @@ TUID = record
    uid_DeathUID,
    uid_DeathUIDn,
    uid_race,
-   uid_class,
+   uid_uibtn,
    uid_req_uid1,
    uid_req_uid1n,
    uid_req_uid2,

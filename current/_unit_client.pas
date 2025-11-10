@@ -538,7 +538,7 @@ begin
    begin
       units_all_e+=1;
       armylimit+=uid_LimitUse;
-      units_ucl_e[uid_isbuilding,uid_class]+=1;
+      units_ucl_e[uid_isbuilding,uid_uibtn]+=1;
       units_bld_e[uid_isbuilding     ]+=1;
       units_bld_l[uid_isbuilding     ]+=uid_LimitUse;
       units_uid_e[uidi            ]+=1;
@@ -556,11 +556,11 @@ begin
          begin
             unit_bld_inc_cntrs(pu);
 
-            p:=@units_ucl_u[uid_isbuilding,uid_class];
+            p:=@units_ucl_u[uid_isbuilding,uid_uibtn];
             if(p^=0)
             then p^:=unum
             else if(0<p^)and(p^<=MaxUnits)then
-                  if(g_units[p^].uid^.uid_class<>uid_class)then p^:=unum;
+                  if(g_units[p^].uid^.uid_uibtn<>uid_uibtn)then p^:=unum;
 
             p:=@units_uid_u[uidi];
             if(p^=0)
@@ -576,7 +576,7 @@ begin
 
                  prod_unit_Limit+=g_uids[_puid].uid_LimitUse;
                  prod_unit_Now+=1;
-                 prod_unit_ucl[g_uids[_puid].uid_class]+=1;
+                 prod_unit_ucl[g_uids[_puid].uid_uibtn]+=1;
                  prod_unit_uid[      _puid      ]+=1;
                  energyl_cur-=g_uids[_puid].uid_EnergyReq;
               end;
@@ -606,7 +606,7 @@ begin
    begin
       units_all_e-=1;
       armylimit-=uid_LimitUse;
-      units_ucl_e[uid_isbuilding,uid_class]-=1;
+      units_ucl_e[uid_isbuilding,uid_uibtn]-=1;
       units_bld_e[uid_isbuilding     ]-=1;
       units_bld_l[uid_isbuilding     ]-=uid_LimitUse;
       units_uid_e[uidi            ]-=1;
@@ -625,8 +625,8 @@ begin
             energyl_cur-=uid_EnergyGen;
             energyl_max-=uid_EnergyGen;
             units_uid_c[uidi]-=1;
-            units_ucl_c[uid_isbuilding,uid_class]-=1;
-            if(units_ucl_u[uid_isbuilding,uid_class]=unum)then units_ucl_u[uid_isbuilding,uid_class]:=0;
+            units_ucl_c[uid_isbuilding,uid_uibtn]-=1;
+            if(units_ucl_u[uid_isbuilding,uid_uibtn]=unum)then units_ucl_u[uid_isbuilding,uid_uibtn]:=0;
             if(units_uid_u[uidi            ]=unum)then units_uid_u[uidi            ]:=0;
 
             unit_done_dec_cntrs(pu);
@@ -639,7 +639,7 @@ begin
 
                  prod_unit_Limit-=g_uids[_puid].uid_LimitUse;
                  prod_unit_Now-=1;
-                 prod_unit_ucl[g_uids[_puid].uid_class]-=1;
+                 prod_unit_ucl[g_uids[_puid].uid_uibtn]-=1;
                  prod_unit_uid[      _puid      ]-=1;
                  energyl_cur+=g_uids[_puid].uid_EnergyReq;
               end;

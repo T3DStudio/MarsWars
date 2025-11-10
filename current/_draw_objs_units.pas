@@ -189,11 +189,11 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(iscomplete         )then ui_GetCommanderWeight+=128;
-      if(not uid_isbuilding )then ui_GetCommanderWeight+=64;
-      if(not uid_HaveAbility)then ui_GetCommanderWeight+=32;
-      if(rld<=0             )then ui_GetCommanderWeight+=16;
-      if(speed>0            )then ui_GetCommanderWeight+=8;
+      if(iscomplete        )then ui_GetCommanderWeight+=128;
+      if(not uid_isbuilding)then ui_GetCommanderWeight+=64;
+      if(uid_HaveAbility   )then ui_GetCommanderWeight+=32;
+      if(uid_BaseSpeed>0   )then ui_GetCommanderWeight+=16;
+      if(rld<=0            )then ui_GetCommanderWeight+=8;
    end;
 end;
 
@@ -221,30 +221,6 @@ begin
    ui_CommandercW :=curWeight;
    ui_CommandercD :=curDist;
 end;
-{function LowerReload(pu1,pu2:PTUnit):PTUnit;
-begin
-   if(pu1<>nil)and(pu2=nil)then
-   begin
-      LowerReload:=pu1;
-      exit;
-   end;
-   if(pu1=nil)and(pu2<>nil)then
-   begin
-      LowerReload:=pu2;
-      exit;
-   end;
-
-   if(pu1^.rld>pu2^.rld)
-   then LowerReload:=pu2
-   else LowerReload:=pu1;
-end;  }
-{if(ui_ReadyForAbility(pu))then
-begin
-if(ui_HaveAbility(pu,false))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_sabilityu,@ui_uibtn_sabilityd,@ui_uibtn_sabilitys,unit_sability(pu       ,true)=0,false,true);
-if(ui_HaveAbility(pu,true ))then UnitOrderSetNearestTarget(pu,mouse_x  ,mouse_y  ,@ui_uibtn_pabilityu,@ui_uibtn_pabilityd,@ui_uibtn_pabilitys,unit_pability(pu,-1,0,0,true)=0,false,true);
-end;
-if(ui_HaveRebuild(pu      ))then UnitOrderSetNearestTarget(pu,ui_cam_cx,ui_cam_cy,@ui_uibtn_rebuildu ,@ui_uibtn_rebuildd ,@ui_uibtn_rebuilds ,unit_rebuild(pu        ,true)=0,true ,true);
-}
 
 procedure ui_CountersAndMarks(pu:PTUnit);
 var i:byte;
@@ -261,7 +237,13 @@ begin
       if(unit_F1SelectFilter(pu))then ui_IncGroupCounter(@ui_group_f1      ,x,y,uidi); // all builders
 
       // UI Selected commander
-      if(isselected)then ui_SetCommander(pu);
+      if(isselected)then
+        case m_brush of
+        -255..-1: if(unit_OrderCheckAbility(pu,byte(-m_brush)))then
+                    UnitOrderSetNearestTarget(pu,mouse_map_x,mouse_map_y,@ui_CommandercPU,@ui_CommandercD,@ui_CommandercW,unit_AbilityCheck(pu,byte(-m_brush),false)=0,false,true );
+        else      ui_SetCommander(pu);
+        end;
+
 
       if(uid_isbuilding)then
       begin
@@ -285,6 +267,7 @@ begin
          end;
          if(isselected)and(uid_HaveRallyPoint)then
          begin
+            ui_uibtn_rpoint+=1;
             UnitsInfoAddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
             SpriteListAddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
          end;
@@ -341,7 +324,7 @@ uab_UACCCLandTo   : begin
       begin
          if(rld<ui_uid_reload [uidi])or(ui_uid_reload [uidi]<0)then ui_uid_reload [uidi]:=rld;
          if(uid_isbuilding)then
-           if(rld<ui_bucl_reload[uid_class])or(ui_bucl_reload[uid_class]<0)then ui_bucl_reload[uid_class]:=rld;
+           if(rld<ui_bucl_reload[uid_uibtn])or(ui_bucl_reload[uid_uibtn]<0)then ui_bucl_reload[uid_uibtn]:=rld;
 
          if(isselected)then
          begin
@@ -359,13 +342,13 @@ uab_UACCCLandTo   : begin
          begin
             if(t>0)then
             begin
-               if(ui_bprod_ucl_time[uid_class]<=0)
-               or(ui_bprod_ucl_time[uid_class]> t)then ui_bprod_ucl_time[uid_class]:=t;
+               if(ui_bprod_ucl_time[uid_uibtn]<=0)
+               or(ui_bprod_ucl_time[uid_uibtn]> t)then ui_bprod_ucl_time[uid_uibtn]:=t;
                if(ui_bprod_first<=0)
                or(ui_bprod_first> t)then ui_bprod_first:=t;
             end;
             ui_bprod_uid_count[uidi     ]+=1;
-            ui_bprod_ucl_count[uid_class]+=1;
+            ui_bprod_ucl_count[uid_uibtn]+=1;
             ui_bprod_all                 +=1;
          end
          else
@@ -659,7 +642,9 @@ begin
 
    ui_CommandercPU   :=nil;
    ui_CommandercD    :=ui_CommandercD.MaxValue;
+   ui_CommandercW    :=0;
 
+   ui_uibtn_rpoint   :=0;
    ui_uibtn_move     :=0;
    ui_uibtn_attack   :=0;
    ui_uibtn_apatrol  :=0;
@@ -674,7 +659,7 @@ begin
         if(playeri=UIPlayer)and(hits>0)then
           if(IsUnitRange(transportU,@tu))then
           begin
-             if(tu^.isselected)and(G_Status=gs_running)and(playeri=UIPlayer)then ui_units_inapc[uidi]+=1;
+             if(tu^.isselected){and(G_Status=gs_running)}then ui_units_inapc[uidi]+=1;
           end
           else ui_CountersAndMarks(pu);
    end;

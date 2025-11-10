@@ -293,6 +293,7 @@ ui_bprod_first,
 ui_bprod_all      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
+ui_uibtn_rpoint   : integer = 0;   // ui rally point
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_attack   : integer = 0;   // ui attack buttons
 ui_uibtn_apatrol  : integer = 0;   // ui apatrol button
@@ -331,7 +332,9 @@ ui_GameStatusY    : integer = 0;
 ui_EnergyX        : integer = 0;
 ui_EnergyY        : integer = 0;
 ui_ArmyX          : integer = 0;
-ui_ArmyY          : integer = 0;
+ui_ArmyY0         : integer = 0;
+ui_ArmyY1         : integer = 0;
+ui_ArmyY2         : integer = 0;
 ui_Apmx           : integer = 0;
 ui_Apmy           : integer = 0;
 ui_FPSX           : integer = 0;
@@ -514,7 +517,7 @@ m_brushc          : cardinal;
 m_brushx,
 m_brushy,
 m_brush           : integer;
-m_focus           : TMouseFocus;
+m_uifocus         : TMouseFocus;
 m_btnN            : integer;
 m_DragCamMove     : boolean = false;
 m_RightClickAct   : boolean = true;
@@ -987,6 +990,7 @@ str_hint_CanRebuildTo,
 str_hint_TargetLimit,
 str_hint_requirements,
 str_hint_req,
+str_hint_reload,
 str_hint_uprod,
 str_hint_bprod,
 

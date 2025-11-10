@@ -208,7 +208,10 @@ end;
 
 procedure saveload_SaveWrite(fn:shortstring);
 var f:file;
+    i:integer;
 begin
+   fn:=folder_save+fn+fileExt_save;
+
    assign(f,fn);
    {$I-}
    rewrite(f,1);
@@ -231,8 +234,6 @@ begin
 end;
 
 function saveload_Save(check:boolean):boolean;
-var i:integer;
-   fn:shortstring;
 begin
    saveload_Save:=false;
 
@@ -245,11 +246,9 @@ begin
 
    if(check)then exit;
 
-   fn:=folder_save+svld_str_fname+fileExt_save;
-
-   if(FileExists(fn))
-   then menu_msgBox_Set(str_menu_SaveLoad+': '+str_FileReWrite,fn,mmbt_SaveRewrite)
-   else saveload_SaveWrite(fn);
+   if(FileExists(folder_save+svld_str_fname+fileExt_save))
+   then menu_msgBox_Set(str_FileSave+': '+str_FileReWrite,svld_str_fname,mmbt_SaveRewrite)
+   else saveload_SaveWrite(svld_str_fname);
 end;
 
 function saveload_Load(check:boolean):boolean;
@@ -334,6 +333,7 @@ end;
 
 procedure saveload_DeleteFile(fn:shortstring);
 begin
+   fn:=folder_save+fn+fileExt_save;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
@@ -344,7 +344,6 @@ begin
 end;
 
 function saveload_DeleteInit(check:boolean):boolean;
-var fn:shortstring;
 begin
    saveload_DeleteInit:=false;
 
@@ -356,7 +355,6 @@ begin
 
    if(check)then exit;
 
-   fn:=folder_save+svld_str_fname+fileExt_save;
-   menu_msgBox_Set(str_menu_SaveLoad+': '+str_FileDelete,fn,mmbt_DeleteSave);
+   menu_msgBox_Set(str_FileDelete,svld_str_fname,mmbt_DeleteSave);
 end;
 

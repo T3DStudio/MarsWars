@@ -4,14 +4,14 @@
 //   FORWARD Declarations
 //
 
-procedure unit_damage(pu:PTUnit;damage:integer;pl:byte;IgnoreArmor:boolean);forward;
-procedure unit_Bonuses (pu:PTUnit);forward;
+procedure unit_damage (pu:PTUnit;damage:integer;pl:byte;IgnoreArmor:boolean);forward;
+procedure unit_Bonuses(pu:PTUnit);forward;
+procedure unit_kill   (pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);forward;
+function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
-{function unit_sability (pCaster:PTUnit;check:boolean):cardinal; forward;
-function unit_pability (pCaster:PTUnit;taru,tarx,tary:integer;check:boolean):cardinal;forward;
-function unit_rebuild  (pu:PTUnit;check:boolean):cardinal;      forward;      }
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
+function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):cardinal;forward;
 
 {procedure ai_Local_InitVars(pu:PTUnit);forward;
 procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
@@ -1115,27 +1115,51 @@ begin
    end;
 end;
 
-function UnitOrderCheckSmith(pu:pTunit;oid:byte):boolean;
+function unit_OrderCheckSmith(pu:pTunit;oid:byte):boolean;
 begin
-   UnitOrderCheckSmith:=true;
+   unit_OrderCheckSmith:=true;
    with pu^     do
    with uid^    do
    with player^ do
      if(uid_issmith)then
        if(oid in uid_prod_Upgrades)or(oid=255)then
          if(units_upgrProds_s<=0)or(isselected)then exit;
-   UnitOrderCheckSmith:=false;
+   unit_OrderCheckSmith:=false;
 end;
-function UnitOrderCheckBarrack(pu:pTunit;oid:byte):boolean;
+function unit_OrderCheckBarrack(pu:pTunit;oid:byte):boolean;
 begin
-   UnitOrderCheckBarrack:=true;
+   unit_OrderCheckBarrack:=true;
    with pu^     do
    with uid^    do
    with player^ do
      if(uid_isbarrack)then
        if(oid in uid_prod_Units)or(oid=255)then
          if(units_unitProds_s<=0)or(isselected)then exit;
-   UnitOrderCheckBarrack:=false;
+   unit_OrderCheckBarrack:=false;
+end;
+function unit_OrderCheckAbility(pu:PTUnit;aid:byte):boolean;
+begin
+   unit_OrderCheckAbility:=false;
+   with pu^ do
+   with uid^ do
+   with player^ do
+     if(uid_ability1=aid)
+     or(uid_ability2=aid)
+     or(uid_ability3=aid)then
+       unit_OrderCheckAbility:=(units_all_s=1)or
+                             ((uo_id<>ua_ability1)
+                           and(uo_id<>ua_ability2)
+                           and(uo_id<>ua_ability3));
+end;
+function unit_AbilityGetUIDRef(aid,uidcaster:byte):byte;
+begin
+   unit_AbilityGetUIDRef:=0;
+   with g_aids[aid] do
+     case ua_mbrush_r of
+     -255..-1   : unit_AbilityGetUIDRef:=byte(-ua_mbrush_r);
+     uambt_self : unit_AbilityGetUIDRef:=uidcaster;
+     uambt_nform: with g_uids[uidcaster] do unit_AbilityGetUIDRef:=uid_nextForm;
+     end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1251,21 +1275,20 @@ begin
      else CheckUnitTeamVision:=(TeamVision[POVTeam]>0)and(TeamDetection[POVTeam]>0);
 end;
 
-procedure UnitOrderSetNearestTarget(taru:PTUnit;cx,cy:integer;ptaru:PPTunit;pdist:pinteger;pCanExec:pboolean;CanExec,noReload:boolean;closest:boolean);
+procedure UnitOrderSetNearestTarget(taru:PTUnit;cx,cy:integer;ptaru:PPTunit;pdist:pinteger;pPriority:pboolean;cPriority,noReload:boolean;closest:boolean);
 var d:integer;
 begin
    d:=point_dist_int(cx,cy,taru^.x,taru^.y);
 
-   if(CanExec>pCanExec^)then
+   if(cPriority>pPriority^)then
    begin
-      ptaru^   :=taru;
-      pdist^   :=d;
-      pCanExec^:=CanExec;
-      exit;
+      ptaru^    :=taru;
+      pdist^    :=d;
+      pPriority^:=cPriority;
    end
    else
-     if(CanExec=pCanExec^)then
-       case CanExec or noReload of
+     if(cPriority=pPriority^)then
+       case cPriority or noReload of
        true : if(    closest and(d<pdist^))
               or(not closest and(d>pdist^))then
               begin
@@ -1296,16 +1319,6 @@ begin
               ui_HaveAttack:=true;
               break;
            end;
-end;
-
-function ui_ReadyForAbility(pu:PTUnit):boolean;
-begin
-   with pu^ do
-   with player^ do
-   ui_ReadyForAbility:=(units_all_s=1)or
-                       ((uo_id<>ua_ability1)
-                     and(uo_id<>ua_ability2)
-                     and(uo_id<>ua_ability3));
 end;
 
 function unit_GetCastingAbility(pu:PTUnit):byte;
@@ -1718,9 +1731,9 @@ begin
        else GetKeyPointColor:=PlayerGetColor(kpOwnerPlayer     ,shadow);
 end;
 
-function ui_SetPlayer(NewPlayerN:byte;check:boolean):boolean;
+function ui_SetUIPlayer(NewPlayerN:byte;check:boolean):boolean;
 begin
-   ui_SetPlayer:=false;
+   ui_SetUIPlayer:=false;
 
    if(NewPlayerN<>255)then
    begin
@@ -1730,7 +1743,7 @@ begin
       with g_gplayers[NewPlayerN] do
         if(isobserver)and(not isdefeated)then exit;
    end;
-   ui_SetPlayer:=true;
+   ui_SetUIPlayer:=true;
 
    if(check)then exit;
 
@@ -1756,7 +1769,7 @@ begin
       if(ui_UnitSelectedNU=0)
       then
       else
-        if(tu^.uid^.uid_class>g_units[ui_UnitSelectedNU].uid^.uid_class)
+        if(tu^.uid^.uid_uibtn>g_units[ui_UnitSelectedNU].uid^.uid_uibtn)
         then
         else exit;
       ui_UnitSelectedNU:=u;
@@ -1778,16 +1791,13 @@ begin
    ui_MouseBrushNeedDrawEdges:=true;
    case m_brush of
    1..255     : exit;
-   -255..-1   : ;
-
-
-   {co_pability: if(ui_uibtn_pabilityu<>nil)then
-                  case ui_uibtn_pabilityu^.uid^.uid_ability of
-                  uab_HTowerBlink,
-                  uab_HKeepShift,
-                  uab_RebuildInPoint,
-                  uab_UACCCLand         : exit;
-                  end; }
+   -255..-1   : with g_aids[-m_brush] do
+                  case ua_mbrush_r of
+                  -255..-1,
+                  uambt_nform,
+                  uambt_self : exit;
+                  else
+                  end;
    end;
    ui_MouseBrushNeedDrawEdges:=false;
 end;

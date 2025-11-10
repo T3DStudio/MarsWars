@@ -92,7 +92,6 @@ begin
    InitGameClientData;
    InitMIDDataCL;
    gfx_MakeUnitIcons;
-   //gfx_MakeAbilityIcons;
    SetAbilityIcons;
 
    //gfx_SaveUnitIcons;

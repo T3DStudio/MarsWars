@@ -639,6 +639,7 @@ end;
 
 procedure replay_DeleteFile(fn:shortstring);
 begin
+   fn:=folder_replay+fn+fileExt_Replay;
    if(FileExists(fn))then
    begin
       DeleteFile(fn);
@@ -649,7 +650,6 @@ begin
 end;
 
 function replay_DeleteInit(check:boolean):boolean;
-var fn:shortstring;
 begin
    replay_DeleteInit:=false;
 
@@ -661,8 +661,7 @@ begin
    replay_DeleteInit:=true;
    if(check)then exit;
 
-   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
-   menu_msgBox_Set(str_menu_Replays+': '+str_FileDelete,fn,mmbt_DeleteReplay);
+   menu_msgBox_Set(str_FileDelete,rpls_list[rpls_list_sel],mmbt_DeleteReplay);
 end;
 
 function replay_IsPaused:boolean;

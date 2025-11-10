@@ -96,7 +96,7 @@ begin
    begin
       uid_MaxHits1     := 1000;
       uid_ProdTimeSec  := 1;
-      uid_class        := 255;
+      uid_uibtn        := 255;
       uid_race         := r_hell;
       uid_CanAttack    := false;
       uid_FastDeathHits:=-32000;
@@ -126,7 +126,7 @@ begin
    uid_EnergyReq       := 900;
    uid_r               := 66;
    uid_BaseSightR      := 250;
-   uid_class           := 0;
+   uid_uibtn           := 0;
    uid_ProdTimeSec     := ptime3;
    uid_BaseRegen       := BaseRegen1;
    uid_isbuilding      := true;
@@ -137,7 +137,6 @@ begin
    uid_upgr_SightStep  := 50;
    uid_ability1        := uab_HKeepShift;
    uid_ability2        := uab_HKeepAura;
-   uid_ability3        := uab_ToNextForm;
    uid_nextForm        := UID_HAKeep;
 
    case i of
@@ -158,7 +157,7 @@ begin
    uid_MaxHits1        := 10000;
    uid_EnergyReq       := 300;
    uid_r               := 60;
-   uid_class           := 1;
+   uid_uibtn           := 1;
    uid_ProdTimeSec     := ptime2;
    uid_BaseRegen       := BaseRegen1;
    uid_OutUnitsTeleBuff:= true;
@@ -175,7 +174,7 @@ begin
    uid_MaxHits1        := 10000;
    uid_EnergyReq       := 300;
    uid_r               := 53;
-   uid_class           := 5;
+   uid_uibtn           := 5;
    uid_ProdTimeSec     := ptime2;
    uid_BaseRegen       := BaseRegen1;
    uid_isbuilding      := true;
@@ -196,7 +195,7 @@ begin
    uid_EnergyGen       := 50;
    uid_EnergyReq       := 50;
    uid_r               := 22;
-   uid_class           := 2;
+   uid_uibtn           := 2;
    uid_ProdTimeSec     := ptime1;
    uid_isbuilding      := true;
    uid_islight         := true;
@@ -221,6 +220,7 @@ UID_HSymbol3: begin
 UID_HSymbol4: begin
               uid_EnergyGen  *= 4;
               uid_EnergyReq  := 0;
+              uid_ability3   := 0;
               end;
    end;
 end;
@@ -232,7 +232,7 @@ begin
    uid_MaxHits1        := 15000;
    uid_EnergyReq       := 1200;
    uid_r               := 65;
-   uid_class           := 9;
+   uid_uibtn           := 9;
    uid_ProdTimeSec     := ptime5;
    uid_BaseRegen       := BaseRegen1;
    uid_isbuilding      := true;
@@ -244,7 +244,7 @@ begin
    uid_MaxHits1        := 15000;
    uid_EnergyReq       := 1200;
    uid_r               := 65;
-   uid_class           := 10;
+   uid_uibtn           := 10;
    uid_ProdTimeSec     := ptime5;
    uid_BaseRegen       := BaseRegen1;
    uid_isbuilding      := true;
@@ -257,7 +257,7 @@ begin
    uid_MaxHits1        := 15000;
    uid_EnergyReq       := 1200;
    uid_r               := 86;
-   uid_class           := 11;
+   uid_uibtn           := 11;
    uid_ProdTimeSec     := ptime5;
    uid_BaseRegen       := BaseRegen1;
    uid_isbuilding      := true;
@@ -269,22 +269,22 @@ end;
 
 UID_HEye:
 begin
-   uid_MaxHits1        := 200;
+   uid_MaxHits1        := 100;
    uid_EnergyReq       := 50;
    uid_r               := 10;
    uid_BaseSightR      := 300;
-   uid_class           := 12;
+   uid_uibtn           := 12;
    uid_ProdTimeSec     := ptime1h;
    uid_isbuilding      := true;
    uid_issolid         := false;
    uid_islight         := true;
    uid_ismech          := false;
-   uid_SplashResist    := true; // ???
+   uid_SplashResist    := true;
    uid_isdetector      := true;
    uid_upgr_SightR     := upgr_hell_EvilEyeR;
    uid_upgr_SightStep  := 50;
-   uid_ability1        := uab_HEyeVision;
-   uid_ability2        := uab_HEyeBlink;
+   uid_ability1        := uab_HEyeBlink;
+   uid_ability2        := uab_HEyeVision;
 end;
 UID_HTeleport:
 begin
@@ -292,7 +292,7 @@ begin
    uid_EnergyReq       := 400;
    uid_r               := 28;
    uid_BaseSightR      := 100;
-   uid_class           := 13;
+   uid_uibtn           := 13;
    uid_ProdTimeSec     := ptime2;
    uid_BaseRegen       := BaseRegen1;
    uid_LimitUse        := ul4;
@@ -308,7 +308,7 @@ begin
    uid_MaxHits1        := 10000;
    uid_EnergyReq       := 2000;
    uid_r               := 50;
-   uid_class           := 14;
+   uid_uibtn           := 14;
    uid_LimitUse        := ul10;
    uid_ProdTimeSec     := ptime10;
    uid_BaseRegen       := BaseRegen1;
@@ -329,7 +329,7 @@ begin
    uid_EnergyReq       := 200;
    uid_r               := 20;
    uid_BaseSightR      := 300;
-   uid_class           := 6;
+   uid_uibtn           := 6;
    uid_ProdTimeSec     := ptime1q;
    uid_ability1        := uab_HTowerBlink;
    uid_ability3        := uab_ToNextFormTHell;
@@ -347,7 +347,7 @@ begin
    uid_EnergyReq       := 400;
    uid_r               := 20;
    uid_BaseSightR      := 350;
-   uid_class           := 7;
+   uid_uibtn           := 7;
    uid_ProdTimeSec     := ptime2;
    uid_req_uid1        := UID_HFortress;
    uid_ability1        := uab_HTowerBlink;
@@ -371,7 +371,7 @@ begin
    uid_r               := 11;
    uid_BaseSpeed       := 10;
    uid_BaseSightR      := 200;
-   uid_class           := 0;
+   uid_uibtn           := 0;
    uid_PainC           := 2;
    uid_ProdTimeSec     := ptime1;
    uid_islight         := true;
@@ -387,7 +387,7 @@ begin
    uid_r               := 14;
    uid_BaseSpeed       := 16;
    uid_BaseSightR      := 200;
-   uid_class           := 1;
+   uid_uibtn           := 1;
    uid_PainC           := 8;
    uid_ProdTimeSec     := ptime1;
    SetWeapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpst2,0,0,0,upgr_hell_MeleeDamage,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,wtp_distance,0,dm_AntiUnitBioHeavy2);
@@ -403,7 +403,7 @@ begin
    uid_r               := 14;
    uid_BaseSpeed       := 10;
    uid_BaseSightR      := 250;
-   uid_class           := 2;
+   uid_uibtn           := 2;
    uid_PainC           := 10;
    uid_ProdTimeSec     := ptime1h;
    uid_LimitUse        := ul2;
@@ -423,7 +423,7 @@ begin
    uid_r               := 14;
    uid_BaseSpeed       := 10;
    uid_BaseSightR      := 275;
-   uid_class           := 3;
+   uid_uibtn           := 3;
    uid_PainC           := 10;
    uid_ProdTimeSec     := ptime1h;
    uid_LimitUse        := ul3;
@@ -438,7 +438,7 @@ begin
    uid_r               := 13;
    uid_BaseSpeed       := 14;
    uid_BaseSightR      := 225;
-   uid_class           := 4;
+   uid_uibtn           := 4;
    uid_PainC           := 5;
    uid_ProdTimeSec     := ptime1;
    uid_LimitUse        := ul1h;
@@ -454,7 +454,7 @@ begin
    uid_r               := 14;
    uid_BaseSpeed       := 10;
    uid_BaseSightR      := 200;
-   uid_class           := 5;
+   uid_uibtn           := 5;
    uid_PainC           := 8;
    uid_ProdTimeSec     := ptime1q;
    uid_LimitUse        := ul1h;
@@ -475,7 +475,7 @@ begin
    uid_r               := 15;
    uid_BaseSpeed       := 7;
    uid_BaseSightR      := 225;
-   uid_class           := 6;
+   uid_uibtn           := 6;
    uid_PainC           := 3;
    uid_ProdTimeSec     := ptime2;
    uid_req_uid1        := UID_HMonastery;
@@ -503,7 +503,7 @@ begin
    uid_r               := 17;
    uid_BaseSpeed       := 8;
    uid_BaseSightR      := 275;
-   uid_class           := 7;
+   uid_uibtn           := 7;
    uid_PainC           := 7;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HMonastery;
@@ -518,7 +518,7 @@ begin
    uid_r               := 14;
    uid_BaseSpeed       := 16;
    uid_BaseSightR      := 300;
-   uid_class           := 8;
+   uid_uibtn           := 8;
    uid_PainC           := 12;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HMonastery;
@@ -536,7 +536,7 @@ begin
    uid_r               := 17;
    uid_BaseSpeed       := 11;
    uid_BaseSightR      := 275;
-   uid_class           := 9;
+   uid_uibtn           := 9;
    uid_PainC           := 7;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HPentagram;
@@ -554,7 +554,7 @@ begin
    uid_r               := 28;
    uid_BaseSpeed       := 14;
    uid_BaseSightR      := 300;
-   uid_class           := 10;
+   uid_uibtn           := 10;
    uid_PainC           := 10;
    uid_ProdTimeSec     := ptime4;
    uid_req_uid1        := UID_HPentagram;
@@ -572,7 +572,7 @@ begin
    uid_r               := 20;
    uid_BaseSpeed       := 14;
    uid_BaseSightR      := 275;
-   uid_class           := 11;
+   uid_uibtn           := 11;
    uid_PainC           := 10;
    uid_ProdTimeSec     := ptime4;
    uid_req_uid1        := UID_HPentagram;
@@ -597,12 +597,12 @@ begin
    uid_FastDeathHits   := 1;
    case i of
 UID_LostSoul: begin
-              uid_class      := 12;
+              uid_uibtn      := 12;
               uid_EnergyReq  := 100;
               uid_ProdTimeSec:= ptimeh;
               end;
 UID_Phantom : begin
-              uid_class      := 13;
+              uid_uibtn      := 13;
               uid_EnergyReq  := 200;
               uid_ProdTimeSec:= ptime1;
               SetWeapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamaget,fr_fps1,0,0,upgr_hell_Phantoms,upgr_hell_MeleeDamage,BaseDamageBonus1,wtrset_all        ,wpr_any,uids_all,[],0,0,wtp_distance,0,dm_Lost);
@@ -627,13 +627,13 @@ begin
    case i of
 UID_Sergant : begin
               uid_BaseSpeed:= 12;
-              uid_class    := 0;
+              uid_uibtn    := 0;
               uid_ZombieUID:= UID_ZSergant;
               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1,MID_SShot,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
               end;
 UID_ZSergant: begin
               uid_BaseSpeed:= 14;
-              uid_class    := 14;
+              uid_uibtn    := 14;
               uid_PainC    := 1;
               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1,MID_SShot,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
               end;
@@ -655,13 +655,13 @@ begin
    case i of
 UID_SSergant : begin
                uid_BaseSpeed:= 12;
-               uid_class    := 1;
+               uid_uibtn    := 1;
                uid_ZombieUID:= UID_ZSSergant;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1h,MID_SSShot,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBioHeavy,0,dm_SSGShot2);
                end;
 UID_ZSSergant: begin
                uid_BaseSpeed:= 14;
-               uid_class    := 15;
+               uid_uibtn    := 15;
                uid_PainC    := 1;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1h,MID_SSShot,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,wtp_UnitBioHeavy,0,dm_SSGShot2);
                end;
@@ -681,7 +681,7 @@ begin
    case i of
 UID_Commando : begin
                uid_BaseSpeed:= 12;
-               uid_class    := 2;
+               uid_uibtn    := 2;
                uid_ZombieUID:= UID_ZCommando;
                uid_islight  := true;
                uid_req_uid1 := UID_UWeaponFactory;
@@ -689,7 +689,7 @@ UID_Commando : begin
                end;
 UID_ZCommando: begin
                uid_BaseSpeed:= 14;
-               uid_class    := 16;
+               uid_uibtn    := 16;
                uid_PainC    := 1;
                uid_islight  := false;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,wtp_UnitBioLight,6,dm_AntiUnitBioLight2);
@@ -710,7 +710,7 @@ begin
    case i of
 UID_Antiaircrafter : begin
                      uid_BaseSpeed:= 12;
-                     uid_class    := 3;
+                     uid_uibtn    := 3;
                      uid_ZombieUID:= UID_ZAntiaircrafter;
                      uid_islight  := false;
                      uid_req_uid1 := UID_UWeaponFactory;
@@ -718,7 +718,7 @@ UID_Antiaircrafter : begin
                      end;
 UID_ZAntiaircrafter: begin
                      uid_BaseSpeed:= 14;
-                     uid_class    := 17;
+                     uid_uibtn    := 17;
                      uid_PainC    := 1;
                      uid_islight  := true;
                      SetWeapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocketS,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,wtp_Fly,0,dm_AntiFly2);
@@ -738,7 +738,7 @@ begin
    case i of
 UID_SiegeMarine : begin
                   uid_BaseSpeed:= 10;
-                  uid_class    := 4;
+                  uid_uibtn    := 4;
                   uid_ZombieUID:= UID_ZSiegeMarine;
                   uid_islight  := false;
                   uid_req_uid1 := UID_UWeaponFactory;
@@ -746,7 +746,7 @@ UID_SiegeMarine : begin
                   end;
 UID_ZSiegeMarine: begin
                   uid_BaseSpeed:= 12;
-                  uid_class    := 18;
+                  uid_uibtn    := 18;
                   uid_PainC    := 1;
                   uid_islight  := true;
                   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_Granade,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,wtp_building,0,dm_Siege4);
@@ -770,7 +770,7 @@ begin
    case i of
 UID_FPlasmagunner : begin
                     uid_BaseSpeed := 12;
-                    uid_class     := 5;
+                    uid_uibtn     := 5;
                     uid_ZombieUID := UID_ZFPlasmagunner;
                     uid_ZombieHits:= uid_MaxHits1 div 10;
                     uid_islight   := false;
@@ -780,7 +780,7 @@ UID_FPlasmagunner : begin
                     end;
 UID_ZFPlasmagunner: begin
                     uid_BaseSpeed := 14;
-                    uid_class     := 19;
+                    uid_uibtn     := 19;
                     uid_PainC     := 1;
                     uid_islight   := true;
                     uid_req_uid2  := UID_HACommandCenter;
@@ -806,7 +806,7 @@ begin
    case i of
 UID_BFGMarine : begin
                 uid_BaseSpeed:= 10;
-                uid_class    := 6;
+                uid_uibtn    := 6;
                 uid_ZombieUID:= UID_ZBFGMarine;
                 uid_req_uid1 := UID_UTechCenter;
                 uid_req_uid2 := UID_UComputerStation;
@@ -814,7 +814,7 @@ UID_BFGMarine : begin
                 end;
 UID_ZBFGMarine: begin
                 uid_BaseSpeed:= 12;
-                uid_class    := 20;
+                uid_uibtn    := 20;
                 uid_PainC    := 1;
                 uid_req_uid2 := UID_HACommandCenter;
                 uid_req_uid2n:= 2;
@@ -837,7 +837,7 @@ begin
    case i of
 UID_Medic : begin
             uid_BaseSpeed:= 12;
-            uid_class    := 7;
+            uid_uibtn    := 7;
             uid_ZombieUID:= UID_ZMedic;
             uid_req_uid1 := UID_UWeaponFactory;
             uid_req_uid2 := UID_UACommandCenter;
@@ -846,7 +846,7 @@ UID_Medic : begin
             end;
 UID_ZMedic: begin
             uid_BaseSpeed:= 14;
-            uid_class    := 21;
+            uid_uibtn    := 21;
             uid_PainC    := 1;
             uid_req_uid1 := UID_HACommandCenter;
             SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsh,0          ,0,0,0                    ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,wtp_heal,0,0);
@@ -869,7 +869,7 @@ begin
    case i of
 UID_Engineer : begin
                uid_BaseSpeed:= 12;
-               uid_class    := 8;
+               uid_uibtn    := 8;
                uid_ZombieUID:= UID_ZEngineer;
                uid_req_uid1 := UID_UWeaponFactory;
                uid_req_uid2 := UID_UACommandCenter;
@@ -878,7 +878,7 @@ UID_Engineer : begin
                end;
 UID_ZEngineer: begin
                uid_BaseSpeed:= 14;
-               uid_class    := 22;
+               uid_uibtn    := 22;
                uid_PainC    := 1;
                uid_req_uid1 := UID_HACommandCenter;
                SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,0                    ,0               ,wtrset_repair            ,wpr_any,uids_all,[],0,0 ,wtp_heal,0,0);
@@ -902,7 +902,6 @@ begin
    uid_ProdTimeSec     := ptime3;
    uid_ability1        := uab_UACCCLand;
    uid_ability2        := uab_UACCCLandTo;
-   uid_ability3        := uab_ToNextForm;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isbuilder       := true;
@@ -913,7 +912,7 @@ begin
 UID_UCommandCenter : begin
                      uid_EnergyGen       := 300;
                      uid_EnergyReq       := 900;
-                     uid_class           := 0;
+                     uid_uibtn           := 0;
                      uid_ZombieUID       := UID_HCommandCenter;
                      uid_nextForm        := UID_UACommandCenter;
                      uid_ability3        := uab_ToNextForm;
@@ -924,7 +923,7 @@ UID_UCommandCenter : begin
 UID_UACommandCenter: begin
                      uid_EnergyGen       := 900;
                      uid_EnergyReq       := 300;
-                     uid_class           := 0;
+                     uid_uibtn           := 0;
                      uid_ZombieUID       := UID_HACommandCenter;
                      uid_prod_Buildings  :=[UID_UCommandCenter..UID_UComputerStation]-[UID_UGenerator2,UID_UACommandCenter];
                      uid_upgr_SightR     := upgr_uac_BuilderR;
@@ -933,7 +932,7 @@ UID_UACommandCenter: begin
 UID_HCommandCenter : begin
                      uid_EnergyGen       := 300;
                      uid_EnergyReq       := 900;
-                     uid_class           := 3;
+                     uid_uibtn           := 3;
                      uid_nextForm        := UID_HACommandCenter;
                      uid_ability3        := uab_ToNextForm;
                      uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HTower,UID_HEye,UID_HBarracks];
@@ -943,7 +942,7 @@ UID_HCommandCenter : begin
 UID_HACommandCenter: begin
                      uid_EnergyGen       := 900;
                      uid_EnergyReq       := 300;
-                     uid_class           := 3;
+                     uid_uibtn           := 3;
                      uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HTower,UID_HEye,UID_HBarracks];
                      uid_upgr_SightR     := upgr_hell_BuilderR;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fpsh,MID_Imp,0,0,upgr_hell_DistDamage1,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,wtp_UnitBioHeavy,0,dm_AntiUnitBioHeavy2);
@@ -966,12 +965,12 @@ begin
 
    case i of
 UID_HBarracks: begin
-                  uid_class       := 4;
+                  uid_uibtn       := 4;
                   uid_prod_Units  := uids_zimbas+[UID_LostSoul,UID_Phantom];
                   uid_ability3    := uab_ToNextFormTHell;
                end;
 UID_UBarracks: begin
-                  uid_class       := 1;
+                  uid_uibtn       := 1;
                   uid_prod_Units  := uids_marines;
                   uid_ZombieUID   := UID_HBarracks;
                   uid_ability3    := uab_ToNextFormTUAC;
@@ -984,7 +983,7 @@ begin
    uid_MaxHits1        := 10000;
    uid_EnergyReq       := 300;
    uid_r               := 60;
-   uid_class           := 4;
+   uid_uibtn           := 4;
    uid_ProdTimeSec     := ptime2;
    uid_isbuilding      := true;
    uid_ismech          := true;
@@ -999,7 +998,7 @@ begin
    uid_MaxHits1        := 10000;
    uid_EnergyReq       := 300;
    uid_r               := 62;
-   uid_class           := 5;
+   uid_uibtn           := 5;
    uid_ProdTimeSec     := ptime2;
    uid_isbuilding      := true;
    uid_ismech          := true;
@@ -1019,7 +1018,7 @@ begin
    uid_EnergyGen       := 100;
    uid_EnergyReq       := 100;
    uid_r               := 38;
-   uid_class           := 2;
+   uid_uibtn           := 2;
    uid_ProdTimeSec     := ptime1;
    uid_isbuilding      := true;
    uid_ismech          := true;
@@ -1042,6 +1041,7 @@ UID_UGenerator3: begin
 UID_UGenerator4: begin
                  uid_EnergyGen  *= 4;
                  uid_EnergyReq  := 0;
+                 uid_ability3   := 0;
                  end;
    end;
 end;
@@ -1052,7 +1052,7 @@ begin
    uid_MaxHits1        := 15000;
    uid_EnergyReq       := 1200;
    uid_r               := 86;
-   uid_class           := 10;
+   uid_uibtn           := 10;
    uid_ProdTimeSec     := ptime5;
    uid_isbuilding      := true;
    uid_ismech          := true;
@@ -1063,7 +1063,7 @@ begin
    uid_MaxHits1        := 15000;
    uid_EnergyReq       := 1200;
    uid_r               := 70;
-   uid_class           := 11;
+   uid_uibtn           := 11;
    uid_ProdTimeSec     := ptime5;
    uid_isbuilding      := true;
    uid_ismech          := true;
@@ -1079,7 +1079,7 @@ begin
    uid_EnergyReq       := 200;
    uid_r               := 35;
    uid_BaseSightR      := 300;
-   uid_class           := 12;
+   uid_uibtn           := 12;
    uid_ProdTimeSec     := ptime2;
    uid_LimitUse        := ul2;
    uid_ability1        := uab_UACScan;
@@ -1096,7 +1096,7 @@ begin
    uid_MaxHits1        := 10000;
    uid_EnergyReq       := 2000;
    uid_r               := 40;
-   uid_class           := 14;
+   uid_uibtn           := 14;
    uid_ProdTimeSec     := ptime10;
    uid_LimitUse        := ul10;
    uid_req_uid1        := UID_UTechCenter;
@@ -1114,7 +1114,7 @@ begin
    uid_EnergyReq       := 250;
    uid_r               := 15;
    uid_BaseSightR      := 300;
-   uid_class           := 6;
+   uid_uibtn           := 6;
    uid_ProdTimeSec     := ptime1;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
@@ -1136,7 +1136,7 @@ begin
    uid_EnergyReq       := 250;
    uid_r               := 15;
    uid_BaseSightR      := 300;
-   uid_class           := 7;
+   uid_uibtn           := 7;
    uid_ProdTimeSec     := ptime1;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
@@ -1159,7 +1159,7 @@ begin
    uid_EnergyReq   := 50;
    uid_r         := 5;
    uid_BaseSightR    := 100;
-   uid_class       := 19;
+   uid_uibtn       := 19;
    uid_ProdTimeSec     := 5;
    uid_CanAttack    := true;
    uid_isbuilding:= true;
@@ -1182,7 +1182,7 @@ begin
    uid_r               := 14;
    uid_BaseSpeed       := 15;
    uid_BaseSightR      := 250;
-   uid_class           := 9;
+   uid_uibtn           := 9;
    uid_ProdTimeSec     := ptime1;
    uid_TransportSize   := 3;
    uid_LimitUse        := ul2;
@@ -1201,7 +1201,7 @@ begin
    uid_r               := 33;
    uid_BaseSpeed       := 18;
    uid_BaseSightR      := 200;
-   uid_class           := 10;
+   uid_uibtn           := 10;
    uid_ProdTimeSec     := ptime1;
    uid_TransportMax    := 8;
    uid_TransportSize   := 8;
@@ -1219,7 +1219,7 @@ begin
    uid_r         := 16;
    uid_BaseSpeed     := 12;
    uid_BaseSightR    := 275;
-   uid_class       := 11;
+   uid_uibtn       := 11;
    uid_ProdTimeSec     := ptime1h;
    uid_TransportSize:= 4;
    uid_LimitUse  := ul3;
@@ -1240,7 +1240,7 @@ begin
    uid_r         := 20;
    uid_BaseSpeed     := 8;
    uid_BaseSightR    := 275;
-   uid_class       := 12;
+   uid_uibtn       := 12;
    uid_ProdTimeSec     := ptime2;
    uid_TransportSize:= 6;
    uid_LimitUse  := ul4;
@@ -1258,7 +1258,7 @@ begin
    uid_r         := 18;
    uid_BaseSpeed     := 17;
    uid_BaseSightR    := 275;
-   uid_class       := 13;
+   uid_uibtn       := 13;
    uid_ProdTimeSec     := ptime2;
    uid_TransportSize:= 6;
    uid_isfly     := uf_fly;
@@ -1279,7 +1279,7 @@ begin
    uid_r         := 25;
    uid_BaseSpeed     := 15;
    uid_BaseSightR    := 225;
-   uid_class       := 14;
+   uid_uibtn       := 14;
    uid_ProdTimeSec     := ptime2;
    uid_TransportMax:= 4;
    uid_TransportSize:= 10;
@@ -1296,7 +1296,7 @@ begin
    uid_MaxHits1     := 20000;
    uid_EnergyReq   := 2000;
    uid_r         := 150;
-   uid_class       := 20;
+   uid_uibtn       := 20;
    uid_ProdTimeSec     := ptime5;
    uid_isbuilding:= true;
    uid_ismech    := true;
@@ -1312,7 +1312,7 @@ begin
    uid_MaxHits1     := 15000;
    uid_EnergyReq   := 1000;
    uid_r         := 100;
-   uid_class       := 21;
+   uid_uibtn       := 21;
    uid_ProdTimeSec     := ptime5;
    uid_isbuilding:= true;
    uid_ismech    := true;
@@ -1324,7 +1324,7 @@ begin
    uid_EnergyGen   := 1000;
    uid_EnergyReq   := 500;
    uid_r         := 55;
-   uid_class       := 22;
+   uid_uibtn       := 22;
    uid_ProdTimeSec     := ptime2;
    uid_isbuilding:= true;
    uid_ismech    := true;
@@ -1339,7 +1339,7 @@ begin
    uid_MaxHits1     := 15000;
    uid_EnergyReq   := 1000;
    uid_r         := 100;
-   uid_class       := 23;
+   uid_uibtn       := 23;
    uid_ProdTimeSec     := ptime5;
    uid_isbuilding:= true;
    uid_ismech    := true;
@@ -1512,14 +1512,14 @@ end;
 
 // nodamage uids
 case m of
-MID_Imp            : mid_ImmuneUnits    :=[UID_Imp        ];
-MID_Cacodemon      : mid_ImmuneUnits    :=[UID_Cacodemon  ];
-MID_Baron          : mid_ImmuneUnits    :=[UID_Knight,
-                                        UID_Baron      ];
-MID_Revenant       : mid_ImmuneUnits    :=[UID_Revenant   ];
-MID_Mancubus       : mid_ImmuneUnits    :=[UID_Mancubus   ];
-MID_YPlasma        : mid_ImmuneUnits    :=[UID_Arachnotron];
-MID_Mine           : mid_ImmuneUnits    :=[UID_UMine      ];
+MID_Imp            : mid_ImmuneUnits:=[UID_Imp        ];
+MID_Cacodemon      : mid_ImmuneUnits:=[UID_Cacodemon  ];
+MID_Baron          : mid_ImmuneUnits:=[UID_Knight,
+                                       UID_Baron      ];
+MID_Revenant       : mid_ImmuneUnits:=[UID_Revenant   ];
+MID_Mancubus       : mid_ImmuneUnits:=[UID_Mancubus   ];
+MID_YPlasma        : mid_ImmuneUnits:=[UID_Arachnotron];
+MID_Mine           : mid_ImmuneUnits:=[UID_UMine      ];
 end;
 
 // other
@@ -1661,21 +1661,10 @@ begin
    setUPGR(r_uac ,upgr_uac_TurretArmor  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation,false);
 end;
 
-{
-TUnitAbility = record
-   ua_type    : TUnitAbilityTargetType;
-   ua_rupgr,
-   ua_rupgrl,
-   ua_ruid    : byte;
-   ua_reload  : integer;
-   {$IFDEF _FULLGAME}
-   ua_mbrush_r: integer;
-   ua_btn     : PTMWTexture;
-   ua_str_name,
-   ua_str_Descript: shortstring;
-   {$ENDIF}
-end;
-}
+////////////////////////////////////////////////////////////////////////////////
+//
+//   ABILITIES
+//
 
 procedure InitAIDs;
 var a:byte;
@@ -1685,17 +1674,15 @@ begin
    begin
       ua_type        :=uat_none;
       ua_reload      :=0;
-      ua_reload_upgr :=0;
-      ua_reload_upgrS:=0;
       ua_req_upgr    :=0;
       ua_req_uid     :=0;
 
       case a of
 uab_Teleport        : begin
                          ua_type        := uat_passive;
-                         ua_reload      := 5;
+                         ua_reload      := 5*fr_fps1;
                          ua_reload_upgr := upgr_hell_TeleportCD;
-                         ua_reload_upgrS:= 1;
+                         ua_reload_upgrS:= fr_fps1;
                       end;
 uab_Recall          : begin
                          ua_type        := uat_UnitOwn;
@@ -1717,6 +1704,7 @@ uab_UACStrike       : begin
 uab_HEyeVision      : begin
                          ua_type        := uat_UnitAlly;
                          ua_reload      := 30*fr_fps1;
+                         ua_req_uid     := UID_HAKeep;
                       end;
 uab_HEyeBlink       : begin
                          ua_type        := uat_Point;
@@ -1770,11 +1758,11 @@ uab_ToNextForm      : begin
                       end;
 uab_ToNextFormTUAC  : begin
                          ua_type        := uat_NoTarget;
-                         ua_req_upgr    := UID_UComputerStation;
+                         ua_req_uid     := UID_UComputerStation;
                       end;
 uab_ToNextFormTHell : begin
                          ua_type        := uat_NoTarget;
-                         ua_req_upgr    := UID_HFortress;
+                         ua_req_uid     := UID_HFortress;
                       end;
 
 uab_ToUACDron       : begin
@@ -1803,6 +1791,8 @@ uab_ToUATurretTo    : begin
       end;
    end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
 
 procedure GameObjectsInit;
 var u:integer;

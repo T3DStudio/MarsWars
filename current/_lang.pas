@@ -4,6 +4,35 @@
 //  COMMON TOOLS
 //
 
+// int ticks to secs
+function it2s(r:integer):integer;
+begin
+   if(r>0)
+   then it2s:=(r+fr_ifps) div fr_fps1
+   else it2s:=0;
+end;
+// card ticks to secs
+function ct2s(r:cardinal):cardinal;
+begin
+   if(r>0)
+   then ct2s:=(r+fr_ifps) div fr_fps1
+   else ct2s:=0;
+end;
+// i2s non zero
+function ir2s(r:integer):shortstring;
+begin
+   if(r<=0)
+   then ir2s:=''
+   else ir2s:=i2s(it2s(r))
+end;
+// c2s non zero
+function cr2s(r:cardinal):shortstring;
+begin
+   if(r<=0)
+   then cr2s:=''
+   else cr2s:=c2s(ct2s(r))
+end;
+
 function RemoveSpecChars(str:shortstring;letNewLine:boolean=true):shortstring;
 var i:byte;
 begin
@@ -570,6 +599,46 @@ begin
    if(length(str_hintUnitCost)>0)then str_hintUnitCost:='('+str_hintUnitCost+')';
 end;
 
+function str_AbilityGetHintHK(aid,uipos:byte):shortstring;
+begin
+   str_AbilityGetHintHK:='';
+   with g_aids[aid] do
+     case ua_type of
+     uat_notarget,
+     uat_point,
+     uat_UnitAny,
+     uat_UnitOwn,
+     uat_UnitAlly,
+     uat_UnitEnemy: case uipos of
+                    0: str_AbilityGetHintHK:=input_actions[iAct_Control_UAbility1].ik_str_HK;
+                    1: str_AbilityGetHintHK:=input_actions[iAct_Control_UAbility2].ik_str_HK;
+                    2: str_AbilityGetHintHK:=input_actions[iAct_Control_UAbility3].ik_str_HK;
+                    end;
+     end;
+end;
+
+function str_AbilityGetHintName(aid,uipos,uidcaster:byte):shortstring;
+var HK:shortstring;
+begin
+   HK:=str_AbilityGetHintHK(aid,uipos);
+   with g_aids[aid] do
+   begin
+      str_AbilityGetHintName:=ua_str_name;
+      case ua_mbrush_r of
+      -255..-1   : if(uidcaster<>-ua_mbrush_r)then
+                     with g_uids[-ua_mbrush_r] do
+                       str_AbilityGetHintName+=' '+uid_str_name;
+      uambt_nform: with g_uids[uidcaster] do
+                     if(uid_nextForm>0)then
+                       if(uidcaster<>uid_nextForm)then
+                         with g_uids[uid_nextForm] do str_AbilityGetHintName+=' '+uid_str_name;
+      end;
+   end;
+   if(length(HK)>0)then
+     str_AbilityGetHintName:=str_AbilityGetHintName+' ('+HK+')';
+end;
+
+
 procedure str_makeHints;
 var
 uid,arm: byte;
@@ -591,7 +660,7 @@ begin
         ILIMIT:='';
         ITEMP :='';
 
-        ITEMP:=str_ProductionHotKey(uid_class);
+        ITEMP:=str_ProductionHotKey(uid_uibtn);
         if(length(ITEMP)>0)
         then uid_str_NameHK:=uid_str_Name+' ('+ITEMP+')'
         else uid_str_NameHK:=uid_str_Name;
@@ -657,10 +726,40 @@ begin
         else upgr_str_Reqs:='';
      end;
 
-   // unit rebuild hint
-   {for uid:=0 to 255 do
-     with g_uids[uid] do
-       uid_str_RebuildHint:=str_MakeRebuildHint(uid,input_actions[iAct_Control_Rebuild].ik_str_HK); }
+   // abilities
+   for uid:=0 to 255 do
+     with g_aids[uid] do
+       if(ua_type<>uat_none)then
+       begin
+          //ITEMP
+          ITEMP:='';
+          if(ua_req_uid >0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [ua_req_uid ].uid_str_name ,1),sep_comma);
+          if(ua_req_upgr>0)then STRADD(@ITEMP,str_ReqNum2s(g_upids[ua_req_upgr].upgr_str_Name,1),sep_comma);
+          ua_str_Reqs:='';
+          if(length(ITEMP)>0)then ua_str_Reqs+=tc_yellow+str_hint_requirements+tc_default+ITEMP;
+
+          ua_str_Common:='';
+          case ua_type of
+          uat_passive  : STRADD(@ua_str_Common,'Passive ability',sep_sdot);
+          uat_notarget : STRADD(@ua_str_Common,'Active ability' ,sep_sdot);
+          end;
+          case ua_type of
+          uat_passive  : ;
+          uat_notarget : STRADD(@ua_str_Common,'Self-targeted'         ,sep_sdot);
+          uat_point    : STRADD(@ua_str_Common,'Ground-targeted'       ,sep_sdot);
+          uat_UnitAny  : STRADD(@ua_str_Common,'Any-unit-targeted'     ,sep_sdot);
+          uat_UnitOwn  : STRADD(@ua_str_Common,'Own-unit-targeted'     ,sep_sdot);
+          uat_UnitAlly : STRADD(@ua_str_Common,'Own&ally-unit-targeted',sep_sdot);
+          uat_UnitEnemy: STRADD(@ua_str_Common,'Enemy-unit-targeted'   ,sep_sdot);
+          end;
+          if(ua_reload>0)then
+          begin
+             STRADD(@ua_str_Common,str_hint_reload+tc_aqua+ir2s(ua_reload)+tc_default+' sec',sep_sdot);
+             if(ua_reload_upgr>0)then
+               STRADD(@ua_str_Common,'Reload time reducing upgrade: '+g_upids[ua_reload_upgr].upgr_str_Name+'(-'+ir2s(ua_reload_upgrS)+')',sep_sdot);
+          end;
+          if(length(ua_str_Common)>0)then ua_str_Common+='.';
+       end;
 end;
 
 function str_Center0(src:shortstring;l:byte):shortstring;
@@ -1119,6 +1218,7 @@ begin
 
    str_hint_requirements         := 'Requirements: ';
    str_hint_req                  := 'Req.: ';
+   str_hint_reload               := 'Base reloading time: ';
    str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
    str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
    str_hint_Ability              := 'Special ability: ';
@@ -1213,34 +1313,32 @@ begin
    str_net_ServerLANVis          := 'LAN Advertise';
    str_net_ConnectedToDed        := '- connected to dedicated server -';
 
-   {
-   uab_RebuildInPoint     = 27;
-   }
-   str_SetAbilityBaseHint(uab_Teleport      ,'Teleportation'           ,'');
-   str_SetAbilityBaseHint(uab_Recall        ,'Recall'                  ,'');
-   str_SetAbilityBaseHint(uab_UACScan       ,'Scan'                    ,'');
-   str_SetAbilityBaseHint(uab_HEyeBlink     ,'Blink of the Eye'        ,'');
-   str_SetAbilityBaseHint(uab_HEyeVision    ,'Hell Vision'             ,'');
-   str_SetAbilityBaseHint(uab_HTowerBlink   ,'Planar Jump'             ,'');
-   str_SetAbilityBaseHint(uab_HKeepShift    ,'Dimension Dhift'         ,'');
-   str_SetAbilityBaseHint(uab_HKeepAura     ,'Decay Aura'              ,'');
-   str_SetAbilityBaseHint(uab_SphereInvuln  ,'Invulnerability sphere'  ,'');
-   str_SetAbilityBaseHint(uab_SpawnLost     ,'Spawn Lost Soul'         ,'');
-   str_SetAbilityBaseHint(uab_SpawnLostTo   ,'Spawn Lost Soul to point','');
-   str_SetAbilityBaseHint(uab_UACCCLand     ,'Land/Take off'           ,'');
-   str_SetAbilityBaseHint(uab_UACCCLandTo   ,'Land/Take off to point'  ,'');
-   str_SetAbilityBaseHint(uab_Unload        ,'Unload'                  ,'');
-   str_SetAbilityBaseHint(uab_UnloadTo      ,'Unload to point'         ,'');
-   str_SetAbilityBaseHint(uab_ToNextForm    ,'Transform to'            ,'');
-   str_SetAbilityBaseHint(uab_ToNextFormTUAC,'Transform to'            ,'');
-   str_SetAbilityBaseHint(uab_ToNextFormTHell,'Transform to'           ,'');
-   str_SetAbilityBaseHint(uab_ToUACDron     ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_ToUGTurret    ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_ToUATurret    ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_ToHTotem      ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_ToHTower      ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_ToUGTurretTo  ,'Transform to '           ,'');
-   str_SetAbilityBaseHint(uab_ToUATurretTo  ,'Transform to '           ,'');
+   str_SetAbilityBaseHint(uab_Teleport       ,'Teleportation'           ,'');
+   str_SetAbilityBaseHint(uab_Recall         ,'Recall'                  ,'');
+   str_SetAbilityBaseHint(uab_UACScan        ,'Scan'                    ,'');
+   str_SetAbilityBaseHint(uab_HEyeBlink      ,'Blink of the Eye'        ,'');
+   str_SetAbilityBaseHint(uab_HEyeVision     ,'Hell Vision'             ,'');
+   str_SetAbilityBaseHint(uab_HTowerBlink    ,'Planar Jump'             ,'');
+   str_SetAbilityBaseHint(uab_HKeepShift     ,'Dimension Dhift'         ,'');
+   str_SetAbilityBaseHint(uab_HKeepAura      ,'Decay Aura'              ,'');
+   str_SetAbilityBaseHint(uab_SphereInvuln   ,'Invulnerability sphere'  ,'');
+   str_SetAbilityBaseHint(uab_SpawnLost      ,'Spawn Lost Soul'         ,'');
+   str_SetAbilityBaseHint(uab_SpawnLostTo    ,'Spawn Lost Soul to point','');
+   str_SetAbilityBaseHint(uab_UACCCLand      ,'Land/Take off'           ,'');
+   str_SetAbilityBaseHint(uab_UACCCLandTo    ,'Land/Take off to point'  ,'');
+   str_SetAbilityBaseHint(uab_Unload         ,'Unload'                  ,'');
+   str_SetAbilityBaseHint(uab_UnloadTo       ,'Unload to point'         ,'');
+   str_SetAbilityBaseHint(uab_ToNextFormTUAC ,'Upgrade'                 ,'');
+   str_SetAbilityBaseHint(uab_ToNextFormTHell,'Upgrade'                 ,'');
+   t:='Transform to';
+   str_SetAbilityBaseHint(uab_ToNextForm     ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToUACDron      ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToUGTurret     ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToUATurret     ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToHTotem       ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToHTower       ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToUGTurretTo   ,t                         ,'');
+   str_SetAbilityBaseHint(uab_ToUATurretTo   ,t                         ,'');
 
    str_SetUnitBaseHint(UID_HKeep          ,'Hell Keep'                   ,'');
    str_SetUnitBaseHint(UID_HAKeep         ,'Great Hell Keep'             ,'');
@@ -2099,7 +2197,7 @@ begin
         writeln(f,uid_str_name);
         writeln(f);
 
-        writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(uid_class)));
+        writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(uid_uibtn)));
         writeln(f,'Categories/Attributes: ',RemoveSpecChars(str_UnitAttributes(nil,u)));
         writeln(f,'Max hits: ',uid_MaxHits1);
 

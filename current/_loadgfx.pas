@@ -1060,7 +1060,9 @@ begin
    ui_EnergyX   := ui_UIPortXC-font_w2;
    ui_EnergyY   := ui_timerY;
    ui_ArmyX     := ui_UIPortXC;
-   ui_ArmyY     := ui_timerY;
+   ui_ArmyY0    := ui_timerY;
+   ui_ArmyY1    := ui_timerY+txt_line_h2;
+   ui_ArmyY2    := ui_timerY+txt_line_h2*2;
 
    ui_Apmx      := ui_FPSX;
    ui_Apmy      := ui_FPSY+txt_line_h2;

@@ -967,7 +967,7 @@ end;
 function menu_msgBox_Code:boolean;
 procedure msgBoxOff;
 begin
-   menu_msg_type:=mmbt_none;
+   menu_msg_type    :=mmbt_none;
    menu_ItemTarget  :=0;
    menu_ItemSelected:=0;
    menu_update:=true;
@@ -1021,7 +1021,7 @@ begin
    clickSound:=false;
    changed:=false;
 
-   // force menu msg box error
+   // force menu msg box error awaiting for server
    if(net_status=ns_client)and(not net_svsearch)and(not g_started)then
      if(net_cl_svttl>=ServerTTL)
      then menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer)
