@@ -62,6 +62,7 @@ begin
    c_agray   :=gfx_rgba2c(80 ,80 ,80 ,128);
    c_black   :=gfx_rgba2c(0  ,0  ,0  ,255);
    c_ablack  :=gfx_rgba2c(0  ,0  ,0  ,128);
+   c_mablack :=gfx_rgba2c(0  ,0  ,0  ,96 );
    c_lava    :=gfx_rgba2c(222,80 ,0  ,255);
 
    ui_max_color    [false]:=c_dorange;
@@ -1072,8 +1073,8 @@ begin
    setlength(ui_fog_fgrid,ui_fog_gridw,ui_fog_gridh);
    setlength(ui_fog_pgrid,ui_fog_gridw,ui_fog_gridh);
 
-   map_mmvw     := round(ui_cam_w*map_mmcx);
-   map_mmvh     := round(ui_cam_h*map_mmcx);
+   map_MiniMap_CamW     := round(ui_cam_w*map_MiniMap_cx);
+   map_MiniMap_CamH     := round(ui_cam_h*map_MiniMap_cx);
    ui_Camera_Bounds;
 
    map_MakeDecals;

@@ -167,8 +167,8 @@ Base vision range: 300
 Build time: 25
 Energy required: 200
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive] except [Imp], base impact 48*3, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive] except [Imp], base impact 45*3, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +18;
@@ -202,7 +202,7 @@ Evil Eye
 
 Hotkey: J
 Categories/Attributes: [building,biological,light,ground,detector]
-Max hits: 100
+Max hits: 50
 Limit used: 1
 Size: 10
 Base vision range: 300
@@ -269,8 +269,8 @@ Base vision range: 350
 Build time: 40
 Energy required: 400
 Requirements: Castle of Damned
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive], base impact 288*0.5, splash damage radius: 20;
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive], base impact 270*0.5, splash damage radius: 20;
 Upgrades:
 - Demonic Spirits - vision range +25;
 - Stone Walls - armor +18;
@@ -332,8 +332,8 @@ Base vision range: 300
 Build time: 60
 Energy required: 900
 
-Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: sight range, targets: [alive] except [Imp], base impact 48*2, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+Arming: 
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive] except [Imp], base impact 45*2, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +18;
@@ -355,8 +355,8 @@ Base vision range: 300
 Build time: 60
 Energy required: 300
 
-Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: sight range, targets: [alive] except [Imp], base impact 48*2, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+Arming: 
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive] except [Imp], base impact 45*2, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Keep Range Upgrade - vision range +50;
 - Stone Walls - armor +18;
@@ -398,8 +398,8 @@ Build time: 10
 Energy required: 100
 PainState base threshold: 1
 
-Arming/Abilities: 
-- melee attack, max. range: 8, targets: [alive], base impact 16*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
+Arming: 
+- melee attack, max. range: 8, targets: [alive], base impact 15*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -423,9 +423,9 @@ Build time: 20
 Energy required: 200
 PainState base threshold: 1
 
-Arming/Abilities: 
-- melee attack, max. range: 8, +zombification, targets: [ground,flying], base impact 16*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical], {Req.: "Phantoms"};
-- melee attack, max. range: 8, targets: [alive], base impact 16*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
+Arming: 
+- melee attack, max. range: 8, +zombification, targets: [ground,flying], base impact 15*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical], {Req.: "Phantoms"};
+- melee attack, max. range: 8, targets: [alive], base impact 15*1, upgrade: Claws and Teeth(+7), factor: x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -450,10 +450,10 @@ Energy required: 200
 PainState base threshold: 2
 Places in transport: 1
 
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: -50
-- ranged attack, max. range: sight range, targets: [alive] except [Imp], base impact 48*1, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
-- melee attack, max. range: 8, targets: [Imp], base impact 48*1, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: sight range, targets: [alive] except [Imp], base impact 45*1, upgrade: Hell Firepower(+7), factor: x2 [unit,biological,heavy];
+- melee attack, max. range: 8, targets: [Imp], base impact 45*1, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -478,8 +478,8 @@ Energy required: 300
 PainState base threshold: 8
 Places in transport: 1
 
-Arming/Abilities: 
-- melee attack, max. range: 8, targets: [alive,ground], base impact 48*1.5, upgrade: Claws and Teeth(+7), factor: x2 [unit,biological,heavy];
+Arming: 
+- melee attack, max. range: 8, targets: [alive,ground], base impact 45*1.5, upgrade: Claws and Teeth(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -503,10 +503,10 @@ Build time: 25
 Energy required: 250
 PainState base threshold: 8
 Requirements: Great Hell Keep
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: +50
-- ranged attack, max. range: sight range, targets: [alive] except [Cacodemon], base impact 48*1, upgrade: Hell Firepower(+7), factor: x2 [unit,mechanical];
-- melee attack, max. range: 8, targets: [Cacodemon], base impact 48*1, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: sight range, targets: [alive] except [Cacodemon], base impact 45*1, upgrade: Hell Firepower(+7), factor: x2 [unit,mechanical];
+- melee attack, max. range: 8, targets: [Cacodemon], base impact 45*1, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -531,9 +531,9 @@ Energy required: 300
 PainState base threshold: 10
 Places in transport: 2
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 72*1, upgrade: Hell Firepower(+7), factor: x2 [unit,light];
-- melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 48*1, upgrade: Claws and Teeth(+7), factor: x2 [unit,light];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 67*1, upgrade: Hell Firepower(+7), factor: x2 [unit,light];
+- melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 45*1, upgrade: Claws and Teeth(+7), factor: x2 [unit,light];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -558,9 +558,9 @@ Energy required: 500
 PainState base threshold: 10
 Places in transport: 3
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 72*1, upgrade: Hell Firepower(+7), factor: x2 [unit,light];
-- melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 48*1, upgrade: Claws and Teeth(+7), factor: x2 [unit,light];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground] except [Hell Knight,Baron of Hell], base impact 67*1, upgrade: Hell Firepower(+7), factor: x2 [unit,light];
+- melee attack, max. range: 8, targets: [Hell Knight,Baron of Hell], base impact 45*1, upgrade: Claws and Teeth(+7), factor: x2 [unit,light];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -585,9 +585,9 @@ Energy required: 1200
 PainState base threshold: 10
 Places in transport: 10
 Requirements: Pentagram of Death
-Arming/Abilities: 
+Arming: 
 bonus anti-building range: +50
-- ranged attack, max. range: sight range, targets: [alive], base impact 240*1, splash damage radius: 40, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+- ranged attack, max. range: sight range, targets: [alive], base impact 225*1, splash damage radius: 40, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -612,9 +612,9 @@ Energy required: 1200
 PainState base threshold: 10
 Places in transport: 10
 Requirements: Pentagram of Death
-Arming/Abilities: 
+Arming: 
 bonus anti-unit range: +50
-- ranged attack, max. range: sight range, targets: [alive], base impact 96*3, upgrade: Demon`s Weapons(+7), factor: x2 [biological],x0.5 [building];
+- ranged attack, max. range: sight range, targets: [alive], base impact 90*3, upgrade: Demon`s Weapons(+7), factor: x2 [biological],x0.5 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -638,7 +638,7 @@ Build time: 40
 Energy required: 500
 PainState base threshold: 3
 Requirements: Monastery of Despair,Great Hell Keep
-Arming/Abilities: 
+Arming: 
 - spawn "Phantom", max. range: sight range+50, targets: [alive], base impact *0.5, {Req.: "Phantoms"};
 - spawn "Lost Soul", max. range: sight range+50, targets: [alive], base impact *0.5;
 Upgrades:
@@ -665,10 +665,10 @@ Energy required: 300
 PainState base threshold: 5
 Places in transport: 2
 
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: +100
-- ranged attack, max. range: sight range, targets: [alive] except [Revenant], base impact 72*1, upgrade: Demon`s Weapons(+7), factor: x2 [flying];
-- melee attack, max. range: 8, targets: [Revenant], base impact 48*1, upgrade: Claws and Teeth(+7);
+- ranged attack, max. range: sight range, targets: [alive] except [Revenant], base impact 67*1, upgrade: Demon`s Weapons(+7), factor: x2 [flying];
+- melee attack, max. range: 8, targets: [Revenant], base impact 45*1, upgrade: Claws and Teeth(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -693,9 +693,9 @@ Energy required: 500
 PainState base threshold: 7
 Places in transport: 3
 Requirements: Monastery of Despair
-Arming/Abilities: 
+Arming: 
 bonus anti-building range: +50
-- ranged attack, max. range: sight range, targets: [alive] except [Mancubus], base impact 48x2*1.2, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+- ranged attack, max. range: sight range, targets: [alive] except [Mancubus], base impact 45x2*1.2, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -720,9 +720,9 @@ Energy required: 500
 PainState base threshold: 7
 Places in transport: 3
 Requirements: Pentagram of Death
-Arming/Abilities: 
+Arming: 
 bonus anti-unit range: +50
-- ranged attack, max. range: sight range, targets: [alive] except [Arachnotron], base impact 96*1.5, upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
+- ranged attack, max. range: sight range, targets: [alive] except [Arachnotron], base impact 90*1.5, upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -747,9 +747,9 @@ Energy required: 700
 PainState base threshold: 12
 Places in transport: 4
 Requirements: Monastery of Despair
-Arming/Abilities: 
+Arming: 
 - resurrection, max. range: 8, targets: [dead,demons&zombies] except [Cyberdemon,Spider Mastermind,Arch-Vile], base impact *2, {Req.: "Resurrection"};
-- ranged attack, max. range: sight range+50, targets: [alive], base impact 288*0.5, splash damage radius: 20;
+- ranged attack, max. range: sight range+50, targets: [alive], base impact 270*0.5, splash damage radius: 20;
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -774,9 +774,9 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 Requirements: Advanced Hell Command Center
-Arming/Abilities: 
+Arming: 
 - heal/repair, max. range: 64, targets: [alive,biological], base impact 10*2;
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Demon`s Weapons(+7);
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 22*2, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -801,9 +801,9 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 Requirements: Advanced Hell Command Center
-Arming/Abilities: 
+Arming: 
 - heal/repair, max. range: 64, targets: [alive,mechanical], base impact 10*2;
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Demon`s Weapons(+7);
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 22*2, upgrade: Demon`s Weapons(+7);
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -828,8 +828,8 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 48*1, upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 45*1, upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -854,8 +854,8 @@ Energy required: 250
 PainState base threshold: 1
 Places in transport: 2
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 144*0.67, upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 135*0.67, upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -880,9 +880,9 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: -50
-- ranged attack, max. range: sight range, targets: [alive], base impact 48*1, upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,light];
+- ranged attack, max. range: sight range, targets: [alive], base impact 45*1, upgrade: Demon`s Weapons(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -907,9 +907,9 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: +75
-- ranged attack, min. range: 40, max. range: sight range, targets: [alive], base impact 48*1, splash damage radius: 20, upgrade: Demon`s Weapons(+7), factor: x2 [flying];
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive], base impact 45*1, splash damage radius: 20, upgrade: Demon`s Weapons(+7), factor: x2 [flying];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -934,8 +934,8 @@ Energy required: 200
 PainState base threshold: 1
 Places in transport: 1
 
-Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 48*1, upgrade: Demon`s Weapons(+7), factor: x4 [building];
+Arming: 
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 45*1, upgrade: Demon`s Weapons(+7), factor: x4 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -959,9 +959,9 @@ Build time: 25
 Energy required: 250
 PainState base threshold: 1
 Requirements: Advanced Hell Command Center
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: +50
-- ranged attack, max. range: sight range, targets: [alive], base impact 48*2, upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
+- ranged attack, max. range: sight range, targets: [alive], base impact 45*2, upgrade: Demon`s Weapons(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -986,9 +986,9 @@ Energy required: 600
 PainState base threshold: 1
 Places in transport: 5
 Requirements: Advanced Hell Command Center(x2)
-Arming/Abilities: 
+Arming: 
 bonus anti-unit range: +50
-- ranged attack, max. range: sight range, targets: [alive], base impact 288*0.5, splash damage radius: 160, upgrade: Demon`s Weapons(+7), factor: x0.5 [building];
+- ranged attack, max. range: sight range, targets: [alive], base impact 270*0.5, splash damage radius: 160, upgrade: Demon`s Weapons(+7), factor: x0.5 [building];
 Upgrades:
 - Hell Sight - vision range +25;
 - Combat Flesh - armor +7;
@@ -1013,8 +1013,8 @@ Energy required: 900
 Zombie: Hell Command Center
 Zombification hits: 3750
 
-Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: sight range, targets: [alive], base impact 48*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
+Arming: 
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive], base impact 45*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
 - Command Center Range Upgrade - vision range +50;
 - Concrete Walls - armor +18;
@@ -1037,8 +1037,8 @@ Energy required: 300
 Zombie: Advanced Hell Command Center
 Zombification hits: 3750
 
-Arming/Abilities: 
-- ranged attack, min. range: 66, max. range: sight range, targets: [alive], base impact 48*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
+Arming: 
+- ranged attack, min. range: 66, max. range: sight range, targets: [alive], base impact 45*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Command Center Turret"};
 Upgrades:
 - Command Center Range Upgrade - vision range +50;
 - Concrete Walls - armor +18;
@@ -1241,9 +1241,9 @@ Base vision range: 300
 Build time: 20
 Energy required: 250
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,unit,mechanical,ground], base impact 48*3, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Anti-ground Plasmagun"};
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 48*3, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,unit,mechanical,ground], base impact 45*3, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical], {Req.: "Anti-ground Plasmagun"};
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 45*3, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Spotlights - vision range +25;
 - Additional Armoring - armor +18;
@@ -1264,8 +1264,8 @@ Base vision range: 300
 Build time: 20
 Energy required: 250
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range+25, targets: [alive,flying], base impact 48*3, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
+Arming: 
+- ranged attack, max. range: sight range+25, targets: [alive,flying], base impact 45*3, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
 Upgrades:
 - Spotlights - vision range +25;
 - Additional Armoring - armor +18;
@@ -1304,8 +1304,8 @@ Base vision range: 100
 Build time: 5
 Energy required: 50
 
-Arming/Abilities: 
-- suicide, max. range: 24, targets: [alive,ground], base impact 480*1, splash damage radius: 80;
+Arming: 
+- suicide, max. range: 24, targets: [alive,ground], base impact 450*1, splash damage radius: 80;
 Upgrades:
 - Concrete Walls - armor +18;
 
@@ -1328,9 +1328,9 @@ Places in transport: 1
 Zombie: Zombie Engineer
 Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
-Arming/Abilities: 
+Arming: 
 - heal/repair, max. range: 64, targets: [alive,mechanical], base impact 10*2, upgrade: Advanced Tools(+5);
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Weapons Upgrade(+7);
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 22*2, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1355,9 +1355,9 @@ Places in transport: 1
 Zombie: Zombie Medic
 Zombification hits: 0
 Requirements: Weapon Factory,Advanced Command Center
-Arming/Abilities: 
+Arming: 
 - heal/repair, max. range: 64, targets: [alive,biological], base impact 10*2, upgrade: Advanced Tools(+5);
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 24*2, upgrade: Weapons Upgrade(+7);
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 22*2, upgrade: Weapons Upgrade(+7);
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1382,8 +1382,8 @@ Places in transport: 1
 Zombie: Zombie Shotguner
 Zombification hits: 0
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 48*1, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 45*1, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1408,8 +1408,8 @@ Places in transport: 2
 Zombie: Zombie SuperShotguner
 Zombification hits: 0
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 144*0.67, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 135*0.67, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,heavy],x0.5 [mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1434,9 +1434,9 @@ Places in transport: 1
 Zombie: Zombie Commando
 Zombification hits: 0
 Requirements: Weapon Factory
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: -50
-- ranged attack, max. range: sight range, targets: [alive], base impact 48*1, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
+- ranged attack, max. range: sight range, targets: [alive], base impact 45*1, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological,light];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1461,9 +1461,9 @@ Places in transport: 1
 Zombie: Zombie Antiaircrafter
 Zombification hits: 0
 Requirements: Weapon Factory
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: +75
-- ranged attack, min. range: 40, max. range: sight range, targets: [alive], base impact 48*1, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive], base impact 45*1, upgrade: Weapons Upgrade(+7), factor: x2 [flying];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1488,8 +1488,8 @@ Places in transport: 1
 Zombie: Zombie Siege Marine
 Zombification hits: 0
 Requirements: Weapon Factory
-Arming/Abilities: 
-- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 48*1, upgrade: Weapons Upgrade(+7), factor: x4 [building];
+Arming: 
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 45*1, upgrade: Weapons Upgrade(+7), factor: x4 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1513,9 +1513,9 @@ Energy required: 250
 Zombie: Zombie Plasmaguner
 Zombification hits: 100
 Requirements: Weapon Factory,Advanced Command Center
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: +50
-- ranged attack, max. range: sight range, targets: [alive], base impact 48*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
+- ranged attack, max. range: sight range, targets: [alive], base impact 45*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1540,9 +1540,9 @@ Places in transport: 5
 Zombie: Zombie BFG Marine
 Zombification hits: 0
 Requirements: Science Facility,Computer Station
-Arming/Abilities: 
+Arming: 
 bonus anti-unit range: +50
-- ranged attack, max. range: sight range, targets: [alive], base impact 288*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+7), factor: x0.5 [building];
+- ranged attack, max. range: sight range, targets: [alive], base impact 270*0.5, splash damage radius: 160, upgrade: Weapons Upgrade(+7), factor: x0.5 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Infantry Combat Armor Upgrade - armor +7;
@@ -1587,8 +1587,8 @@ Build time: 20
 Energy required: 400
 Places in transport: 3
 
-Arming/Abilities: 
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 48*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
+Arming: 
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 45*2, upgrade: Weapons Upgrade(+7), factor: x2 [unit,mechanical];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1611,10 +1611,10 @@ Build time: 30
 Energy required: 500
 Places in transport: 4
 Requirements: Science Facility
-Arming/Abilities: 
+Arming: 
 bonus anti-fly range: -50, bonus anti-unit range: +50
-- ranged attack, max. range: sight range, targets: [alive,ground], base impact 48*4, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological];
-- ranged attack, max. range: sight range, targets: [alive,flying], base impact 48*1.5, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
+- ranged attack, max. range: sight range, targets: [alive,ground], base impact 45*4, upgrade: Weapons Upgrade(+7), factor: x2 [unit,biological];
+- ranged attack, max. range: sight range, targets: [alive,flying], base impact 45*1.5, upgrade: Weapons Upgrade(+7), {Req.: "Anti-air Weapon"};
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1637,9 +1637,9 @@ Build time: 40
 Energy required: 600
 Places in transport: 6
 Requirements: Science Facility
-Arming/Abilities: 
+Arming: 
 bonus anti-building range: +50
-- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 48x2*1.5, splash damage radius: 20, upgrade: Weapons Upgrade(+7), factor: x4 [building];
+- ranged attack, min. range: 40, max. range: sight range, targets: [alive,ground], base impact 45x2*1.5, splash damage radius: 20, upgrade: Weapons Upgrade(+7), factor: x4 [building];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;
@@ -1661,9 +1661,9 @@ Base vision range: 275
 Build time: 40
 Energy required: 600
 Requirements: Science Facility,Advanced Command Center
-Arming/Abilities: 
+Arming: 
 bonus anti-unit range: +25
-- ranged attack, max. range: sight range, targets: [alive], base impact 96*2, upgrade: Weapons Upgrade(+7), factor: x2 [light,ground];
+- ranged attack, max. range: sight range, targets: [alive], base impact 90*2, upgrade: Weapons Upgrade(+7), factor: x2 [light,ground];
 Upgrades:
 - Light Amplification Visors - vision range +25;
 - Mech Combat Armor Upgrade - armor +7;

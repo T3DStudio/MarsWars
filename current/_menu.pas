@@ -65,7 +65,8 @@ begin
 
    case start of
    true : begin   // start
-             if(net_status<>ns_none)then exit;
+             if(net_status<>ns_none)
+             or(g_LobbyTimer>0)then exit;
              GameNetServer:=true;
              if(check)then exit;
 
@@ -96,6 +97,7 @@ begin
    true : begin   // start connecting
              if(net_status<>ns_none)
              or(rpls_pstate=rpls_read)
+             or(g_LobbyTimer>0)
              or(G_Started)then exit;
              GameNetClient:=true;
              if(check)then exit;
@@ -107,7 +109,7 @@ begin
                 rpls_pnu     :=0;
                 net_svsearch :=false;
                 net_cl_Hoster:=255;
-                net_cl_svttl :=ServerTTL;
+                net_cl_svttl :=TTLServer;
                 net_cl_log_n :=net_cl_log_n.MaxValue;
                 PlayerReady  :=false;
                 menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer);
@@ -136,6 +138,7 @@ begin
    case start of
    true : begin
              if(net_svsearch)
+             or(g_LobbyTimer>0)
              or(net_status<>ns_none)then exit;
              GameNetServerSearch:=true;
              if(check)then exit;
@@ -159,9 +162,9 @@ begin
           end;
    end;
 end;
-function GameNetServerConnect(check:boolean):boolean;
+function GameNetServerListConnect(check:boolean):boolean;
 begin
-   GameNetServerConnect:=false;
+   GameNetServerListConnect:=false;
 
    if(rpls_pstate<>rpls_none)
    or(G_Started)
@@ -170,7 +173,7 @@ begin
    or(net_svsearch_sel<0)
    or(net_svsearch_size<=net_svsearch_sel)then exit;
 
-   GameNetServerConnect:=true;
+   GameNetServerListConnect:=true;
 
    if(check)then exit;
 
@@ -281,7 +284,7 @@ begin
        end;
 end;
 
-procedure menu_page_BottomButtons(b1,b2,b3,b4,b5,b6:byte);
+procedure menu_page_BottomButtons(b1,b2,b3,b4,b5,b6,b7:byte);
 var n:byte;
 gapX :integer;
 begin
@@ -292,6 +295,7 @@ begin
    if(b4>0)then n+=1;
    if(b5>0)then n+=1;
    if(b6>0)then n+=1;
+   if(b7>0)then n+=1;
 
    if(n=0)then exit;
 
@@ -311,7 +315,8 @@ begin
    if(b3>0)then begin menu_Item_Set(b3,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
    if(b4>0)then begin menu_Item_Set(b4,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
    if(b5>0)then begin menu_Item_Set(b5,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b6>0)then begin menu_Item_Set(b6,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);                           end;
+   if(b6>0)then begin menu_Item_Set(b6,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
+   if(b7>0)then begin menu_Item_Set(b7,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);                           end;
 end;
 
 procedure menu_page_TopCaption(mi:byte);
@@ -323,6 +328,7 @@ end;
 
 procedure menu_page_SaveLoad;
 begin
+   menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_SaveLoad);
 
    mtx0:=menu_border1;
@@ -339,8 +345,8 @@ begin
    menu_Item_Set(mi_SaveLoad_fname  ,mi_x0,mi_y1,mi_x1,mi_y1+menu_ListLineH,true);
 
    if(g_started)and(rpls_pstate<>rpls_read)
-   then menu_page_BottomButtons(mi_back,mi_SaveLoad_save,mi_SaveLoad_load,mi_SaveLoad_delete,0,0)
-   else menu_page_BottomButtons(mi_back,                 mi_SaveLoad_load,mi_SaveLoad_delete,0,0,0);
+   then menu_page_BottomButtons(mi_back,mi_SaveLoad_save,mi_SaveLoad_load,mi_SaveLoad_delete  ,0,0,0)
+   else menu_page_BottomButtons(mi_back,                 mi_SaveLoad_load,mi_SaveLoad_delete,0,0,0,0);
 
    menu_item_setEnabled(mi_SaveLoad_save  ,saveload_Save  (true));
    menu_item_setEnabled(mi_SaveLoad_load  ,saveload_Load  (true));
@@ -349,6 +355,7 @@ end;
 
 procedure menu_page_Replays;
 begin
+   menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Replays);
 
    mtx0:=menu_border1;
@@ -361,7 +368,7 @@ begin
    mtx1:=menu_w-menu_border1;
    menu_Item_Set(mi_Replays_info    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
 
-   menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0);
+   menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0,0);
 
    menu_item_setEnabled(mi_Replays_play  ,replay_Play  (true));
    menu_item_setEnabled(mi_Replays_delete,replay_DeleteInit(true));
@@ -369,6 +376,7 @@ end;
 
 procedure menu_page_Settings;
 begin
+   menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Settings);
 
    mtx0:=menu_border1;
@@ -404,13 +412,13 @@ begin
                           menu_Item_Set(mi_SV_ResolutionW     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_ResolutionH     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_ResolutionApply ,mtx0,mty0,mtx1,mty0+menu_SmallW,((menu_ResolutionWi<>vid_vw)
-                                                                                    or(menu_ResolutionHi<>vid_vh))
-                                                                                    and(menu_ResolutionWi>=vid_minw)
-                                                                                    and(menu_ResolutionHi>=vid_minh));
-                                                                                           mty0+=menu_SmallW;
-                                                                                           mty0+=menu_SmallW;
+                                                                                              or(menu_ResolutionHi<>vid_vh))
+                                                                                              and(menu_ResolutionWi>=vid_minw)
+                                                                                              and(menu_ResolutionHi>=vid_minh));
+                                                                                                     mty0+=menu_SmallW;
+                                                                                                     mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_Windowed        ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                                                                                           mty0+=menu_SmallW;
+                                                                                                     mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_ShowFPS         ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_MenuScaling     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_SmoothScaled    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);
@@ -418,14 +426,34 @@ begin
    mi_settings_Sound : begin
                           menu_Item_Set(mi_SS_SoundVolume     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_MusicVolume     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                                                                                           mty0+=menu_SmallW;
+                                                                                                     mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_PlayerNext      ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_PlaylistSize    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_ReloadPlaylist  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                        end;
    end;
 
-   menu_page_BottomButtons(mi_back,0,0,0,0,0);
+   menu_page_BottomButtons(mi_back,0,0,0,0,0,0);
+end;
+
+procedure menu_page_Help;
+begin
+   menu_DarkBack:=true;
+   menu_page_TopCaption(mi_caption_Help);
+
+   mtx0:=menu_border1;
+   mty0:=menu_underCaptionY;
+   menu_Item_Set(mi_help_Basics      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
+   menu_Item_Set(mi_help_UnitsInfo   ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
+   menu_Item_Set(mi_help_UnitsBalance,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
+
+   case menu_HelpPage of
+   mi_help_Basics      :;
+   mi_help_UnitsInfo   :;
+   mi_help_UnitsBalance:;
+   end;
+
+   menu_page_BottomButtons(mi_back,0,0,0,0,0,0);
 end;
 
 procedure menu_page_Scirmish_Players(x0,x1,y0:integer);
@@ -438,31 +466,35 @@ begin
 
    mty0+=menu_ListLineH-2;
    mtx0:=menu_items[mi_Players_Panel].mi_x0;
-   menu_Item_Set(mi_Players_StateC,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersStateW;
-   menu_Item_Set(mi_Players_NameC ,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersNameW;
-   menu_Item_Set(mi_Players_RaceC ,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersRaceW;
-   menu_Item_Set(mi_Players_TeamC ,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersTeamW;
-   menu_Item_Set(mi_Players_ColorC,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false,9);
-   mty0-=menu_ListLinehH;
+   menu_Item_Set(mi_Players_CState   ,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersStateW;
+   menu_Item_Set(mi_Players_CName    ,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersNameW;
+   menu_Item_Set(mi_Players_CRace    ,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersRaceW;
+   menu_Item_Set(mi_Players_CTeam    ,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersTeamW;
+   menu_Item_Set(mi_Players_CObs     ,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_ListLineH,false,9);mtx0+=menu_PlayersObsW;
+   menu_Item_Set(mi_Players_CColor   ,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false,9);
    if(net_status<>ns_none)then
-   menu_Item_Set(mi_Players_PingC ,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_ListLineH,false,9);
+   menu_Item_Set(mi_Players_CPing    ,mtx0,mty0-menu_ListLinehH,mtx0+menu_PlayersPingW,mty0,false,9);mtx0+=menu_PlayersPingW;
 
-   mty0+=menu_ListLineH+menu_ListLinehH;
+   mty0+=menu_ListLineH;
    for p:=0 to LastPlayer do
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
       if(p<map_MaxPlayers)then
-      menu_Item_Set(mi_Players_State0 +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle     (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
+      menu_Item_Set(mi_Players_State0   +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle      (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
 
-      if(g_gplayers[p].state=ps_None)then
-      menu_Item_Set(mi_Players_Slot0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSwap        (p,LocalPlayer,true))
+      if(g_gplayers[p].state=ps_None)and(not g_started)then
+      menu_Item_Set(mi_Players_Slot0    +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSwap         (p,LocalPlayer,true))
       else
-      menu_Item_Set(mi_Players_Player0+p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll(p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
+      menu_Item_Set(mi_Players_Player0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
 
-      menu_Item_Set(mi_Players_Race0  +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll   (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
-      if(p<map_MaxPlayers)then
-      menu_Item_Set(mi_Players_Team0  +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll   (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
-      menu_Item_Set(mi_Players_Ping0  +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true                                      ,9);
+      if(p<map_MaxPlayers)and(not g_gplayers[p].isobserver)then
+      menu_Item_Set(mi_Players_Race0    +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll    (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
+      if(p<map_MaxPlayers)and(not g_gplayers[p].isobserver)then
+      menu_Item_Set(mi_Players_Team0    +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll    (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
+
+      menu_Item_Set(mi_Players_Obs0     +p,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_PListLineH,PlayerToggleObserver(p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersObsW;
+      menu_Item_Set(mi_Players_Ping0    +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true                                       ,9);mtx0+=menu_PlayersPingW;
+
       mty0+=menu_PListLineH;
    end;
    mtx0:=menu_items[mi_Players_Panel].mi_x0;
@@ -578,32 +610,41 @@ end;
 
 procedure menu_page_Scirmish;
 var
-btns : array[0..5] of byte = (0,0,mi_Settings,0,0,0);
+btns : array[0..6] of byte = (0,0,0,0,0,0,0);
 begin
+   menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Scirmish);
    with menu_items[mi_caption_Scirmish] do
    menu_Item_Set(mi_SubCaptionInfoLine,0,mi_y1,menu_w,mi_y1+menu_BaseW1,true);
 
-   if(MenuBack(false,true))then
-     btns[0]:=mi_back;
+   // bottom buttons
+   if(g_LobbyTimer>0)and(net_status<>ns_client)
+   then btns[0]:=mi_StopTimer
+   else
+   begin
+      if(MenuBack(false,true))then btns[0]:=mi_back;
+      if(saveload_Allowed)and(g_started)then btns[1]:=mi_SaveLoad;
+      btns[2]:=mi_Settings;
+      btns[3]:=mi_Help;
 
-   if(saveload_Allowed)and(g_started)
-   then btns[1]:=mi_SaveLoad;
+      if(PlayerSurrender(LocalPlayer,true))then btns[4]:=mi_Surrender;
 
-   if(PlayerSurrender(LocalPlayer,true))
-   then btns[3]:=mi_Surrender;
+      case net_status of
+      ns_none,
+      ns_server: case g_started of
+                 true : btns[5]:=mi_Break;
+                 false: btns[5]:=mi_StartTimer;
+                 end;
+      ns_client: btns[5]:=mi_MP_Disconnect;
+      end;
+      if(menu_ReadyButtonEnabled)then btns[6]:=mi_Players_Ready;
 
-   case net_status of
-   ns_none,
-   ns_server: case g_started of
-              true : btns[4]:=mi_Break;
-              false: btns[4]:=mi_Start;
-              end;
-   ns_client: btns[4]:=mi_MP_Disconnect;
    end;
-   if(menu_ReadyButtonEnabled)then btns[5]:=mi_Players_Ready;
 
-   menu_page_BottomButtons(btns[0],btns[1],btns[2],btns[3],btns[4],btns[5]);
+   menu_page_BottomButtons(btns[0],btns[1],btns[2],btns[3],btns[4],btns[5],btns[6]);
+
+   menu_Item_Set(mi_UnderBottomInfoLine,0     ,menu_h-menu_StepFromBottom-menu_BigButtonH*2,
+                                        menu_w,menu_h-menu_StepFromBottom-menu_BigButtonH  ,true);
 
    // PLAYERS BLOCK
    menu_page_Scirmish_Players (menu_BaseW1h,menu_BaseW1h+menu_PlayersW,menu_underCaptionY);
@@ -624,29 +665,32 @@ end;
 
 procedure menu_page_Campaing;
 begin
+   menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Campaings);
 
    if(g_started)
-   then menu_page_BottomButtons(mi_back,mi_SaveLoad,mi_Settings,mi_Break,0,0)
-   else menu_page_BottomButtons(mi_back,mi_Settings,mi_Start   ,0       ,0,0);
+   then menu_page_BottomButtons(mi_back,mi_SaveLoad,mi_Settings,mi_Help,mi_Break   ,0,0)
+   else menu_page_BottomButtons(mi_back,            mi_Settings,mi_Help,mi_StartNow,0,0,0);
 end;
 
 procedure net_LANSearch;
 begin
+   menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_SVSearch);
 
    menu_Item_Set(mi_NetSearch_List,menu_hw-menu_ListW1,menu_underCaptionY,
                                    menu_hw+menu_ListW1,menu_underCaptionY+menu_ListLineH2*menu_SvSearchListH,true);
 
-   menu_page_BottomButtons(mi_back,mi_NetSearch_Connect,0,0,0,0);
+   menu_page_BottomButtons(mi_back,mi_NetSearch_Connect,0,0,0,0,0);
 
-   menu_item_setEnabled(mi_NetSearch_Connect,GameNetServerConnect(true));
+   menu_item_setEnabled(mi_NetSearch_Connect,GameNetServerListConnect(true));
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure menu_Rebuild;
 begin
+   menu_DarkBack:=false;
    FillChar(menu_items,SizeOf(Menu_items),0);
 
    if(net_svsearch)
@@ -656,14 +700,17 @@ begin
      mi_SaveLoad: menu_page_SaveLoad;
      mi_Replays : menu_page_Replays;
      mi_Settings: menu_page_Settings;
+     mi_Help    : menu_page_Help;
      else
        case g_type of
        gt_scirmish : menu_page_Scirmish;
        gt_campaing : menu_page_Campaing;
-       else menu_page_BottomButtons(mi_Campaings,mi_Scirmish,mi_SaveLoad,mi_Replays,mi_Settings,mi_Exit);
+       else menu_page_BottomButtons(mi_Campaings,mi_Scirmish,mi_SaveLoad,mi_Replays,mi_Settings,mi_Help,mi_Exit);
        end;
        menu_item_setEnabled(mi_Break        ,GameBreak(true ));
-       menu_item_setEnabled(mi_Start        ,GameStart(true ));
+       menu_item_setEnabled(mi_StartNow     ,GameStart(true ));
+       menu_item_setEnabled(mi_StartTimer   ,GameStart(true )and(g_LobbyTimer<=0));
+       menu_item_setEnabled(mi_StopTimer    ,g_LobbyTimer>0);
        menu_item_setEnabled(mi_Surrender    ,PlayerSurrender(LocalPlayer,true ));
        menu_item_setEnabled(mi_MP_Disconnect,GameNetClient(false,true));
      end;
@@ -686,13 +733,14 @@ mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
                      else GameMapSetSeed(LocalPlayer,s2c(menu_mseed),false);
 mi_MP_ServerPort   : menu_GetServerPort;
 mi_MP_ClientAddress: menu_GetClientAddress;
+mi_MP_ChatLine,
 mi_MP_ChatList     : if(EnterKey)then
                      begin
                         if(length(net_chat_str)>0)then
                         begin
                            if(net_status=ns_client)
                            then net_send_chat(            255,net_chat_str)
-                           else GameLogChat  (LocalPlayer,255,net_chat_str);
+                           else GameLog_Chat  (LocalPlayer,255,net_chat_str);
                         end;
                         net_chat_str:='';
                      end;
@@ -709,19 +757,26 @@ begin
    case item of
 mi_back                : if(not check)then MenuBack(false,false);
 mi_exit                : if(not check)then GameCycle:=false;
-
-mi_Start               : if(not check)then GameStart(false);      // start game
-mi_Break               : if(not check)then GameBreak(false);      // break game
+mi_StartTimer          : if(not check)then if(TestMode=0)
+                                           then g_LobbyTimer:=g_GameStartTime
+                                           else g_LobbyTimer:=fr_fps1;
+mi_StopTimer           : if(not check)then begin
+                                           g_LobbyTimer:=0;
+                                           GameLog_BreakStarting;
+                                           end;
+mi_StartNow            : if(not check)then GameStart(false);
+mi_Break               : if(not check)then GameBreak(false);
 mi_Surrender           : if(not check)then
                            if(PlayerSurrender(LocalPlayer,false))then
                              if(MainMenu)then MenuBack(true,false);
-// Surrender
+
 mi_Campaings           : if(not check)then g_type:=gt_campaing;
 mi_Scirmish            : if(not check)then g_type:=gt_scirmish;
 
 mi_SaveLoad            : if(not check)then begin menu_page:=item;saveload_MakeFolderList;end;
 mi_Replays             : if(not check)then begin menu_page:=item;  replay_MakeFolderList;end;
 mi_Settings            : if(not check)then begin menu_page:=item; menu_ResolutionWi:=vid_vw;menu_ResolutionHi:=vid_vh;end;
+mi_Help                : if(not check)then menu_page:=item;
 
 // SETTINGS LIST
 mi_settings_Game,
@@ -771,17 +826,17 @@ mi_SS_SoundVolume      : if(not check)then
                          begin
                             menu_GetBarValByte(item,@snd_SoundVolume,0,snd_MaxSoundVolume,true);
                             snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
-                            SoundSourceUpdateGainAll;
+                            snd_SoundSourceUpdateGainAll;
                          end;
 mi_SS_MusicVolume      : if(not check)then
                          begin
                             menu_GetBarValByte(item,@snd_MusicVolume,0,snd_MaxSoundVolume,true);
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
-                            SoundSourceUpdateGainAll;
+                            snd_SoundSourceUpdateGainAll;
                          end;
-mi_SS_PlayerNext       : if(not check)then SoundMusicControll(true);
+mi_SS_PlayerNext       : if(not check)then snd_SoundMusicControll(true);
 mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,true,1,snd_musicListSizeMax);
-mi_SS_ReloadPlaylist   : if(not check)then GameMusicReLoad;
+mi_SS_ReloadPlaylist   : if(not check)then snd_GameMusicReLoad;
 
 // SAVE LOAD
 mi_SaveLoad_list       : if(not check)then
@@ -816,6 +871,8 @@ mi_Players_Race0..
 mi_Players_Race7       : if(not check)then PlayerRaceScroll   (item-mi_Players_Race0  ,LocalPlayer     ,false);
 mi_Players_Team0..
 mi_Players_Team7       : if(not check)then PlayerTeamScroll   (item-mi_Players_Team0  ,LocalPlayer,true,false);
+mi_Players_Obs0..
+mi_Players_Obs7        : if(not check)then PlayerToggleObserver(item-mi_Players_Obs0  ,LocalPlayer     ,false);
 mi_Players_Ready       : if(not check)then PlayerReady:=not PlayerReady;
 
 // SCIRMISH MAP
@@ -844,7 +901,7 @@ mi_MP_ClientLANSearch  : if(not check)then GameNetServerSearch(true,false);
 
 // Net Search MULTIPLAYER
 mi_NetSearch_List      : if(not check)then menu_ListMouseXY2Line(item,@net_svsearch_sel,net_svsearch_scroll,menu_ListLineH2);
-mi_NetSearch_Connect   : if(not check)then GameNetServerConnect(false);
+mi_NetSearch_Connect   : if(not check)then GameNetServerListConnect(false);
    else
       menu_Controls_MLB:=false;
    end;
@@ -859,7 +916,7 @@ mi_SaveLoad_list  : case g_started of
                     false: if(not check)then saveload_Load(false);
                     end;
 mi_Replays_list   : if(not check)then replay_Play  (false);
-mi_NetSearch_List : if(not check)then GameNetServerConnect(false);
+mi_NetSearch_List : if(not check)then GameNetServerListConnect(false);
    else
       menu_Controls_DMLB:=false;
    end;
@@ -880,13 +937,13 @@ mi_SS_SoundVolume      : if(not check)then
                          begin
                             menu_GetBarValByte(item,@snd_SoundVolume,0,snd_MaxSoundVolume,false);
                             snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
-                            SoundSourceUpdateGainAll;
+                            snd_SoundSourceUpdateGainAll;
                          end;
 mi_SS_MusicVolume      : if(not check)then
                          begin
                             menu_GetBarValByte(item,@snd_MusicVolume,0,snd_MaxSoundVolume,false);
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
-                            SoundSourceUpdateGainAll;
+                            snd_SoundSourceUpdateGainAll;
                          end;
 mi_Players_Player0..
 mi_Players_Player7     : if(not check)then PlayerAILevelScroll(item-mi_Players_Player0,LocalPlayer,false,false);
@@ -957,8 +1014,8 @@ mi_Map_Seed            : if(not check)then menu_mseed        :=    StringApplyIn
 
 mi_MP_ServerPort       : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,changed);
 mi_MP_ClientAddress    : if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                 ,changed);
+mi_MP_ChatLine,
 mi_MP_ChatList         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                ,changed);
-mi_MP_ChatLine         : ;
    else
       menu_Controls_Text:=false;
    end;
@@ -970,7 +1027,8 @@ begin
    menu_msg_type    :=mmbt_none;
    menu_ItemTarget  :=0;
    menu_ItemSelected:=0;
-   menu_update:=true;
+   menu_update      :=true;
+   snd_SoundPlayUI(snd_click);
 end;
 begin
    menu_msgBox_Code:=(menu_msg_type<>mmbt_none);
@@ -989,13 +1047,15 @@ begin
                           if(InputActionPressed(iact_MLB))then
                             if (menu_msg_btn1x0<=mouse_x)and(mouse_x<=menu_msg_btn1x1)
                             and(menu_msg_btn1y0<=mouse_y)and(mouse_y<=menu_msg_btn1y1)then
-                              case menu_msg_type of
-                              mmbt_SaveRewrite : saveload_SaveWrite (menu_msg_Body);
-                              mmbt_DeleteSave  : saveload_DeleteFile(menu_msg_Body);
-                              mmbt_DeleteReplay:   replay_DeleteFile(menu_msg_Body);
-                              end;
-                          if(InputActionPressed(iAct_any))then
-                            msgBoxOff;
+                            begin
+                               case menu_msg_type of
+                               mmbt_SaveRewrite : saveload_SaveWrite (menu_msg_Body);
+                               mmbt_DeleteSave  : saveload_DeleteFile(menu_msg_Body);
+                               mmbt_DeleteReplay:   replay_DeleteFile(menu_msg_Body);
+                               end;
+                               snd_SoundPlayUI(snd_click);
+                            end;
+                          if(InputActionPressed(iAct_any))then msgBoxOff;
                        end;
    end;
 end;
@@ -1023,7 +1083,7 @@ begin
 
    // force menu msg box error awaiting for server
    if(net_status=ns_client)and(not net_svsearch)and(not g_started)then
-     if(net_cl_svttl>=ServerTTL)
+     if(net_cl_svttl>=TTLServer)
      then menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer)
      else
        if(menu_msg_type=mmbt_netWaitServer)then menu_msg_type:=mmbt_none;
@@ -1103,7 +1163,7 @@ begin
              SetSelectedItem(mi_NetSearch_List);
              SetSelectedItem(mi_SaveLoad_list );
              SetSelectedItem(mi_Replays_list  );
-             SetSelectedItem(mi_MP_ChatList);
+             SetSelectedItem(mi_MP_ChatList   );
 
              if(menu_Controls_MWD(menu_ItemSelected,false))then
              begin
@@ -1121,7 +1181,7 @@ begin
              SetSelectedItem(mi_NetSearch_List);
              SetSelectedItem(mi_SaveLoad_list );
              SetSelectedItem(mi_Replays_list  );
-             SetSelectedItem(mi_MP_ChatList);
+             SetSelectedItem(mi_MP_ChatList   );
              if(menu_Controls_MWU(menu_ItemSelected,false))then
              begin
                 SetBBit(@menu_ItemActs,miat_MWhell,true);
@@ -1132,7 +1192,6 @@ begin
    false: if(menu_Controls_MWU(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_MWhell,true);
    end;
 
-
 ///////////////////////////////////   other keyboards keys
 
    if(InputActionPressed(iact_Esc   ))then MenuBack(false,false);
@@ -1141,7 +1200,7 @@ begin
   // if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
   // if(InputActionPressed(iAct_test_debug1      ))then ;
 
-   if(clickSound)then SoundPlayUI(snd_click);
+   if(clickSound)then snd_SoundPlayUI(snd_click);
 
    mouse_x:=mnx;
    mouse_y:=mny;

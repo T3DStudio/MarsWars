@@ -12,36 +12,31 @@ begin
 end;
 
 procedure Dedicated_Code;
+var GameEnded:boolean;
 begin
    case G_Started of
-false: if(PlayersAllReady)then
-       begin
-          if(ded_GameStartTimer=0)then
-          begin
-             ded_GameStartTimer:=ded_GameStartTime;
-             GameLogPlayersReady;
-          end;
-          if(ded_GameStartTimer>0)then
-          begin
-             ded_GameStartTimer-=1;
-             if(ded_GameStartTimer>0)then
-             begin
-                if((ded_GameStartTimer mod fr_fps1)=0)then
-                  GameLogStartsIn(ded_GameStartTimer div fr_fps1);
-                exit;
-             end;
-          end;
+   false: if(g_LobbyTimer<=0)then
+            if(PlayersAllReady)and(PlayersNonObserversCount>1)then
+              g_LobbyTimer:=g_GameStartTime;
+   true : begin
+             GameEnded:=Game_IsEnded;
+             if(GameEnded)then
+               if(g_LobbyTimer<=0)
+               then g_LobbyTimer:=ded_GameEndTime
+               else
+               begin
+                  g_LobbyTimer-=1;
+                  if(g_LobbyTimer>0)then
+                  begin
+                     if((g_LobbyTimer mod fr_fps5)=0)then
+                       GameLog_EndsIn(g_LobbyTimer div fr_fps1);
+                  end;
+               end;
 
-          menu_update:=true;
-          G_Started  :=true;
-          GameStartSkirmish;
-       end
-       else ded_GameStartTimer:=0;
-true : if(PlayerAllOut)then
-       begin
-          G_Started:=false;
-          GameDefaultAll;
-       end;
+             if(NoHumanPlayers)
+             or(GameEnded and(g_LobbyTimer=0))then
+               GameBreak(false);
+          end;
    end;
 end;
 
@@ -78,28 +73,38 @@ begin
 end;
 
 procedure PlayerDataLine(p:byte);
+function PlayerGetPINGStr:shortstring;
+begin
+   PlayerGetPINGStr:='';
+   with g_gplayers[p] do
+   with g_nplayers[p] do
+     if(state=ps_human)then PlayerGetPINGStr:=w2s(net_ping);
+end;
+
 begin
    with g_gplayers[p] do
      if(state=ps_none)
-     then   Dedicated_screenLine(PlayerStateString(p),1,name,7,'--'           ,25, ''         ,35, '',0, '',0)
+     then   Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,'',29,'',39,'',49)
      else
        if(isobserver)
-       then Dedicated_screenLine(PlayerStateString(p),1,name,7,str_observer   ,25, '-'        ,35, '',0, '',0)
-       else Dedicated_screenLine(PlayerStateString(p),1,name,7,str_race[mrace],25, b2s(team+1),35, '',0, '',0);
+       then Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,str_observer   ,29, ''         ,39, PlayerGetPINGStr,49)
+       else Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,str_race[mrace],29, b2s(team+1),39, PlayerGetPINGStr,49);
 end;
 
-function SVGameStatus:shortstring;
+function Dedicated_GameStatusStr:shortstring;
 begin
-   if(g_started)
-   then SVGameStatus:=str_GameStarted
-   else SVGameStatus:=str_GameLobby;
-   case G_status of
-   gs_running    : ;
-   0..LastPlayer : SVGameStatus:=str_GamePaused+b2s(G_Status+1);
-   gs_win_team0..
-   gs_win_team7  : SVGameStatus:=str_GameEnded+b2s(G_Status-gs_win_team0);
-   else            SVGameStatus:='UNKNOWN STATUS';
-   end;
+   if(not g_started)
+   then Dedicated_GameStatusStr:=str_GameLobby
+   else
+     case G_status of
+     gs_running    : Dedicated_GameStatusStr:=str_GameStarted;
+     gs_paused0..
+     gs_paused7    : Dedicated_GameStatusStr:=str_GamePaused+g_gplayers[G_status-gs_paused0].name;
+     gs_waitplayers: Dedicated_GameStatusStr:=str_GameWFPlayers;
+     gs_win_team0..
+     gs_win_team7  : Dedicated_GameStatusStr:=str_GameEnded+b2s(G_Status-gs_win_team0+1);
+     else            Dedicated_GameStatusStr:='UNKNOWN STATUS';
+     end;
 end;
 
 procedure Dedicated_Screen;
@@ -115,17 +120,16 @@ begin
    begin
       case console_y of
       0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_ServerPort);
-      1 : writeln(str_GameStatus, SVGameStatus);
-      2 : writeln(str_GameOptions);
-      4 : writeln('   ',str_game_FixedPositions,b2c[g_FixedPositions]);
-      6 : writeln('   ',str_game_AISlots       ,g_AISlots            );
-      8 : writeln('   ',str_game_DefeatedObs   ,b2c[g_DefeatedObs ]  );
+      2 : writeln(str_GameStatus, Dedicated_GameStatusStr);
+      4 : writeln(str_GameOptions);
+      6 : Dedicated_screenLine(str_game_FixedPositions,1, str_game_AISlots,25, str_game_DefeatedObs,50, '' ,1,'',55,'',70);
+      8 : Dedicated_screenLine(b2c[g_FixedPositions]  ,1, ai_name(g_AISlots) ,25, b2c[g_DefeatedObs ] ,50, '' ,1,'',55,'',70);
       10: writeln;
       12: writeln(str_MapOptions);
       14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size ,45, str_map_Obstacles    ,55, str_map_Symmetry ,70);
       16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_size),45, strMX(map_ObstaclesF),55, b2c[map_symmetry],70);
       18: writeln;
-      20: Dedicated_screenLine(str_PlayerState                ,1, str_Player,7,str_srace,25,str_team ,35, '',0, '',0);   // captions
+      20: Dedicated_screenLine('#',1,str_State                ,3, str_Player,11,str_srace,29,str_team ,39, str_ping,49);   // captions
       22: PlayerDataLine(0);
       24: PlayerDataLine(1);
       26: PlayerDataLine(2);

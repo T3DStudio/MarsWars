@@ -18,6 +18,7 @@ NOTSET                 = smallint.MaxValue;
 
 fr_fps1                = 60;
 fr_RateTicks           = 1000/fr_fps1;
+fr_FrameMS             = round(fr_RateTicks);
 
 fr_fpsh                = fr_fps1 div 2; // half
 fr_fpst                = fr_fps1 div 3; // thrid
@@ -102,8 +103,9 @@ gs_paused6             = 6;
 gs_paused7             = 7;
 gs_replayend           = 10;
 gs_replayerror         = 11;
-gs_waitserver          = 12;
-gs_replaypause         = 13;
+gs_replaypause         = 12;
+gs_waitserver          = 13;
+gs_waitplayers         = 14;
 gs_win_team0           = 20; // 0
 gs_win_team1           = 21;
 gs_win_team2           = 22;
@@ -137,6 +139,8 @@ map_MaxObstacles       = 7;
 
 zone_solid             : word = word.MaxValue;
 
+g_GameStartTime        = fr_fps1*5+fr_fps1-1;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Key Points life
@@ -155,7 +159,6 @@ str_wcaption           : shortstring = 'MarsWars: HELL vs UAC, '+str_ver+#0;
 str_cprt               : shortstring = '[ T3DStudio (c) 2016-2025 ]';
 str_ps_ttl             : char = '?';
 str_ps_Me              : char = '>';
-str_ps_none            : shortstring = '--';
 b2c                    : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
@@ -182,57 +185,69 @@ lmt_chat_player7       = 7;} // LaastPlayer
 lmt_chat_common        = 8;
 lmt_game_message       = 9;
 lmt_game_end           = 10;
-lmt_game_PlayersReady  = 11;
-lmt_game_StartsIn      = 12;
-lmt_player_defeated    = 13;
-lmt_player_leave       = 14;
-lmt_player_surrender   = 15;
-lmt_player_ready       = 16;
-lmt_player_nready      = 17;
-lmt_prod_BadPlace      = 18;
-lmt_prod_BadOrder      = 19;
-lmt_prod_AllBusy       = 20;
-lmt_unit_ready         = 21;
-lmt_unit_LevelUp       = 22;
-lmt_unit_attacked      = 23;
-lmt_unit_NeedBuilder   = 24;
-lmt_unit_resurrected   = 25;
-lmt_upgrade_InProgress = 26;
-lmt_upgrade_complete   = 27;
-lmt_Req_Energy         = 28;
-lmt_Req_Common         = 29;
-lmt_Req_Limit          = 30;
-lmt_Req_MaxCount       = 31;
-lmt_map_mark           = 32;
-lmt_allies_attacked    = 33;
-lmt_NeedProdUnit       = 34;
-lmt_ability_reload     = 35;
-lmt_ability_BadPlace   = 36;
-lmt_kpoint_captured    = 37;
-lmt_kpoint_lost        = 38;
-lmt_ngen_exh           = 39;
-lmt_ngen_captured      = 40;
-lmt_ngen_lost          = 41;
-lmt_koth_control       = 42;
-lmt_invalid_Target     = 43;
-lmt_Invalid_Order      = 44;
-lmt_replay_RecStart    = 45;
-lmt_replay_RecStop     = 46;
-lmt_replay_RecError    = 47;
+lmt_game_ReadyToStart  = 11;
+lmt_game_BreakStarting = 12;
+lmt_game_StartsIn      = 13;
+lmt_game_ResetIn       = 14;
+lmt_game_Paused        = 15;
+lmt_game_Resumed       = 16;
+lmt_player_connected   = 17;
+lmt_player_leave       = 18;
+lmt_player_timeout     = 19;
+lmt_player_defeated    = 20;
+lmt_player_surrender   = 21;
+lmt_player_ready       = 22;
+lmt_player_nready      = 23;
+lmt_prod_BadPlace      = 24;
+lmt_prod_BadOrder      = 25;
+lmt_prod_AllBusy       = 26;
+lmt_unit_ready         = 27;
+lmt_unit_LevelUp       = 28;
+lmt_unit_attacked      = 29;
+lmt_unit_NeedBuilder   = 30;
+lmt_unit_resurrected   = 31;
+lmt_upgrade_InProgress = 32;
+lmt_upgrade_complete   = 33;
+lmt_Req_Energy         = 34;
+lmt_Req_Common         = 35;
+lmt_Req_Limit          = 36;
+lmt_Req_MaxCount       = 37;
+lmt_map_mark           = 38;
+lmt_allies_attacked    = 39;
+lmt_NeedProdUnit       = 40;
+lmt_ability_reload     = 41;
+lmt_ability_BadPlace   = 42;
+lmt_kpoint_captured    = 43;
+lmt_kpoint_lost        = 44;
+lmt_ngen_exh           = 45;
+lmt_ngen_captured      = 46;
+lmt_ngen_lost          = 47;
+lmt_koth_control       = 48;
+lmt_invalid_Target     = 49;
+lmt_Invalid_Order      = 50;
+lmt_replay_RecStart    = 51;
+lmt_replay_RecStop     = 52;
+lmt_replay_RecError    = 53;
 
 
 lmts_menu_chat         = [
                           0..LastPlayer,
+                          lmt_chat_common,
                           lmt_game_message,
                           lmt_game_end,
-                          lmt_game_PlayersReady,
+                          lmt_game_ReadyToStart,
+                          lmt_game_BreakStarting,
                           lmt_game_StartsIn,
-                          lmt_player_defeated,
+                          lmt_game_ResetIn,
+                          lmt_game_Paused,
+                          lmt_game_Resumed,
+                          lmt_player_connected,
                           lmt_player_leave,
+                          lmt_player_timeout,
+                          lmt_player_defeated,
                           lmt_player_surrender,
                           lmt_player_ready,
                           lmt_player_nready,
-                          lmt_chat_common,
                           lmt_replay_RecStart,
                           lmt_replay_RecStop,
                           lmt_replay_RecError
@@ -255,13 +270,16 @@ uia_newstrict          = 2;  }
 
 net_MaxQuality            = 9;
 rpls_MaxQuality           = net_MaxQuality div 2;
-                                                          // 60 140 220 300 380 460 540 620 700 800
+                                                             // 60 140 220 300 380 460 540 620 700 800
 Quality2Units             : array[0..net_MaxQuality] of byte = (15,35 ,55 ,75 ,95 ,115,135,155,175,200);
 
-ClientTTL                 = fr_fps1*10;
-ServerTTL                 = fr_fps1;
+TTLMaxClientLobby         = fr_fps1*10;
+TTLMaxClientGame          = fr_fps1*60;
+TTLServer                 = fr_fps1;
 
-net_PingTime              = fr_fps2;
+net_MaxPing               = word.MaxValue-fr_FrameMS;
+
+net_PingReqTime           = fr_fps2;
 net_PeriodTime            = fr_fpsq;
 
 NetTickN                  = 2;
@@ -277,12 +295,12 @@ ns_server                 = 1;
 ns_client                 = 2;
 
 nmid_LAN_Adv              = 2;
-nmid_GameInfo             = 3;
+nmid_LobbyInfo            = 3;
 nmid_connect              = 4;
 nmid_ClientData           = 5;
 nmid_LogMessage           = 6;
 nmid_LogUpdate            = 7;
-nmid_snapshot             = 8;
+nmid_GameData             = 8;
 nmid_pause                = 9;
 nmid_ServerFull           = 10;
 nmid_WrongVersion         = 11;
@@ -297,17 +315,18 @@ nmid_lobby_PAILevelScroll = 19;
 nmid_lobby_PAIToggle      = 20;
 nmid_lobby_PRace          = 21;
 nmid_lobby_PTeam          = 22;
-nmid_lobby_MSeed          = 23;
-nmid_lobby_MScenario      = 24;
-nmid_lobby_MGenerators    = 25;
-nmid_lobby_MSize          = 26;
-nmid_lobby_MObstacles     = 27;
-nmid_lobby_MSymmetry      = 28;
-nmid_lobby_MRandom        = 29;
-nmid_lobby_GFixedPositions= 30;
-nmid_lobby_GAISlots       = 31;
-nmid_lobby_GDefeatedObs   = 32;
-nmid_lobby_GRandomScirmish= 33;
+nmid_lobby_PObserver      = 23;
+nmid_lobby_MSeed          = 24;
+nmid_lobby_MScenario      = 25;
+nmid_lobby_MGenerators    = 26;
+nmid_lobby_MSize          = 27;
+nmid_lobby_MObstacles     = 28;
+nmid_lobby_MSymmetry      = 29;
+nmid_lobby_MRandom        = 30;
+nmid_lobby_GFixedPositions= 31;
+nmid_lobby_GAISlots       = 32;
+nmid_lobby_GDefeatedObs   = 33;
+nmid_lobby_GRandomScirmish= 34;
 nmid_ping_Request         = 40;
 nmid_ping_Answer          = 41;
 
@@ -438,34 +457,6 @@ TargetCheckSRangeBonus = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  Weapon: priority type
-//
-
-wtp_Default            = 0;
-wtp_hits               = 1;
-wtp_Rmhits             = 2;
-wtp_distance           = 3;
-wtp_building           = 4;
-wtp_UnitBioLight       = 7;
-wtp_UnitBioHeavy       = 8;
-wtp_UnitMech           = 10;
-wtp_UnitBio            = 11;
-wtp_Bio                = 12;
-wtp_Light              = 13;
-wtp_UnitLight          = 14;
-wtp_BuildingHeavy      = 15;
-wtp_Scout              = 16;
-wtp_heal               = 17;
-wtp_Fly                = 18;
-wtp_nolost_hits        = 19;
-wtp_max_hits           = 20;
-wtp_limit              = 21;
-wtp_limitaround        = 22;
-wtp_GroundLight        = 23;
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
 //  AI bits
 //
 
@@ -497,17 +488,17 @@ ub_Pain                = 0;
 ub_Resurect            = 1;
 ub_Cast                = 2;
 ub_AltMode             = 3;
-ub_CCast               = 4;
-ub_Invis               = 5;
-ub_Detect              = 6;
-ub_Invuln              = 7;
-ub_Summoned            = 8;
-ub_Teleport            = 9;
-ub_HVision             = 10;
-ub_Damaged             = 11;
-ub_Heal                = 12;
-ub_Scaned              = 13;
-ub_Decay               = 14;
+ub_Invis               = 4;
+ub_Detect              = 5;
+ub_Invuln              = 6;
+ub_Summoned            = 7;
+ub_Teleport            = 8;
+ub_HVision             = 9;
+ub_Damaged             = 10;
+ub_Heal                = 11;
+ub_Scaned              = 12;
+ub_Decay               = 13;
+ub_SpecPause           = 14;
 ub_ArchFire            = 15;
 
 ub_infinity            = NOTSET;
@@ -716,7 +707,7 @@ mvxy_none              = 0;
 mvxy_relative          = 1;
 mvxy_strict            = 2;
 
-BaseDamage1            = 48;
+BaseDamage1            = 45;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamaget            = BaseDamage1 div 3;
 BaseDamageq            = BaseDamage1 div 4;
@@ -765,7 +756,7 @@ UID_HSymbol4           = 7;
 UID_HPools             = 8;
 UID_HTower             = 9;
 UID_HTeleport          = 10;
-UID_HEye           = 11;
+UID_HEye               = 11;
 UID_HMonastery         = 12;
 UID_HPentagram         = 13;
 UID_HTotem             = 14;
@@ -874,7 +865,8 @@ ua_ability1            = 3;
 ua_ability2            = 4;
 ua_ability3            = 5;
 
-ua_patrol              = 7; // only for client data transfer
+ua_patrol              = 6; // only for client data transfer
+ua_apatrol             = 7; // only for function
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -898,28 +890,30 @@ uab_UACCCLandTo        = 14;
 uab_Unload             = 15;
 uab_UnloadTo           = 16;
 
-uab_ToNextForm         = 17;
-uab_ToNextFormTUAC     = 18;
-uab_ToNextFormTHell    = 19;
+uab_ToHAKeep           = 20;
+uab_ToHGate            = 21;
+uab_ToHSymbol2         = 22;
+uab_ToHSymbol3         = 23;
+uab_ToHSymbol4         = 24;
+uab_ToHPool            = 25;
+uab_ToHACommandCenter  = 26;
+uab_ToHBarracks        = 27;
+uab_ToHTower           = 28;
+uab_ToHTotem           = 29;
 
-uab_ToUACDron          = 20;
-uab_ToUGTurret         = 21;
-uab_ToUATurret         = 22;
-uab_ToHTotem           = 23;
-uab_ToHTower           = 24;
+uab_ToUACommandCenter  = 30;
+uab_ToUBarracks        = 31;
+uab_ToUFactory         = 32;
+uab_ToUWeaponFactory   = 33;
+uab_ToUGenerator2      = 34;
+uab_ToUGenerator3      = 35;
+uab_ToUGenerator4      = 36;
+uab_ToUAGTurret        = 37;
+uab_ToUAATurret        = 38;
+uab_ToUACDron          = 39;
+uab_ToUGTurretTo       = 40;
+uab_ToUATurretTo       = 41;
 
-uab_ToUGTurretTo       = 25;
-uab_ToUATurretTo       = 26;
-
-
-{client_rld_abils       = [
-                         uab_Teleport,uab_HEyeVision,uab_SphereInvuln,uab_HKeepShift,uab_HTowerBlink
-                         ];
-client_rld_uids        = [];
-client_cast_abils      = [
-                         uab_UACScan  ,
-                         uab_UACStrike
-                         ];  }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1403,6 +1397,7 @@ ui_CtrlPanelBW         = 3;
 ui_CtrlPanelBH         = ui_CtrlPanelBW+10;
 ui_CtrlPanelBL         = ui_CtrlPanelBH-1;
 ui_CtrlPanelW          = ui_ButtonW1*ui_CtrlPanelBW;
+ui_CtrlPanelWh         = ui_CtrlPanelW div 2;
 ui_CtrlPanelWb         = ui_CtrlPanelW+1;
 ui_CtrlPanelH          = ui_ButtonW1*ui_CtrlPanelBH;
 ui_TabButtonW          = ui_CtrlPanelW div 4;
@@ -1438,8 +1433,8 @@ aummat_info            = 7;
 
 // abilities
 
-uambt_self             = -256;
-uambt_nform            = -257;
+uambt_self             = -257;
+uambt_sightR           = -258;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1488,20 +1483,24 @@ mi_Back                = 1;
 mi_Break               = 2;
 mi_Exit                = 3;
 
-mi_Start               = 10;
-mi_Surrender           = 11;
-mi_Campaings           = 12;
-mi_Scirmish            = 13;
-mi_SaveLoad            = 14;
-mi_Replays             = 15;
-mi_Settings            = 16;
+mi_StartNow            = 10;
+mi_StartTimer          = 11;
+mi_StopTimer           = 12;
+mi_Surrender           = 13;
+mi_Campaings           = 14;
+mi_Scirmish            = 15;
+mi_SaveLoad            = 16;
+mi_Replays             = 17;
+mi_Settings            = 18;
+mi_Help                = 19;
 
 mi_caption_Campaings   = 20;
 mi_caption_Scirmish    = 21;
 mi_caption_SaveLoad    = 22;
 mi_caption_Replays     = 23;
 mi_caption_Settings    = 24;
-mi_caption_SVSearch    = 25;
+mi_caption_Help        = 25;
+mi_caption_SVSearch    = 26;
 
 ////  SETTINGS
 mi_settings_Game       = 30;
@@ -1554,13 +1553,14 @@ mi_SaveLoad_delete     = 95;
 
 //// SCIRMISH PLAYERS BLOCK
 mi_Players_Panel       = 100;
-mi_Players_NameC       = 101;
-mi_Players_StateC      = 102;
-mi_Players_RaceC       = 103;
-mi_Players_TeamC       = 104;
-mi_Players_ColorC      = 105;
-mi_Players_PingC       = 106;
-mi_Players_Ready       = 107;
+mi_Players_CName       = 101;
+mi_Players_CState      = 102;
+mi_Players_CRace       = 103;
+mi_Players_CTeam       = 104;
+mi_Players_CColor      = 105;
+mi_Players_CPing       = 106;
+mi_Players_CObs        = 107;
+mi_Players_Ready       = 108;
 
 mi_Players_Player0     = 110;
 mi_Players_Player1     = 111;
@@ -1616,43 +1616,58 @@ mi_Players_Ping5       = 165;
 mi_Players_Ping6       = 166;
 mi_Players_Ping7       = 167;
 
+mi_Players_Obs0        = 170;
+mi_Players_Obs1        = 171;
+mi_Players_Obs2        = 172;
+mi_Players_Obs3        = 173;
+mi_Players_Obs4        = 174;
+mi_Players_Obs5        = 175;
+mi_Players_Obs6        = 176;
+mi_Players_Obs7        = 177;
+
 //// SCIRMISH MAP BLOCK
-mi_Map_Panel           = 170;
-mi_Map_Map             = 171;
-mi_Map_Scenario        = 172;
-mi_Map_Generators      = 173;
-mi_Map_Seed            = 174;
-mi_Map_Size            = 175;
-mi_Map_Obstacles       = 176;
-mi_Map_Symmetry        = 177;
-mi_Map_Theme           = 178;
-mi_Map_Random          = 179;
+mi_Map_Panel           = 180;
+mi_Map_Map             = 181;
+mi_Map_Scenario        = 182;
+mi_Map_Generators      = 183;
+mi_Map_Seed            = 184;
+mi_Map_Size            = 185;
+mi_Map_Obstacles       = 186;
+mi_Map_Symmetry        = 187;
+mi_Map_Theme           = 188;
+mi_Map_Random          = 189;
 
 //// SCIRMISH GAME BLOCK
-mi_Game_Panel          = 180;
-mi_Game_FixedPositions = 181;
-mi_Game_AISlots        = 182;
-mi_Game_DefeatedObs    = 183;
-mi_Game_Random         = 184;
+mi_Game_Panel          = 190;
+mi_Game_FixedPositions = 191;
+mi_Game_AISlots        = 192;
+mi_Game_DefeatedObs    = 193;
+mi_Game_Random         = 194;
 
 //// SCIRMISH MULTIPLAYER BLOCK
-mi_MP_Panel            = 190;
-mi_MP_ServerToggle     = 191;
-mi_MP_ServerPort       = 192;
-mi_MP_ServerLANVis     = 193;
-mi_MP_Connect          = 194;
-mi_MP_Disconnect       = 195;
-mi_MP_ClientAddress    = 196;
-mi_MP_ClientQuality    = 197;
-mi_MP_ClientLANSearch  = 198;
-mi_MP_ChatList         = 199;
-mi_MP_ChatLine         = 200;
+mi_MP_Panel            = 200;
+mi_MP_ServerToggle     = 201;
+mi_MP_ServerPort       = 202;
+mi_MP_ServerLANVis     = 203;
+mi_MP_Connect          = 204;
+mi_MP_Disconnect       = 205;
+mi_MP_ClientAddress    = 206;
+mi_MP_ClientQuality    = 207;
+mi_MP_ClientLANSearch  = 208;
+mi_MP_ChatList         = 209;
+mi_MP_ChatLine         = 210;
 
-mi_NetSearch_List      = 201;
-mi_NetSearch_Connect   = 202;
+mi_NetSearch_List      = 211;
+mi_NetSearch_Connect   = 212;
 
-//// SCIRMISH REPLAY INFO
-mi_SubCaptionInfoLine  = 210;
+//// SCIRMISH INFO
+mi_SubCaptionInfoLine  = 220;
+mi_UnderBottomInfoLine = 221;
+
+////  HELP
+mi_help_Basics         = 230;
+mi_help_UnitsInfo      = 231;
+mi_help_UnitsBalance   = 232;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1682,7 +1697,7 @@ menu_PListLineH        = menu_ListLineH-2;
 menu_ListLinehH        = menu_ListLineH div 2;
 
 menu_CaptionhW         = menu_BaseW1*3;
-menu_BigButtonW        = menu_BaseW1*4;
+menu_BigButtonW        = menu_BaseW1*3+menu_BaseWh;
 menu_BigButtonH        = menu_BaseW1;
 menu_BigButtonhH       = menu_BigButtonH div 2;
 menu_StepFromBottom    = menu_BaseW1+menu_BasehW;
@@ -1706,12 +1721,13 @@ menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
 menu_ListWh            = menu_ListW1 div 2;
 menu_ListWq            = menu_ListWh div 2;
 
-menu_PlayersNameW      = font_w3+MaxPlayerNameLen*font_w1;
 menu_PlayersStateW     = font_w1h+menu_ListLineH;
-menu_PlayersRaceW      = font_w1h+8*font_w1;
-menu_PlayersTeamW      = font_w1h+4*font_w1;
-menu_PlayersPingW      = font_w1h+4*font_w1;
-menu_PlayersW          = menu_PlayersNameW+menu_PlayersStateW+menu_PlayersRaceW+menu_PlayersTeamW+menu_PlayersPingW;
+menu_PlayersNameW      = font_w2+MaxPlayerNameLen*font_w1;
+menu_PlayersRaceW      = font_w1h+6*font_w1+font_wh;
+menu_PlayersTeamW      = font_w1h+3*font_w1;
+menu_PlayersPingW      = font_w1h+4*font_w1+font_wh;
+menu_PlayersObsW       = font_w1h+3*font_w1+font_wh;
+menu_PlayersW          = menu_PlayersStateW+menu_PlayersNameW+menu_PlayersRaceW+menu_PlayersTeamW+menu_PlayersPingW+menu_PlayersObsW;
 
 menu_msg_x0            = menu_hw-menu_ListWh;
 menu_msg_y0            = menu_hh-menu_BaseW2;
@@ -1762,7 +1778,6 @@ folder_sound           : shortstring = 'sound\';
 folder_save            : shortstring = 'save\';
 folder_replay          : shortstring = 'replay\';
 folder_effects         : shortstring = 'effs\';
-folder_missiles        : shortstring = 'missiles\';
 folder_ui              : shortstring = 'ui\';
 
 ui_limitstr            : shortstring = '125';
@@ -1809,6 +1824,7 @@ sep_comma              = ',';
 sep_scomma             = ', ';
 sep_sdot               = '. ';
 sep_wdash              = '-';
+sep_space              = ' ';
 
 MaxChatStringLength    = 220;
 
@@ -1839,12 +1855,13 @@ theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH B
 
 {$ELSE }
 
-ded_GameStartTime        = fr_fps1*5+fr_fps1-1;
+ded_GameEndTime          = fr_fps1*60+fr_fps1-1;
 
 str_GameLobby            : shortstring = 'Lobby';
-str_GameStarted          : shortstring = 'Run';
-str_GamePaused           : shortstring = 'Paused by player #';
+str_GameStarted          : shortstring = 'Started';
+str_GameWFPlayers        : shortstring = 'Waiting for players';
 str_GameEnded            : shortstring = 'Won by a team #';
+str_GamePaused           : shortstring = 'Paused by ';
 str_UDPPort              : shortstring = ' UPD port: ';
 str_GameStatus           : shortstring = 'Game status: ';
 str_GameOptions          : shortstring = 'Game options:';
@@ -1872,23 +1889,22 @@ str_map_Seed             : shortstring = 'Seed';
 str_map_Size             : shortstring = 'Size';
 str_map_Obstacles        : shortstring = 'Obstacles';
 str_map_Symmetry         : shortstring = 'Symmetry';
-str_game_AISlots         : shortstring = 'Fill empty slots:         ';
-str_game_FixedPositions  : shortstring = 'Fixed player starts:      ';
-str_game_DefeatedObs     : shortstring = 'Observer mode after lose: ';
+str_game_AISlots         : shortstring = 'Fill empty slots';
+str_game_FixedPositions  : shortstring = 'Fixed player starts';
+str_game_DefeatedObs     : shortstring = 'Observer mode after lose';
 str_gmsg_PlayerPaused    : shortstring = 'player paused the game';
 str_gmsg_PlayerResumed   : shortstring = 'player has resumed the game';
-str_gmsg_PlayerLeft      : shortstring = ' left the game';
-str_gmsg_PlayerSurrender : shortstring = ' surrenders!';
 
 str_Player               : shortstring = 'Player';
-str_PlayerState          : shortstring = 'State';
+str_State                : shortstring = 'State';
 str_team                 : shortstring = 'Team';
 str_srace                : shortstring = 'Race';
+str_ping                 : shortstring = 'Ping';
 
-str_ps_AI                : string[4] = 'AI';
-str_ps_Hum               : string[4] = 'Hum.';
+str_ps_AI                : shortstring = 'AI';
+str_ps_Hum               : shortstring = 'Hum.';
 
-str_race                 : array[0..r_cnt       ] of shortstring = ('RANDOM','HELL','UAC');
+str_race                 : array[0..r_cnt] of shortstring = ('RANDOM','HELL','UAC');
 str_observer             : shortstring = 'OBSERVER';
 
 {$ENDIF}

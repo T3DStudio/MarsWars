@@ -121,25 +121,25 @@ end;
 //
 
 TMWSoundSource = record
-   source   :TALuint;
-   volumevar:psingle;
+   snd_src_source   :TALuint;
+   snd_src_volumevar:psingle;
 end;
 PTMWSoundSource   = ^TMWSoundSource;
 TMWSoundSourceSet = record
-   ssl: array of TMWSoundSource;
-   ssn: integer;
+   snd_srcset_l: array of TMWSoundSource;
+   snd_srcset_n: integer;
 end;
 PTMWSoundSourceSet = ^TMWSoundSourceSet;
 
 TMWSound = record
-   sound  : TALuint;
+   oal_sound: TALuint;
 end;
 PTMWSound = ^TMWSound;
 
 TSoundSet = record
-   snds : array of PTMWSound;
-   sndn,
-   sndps: integer;
+   snd_sset_l: array of PTMWSound;
+   snd_sset_n,
+   snd_sset_c: integer;
 end;
 PTSoundSet = ^TSoundSet;
 PPTSoundSet = ^PTSoundSet;
@@ -217,6 +217,10 @@ end;
 //   GAME
 //
 
+TCheckCollisionR = (cbr_no,cbr_mapSide,cbr_unit,cbr_cpoint,cbr_obstacle);
+TCheckBuildArea  = (cba_inBuildArea,cba_noBuilders,cba_NoBuildArea,cba_outBuildArea);
+TCheckBuildPlace = (cbp_good,cbp_noplace,cbp_out,cbp_unknown);
+
 TUnitAbilityTargetType = (uat_none=0,uat_passive,uat_notarget,uat_point,uat_UnitAny,uat_UnitOwn,uat_UnitAlly,uat_UnitEnemy);
 
 TUnitAbility = record
@@ -228,6 +232,7 @@ TUnitAbility = record
    ua_reload_upgrS: integer;
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
+   ua_mbrush_hint : byte;
    ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Reqs,
@@ -303,7 +308,6 @@ TUnitArms = record
   aw_req_uid     : byte;
   aw_req_flags   : cardinal;
 
-  aw_tar_prior   : byte;
   aw_tar_uids    : TSob;
   aw_tar_Flags   : cardinal;
 
@@ -363,7 +367,6 @@ TUID = record
    uid_upgr_SightR,
    uid_upgr_Armor,
    uid_upgr_Regen,
-   uid_nextForm,
    uid_DeathMissile,
    uid_DeathMissile_dmod,
    uid_DeathUID,
@@ -392,11 +395,15 @@ TUID = record
    uid_ability2,
    uid_ability3
                     : byte;
+   uid_ability_ishkeep,
    uid_ability_isradar,
    uid_ability_isteleport,
    uid_ability_isCanLiftUp
                     : boolean;
 
+   uid_client_WReload,
+   uid_client_WCastTarget,
+   uid_NoOrderWhenCast,
    uid_HaveRallyPoint,
    uid_HaveAbility,
    uid_OutUnitsTeleBuff,
@@ -419,6 +426,7 @@ TUID = record
    uid_prod_Upgrades,
    ups_TransportUIDs: TSoB;
    {$IFDEF _FULLGAME}
+   uid_MiniMapR,
    uid_AnimStepFoot,
    uid_AnimStepDeath,
    uid_AnimStepWalk,
@@ -723,7 +731,7 @@ TUnit = record
    wanim    : boolean;
 
    animw,
-   mmx,mmy,mmr,
+   mmx,mmy,
    fx,fy,fsr,
    anim,animf,
    shadowz

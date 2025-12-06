@@ -46,7 +46,7 @@ begin
      end;
 end;
 
-procedure doodads_sprites(noanim:boolean);
+procedure doodads_AddSprites(noanim:boolean);
 var o,edgesR:integer;
 begin
    for o:=1 to MaxObstacles do
@@ -124,9 +124,9 @@ begin
                       end;
         end;
 
-        o_mmx:=round(o_x*map_mmcx);
-        o_mmy:=round(o_y*map_mmcx);
-        o_mmr:=max2i(1,round(o_r*map_mmcx));
+        o_mmx:=round(o_x*map_MiniMap_cx);
+        o_mmy:=round(o_y*map_MiniMap_cx);
+        o_mmr:=max2i(1,round(o_r*map_MiniMap_cx));
      end;
 end;
 

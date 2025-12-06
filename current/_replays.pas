@@ -419,7 +419,7 @@ begin
       end
       else
       begin
-         GameDefaultAll;
+         Game_DefaultAll;
 
          if(rpls_head_itemn>1)then
           for p:=1 to rpls_head_itemn-1 do
@@ -433,7 +433,7 @@ begin
             menu_page     :=mi_replays;
             rpls_str_info1:=str_FileError_WVer+rpls_file_LastErrS;
             rpls_str_info2:='';
-            GameDefaultAll;
+            Game_DefaultAll;
             exit;
          end;
 
@@ -448,7 +448,7 @@ begin
             menu_page     :=mi_replays;
             rpls_str_info1:=str_FileError_WVer;
             rpls_str_info2:='';
-            GameDefaultAll;
+            Game_DefaultAll;
             exit;
          end;
 
@@ -465,7 +465,7 @@ begin
                 menu_page     :=mi_replays;
                 rpls_str_info1:=str_FileError_WVer;
                 rpls_str_info2:='';
-                GameDefaultAll;
+                Game_DefaultAll;
                 exit;
              end;
 
@@ -534,7 +534,7 @@ begin
 
       if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_FastSkip);
 
-      if(rpls_FastSkip)then effects_sprites(false);
+      if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;
    end;
    if(rpls_ForwardSkip=0)then rpls_FastSkip:=false;

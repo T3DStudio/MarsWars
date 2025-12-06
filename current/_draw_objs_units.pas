@@ -1,58 +1,72 @@
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//    MINI MAP
+//
+
 procedure unit_DrawMiniMap(pu:PTUnit);
 begin
    if(ui_blink_timer1=0)and(not MainMenu)and(vid_draw)then
      with pu^  do
      with uid^ do
      begin
-        if(uid^.uid_isbuilding)and(mmr>0)
-        then rectangleColor(ui_minimap,mmx-mmr,mmy-mmr,
-                                       mmx+mmr,mmy+mmr,PlayerGetColor(player^.pnum,false))
-        else pixelColor    (ui_minimap,mmx,mmy,        PlayerGetColor(player^.pnum,false));
+        if(uid^.uid_isbuilding)and(uid_MiniMapR>0)
+        then rectangleColor(ui_minimap,mmx-uid_MiniMapR,mmy-uid_MiniMapR,
+                                       mmx+uid_MiniMapR,mmy+uid_MiniMapR,PlayerGetColor(player^.pnum,false))
+        else pixelColor    (ui_minimap,mmx,mmy,                          PlayerGetColor(player^.pnum,false));
 
         with player^ do
         begin
            if(UIPlayer<=LastPlayer)then
              if(team<>g_gplayers[UIPlayer].team)then exit;
 
-           {if(uid_ability=uab_UACScan)and(rld>radar_vision_time)and(ui_mm_ScanBlink)then
-             filledCircleColor(ui_minimap,trunc(uo_x  *map_mmcx),
-                                          trunc(uo_y  *map_mmcx),
-                                          trunc(srange*map_mmcx),PlayerGetColor(pnum,true));}
+           if(uid_ability_isradar)and(ui_mm_ScanBlink)then
+             if(buffs[ub_Cast]>0)then
+               filledCircleColor(ui_minimap,trunc(uo_x  *map_MiniMap_cx),
+                                            trunc(uo_y  *map_MiniMap_cx),
+                                            trunc(srange*map_MiniMap_cx),PlayerGetColor(pnum,true));
         end;
      end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//    SPRITE DEPTH
+//
 
-function draw_SpriteDepth(y:integer;f:boolean):integer;
+function draw_DefaultSpriteDepth(y:integer;f:boolean):integer;
 begin
-   draw_SpriteDepth:=map_flydepths[f]+y;
+   draw_DefaultSpriteDepth:=map_flydepths[f]+y;
 end;
 
-function unit_SpriteDepth(pu:PTUnit):integer;
+function unit_GetSpriteDepth(pu:PTUnit):integer;
 begin
-   unit_SpriteDepth:=0;
+   unit_GetSpriteDepth:=0;
    with pu^ do
-    case uidi of
-UID_UPortal,
-UID_HTeleport,
-UID_HPentagram,
-UID_HSymbol1,
-UID_HSymbol2,
-UID_HSymbol3,
-UID_HSymbol4,
-UID_HAltar,
-UID_UMine     : unit_SpriteDepth:=sd_tcraters+vy;
-    else
-      if(uid^.uid_isbuilding)and(iscomplete=false)
-      then unit_SpriteDepth:=sd_build+vy
-      else
-        if(hits>0)or(buffs[ub_Resurect]>0)
-        then unit_SpriteDepth:=draw_SpriteDepth(vy,ukfly or (zfall>0))
-        else unit_SpriteDepth:=draw_SpriteDepth(vy,ukfly);
+     case uidi of
+     UID_UPortal,
+     UID_HTeleport,
+     UID_HPentagram,
+     UID_HSymbol1,
+     UID_HSymbol2,
+     UID_HSymbol3,
+     UID_HSymbol4,
+     UID_HAltar,
+     UID_UMine     : unit_GetSpriteDepth:=sd_tcraters+vy;
+     else
+       if(uid^.uid_isbuilding)and(not iscomplete)
+       then unit_GetSpriteDepth:=sd_build+vy
+       else
+         if(hits>0)or(buffs[ub_Resurect]>0)
+         then unit_GetSpriteDepth:=draw_DefaultSpriteDepth(vy,ukfly or (zfall>0))
+         else unit_GetSpriteDepth:=draw_DefaultSpriteDepth(vy,ukfly);
     end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//    FOG
+//
 
 procedure fog_RevealScreenCircle(x,y,r:integer);
 var iy,i:integer;
@@ -80,15 +94,6 @@ begin
                 and((ui_fog_sy-r)<=y)and(y<=(ui_fog_ey+r));
 end;
 
-procedure unit_UpdateFogXY(pu:PTUnit);
-begin
-   with pu^ do
-   begin
-      fx :=x div fog_cw;
-      fy :=y div fog_cw;
-   end;
-end;
-
 function unit_FogReveal(pu:PTUnit):boolean;
 begin
    unit_FogReveal:=false;
@@ -101,8 +106,9 @@ begin
        if(ui_CheckUnitFullFogReveal(pu))then
        begin
           if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
-          //if(uid_ability=uab_UACScan)and(rld>radar_vision_time)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,
-          //                                                                                 (uo_y div fog_cw)-ui_fog_sy,fsr);
+          if(uid_ability_isradar)then
+            if(buffs[ub_Cast]>0)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,
+                                                            (uo_y div fog_cw)-ui_fog_sy,fsr);
           unit_FogReveal:=true
        end
        else
@@ -112,8 +118,71 @@ begin
            if(CheckUnitTeamVision(g_gplayers[UIplayer].team,pu,false))then unit_FogReveal:=true;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//    UI COMMANDER
+//
 
-procedure ui_ProductionCounters(pu:PTUnit;pn:integer);
+function ui_CommanderGetWeight(pu:PTUnit):byte;
+begin
+   ui_CommanderGetWeight:=0;
+   with pu^ do
+   with uid^ do
+   begin
+      if (iscomplete        )then ui_CommanderGetWeight+=128;
+      if (not uid_isbuilding)then ui_CommanderGetWeight+=64;
+      if (uid_HaveAbility   )then ui_CommanderGetWeight+=32;
+      if (uid_BaseSpeed>0   )then ui_CommanderGetWeight+=16;
+      if (rld<=0            )then ui_CommanderGetWeight+=8;
+      if (uo_id<>ua_ability1)
+      and(uo_id<>ua_ability2)
+      and(uo_id<>ua_ability3)then ui_CommanderGetWeight+=4;
+   end;
+end;
+
+procedure ui_CommanderSet(pu:PTUnit);
+var
+curWeight:byte;
+curDist  :integer;
+begin
+   curWeight:=ui_CommanderGetWeight(pu);
+   curDist  :=point_dist_int(ui_cam_cx,ui_cam_cy,pu^.x,pu^.y);
+   if(ui_CommandercPU=nil)
+   then
+   else
+     if(curWeight<ui_CommandercW)
+     then exit
+     else
+       if(curWeight>ui_CommandercW)
+       then
+       else // equal weight
+         case pu^.rld>0 of
+         true : if(pu^.rld<ui_CommandercPU^.rld)
+                then
+                else exit;
+         false: if(curDist<ui_CommandercD)
+                then
+                else exit;
+         end;
+
+   ui_CommandercPU:=pu;
+   ui_CommandercW :=curWeight;
+   ui_CommandercD :=curDist;
+end;
+
+procedure ui_CommanderClear;
+begin
+   ui_CommandercPU:=nil;
+   ui_CommandercW :=0;
+   ui_CommandercD :=ui_CommandercD.MaxValue;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    UI COUNTERS
+//
+
+procedure ui_UICountersProduction(pu:PTUnit;pn:integer);
 var i,t:byte;
 begin
    with pu^     do
@@ -183,46 +252,7 @@ begin
    end;
 end;
 
-function ui_GetCommanderWeight(pu:PTUnit):byte;
-begin
-   ui_GetCommanderWeight:=0;
-   with pu^ do
-   with uid^ do
-   begin
-      if(iscomplete        )then ui_GetCommanderWeight+=128;
-      if(not uid_isbuilding)then ui_GetCommanderWeight+=64;
-      if(uid_HaveAbility   )then ui_GetCommanderWeight+=32;
-      if(uid_BaseSpeed>0   )then ui_GetCommanderWeight+=16;
-      if(rld<=0            )then ui_GetCommanderWeight+=8;
-   end;
-end;
-
-procedure ui_SetCommander(pu:PTUnit);
-var
-curWeight:byte;
-curDist  :integer;
-begin
-   curWeight:=ui_GetCommanderWeight(pu);
-   curDist  :=point_dist_int(ui_cam_cx,ui_cam_cy,pu^.x,pu^.y);
-   if(ui_CommandercPU=nil)
-   then
-   else
-     if(curWeight<ui_CommandercW)
-     then exit
-     else
-       if(curWeight>ui_CommandercW)
-       then
-       else // equal weight
-         if(curDist<ui_CommandercD)
-         then
-         else exit;
-
-   ui_CommandercPU:=pu;
-   ui_CommandercW :=curWeight;
-   ui_CommandercD :=curDist;
-end;
-
-procedure ui_CountersAndMarks(pu:PTUnit);
+procedure unit_UICounters(pu:PTUnit);
 var i:byte;
     t:integer;
 HaveAttack:boolean;
@@ -236,14 +266,13 @@ begin
       if(unit_F2SelectFilter(pu))then ui_IncGroupCounter(@ui_group_f2      ,x,y,uidi); // all battle units
       if(unit_F1SelectFilter(pu))then ui_IncGroupCounter(@ui_group_f1      ,x,y,uidi); // all builders
 
-      // UI Selected commander
+      // UI update the commander
       if(isselected)then
         case m_brush of
         -255..-1: if(unit_OrderCheckAbility(pu,byte(-m_brush)))then
-                    UnitOrderSetNearestTarget(pu,mouse_map_x,mouse_map_y,@ui_CommandercPU,@ui_CommandercD,@ui_CommandercW,unit_AbilityCheck(pu,byte(-m_brush),false)=0,false,true );
-        else      ui_SetCommander(pu);
+                  UnitOrderSetNearestTarget(pu,mouse_map_x,mouse_map_y,@ui_CommandercPU,@ui_CommandercD,@ui_CommandercW,unit_AbilityCheck(pu,byte(-m_brush),false)=0,false,true );
+        else      ui_CommanderSet(pu);
         end;
-
 
       if(uid_isbuilding)then
       begin
@@ -252,91 +281,41 @@ begin
             // building area and possible buildings for UI
             if(uid_isbuilder)and(not ukfly)then
               if(units_builders_s=0)or(isselected)then
-              begin
-                 ui_bprod_possible+=uid_prod_Buildings;
-                 if(0<m_brush)and(m_brush<=255)then
-                   if(m_brush in uid_prod_Buildings)then
-                     if(RectInCam(x,y,srange,srange,0))then UnitsInfoAddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
-              end;
+                ui_bprod_possible+=uid_prod_Buildings;
 
             // production counters
             for i:=0 to LastUnitLevel do
               if(i>level)
               then break
-              else ui_ProductionCounters(pu,i);
+              else ui_UICountersProduction(pu,i);
          end;
+         // have rally point
          if(isselected)and(uid_HaveRallyPoint)then
-         begin
-            ui_uibtn_rpoint+=1;
-            UnitsInfoAddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
-            SpriteListAddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
-         end;
-      end;
-
-      if(uo_x>0)and((uo_x<>x)or(uo_y<>y))and(speed>0)then // unit is moving
-      begin
-         if(isselected)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
-           if(uo_id=ua_move)or(uo_id=ua_amove)then
-             if(uo_bx>0)then UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
-
-         if(uo_id=ua_ability1)
-         or(uo_id=ua_ability2)
-         or(uo_id=ua_ability3)then
-         begin
-            i:=unit_GetCastingAbility(pu);
-            if(i>0)then
-              with g_aids[i] do
-                case ua_type of
-                uat_point    : begin
-                                  SpriteListAddEffect(uo_x,uo_y,0,0,ui_AbilityGetBrushSpr(pu,i),128);
-                                  if(ui_DrawEdges)then
-                                  begin
-                                     t:=ui_AbilityGetBrushR(pu,i);
-                                     if(t>0)then
-                                       UnitsInfoAddCircle(uo_x,uo_y,t,ui_blink2_color_BY);
-                                  end;
-
-                                  if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
-                               end;
-                uat_UnitAny,
-                uat_UnitOwn,
-                uat_UnitAlly,
-                uat_UnitEnemy:;
-                end;
-         end;
-
-         {if(uo_id=ua_psability)then   -255..-1
-           case uid_ability of
-uab_RebuildInPoint: begin
-                    SpriteListAddEffect(uo_x,uo_y,0,0,uid2spr(uid_rebuild_uid,270,0),128);
-                    if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
-                    if(ui_DrawEdges)then UnitsInfoAddCircle(uo_x,uo_y,g_uids[uid_rebuild_uid].uid_r,ui_blink2_color_BY);
-                    end;
-uab_UACCCLandTo   : begin
-                    SpriteListAddEffect(uo_x,uo_y+fly_hz,0,0,uid2spr(uidi,270,0),128);
-                    if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y+fly_hz,ui_blink_color1[ui_blink2_colorb]);
-                    if(ui_DrawEdges)then UnitsInfoAddCircle(uo_x,uo_y+fly_hz,uid_r,ui_blink2_color_BY);
-                    end;
-           end;}
+           ui_uibtn_rpoint+=1;
       end;
 
       if(iscomplete)then
       begin
+         // reload by uid
          if(rld<ui_uid_reload [uidi])or(ui_uid_reload [uidi]<0)then ui_uid_reload [uidi]:=rld;
+         // reload by ucl, only buildings
          if(uid_isbuilding)then
-           if(rld<ui_bucl_reload[uid_uibtn])or(ui_bucl_reload[uid_uibtn]<0)then ui_bucl_reload[uid_uibtn]:=rld;
+           if(rld<ui_bucl_reload[uid_uibtn])
+           or(ui_bucl_reload[uid_uibtn]<0)then ui_bucl_reload[uid_uibtn]:=rld;
 
+         // maon orders
          if(isselected)then
          begin
             HaveAttack:=ui_HaveAttack(pu);
-            if (speed   >0)then ui_uibtn_move  +=1;
-            if (HaveAttack)then ui_uibtn_attack+=1;
+            if (speed   >0)then ui_uibtn_move   +=1;
+            if (HaveAttack)then ui_uibtn_attack +=1;
             if (speed   >0)
             and(HaveAttack)then ui_uibtn_apatrol+=1;
          end;
       end
       else
       begin
+         // building time
          t:=min2i(uid_ProdTimeSec,((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2);
          if(uid_isbuilding)then
          begin
@@ -362,6 +341,129 @@ uab_UACCCLandTo   : begin
    end;
 end;
 
+procedure unit_UICountersAll;
+var
+u :integer;
+tu,
+pu:PTUnit;
+begin
+   for u:=0 to 255 do
+   begin
+      ui_uid_reload [u]:=-1;
+      ui_bucl_reload[u]:=-1;
+   end;
+   FillChar(ui_bprod_uid_count,SizeOf(ui_bprod_uid_count),0);
+   FillChar(ui_bprod_ucl_count,SizeOf(ui_bprod_ucl_count),0);
+   FillChar(ui_bprod_ucl_time ,SizeOf(ui_bprod_ucl_time ),0);
+   FillChar(ui_uprod_uid_time ,SizeOf(ui_uprod_uid_time ),0);
+   FillChar(ui_uprod_uid_max  ,SizeOf(ui_uprod_uid_max  ),0);
+   FillChar(ui_pprod_upg_time ,SizeOf(ui_pprod_upg_time ),0);
+   FillChar(ui_pprod_upg_max  ,SizeOf(ui_pprod_upg_max  ),0);
+   FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
+   FillChar(ui_group_d        ,SizeOf(ui_group_d        ),0);
+   FillChar(ui_group_f1       ,SizeOf(ui_group_f1       ),0);
+   FillChar(ui_group_f2       ,SizeOf(ui_group_f2       ),0);
+   ui_uprod_max      :=0;
+   ui_uprod_cur      :=0;
+   ui_uprod_first    :=0;
+   ui_pprod_max      :=0;
+   ui_pprod_cur      :=0;
+   ui_pprod_first    :=0;
+
+   ui_CommanderClear;
+
+   ui_uibtn_rpoint   :=0;
+   ui_uibtn_move     :=0;
+   ui_uibtn_attack   :=0;
+   ui_uibtn_apatrol  :=0;
+   ui_bprod_possible :=[];
+   ui_bprod_first    :=0;
+   ui_bprod_all      :=0;
+
+   for u:=1 to MaxUnits do
+   begin
+      pu:=@g_units[u];
+      with pu^ do
+        if(playeri=UIPlayer)and(hits>0)then
+          if(IsUnitRange(transportU,@tu))then
+          begin
+             if(tu^.isselected)then ui_units_inapc[uidi]+=1;
+          end
+          else unit_UICounters(pu);
+   end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    UI LAYER UNIT MARKS
+//
+
+procedure unit_UIMarks(pu:PTUnit);
+var
+i:byte;
+t:integer;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(uid_isbuilding)then
+      begin
+         // building areas
+         if(iscomplete)and(uid_isbuilder)and(not ukfly)then
+           if(units_builders_s=0)or(isselected)then
+             case m_brush of
+             1..255 : if(m_brush in uid_prod_Buildings)then
+                        if(RectInCam(x,y,srange,srange,0))then
+                          UnitsInfoAddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
+             end;
+         // rally points
+         if(isselected)and(uid_HaveRallyPoint)then
+         begin
+            UnitsInfoAddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
+            SpriteListAddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
+         end;
+      end;
+
+      if(speed>0)then
+        if(uo_x<>x)or(uo_y<>y)then // unit is moving or casting
+          case uo_id of
+          ua_move,
+          ua_amove   : if(uo_bx>0)and(isselected)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
+                         UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+          ua_ability1,
+          ua_ability2,
+          ua_ability3: begin
+                          i:=unit_GetCastingAbility(pu);
+                          if(i>0)then
+                            with g_aids[i] do
+                              case ua_type of
+                              uat_point    : begin
+                                                SpriteListAddEffect(uo_x,uo_y,0,0,ui_AbilityGetBrushSpr(i,uidi),128);
+                                                if(ui_DrawEdges)then
+                                                begin
+                                                   t:=ui_AbilityGetBrushR(i,pu);
+                                                   if(t>0)then
+                                                     UnitsInfoAddCircle(uo_x,uo_y,t,ui_blink2_color_BY);
+                                                end;
+
+                                                if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+                                             end;
+                              uat_UnitAny,
+                              uat_UnitOwn,
+                              uat_UnitAlly,
+                              uat_UnitEnemy:;
+                              end;
+                       end;
+          end;
+   end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    UI VISUALs
+//
+
 procedure unit_FootEffect(pu:PTUnit);
 begin
    with pu^ do
@@ -371,7 +473,7 @@ begin
         animf-=1;
         if(animf<=0)then
         begin
-           SoundPlayUnit(uid_snd_Foot,nil,nil);
+           snd_SoundPlayUnit(uid_snd_Foot,nil,nil);
            animf:=uid_AnimStepFoot;
         end;
      end;
@@ -382,9 +484,9 @@ begin
    EID2Spr:=@spr_dummy;
 
    with g_eids[eid] do
-    if(smodel<>nil)then
-     if(smodel^.sm_spritesNum>0)then
-      EID2Spr:=@smodel^.sm_spritesL[0];
+     if(smodel<>nil)then
+       if(smodel^.sm_spritesNum>0)then
+         EID2Spr:=@smodel^.sm_spritesL[0];
 end;
 
 procedure unit_UpdateStatusStrings(pu:PTUnit);
@@ -406,7 +508,7 @@ begin
    begin
       // buffs and level
       lvlstr_b:='';
-      if(buffs[ub_Detect  ]>0)then lvlstr_b+=char_detect;
+      if(buffs[ub_Detect]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
       if(not uid_isbuilding)or(uid_isbarrack)or(uid_issmith)then
@@ -467,19 +569,7 @@ begin
    end;
 end;
 
-function gfx_AlphaGlows(amplitudo:byte;shift:cardinal):byte;
-var amplitudoH,t:cardinal;
-begin
-   gfx_AlphaGlows:=0;
-   if(amplitudo=0)then exit;
-   amplitudoH:=amplitudo div 2;
-   t:=(g_tick+shift) mod amplitudo;
-   if(t>amplitudoH)
-   then gfx_AlphaGlows:=amplitudo-t
-   else gfx_AlphaGlows:=t;
-end;
-
-procedure unit_SpriteAlive(pu:PTUnit;noanim:boolean);
+procedure unit_AddSpriteAlive(pu:PTUnit;noanim:boolean);
 const _btnas: array[0..LastUnitLevel] of integer = (0,ui_ButtonWh,ui_ButtonW1,ui_ButtonW1+ui_ButtonWh);
 var
 spr        : PTMWTexture;
@@ -497,8 +587,8 @@ begin
 /////////      Visible in fog of war
       unit_DrawMiniMap(pu);
 
-      //if(uid_ability=uab_HKeepShift)then
-      //  if(buffs[ub_CCast]>0)then exit;
+      if(uid_ability_ishkeep)then
+        if(buffs[ub_Cast]>0)then exit;
 
       wanim:=false;
       if(G_Status=gs_running)then
@@ -515,7 +605,7 @@ begin
       if(spr_depth<-1)then t*=2;
       shadowz+=t;
 
-/////////      Visible in player's view
+/////////      Visible in player's cam
       if(not RectInCam(vx,vy,spr^.hw,spr^.hh,shadowz))then exit;
 
       if((unum mod ui_blink_period2)=ui_blink_timer2)then
@@ -523,7 +613,7 @@ begin
 
       UnitsInfoAddFromUnit(pu,uid_SpriteModel[level]);
 
-      spr_depth:=unit_SpriteDepth(pu);
+      spr_depth:=unit_GetSpriteDepth(pu);
       spr_alpha:=255;
       ColorAura :=0;
 
@@ -583,8 +673,6 @@ begin
 
            SpriteListAddEffect(vx,vy+uid_eid_bcrater_y,sd_liquid+uid_eid_bcrater_y+y,0,EID2Spr(uid_eid_bcrater),spr_alphab);
         end;
-       // else if(buffs[ub_Invis]>0)then spr_alpha:=spr_alpha shr 1;
-
 
       if(ui_ColoredShadow)
       then ColorShadow:=PlayerGetColor(playeri,true)
@@ -594,7 +682,7 @@ begin
    end;
 end;
 
-procedure unit_SpriteDead(pu:PTUnit);
+procedure unit_AddSpriteDead(pu:PTUnit);
 var spr:PTMWTexture;
 begin
    with pu^ do
@@ -607,65 +695,11 @@ begin
         if(spr<>pspr_dummy)then
           if(unit_FogReveal(pu))then
             if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-              SpriteListAddDoodad(vx,vy,unit_SpriteDepth(pu),-32000,spr,byte(mm3i(0,abs(hits-hits_fdead)*4,255)),0,0);
+              SpriteListAddDoodad(vx,vy,unit_GetSpriteDepth(pu),-32000,spr,byte(mm3i(0,abs(hits-hits_fdead)*4,255)),0,0);
      end;
 end;
 
-procedure unit_UICounters;
-var
-u :integer;
-tu,
-pu:PTUnit;
-begin
-   for u:=0 to 255 do
-   begin
-      ui_uid_reload [u]:=-1;
-      ui_bucl_reload[u]:=-1;
-   end;
-   FillChar(ui_bprod_uid_count,SizeOf(ui_bprod_uid_count),0);
-   FillChar(ui_bprod_ucl_count,SizeOf(ui_bprod_ucl_count),0);
-   FillChar(ui_bprod_ucl_time ,SizeOf(ui_bprod_ucl_time ),0);
-   FillChar(ui_uprod_uid_time ,SizeOf(ui_uprod_uid_time ),0);
-   FillChar(ui_uprod_uid_max  ,SizeOf(ui_uprod_uid_max  ),0);
-   FillChar(ui_pprod_upg_time ,SizeOf(ui_pprod_upg_time ),0);
-   FillChar(ui_pprod_upg_max  ,SizeOf(ui_pprod_upg_max  ),0);
-   FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
-   FillChar(ui_group_d        ,SizeOf(ui_group_d        ),0);
-   FillChar(ui_group_f1       ,SizeOf(ui_group_f1       ),0);
-   FillChar(ui_group_f2       ,SizeOf(ui_group_f2       ),0);
-   ui_uprod_max      :=0;
-   ui_uprod_cur      :=0;
-   ui_uprod_first    :=0;
-   ui_pprod_max      :=0;
-   ui_pprod_cur      :=0;
-   ui_pprod_first    :=0;
-
-   ui_CommandercPU   :=nil;
-   ui_CommandercD    :=ui_CommandercD.MaxValue;
-   ui_CommandercW    :=0;
-
-   ui_uibtn_rpoint   :=0;
-   ui_uibtn_move     :=0;
-   ui_uibtn_attack   :=0;
-   ui_uibtn_apatrol  :=0;
-   ui_bprod_possible :=[];
-   ui_bprod_first    :=0;
-   ui_bprod_all      :=0;
-
-   for u:=1 to MaxUnits do
-   begin
-      pu:=@g_units[u];
-      with pu^ do
-        if(playeri=UIPlayer)and(hits>0)then
-          if(IsUnitRange(transportU,@tu))then
-          begin
-             if(tu^.isselected){and(G_Status=gs_running)}then ui_units_inapc[uidi]+=1;
-          end
-          else ui_CountersAndMarks(pu);
-   end;
-end;
-
-procedure unit_sprites(noanim:boolean);
+procedure unit_AddSpritesAndMarks(noanim:boolean);
 var
 u :integer;
 pu:PTUnit;
@@ -674,11 +708,21 @@ begin
    begin
       pu:=@g_units[u];
       with pu^ do
-        if not((0<transportU)and(transportU<=MaxUnits))then
+        if not(IsUnitRange(transportU,nil))then
           if(hits<=0)
-          then unit_SpriteDead (pu)
-          else unit_SpriteAlive(pu,noanim);
+          then unit_AddSpriteDead (pu)
+          else
+          begin
+             unit_UIMarks(pu);
+             unit_AddSpriteAlive(pu,noanim);
+          end;
    end;
+
+   if(ui_CommandercPU<>nil)then
+     case m_brush of
+     -255..-1: with ui_CommandercPU^ do
+                 UnitsInfoAddLine(x,y,m_brushx,m_brushy,ui_blink_color1[ui_blink2_colorb]);
+     end;
 end;
 
 

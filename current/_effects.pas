@@ -245,18 +245,18 @@ begin
            o:=1;
         end;
         for i:=1 to o do effect_add(m_vx-g_randomr(r),
-                                    m_vy-g_randomr(r),draw_SpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
+                                    m_vy-g_randomr(r),draw_DefaultSpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
 
         if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_vx,m_vy,sd_liquid+m_vy,mid_eid_Decal);
 
         if(mid_snd_DeathSkip[m_eid_DeathType]>0)then
           if(random(mid_snd_DeathSkip[m_eid_DeathType])>0)then exit;
 
-        SoundPlayUnit(mid_snd_death[m_eid_DeathType],nil,nil);
+        snd_SoundPlayUnit(mid_snd_death[m_eid_DeathType],nil,nil);
      end;
 end;
 
-procedure missiles_sprites;
+procedure missiles_AddSprites;
 var  m:integer;
    spr:PTMWTexture;
 begin
@@ -267,7 +267,7 @@ begin
            if(m_vstep>0)then
            begin
               spr:=_sm2s(mid_SpriteModel,sms_stand,m_dir,0,nil);
-              SpriteListAddEffect(m_vx,m_vy,draw_SpriteDepth(m_vy,m_mfs)+100,0,spr,255);
+              SpriteListAddEffect(m_vx,m_vy,draw_DefaultSpriteDepth(m_vy,m_mfs)+100,0,spr,255);
            end;
 end;
 
@@ -275,12 +275,12 @@ end;
 procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
 begin
    if ui_CheckMapPointFogVision(vx,vy,true)
-   or ui_CheckMapPointFogVision(tx,ty,true) then SoundPlayUnit(snd,nil,nil);
-   effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),eidstart);
-   effect_add(tx,ty,draw_SpriteDepth(ty+1,ukfly),eidend  );
+   or ui_CheckMapPointFogVision(tx,ty,true) then snd_SoundPlayUnit(snd,nil,nil);
+   effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart);
+   effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  );
 end;
 
-procedure effects_sprites(noanim:boolean);
+procedure effects_AddSprites(noanim:boolean);
 var ei,
  alpha:integer;
    spr:PTMWTexture;

@@ -32,6 +32,7 @@ uses SysUtils, SDL, SDL_Net,crt
 {$include _objects_main_data.pas}
      {$IFDEF _FULLGAME}
         {$include _objects_client_data.pas}
+        {$include _strings.pas}
         {$include _lang.pas}
         {$include _config.pas}
         {$include _sprite_model.pas}
@@ -72,7 +73,6 @@ begin
    {$IFDEF _FULLGAME}
    if(TestMode=2)then
    begin
-   WriteUnitDescriptions;
    {$IFDEF UNITDATA}
    test_UnitsSpec;
    {$ENDIF}

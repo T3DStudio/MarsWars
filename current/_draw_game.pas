@@ -553,7 +553,7 @@ end;
 //  Key Points
 //
 
-procedure keyPoints_sprites;
+procedure keyPoints_AddSprites;
 var t,i:integer;
    ddir:single;
 ccolor,
@@ -732,6 +732,7 @@ begin
 
               if(aiu_alarm_d<32000)then
               lineColor(vid_screen,ix,iy,aiu_alarm_x+ui_cam_x  ,aiu_alarm_y+ui_cam_y  ,c_red );
+
            end;
 
            draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_LU,255, PlayerGetColor(playeri,false));
@@ -774,7 +775,7 @@ begin
            //draw_text(vid_screen,ix,iy,i2s(u)+#13+i2s(tar1)+#13+i2s(uo_id)+#13+i2s(buffs[ub_stop]), ta_LU,255, plcolor[player]);
 
            //if(tar1>0)then lineColor(vid_screen,ix,iy,g_units[tar1].x-ui_cam_x,g_units[tar1].y-ui_cam_y,c_white);
-            //lineColor(vid_screen,ix+10,iy+10,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);  and(player=LocalPlayer)
+           //lineColor(vid_screen,ix+10,iy+10,uo_x-ui_cam_x,uo_y-ui_cam_y,c_white);  //and(player=LocalPlayer)
         end;
 
          //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);

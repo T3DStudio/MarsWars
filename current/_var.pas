@@ -13,7 +13,6 @@ g_tick            : cardinal = 0;
 g_started         : boolean  = false;
 g_status          : byte     = 0;
 
-g_type            : byte     = 0; // 0 = none, 1 = scirmish, 2 - campaing
 g_FixedPositions  : boolean  = false;
 g_AISlots         : byte     = player_default_ai_level;
 g_DefeatedObs     : boolean  = true;
@@ -39,6 +38,8 @@ g_aids            : array[byte] of TUnitAbility;
 
 g_random_i        : word    = 0;
 g_random_p        : byte    = 0;
+
+g_LobbyTimer      : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -136,7 +137,14 @@ u_royal_d         : integer;
 test_InstaProd    : boolean = true;
 {$ENDIF}
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//   CLIENT GAME VARS
+//
+
 {$IFDEF _FULLGAME}
+
+g_type            : byte     = 0; // 0 = none, 1 = scirmish, 2 - campaing
 
 g_eids            : array[byte] of TEID;
 g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
@@ -261,9 +269,8 @@ ui_CommandercPU   : PTUnit = nil;
 ui_CommandercD    : integer = 0;
 ui_CommandercW    : byte = 0;
 ui_CommanderpPU   : PTUnit = nil;
-ui_UnitSelectedNU : integer = 0;
-ui_UnitSelectedpU : integer = 0;
-ui_UnitSelectedn  : byte = 0;
+ui_UnitSelSound   : boolean = false;
+ui_UnitSelSoundA  : integer = 0;
 ui_tab            : byte = 0;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
 ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ButtonsNum] of byte;
@@ -370,8 +377,10 @@ menu_sc_cx        : single;
 
 MainMenu          : boolean = true;
 
+menu_DarkBack     : boolean = false;
 menu_Page         : byte = 0;
 menu_SettingsPage : byte = mi_settings_Game;
+menu_HelpPage     : byte = 0;
 menu_ItemActs     : byte = 0;
 menu_ItemTarget   : integer;
 menu_ItemSelected : integer;
@@ -402,9 +411,9 @@ menu_ChatScroll   : integer = 0;
 //  MAP VISUAL
 //
 
-map_mmcx          : single;
-map_mmvw,
-map_mmvh          : integer;
+map_MiniMap_cx    : single;
+map_MiniMap_CamW,
+map_MiniMap_CamH  : integer;
 
 map_terrain       : pSDL_SURFACE;
 
@@ -563,6 +572,7 @@ c_ltgray,
 c_gray,
 c_dgray,
 c_ablack,
+c_mablack,
 c_purple,
 c_violet,
 c_black           : cardinal;
@@ -892,8 +902,11 @@ str_ps_Host         : string4;
 
 str_lobby_PlayerReady: array[false..true] of shortstring;
 
+str_lobby_GameResetIn,
 str_lobby_GameStartIn,
-str_lobby_AllPReady : shortstring;
+str_lobby_ReadyToStart,
+str_lobby_BreakStarting
+                       : shortstring;
 
 str_menu_Campaings,
 str_menu_Scirmish,
@@ -902,15 +915,17 @@ str_menu_SaveLoad,
 str_menu_LoadGame,
 str_menu_Replays,
 str_menu_Settings,
+str_menu_Help,
 
 str_menu_Start,
+str_menu_Cancel,
 str_menu_Surrender,
 str_menu_Abort,
 str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
 str_menu_Pause,
-str_menu_chat,
+str_menu_Chat,
 
 str_menuMsg_HintDefault,
 str_menuMsg_HintClient,
@@ -977,6 +992,7 @@ str_hint_UpgradesLvl,
 str_hint_Demons,
 str_hint_Except,
 str_hint_UnitArming,
+str_hint_Abilities,
 str_hint_SplashResist,
 str_hint_hits,
 str_hint_BaseSightR,
@@ -1010,7 +1026,6 @@ str_uarm_BonusAFlyR,
 str_uarm_BonusAGroundR,
 str_uarm_BonusAUnitR,
 str_uarm_BonusABuildingR,
-str_uarm_Priority,
 str_uarm_Upgrade,
 str_uarm_Factor,
 
@@ -1019,7 +1034,9 @@ str_gmsg_RecordError,
 str_gmsg_RecordStop,
 str_gmsg_PlayerPaused,
 str_gmsg_PlayerResumed,
-str_gmsg_PlayerLeft,
+str_gmsg_PlayerConnected,
+str_gmsg_PlayerLeave,
+str_gmsg_PlayerTimeOut,
 str_gmsg_PlayerSurrender,
 str_gmsg_PlayerDefeat,
 str_gmsg_GameSaved,
@@ -1030,11 +1047,15 @@ str_gmsg_GameStarted,
 str_gmsg_PortBlocked,
 
 str_gstat_WaitForServer,
+str_gstat_WaitForPlayers,
 str_gstat_Unknown,
 str_gstat_ReplayEnd,
 str_gstat_ReplayError,
 str_gstat_ReplayPaused,
 str_gstat_GamePaused,
+str_gstat_Lobby,
+str_gstat_Started,
+str_gstat_WonByTeam,
 str_gstat_Win,
 str_gstat_Lose,
 
@@ -1136,6 +1157,7 @@ str_PT_Race,
 str_PT_Team,
 str_PT_Color,
 str_PT_Ping,
+str_PT_Obs,
 
 str_Caption_Server,
 str_Caption_Client,
@@ -1157,7 +1179,6 @@ str_SG_HealthBarsL       : array[0..2] of shortstring;
 str_SG_ControlPanelPosL  : array[0..3] of shortstring;
 
 str_action_hint,
-str_uarm_PriorityL,
 str_menu_hint            : array[byte] of shortstring;
 
 str_camp_MissionName,
@@ -1165,7 +1186,8 @@ str_camp_map             : array[0..LastMission] of shortstring;
 str_camp_infol           : array[0..LastMission] of TStringList;
 str_camp_infon           : array[0..LastMission] of integer;
 
-str_YesNo,
+str_YesNoC,
+str_YesNoG,
 str_SG_LanguageL,
 str_SG_RightClickActL    : array[false..true] of shortstring;
 
@@ -1213,10 +1235,11 @@ snd_player_defeated,
 snd_upgrade_complete,
 snd_victory,
 snd_unit_adv,
-snd_unit_promoted
+snd_unit_promoted,
+snd_rally_point
                    : array[1..r_cnt] of PTSoundSet;
 
-snd_radar,
+snd_RadarScan,
 
 snd_uac_mine,
 snd_uac_cc,
@@ -1335,7 +1358,7 @@ snd_zimba_ready,
 snd_zimba_pain,
 snd_zimba_move,
 
-snd_hell_invuln,
+snd_PowerUp,
 snd_hell_pain,
 snd_hell_melee,
 snd_hell_attack,
@@ -1394,33 +1417,36 @@ snd_arachno_move,
 snd_arachno_foot,
 snd_arachno_ready,
 
-snd_cube,
-snd_pistol,
-snd_shotgun,
-snd_ssg,
-snd_plasma,
-snd_bfg_shot,
-snd_bfg_exp,
-snd_healing,
-snd_electro,
-snd_jetpon,
+snd_IconOfSinCube,
+snd_shot_pistol,
+snd_shot_shotgun,
+snd_shot_ssg,
+snd_shot_plasma,
+snd_shot_bfg,
+snd_explode_bfg,
+snd_Healing,
+snd_repairing,
+snd_JetPackOn,
 snd_click,
 snd_chat,
 snd_rico,
-snd_flyer_s,
-snd_flyer_a,
-snd_launch,
-snd_CCup,
+snd_shot_flyer,
+snd_explode_flyer,
+snd_shot_rocket,
+snd_CCenterLiftUp,
 snd_bomblaunch,
-snd_meat,
-snd_building_explode,
-snd_transport,
-snd_teleport,
-snd_pexp,
-snd_exp,
+snd_Gibs,
+snd_explode_building,
+snd_Transport,
+snd_Teleport,
+snd_explode_plasma,
+snd_explode,
 snd_mapmark,
-snd_capture,
-snd_cplost,
+snd_KeyPointCapture,
+snd_KeyPointLost,
+snd_SwitchOn,
+snd_SwitchOff,
+snd_Stink,
 snd_hell
               : PTSoundSet;
 
@@ -1429,7 +1455,6 @@ snd_hell
 
 menu_update       : boolean = true;
 console_y         : integer = 0;
-ded_GameStartTimer: integer = 0;
 
 {$ENDIF}
 

@@ -25,7 +25,7 @@ begin
               energyl_cur-=kpEnergy;
               energyl_max-=kpEnergy;
            end;
-           if(log)then GameLogKeyPointLost(kpOwnerPlayer,i);
+           if(log)then GameLog_KeyPointLost(kpOwnerPlayer,i);
         end;
 
         kpOwnerPlayer:=newOwnerPlayer;
@@ -40,7 +40,7 @@ begin
               energyl_cur+=kpEnergy;
               energyl_max+=kpEnergy;
            end;
-           if(log)then GameLogKeyPointCaptured(kpOwnerPlayer,i);
+           if(log)then GameLog_KeyPointCaptured(kpOwnerPlayer,i);
         end;
      end;
 end;
@@ -66,7 +66,7 @@ begin
 
           if(p>0)then // life expired
           begin
-             GameLogNGenExh(kpOwnerPlayer,i);
+             GameLog_NgenExh(kpOwnerPlayer,i);
              KeyPoint_ChangeOwner(i,255,false);
              kpCaptureR:=-kpCaptureR;
              {$IFDEF _FULLGAME}
@@ -122,7 +122,7 @@ begin
                  if(kpTimerOwnerPlayer<=LastPlayer)
                  then kpTimerOwnerTeam:=g_gplayers[kpTimerOwnerPlayer].team
                  else kpTimerOwnerTeam:=255;
-                 if(i=0)and(map_scenario=mc_KotH)then GameLogKotHControl;
+                 if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
                  kpTimer:=0;
               end;
               if(kpTimer<kpCaptureTime)

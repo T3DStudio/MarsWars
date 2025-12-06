@@ -102,8 +102,6 @@ begin
            plog_n_cl^:=0;
         end;
 
-        //writeln(s,' ',log_n,plog_n_cl^);
-
         i:=log_i;
         if(s>0)then
         begin
@@ -118,15 +116,15 @@ begin
            begin
               with log_l[i] do
               begin
-                 wudata_byte  (lm_type,rpl);
+                 wudata_byte(lm_type,rpl);
                  b:=lm_data_t and %00000011;
-                 if(lm_data_u       >0)then b:=b or %00000100;
+                 if(lm_data_u        >0)then b:=b or %00000100;
                  if(length(lm_string)>0)then b:=b or %00001000;
-                 if(lm_x         >0)then b:=b or %00010000;
-                 wudata_byte  (b,rpl);
+                 if(lm_x             >0)then b:=b or %00010000;
+                 wudata_byte(b,rpl);
 
-                 if((b and %00000100)>0)then wudata_byte  (lm_data_u ,rpl);
-                 if((b and %00001000)>0)then wudata_string(lm_string  ,rpl);
+                 if((b and %00000100)>0)then wudata_byte  (lm_data_u,rpl);
+                 if((b and %00001000)>0)then wudata_string(lm_string,rpl);
                  if((b and %00010000)>0)then
                  begin
                     wudata_byte(byte(lm_x shr 5),rpl);
@@ -172,7 +170,7 @@ begin
       SetBBit(@byte1,1, transportU>0           );
       SetBBit(@byte1,2, (level and %01)      >0);
       SetBBit(@byte1,3, (level and %10)      >0);
-      SetBBit(@byte1,4, buffs[ub_Pain        ]>0);
+      SetBBit(@byte1,4, buffs[ub_Pain       ]>0);
       SetBBit(@byte1,5,(a_tar_cl>0)and(a_rld>0));
       SetBBit(@byte1,6, isselected             );
       SetBBit(@byte1,7, byte2>0                );
@@ -215,12 +213,16 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(rpl)
-      then wudtick:=@rpls_wudata_t[unum]
-      else wudtick:=@net_wudata_t[unum];
-      if(rpl)
-      then wudelay:=fr_fpsh
-      else wudelay:=fr_fpsq;
+      case rpl of
+      true : begin
+                wudtick:=@rpls_wudata_t[unum];
+                wudelay:=fr_fpsh;
+             end;
+      false: begin
+                wudtick:=@net_wudata_t [unum];
+                wudelay:=fr_fpsq;
+             end;
+      end;
 
       if(wudtick^>g_tick)
       then wb:=true
@@ -228,11 +230,11 @@ begin
         if((g_tick-wudtick^)>=wudelay)
         then wb:=true;
 
-      if(rpl)
-      then b:=group and %00001111
-      else b:=0;
-      uo:=uo_id;
-      if(uo_bx>0)then uo:=ua_patrol;
+      b:=group and %00001111;
+
+      if(uo_bx>0)
+      then uo:=ua_patrol
+      else uo:=uo_id;
 
       b:=b or ((uo and %00000111) shl 4);
 
@@ -244,21 +246,19 @@ begin
 
       wudtick^:=g_tick;
 
-     { if(iscomplete)then
-        if(uid_ability in client_rld_abils)
-        or(uidi     in client_rld_uids )then wudata_reload(rld,rpl); }
+      if(iscomplete)and(uid_client_WReload)then
+        wudata_reload(rld,rpl);
 
       wudata_prod(pu,rpl);
-                              //    or(uo=ua_psability)
-      if(isselected or not rpl)then
-        if(uid_HaveRallyPoint)then
-          if(IsUnitRange(rpoint_tar,nil))
-          then wudata_int(-rpoint_tar,rpl)
-          else
-          begin
-             wudata_int(rpoint_x,rpl);
-             wudata_int(rpoint_y,rpl);
-          end;
+
+      if(uid_HaveRallyPoint and(isselected or not rpl))then
+        if(IsUnitRange(rpoint_tar,nil))
+        then wudata_int(-rpoint_tar,rpl)
+        else
+        begin
+           wudata_int(rpoint_x,rpl);
+           wudata_int(rpoint_y,rpl);
+        end;
    end;
 end;
 
@@ -304,6 +304,7 @@ begin
                wudata_word(wt,rpl);
             end;
 
+            // (uid_client_WRPointCast and (buffs[ub_Cast]>0))
             {if(buffs[ub_Cast]>0)then
              if(uid_ability in client_cast_abils)then
               if(wudata_reload(rld,rpl)>0)then
@@ -427,13 +428,11 @@ end;
 
 procedure wclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
-wtick      : cardinal;
+wtick       : cardinal;
 wtickb0,
-wtickb1    : boolean;
-lastPUnit  : pinteger;
+wtickb1     : boolean;
+lastPUnit   : pinteger;
 bs_alive,
-bs_observer,
-bs_defeated,
 bs_revealed : byte;
 i,
 units_ingame,
@@ -474,17 +473,13 @@ mc_royale   : wudata_int(g_royal_r,rpl);
       lastPUnit:=@g_nplayers[POVPlayer].n_u;
    end;
 
-   bs_alive:=0;
-   bs_observer:=0;
-   bs_defeated:=0;
-   bs_revealed:=0;
+   bs_alive    :=0;
+   bs_revealed :=0;
    units_ingame:=0;
    for i:=0 to LastPlayer do
      with g_gplayers[i] do
        if(state>ps_None)then
        begin
-          if(isobserver)then SetBBit(@bs_observer,i,true);
-          if(isdefeated)then SetBBit(@bs_defeated,i,true);
           if(isrevealed)then SetBBit(@bs_revealed,i,true);
           if(not isdefeated)and(not isobserver)then
           begin
@@ -493,9 +488,7 @@ mc_royale   : wudata_int(g_royal_r,rpl);
           end;
        end;
 
-   wudata_byte(bs_observer,rpl);
-   wudata_byte(bs_defeated,rpl);
-
+   wudata_byte(bs_alive,rpl);
    if(bs_alive>0)then
    begin
       if(units_now>255)then units_now:=255;
@@ -679,14 +672,14 @@ begin
       {if(uid^.uid_ability=uab_HKeepShift)then
       begin
          case uidi of
-UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_cube    );
-UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_S,snd_cube    );
-         else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport);
+UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube    );
+UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube    );
+         else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_Teleport);
          end;
          buffs[ub_CCast]:=fr_fps1;
          exit;
       end // default teleport effects
-      else} effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_teleport)
+      else} effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_Teleport)
    end;
 end;
 
@@ -750,8 +743,8 @@ begin
            if(playeri=UIPlayer)then
            begin
               if(not iscomplete)then
-                with uid^ do SoundPlayAnoncer(snd_build_place[uid_race],false,false);
-              if(not rpl)and(isselected)then ui_UpdateLastSelectedUnit(unum);
+                with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
+              //if(not rpl)and(isselected)then ui_UpdateLastSelectedUnit(unum);
            end;
         end;
 
@@ -780,8 +773,6 @@ begin
                 effect_UnitDeath(cu,true,@vis);
              end;
           end;
-
-          if(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
 
           missiles_clear_tar(unum,true);
           unit_clear_a_tar(unum);
@@ -818,10 +809,10 @@ begin
 
                if(pu^.iscomplete)and(not iscomplete)then
                  if(playeri=UIPlayer)then
-                   with uid^ do SoundPlayAnoncer(snd_build_place[uid_race],false,false);
+                   with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
 
-               if(not rpl)and(not pu^.isselected)and(isselected)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
-               if(pu^.transportU<>transportU)and(vis)then SoundPlayUnit(snd_transport,nil,@vis);
+               //if(not rpl)and(not pu^.isselected)and(isselected)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
+               if(pu^.transportU<>transportU)and(vis)then snd_SoundPlayUnit(snd_Transport,nil,@vis);
 
                if(iscomplete)then
                begin
@@ -861,7 +852,7 @@ begin
                    if(uid_DeathMissile>0)
                    then missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);
 
-                 if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
+                 //if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;
 
@@ -1111,7 +1102,7 @@ begin
    begin
       b:=rudata_byte(rpl,0);
 
-      if(rpl)then group:=b and %00001111;
+      group:=b and %00001111;
 
       puo:=uo_id;
       uo_id:=(b and %01110000)shr 4;
@@ -1126,29 +1117,23 @@ begin
 
       if((b and %10000000)=0)then exit;
 
-      {if(iscomplete)then
-        if(uid_ability in client_rld_abils)
-        or(uidi     in client_rld_uids )then rudata_reload(@rld,rpl); }
-
       rudata_prod(uu,rpl);
 
-      // or(uo_id=ua_psability)
-      if(isselected or not rpl)then
-        if(uid_HaveRallyPoint)then
-        begin
-           rpoint_x:=rudata_int(rpl,0);
-           if(IsUnitRange(-rpoint_x,@tu))then
-           begin
-              rpoint_tar:=-rpoint_x;
-              rpoint_x  :=tu^.vx;
-              rpoint_y  :=tu^.vy;
-           end
-           else
-           begin
-              rpoint_tar:=0;
-              rpoint_y  :=rudata_int(rpl,0);
-           end;
-        end;
+      if(uid_HaveRallyPoint and(isselected or not rpl))then
+      begin
+         rpoint_x:=rudata_int(rpl,0);
+         if(IsUnitRange(-rpoint_x,@tu))then
+         begin
+            rpoint_tar:=-rpoint_x;
+            rpoint_x  :=tu^.vx;
+            rpoint_y  :=tu^.vy;
+         end
+         else
+         begin
+            rpoint_tar:=0;
+            rpoint_y  :=rudata_int(rpl,0);
+         end;
+      end;
    end;
 end;
 
@@ -1359,25 +1344,12 @@ begin
 mc_royale   : g_royal_r:=rudata_int(rpl,0);
      end;
 
-   bs:=rudata_byte(rpl,0);
-   for i:=0 to LastPlayer do
-     with g_gplayers[i] do
-       if(state>ps_None)then
-         isobserver:=GetBBit(@bs,i);
-   bs:=rudata_byte(rpl,0);
-   for i:=0 to LastPlayer do
-     with g_gplayers[i] do
-       if(state>ps_None)then
-         isdefeated:=GetBBit(@bs,i);
-   bs_alive:=0;
+   bs_alive:=rudata_byte(rpl,0);
    units_ingame:=0;
    for i:=0 to LastPlayer do
      with g_gplayers[i] do
-       if(state>ps_None)and(not isobserver)and(not isdefeated)then
-       begin
-          SetBBit(@bs_alive,i,true);
-          units_ingame+=MaxPlayerUnits;
-       end;
+       if(GetBBit(@bs_alive,i))then
+         units_ingame+=MaxPlayerUnits;
 
    if(bs_alive>0)then
    begin

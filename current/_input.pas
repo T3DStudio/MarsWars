@@ -402,15 +402,15 @@ begin
    if(iActIfOn(iAct_Control_UAbility1,(ctabType=tcc_Controls)and(ui_PanelBTNAbility(ui_CommandercPU,1))))then
      with ui_CommandercPU^ do
        with uid^ do
-         iActSetDisabled(iAct_Control_UAbility1,GameLogBits2Message(LocalPlayer,uid_ability1,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability1,false),x,y,true) );
+         iActSetDisabled(iAct_Control_UAbility1,GameLog_ReqBits(LocalPlayer,uid_ability1,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability1,false),x,y,true) );
    if(iActIfOn(iAct_Control_UAbility2,(ctabType=tcc_Controls)and(ui_PanelBTNAbility(ui_CommandercPU,2))))then
      with ui_CommandercPU^ do
        with uid^ do
-         iActSetDisabled(iAct_Control_UAbility2,GameLogBits2Message(LocalPlayer,uid_ability2,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability2,false),x,y,true) );
+         iActSetDisabled(iAct_Control_UAbility2,GameLog_ReqBits(LocalPlayer,uid_ability2,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability2,false),x,y,true) );
    if(iActIfOn(iAct_Control_UAbility3,(ctabType=tcc_Controls)and(ui_PanelBTNAbility(ui_CommandercPU,3))))then
      with ui_CommandercPU^ do
        with uid^ do
-         iActSetDisabled(iAct_Control_UAbility3,GameLogBits2Message(LocalPlayer,uid_ability3,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability3,false),x,y,true) );
+         iActSetDisabled(iAct_Control_UAbility3,GameLog_ReqBits(LocalPlayer,uid_ability3,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability3,false),x,y,true) );
 
    iActSetOnEnabled(iAct_Control_UAMove  ,(ctabType=tcc_Controls)and((ui_uibtn_move>0)or(ui_uibtn_attack>0)),true);
    iActSetOnEnabled(iAct_Control_UAStop  ,(ctabType=tcc_Controls)and((ui_uibtn_move>0)or(ui_uibtn_attack>0)),true);
@@ -428,28 +428,28 @@ begin
      iActSetOnEnabled(iAct_Control_UDestroy ,(ctabType=tcc_Controls)and(POVPlayer^.units_all_s>0),true);
 end;
 
-procedure MapMarker(x,y:integer);
+{procedure MapMarker(x,y:integer);
 begin
    if(net_status=ns_client)
    then net_SendMapMark(x,y)
    else GameLogMapMark(LocalPlayer,x,y);
    m_brush:=co_empty;
-end;
+end; }
 
-procedure ui_CommandEffect(cmd,tar,ox1,oy1:integer;oid:byte);
-function TarIsEnemy:boolean;
+procedure ui_CommandEffect(cmd,otar,ox,oy:integer;oid:byte);
+function local_TarIsEnemy:boolean;
 begin
-   TarIsEnemy:=false;
-   if(IsUnitRange(tar,nil))then
-     if(g_units[tar].player^.team<>g_gplayers[LocalPlayer].team)then TarIsEnemy:=true;
+   local_TarIsEnemy:=false;
+   if(IsUnitRange(otar,nil))then
+     if(g_units[otar].player^.team<>g_gplayers[LocalPlayer].team)then local_TarIsEnemy:=true;
 end;
-procedure ui_ClickEffect(color:cardinal);
+procedure local_ClickEffect(color:cardinal);
 begin
-   ui_click_eff(ox1,oy1,fr_fpsq,color);
+   ui_click_eff(ox,oy,fr_fpsq,color);
 end;
-procedure ui_UnitMarkEffect;
+procedure local_UnitMarkEffect;
 begin
-   ui_umark_u:=tar;
+   ui_umark_u:=otar;
    ui_umark_t:=fr_fpsh;
 end;
 begin
@@ -459,30 +459,35 @@ begin
         case cmd of
         //co_ability,
         co_move,
-        co_patrol : SoundPlayUnitCommand(uid_snd_move);
+        co_patrol : snd_SoundPlayUnitCommand(uid_snd_move);
         co_amove,
         co_apatrol,
-        co_rcamove: SoundPlayUnitCommand(uid_snd_attack);
-        co_rcmove : if(TarIsEnemy)
-                    then SoundPlayUnitCommand(uid_snd_attack)
-                    else SoundPlayUnitCommand(uid_snd_move  );
+        co_rcamove: if(uid_HaveRallypoint)
+                    then snd_SoundPlayUnitCommand(snd_rally_point[ui_CommandercPU^.player^.race])
+                    else snd_SoundPlayUnitCommand(uid_snd_attack);
+        co_rcmove : if(uid_HaveRallypoint)
+                    then snd_SoundPlayUnitCommand(snd_rally_point[ui_CommandercPU^.player^.race])
+                    else
+                      if(local_TarIsEnemy)
+                      then snd_SoundPlayUnitCommand(uid_snd_attack)
+                      else snd_SoundPlayUnitCommand(uid_snd_move  );
         end;
 
         case cmd of
         co_ability: with g_aids[oid]do
                       case ua_type of
-                      uat_point    : ui_ClickEffect(c_aqua);
+                      uat_point    : local_ClickEffect(c_aqua);
                       uat_UnitAny,
                       uat_UnitOwn,
                       uat_UnitAlly,
-                      uat_UnitEnemy: if(not IsUnitRange(tar,nil))then ui_UnitMarkEffect;
+                      uat_UnitEnemy: if(not IsUnitRange(otar,nil))then local_UnitMarkEffect;
                       end;
         co_move,
-        co_patrol : ui_ClickEffect(c_lime);
-        co_apatrol: ui_ClickEffect(c_red);
+        co_patrol : local_ClickEffect(c_lime);
+        co_apatrol: local_ClickEffect(c_red);
         co_amove,
-        co_rcamove: if(not IsUnitRange(tar,nil))then ui_ClickEffect(c_red ) else ui_UnitMarkEffect;
-        co_rcmove : if(not IsUnitRange(tar,nil))then ui_ClickEffect(c_lime) else ui_UnitMarkEffect;
+        co_rcamove: if(not IsUnitRange(otar,nil))then local_ClickEffect(c_red ) else local_UnitMarkEffect;
+        co_rcmove : if(not IsUnitRange(otar,nil))then local_ClickEffect(c_lime) else local_UnitMarkEffect;
         end;
      end;
 end;
@@ -534,17 +539,17 @@ btar_pu  : PTUnit;
 w,
 btar_w   : byte;
 pUIPlayer: PTPlayerGameData;
-function GetWeight(pu:PTUnit):byte;
+function local_GetWeight(pu:PTUnit):byte;
 begin
-   GetWeight:=0;
+   local_GetWeight:=0;
    with pu^  do
    with uid^ do
    begin
-      if(ukfly)then GetWeight+=16;
+      if(ukfly)then local_GetWeight+=16;
       if(btar_pu<>nil)then
       begin
-         if(uid_r<btar_pu^.uid^.uid_r)then GetWeight+=8;
-         if(hits <btar_pu^.hits      )then GetWeight+=4;
+         if(uid_r<btar_pu^.uid^.uid_r)then local_GetWeight+=8;
+         if(hits <btar_pu^.hits      )then local_GetWeight+=4;
       end;
    end;
 end;
@@ -589,17 +594,10 @@ begin
           co_empty,
           co_move,
           co_amove   :; // allowed any units
-          -255..-1   : with g_aids[-mbrush] do
-                         case ua_type of
-                         uat_UnitAny  :;
-                         uat_UnitOwn  : if(player      <>pUIPlayer      )then continue;
-                         uat_UnitAlly : if(player^.team<>pUIPlayer^.team)then continue;
-                         uat_UnitEnemy: if(player^.team= pUIPlayer^.team)then continue;
-                         else continue;
-                         end;
+          -255..-1   : if(not ability_CheckTarget(-mbrush,pUIPlayer,player))then continue;
           end;
 
-          w:=GetWeight(g_punits[u]);
+          w:=local_GetWeight(g_punits[u]);
 
           if(btar_pu=nil)
           then
@@ -628,7 +626,7 @@ begin
      case m_brush of
      1..255             : if not(m_brush in ui_bprod_possible)then
                           begin
-                             if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_builders,-1,-1);
+                             if(logErrors)then GameLog_ReqBits(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_builders,-1,-1);
                              m_brush:=co_empty;
                           end
                           else
@@ -636,7 +634,7 @@ begin
                              ReqBits:=CheckUnitReqs(@g_gplayers[LocalPlayer],m_brush);
                              if(ReqBits>0)then
                              begin
-                                if(logErrors)then GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
+                                if(logErrors)then GameLog_ReqBits(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
                                 m_brush:=co_empty;
                              end
                              else
@@ -650,10 +648,10 @@ begin
                                   end;
 
                                   case CheckBuildPlace(m_brushx,m_brushy,0,0,LocalPlayer,m_brush) of
-                                  0 :  m_brushc:=c_lime;
-                                  1 :  m_brushc:=c_red;
-                                  2 :  m_brushc:=c_blue;
-                                  else m_brushc:=c_gray;
+                                  cbp_good   :  m_brushc:=c_lime;
+                                  cbp_noplace:  m_brushc:=c_red;
+                                  cbp_out    :  m_brushc:=c_blue;
+                                  else          m_brushc:=c_gray;
                                   end;
                                end;
                           end;
@@ -667,14 +665,19 @@ begin
                                            then m_brush:=co_empty
                                            else
                                              with ui_CommandercPU^ do
-                                               if(GameLogBits2Message(LocalPlayer,byte(-m_brush),lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,byte(-m_brush),false),x,y,not logErrors))
+                                               if(GameLog_ReqBits(LocalPlayer,byte(-m_brush),lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,byte(-m_brush),false),x,y,not logErrors))
                                                then m_brush:=co_empty
                                                else
                                                begin
-                                                  tuid:=unit_AbilityGetUIDRef(byte(-m_brush),uidi);
+                                                  m_brushc:=c_aqua;
+                                                  tuid:=unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi);
                                                   if(tuid>0)then
                                                     with g_uids[tuid] do
-                                                      math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                                    begin
+                                                       math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,true)<>cbr_no)
+                                                       then m_brushc:=c_red;
+                                                    end;
                                                end
                             else m_brush:=co_empty
                             end;
@@ -690,8 +693,20 @@ end;
 procedure ui_MBrush2Command(x,y,target:integer);
 begin
    case m_brush of
--255..-1   : PlayerSendOrder(co_ability,target,x,y,byte(-m_brush),
-                                                     uo_corder,LocalPlayer);  // ability
+1..255     : begin
+                if(m_brushc=c_lime)
+                then PlayerSendOrder(m_brushx,m_brushy,0,0,byte(m_brush),
+                                                     uo_build ,LocalPlayer)
+                else GameLog_ReqBits(LocalPlayer,byte( m_brush),lmt_argt_unit   ,ureq_place        ,mouse_map_x,mouse_map_y);
+                exit;
+             end;
+-255..-1   : begin
+                if(m_brushc=c_aqua)
+                then PlayerSendOrder(co_ability,target,x,y,byte(-m_brush),
+                                                     uo_corder,LocalPlayer)   // ability
+                else GameLog_ReqBits(LocalPlayer,byte(-m_brush),lmt_argt_ability,ureq_InvalidTarget,mouse_map_x,mouse_map_y);
+                exit;
+             end;
 co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // move
 co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // attack
 co_patrol,
@@ -780,7 +795,7 @@ begin
                                 with g_aids[uid_ability1] do
                                   if(ua_type>uat_passive)then
                                     if(SoundOn)then
-                                      if(not GameLogBits2Message(LocalPlayer,uid_ability1,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability1,false),x,y,false))then
+                                      if(not GameLog_ReqBits(LocalPlayer,uid_ability1,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability1,false),x,y,false))then
                                         if(ua_type=uat_notarget)
                                         then PlayerSendOrder(co_ability,0,ui_cam_cx,ui_cam_cy,uid_ability1,uo_corder,LocalPlayer)
                                         else m_brush:=-uid_ability1;
@@ -790,7 +805,7 @@ begin
                                 with g_aids[uid_ability2] do
                                   if(ua_type>uat_passive)then
                                     if(SoundOn)then
-                                      if(not GameLogBits2Message(LocalPlayer,uid_ability2,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability2,false),x,y,false))then
+                                      if(not GameLog_ReqBits(LocalPlayer,uid_ability2,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability2,false),x,y,false))then
                                         if(ua_type=uat_notarget)
                                         then PlayerSendOrder(co_ability,0,ui_cam_cx,ui_cam_cy,uid_ability2,uo_corder,LocalPlayer)
                                         else m_brush:=-uid_ability2;
@@ -800,7 +815,7 @@ begin
                                 with g_aids[uid_ability3] do
                                   if(ua_type>uat_passive)then
                                     if(SoundOn)then
-                                      if(not GameLogBits2Message(LocalPlayer,uid_ability3,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability3,false),x,y,false))then
+                                      if(not GameLog_ReqBits(LocalPlayer,uid_ability3,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability3,false),x,y,false))then
                                         if(ua_type=uat_notarget)
                                         then PlayerSendOrder(co_ability,0,ui_cam_cx,ui_cam_cy,uid_ability3,uo_corder,LocalPlayer)
                                         else m_brush:=-uid_ability3;
@@ -924,13 +939,6 @@ begin
      end;
 end;
 
-procedure ui_PointClick;
-var u:integer;
-begin
-   u:=mouse_BrushTarget(mouse_map_x,mouse_map_y,co_empty);
-   if(u>0)then ui_UpdateLastSelectedUnit(u);
-end;
-
 procedure GameControlsMouse;
 var
    u,bx,by:integer;
@@ -978,8 +986,8 @@ begin
    // map mouse
    if(m_uifocus=mf_MiniMap)then
    begin
-      mouse_map_x:=round((mouse_x-ui_UIPanelX)/map_mmcx);
-      mouse_map_y:=round((mouse_y-ui_UIPanelY)/map_mmcx);
+      mouse_map_x:=round((mouse_x-ui_UIPanelX)/map_MiniMap_cx);
+      mouse_map_y:=round((mouse_y-ui_UIPanelY)/map_MiniMap_cx);
    end
    else
    begin
@@ -992,7 +1000,7 @@ begin
    m_UnitTargetN:=0;
    m_UnitTargetP:=nil;
    if(mouse_select_xs0=NOTSET)
-   or(CheckSimpleClick(mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y))then
+   or(CheckPointClick(mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y))then
    begin
       m_UnitTargetN:=mouse_BrushTarget(mouse_map_x,mouse_map_y,m_brush);
       if(m_UnitTargetN>0)then
@@ -1014,9 +1022,7 @@ begin
                                   mouse_select_xs0:=mouse_map_x;
                                   mouse_select_ys0:=mouse_map_y;
                                end;
-                   1..255    : if(m_brushc=c_lime)
-                               then PlayerSendOrder(m_brushx,m_brushy,0,0,byte(m_brush), uo_build  ,LocalPlayer)
-                               else GameLogBits2Message(LocalPlayer,byte(m_brush),lmt_argt_unit,ureq_place,mouse_map_x,mouse_map_y);
+                   1..255,
                    -255..-1,
                    co_move,
                    co_amove,
@@ -1054,8 +1060,8 @@ begin
       if(mouse_select_xs0<>NOTSET)then //select
       begin
          units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,255);
-         if(G_Status=gs_running)and(rpls_pstate<rpls_read)then
-           if(CheckSimpleClick(mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y))then ui_PointClick;
+         //if(G_Status=gs_running)and(rpls_pstate<rpls_read)then
+         //  if(CheckPointClick(mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y))then ui_PointClick;
 
          mouse_select_xs0:=NOTSET;
       end;
@@ -1063,7 +1069,7 @@ begin
 
    if(m_mmap_move)and(mouse_select_xs0=NOTSET)then
    begin
-      ui_Camera_MoveToPoint(trunc((mouse_x-ui_UIPanelX)/map_mmcx), trunc((mouse_y-ui_UIPanelY)/map_mmcx));
+      ui_Camera_MoveToPoint(trunc((mouse_x-ui_UIPanelX)/map_MiniMap_cx), trunc((mouse_y-ui_UIPanelY)/map_MiniMap_cx));
       ui_Camera_Bounds;
    end;
 
@@ -1097,7 +1103,7 @@ begin
 
    if(clickSound<>nil)then
    begin
-      SoundPlayUI(clickSound);
+      snd_SoundPlayUI(clickSound);
       ui_update_now:=true;
    end;
 end;
@@ -1160,7 +1166,7 @@ begin
               if(ui_InGameChat>0)then
                 if(net_status=ns_client)
                 then net_send_chat(            ui_InGameChat,net_chat_str)
-                else GameLogChat  (LocalPlayer,ui_InGameChat,net_chat_str);
+                else GameLog_Chat  (LocalPlayer,ui_InGameChat,net_chat_str);
               net_chat_str:='';
            end;
            ui_InGameChat:=0;
@@ -1276,7 +1282,7 @@ begin
 
    if(clickSound)then
    begin
-      SoundPlayUI(snd_click);
+      snd_SoundPlayUI(snd_click);
       ui_update_now:=true;
    end;
 end;
@@ -1294,7 +1300,7 @@ begin
    end
    else
    begin
-      unit_UICounters;
+      unit_UICountersAll;
       ui_EnableControlActs;
       GameControlsKeyboard;
       GameControlsMouse;

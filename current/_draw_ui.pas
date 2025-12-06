@@ -25,12 +25,13 @@ function ui_PanelBTNAbility(pu:PTUnit;abilityN:byte):boolean;
 begin
    ui_PanelBTNAbility:=false;
    if(pu<>nil)then
-     with pu^.uid^ do
-       case abilityN of
-       1 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability1,true)=0;
-       2 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability2,true)=0;
-       3 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability3,true)=0;
-       end;
+     if(unit_ReadyForAbilityOrder(pu))then
+       with pu^.uid^ do
+         case abilityN of
+         1 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability1,true)=0;
+         2 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability2,true)=0;
+         3 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability3,true)=0;
+         end;
 end;
 
 procedure d_UIMinimapAlarms;
@@ -58,14 +59,14 @@ aummat_info       : CircleColor   (ui_minimap,al_mx  ,al_my  ,              r, a
    map_MinimapKeyPoints(ui_minimap,true);
 
    case map_scenario of
-mc_royale   : circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_mmcx)+1,ui_max_color[ui_mm_ScanBlink]);
+mc_royale   : circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
    end;
 end;
 
 procedure d_UIMinimap(tar:pSDL_Surface);
 var i:byte;
 begin
-   rectangleColor(ui_minimap,ui_cam_mmx,ui_cam_mmy,ui_cam_mmx+map_mmvw,ui_cam_mmy+map_mmvh, c_white);
+   rectangleColor(ui_minimap,ui_cam_mmx,ui_cam_mmy,ui_cam_mmx+map_MiniMap_CamW,ui_cam_mmy+map_MiniMap_CamH, c_white);
 
    d_UIMinimapAlarms;
 
@@ -75,7 +76,7 @@ begin
      for i:=0 to LastPlayer do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then
-        circleColor(ui_minimap,round(aia_x*map_mmcx),round(aia_y*map_mmcx),5,c_orange);
+        circleColor(ui_minimap,round(aia_x*map_MiniMap_cx),round(aia_y*map_MiniMap_cx),5,c_orange);
 
    draw_sdlsurface(tar       ,1,1,ui_minimap );
    draw_sdlsurface(ui_minimap,0,0,ui_bminimap);
@@ -116,7 +117,7 @@ begin
    draw_sdlsurface(tar,m_brushx-spr^.hw,m_brushy-spr^.hh,spr^.surf);
    SDL_SetAlpha(spr^.surf,SDL_SRCALPHA or SDL_RLEACCEL,255);
 
-   circleColor(tar,m_brushx,m_brushy,g_uids[uid].uid_r,c_gray);
+   circleColor(tar,m_brushx,m_brushy,g_uids[uid].uid_r,m_brushc);
    if(ui_DrawEdges)then DrawNoBuildAreas(g_uids[uid].uid_r);
 end;
 
@@ -154,15 +155,15 @@ begin
                    DrawNoBuildAreas(uid_r);
                 end;
    -255..-1   : if(ui_CommandercPU<>nil)then
-                begin
-                   with g_aids[-m_brush] do //
-                     if(ua_mbrush_r>0)
-                     then circleColor(tar,mouse_x,mouse_y,ua_mbrush_r,c_aqua)
-                     else
-                       if(ua_mbrush_r<0)
-                       then DrawUIDBrush(unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi));
-                   with ui_CommandercPU^ do lineColor(tar,x-ui_cam_x,y-ui_cam_y,m_brushx,m_brushy,c_gray);
-                end;
+                  with g_aids[-m_brush] do //
+                    if(ua_mbrush_r>0)
+                    then circleColor(tar,mouse_x,mouse_y,ua_mbrush_r,c_aqua)
+                    else
+                      if(ua_mbrush_r=uambt_sightR)
+                      then circleColor(tar,mouse_x,mouse_y,ui_CommandercPU^.srange,c_aqua)
+                      else
+                        if(ua_mbrush_r<0)
+                        then DrawUIDBrush(unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi));
    end;
 
    m_brushx+=ui_cam_x;
@@ -313,6 +314,7 @@ var
 ucl,p,
 uid,
 ux,uy:integer;
+tstr :shortstring;
 begin
    draw_sdlsurface(tar,0,0,ui_UIPanelTemplate);
 
@@ -388,9 +390,12 @@ drawButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                                    end;
                                                    if(p>0)then
                                                    begin
-                                                      drawButtonS(tar,ux,uy,ui_AbilityGetBTN(ui_CommandercPU,p),-m_brush=p,not iActEnabled(uid));
-                                                      drawButtonT(tar,ux,uy,'','','','',ir2s(ui_CommandercPU^.rld),
-                                                                            0 ,0 ,0 ,0 ,c_aqua                    ,'');
+                                                      drawButtonS(tar,ux,uy,g_aids[p].ua_btn,-m_brush=p,not iActEnabled(uid));
+                                                      if(g_aids[p].ua_reload>0)
+                                                      then tstr:=ir2s(ui_CommandercPU^.rld)
+                                                      else tstr:='';
+                                                      drawButtonT(tar,ux,uy,'','','','',tstr  ,
+                                                                            0 ,0 ,0 ,0 ,c_aqua,'');
                                                    end;
                                                 end;
                        iAct_Control_UAMove    : drawButtonS(tar,ux,uy,spr_uibtn_Attack    ,false,not iActEnabled(uid));
@@ -479,31 +484,41 @@ procedure AddLine(pstr:pshortstring);
 begin
    str_AddToStrList(@ui_MouseHintL,@ui_MouseHintN,ui_HintLineLen,@ui_MouseHintW,false,false,pstr^);
 end;
+procedure UnitAddAbilityDescr(aid:byte);
+begin
+   with g_aids[aid] do
+   begin
+      s1:='- '+str_AbilityGetHintName(aid,255);
+      AddLine(@s1);
+   end;
+end;
+
 procedure BrushUnitTargetHint;
 begin
    if(m_UnitTargetP<>nil)then
      with m_UnitTargetP^ do
-     with uid^ do
-     with player^ do
-     begin
-        AddLine(@uid_str_name);
-        s1:=str_UnitAttributes(m_UnitTargetP,0);
-        AddLine(@s1);
-        s1:='';
-        STRADD(@s1,lvlstr_w,sep_wdash);
-        STRADD(@s1,lvlstr_a,sep_wdash);
-        STRADD(@s1,lvlstr_s,sep_wdash);
-        if(length(s1)>0)then
-        begin
-        s1:=str_hint_UpgradesLvl+s1+tc_default;
-        STRADD(@s1,str_hint_hits+li2s(hits),sep_scomma);
-        if(playeri=UIPlayer)and(uid_EnergyGen>0)then
-        STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_scomma);
-        AddLine(@s1);
-        end;
-        s1:=tc_white+'('+tc_default+chr(playeri)+name+tc_white+')';
-        AddLine(@s1);
-     end;
+     if(hits>0)then
+       with uid^ do
+       with player^ do
+       begin
+          AddLine(@uid_str_name);
+          s1:=str_UnitAttributes(m_UnitTargetP,0);
+          AddLine(@s1);
+          s1:='';
+          STRADD(@s1,lvlstr_w,sep_wdash);
+          STRADD(@s1,lvlstr_a,sep_wdash);
+          STRADD(@s1,lvlstr_s,sep_wdash);
+          if(length(s1)>0)then
+          begin
+          s1:=str_hint_UpgradesLvl+s1+tc_default;
+          STRADD(@s1,str_hint_hits+li2s(hits),sep_scomma);
+          if(playeri=UIPlayer)and(uid_EnergyGen>0)then
+          STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_scomma);
+          AddLine(@s1);
+          end;
+          s1:=tc_white+'('+tc_default+chr(playeri)+name+tc_white+')';
+          AddLine(@s1);
+       end;
 end;
 begin
    case m_uifocus of
@@ -549,6 +564,13 @@ begin
                                                                 AddLine(@uid_str_Arms[taid]);
                                                               AddLine(@uid_str_ArmsCommon );
                                                            end;
+                                                           if(uid_HaveAbility)then
+                                                           begin
+                                                              AddLine(@str_hint_Abilities);
+                                                              if(uid_ability1>0)then UnitAddAbilityDescr(uid_ability1);
+                                                              if(uid_ability2>0)then UnitAddAbilityDescr(uid_ability2);
+                                                              if(uid_ability3>0)then UnitAddAbilityDescr(uid_ability3);
+                                                           end;
                                                            AddLine(@uid_str_Reqs);
                                                            AddLine(@uid_str_Prod);
                                                         end;
@@ -582,18 +604,17 @@ begin
                                                                     with g_aids[taid] do
                                                                     begin
                                                                        case tuid of
-                                                                       iAct_Control_UAbility1: s1:=str_AbilityGetHintName(taid,0,uidi);
-                                                                       iAct_Control_UAbility2: s1:=str_AbilityGetHintName(taid,1,uidi);
-                                                                       iAct_Control_UAbility3: s1:=str_AbilityGetHintName(taid,2,uidi);
+                                                                       iAct_Control_UAbility1: s1:=str_AbilityGetHintName(taid,0);
+                                                                       iAct_Control_UAbility2: s1:=str_AbilityGetHintName(taid,1);
+                                                                       iAct_Control_UAbility3: s1:=str_AbilityGetHintName(taid,2);
                                                                        end;
                                                                        AddLine(@s1);
                                                                        AddLine(@ua_str_Common  );
                                                                        AddLine(@ua_str_Descript);
                                                                        AddLine(@ua_str_Reqs    );
 
-                                                                       taid:=unit_AbilityGetUIDRef(taid,uidi);
-                                                                       if(taid>0)and(taid<>uidi)then
-                                                                         with g_uids[taid] do
+                                                                       if(ua_mbrush_hint>0)then
+                                                                         with g_uids[ua_mbrush_hint] do
                                                                          begin
                                                                             s1:=' ';
                                                                             AddLine(@s1);
@@ -682,7 +703,7 @@ begin
    // resources
    if(UIPlayer<=LastPlayer)then
      with g_gplayers[UIPlayer] do
-       if(not isdefeated)and(not isobserver)then
+       if(state<>ps_none)and(not isdefeated)and(not isobserver)then
        begin
           limit:=armylimit+prod_unit_Limit;
           draw_text(tar,ui_EnergyX,ui_EnergyY,str_ui_EnergyLevel   +tc_default+i2s(energyl_cur           )+tc_white+' / '+tc_aqua  +i2s(energyl_max)
@@ -691,6 +712,8 @@ begin
                                                                                                                             ,ta_LU,255,ui_limit[limit>=MaxPlayerLimit]);
           draw_text(tar,ui_ArmyX  ,ui_ArmyY1 ,str_ui_LimitUnits    +limit2s(units_bld_l[true ]                ,MinUnitLimit),ta_LU,255,c_white);
           draw_text(tar,ui_ArmyX  ,ui_ArmyY2 ,str_ui_LimitBuildings+limit2s(units_bld_l[false]+prod_unit_Limit,MinUnitLimit),ta_LU,255,c_white);
+
+          d_UIGroupsIcons(tar);
        end;
 
    // GAME STATUS VICTORY/DEFEAT/PAUSE/REPLAY END
@@ -755,9 +778,6 @@ begin
 
    //if(ui_ShowAPM )then draw_text(tar,ui_Apmx,ui_Apmy,'APM: '+_playerAPM[UIPlayer].APM_Str                 ,ta_LU,255,c_white);
    if(vid_ShowFPS)then draw_text(tar,ui_FPSX,ui_FPSY,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
-
-   if(UIPlayer<=LastPlayer)then
-     d_UIGroupsIcons(tar);
 end;
 
 procedure d_UIMouseCursor(tar:pSDL_Surface);   //cursor/brash

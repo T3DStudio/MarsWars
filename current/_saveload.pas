@@ -230,7 +230,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameSaved);
+   GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameSaved);
 end;
 
 function saveload_Save(check:boolean):boolean;
@@ -285,7 +285,7 @@ begin
       {$I+}
       if(vr=g_version)then
       begin
-         GameDefaultAll;
+         Game_DefaultAll;
 
          {$I-}
          if(svld_itemn>1)then
@@ -303,7 +303,7 @@ begin
 
          if(ioresult<>0)then
          begin
-            GameDefaultAll;
+            Game_DefaultAll;
             svld_str_info1:=str_FileError_Open;
             svld_str_info2:='';
             exit;
@@ -325,7 +325,7 @@ begin
 
          MenuBack(true,false);
 
-         GameLogChat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
+         GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
       end;
       close(f);
    end;

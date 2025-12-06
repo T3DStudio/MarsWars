@@ -17,23 +17,25 @@ begin
    else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
 
-procedure d_MakeSpriteList(noanim:boolean);
+procedure D_AddAllSprites(noanim:boolean);
 begin
-  doodads_sprites(noanim);
-     unit_sprites(noanim);
-  effects_sprites(noanim);
- missiles_sprites;
-keyPoints_sprites;
+  doodads_AddSprites(noanim);
+     unit_AddSpritesAndMarks(noanim);
+  effects_AddSprites(noanim);
+ missiles_AddSprites;
+keyPoints_AddSprites;
 end;
 
 procedure d_Game;
 begin
    d_UpdateUIPlayer(0);
    PlayersUpdateColorSchema(UIPlayer);
+   if(ui_update_timer=0)
+   or(ui_update_now)then unit_UICountersAll;
 
    ui_DrawEdges:=ui_MouseBrushNeedDrawEdges;
 
-   d_MakeSpriteList(G_Status<>gs_running);
+   D_AddAllSprites(G_Status<>gs_running);
 
    D_LayerTerrain   (vid_screen);
    D_LayerSpriteList(vid_screen);
@@ -88,6 +90,11 @@ begin
      for i:=0 to LastPlayer do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then n+=1;  }
+
+
+     draw_text(vid_screen,ui_cam_w,ui_cam_h-10,
+     i2s(m_brush),
+     ta_RU,255, c_white);
   {
    draw_text(vid_screen,ui_cam_w,ui_cam_h-10,
        c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+

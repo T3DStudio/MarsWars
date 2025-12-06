@@ -4,7 +4,7 @@
 //   FORWARD Declarations
 //
 
-procedure unit_damage (pu:PTUnit;damage:integer;pl:byte;IgnoreArmor:boolean);forward;
+procedure unit_damage (pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);forward;
 procedure unit_Bonuses(pu:PTUnit);forward;
 procedure unit_kill   (pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);forward;
 function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;forward;
@@ -36,9 +36,12 @@ procedure GameRemoveAIObservers; forward;
 {$IFDEF _FULLGAME}
 procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);  forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
+procedure ui_EnableControlActs;forward;
 function uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
-procedure SoundLogUIPlayer(PListener:byte);   forward;
+procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
+
+procedure unit_UICountersAll; forward;
 
 function gfx_ShadowColor(c:cardinal):cardinal;forward;
 
@@ -48,10 +51,9 @@ function GameNetServerSearch(start,check:boolean):boolean;forward;
 procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);forward;
 function menu_MouseXY2Item:byte; forward;
 function menu_ReadyButtonEnabled:boolean;forward;
-function PlayerNameChangeble  :boolean;forward;
-
 function menu_ChatSize:integer;  forward;
 
+function PlayerNameChangeble  :boolean;forward;
 
 function PlayerGetColor  (player:byte;shadow:boolean):cardinal;  forward;
 function PlayerAIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
@@ -83,6 +85,8 @@ begin
       l-=1;
    end;
 end;
+
+function str_AbilityGetHintName(aid,uipos:byte):shortstring;forward;
 {$ENDIF}
 
 
@@ -163,6 +167,14 @@ begin
    if(x=0)
    then strMX:='-'
    else strMX:='x'+b2s(x);
+end;
+
+procedure STRADD(s:pshortstring;ad,sep:shortstring);
+begin
+   if(length(ad)>0)then
+     if(length(s^)=0)
+     then s^:=ad
+     else s^:=s^+sep+ad;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -524,9 +536,11 @@ begin
         case amtype of
 0..LastPlayer,
 lmt_chat_common,
-lmt_player_defeated,
+lmt_player_connected,
 lmt_player_leave,
 lmt_player_surrender,
+lmt_player_timeout,
+lmt_player_defeated,
 lmt_player_ready,
 lmt_player_nready,
 lmt_replay_RecStart,
@@ -534,8 +548,12 @@ lmt_replay_RecStop,
 lmt_replay_RecError,
 lmt_game_end,
 lmt_game_message,
-lmt_game_PlayersReady,
-lmt_game_StartsIn
+lmt_game_ReadyToStart,
+lmt_game_BreakStarting,
+lmt_game_StartsIn,
+lmt_game_ResetIn,
+lmt_game_Paused,
+lmt_game_Resumed
                      :;
 
 lmt_unit_attacked,
@@ -569,7 +587,34 @@ lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]
         {$IFDEF _FULLGAME}
         if(ptarget=rpls_player)and(rpls_log_c<MaxPlayerLog)and(rpls_fstate=rpls_write)then rpls_log_c+=1;
 
-        if(net_status=ns_client)
+        case g_started of
+        false: case amtype of
+               lmt_game_ReadyToStart : g_LobbyTimer:=g_GameStartTime;
+               lmt_game_StartsIn     : g_LobbyTimer:=adatau*fr_fps1-1;
+               lmt_game_BreakStarting: g_LobbyTimer:=0;
+               end;
+        true : case amtype of
+               lmt_player_leave,
+               lmt_player_surrender,
+               lmt_player_timeout,
+               lmt_player_defeated   : if(adatau<=LastPlayer)then
+                                         with g_gplayers[adatau] do
+                                           case amtype of
+                                           lmt_player_leave,
+                                           lmt_player_timeout  : begin
+                                                                 isdefeated:=true;
+                                                                 state:=ps_none;
+                                                                 end;
+                                           lmt_player_surrender,
+                                           lmt_player_defeated : begin
+                                                                 isdefeated:=true;
+                                                                 if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
+                                                                 end;
+                                           end;
+               end;
+        end;
+
+        if(net_status=ns_client)or(not g_started)
         then POVPlayer:=LocalPlayer
         else POVPlayer:=UIPlayer;
         if(ptarget=POVPlayer)then
@@ -579,7 +624,7 @@ lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]
 
            menu_update:=true;
 
-           if(LogMes2UIAlarm)then SoundLogUIPlayer(POVPlayer);
+           if(LogMes2UIAlarm)then snd_SoundLogUIPlayer(POVPlayer);
 
            if(rpls_pstate<rpls_read)and(g_type<>gt_campaing)then
              if((amtype=lmt_player_defeated)and(g_DefeatedObs)and(adatau=UIPlayer))
@@ -605,34 +650,56 @@ end;
 //
 //   TYPICAL GAME LOG MESSAGES
 
-procedure GameLogChat(sender,targets:byte;message:shortstring);
+// LOG
+procedure GameLog_Chat(sender,targets:byte;message:shortstring);
 begin
    if(targets>0)then
      if(sender<=LastPlayer)
      then PlayersAddToLog(sender,targets,sender         ,0,0,g_gplayers[sender].name+': '+message,0,0)
      else PlayersAddToLog(sender,targets,lmt_chat_common,0,0,message                             ,0,0);
 end;
-procedure GameLogCommon(sender,targets:byte;message:shortstring);
+procedure GameLog_Common(sender,targets:byte;message:shortstring);
 begin
    PlayersAddToLog(sender,targets,lmt_game_message,0,0,message,0,0);
 end;
-procedure GameLogPlayerReady(player:byte);
-begin
-   if(player>LastPlayer)then exit;
 
-   with g_gplayers[player] do
-     if(isready)
-     then PlayersAddToLog(255,255,lmt_player_ready ,0,0,name,0,0)
-     else PlayersAddToLog(255,255,lmt_player_nready,0,0,name,0,0)
-end;
-procedure GameLogPlayersReady;
+// PLAYERS
+procedure GameLog_PlayerConnected(player:byte);
 begin
-   PlayersAddToLog(255,255,lmt_game_PlayersReady,0,0,'',0,0)
+   if(player<=LastPlayer)then
+   PlayersAddToLog(player,log_to_all,lmt_player_connected,0,0,g_gplayers[player].name,0,0);
 end;
-procedure GameLogStartsIn(seconds:integer);
+procedure GameLog_PlayerLeave(player:byte);
 begin
-   PlayersAddToLog(255,255,lmt_game_StartsIn,0,byte(seconds),'',0,0)
+   if(player<=LastPlayer)then
+   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,player,g_gplayers[player].name,0,0);
 end;
+procedure GameLog_PlayerTimeOut(player:byte);
+begin
+   if(player<=LastPlayer)then
+   PlayersAddToLog(player,log_to_all,lmt_player_timeout,0,player,g_gplayers[player].name,0,0);
+end;
+procedure GameLog_PlayerDefeated(player:byte);
+begin
+   if(player<=LastPlayer)then
+   PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,g_gplayers[player].name,0,0);
+end;
+procedure GameLog_PlayerSurrender(player:byte);
+begin
+   if(player<=LastPlayer)then
+   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,player,g_gplayers[player].name,0,0);
+end;
+
+procedure GameLog_PlayerReadyStat(player:byte);
+begin
+   if(player<=LastPlayer)then
+     with g_gplayers[player] do
+       if(isready)
+       then PlayersAddToLog(255,255,lmt_player_ready ,0,0,name,0,0)
+       else PlayersAddToLog(255,255,lmt_player_nready,0,0,name,0,0)
+end;
+
+// RECORDS
 procedure GameLogRecStart(fname:shortstring);
 begin
    PlayersAddToLog(255,255,lmt_replay_RecStart,0,0,fname,0,0)
@@ -645,55 +712,45 @@ procedure GameLogRecError(errorStr:shortstring);
 begin
    PlayersAddToLog(255,255,lmt_replay_RecError,0,0,errorStr,0,0)
 end;
-procedure GameLogEndGame(wteam:byte);
+
+// GAME
+procedure GameLog_ReadyToStart;
 begin
-   if(not ServerSide)then exit;
+   PlayersAddToLog(255,255,lmt_game_ReadyToStart,0,0,'',0,0)
+end;
+procedure GameLog_BreakStarting;
+begin
+   PlayersAddToLog(255,255,lmt_game_BreakStarting,0,0,'',0,0)
+end;
+procedure GameLog_StartsIn(seconds:integer);
+begin
+   PlayersAddToLog(255,255,lmt_game_StartsIn,0,byte(seconds),'',0,0)
+end;
+procedure GameLog_EndsIn(seconds:integer);
+begin
+   PlayersAddToLog(255,255,lmt_game_ResetIn ,0,byte(seconds),'',0,0)
+end;
+procedure GameLog_EndGame(wteam:byte);
+begin
    PlayersAddToLog(0,log_to_all,lmt_game_end,0,wteam,'',0,0);
 end;
-procedure GameLogPlayerDefeated(player:byte);
+procedure GameLog_Paused(playerN:byte);
 begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,'',0,0);
+   if(playerN<=LastPlayer)then
+     with g_gplayers[playerN] do
+   PlayersAddToLog(0,log_to_all,lmt_game_Paused,0,0,name,0,0);
 end;
-procedure GameLogPlayerLeave(player:byte);
+procedure GameLog_Resumed(playerN:byte);
 begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,0,g_gplayers[player].name+str_gmsg_PlayerLeft,0,0);
+   if(playerN<=LastPlayer)then
+     with g_gplayers[playerN] do
+   PlayersAddToLog(0,log_to_all,lmt_game_Resumed,0,0,name,0,0);
 end;
-procedure GameLogPlayerSurrender(player:byte);
-begin
-   if(player>LastPlayer)or(not ServerSide)then exit;
-   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,0,g_gplayers[player].name+str_gmsg_PlayerSurrender,0,0);
-end;
-procedure GameLogUnitReady(pu:PTunit);
-begin
-   if(pu=nil)or(not ServerSide)then exit;
 
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y);
-end;
-procedure GameLogUnitResurrected(pu:PTunit);
-begin
-   if(pu=nil)or(not ServerSide)then exit;
-
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_resurrected,lmt_argt_unit ,uidi,'',x,y);
-end;
-procedure GameLogUnitPromoted(pu:PTunit);
-begin
-   if(pu=nil)or(not ServerSide)then exit;
-
-   with pu^ do
-    PlayersAddToLog(playeri,0,lmt_unit_LevelUp,0,uidi,'',x,y);
-end;
-procedure GameLogUpgradeComplete(pl,upid:byte;x,y:integer);
-begin
-   if(pl>LastPlayer)or(not ServerSide)then exit;
-
-   PlayersAddToLog(pl,0,lmt_upgrade_complete,0,upid,'',x,y);
-end;
-function GameLogBits2Message(playerN,auid,atype:byte;bits:cardinal;x,y:integer;check:boolean=false):boolean;
+function GameLog_ReqBits(playerN,auid,atype:byte;bits:cardinal;x,y:integer;check:boolean=false):boolean;
 var bt:byte;
 begin
-   GameLogBits2Message:=false;
+   GameLog_ReqBits:=false;
    if(playerN>LastPlayer)or(bits=0)then exit;
 
    with g_gplayers[playerN] do
@@ -703,7 +760,7 @@ begin
       if(auid>0)and(atype=lmt_argt_unit)then
         if(units_uid_e[auid]<=0)and(units_uid_m[auid]<=0)then exit;
    end;
-   GameLogBits2Message:=true;
+   GameLog_ReqBits:=true;
 
    if(check)then exit;
 
@@ -752,17 +809,40 @@ begin
 
    PlayersAddToLog(playerN,0,bt,atype,auid,'',x,y);
 end;
-procedure GameLogMapMark(pl:byte;x,y:integer);
+procedure GameLog_MapMark(playeri:byte;x,y:integer);
 begin
-   if(pl>LastPlayer)or(not ServerSide)then exit;
+   if(playeri>LastPlayer)then exit;
 
-   PlayersAddToLog(pl,
-   PlayerGetAlliesByte(pl,true)
-   ,lmt_map_mark,0,pl,'',x,y);
+   PlayersAddToLog(playeri,
+   PlayerGetAlliesByte(playeri,true)
+   ,lmt_map_mark,0,playeri,'',x,y);
 end;
-procedure GameLogUnitAttacked(pu:PTunit);
+
+// UNITS
+procedure GameLog_UnitReady(pu:PTunit);
 begin
-   if(pu=nil)or(not ServerSide)then exit;
+   if(pu<>nil)then
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y);
+end;
+procedure GameLog_UnitResurrected(pu:PTunit);
+begin
+   if(pu<>nil)then
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_resurrected,lmt_argt_unit ,uidi,'',x,y);
+end;
+procedure GameLog_UnitPromoted(pu:PTunit);
+begin
+   if(pu<>nil)then
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_LevelUp,0,uidi,'',x,y);
+end;
+procedure GameLog_UpgradeComplete(playeri,upid:byte;x,y:integer);
+begin
+   if(playeri>LastPlayer)then exit;
+
+   PlayersAddToLog(playeri,0,lmt_upgrade_complete,0,upid,'',x,y);
+end;
+procedure GameLog_UnitAttacked(pu:PTunit);
+begin
+   if(pu=nil)then exit;
 
    with pu^ do
    begin
@@ -770,7 +850,9 @@ begin
       PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,false),lmt_allies_attacked,0,uidi,'',x,y);
    end;
 end;
-procedure GameLogKeyPointCaptured(from_player,kpoint:byte);
+
+// KEY POINTS
+procedure GameLog_KeyPointCaptured(from_player,kpoint:byte);
 begin
    if(from_player>LastPlayer)
    or(LastKeyPoint<kpoint)then exit;
@@ -782,7 +864,7 @@ begin
      then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kpx,kpy)
      else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kpx,kpy);
 end;
-procedure GameLogKeyPointLost(from_player,kpoint:byte);
+procedure GameLog_KeyPointLost(from_player,kpoint:byte);
 begin
    if(from_player>LastPlayer)
    or(LastKeyPoint<kpoint)then exit;
@@ -794,14 +876,14 @@ begin
      then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kpx,kpy)
      else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kpx,kpy);
 end;
-procedure GameLogKotHControl;
+procedure GameLog_KotHControl;
 begin
    if(map_scenario<>mc_KotH)then exit;
 
    with g_KeyPoints[0] do
      PlayersAddToLog(255,255,lmt_koth_control,0,kpTimerOwnerTeam,'',kpx,kpy);
 end;
-procedure GameLogNgenExh(from_player,kpoint:byte);
+procedure GameLog_NgenExh(from_player,kpoint:byte);
 begin
    if(from_player>LastPlayer)
    or(LastKeyPoint<kpoint)then exit;
@@ -812,6 +894,7 @@ begin
      PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kpx,kpy);
 end;
 
+// PLAYER LOG COMMON
 procedure PlayerClearLog(playerN:byte);
 var i:cardinal;
 begin
@@ -837,6 +920,8 @@ begin
    for p:=0 to LastPlayer do PlayerClearLog(p);
 end;
 
+// OTHEr
+
 function PlayersAllReady:boolean;
 var p,
 c_human,
@@ -852,6 +937,21 @@ begin
           if(isready){$IFDEF _FULLGAME}or(p=LocalPlayer){$ENDIF}then c_ready+=1;
        end;
    PlayersAllReady:=(c_ready=c_human)and(c_human>0);
+end;
+function PlayersNonObserversCount:byte;
+var p:byte;
+begin
+   PlayersNonObserversCount:=0;
+   for p:=0 to LastPlayer do
+     if(p<map_MaxPlayers)then
+       with g_gplayers[p] do
+         case state of
+         ps_none : if(g_AISlots>0)then
+                   PlayersNonObserversCount+=1;
+         ps_ai   : PlayersNonObserversCount+=1;
+         ps_human: if(not isobserver)then
+                   PlayersNonObserversCount+=1;
+         end;
 end;
 
 function PlayerGetFixedTeams(gm,p:byte):byte;
@@ -959,7 +1059,7 @@ begin
    if(team>LastPlayer)then exit;
 
    G_status:=gs_win_team0+team;
-   GameLogEndGame(team);
+   GameLog_EndGame(team);
 end;
 
 function Game_IsEnded:boolean;
@@ -1137,31 +1237,26 @@ begin
          if(units_unitProds_s<=0)or(isselected)then exit;
    unit_OrderCheckBarrack:=false;
 end;
+function unit_ReadyForAbilityOrder(pu:PTUnit):boolean;
+begin
+   with pu^ do
+   with player^ do
+     unit_ReadyForAbilityOrder:=(units_all_s=1)or
+                               ((uo_id<>ua_ability1)
+                             and(uo_id<>ua_ability2)
+                             and(uo_id<>ua_ability3));
+end;
+
 function unit_OrderCheckAbility(pu:PTUnit;aid:byte):boolean;
 begin
    unit_OrderCheckAbility:=false;
    with pu^ do
    with uid^ do
-   with player^ do
      if(uid_ability1=aid)
      or(uid_ability2=aid)
      or(uid_ability3=aid)then
-       unit_OrderCheckAbility:=(units_all_s=1)or
-                             ((uo_id<>ua_ability1)
-                           and(uo_id<>ua_ability2)
-                           and(uo_id<>ua_ability3));
+       unit_OrderCheckAbility:=unit_ReadyForAbilityOrder(pu);
 end;
-function unit_AbilityGetUIDRef(aid,uidcaster:byte):byte;
-begin
-   unit_AbilityGetUIDRef:=0;
-   with g_aids[aid] do
-     case ua_mbrush_r of
-     -255..-1   : unit_AbilityGetUIDRef:=byte(-ua_mbrush_r);
-     uambt_self : unit_AbilityGetUIDRef:=uidcaster;
-     uambt_nform: with g_uids[uidcaster] do unit_AbilityGetUIDRef:=uid_nextForm;
-     end;
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   OTHER
@@ -1181,7 +1276,7 @@ end;
 function ai_name(ain:byte):shortstring;
 begin
    if(ain=0)
-   then ai_name:=str_ps_none
+   then ai_name:=''
    else
      {$IFDEF _FULLGAME}
      case ain of
@@ -1333,50 +1428,19 @@ begin
      end;
 end;
 
-{function ui_HaveAbility(pu:PTUnit;pability:boolean):boolean;
+function ability_CheckTarget(aid:byte;pCasterPlayer,pTargetPlayer:PTPlayerGameData):boolean;
 begin
-   ui_HaveAbility:=false;
-
-   if(pu=nil)then exit;
-   with pu^ do
-   with uid^ do
-   begin
-      if(hits<=0)
-      or(uid_ability=0)
-      or(not iscomplete)then exit;
-
-      if not(uid_ability in player^.a_ability)then exit;
-
-      case pability of
-      false: if not(uid_ability in uab_sabilityOrder)then exit;
-      true : if not(uid_ability in uab_pabilityOrder)then exit;
-      end;
-   end;
-
-   ui_HaveAbility:=true;
+   ability_CheckTarget:=false;
+   with g_aids[aid] do
+     case ua_type of
+     uat_UnitAny  :;
+     uat_UnitOwn  : if(pCasterPlayer      <>pTargetPlayer      )then exit;
+     uat_UnitAlly : if(pCasterPlayer^.team<>pTargetPlayer^.team)then exit;
+     uat_UnitEnemy: if(pCasterPlayer^.team= pTargetPlayer^.team)then exit;
+     else exit;
+     end;
+   ability_CheckTarget:=true;
 end;
-
-function ui_HaveRebuild(pu:PTUnit):boolean;
-begin
-   ui_HaveRebuild:=false;
-
-   if(pu=nil)then exit;
-
-   with pu^ do
-   with uid^ do
-   begin
-      if(hits<=0)
-      or(not iscomplete)then exit;
-      if(uid_rebuild_uid=0)then exit;
-      if(uid_rebuild_uid=uidi)and(level>=LastUnitLevel)then exit;
-      if(uid_rebuild_uid<>uidi)then
-        with player^ do
-          if(units_uid_m[uid_rebuild_uid]<=0)then exit;
-      if not(uid_rebuild_uid in player^.a_rebuild)then exit;
-   end;
-
-   ui_HaveRebuild:=true;
-end;   }
 
 {$IFDEF _FULLGAME}
 
@@ -1543,6 +1607,16 @@ end;
 //
 
 function GameGetStatus(pstr:pshortstring;pcol:pcardinal;POVPlayer:byte):boolean;
+function GetLagPlayers:shortstring;
+var p:byte;
+begin
+   GetLagPlayers:='';
+   for p:=0 to LastPlayer do
+     with g_nplayers[p] do
+     with g_gplayers[p] do
+       if(state=ps_human)and(not isobserver)and(not isdefeated)and(net_ttl>=fr_fps1)then
+         STRADD(@GetLagPlayers,name+'('+b2s((TTLMaxClientGame-net_ttl) div fr_fps1)+')',sep_comma);
+end;
 begin
    GameGetStatus:=false;
 
@@ -1566,17 +1640,24 @@ gs_replayend  : begin
                    pstr^:='';
                    pcol^:=c_white;
                 end;
-gs_waitserver : begin
-                   pstr^:=str_gstat_WaitForServer;
-                   pcol^:=PlayerGetColor(net_cl_Hoster,false);
-                end;
 gs_replaypause: begin
                    pstr^:=str_gstat_ReplayPaused;
                    pcol^:=c_white;
                 end;
+gs_waitserver : begin
+                   pstr^:=str_gstat_WaitForServer;
+                   if(net_cl_Hoster<=LastPlayer)then
+                   pstr^+=tc_nl2+'('+g_gplayers[net_cl_Hoster].name+')';
+                   pcol^:=PlayerGetColor(net_cl_Hoster,false);
+                end;
+gs_waitplayers: begin
+                   pstr^:=str_gstat_WaitForPlayers;
+                   if(rpls_pstate<>rpls_read)then pstr^+=tc_nl2+GetLagPlayers;
+                   pcol^:=c_white;
+                end;
 gs_win_team0..
 gs_win_team7  : if(POVPlayer>LastPlayer)
-                then pstr^:=''
+                then pstr^:=str_gstat_WonByTeam+b2s(G_status-gs_win_team0+1)
                 else
                   if((G_status-gs_win_team0)=g_gplayers[POVPlayer].team)then
                   begin
@@ -1598,6 +1679,16 @@ function MenuBack(offMenu,check:boolean):boolean;
 begin
    MenuBack:=false;
    if(not MainMenu)then exit;
+
+   if(g_LobbyTimer>0)and(net_status<>ns_client)then
+   begin
+      MenuBack:=true;
+      if(check)then exit;
+
+      g_LobbyTimer:=0;
+      menu_update:=true;
+      if(not offMenu)then exit;
+   end;
 
    if(GameNetServerSearch(false,check))then
    begin
@@ -1761,22 +1852,6 @@ begin
      else ui_ControlTabType:=tcc_controls;
 end;
 
-procedure ui_UpdateLastSelectedUnit(u:integer);
-var tu:PTUnit;
-begin
-   if(IsUnitRange(u,@tu))then
-   begin
-      if(ui_UnitSelectedNU=0)
-      then
-      else
-        if(tu^.uid^.uid_uibtn>g_units[ui_UnitSelectedNU].uid^.uid_uibtn)
-        then
-        else exit;
-      ui_UnitSelectedNU:=u;
-      ui_update_now:=true;
-   end;
-end;
-
 function ui_UnitNeedDrawRange(pu:PTUnit):boolean;
 begin
    with pu^  do
@@ -1794,53 +1869,39 @@ begin
    -255..-1   : with g_aids[-m_brush] do
                   case ua_mbrush_r of
                   -255..-1,
-                  uambt_nform,
-                  uambt_self : exit;
-                  else
+                  uambt_self: exit;
                   end;
    end;
    ui_MouseBrushNeedDrawEdges:=false;
 end;
-
-function ui_AbilityGetBrushR(pCaster:PTUnit;aid:byte):integer;
+function ui_AbilityGetBrushR(aid:byte;pCaster:PTUnit):integer;
 begin
    ui_AbilityGetBrushR:=0;
    with g_aids[aid] do
      case ua_mbrush_r of
-     -255..-1   : ui_AbilityGetBrushR:=g_uids[-ua_mbrush_r].uid_r;
-     uambt_nform: with pCaster^.uid^ do
-                    if(uid_nextForm>0)then
-                      ui_AbilityGetBrushR:=g_uids[uid_nextForm].uid_r;
-     uambt_self : ui_AbilityGetBrushR:=pCaster^.uid^.uid_r;
-     else         ui_AbilityGetBrushR:=ua_mbrush_r;
+     -255..-1    : ui_AbilityGetBrushR:=g_uids[-ua_mbrush_r].uid_r;
+     uambt_sightR: if(pCaster<>nil)then ui_AbilityGetBrushR:=pCaster^.srange;
+     uambt_self  : if(pCaster<>nil)then ui_AbilityGetBrushR:=pCaster^.uid^.uid_r;
+     else          ui_AbilityGetBrushR:=ua_mbrush_r;
      end;
 end;
-function ui_AbilityGetBrushSpr(pCaster:PTUnit;aid:byte):pTMWTexture;
+function ui_AbilityGetBrushSpr(aid,casterUID:byte):pTMWTexture;
 begin
    ui_AbilityGetBrushSpr:=pspr_dummy;
    with g_aids[aid] do
      case ua_mbrush_r of
      -255..-1   : ui_AbilityGetBrushSpr:=uid2spr(-ua_mbrush_r,270,0);
-     uambt_nform: with pCaster^.uid^ do
-                    if(uid_nextForm>0)then
-                      ui_AbilityGetBrushSpr:=uid2spr(-uid_nextForm,270,0);
-     uambt_self : ui_AbilityGetBrushSpr:=uid2spr(pCaster^.uidi,270,0);
+     uambt_self : ui_AbilityGetBrushSpr:=uid2spr(casterUID   ,270,0);
      end;
 end;
-function ui_AbilityGetBTN(pCaster:PTUnit;aid:byte):pSDL_Surface;
+function unit_AbilityGetUIDRef(aid,casterUID:byte):byte;
 begin
+   unit_AbilityGetUIDRef:=0;
    with g_aids[aid] do
-   begin
-      ui_AbilityGetBTN:=ua_BTN;
-      case ua_mbrush_r of
-      -255..-1   : ui_AbilityGetBTN:=g_uids[-ua_mbrush_r].uid_BTNBig.surf;
-      uambt_nform: with pCaster^.uid^ do
-                     if(uid_nextForm>0)then
-                       ui_AbilityGetBTN:=g_uids[uid_nextForm].uid_BTNBig.surf;
-      uambt_self : ui_AbilityGetBTN:=pCaster^.uid^.uid_BTNBig.surf;
-      else
-      end;
-   end;
+     case ua_mbrush_r of
+     -255..-1   : unit_AbilityGetUIDRef:=byte(-ua_mbrush_r);
+     uambt_self : unit_AbilityGetUIDRef:=casterUID;
+     end;
 end;
 
 function ui_fog_CheckXY(x,y:integer):boolean;
@@ -1854,7 +1915,6 @@ begin
    if(0<=cx)and(cx<ui_fog_gridw)
   and(0<=cy)and(cy<ui_fog_gridh)then ui_fog_CheckXY:=ui_fog_pgrid[cx,cy];
 end;
-
 
 function ui_CheckUnitUIPlayerVision(tu:PTUnit;CheckCam:boolean):boolean;
 begin
@@ -1952,8 +2012,8 @@ begin
 
    ui_cam_cx :=ui_cam_x+ui_cam_hw;
    ui_cam_cy :=ui_cam_y+ui_cam_hh;
-   ui_cam_mmx:=round(ui_cam_x*map_mmcx);
-   ui_cam_mmy:=round(ui_cam_y*map_mmcx);
+   ui_cam_mmx:=round(ui_cam_x*map_MiniMap_cx);
+   ui_cam_mmy:=round(ui_cam_y*map_MiniMap_cx);
    ui_cam_fx :=ui_cam_x mod fog_cw;
    ui_cam_fy :=ui_cam_y mod fog_cw;
    ui_fog_sx :=ui_cam_x div fog_cw;
@@ -1966,6 +2026,12 @@ procedure ui_Camera_MoveToPoint(mx,my:integer);
 begin
    ui_cam_x:=mx-ui_cam_hw;
    ui_cam_y:=my-ui_cam_hh;
+   case ui_ControlPanelPos of
+   cpp_left  : ui_cam_x-=ui_CtrlPanelWh;
+   cpp_right : ui_cam_x+=ui_CtrlPanelWh;
+   cpp_top   : ui_cam_y-=ui_CtrlPanelWh;
+   cpp_bottom: ui_cam_y+=ui_CtrlPanelWh;
+   end;
    ui_Camera_Bounds;
 end;
 
@@ -2028,7 +2094,7 @@ begin
        case lm_data_t of
        lmt_argt_unit   : with g_uids [lm_data_u] do ParseLogMessage+=' ('+uid_str_name +')';
        lmt_argt_upgrade: with g_upids[lm_data_u] do ParseLogMessage+=' ('+upgr_str_Name+')';
-       lmt_argt_ability: with g_aids [lm_data_u] do ParseLogMessage+=' ('+ua_str_name  +')';
+       lmt_argt_ability: ParseLogMessage+=' ('+str_AbilityGetHintName(lm_data_u,255)+')';
        end;
 end;
 
@@ -2060,19 +2126,25 @@ lmt_prod_BadPlace     : begin
                         end;
 lmt_prod_AllBusy      : ParseLogMessage:=str_warn_prod_AllBusy;
 
+lmt_player_connected  : ParseLogMessage:=lm_string+str_gmsg_PlayerConnected;
+lmt_player_leave      : ParseLogMessage:=lm_string+str_gmsg_PlayerLeave;
+lmt_player_timeout    : ParseLogMessage:=lm_string+str_gmsg_PlayerTimeOut;
+lmt_player_surrender  : ParseLogMessage:=lm_string+str_gmsg_PlayerSurrender;
+lmt_player_defeated   : ParseLogMessage:=lm_string+str_gmsg_PlayerDefeat;
 lmt_player_ready,
 lmt_player_nready     : ParseLogMessage:=lm_string+str_lobby_PlayerReady[lm_type=lmt_player_ready];
-lmt_player_surrender,
-lmt_player_leave,
+lmt_game_Paused       : ParseLogMessage:=lm_string+str_gmsg_PlayerPaused;
+lmt_game_Resumed      : ParseLogMessage:=lm_string+str_gmsg_PlayerResumed;
 lmt_game_message      : ParseLogMessage:=lm_string;
 lmt_game_end          : if(lm_data_u<=LastPlayer)and(UIPlayer<=LastPlayer)then
                           if(lm_data_u=g_gplayers[UIPlayer].team)
                           then ParseLogMessage:=str_gstat_Win
                           else ParseLogMessage:=str_gstat_Lose;
-lmt_game_PlayersReady : ParseLogMessage:=str_lobby_AllPReady;
+lmt_game_ReadyToStart : ParseLogMessage:=str_lobby_ReadyToStart;
+lmt_game_BreakStarting: ParseLogMessage:=str_lobby_BreakStarting;
 lmt_game_StartsIn     : ParseLogMessage:=str_lobby_GameStartIn+b2s(lm_data_u);
+lmt_game_ResetIn      : ParseLogMessage:=str_lobby_GameResetIn+b2s(lm_data_u);
 
-lmt_player_defeated   : if(lm_data_u<=LastPlayer)then ParseLogMessage:=g_gplayers[lm_data_u].name+str_gmsg_PlayerDefeat;
 lmt_upgrade_InProgress: ParseLogMessage:=str_warn_upgrade_InProgress;
 lmt_upgrade_complete  : begin
                         with g_upids[lm_data_u] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
@@ -2359,7 +2431,7 @@ begin
 
         if(state>ps_None)then
           if(observer)
-          then strInfoVar2^+=str_SpaceSize(str_observer   ,9)+b2s(team+1)
+          then strInfoVar2^+=str_SpaceSize(str_observer   ,9)
           else strInfoVar2^+=str_SpaceSize(str_race[mrace],9)+b2s(team+1);
         strInfoVar2^+=tc_nl2
      end;
@@ -2369,22 +2441,15 @@ end;
 
 {$ELSE}
 
-function PlayerAllOut:boolean;
-var p,
-c_players,
-c_out    :byte;
+
+function NoHumanPlayers:boolean;
+var p:byte;
 begin
-   c_players:=0;
-   c_out    :=0;
-   for p:=0 to MaxPlayers do
+   NoHumanPlayers:=false;
+   for p:=0 to LastPlayer do
      with g_gplayers[p] do
-     with g_nplayers[p] do
-       if(state=PS_human)then
-       begin
-          c_players+=1;
-          if(net_ttl>=ClientTTL)then c_out+=1;
-       end;
-   PlayerAllOut:=((c_out=c_players)and(c_players>0))or(c_players=0);
+       if(state=PS_human)then exit;
+   NoHumanPlayers:=true;
 end;
 
 {$ENDIF}

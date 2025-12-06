@@ -89,10 +89,10 @@ begin
    InitRX2Y;
    lng_eng;
    SwitchLanguage;
-   InitGameClientData;
-   InitMIDDataCL;
+   InitClientDataGame;
+   InitClientDataMissiles;
    gfx_MakeUnitIcons;
-   SetAbilityIcons;
+   InitClientDataAbilities;
 
    //gfx_SaveUnitIcons;
 
@@ -101,7 +101,7 @@ begin
    if not(InitNET)then exit;
 
    Map_randommap;
-   GameDefaultAll;
+   Game_DefaultAll;
 
    NEW(sys_EVENT);
 

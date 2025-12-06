@@ -1,10 +1,19 @@
 {$IFDEF _FULLGAME}
-procedure unit_MiniMapXY(pu:PTUnit);
+procedure unit_UpdateMiniMapXY(pu:PTUnit);
 begin
    with pu^ do
    begin
-      mmx:=trunc(x*map_mmcx);
-      mmy:=trunc(y*map_mmcx);
+      mmx:=trunc(x*map_MiniMap_cx);
+      mmy:=trunc(y*map_MiniMap_cx);
+   end;
+end;
+
+procedure unit_UpdateFogXY(pu:PTUnit);
+begin
+   with pu^ do
+   begin
+      fx :=x div fog_cw;
+      fy :=y div fog_cw;
    end;
 end;
 
@@ -21,22 +30,22 @@ begin
 
       case etype of
 EID_HVision : begin
-              SoundPlayUnit(snd_hell_eye,pu,nil);
-              effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),EID_HVision);
+              snd_SoundPlayUnit(snd_hell_eye,pu,nil);
+              effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_HVision);
               end;
 EID_Invuln  : begin
-              SoundPlayUnit(snd_hell_invuln,pu,nil);
-              effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),EID_Invuln);
+              snd_SoundPlayUnit(snd_PowerUp,pu,nil);
+              effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_Invuln);
               end;
       else
                case uid^.uid_race of
       r_hell : begin
-                  SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
-                  effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),EID_HLevelUp);
+                  snd_SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
+                  effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_HLevelUp);
                end;
       r_uac  : begin
-                  SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
-                  effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),EID_ULevelUp);
+                  snd_SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
+                  effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_ULevelUp);
                end;
                end;
       end;
@@ -47,8 +56,8 @@ procedure effect_RStationShot(pu:PTUnit);
 begin
    with pu^ do
    begin
-      effect_add(vx,vy-15,draw_SpriteDepth(vy+10,ukfly),EID_Exp2);
-      SoundPlayUnit(snd_bomblaunch,nil,nil)
+      effect_add(vx,vy-15,draw_DefaultSpriteDepth(vy+10,ukfly),EID_Exp2);
+      snd_SoundPlayUnit(snd_bomblaunch,nil,nil)
    end;
 end;
 
@@ -57,8 +66,8 @@ begin
    effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
    if(ui_CheckMapPointFogVision(vx,vy,true))then
    begin
-      effect_add(vx,vy,draw_SpriteDepth(vy+1,false),EID_BBExp);
-      SoundPlayUnit(snd_exp,nil,nil);
+      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,false),EID_BBExp);
+      snd_SoundPlayUnit(snd_explode,nil,nil);
    end;
 end;
 
@@ -75,10 +84,10 @@ begin
           else
              if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-          SoundPlayUnit(uid_snd_Summon,nil,nil);
-          effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_Summon[level]);
+          snd_SoundPlayUnit(uid_snd_Summon,nil,nil);
+          effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),uid_eid_Summon[level]);
 
-          if(playeri=UIPlayer)then SoundPlayUnit(uid_snd_ready,nil,nil);
+          if(playeri=UIPlayer)then snd_SoundPlayUnit(uid_snd_ready,nil,nil);
        end;
 end;
 
@@ -87,7 +96,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(not ukfly)and(uid_eid_bcrater>0)then
+      if(not ukfly)and(uid_eid_bcrater>0)and(uid_isbuilding)then
         effect_add(vx,vy+uid_eid_bcrater_y,sd_liquid+vy,uid_eid_bcrater);
 
       if(pUIVision<>nil)then
@@ -99,13 +108,13 @@ begin
 
       if(fastdeath)then
       begin
-         effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_DeathFast[level]);
-         SoundPlayUnit(uid_snd_DeathFast,nil,nil);
+         effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),uid_eid_DeathFast[level]);
+         snd_SoundPlayUnit(uid_snd_DeathFast,nil,nil);
       end
       else
       begin
          effect_add(vx,vy,vy+1,uid_eid_DeathSlow[level]);
-         SoundPlayUnit(uid_snd_DeathSlow,nil,nil);
+         snd_SoundPlayUnit(uid_snd_DeathSlow,nil,nil);
       end;
    end;
 end;
@@ -122,8 +131,8 @@ begin
       else
         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-      effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),uid_eid_Pain[level]);
-      SoundPlayUnit(uid_snd_Pain,nil,nil);
+      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),uid_eid_Pain[level]);
+      snd_SoundPlayUnit(uid_snd_Pain,nil,nil);
    end;
 end;
 
@@ -137,7 +146,7 @@ begin
      if(not ui_CheckMapPointFogVision(tx,ty,true))then exit;
 
    effect_add(tx,ty,dy,effect);
-   SoundPlayUnit(sound,nil,nil);
+   snd_SoundPlayUnit(sound,nil,nil);
 end;
 
 procedure effect_UnitAttack(pu:PTUnit;start:boolean;pUIVision:pboolean);
@@ -155,13 +164,13 @@ begin
 
       if(start)then
       begin
-         effect_add(vx,vy,draw_SpriteDepth(vy+1,ukfly),aw_eid_start);
-         SoundPlayUnit(aw_snd_start,nil,nil);
+         effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),aw_eid_start);
+         snd_SoundPlayUnit(aw_snd_start,nil,nil);
       end
       else
       begin
-         effect_add(vx+aw_offset_x,vy+aw_offset_y,draw_SpriteDepth(vy+1,ukfly),aw_eid_shot );
-         SoundPlayUnit(aw_snd_shot,nil,nil);
+         effect_add(vx+aw_offset_x,vy+aw_offset_y,draw_DefaultSpriteDepth(vy+1,ukfly),aw_eid_shot );
+         snd_SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
 end;
@@ -170,7 +179,7 @@ procedure effect_ScanSound(pCaster:PTUnit);
 begin
    if(UIPlayer<=LastPlayer)then
      if(pCaster^.player^.team<>g_gplayers[UIPlayer].team)then exit;
-   SoundPlayUnit(snd_radar,nil,nil);
+   snd_SoundPlayUnit(snd_RadarScan,nil,nil);
 end;
 
 {$ENDIF}
@@ -231,7 +240,7 @@ begin
       if(uid<>nil)then
         mapZone:=map_GetZone(x,y,uid^.uid_r);
       {$IFDEF _FULLGAME}
-      unit_MiniMapXY(pu);
+      unit_UpdateMiniMapXY(pu);
       unit_UpdateFogXY(pu);
       {$ENDIF}
    end;
@@ -249,18 +258,24 @@ begin
       if(x<>_px)or(y<>_py)then
       begin
          unit_UpdateXY(pu);
-         if(_px=uo_x)
-        and(_py=uo_y)then
-        begin
-           uo_x:=x;
-           uo_y:=y;
-        end;
-         if(_px=rpoint_x)
-        and(_py=rpoint_y)then
-        begin
-           rpoint_x:=x;
-           rpoint_y:=y;
-        end;
+         case uo_id of
+         ua_move,
+         ua_hold,
+         ua_amove: begin
+                      if(_px=uo_x)
+                     and(_py=uo_y)then
+                      begin
+                         uo_x:=x;
+                         uo_y:=y;
+                      end;
+                      if(_px=rpoint_x)
+                     and(_py=rpoint_y)then
+                      begin
+                         rpoint_x:=x;
+                         rpoint_y:=y;
+                      end;
+                   end;
+         end;
       end;
       case movevxy of
 mvxy_relative: begin
@@ -308,12 +323,11 @@ begin
      end;
 end;
 
-procedure unit_OrderClear(pu:PTUnit;clearid:boolean);
+procedure unit_OrderClear(pu:PTUnit;newID:byte);
 begin
    with pu^ do
    begin
-      if(clearid)then
-      uo_id :=ua_amove;
+      if(newID<255)then uo_id :=newID;
 
       uo_tar:=0;
       uo_x  :=x;
@@ -365,7 +379,7 @@ begin
       {$ENDIF}
       buffs[ub_Teleport]:=fr_fps1;
       unit_SetXY(pu,tx,ty,mvxy_strict);
-      unit_OrderClear(pu,false);
+      unit_OrderClear(pu,255);
       unit_clear_tar(unum);
       missiles_clear_tar(unum,false);
       unit_UpdateVision(pu);
@@ -390,20 +404,13 @@ begin
    if(ServerSide)then unit_zfall(pu);
    with pu^ do
      if(vx<>x)or(vy<>y)then
-       {if(IsUnitRange(transportU,nil))then
-       begin
-          vstp:=0;
-          vx  :=x;
-          vy  :=y;
-       end
-       else }
-       begin
-          if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
-          if(vstp<=0)then vstp:=UnitStepTicks;
-          vx  +=(x-vx) div vstp;
-          vy  +=(y-vy) div vstp;
-          vstp-=1;
-       end;
+     begin
+        if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
+        if(vstp<=0)then vstp:=UnitStepTicks;
+        vx  +=(x-vx) div vstp;
+        vy  +=(y-vy) div vstp;
+        vstp-=1;
+     end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -435,9 +442,6 @@ begin
       unit_ability_HellVision:=ureq_other;
       if(not iscomplete)
       or(hits<=0)then exit;
-
-      unit_ability_HellVision:=ureq_reloading;
-      if(rld>0)then exit;
    end;
 
    unit_ability_HellVision:=0;
@@ -476,9 +480,6 @@ begin
       unit_ability_Recall:=ureq_other;
       if(not iscomplete)
       or(hits<=0)then exit;
-
-      unit_ability_Recall:=ureq_reloading;
-      if(rld>0)then exit;
    end;
 
    unit_ability_Recall:=0;
@@ -505,7 +506,7 @@ begin
       if(tard>base_1r)then
       begin
          unit_ability_Recall:=0;
-         unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
+         unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
          teleport_CalcReload(pTeleporter,pTarget^.uid^.uid_LimitUse);
 
          pTarget^.uo_x  :=pTarget^.x;
@@ -544,7 +545,7 @@ begin
             unit_Teleport2Point(pTarget,
             pTeleporter^.rpoint_x+g_random(uid_missileR),
             pTeleporter^.rpoint_y+g_random(uid_missileR)
-            {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});
+            {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
             teleport_CalcReload(pTeleporter,uid_LimitUse);
             unit_ability_teleport:=true;
          end;
@@ -554,15 +555,14 @@ function unit_ability_UACScan(pRadar:PTUnit;x0,y0:integer;check:boolean):cardina
 begin
    unit_ability_UACScan:=ureq_other;
    with pRadar^ do
-     if(iscomplete)and(rld<=0)and(buffs[ub_Cast]<=0)and(uid^.uid_ability_isradar)then
+     if(hits>0)and(iscomplete)and(buffs[ub_Cast]<=0)and(uid^.uid_ability_isradar)then
      begin
         unit_ability_UACScan:=0;
 
         if(check)then exit;
 
-        rpoint_x      :=x0;
-        rpoint_y      :=y0;
-        rpoint_tar    :=0;
+        uo_x:=x0;
+        uo_y:=y0;
         buffs[ub_Cast]:=detection_time;
 
         {$IFDEF _FULLGAME}
@@ -571,12 +571,12 @@ begin
      end;
 end;
 
-function unit_ability_HInvuln(pu:PTUnit;taru:integer;check:boolean):cardinal;
-var tu:PTUnit;
+function unit_ability_HInvuln(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
 begin
-   // pu - caster
-   // tu - target
-   with pu^ do
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
    begin
       unit_ability_HInvuln:=ureq_other;
       if(not iscomplete)
@@ -586,28 +586,21 @@ begin
       if(rld>0)then exit;
    end;
 
+   unit_ability_HInvuln:=0;
+   if(check)then exit;
+
    unit_ability_HInvuln:=ureq_InvalidTarget;
-   if(not IsUnitRange(taru,@tu))
-   then exit;
+   if(not IsUnitRange(target,@pTarget))then exit;
 
-   if(tu^.hits<=0)then exit;
+   if(pTarget^.hits<=0)
+   or(pTarget^.buffs[ub_Invuln]>0)then exit;
 
-   with pu^ do
-   with player^ do
-   begin
-      if(team<>tu^.player^.team)
-      or(tu^.buffs[ub_Invuln]>0)then exit;
+   unit_ability_HInvuln:=0;
 
-      unit_ability_HInvuln:=0;
-
-      if(check)then exit;
-
-      tu^.buffs[ub_Invuln]:=invuln_time;
-      pu^.rld:=haltar_reload;
-      {$IFDEF _FULLGAME}
-      effect_LevelUp(tu,EID_Invuln,nil);
-      {$ENDIF}
-   end;
+   pTarget^.buffs[ub_Invuln]:=invuln_time;
+   {$IFDEF _FULLGAME}
+   effect_LevelUp(pTarget,EID_Invuln,nil);
+   {$ENDIF}
 end;
 
 procedure unit_UACStrike_missile(pu:PTUnit);
@@ -626,17 +619,17 @@ var p:byte;
 begin
    unit_ability_UACStrike:=ureq_other;
    with pu^ do
-     if(iscomplete)and(rld<=0)then
+     if(hits>0)and(iscomplete)and(rld<=0)and(buffs[ub_Cast]<=0)then
        with player^ do
        begin
           unit_ability_UACStrike:=0;
           if(check)then exit;
-          unit_OrderClear(pu,true);
+          unit_OrderClear(pu,ua_amove);
           uo_x:=x0;
           uo_y:=y0;
-          for p:=0 to LastPlayer do AddToInt(@TeamVision[p],fr_fps2);
-          unit_UACStrike_missile(pu);
           buffs[ub_Cast]:=fr_fps2;
+          for p:=0 to LastPlayer do AddToInt(@TeamVision[p],buffs[ub_Cast]);
+          unit_UACStrike_missile(pu);
        end;
 end;
 
@@ -669,10 +662,10 @@ begin
       {$IFDEF _FULLGAME}
       else
         with g_uids[auid] do
-          effect_InPoint(tx,ty,draw_SpriteDepth(ty+1,ukfly),nil,uid_eid_DeathFast[0],uid_snd_DeathFast);
+          effect_InPoint(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),nil,uid_eid_DeathFast[0],uid_snd_DeathFast);
 
         {case auid of
-//UID_Phantom : effect_InPoint(tx,ty,draw_SpriteDepth(ty+1,ukfly),nil,auid,snd_pexp);
+//UID_Phantom : effect_InPoint(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),nil,auid,snd_explode_plasmasnd_explode_plasma);
 UID_LostSoul:
         end; } //
       {$ENDIF};
@@ -720,6 +713,7 @@ var vx,vy,a:single;
 begin
    vx :=x0-tx^;
    vy :=y0-ty^;
+   if(vx=0)and(vy=0)then exit;
    a  :=sqrt(sqr(vx)+sqr(vy));
    if(a=0)then exit;
    vx :=vx/a;
@@ -766,7 +760,9 @@ var nrx,
     nrt : array[0..nrl] of integer;
 dx,dy,
 o,u,d   : integer;
-
+{$IFDEF _FULLGAME}
+a       : byte;
+{$ENDIF}
 procedure add(ax,ay,ad,at:integer);
 var i,n:integer;
 begin
@@ -781,13 +777,13 @@ begin
    if(i>nrl)then exit;
 
    if(i<>nrl)then
-    for n:=nrl-1 downto i do
-    begin
-       nrd[i+1]:=nrd[i];
-       nrx[i+1]:=nrx[i];
-       nry[i+1]:=nry[i];
-       nrt[i+1]:=nrt[i];
-    end;
+     for n:=nrl-1 downto i do
+     begin
+        nrd[i+1]:=nrd[i];
+        nrx[i+1]:=nrx[i];
+        nry[i+1]:=nry[i];
+        nrt[i+1]:=nrt[i];
+     end;
 
    nrd[i]:=ad;
    nrx[i]:=ax;
@@ -850,29 +846,35 @@ begin
            add(x,y,d-o,o);
         end;
 
+   {$IFDEF _FULLGAME}
    for u:=1 to MaxUnits do
     with g_units[u] do
      with uid^ do
       if(hits>0)and(unum<>ignore_unum)and(iscomplete)then
-       if(not IsUnitRange(transportU,nil))then ;
-        {if(uo_id=ua_psability)then  // -255..-1
-        begin
-           if(UnitObsTeamVis<=LastPlayer)then
-             if(TeamVision[UnitObsTeamVis]<=0)then continue;
-
-           {case uid_ability of
-     uab_RebuildInPoint: begin
-                         o:=tr+g_uids[uid_rebuild_uid].uid_r;
-                         d:=point_dist_int(uo_x,uo_y,tx,ty);
-                         add(uo_x,uo_y,d-o,o);
-                         end;
-           uab_UACCCLand   : begin
-                         o:=tr+uid_r;
-                         d:=point_dist_int(uo_x,uo_y+fly_hz,tx,ty);
-                         add(uo_x,uo_y+fly_hz,d-o,o);
-                         end;
-           end;}
-        end; }
+       if(not IsUnitRange(transportU,nil))then
+         case uo_id of
+         ua_ability1,
+         ua_ability2,
+         ua_ability3: begin
+                         if(UnitObsTeamVis<=LastPlayer)then
+                           if(TeamVision[UnitObsTeamVis]<=0)then continue;
+                         a:=unit_GetCastingAbility(g_punits[u]);
+                         if(a>0)then
+                           with g_aids[a] do
+                             case ua_type of
+                             uat_point    : begin
+                                               o:=ui_AbilityGetBrushR(a,g_punits[u]);
+                                               if(o>0)then
+                                               begin
+                                                  o+=tr;
+                                                  d:=point_dist_int(uo_x,uo_y,tx,ty);
+                                                  add(uo_x,uo_y,d-o,o);
+                                               end;
+                                            end;
+                             end;
+                      end;
+         end;
+   {$ENDIF}
 
    if(nrd[1]<=-1)
    then math_2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
@@ -892,7 +894,7 @@ begin
    newy^:=ty;
 end;
 
-
+{$IFDEF _FULLGAME}
 procedure BuildingFindNewPlace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger;UnitObsTeamVis:byte=255);
 var
 aukfly  :boolean;
@@ -944,12 +946,20 @@ begin
    newx^:=tx;
    newy^:=ty;
 end;
+{$ENDIF}
 
-
-function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean;reveal_u:PTUnit=nil):byte;
+function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles,check_castPoint:boolean;reveal_u:PTUnit=nil):TCheckCollisionR;
 var u,dx,dy:integer;
 begin
-   CheckCollisionR:=0;
+   CheckCollisionR:=cbr_no;
+
+   if(building)then
+     if(tx<tr)or((map_size-tr)<tx)
+     or(ty<tr)or((map_size-tr)<ty)then
+     begin
+        CheckCollisionR:=cbr_mapSide;  // out of map bounds
+        exit;
+     end;
 
    for u:=1 to MaxUnits do
     if(u<>skipunit)then
@@ -959,7 +969,7 @@ begin
         if(speed<=0)or(not iscomplete)then
          if(point_dist_int(x,y,tx,ty)<(tr+uid_r))then
          begin
-            CheckCollisionR:=2;
+            CheckCollisionR:=cbr_unit;
             if(reveal_u<>nil)then
             begin
                AddToInt(@TeamVision[reveal_u^.player^.team],MinVisionTime);
@@ -968,7 +978,9 @@ begin
                AddToInt(@reveal_u^.TeamDetection[player^.team],MinVisionTime);
             end;
             exit;
-         end;
+         end
+         else
+           if(check_castPoint)then ;
 
    if(flylevel)then exit;
 
@@ -982,17 +994,9 @@ begin
         if(dx<=0)then continue;
         if(point_dist_int(tx,ty,kpx,kpy)<dx)then
         begin
-           CheckCollisionR:=3;
+           CheckCollisionR:=cbr_cpoint;
            exit;
         end;
-     end;
-
-   if(building)then
-     if(tx<tr)or((map_size-tr)<tx)
-     or(ty<tr)or((map_size-tr)<ty)then
-     begin
-        CheckCollisionR:=5;  // out of bounds
-        exit;
      end;
 
    if(not check_obstacles)then exit;
@@ -1010,21 +1014,19 @@ begin
         if(o_r>0)and(o_type>0)then
          if(point_dist_int(o_x,o_y,tx,ty)<(tr+o_r))then
          begin
-            CheckCollisionR:=4;
+            CheckCollisionR:=cbr_obstacle;
             exit;
          end;
 end;
 
-function CheckInBuildArea(tx,ty,tr:integer;buid,pl:byte):byte;
+function CheckInBuildArea(tx,ty,tr:integer;buid,playerN:byte):TCheckBuildArea;
 var u:integer;
 begin
-   CheckInBuildArea:=0;
-
-   if(pl<=LastPlayer)then
-     with g_gplayers[pl] do
+   if(playerN<=LastPlayer)then
+     with g_gplayers[playerN] do
        if(units_builders_e<=0)then
        begin
-          CheckInBuildArea:=1; // no builders
+          CheckInBuildArea:=cba_noBuilders; // no builders
           exit;
        end;
 
@@ -1032,7 +1034,7 @@ begin
      if(tx<uid_r)or((map_size-uid_r)<tx)
      or(ty<uid_r)or((map_size-uid_r)<ty)then
      begin
-        CheckInBuildArea:=2;  // out of bounds
+        CheckInBuildArea:=cba_outBuildArea;  // out of bounds
         exit;
      end;
 
@@ -1041,54 +1043,45 @@ begin
        if(kpCaptureR>0)and(kpNoBuildR>0)then
          if(point_dist_int(tx,ty,kpx,kpy)<kpNoBuildR)then
          begin
-            CheckInBuildArea:=2;
+            CheckInBuildArea:=cba_NoBuildArea;
             exit;
          end;
 
    tr+=g_uids[buid].uid_r;
 
-   CheckInBuildArea:=2;
+   CheckInBuildArea:=cba_outBuildArea;
 
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
      with uid^ do
-      if(hits>0)and(iscomplete)and(uid_isbuilder)and(not ukfly)and(playeri=pl)then
+      if(hits>0)and(iscomplete)and(uid_isbuilder)and(not ukfly)and(playeri=playerN)then
        if(player^.units_builders_s=0)or(isselected)then
         if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
          if(buid in uid_prod_Buildings)and(IsUnitRange(transportU,nil)=false)then
           if(point_dist_int(x,y,tx,ty)<srange)then
           begin
-             CheckInBuildArea:=0; // inside build area
+             CheckInBuildArea:=cba_inBuildArea; // inside build area
              break;
           end;
 end;
 
-function CheckBuildPlace(tx,ty,tr,uskip:integer;playern,buid:byte):byte;
-var i:byte;
+function CheckBuildPlace(tx,ty,tr,skip_unit:integer;playern,buid:byte):TCheckBuildPlace;
 begin
-   CheckBuildPlace:=0;
-
+   CheckBuildPlace:=cbp_good;
    {
-   0 :  m_brushc:=c_lime;
-   1 :  m_brushc:=c_red;
-   2 :  m_brushc:=c_blue;
-   else m_brushc:=c_gray;
+   cbp_good   : m_brushc:=c_lime;
+   cbp_noplace: m_brushc:=c_red;
+   cbp_out    : m_brushc:=c_blue;
+   else         m_brushc:=c_gray;
    }
-
-   if(playern<=LastPlayer)then
-     if(g_gplayers[playern].state=ps_AI)then
-       if(map_IfObstacleZone(map_GetZone(tx,ty)))then begin CheckBuildPlace:=2;exit;end;
-
-   i:=CheckInBuildArea(tx,ty,0,buid,playern); // 0=inside; 1=outside; 2=no builders
-   case i of
-   0  : ;
-   2  : begin CheckBuildPlace:=2;exit;end;
-   else begin CheckBuildPlace:=3;exit;end;
+   case CheckInBuildArea(tx,ty,0,buid,playern) of
+cba_inBuildArea : with g_uids[buid] do
+                    if(CheckCollisionR(tx,ty,tr+uid_r,skip_unit,uid_isbuilding,uid_isfly,true,false)<>cbr_no)then
+                      CheckBuildPlace:=cbp_noplace;
+cba_NoBuildArea : CheckBuildPlace:=cbp_noplace;
+cba_outBuildArea: CheckBuildPlace:=cbp_out;
+   else           CheckBuildPlace:=cbp_unknown;
    end;
-
-   with g_uids[buid] do
-    i:=CheckCollisionR(tx,ty,tr+uid_r,uskip,uid_isbuilding,uid_isfly,true);
-   if(i>0)then CheckBuildPlace:=1;
 end;
 
 {function unit_ability_SpecReload(pu:PTUnit;ability:byte;newReload:integer):integer;
@@ -1123,7 +1116,7 @@ begin
 
       rld:=fr_fps1;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly, true,pu)>0)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly,true,false,pu)<>cbr_no)then
       begin
          unit_ability_HKeepBlink:=ureq_landplace;
 
@@ -1133,12 +1126,11 @@ begin
       buffs[ub_Cast]:=fr_fps1;
 
       case uidi of
-      UID_HKeep : unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_cube{$ENDIF});   // нет эффекта когда телепортируемся в неразведанную область
-      UID_HAKeep: unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_cube{$ENDIF});
+      UID_HKeep : unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube{$ENDIF});   // нет эффекта когда телепортируемся в неразведанную область
+      UID_HAKeep: unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube{$ENDIF});
       end;
    end;
 end;
-
 
 function unit_ability_HTowerBlink(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
@@ -1164,16 +1156,14 @@ begin
       unit_ability_HTowerBlink:=0;
       if(check)then exit;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly,true,pu )>0)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly,true,false,pu )<>cbr_no)then
       begin
          unit_ability_HTowerBlink:=ureq_landplace;
          rld:=fr_fps1;
          exit;
       end;
 
-      //rld:=hblink_reload;
-      //buffs[ub_Cast]:=fr_fpsh;
-      unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
+      unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
    end;
 end;
 
@@ -1184,8 +1174,8 @@ begin
       if(not Client)then
       begin
          transportU:= 0;
-         a_tar    := 0;
-         a_weap   := 0;
+         a_tar     := 0;
+         a_weap    := 0;
       end;
 
       uo_id    := ua_amove;
@@ -1223,7 +1213,7 @@ begin
       {$IFDEF _FULLGAME}
       wanim    := false;
       anim     := 0;
-      unit_MiniMapXY(pu);
+      unit_UpdateMiniMapXY(pu);
       unit_UpdateFogXY(pu);
       {$ENDIF}
    end;
@@ -1307,7 +1297,7 @@ begin
          hits  := 1;
          energyl_cur-=uid_EnergyReq;
          {$IFDEF _FULLGAME}
-         if(playeri=UIPlayer)then SoundPlayAnoncer(snd_build_place[uid_race],false,false);
+         if(playeri=UIPlayer)then snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
          {$ENDIF}
       end;
 
@@ -1405,7 +1395,7 @@ begin
    unit_start_build:=CheckUnitReqs(@g_gplayers[bp],buid);
    if(unit_start_build=0)then
      with g_gplayers[bp] do
-       if(CheckBuildPlace(bx,by,0,0,bp,buid)=0)
+       if(CheckBuildPlace(bx,by,0,0,bp,buid)=cbp_good)
        then unit_add(bx,by,-1,buid,bp,false,false,0)
        else unit_start_build:=ureq_place;
 end;
@@ -1447,9 +1437,9 @@ begin
          begin
             LastCreatedUnitP^.buffs[ub_Teleport]:=fr_fps1;
             {$IFDEF _FULLGAME}
-            if(SoundPlayUnit(snd_teleport,pu,nil))
+            if(snd_SoundPlayUnit(snd_Teleport,pu,nil))
             then effect_add(LastCreatedUnitP^.vx,
-                            LastCreatedUnitP^.vy,draw_SpriteDepth(LastCreatedUnitP^.vy+1,LastCreatedUnitP^.ukfly),EID_Teleport);
+                            LastCreatedUnitP^.vy,draw_DefaultSpriteDepth(LastCreatedUnitP^.vy+1,LastCreatedUnitP^.ukfly),EID_Teleport);
             {$ENDIF}
          end;
          barrack_out:=true;
@@ -1475,7 +1465,7 @@ begin
       for i:=0 to count do announcer:=barrack_out(pu,_uid,sstep,dir+i*15) or announcer;
 
       if(announcer)
-      then GameLogUnitReady(LastCreatedUnitP);
+      then GameLog_UnitReady(LastCreatedUnitP);
    end;
 end;
 
@@ -1825,7 +1815,7 @@ begin
               begin
                  upgrs_cur[tuid]+=1;
                  unit_ProdStopUpgradeLine(pu,255,i,false);
-                 GameLogUpgradeComplete(playeri,tuid,x,y);
+                 GameLog_UpgradeComplete(playeri,tuid,x,y);
               end
               else pprod_r[i]:=max2i(1,pprod_r[i]-1*(upgrs_cur[upgr_fast_product]+1) );
          end;
@@ -1868,7 +1858,7 @@ begin
 end;
 
 
-procedure unit_detect(uTarget,uDetector:PTUnit;ud:integer);
+procedure unit_detect(uTarget,uDetector:PTUnit;udist:integer);
 var td:integer;
 scan_buff:byte;
 begin
@@ -1880,12 +1870,12 @@ begin
       else
         if(uDetector^.uid^.uid_ability_isradar)and(uDetector^.buffs[ub_Cast]>0)then
         begin
-           td:=point_dist_int(x,y,uDetector^.rpoint_x,uDetector^.rpoint_y);
-           if(td<ud)
+           td:=point_dist_int(x,y,uDetector^.uo_x,uDetector^.uo_y);
+           if(td<udist)
            then scan_buff:=ub_Scaned
-           else td:=ud;
+           else td:=udist;
         end
-        else td:=ud;
+        else td:=udist;
 
       if(td<=(uDetector^.srange+uid^.uid_r))then
         if(buffs[ub_Invis]<=0)then
@@ -1916,7 +1906,7 @@ begin
       if(units_all_e<=0)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
       begin
          isdefeated:=true;
-         GameLogPlayerDefeated(playeri);
+         GameLog_PlayerDefeated(playeri);
          if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
       end;
    end;
@@ -1935,15 +1925,11 @@ begin
            with uid^ do fastdeath:=(fastdeath)or(uid_FastDeathHits>=0)or(uid_isbuilding);
            buffs[ub_Pain]:=fr_fps1; // prevent fast resurrecting
 
-           if(not suicide)then GameLogUnitAttacked(pu);
+           if(not suicide)then GameLog_UnitAttacked(pu);
            {$IFDEF _FULLGAME}
            effect_UnitDeath(pu,fastdeath,nil);
            {$ENDIF}
         end;
-
-        {$IFDEF _FULLGAME}
-        if(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
-        {$ENDIF}
 
         unit_dec_Kcntrs(pu);
 
@@ -2068,9 +2054,9 @@ UID_UMine         : buffs[ub_Invis]:=ub_infinity;
 UID_Phantom,
 UID_LostSoul      : begin
                        tu:=nil;
-                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_CCast]:=fr_fpsh;
+                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_SpecPause]:=fr_fpsh;
                        if(buffs[ub_pain]<=0)then
-                         if(buffs[ub_CCast]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_isfly;
+                         if(buffs[ub_SpecPause]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_isfly;
                        ukfloater:=not ukfly;
                     end;
 //UID_UTransport    : begin level:=min2i(upgrs_cur[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+4*level;end;

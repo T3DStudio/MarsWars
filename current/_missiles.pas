@@ -1,6 +1,6 @@
 {$IFDEF _FULLGAME}
 
-procedure InitMIDDataCL;
+procedure InitClientDataMissiles;
 var m:byte;
 begin
    for m:=0 to 255 do
@@ -58,7 +58,7 @@ MID_YPlasma,
 MID_BPlasma,
 MID_Imp,
 MID_Cacodemon,
-MID_Baron    : mid_snd_death[false]:=snd_pexp;
+MID_Baron    : mid_snd_death[false]:=snd_explode_plasma;
 MID_ArchFire,
 MID_Blizzard,
 MID_Mine,
@@ -66,7 +66,7 @@ MID_Tank,
 MID_Granade,
 MID_HRocket,
 MID_URocket,
-MID_Revenant : mid_snd_death[false]:=snd_exp;
+MID_Revenant : mid_snd_death[false]:=snd_explode;
 MID_Bullet,
 MID_SChaingun,
 MID_Chaingun,
@@ -76,10 +76,10 @@ MID_SSShot   : begin
                mid_snd_DeathSkip[false]:=5;
                end;
 MID_BFG      : begin
-               mid_snd_death[false]:=snd_bfg_exp;
+               mid_snd_death[false]:=snd_explode_bfg;
                mid_eid_target_eff  :=EID_BFG;
                end;
-MID_Flyer    : mid_snd_death[false]:=snd_flyer_a;
+MID_Flyer    : mid_snd_death[false]:=snd_explode_flyer;
       end;
       mid_snd_death [true ]:=mid_snd_death[false];
       mid_eid_death [false]:=m;
@@ -92,10 +92,10 @@ MID_Flyer    : mid_snd_death[false]:=snd_flyer_a;
       // death sound and effect
       case m of
 MID_URocketS : begin
-                  mid_snd_death [true ]:=snd_exp;
+                  mid_snd_death [true ]:=snd_explode;
                   mid_eid_DeathN[true ]:=4;
                   mid_eid_DeathR[true ]:=20;
-                  mid_snd_death [false]:=snd_exp;
+                  mid_snd_death [false]:=snd_explode;
                   mid_eid_DeathN[false]:=4;
                   mid_eid_DeathR[false]:=20;
                end;
@@ -274,7 +274,7 @@ begin
           if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ismech)then // splash m_damage
           begin
              {$IFDEF _FULLGAME}
-             if(mid_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_SpriteDepth(tu^.vy+1,tu^.ukfly),mid_eid_target_eff);
+             if(mid_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_DefaultSpriteDepth(tu^.vy+1,tu^.ukfly),mid_eid_target_eff);
              {$ENDIF}
 
              m_mtars-=1;
@@ -366,7 +366,7 @@ mh_homing   : begin
       else
         if(mid_eid_FlyStep>0)and(mid_eid_FlyTrace>0)then
          if((m_vstep mod mid_eid_FlyStep)=0)then
-           if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then effect_add(m_vx,m_vy,draw_SpriteDepth(m_vy,m_mfs),mid_eid_FlyTrace);
+           if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then effect_add(m_vx,m_vy,draw_DefaultSpriteDepth(m_vy,m_mfs),mid_eid_FlyTrace);
       {$ENDIF};
    end;
 end;

@@ -198,10 +198,10 @@ begin
            color:=c_white;
         end;
 
-        x:=round(map_PlayerStartX[p]*map_mmcx);
-        y:=round(map_PlayerStartY[p]*map_mmcx);
+        x:=round(map_PlayerStartX[p]*map_MiniMap_cx);
+        y:=round(map_PlayerStartY[p]*map_MiniMap_cx);
 
-        map_minimap_KeyPoint(tar,x,y,trunc(base_1r*map_mmcx),pc,color);
+        map_minimap_KeyPoint(tar,x,y,trunc(base_1r*map_MiniMap_cx),pc,color);
      end;
 end;
 
@@ -269,8 +269,8 @@ begin
    ax:=mm3i(1,ax,map_Size);
    ay:=mm3i(1,ay,map_Size);
 
-   mx:=trunc(ax*map_mmcx);
-   my:=trunc(ay*map_mmcx);
+   mx:=trunc(ax*map_MiniMap_cx);
+   my:=trunc(ay*map_MiniMap_cx);
 
    if(not new)then
     for i:=0 to ui_max_alarms do

@@ -98,9 +98,10 @@ begin
    map_Size    := mm3i(map_MinSize,map_Size,map_MaxSize);
    map_hSize   := map_Size div 2;
    {$IFDEF _FULLGAME}
-   map_mmcx    := (ui_CtrlPanelW-2)/map_Size;
-   map_mmvw    := trunc(ui_cam_w*map_mmcx)+1;
-   map_mmvh    := trunc(ui_cam_h*map_mmcx)+1;
+   map_MiniMap_cx    := (ui_CtrlPanelW-2)/map_Size;
+   map_MiniMap_CamW    := trunc(ui_cam_w*map_MiniMap_cx)+1;
+   map_MiniMap_CamH    := trunc(ui_cam_h*map_MiniMap_cx)+1;
+   units_UpdateMiniMapR;
    {$ENDIF}
 end;
 
@@ -278,9 +279,9 @@ begin
           kpCaptureTime:=aCaptureTime;
           kplifetime   :=aLifeTime;
           {$IFDEF _FULLGAME}
-          kpmmx        :=round(kpx*map_mmcx);
-          kpmmy        :=round(kpy*map_mmcx);
-          kpmmr        :=round(kpCaptureR*map_mmcx);
+          kpmmx        :=round(kpx*map_MiniMap_cx);
+          kpmmy        :=round(kpy*map_MiniMap_cx);
+          kpmmr        :=round(kpCaptureR*map_MiniMap_cx);
           {$ENDIF}
           setKeyPoint:=true;
           break;
@@ -331,9 +332,9 @@ mc_KotH     : with g_KeyPoints[0] do
                  kpCaptureTime:=ptime3*fr_fps1;
 
                  {$IFDEF _FULLGAME}
-                 kpmmx:=round(kpx*map_mmcx);
-                 kpmmy:=round(kpy*map_mmcx);
-                 kpmmr:=round(kpCaptureR*map_mmcx)+1;
+                 kpmmx:=round(kpx*map_MiniMap_cx);
+                 kpmmy:=round(kpy*map_MiniMap_cx);
+                 kpmmr:=round(kpCaptureR*map_MiniMap_cx)+1;
                  {$ENDIF}
               end;
 mc_KeyPoints: map_KeyPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0);
@@ -725,9 +726,11 @@ end;
 
 procedure Map_Make;
 begin
+   {$IFDEF _FULLGAME}
    case g_type of //map_MaxPlayers
 gt_none,
 gt_scirmish: begin
+   {$ENDIF}
              map_BaseVars;
 
              map_ObstaclesGap:=40;
@@ -750,14 +753,10 @@ gt_scirmish: begin
              map_PlayersStarts;
              {$IFDEF _FULLGAME}
              map_seed2theme;
-             {$ENDIF}
              end;
-{$IFDEF _FULLGAME}
 gt_campaing: SetThemeCampaing(cmp_sel);
-{$ENDIF}
    end;
 
-   {$IFDEF _FULLGAME}
    map_MakeThemeSprites;
    {$ENDIF}
    map_ReCreateObjects;
