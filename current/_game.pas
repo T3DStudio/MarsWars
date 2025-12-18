@@ -5,7 +5,7 @@ begin
    begin
       PlayerSetAllowedUnits(playerN,[ UID_HKeep         ..UID_HBarracks,
                                       UID_LostSoul      ..UID_ZBFGMarine,
-                                      UID_UCommandCenter..UID_UComputerStation,
+                                      UID_UCommandCenter..UID_URMStation,
                                       UID_Engineer      ..UID_Flyer  ],
                                     MaxUnits,true);
 
@@ -341,7 +341,7 @@ begin
          unit_add(x,y,0,uid,playerN,true,false,0);
          count-=1;
       end;
-      d  :=point_dir(x,y,map_hSize,map_hSize);
+      d  :=point_dir(x,y,map_Sizeh,map_Sizeh);
       ds :=360 div (count+1);
       r  :=50+count*18;
       for i:=0 to count do
@@ -359,7 +359,7 @@ end;
 procedure Game_StartSkirmish;
 var p:byte;
 begin
-   g_royal_r:=trunc(sqrt(sqr(map_hSize)*2));
+   g_royal_r:=trunc(sqrt(sqr(map_Sizeh)*2));
    if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
 
    for p:=0 to LastPlayer do
@@ -385,7 +385,7 @@ begin
                PlayerSetState(p,ps_AI);
             end;
 
-          if(race=r_random)then race:=1+random(r_cnt);
+          if(race=r_random)then race:=1+random(r_count);
 
           if(state=ps_human)then ai_skill:=player_default_ai_level;//g_AISlots
        end;
@@ -397,9 +397,7 @@ begin
           PlayerSetSkirmishTech(p);
           ai_PlayerSetSkirmishSettings(p);
           if(not isobserver)then
-             if(map_generators>0)
-             then GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_abase[race],p,1)
-             else GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],p,0);
+             GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],p,0)
        end;
 
    {$IFDEF _FULLGAME}
@@ -897,7 +895,7 @@ begin
      with g_gplayers[p] do
        if(state<>ps_human)then
        begin
-          race :=random(r_cnt+1);
+          race :=random(r_count+1);
           mrace:=race;
 
           team:=random(6);
@@ -1250,7 +1248,7 @@ begin
          {$ENDIF}
 
          race+=1;
-         if(race>r_cnt)then race:=r_random;
+         if(race>r_count)then race:=r_random;
          mrace:=race;
       end;
 end;
@@ -1332,7 +1330,6 @@ begin
         {$ENDIF}
 
         isobserver:=not isobserver;
-        writeln(PlayerTarget,isobserver);
      end;
 end;
 
@@ -1407,8 +1404,8 @@ begin
    nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,map_MaxGenerators);Map_Make;end;
    nmid_lobby_MSize          : begin
                                   case forward of
-                                  true : ScrollInt(@map_Size, map_SizeMenuStep,map_MinSize,map_MaxSize);
-                                  false: ScrollInt(@map_Size,-map_SizeMenuStep,map_MinSize,map_MaxSize);
+                                  true : ScrollInt(@map_Size1, map_SizeMenuStep,map_MinSize,map_MaxSize);
+                                  false: ScrollInt(@map_Size1,-map_SizeMenuStep,map_MinSize,map_MaxSize);
                                   end;
                                   Map_Make;
                                end;

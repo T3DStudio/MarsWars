@@ -34,9 +34,10 @@ procedure KeyPoints_Clear;   forward;
 procedure GameRemoveAIObservers; forward;
 
 {$IFDEF _FULLGAME}
-procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);  forward;
+procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 procedure ui_EnableControlActs;forward;
+procedure ui_InitControlPanelBTNActions;forward;
 function uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
 procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
@@ -86,7 +87,9 @@ begin
    end;
 end;
 
-function str_AbilityGetHintName(aid,uipos:byte):shortstring;forward;
+function str_AbilityHintName(aid,uipos:byte):shortstring;forward;
+function str_GTick2Time(gtick:cardinal):shortstring;forward;
+function str_SpaceSize(str:shortstring;newSize:byte):shortstring;forward;
 {$ENDIF}
 
 
@@ -534,7 +537,8 @@ begin
      if(state>ps_None)then
      begin
         case amtype of
-0..LastPlayer,
+lmt_chat_player0..
+lmt_chat_player7,
 lmt_chat_common,
 lmt_player_connected,
 lmt_player_leave,
@@ -655,8 +659,8 @@ procedure GameLog_Chat(sender,targets:byte;message:shortstring);
 begin
    if(targets>0)then
      if(sender<=LastPlayer)
-     then PlayersAddToLog(sender,targets,sender         ,0,0,g_gplayers[sender].name+': '+message,0,0)
-     else PlayersAddToLog(sender,targets,lmt_chat_common,0,0,message                             ,0,0);
+     then PlayersAddToLog(sender,targets,lmt_chat_player0+sender,0,0,g_gplayers[sender].name+': '+message,0,0)
+     else PlayersAddToLog(sender,targets,lmt_chat_common        ,0,0,message                             ,0,0);
 end;
 procedure GameLog_Common(sender,targets:byte;message:shortstring);
 begin
@@ -859,7 +863,7 @@ begin
 
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
-   with g_KeyPoints[kpoint] do
+   with map_KeyPointsL[kpoint] do
      if(kpEnergy>0)
      then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kpx,kpy)
      else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kpx,kpy);
@@ -871,7 +875,7 @@ begin
 
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
-   with g_KeyPoints[kpoint] do
+   with map_KeyPointsL[kpoint] do
      if(kpEnergy>0)
      then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kpx,kpy)
      else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kpx,kpy);
@@ -880,7 +884,7 @@ procedure GameLog_KotHControl;
 begin
    if(map_scenario<>mc_KotH)then exit;
 
-   with g_KeyPoints[0] do
+   with map_KeyPointsL[0] do
      PlayersAddToLog(255,255,lmt_koth_control,0,kpTimerOwnerTeam,'',kpx,kpy);
 end;
 procedure GameLog_NgenExh(from_player,kpoint:byte);
@@ -890,7 +894,7 @@ begin
 
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
-   with g_KeyPoints[kpoint] do
+   with map_KeyPointsL[kpoint] do
      PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kpx,kpy);
 end;
 
@@ -1050,7 +1054,7 @@ end;
 function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
    if(map_scenario=mc_royale)
-   then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_hSize,map_hSize)+d)>=g_royal_r
+   then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_Sizeh,map_Sizeh)+d)>=g_royal_r
    else g_CheckRoyalBattlePoint:=false;
 end;
 
@@ -1463,92 +1467,7 @@ end;
 //   COMMON STRING
 //
 
-function str_DateTime:shortstring;
-var YY,MM,DD,H,M,S,MS:word;
-function w2sZ(v,l:word):shortstring;
-begin
-   w2sZ:=w2s(v);
-   if(l>0)then
-     while(length(w2sZ)<l)do
-       insert('0',w2sZ,1);
-end;
-begin
-   DeCodeDate(Date,YY,MM,DD);
-   DeCodeTime(Time,H,M,S,MS);
-   str_DateTime:=w2sZ(YY,4)+'_'+w2sZ(MM,2)+'_'+w2sZ(DD,2)+' '+w2sZ(H,2)+'-'+w2sZ(M,2)+'-'+w2sZ(S,2)+'-'+w2sZ(MS,4);
-end;
 
-function str_Trim(s:shortstring;l:byte):shortstring;
-var n:byte;
-begin
-   if(length(s)>l)then
-   begin
-      setlength(s,l);
-      n:=0;
-      while(l>0)and(n<3)do
-      begin
-         s[l]:='.';
-         l-=1;
-         n+=1;
-      end;
-   end;
-   str_Trim:=s;
-end;
-
-function str_CutLast(s:shortstring;l:byte):shortstring;
-var t:byte;
-begin
-   t:=length(s);
-   if(t<=l)
-   then str_CutLast:=s
-   else str_CutLast:=copy(s,t-l+1,l);
-end;
-
-function str_GTick2Time(gtick:cardinal):shortstring;
-var
-s , m, h: cardinal;
-ss,sm,sh:shortstring;
-begin
-   s:=gtick div fr_fps1;
-   m:=s div 60;
-   s:=s mod 60;
-   h:=m div 60;
-   m:=m mod 60;
-
-   str_GTick2Time:='';
-   if(h>0)then
-   begin
-      if(h<10)then sh:='0'+c2s(h) else sh:=c2s(h);
-      str_GTick2Time:=sh+':';
-   end;
-   if(m<10)then sm:='0'+c2s(m) else sm:=c2s(m);
-   if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
-   str_GTick2Time+=sm+':'+ss;
-end;
-
-function str_SpaceSize(str:shortstring;newSize:byte):shortstring;
-var l,i:byte;
-begin
-   str_SpaceSize:=str;
-   l:=0;
-   i:=length(str_SpaceSize);
-   while(i>0)do
-   begin
-      if not(str_SpaceSize[i] in tc_SpecChars)then l+=1;
-      i-=1;
-   end;
-   if(newSize>l)then
-   begin
-      while(l<newSize)do
-      begin
-         l+=1;
-         str_SpaceSize+=' ';
-      end;
-   end
-   else
-     if(newSize<l)then
-       setlength(str_SpaceSize,newSize);
-end;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1815,7 +1734,7 @@ begin
    true : GetKeyPointColor:=PlayerColorDefaultShadow;
    end;
    if(keyPoint>LastKeyPoint)then exit;
-   with g_KeyPoints[keyPoint] do
+   with map_KeyPointsL[keyPoint] do
      if(kpCaptureR>0)then
        if(kpTimer>0)and(ui_blink3=0)
        then GetKeyPointColor:=PlayerGetColor(kpTimerOwnerPlayer,shadow)
@@ -1998,8 +1917,8 @@ by0,by1:integer;
 begin
    bx0:=0;
    by0:=0;
-   bx1:=map_Size-ui_cam_w;
-   by1:=map_Size-ui_cam_h;
+   bx1:=map_Size1-ui_cam_w;
+   by1:=map_Size1-ui_cam_h;
    case ui_ControlPanelPos of
    cpp_left  : bx0-=ui_UIPanelW;
    cpp_right : bx1+=ui_UIPanelW;
@@ -2094,7 +2013,7 @@ begin
        case lm_data_t of
        lmt_argt_unit   : with g_uids [lm_data_u] do ParseLogMessage+=' ('+uid_str_name +')';
        lmt_argt_upgrade: with g_upids[lm_data_u] do ParseLogMessage+=' ('+upgr_str_Name+')';
-       lmt_argt_ability: ParseLogMessage+=' ('+str_AbilityGetHintName(lm_data_u,255)+')';
+       lmt_argt_ability: ParseLogMessage+=' ('+str_AbilityHintName(lm_data_u,255)+')';
        end;
 end;
 
@@ -2103,10 +2022,11 @@ begin
    mcolor^:=c_white;
    with ptlog^ do
      case lm_type of
-0..LastPlayer         : if(length(lm_string)>0)then
+lmt_chat_player0..
+lmt_chat_player7      : if(length(lm_string)>0)then
                         begin
                            //lm_type = sender
-                           mcolor^:=PlayerGetColor(lm_type,false);
+                           mcolor^:=PlayerGetColor(lm_type-lmt_chat_player0,false);
                            ParseLogMessage:=lm_string;
                         end;
 lmt_chat_common       : ParseLogMessage:=lm_string;
@@ -2384,7 +2304,7 @@ begin
    BlockRead(f,vcard ,sizeof(map_seed      ));   strInfoVar1^+=' '+str_map_Seed      +': '+c2s(vcard)+tc_nl2;
 
    vint:=-1;
-   BlockRead(f,vint  ,sizeof(map_Size      ));
+   BlockRead(f,vint  ,sizeof(map_Size1     ));
    if(vint<map_MinSize)or(map_MaxSize<vint )then exit
                                             else strInfoVar1^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl2;
    vbyte1:=255;
@@ -2393,7 +2313,7 @@ begin
                                             else strInfoVar1^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
 
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar1^+=' '+str_map_Symmetry  +': '+b2cc[vbyte1>0]+tc_nl2;
+   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar1^+=' '+str_map_Symmetry  +': '+str_YesNoC[vbyte1>0]+tc_nl2;
 
    vint:=-1;
    BlockRead(f,vint  ,sizeof(theme_i       ));

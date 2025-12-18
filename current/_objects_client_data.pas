@@ -644,14 +644,6 @@ begin
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
    setEffectSND (  nil,snd_explode ,snd_explode ,nil);
 end;
-UID_APC:
-begin
-   uid_AnimStepWalk:=17;
-   setMWSModel(0,@spr_APC);
-   setCommandSND(snd_APC_ready,snd_APC_move,snd_APC_move,snd_APC_move,snd_APC_move);
-   setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (  nil,snd_explode ,snd_explode ,nil);
-end;
 UID_UACDron:
 begin
    setMWSModel(0,@spr_UACBot);
@@ -798,16 +790,6 @@ begin
    setMWSModel(0,@spr_UNuclearPlant);
    setBuildingSND(snd_uac_nucl);
 end;
-UID_UMine:
-begin
-   setMWSModel   (0,@spr_Mine);
-   setBuildingSND(snd_uac_mine);
-   uid_snd_ready:=snd_uac_mine;
-   setWeaponESND(0,nil,snd_repairing,0,0);
-   setEffectEID(0,0  ,EID_Exp,EID_Exp,0  );
-   setEffectSND(  nil,snd_explode,snd_explode,nil);
-   uid_eid_bcrater:=255;
-end;
 
 UID_UBaseMil:
 begin
@@ -926,7 +908,7 @@ end;
                            setEffectEID2(1,uid2spr(UID_UBarracks       ,0,1));
 
    // ui panel
-   for r:=1 to r_cnt do
+   for r:=1 to r_count do
    begin
       i:=0;
       for u:=0 to 255 do
@@ -973,7 +955,7 @@ upgr_uac_BioArmor       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,1 ]; end;
 upgr_uac_BuildArmor     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,2 ]; end;
 upgr_uac_RepairTools    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,3 ]; end;
 upgr_uac_BioSpeed       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,4 ]; end;
-upgr_uac_ssgup          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,14]; end;
+upgr_uac_SSMWeapon          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,14]; end;
 upgr_uac_BuilderR       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,11]; end;
 upgr_uac_CCFly          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,9 ]; end;
 upgr_uac_CCAttack       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,10]; end;

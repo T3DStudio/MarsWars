@@ -66,21 +66,21 @@ begin
       or(hits<=0)
       or(damage<=0)
       then exit;
-      damage:=1;
+      //damage:=1;
 
       armor:=0;
 
       if(iscomplete)and(not IgnoreArmor)then
       begin
          with player^ do
-           if(uid_isbuilding)
-           then armor+=integer(upgrs_cur[uid_upgr_Armor]+upgrs_cur[upgr_race_armor_build[uid_race]])*UpgradeBuildArmorBonus
-           else
-             if(uid_ismech)
-             then armor+=integer(upgrs_cur[uid_upgr_Armor]+upgrs_cur[upgr_race_armor_mech[uid_race]])*UpgradeUnitArmorBonus
-             else armor+=integer(upgrs_cur[uid_upgr_Armor]+upgrs_cur[upgr_race_armor_bio [uid_race]])*UpgradeUnitArmorBonus;
+         begin
+            if(uid_Armor_upgr1>0)then armor+=integer(upgrs_cur[uid_Armor_upgr1])*uid_Armor_upgrV;
+            if(uid_Armor_upgr2>0)then armor+=integer(upgrs_cur[uid_Armor_upgr2])*uid_Armor_upgrV;
+         end;
 
          if(level>0)and(not uid_isbuilding)then armor+=level*uid_LevelBonusArmor;
+
+        // writeln(damage,' ',armor);
 
          damage-=armor;
       end;
@@ -102,18 +102,19 @@ begin
            if(buffs[ub_Pain]<=0)then exit;
 
          if(not uid_isbuilding)and(not uid_ismech)then
-           if(uid_PainC>0)then
+           if(uid_Pain>0)then
            begin
               if(pains>0)then pains-=1;
               if(pains=0)then
               begin
-                 pains:=uid_PainC;
+                 pains:=uid_Pain;
 
                  buffs[ub_Pain]:=max2i(pain_time,a_rld);
 
                  with player^ do
-                   if(uid_race=r_hell)then
-                     if(upgrs_cur[upgr_hell_PainFactor]>0)then pains+=uid_PainCUpgrStep*upgrs_cur[upgr_hell_PainFactor];
+                   if(uid_PainState_upgr>0)then
+                     pains+=integer(upgrs_cur[uid_PainState_upgr])*uid_PainState_upgrV;
+
                  if(level>0)then pains+=level*2;
 
                  {$IFDEF _FULLGAME}
@@ -382,11 +383,9 @@ begin
           else
           begin
              with uid^ do
-              if(not uid_isbuilding)then
                with player^ do
-                if(uid_ismech)
-                then ss+=upgrs_cur[upgr_race_mspeed_mech[uid_race]]*2
-                else ss+=upgrs_cur[upgr_race_mspeed_bio [uid_race]]*2;
+                 if(uid_MSpeed_Upgr>0)then
+                   ss+=integer(upgrs_cur[uid_MSpeed_Upgr])*uid_MSpeed_UpgrV;
 
              if(mdist>70)
              then mdist:=8+g_random(25)
@@ -720,14 +719,14 @@ UID_HKeep     : if(udist<srange)
    end;
 end;
 
-procedure unit_CaptureKPoint(pu:PTUnit);
+procedure unit_CaptureKeyPoint(pu:PTUnit);
 var kpi:byte;
 begin
    with pu^ do
      for kpi:=0 to LastKeyPoint do
-       with g_KeyPoints[kpi] do
+       with map_KeyPointsL[kpi] do
          if(kpCaptureR>0)then
-           if(point_dist_int(x,y,kpx,kpy)<=kpCaptureR)then
+           if(point_dist_int(x,y,kpx,kpy)<=(kpCaptureR+uid^.uid_r))then
            begin
               kpUnitsPlayer[playeri     ]+=uid^.uid_LimitUse;
               kpUnitsTeam  [player^.team]+=uid^.uid_LimitUse;
@@ -1304,7 +1303,7 @@ wpt_directdmgZ : if(not fakemissile)and(aw_object_count>0)then
                      unit_damage(pTarget,damage,playeri,false);
                   end;
 wpt_unit       : if(not fakemissile)then unit_ArmSpawnUnit(pAttacker,aw_object_id);
-wpt_suicide    : if(ServerSide)then unit_kill(pAttacker,false,true,true,false,true);
+//wpt_suicide    : if(ServerSide)then unit_kill(pAttacker,false,true,true,false,true);
             else
               if(ServerSide)and(not fakemissile)then
                 case aw_type of
@@ -1403,8 +1402,8 @@ begin
          rpoint_x:=ptar^.vx;
          rpoint_y:=ptar^.vy;
       end;
-      rpoint_x:=mm3i(1,rpoint_x,map_Size);
-      rpoint_y:=mm3i(1,rpoint_y,map_Size);
+      rpoint_x:=mm3i(1,rpoint_x,map_Size1);
+      rpoint_y:=mm3i(1,rpoint_y,map_Size1);
    end;
 end;
 
@@ -1572,8 +1571,8 @@ begin
          unit_DefaultUOMove:=(x=uo_x)and(y=uo_y);
       end;
 
-      uo_x:=mm3i(1,uo_x,map_Size);
-      uo_y:=mm3i(1,uo_y,map_Size);
+      uo_x:=mm3i(1,uo_x,map_Size1);
+      uo_y:=mm3i(1,uo_y,map_Size1);
       move_x:=uo_x;
       move_y:=uo_y;
    end;
@@ -1921,6 +1920,7 @@ begin
 end;
 
 procedure unit_BehaviorSpecial(pu:PTUnit);
+var tu:PTUnit;
 begin
    with pu^ do
    with uid^ do
@@ -1946,7 +1946,7 @@ begin
                                       ukfly:=uf_fly;
                                       if(ServerSide)then zfall:=zfall-fly_hz;
                                    end;
-                                   speed:=uid_BaseSpeed;
+                                   speed:=uid_MSpeed_Base;
                                 end
                                 else
                                 begin
@@ -1969,6 +1969,21 @@ begin
                                         GameLog_ReqBits(playeri,uid_ability1,lmt_argt_ability,ureq_landplace,x,y);
                                      end;
                                 end;
+
+      UID_Phantom,
+      UID_LostSoul          : if(not iscomplete)then
+                              begin
+                                 ukfly:=uid_isfly;
+                                 ukfloater:=false;
+                              end
+                              else
+                              begin
+                                 tu:=nil;
+                                 if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_SpecPause]:=fr_fpsh;
+                                 if(buffs[ub_pain]<=0)then
+                                   if(buffs[ub_SpecPause]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_isfly;
+                                 ukfloater:=not ukfly;
+                              end
       end;
    end;
 end;
@@ -2035,14 +2050,9 @@ begin
              if(cycle_order=g_cycle_regen)then
                if(hits<uid_MaxHits1)then
                begin
-                  i:=upgrs_cur[uid_upgr_Regen];
-                  if(uid_isbuilding)
-                  then i+=upgrs_cur[upgr_race_regen_build[uid_race]]
-                  else
-                    if(uid_ismech)
-                    then i+=upgrs_cur[upgr_race_regen_mech[uid_race]]
-                    else i+=upgrs_cur[upgr_race_regen_bio [uid_race]];
-                  i:=(i*BaseRegen1)+uid_BaseRegen;
+                  i:=uid_Regen_Base;
+                  if(uid_Regen_upgr>0)then
+                    i+=integer(upgrs_cur[uid_Regen_upgr])*BaseRegen1;
 
                   if(i>0)then
                   begin
@@ -2052,7 +2062,7 @@ begin
                end;
           end;
 
-          unit_CaptureKPoint(pu);
+          unit_CaptureKeyPoint(pu);
 
           if(cycle_order=g_cycle_order)then
           begin
@@ -2060,7 +2070,7 @@ begin
              u_royal_d :=NOTSET;
              if(map_scenario=mc_royale)then
              begin
-                u_royal_cd:=point_dist_int(x,y,map_hSize,map_hSize);
+                u_royal_cd:=point_dist_int(x,y,map_Sizeh,map_Sizeh);
                 u_royal_d :=g_royal_r-u_royal_cd;
                 if(u_royal_d<uid_missileR)then
                 begin
@@ -2100,7 +2110,8 @@ begin
 
            if(hits>0)then
            begin
-              unit_Bonuses(pu);
+              if(cycle_order=g_cycle_order)then
+                unit_Bonuses(pu);
               unit_BehaviorBase(pu);
            end
            else unit_death(pu);

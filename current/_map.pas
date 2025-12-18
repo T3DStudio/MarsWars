@@ -95,12 +95,12 @@ procedure map_BaseVars;
 begin
    map_Seed2RandomBase;
 
-   map_Size    := mm3i(map_MinSize,map_Size,map_MaxSize);
-   map_hSize   := map_Size div 2;
+   map_Size1       := mm3i(map_MinSize,map_Size1,map_MaxSize);
+   map_Sizeh       := map_Size1 div 2;
    {$IFDEF _FULLGAME}
-   map_MiniMap_cx    := (ui_CtrlPanelW-2)/map_Size;
-   map_MiniMap_CamW    := trunc(ui_cam_w*map_MiniMap_cx)+1;
-   map_MiniMap_CamH    := trunc(ui_cam_h*map_MiniMap_cx)+1;
+   map_MiniMap_cx  := (ui_CtrlPanelW-1)/map_Size1;
+   map_MiniMap_CamW:= trunc(ui_cam_w*map_MiniMap_cx)+1;
+   map_MiniMap_CamH:= trunc(ui_cam_h*map_MiniMap_cx)+1;
    units_UpdateMiniMapR;
    {$ENDIF}
 end;
@@ -138,14 +138,14 @@ end;
 
 function IfInMapRect(tx,ty,sideBorder:integer):boolean;
 begin
-   IfInMapRect:=(sideBorder<tx)and(tx<(map_size-sideBorder))
-             and(sideBorder<ty)and(ty<(map_size-sideBorder));
+   IfInMapRect:=(sideBorder<tx)and(tx<(map_Size1-sideBorder))
+             and(sideBorder<ty)and(ty<(map_Size1-sideBorder));
 end;
 
-function map_IfPlayerStartHere(x,y,m:integer;check_symmetry:boolean):boolean;
+function map_IfPlayerStartHere(x,y,gap:integer):boolean;
 var p:byte;
 begin
-   if(m<=0)then
+   if(gap<=0)then
    begin
       map_IfPlayerStartHere:=true;
       exit;
@@ -153,8 +153,8 @@ begin
    if(not IfInMapRect(x,y,-base_1r))then exit;
    map_IfPlayerStartHere:=false;
 
-   if(check_symmetry)then
-     if(point_dist_int(x,y,map_Size-x,map_Size-y)<m)then
+   if(map_symmetry)then
+     if(point_dist_int(x,y,map_Size1-x,map_Size1-y)<gap)then
      begin
         map_IfPlayerStartHere:=true;
         exit;
@@ -162,84 +162,82 @@ begin
 
    for p:=0 to LastPlayer do
      if(IfInMapRect(map_PlayerStartX[p],map_PlayerStartY[p],-base_1r))then
-       if(point_dist_int(x,y,map_PlayerStartX[p],map_PlayerStartY[p])<m)then
+       if(point_dist_int(x,y,map_PlayerStartX[p],map_PlayerStartY[p])<gap)then
        begin
           map_IfPlayerStartHere:=true;
           break;
        end;
 end;
 
-function map_IfKeyPointHere(x,y,m:integer;check_symmetry:boolean):boolean;
+function map_IfKeyPointHere(x,y,gap:integer):boolean;
 var p:byte;
 begin
-   if(m<=0)then
+   if(gap<=0)then
    begin
       map_IfKeyPointHere:=true;
       exit;
    end;
    map_IfKeyPointHere:=false;
 
-   if(check_symmetry)then
-     if(point_dist_int(x,y,map_Size-x,map_Size-y)<(m*2))then
+   if(map_symmetry)then
+     if(point_dist_int(x,y,map_Size1-x,map_Size1-y)<(gap*2))then
      begin
         map_IfKeyPointHere:=true;
         exit;
      end;
 
    for p:=0 to LastKeyPoint do
-     with g_KeyPoints[p] do
+     with map_KeyPointsL[p] do
        if(kpCaptureR>0)then
-         if(point_dist_int(x,y,kpx,kpy)<(m+max2i(kpSolidr,kpCaptureR)))then
+         if(point_dist_int(x,y,kpx,kpy)<(gap+max2i(kpSolidr,kpCaptureR)))then
          begin
             map_IfKeyPointHere:=true;
             break;
          end;
 end;
 
-function map_IfObstacleHere(td:byte;ix,iy:integer):boolean;
+function map_IfObstacleHere(did:byte;ix,iy:integer):boolean;
 var d:integer;
 begin
    map_IfObstacleHere:=false;
 
    with map_ObstaclesL[0] do
-     if(map_Symmetry)then
+     if(map_symmetry)then
      begin
-        o_type:=td;
-        o_r:=DID_R[td];
-        o_x:=map_Size-ix;
-        o_y:=map_Size-iy;
+        o_type:=did;
+        o_r   :=DID_R[did];
+        o_x   :=map_Size1-ix;
+        o_y   :=map_Size1-iy;
      end
      else
      begin
         o_type:=0;
-        o_x:=-32000;
-        o_y:=-32000;
+        o_x   :=o_x.MinValue;
+        o_y   :=o_y.MinValue;
      end;
 
    for d:=0 to map_ObstaclesN do
      with map_ObstaclesL[d] do
        if(o_type>0)then
-         if(point_dist_int(o_x,o_y,ix,iy)<(DID_R[o_type]+DID_R[td]+map_ObstaclesGap))then         //_dec_min_r(o_type,td)
+         if(point_dist_int(o_x,o_y,ix,iy)<(DID_R[o_type]+DID_R[did]+map_ObstaclesGap))then
          begin
             map_IfObstacleHere:=true;
             break;
          end;
+
+   with map_ObstaclesL[0] do
+   begin
+      o_type:=0;
+      o_x   :=o_x.MinValue;
+      o_y   :=o_y.MinValue;
+   end;
 end;
 
-function map_IfSomethingHere(di:byte;ix,iy,doodad_r:integer):boolean;
+function map_IfSomethingHere(did:byte;ix,iy,doodad_r:integer):boolean;
 begin
-   map_IfSomethingHere:=false;
-   if(map_IfObstacleHere(di,ix,iy))
-   or(map_IfPlayerStartHere(ix,iy,doodad_r,false))
-   then map_IfSomethingHere:=true
-   else
-     if(map_Symmetry)then
-     begin
-        ix:=map_Size-ix;
-        iy:=map_Size-iy;
-        if(map_IfObstacleHere(di,ix,iy))
-        or(map_IfPlayerStartHere(ix,iy,doodad_r,false))then map_IfSomethingHere:=true;
-     end;
+   map_IfSomethingHere:=(map_IfObstacleHere(did,ix,iy))
+                      or(map_IfPlayerStartHere(ix,iy,doodad_r));
+
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,27 +249,21 @@ procedure map_KeyPoints_UpdateZone;
 var pn:integer;
 begin
    for pn:=0 to LastKeyPoint do
-     with g_KeyPoints[pn] do
+     with map_KeyPointsL[pn] do
        if(kpCaptureR>0)then kpzone:=map_GetZone(kpx,kpy,kpCaptureR);
 end;
 
-procedure map_KeyPoints_Default(acount,aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
-const max_attempts = 500;
-var
-ix,iy,
-u,b,
-attempts:integer;
-function setKeyPoint(px,py:integer):boolean;
-var pn:byte;
+function map_KeyPoints_Add(akpx,akpy,aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal):boolean;
+var kp:integer;
 begin
-   setKeyPoint:=false;
-   for pn:=0 to LastKeyPoint do
-     with g_KeyPoints[pn] do
+   map_KeyPoints_Add:=false;
+   for kp:=0 to LastKeyPoint do
+     with map_KeyPointsL[kp] do
        if(kpCaptureR<=0)then
        begin
-          kpx          :=px;
-          kpy          :=py;
-          kpToCenterD  :=point_dist_int(kpx,kpy,map_hSize,map_hSize);
+          kpx          :=akpx;
+          kpy          :=akpy;
+          kpToCenterD  :=point_dist_int(kpx,kpy,map_Sizeh,map_Sizeh);
           kpSolidr     :=aSolidR;
           kpNoBuildR   :=aNoBuildR;
           kpEnergy     :=aEnergy;
@@ -283,13 +275,21 @@ begin
           kpmmy        :=round(kpy*map_MiniMap_cx);
           kpmmr        :=round(kpCaptureR*map_MiniMap_cx);
           {$ENDIF}
-          setKeyPoint:=true;
+          map_KeyPoints_Add:=true;
+          map_KeyPointsN+=1;
           break;
        end;
 end;
+
+procedure map_KeyPoints_Random(acount,aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+const max_attempts = 500;
+var
+ix,iy,
+u,b,
+attempts:integer;
 begin
-   u:=map_Size div 50;
-   b:=map_Size-(u*2);
+   u:=map_Size1 div 50;
+   b:=map_Size1-(u*2);
 
    while(acount>0)do
    begin
@@ -304,44 +304,51 @@ begin
          ix:=u+g_random(b);
          iy:=u+g_random(b);
 
-         if(map_IfPlayerStartHere(ix,iy,base_1rh,map_Symmetry))
-         or(map_IfKeyPointHere   (ix,iy,base_1rh,map_Symmetry))then continue;
+         if(map_IfPlayerStartHere(ix,iy,base_1rh))
+         or(map_IfKeyPointHere   (ix,iy,base_1rh))then continue;
 
+         if(not map_KeyPoints_Add(ix,iy,aSolidR,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
          if(map_Symmetry)then
-           if(map_IfPlayerStartHere(map_Size-ix,map_Size-iy,base_1rh,map_Symmetry))
-           or(map_IfKeyPointHere   (map_Size-ix,map_Size-iy,base_1rh,map_Symmetry))then continue;
-
-         if(not setKeyPoint(ix,iy))then exit;
-         if(map_Symmetry)then
-           setKeyPoint(map_Size-ix,map_Size-iy);
+           if(not map_KeyPoints_Add(map_Size1-ix,map_Size1-iy,aSolidR,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
          break;
       end;
    end;
 end;
 
-procedure map_KeyPoints;
+procedure map_KeyPoints_AddAtStarts(aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+var   p:byte;
+r,sx,sy:integer;
+begin
+   r:=round((aCaptureR+g_uids[uid_race_start_fbase[r_uac]].uid_r)/1.74);
+   for p:=0 to LastPlayer do
+     if(p<map_MaxPlayers)then
+     begin
+        sx:=sign(map_Sizeh-map_PlayerStartX[p]);
+        sy:=sign(map_Sizeh-map_PlayerStartY[p]);
+        if(sx=0)and(sy=0)then
+        begin
+           sx:=1;
+           sy:=1;
+        end;
+        map_KeyPoints_Add(map_PlayerStartX[p]+r*sx,
+                          map_PlayerStartY[p]+r*sy,aSolidR,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+     end;
+end;
+
+procedure map_KeyPoints_Create;
 begin
    KeyPoints_Clear;
 
    case map_scenario of
-mc_KotH     : with g_KeyPoints[0] do
-              begin
-                 kpx:=map_hSize;
-                 kpy:=map_hSize;
-                 kpCaptureR   :=base_1r;
-                 kpCaptureTime:=ptime3*fr_fps1;
-
-                 {$IFDEF _FULLGAME}
-                 kpmmx:=round(kpx*map_MiniMap_cx);
-                 kpmmy:=round(kpy*map_MiniMap_cx);
-                 kpmmr:=round(kpCaptureR*map_MiniMap_cx)+1;
-                 {$ENDIF}
-              end;
-mc_KeyPoints: map_KeyPoints_Default(4,0,gm_cptp_r,base_1r,0,gm_cptp_time,0);
+mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,0,base_1r,0,0,keyPoint_CaptTime_KotH,0);
+mc_KeyPoints: map_KeyPoints_Random(4,0,keyPoint_r,base_1r,0,keyPoint_CaptTime_Def,0);
    end;
 
    if(map_generators>0)then
-     map_KeyPoints_Default(MaxKeyPoints-byte(map_scenario=mc_KotH),50,gm_cptp_gr,gm_cptp_gr-25,map_generators_Energy,gm_cptp_gtime,map_generators_LifeTime[map_generators]);
+   begin
+      map_KeyPoints_AddAtStarts(50,keyPoint_SolidR,keyPoint_SolidR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),50,keyPoint_SolidR,keyPoint_SolidR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+   end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -420,15 +427,15 @@ begin
       adir+=astep;
       if(p=pInCenter)then continue;
       project2rect(@map_PlayerStartX[p],@map_PlayerStartY[p],adir,cr);
-      map_PlayerStartX[p]+=map_hSize;
-      map_PlayerStartY[p]+=map_hSize;
+      map_PlayerStartX[p]+=map_Sizeh;
+      map_PlayerStartY[p]+=map_Sizeh;
    end;
    if(pInCenter>LastPlayer)then exit;
    map_PlayerStartX[pInCenter]:=cx;
    map_PlayerStartY[pInCenter]:=cy;
 end;
 
-procedure map_Starts_Default;
+procedure map_Starts_Random;
 const max_attempts = 500;
 var
 p,ph   : byte;
@@ -440,9 +447,9 @@ begin
    if(map_MaxPlayers=0)then exit;
    ph:=(map_MaxPlayers div 2)+(map_MaxPlayers mod 2);
 
-   bb0:=base_1r+(map_Size-map_MinSize) div 7;
-   bb1:=map_Size-(bb0*2);
-   gap:=(map_Size div 5)+base_1r;
+   bb0:=base_1r+(map_Size1-map_MinSize) div 7;
+   bb1:=map_Size1-(bb0*2);
+   gap:=(map_Size1 div 5)+base_1r;
 
    for p:=0 to map_MaxPlayers-1 do
    begin
@@ -455,15 +462,15 @@ begin
          attempts+=1;
 
          if(attempts>max_attempts)
-         or(not map_IfPlayerStartHere(ix,iy,gap,map_Symmetry))then break;
+         or(not map_IfPlayerStartHere(ix,iy,gap))then break;
       end;
 
       map_PlayerStartX[p]:=ix;
       map_PlayerStartY[p]:=iy;
       if(map_Symmetry)then
       begin
-         map_PlayerStartX[p+ph]:=map_Size-map_PlayerStartX[p];
-         map_PlayerStartY[p+ph]:=map_Size-map_PlayerStartY[p];
+         map_PlayerStartX[p+ph]:=map_Size1-map_PlayerStartX[p];
+         map_PlayerStartY[p+ph]:=map_Size1-map_PlayerStartY[p];
       end;
    end;
 
@@ -473,7 +480,7 @@ begin
        if(point_dist_int(map_PlayerStartX[ix],map_PlayerStartY[ix],
                          map_PlayerStartX[iy],map_PlayerStartY[iy])<base_3r)then
        begin
-          map_Starts_Rect(map_hSize,map_hSize,map_size div 3,integer(map_seed mod 360),map_seed mod (MaxPlayers*2));
+          map_Starts_Rect(map_Sizeh,map_Sizeh,map_Size1 div 3,integer(map_seed mod 360),map_seed mod (MaxPlayers*2));
           exit;
        end;
 end;
@@ -526,12 +533,12 @@ begin
 mc_1x1,
 mc_2x2,
 mc_3x3,
-mc_4x4    : map_Starts_Teams(map_hSize,map_hSize,map_size div 3,map_dir,2);
-mc_2x2x2  : map_Starts_Teams(map_hSize,map_hSize,map_size div 3,map_dir,3);
-mc_2x2x2x2: map_Starts_Teams(map_hSize,map_hSize,map_size div 3,map_dir,4);
-mc_KotH   : map_Starts_Circle(map_hSize,map_hSize,integer(map_seed),map_hSize-(map_Size div 8));
-mc_royale : map_Starts_Circle(map_hSize,map_hSize,integer(map_seed),map_hSize-(map_Size div 5));
-   else     map_Starts_Default;
+mc_4x4    : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,2);
+mc_2x2x2  : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,3);
+mc_2x2x2x2: map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,4);
+mc_KotH   : map_Starts_Circle(map_Sizeh,map_Sizeh,integer(map_seed),map_Sizeh-(map_Size1 div 8));
+mc_royale : map_Starts_Circle(map_Sizeh,map_Sizeh,integer(map_seed),map_Sizeh-(map_Size1 div 5));
+   else     map_Starts_Random;
    end;
 
 end;
@@ -545,18 +552,18 @@ end;
 function map_TryAddObstacle(di:byte;ix,iy:integer;obstacleGapR:integer):boolean;
 begin
    map_TryAddObstacle:=false;
-   if (map_ObstaclesGap<(ix-DID_R[di]))and((ix+DID_R[di])<(map_size-map_ObstaclesGap))
-   and(map_ObstaclesGap<(iy-DID_R[di]))and((iy+DID_R[di])<(map_size-map_ObstaclesGap))then
+   if (map_ObstaclesGap<(ix-DID_R[di]))and((ix+DID_R[di])<(map_Size1-map_ObstaclesGap))
+   and(map_ObstaclesGap<(iy-DID_R[di]))and((iy+DID_R[di])<(map_Size1-map_ObstaclesGap))then
      if(not map_IfSomethingHere(di,ix,iy,obstacleGapR+DID_R[di]))then
      begin
         map_addObstacle(ix,iy,di);
-        if(map_Symmetry)then
-          map_addObstacle(map_Size-ix,map_Size-iy,di);
+        if(map_symmetry)then
+          map_addObstacle(map_Size1-ix,map_Size1-iy,di);
         map_TryAddObstacle:=true;
      end;
 end;
 
-function map_PickAndAddObstacle(ix,iy:integer;lqs,rks:pinteger;obstacleGapR:integer):boolean;
+function map_PickAndAddObstacle(ix,iy:integer;n_liquids,n_rocks:pinteger;obstacleGapR:integer):boolean;
 var di:byte;
 begin
    map_PickAndAddObstacle:=false;
@@ -565,24 +572,24 @@ begin
      DID_LiquidR1,
      DID_LiquidR2,
      DID_LiquidR3,
-     DID_LiquidR4: if(lqs^<=0)
+     DID_LiquidR4: if(n_liquids^<=0)
                    then continue
                    else
                      if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
                      begin
                         map_PickAndAddObstacle:=true;
-                        lqs^-=1;
+                        n_liquids^-=1;
                         break;
                      end
                      else continue;
      DID_SRock,
-     DID_BRock   : if(rks^<=0)
+     DID_BRock   : if(n_rocks^<=0)
                    then continue
                    else
                      if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
                      begin
                         map_PickAndAddObstacle:=true;
-                        rks^-=1;
+                        n_rocks^-=1;
                         break;
                      end
                      else continue;
@@ -641,7 +648,7 @@ begin
    end;
 end; }
 
-procedure map_ReCreateObjects;
+procedure map_Obstacles_Create;
 const attempts_max = 200;
 var
 i,ir,
@@ -651,6 +658,7 @@ n_rocks,
 n_obstacles,
 attempts:integer;
 begin
+   // clear
    map_ObstaclesN:=0;
    FillChar(map_ObstaclesL,SizeOf(map_ObstaclesL),0);
    for ix:=0 to MapObstaclesGridN do
@@ -661,7 +669,8 @@ begin
         setlength(oc_l,oc_n);
      end;
 
-   n_obstacles:=trunc(MaxObstacles*((sqr(map_Size) div ddc_div)/ddc_cf))+1;
+   // create
+   n_obstacles:=trunc(MaxObstacles*((sqr(map_Size1) div ddc_div)/ddc_cf))+1;
 
    if(map_Symmetry)
    then n_obstacles:=mm3i(1,round(n_obstacles/2),MaxObstacles)
@@ -670,12 +679,12 @@ begin
    n_rocks  :=0;
    n_liquids:=0;
 
-   i  :=(n_obstacles div 11);
+   i  :=(n_obstacles div (map_MaxObstacles+2));
    ix :=i*map_ObstaclesF;
    n_liquids:=ix div 4;
    n_rocks  :=ix-n_liquids;
 
-   ir :=base_1r+(map_Size div 100);
+   ir :=base_1r+(map_Size1 div 100);
    ix :=map_seed;
    iy :=0;
 
@@ -685,8 +694,8 @@ begin
       attempts:=0;
       while true do
       begin
-         ix:=g_randomx(ix,map_Size);
-         iy:=g_randomx(iy,map_Size);
+         ix:=g_randomx(ix,map_Size1);
+         iy:=g_randomx(iy,map_Size1);
 
          if(map_PickAndAddObstacle(ix,iy,@n_liquids,@n_rocks,ir))then break;
 
@@ -696,14 +705,18 @@ begin
    end;
 
    map_RefreshDoodadsCells;
+end;
 
+procedure map_CreateObjects;
+begin
+   map_Obstacles_Create;
    map_Seed2RandomBase;
-   map_KeyPoints;
+   map_KeyPoints_Create;
    map_KeyPoints_UpdateZone;
    {$IFDEF _FULLGAME}
    map_DoodadsDrawData;
    map_RedrawMenuMinimap;
-   map_MakeDecals;
+   map_Decals_Create;
    {$ENDIF}
 end;
 
@@ -719,7 +732,7 @@ procedure Map_randommap;
 begin
    Map_RandomSeed;
 
-   map_Size     :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
+   map_Size1     :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
    map_ObstaclesF:=random(map_MaxObstacles+1);
    map_Symmetry :=random(2)>0;
 end;
@@ -759,7 +772,7 @@ gt_campaing: SetThemeCampaing(cmp_sel);
 
    map_MakeThemeSprites;
    {$ENDIF}
-   map_ReCreateObjects;
+   map_CreateObjects;
 end;
 
 

@@ -1,24 +1,24 @@
 
 const
 
-aiucl_main0      : array[1..r_cnt] of byte = (UID_HKeep          ,UID_UCommandCenter  );
-aiucl_main0A     : array[1..r_cnt] of byte = (UID_HAKeep         ,UID_UACommandCenter );
-aiucl_main1      : array[1..r_cnt] of byte = (UID_HCommandCenter ,0                   );
-aiucl_main1A     : array[1..r_cnt] of byte = (UID_HACommandCenter,0                   );
-aiucl_generator  : array[1..r_cnt] of byte = (UID_HSymbol1       ,UID_UGenerator1     );
-aiucl_barrack0   : array[1..r_cnt] of byte = (UID_HGate          ,UID_UBarracks       );
-aiucl_barrack1   : array[1..r_cnt] of byte = (UID_HBarracks      ,UID_UFactory        );
-aiucl_smith      : array[1..r_cnt] of byte = (UID_HPools         ,UID_UWeaponFactory  );
-aiucl_tech0      : array[1..r_cnt] of byte = (UID_HPentagram     ,UID_UComputerStation);
-aiucl_tech1      : array[1..r_cnt] of byte = (UID_HMonastery     ,UID_UTechCenter     );
-aiucl_tech2      : array[1..r_cnt] of byte = (UID_HFortress      ,UID_UComputerStation);
-aiucl_detect     : array[1..r_cnt] of byte = (UID_HEye       ,UID_URadar          );
-aiucl_spec1      : array[1..r_cnt] of byte = (UID_HAltar         ,UID_URMStation      );
-aiucl_spec2      : array[1..r_cnt] of byte = (UID_HTeleport      ,0                   );
-aiucl_twr_air1   : array[1..r_cnt] of byte = (UID_HTower         ,UID_UATurret        );
-aiucl_twr_air2   : array[1..r_cnt] of byte = (UID_HTotem         ,UID_UATurret        );
-aiucl_twr_ground1: array[1..r_cnt] of byte = (UID_HTower         ,UID_UGTurret        );
-aiucl_twr_ground2: array[1..r_cnt] of byte = (UID_HTotem         ,UID_UGTurret        );
+aiucl_main0      : array[1..r_count] of byte = (UID_HKeep          ,UID_UCommandCenter  );
+aiucl_main0A     : array[1..r_count] of byte = (UID_HAKeep         ,UID_UACommandCenter );
+aiucl_main1      : array[1..r_count] of byte = (UID_HCommandCenter ,0                   );
+aiucl_main1A     : array[1..r_count] of byte = (UID_HACommandCenter,0                   );
+aiucl_generator  : array[1..r_count] of byte = (UID_HSymbol1       ,UID_UGenerator1     );
+aiucl_barrack0   : array[1..r_count] of byte = (UID_HGate          ,UID_UBarracks       );
+aiucl_barrack1   : array[1..r_count] of byte = (UID_HBarracks      ,UID_UFactory        );
+aiucl_smith      : array[1..r_count] of byte = (UID_HPools         ,UID_UWeaponFactory  );
+aiucl_tech0      : array[1..r_count] of byte = (UID_HPentagram     ,UID_UComputerStation);
+aiucl_tech1      : array[1..r_count] of byte = (UID_HMonastery     ,UID_UTechCenter     );
+aiucl_tech2      : array[1..r_count] of byte = (UID_HFortress      ,UID_UComputerStation);
+aiucl_detect     : array[1..r_count] of byte = (UID_HEye       ,UID_URadar          );
+aiucl_spec1      : array[1..r_count] of byte = (UID_HAltar         ,UID_URMStation      );
+aiucl_spec2      : array[1..r_count] of byte = (UID_HTeleport      ,0                   );
+aiucl_twr_air1   : array[1..r_count] of byte = (UID_HTower         ,UID_UATurret        );
+aiucl_twr_air2   : array[1..r_count] of byte = (UID_HTotem         ,UID_UATurret        );
+aiucl_twr_ground1: array[1..r_count] of byte = (UID_HTower         ,UID_UGTurret        );
+aiucl_twr_ground2: array[1..r_count] of byte = (UID_HTotem         ,UID_UGTurret        );
 
 siedge_uids = [UID_Mancubus,UID_Cyberdemon,UID_ZSiegeMarine,UID_SiegeMarine,UID_Tank];
 
@@ -157,8 +157,8 @@ afree  :byte;
 begin
    afree  :=255;
    anobase:=255;  //no base alarm, low priority, can be replaced by base alarm
-   ax:=mm3i(1,ax,map_Size);
-   ay:=mm3i(1,ay,map_Size);
+   ax:=mm3i(1,ax,map_Size1);
+   ay:=mm3i(1,ay,map_Size1);
    with pplayer^ do
      for a:=0 to LastPlayer do
        with ai_alarms[a] do
@@ -202,7 +202,7 @@ var i:byte;
 begin
    if(not g_FixedPositions)then
    begin
-      if(map_Symmetry)then ai_PlayerSetAlarm(@g_gplayers[p],map_Size-map_PlayerStartX[p],map_Size-map_PlayerStartY[p],1,base_1r,true,map_GetZone(map_Size-map_PlayerStartX[p],map_Size-map_PlayerStartY[p]));
+      if(map_Symmetry)then ai_PlayerSetAlarm(@g_gplayers[p],map_Size1-map_PlayerStartX[p],map_Size1-map_PlayerStartY[p],1,base_1r,true,map_GetZone(map_Size1-map_PlayerStartX[p],map_Size1-map_PlayerStartY[p]));
    end
    else
       for i:=0 to LastPlayer do

@@ -493,7 +493,8 @@ begin
      with g_gplayers[PListener] do
        with log_l[log_i] do
          case lm_type of
-0..LastPlayer           : if(lm_type<>PListener)then snd_SoundPlayUI(snd_chat);
+lmt_chat_player0..
+lmt_chat_player7        : if((lm_type-lmt_chat_player0)<>PListener)then snd_SoundPlayUI(snd_chat);
 lmt_player_leave,
 lmt_player_surrender,
 lmt_chat_common,
@@ -663,7 +664,7 @@ begin
    snd_Teleport             :=snd_SoundSetLoad('Teleport'        );
    snd_Transport            :=snd_SoundSetLoad('Transport'       );
 
-   for r:=1 to r_cnt do
+   for r:=1 to r_count do
    begin
    snd_under_attack[true ,r]:=snd_SoundSetLoad(folder_Race[r]+'base_under_attack'    );
    snd_under_attack[false,r]:=snd_SoundSetLoad(folder_Race[r]+'unit_under_attack'    );
@@ -693,8 +694,6 @@ begin
    snd_CCenterLiftUp        :=snd_SoundSetLoad(folder_Race[r_uac]+'CCenterLiftUp');
    snd_bomblaunch           :=snd_SoundSetLoad(folder_Race[r_uac]+'bomblaunch'   );
 
-   snd_uac_mine             :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'mine');
-
    snd_uac_cc               :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'command_center' );
    snd_uac_barracks         :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'barraks'        );
    snd_uac_generator        :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'generator'      );
@@ -711,9 +710,6 @@ begin
    snd_uac_rescc            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'resourse_senter');
 
    snd_uac_hdeath           :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'death'              );
-
-   snd_APC_ready            :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'APC\UAC_im_find2'   );
-   snd_APC_move             :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'APC\uac_u'          );
 
    snd_bfgmarine_ready      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'bfgmarine\ready'    );
    snd_bfgmarine_annoy      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'bfgmarine\an'       );

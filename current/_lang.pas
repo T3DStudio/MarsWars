@@ -4,9 +4,25 @@
 //  MAIN
 //
 
+procedure DocHelp_AddHotKeyAction(iActSet:TSoB;descr:shortstring;gapStr:shortstring=': ');
+var i:byte;
+   hk:shortstring;
+begin
+   if(iActSet=[])
+   then str_AddToStrList(@str_doc_HotKeys,ui_DocLineLen1,false,false,descr)
+   else
+   begin
+      hk:='';
+      for i in iActSet do
+        STRADD(@hk,str_ActionHotKey(i),sep_space);
+      str_AddToStrList(@str_doc_HotKeys,ui_DocLineLen2,false,false,hk+gapStr+descr);
+   end;
+end;
+
 procedure lng_eng;
-var t:shortstring;
-    i:byte;
+var
+t1:shortstring;
+i :byte;
 begin
    str_ps_AI                     := 'AI';
    str_ps_Host                   := 'HOST';
@@ -135,7 +151,7 @@ begin
    str_map_ScenarioL[mc_KotH     ]:= tc_aqua  +'KotH'        +tc_default;
    str_map_ScenarioL[mc_royale   ]:= tc_red   +'Royal Battle'+tc_default;
    for i:=0 to mc_Last do
-   str_replay_ScenarioL[i]:=RemoveSpecChars(str_map_ScenarioL[i]);
+   str_replay_ScenarioL[i]:=str_RemoveSpecChars(str_map_ScenarioL[i]);
    str_map_Generators            := 'Generators';
    str_map_GeneratorsL[mapg_no ] := 'no';
    str_map_GeneratorsL[mapg_5  ] := '5 min';
@@ -269,7 +285,7 @@ begin
    str_ui_ChatAllies             := 'ALLIES:';
    str_ui_Tab[tab_Buildings]     := 'Buildings';
    str_ui_Tab[tab_Units    ]     := 'Units';
-   str_ui_Tab[tab_Upgrades ]     := 'Researches';
+   str_ui_Tab[tab_Upgrades ]     := 'Upgrades&Researches';
    str_ui_Tab[tab_Controls ]     := 'Controls';
    str_ui_LimitArmy              := tc_orange+'Army limit'  +tc_white+': ';
    str_ui_LimitBuildings         := tc_red   +'Units'       +tc_white+': ';
@@ -277,9 +293,10 @@ begin
    str_ui_EnergyLevel            := tc_aqua  +'Energy level'+tc_white+': ';
    str_ui_objectives             := 'Objectives:';
 
+   str_hint_upgrade              := 'upgrade';
+   str_hint_sec                  := 'sec.';
    str_hint_requirements         := 'Requirements: ';
    str_hint_req                  := 'Req.: ';
-   str_hint_reload               := 'Base reloading time: ';
    str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
    str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
    str_hint_Ability              := 'Special ability: ';
@@ -296,9 +313,7 @@ begin
    str_hint_CanRebuildTo         := 'Can be rebuilt into ';
    str_hint_UnitArming           := 'Arming: ';
    str_hint_Abilities            := 'Abilities: ';
-   str_hint_hits                 := 'Hits: ';
    str_hint_SightR               := 'sight range';
-   str_hint_BaseSightR           := 'Base '+str_hint_SightR+': ';
 
    str_attr_alive                := tc_lime  +'alive'       ;
    str_attr_dead                 := tc_dgray +'dead'        ;
@@ -323,7 +338,7 @@ begin
    str_uarm_ressurect            := 'resurrection';
    str_uarm_heal                 := 'heal/repair';
    str_uarm_spawn                := 'spawn';
-   str_uarm_suicide              := 'suicide';
+   //str_uarm_suicide              := 'suicide';
    str_uarm_targets              := 'targets: ';
    str_uarm_BaseImpact           := 'base impact';
    str_uarm_MinRange             := 'min. range: ';
@@ -335,6 +350,18 @@ begin
    str_uarm_SplashDamageR        := 'splash damage radius: ';
    str_uarm_Upgrade              := 'upgrade: ';
    str_uarm_Factor               := ', factor: ';
+
+   str_ability_passive           := 'Passive ability';
+   str_ability_active            := 'Active ability';
+   str_ability_notarget          := 'Self-targeted';
+   str_ability_point             := 'Ground-targeted';
+   str_ability_UnitAny           := 'Any-unit-targeted';
+   str_ability_UnitOwn           := 'Own-unit-targeted';
+   str_ability_UnitAlly          := 'Own&ally-unit-targeted';
+   str_ability_UnitEnemy         := 'Enemy-unit-targeted';
+   str_ability_reload            := 'Base reloading time: ';
+   str_ability_ReloadFactors     := 'Reload time reduction factors: ';
+   str_ability_rldDecByLevel     := 'unit level';
 
    str_Camp_Difficulty           := 'Difficulty';
    str_Camp_DifficultyL[0]       := tc_aqua  +'I`m too young to die'+tc_default; // It's my first RTS
@@ -355,6 +382,41 @@ begin
    str_net_ServerLANVis          := 'LAN Advertise';
    str_net_ConnectedToDed        := '- connected to dedicated server -';
 
+   str_help_Basics               := 'Basics';
+   str_help_HotKeys              := 'Hot keys';
+   str_help_UnitsInfo            := 'Units Info';
+   str_help_BalanceTable         := 'Balance Table';
+
+   str_doc_HotKey                := 'Hot key: ';
+   str_doc_Attributes            := 'Categories/Attributes: ';
+   str_doc_ProdEnergy            := 'Energy required: ';
+   str_doc_ProdTime              := 'Build time: ';
+   str_doc_Limit                 := 'Limit used: ';
+   str_doc_MaxHits               := 'Max hits: ';
+   str_doc_BaseRegen             := 'Base regeneration: ';
+   str_doc_BaseSightR            := 'Base '+str_hint_SightR+': ';
+   str_doc_Size                  := 'Size: ';
+   str_doc_BaseMSpeed            := 'Base speed: ';
+   str_doc_Role                  := 'Unit function: ';
+   str_doc_Description           := 'Description: ';
+   str_doc_PainC                 := 'PainState base threshold: ';
+   str_doc_TransportSize         := 'Places in transport: ';
+   str_doc_TransportCpst         := 'Base transport capacity: ';
+   str_doc_LevelArmorBonus       := 'Bonus to armor per level: ';
+   str_doc_LevelDamageBonus      := 'Bonus to impact per level: ';
+   str_doc_ZombieUID             := 'Zombie: ';
+   str_doc_ZombieHits            := 'Zombie hits threshold: ';
+   str_doc_DeathUnit             := 'Spawn unit at death: ';
+   str_doc_UpgrArmor             := 'Armor: ';
+   str_doc_UpgrRegen             := 'Regeneration: ';
+   str_doc_UpgrSpeed             := 'Move speed: ';
+   str_doc_UpgrPainS             := 'Painstate threshold: ';
+   str_doc_UpgrSightR            := 'Sight range: ';
+   str_doc_UpgrTransport         := 'Transport capacity: ';
+   str_doc_LMB                   := tc_lime+'LMB'+tc_white;
+   str_doc_RMB                   := tc_red +'RMB'+tc_white;
+   str_doc_MWH                   := tc_yellow+'MWheel'+tc_white;
+
    str_SetAbilityBaseHint(uab_Teleport           ,'Teleportation'           ,'');
    str_SetAbilityBaseHint(uab_Recall             ,'Recall'                  ,'');
    str_SetAbilityBaseHint(uab_UACScan            ,'Scan'                    ,'');
@@ -371,30 +433,30 @@ begin
    str_SetAbilityBaseHint(uab_UACCCLandTo        ,'Land/Take-off to point'  ,'');
    str_SetAbilityBaseHint(uab_Unload             ,'Unload'                  ,'');
    str_SetAbilityBaseHint(uab_UnloadTo           ,'Unload to point'         ,'');
-   t:='Transform to ';
-   str_SetAbilityBaseHint(uab_ToHAKeep           ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHSymbol2         ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHSymbol3         ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHSymbol4         ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHACommandCenter  ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHTower           ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHTotem           ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUACommandCenter  ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUGenerator2      ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUGenerator3      ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUGenerator4      ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUAGTurret        ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUAATurret        ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUACDron          ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUGTurretTo       ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUATurretTo       ,t                         ,'');
-   t:='Advanced ';
-   str_SetAbilityBaseHint(uab_ToHGate            ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHPool            ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToHBarracks        ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUBarracks        ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUFactory         ,t                         ,'');
-   str_SetAbilityBaseHint(uab_ToUWeaponFactory   ,t                         ,'');
+   t1:='Transform to ';
+   str_SetAbilityBaseHint(uab_ToHAKeep           ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHSymbol2         ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHSymbol3         ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHSymbol4         ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHACommandCenter  ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHTower           ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHTotem           ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUACommandCenter  ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUGenerator2      ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUGenerator3      ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUGenerator4      ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUAGTurret        ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUAATurret        ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUACDron          ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUGTurretTo       ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUATurretTo       ,t1                         ,'');
+   t1:='Advanced ';
+   str_SetAbilityBaseHint(uab_ToHGate            ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHPool            ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHBarracks        ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUBarracks        ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUFactory         ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUWeaponFactory   ,t1                         ,'');
 
 
    str_SetUnitBaseHint(UID_HKeep          ,'Hell Keep'                   ,'');
@@ -478,9 +540,8 @@ begin
    str_SetUnitBaseHint(UID_UATurret         ,'Anti-air Turret'               ,'Anti-air defensive structure'   );
    str_SetUnitBaseHint(UID_UTechCenter      ,'Science Facility'              ,'');
    str_SetUnitBaseHint(UID_UComputerStation ,'Computer Station'              ,'');
-   str_SetUnitBaseHint(UID_URadar           ,'Radar'                         ,'Reveals map. Reload time of the ability is '+tc_aqua+i2s(radar_reload_sec)+tc_default+' sec');
+   str_SetUnitBaseHint(UID_URadar           ,'Radar'                         ,'Reveals the map area');
    str_SetUnitBaseHint(UID_URMStation       ,'Rocket Launcher Station'       ,'');
-   str_SetUnitBaseHint(UID_UMine            ,'Mine'                          ,'');
 
    str_SetUnitBaseHint(UID_Sergant          ,'Shotguner'                     ,'');
    str_SetUnitBaseHint(UID_SSergant         ,'SuperShotguner'                ,'');
@@ -496,7 +557,6 @@ begin
    str_SetUnitBaseHint(UID_Terminator       ,'Terminator'                    ,'');
    str_SetUnitBaseHint(UID_Tank             ,'Tank'                          ,'');
    str_SetUnitBaseHint(UID_Flyer            ,'Fighter'                       ,'');
-   str_SetUnitBaseHint(UID_APC              ,'Ground APC'                    ,'');
 
 
    str_SetUpgrBaseHint(upgr_uac_DistDamage   ,'Weapons Upgrade'                  ,'Increase the damage of ranged attacks for all UAC units and defensive structures');
@@ -504,7 +564,7 @@ begin
    str_SetUpgrBaseHint(upgr_uac_BuildArmor   ,'Concrete Walls'                   ,'Increase the armor of all UAC buildings'                       );
    str_SetUpgrBaseHint(upgr_uac_RepairTools  ,'Advanced Tools'                   ,'Increase repair/healing efficiency of Engineers/Medics'        );
    str_SetUpgrBaseHint(upgr_uac_BioSpeed     ,'Lightweight Armor'                ,'Increase the movement speed of all Barrack`s units'            );
-   str_SetUpgrBaseHint(upgr_uac_ssgup        ,'Expansive bullets'                ,'Attacks of Shotguner, SuperShotguner and Terminator are more likely to cause a pain state' );
+   str_SetUpgrBaseHint(upgr_uac_SSMWeapon    ,'Surface to Surface Missiles'      ,'Anti-ground weapon for Antiaircrafter');
    str_SetUpgrBaseHint(upgr_uac_TowerR       ,'Spotlights'                       ,'Increase the range of defensive structures'                    );
    str_SetUpgrBaseHint(upgr_uac_CCFly        ,'Command Center Flight Engines'    ,'Command Center gains ability to fly'                           );
    str_SetUpgrBaseHint(upgr_uac_CCAttack     ,'Command Center Turret'            ,'Plasma turret for Command Center'                              );
@@ -521,46 +581,48 @@ begin
    str_SetUpgrBaseHint(upgr_uac_TurretPlasma ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+tc_default+'] weapon for Anti-ground turret'  );
    str_SetUpgrBaseHint(upgr_uac_TurretArmor  ,'Additional Armoring'              ,'Additional armor for Turrets'               );
 
+   /////////////////////////////////////////////////////////////////////////////
+   //  GAME ACT HINTS
 
-   str_MakeActionHint(iAct_Control_USelBase,'Select all builders');
-   str_MakeActionHint(iAct_Control_USelArmy,'Select all battle units');
+   str_SetActionBaseHint(iAct_Control_USelBase   ,'Select all builders');
+   str_SetActionBaseHint(iAct_Control_USelArmy   ,'Select all not busy battle units;');
 
-   t:='attack enemies';
-   str_MakeActionHint(iAct_Control_UAMove     ,'Move, '  +t);
-   str_MakeActionHint(iAct_Control_UAStop     ,'Stop, '  +t);
-   str_MakeActionHint(iAct_Control_UAPatrol   ,'Patrol, '+t);
-   t:='ignore enemies';
-   str_MakeActionHint(iAct_Control_UMove      ,'Move, '  +t);
-   str_MakeActionHint(iAct_Control_UStop      ,'Stop, '  +t);
-   str_MakeActionHint(iAct_Control_UPatrol    ,'Patrol, '+t);
+   t1:='attack enemies';
+   str_SetActionBaseHint(iAct_Control_UAMove     ,'Move, '  +t1);
+   str_SetActionBaseHint(iAct_Control_UAStop     ,'Stop, '  +t1);
+   str_SetActionBaseHint(iAct_Control_UAPatrol   ,'Patrol, '+t1);
+   t1:='ignore enemies';
+   str_SetActionBaseHint(iAct_Control_UMove      ,'Move, '  +t1);
+   str_SetActionBaseHint(iAct_Control_UStop      ,'Stop, '  +t1);
+   str_SetActionBaseHint(iAct_Control_UPatrol    ,'Patrol, '+t1);
 
-   str_MakeActionHint(iAct_Control_UProdCncl  ,'Cancel production');
-   str_MakeActionHint(iAct_Control_UDestroy   ,'Destroy');
-   str_MakeActionHint(iAct_Control_USelArmy   ,'Select all battle units');
+   str_SetActionBaseHint(iAct_Control_UProdCncl  ,'Cancel production');
+   str_SetActionBaseHint(iAct_Control_UDestroy   ,'Destroy');
+   str_SetActionBaseHint(iAct_Control_USelArmy   ,'Select all battle units');
 
-   str_MakeActionHint(iAct_InGamePause        ,'Pause');
-   str_MakeActionHint(iAct_InGameMenu         ,'Menu' );
+   str_SetActionBaseHint(iAct_InGamePause        ,'Pause');
+   str_SetActionBaseHint(iAct_InGameMenu         ,'Menu' );
 
-   str_MakeActionHint(iAct_Replay_Fast        ,'Faster game speed');
-   str_MakeActionHint(iAct_Replay_Pause       ,'Pause');
-   str_MakeActionHint(iAct_Replay_Back2       ,'Rewind 2 seconds');
-   str_MakeActionHint(iAct_Replay_Back10      ,'Rewind 10 seconds');
-   str_MakeActionHint(iAct_Replay_Back60      ,'Rewind 60 seconds');
-   str_MakeActionHint(iAct_Replay_Forward2    ,'Fast forward 2 seconds');
-   str_MakeActionHint(iAct_Replay_Forward10   ,'Fast forward 10 seconds');
-   str_MakeActionHint(iAct_Replay_Forward60   ,'Fast forward 60 seconds');
-   str_MakeActionHint(iAct_Replay_POV         ,'Player-recorder POV');
-   str_MakeActionHint(iAct_Replay_Log         ,'List of game messages');
-   str_MakeActionHint(iAct_Replay_Fog         ,'Fog of war');
-   str_MakeActionHint(iAct_Replay_PlayerAll   ,'All players');
-   str_MakeActionHint(iAct_Replay_Player0     ,'Player #1');
-   str_MakeActionHint(iAct_Replay_Player1     ,'Player #2');
-   str_MakeActionHint(iAct_Replay_Player2     ,'Player #3');
-   str_MakeActionHint(iAct_Replay_Player3     ,'Player #4');
-   str_MakeActionHint(iAct_Replay_Player4     ,'Player #5');
-   str_MakeActionHint(iAct_Replay_Player5     ,'Player #6');
-   str_MakeActionHint(iAct_Replay_Player6     ,'Player #7');
-   str_MakeActionHint(iAct_Replay_Player7     ,'Player #8');
+   str_SetActionBaseHint(iAct_Replay_Fast        ,'Faster game speed');
+   str_SetActionBaseHint(iAct_Replay_Pause       ,'Pause');
+   str_SetActionBaseHint(iAct_Replay_Back2       ,'Rewind 2 seconds');
+   str_SetActionBaseHint(iAct_Replay_Back10      ,'Rewind 10 seconds');
+   str_SetActionBaseHint(iAct_Replay_Back60      ,'Rewind 60 seconds');
+   str_SetActionBaseHint(iAct_Replay_Forward2    ,'Fast forward 2 seconds');
+   str_SetActionBaseHint(iAct_Replay_Forward10   ,'Fast forward 10 seconds');
+   str_SetActionBaseHint(iAct_Replay_Forward60   ,'Fast forward 60 seconds');
+   str_SetActionBaseHint(iAct_Replay_POV         ,'Player-recorder POV');
+   str_SetActionBaseHint(iAct_Replay_Log         ,'List of game messages');
+   str_SetActionBaseHint(iAct_Replay_Fog         ,'Fog of war');
+   str_SetActionBaseHint(iAct_Replay_PlayerAll   ,'All players');
+   str_SetActionBaseHint(iAct_Replay_Player0     ,'Player #1');
+   str_SetActionBaseHint(iAct_Replay_Player1     ,'Player #2');
+   str_SetActionBaseHint(iAct_Replay_Player2     ,'Player #3');
+   str_SetActionBaseHint(iAct_Replay_Player3     ,'Player #4');
+   str_SetActionBaseHint(iAct_Replay_Player4     ,'Player #5');
+   str_SetActionBaseHint(iAct_Replay_Player5     ,'Player #6');
+   str_SetActionBaseHint(iAct_Replay_Player6     ,'Player #7');
+   str_SetActionBaseHint(iAct_Replay_Player7     ,'Player #8');
 
    str_action_hint[iAct_Observer_Fog      ]:= str_action_hint[iAct_Replay_Fog      ];
    str_action_hint[iAct_Observer_PlayerAll]:= str_action_hint[iAct_Replay_PlayerAll];
@@ -573,25 +635,176 @@ begin
    str_action_hint[iAct_Observer_Player6  ]:= str_action_hint[iAct_Replay_Player6  ];
    str_action_hint[iAct_Observer_Player7  ]:= str_action_hint[iAct_Replay_Player7  ];
 
-   //_mkHStrACT(12,'Alarm mark'       );
+   /////////////////////////////////////////////////////////////////////////////
+   //  MENU HINTS
 
    FillChar(str_menu_hint,sizeOf(str_menu_hint),0);
+   FillChar(menu_hint_pos,sizeOf(menu_hint_pos),0);
 
-   for i in byte do str_menu_hint[i]:=b2s(i);
+   for i:=1 to 255 do menu_set_hint(i,i,'');
 
-   {for i in [6,7,106,8,9,10,12,13,18,20,22,23,27,26,29,31,38,39,40,42,44,53,56,62,74,76,79,82,86,89] do
-   str_menu_hint[i]:='LMB';
+   menu_set_hint(mi_SaveLoad_fname,mi_SaveLoad_list,'');
 
-   for i in [14,116,117,16,30,51,52,63,77,78,84,91,193,194,92,97] do
-   str_menu_hint[i]:='LMB/RMB';
+   for i in [mi_Players_Panel    ..mi_Players_Obs7     ] do menu_set_hint(i,mi_Players_Panel    ,'');
+   for i in [mi_Map_Panel        ..mi_Map_Random       ] do menu_set_hint(i,mi_Map_Panel        ,'');
+   for i in [mi_Game_Panel       ..mi_Game_Random      ] do menu_set_hint(i,mi_Game_Panel       ,'');
+   for i in [mi_MP_Panel         ..mi_MP_ChatLine      ] do menu_set_hint(i,mi_MP_Panel         ,'');
 
-   for i in [87,90,11,83] do
-   str_menu_hint[i]:='LMB: select for edition';
+   for i in [mi_SG_ColoredShadows..mi_SG_PlayersColor  ] do menu_set_hint(i,mi_SG_ColoredShadows,'');
+   for i in [mi_SR_RecordGames   ..mi_SR_RecordQuality ] do menu_set_hint(i,mi_SR_RecordGames   ,'');
+   for i in [mi_SV_ResolutionW   ..mi_SV_SmoothScaled  ] do menu_set_hint(i,mi_SV_ResolutionW   ,'');
+   for i in [mi_SS_SoundVolume   ..mi_SS_ReloadPlaylist] do menu_set_hint(i,mi_SS_SoundVolume   ,'');
 
-   str_menu_hint[50]:='LMB: select for edition; RMB: set random value';
-   str_menu_hint[60]:='LMB: change AI player skill; RMB: jump to position';
-   str_menu_hint[61]:='LMB: add/remove AI player';
-   str_menu_hint[80]:='LMB: make random scirmish settings, RMB: make&run game'; }
+   // PLAYERS
+   for i:=mi_Players_AIskil0 to mi_Players_AIskil7 do menu_set_hint(i,mi_Players_Panel,': change AI skill');
+   for i:=mi_Players_Slot0   to mi_Players_Slot7   do menu_set_hint(i,mi_Players_Panel,': jump to this slot');
+   for i:=mi_Players_State0  to mi_Players_State7  do menu_set_hint(i,mi_Players_Panel,': add/remove AI Player');
+
+   // MAP
+   menu_set_hint(mi_Map_Generators,mi_Map_Panel,': generators life time');
+   menu_set_hint(mi_Map_Seed      ,mi_Map_Panel,': select for edition/make random value');
+   menu_set_hint(mi_Map_Obstacles ,mi_Map_Panel,': obstacles density');
+
+   /////////////////////////////////////////////////////////////////////////////
+   //  Help docs
+
+   str_StringListClear(@str_doc_Basics1);
+   str_StringListClear(@str_doc_HotKeys);
+
+   DocHelp_AddHotKeyAction([],'COMMON HOTKEYS');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_InGameChat       ],'in-game chat(common)');
+   DocHelp_AddHotKeyAction([iAct_InGameChatAll    ],'in-game chat(to all players)');
+   DocHelp_AddHotKeyAction([iAct_InGameChatAll    ],'in-game chat(to allied players)');
+   DocHelp_AddHotKeyAction([iAct_InGamePause      ],'toggle pause(only multiplayer game)');
+   DocHelp_AddHotKeyAction([iAct_InGameMenu       ],'toggle menu');
+
+   DocHelp_AddHotKeyAction([iAct_Tab              ],'switch control panel tab' );
+   DocHelp_AddHotKeyAction([iAct_ScreenShot       ],'make *.bmp screenshot'    );
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([],'GAME HOTKEYS');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_LastEvent        ],'move camera to last event place');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_USetGroup1..
+                            iAct_USetGroup9]       ,'assign currently selected units to the numbered control group');
+   DocHelp_AddHotKeyAction([iAct_USetGroup0       ],'unassign currently selected units from any numbered control group');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_UAddGroup1..
+                            iAct_UAddGroup9       ],'add currently selected units to the numbered control group');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_USelGroup1..
+                            iAct_USelGroup9       ],'select units from the numbered control group; double tap - move camera to nearest unit from the group');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_UASlGroup1..
+                            iAct_UASlGroup9       ],'add to selection units from the numbered control group');
+   DocHelp_AddHotKeyAction([],' ');
+
+   DocHelp_AddHotKeyAction([iAct_Control_UAbility1..
+                            iAct_Control_UAbility3],'abilities of selected units');
+
+   DocHelp_AddHotKeyAction([iAct_Control_UMove,iAct_Control_UStop,iAct_Control_UPatrol,
+                            iAct_Control_UAMove,iAct_Control_UAStop,iAct_Control_UAPatrol]
+                                                   ,'basic orders of selected units');
+   DocHelp_AddHotKeyAction([iAct_Control_UProdCncl],'cancel production in selected buildings');
+   DocHelp_AddHotKeyAction([iAct_Control_UDestroy ],'kill selected units');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_Control_USelBase ],'select all builders; double tap - move camera to nearest builder');
+   DocHelp_AddHotKeyAction([iAct_Control_USelArmy ],'select all not busy battle units; double tap - move camera to nearest unit');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_SProd1..
+                            iAct_SProd24          ],'production hotkeys');
+
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([],'REPLAY PLAYBACK CONTROLS');
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([iAct_Replay_Fast      ],'toggle uncapped FPS(faster game speed)' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Pause     ],'pause playback'    );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back60    ],'rewind 60 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back10    ],'rewind 10 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back2     ],'rewind 2 seconds'  );
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward2  ],'fast forward 2 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward10 ],'fast forward 10 seconds');
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward60 ],'fast forward 60 seconds');
+   DocHelp_AddHotKeyAction([iAct_Replay_POV       ],'toggle player-recorder POV'  );
+   DocHelp_AddHotKeyAction([iAct_Replay_Log       ],'toggle list of game messages');
+   DocHelp_AddHotKeyAction([iAct_Replay_Fog       ],'toggle fog of war' );
+   DocHelp_AddHotKeyAction([iAct_Replay_PlayerAll ],'set all players vision');
+   DocHelp_AddHotKeyAction([iAct_Replay_Player0..
+                            iAct_Replay_Player7   ],'set player vision');
+
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([],'OBSERVER MODE CONTROLS');
+   DocHelp_AddHotKeyAction([],' ');
+
+   DocHelp_AddHotKeyAction([iAct_Observer_Fog      ],'toggle fog of war' );
+   DocHelp_AddHotKeyAction([iAct_Observer_PlayerAll],'set all players vision');
+   DocHelp_AddHotKeyAction([iAct_Observer_Player0..
+                            iAct_Observer_Player7  ],'set player vision');
+
+   DocHelp_AddHotKeyAction([],' ');
+   DocHelp_AddHotKeyAction([],'TEST MODE CONTROLS');
+   DocHelp_AddHotKeyAction([],' ');
+
+   DocHelp_AddHotKeyAction([iAct_test_FastTime     ],'toggle uncapped FPS(faster game speed)');
+   DocHelp_AddHotKeyAction([iAct_test_InstaProd    ],'toggle instant production');
+   DocHelp_AddHotKeyAction([iAct_test_ToggleAI     ],'toggle AI control for current player');
+   DocHelp_AddHotKeyAction([iAct_test_iddqd        ],'toggle invulnerability for current player');
+   DocHelp_AddHotKeyAction([iAct_test_FogToggle    ],'toggle fog of war'   );
+   DocHelp_AddHotKeyAction([iAct_test_DrawToggle   ],'toggle screen redraw');
+   DocHelp_AddHotKeyAction([iAct_test_NullUpgrades ],'cancel all upgrades for current player');
+   DocHelp_AddHotKeyAction([iAct_test_BePlayer0..
+                            iAct_test_BePlayer7    ],'set current player');
+   {
+   input_SetAction(iAct_test_debug0       ,ikt_keyboard,0           ,SDLK_KP8         );
+   input_SetAction(iAct_test_debug1       ,ikt_keyboard,0           ,SDLK_KP9         );
+   }
+
+
+   //str_doc_HotKeys
+
+
+   {
+   Game Basics: UI
+
+   Game minimap:
+   Minimap indicator types:
+   - Green pulse circle – unit ready;
+   - Green pulse square – construction complete;
+   - Yellow pulse square - upgrade complete;
+   - Aqua pulse circle - unit promoted;
+   - Red pulse circle – unit is under attack;
+   - Red pulse square – base is under attack.
+
+   Tabs:
+   - Buildings – available buildings;
+   - Units – available units;
+   - Upgrades/researches – available upgrades/researches;
+   - Controls – unit abilities, basic orders and other game controls.
+
+   Numbers on icons:
+   Green – total number of selected units/buildings;
+   Yellow – number of productions;
+   Orange or gray - total number of that type of building/unit or research level;
+   Purple - number of units of that type in selected transport(s);
+   White - time left to finish production;
+   Aqua – ability recharge time;
+
+
+
+
+
+   Dedicated server
+   Dedicated server - a special version of the game that does not load any game resources and
+   immediately starts working as a server. To start a dedicated server, run it with the following
+   parameters:
+   MarsWars_ded.exe [X]
+   where Х - UDP port (optional argument, default value - 10666).
+   Any connected player can change the game settings in a dedicated server's lobby.
+The game will start automatically as soon as all players mark the 'ready' option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.
+
+
+   }
 
    /////////////////////////////////////////////////////////////////////////////
 
@@ -626,58 +839,58 @@ begin
    str_camp_MissionName[22] := 'UAC#11:    ';
    str_camp_MissionName[23] := 'UAC#12: Battle For Mars';
 
-   str_camp_map [0 ] := str_cmp_map(str_cmp_unk ,'HELL WORLD','Portal valley');
-   str_camp_map [1 ] := str_cmp_map('15.11.2145','PHOBOS'    ,'Hall crater'   );
-   str_camp_map [2 ] := str_cmp_map('16.11.2145','PHOBOS'    ,'Drunlo crater' );
-   str_camp_map [3 ] := str_cmp_map('15.11.2145','DEIMOS'    ,'Anomaly Zone'  );
-   str_camp_map [4 ] := str_cmp_map('16.11.2145','DEIMOS'    ,'Swift crater'  );
-   str_camp_map [5 ] := str_cmp_map('16.11.2145','DEIMOS'    ,'Voltaire Area' );
-   str_camp_map [6 ] := str_cmp_map('16.11.2145','MARS'      ,'Hellas Area');
-   str_camp_map [7 ] := str_cmp_map('16.11.2145','MARS'      ,'Hellas Area');
-   str_camp_map [8 ] := str_cmp_map('16.11.2145','MARS'      ,'Hellas Area');
-   str_camp_map [9 ] := str_cmp_map('25.11.2145','EARTH'     ,'Unknown');
-   str_camp_map [10] := str_cmp_map('26.11.2145','EARTH'     ,'Unknown');
-   str_camp_map [11] := str_cmp_map('27.11.2145','EARTH'     ,'Unknown');
+   {str_camp_MissionMap [0 ] := str_camp_SetMapInfo(str_cmp_unk ,'HELL WORLD','Portal valley');
+   str_camp_MissionMap [1 ] := str_camp_SetMapInfo('15.11.2145','PHOBOS'    ,'Hall crater'  );
+   str_camp_MissionMap [2 ] := str_camp_SetMapInfo('16.11.2145','PHOBOS'    ,'Drunlo crater');
+   str_camp_MissionMap [3 ] := str_camp_SetMapInfo('15.11.2145','DEIMOS'    ,'Anomaly Zone' );
+   str_camp_MissionMap [4 ] := str_camp_SetMapInfo('16.11.2145','DEIMOS'    ,'Swift crater' );
+   str_camp_MissionMap [5 ] := str_camp_SetMapInfo('16.11.2145','DEIMOS'    ,'Voltaire Area');
+   str_camp_MissionMap [6 ] := str_camp_SetMapInfo('16.11.2145','MARS'      ,'Hellas Area'  );
+   str_camp_MissionMap [7 ] := str_camp_SetMapInfo('16.11.2145','MARS'      ,'Hellas Area'  );
+   str_camp_MissionMap [8 ] := str_camp_SetMapInfo('16.11.2145','MARS'      ,'Hellas Area'  );
+   str_camp_MissionMap [9 ] := str_camp_SetMapInfo('25.11.2145','EARTH'     ,'Unknown');
+   str_camp_MissionMap [10] := str_camp_SetMapInfo('26.11.2145','EARTH'     ,'Unknown');
+   str_camp_MissionMap [11] := str_camp_SetMapInfo('27.11.2145','EARTH'     ,'Unknown');
 
-   str_camp_map [12] := str_cmp_map('16.11.2145','PHOBOS'    ,'Todd crater'  );
-   str_camp_map [13] := str_cmp_map('16.11.2145','PHOBOS'    ,'Roche crater' );
-   str_camp_map [14] := str_cmp_map('17.11.2145','PHOBOS'    ,'Anomaly Zone' );
-   str_camp_map [15] := str_cmp_map('17.11.2145','DEIMOS'    ,'Anomaly Zone' );
-   str_camp_map [16] := str_cmp_map('18.11.2145','DEIMOS'    ,'Voltaire Area');
-   str_camp_map [17] := str_cmp_map('18.11.2145','DEIMOS'    ,'Voltaire Area');
-   str_camp_map [18] := str_cmp_map('20.11.2145','HELL'      ,'Portal valley');
-   str_camp_map [19] := str_cmp_map('21.11.2145','HELL'      ,'Unknown'      );
-   str_camp_map [20] := str_cmp_map('22.11.2145','HELL'      ,'Unknown'      );
-   str_camp_map [21] := str_cmp_map('21.11.2145','MARS'      ,'Hellas Area');
-   str_camp_map [22] := str_cmp_map('21.11.2145','MARS'      ,'Hellas Area');
-   str_camp_map [23] := str_cmp_map('22.11.2145','MARS'      ,'Hellas Area');
+   str_camp_MissionMap [12] := str_camp_SetMapInfo('16.11.2145','PHOBOS'    ,'Todd crater'  );
+   str_camp_MissionMap [13] := str_camp_SetMapInfo('16.11.2145','PHOBOS'    ,'Roche crater' );
+   str_camp_MissionMap [14] := str_camp_SetMapInfo('17.11.2145','PHOBOS'    ,'Anomaly Zone' );
+   str_camp_MissionMap [15] := str_camp_SetMapInfo('17.11.2145','DEIMOS'    ,'Anomaly Zone' );
+   str_camp_MissionMap [16] := str_camp_SetMapInfo('18.11.2145','DEIMOS'    ,'Voltaire Area');
+   str_camp_MissionMap [17] := str_camp_SetMapInfo('18.11.2145','DEIMOS'    ,'Voltaire Area');
+   str_camp_MissionMap [18] := str_camp_SetMapInfo('20.11.2145','HELL'      ,'Portal valley');
+   str_camp_MissionMap [19] := str_camp_SetMapInfo('21.11.2145','HELL'      ,'Unknown'      );
+   str_camp_MissionMap [20] := str_camp_SetMapInfo('22.11.2145','HELL'      ,'Unknown'      );
+   str_camp_MissionMap [21] := str_camp_SetMapInfo('21.11.2145','MARS'      ,'Hellas Area');
+   str_camp_MissionMap [22] := str_camp_SetMapInfo('21.11.2145','MARS'      ,'Hellas Area');
+   str_camp_MissionMap [23] := str_camp_SetMapInfo('22.11.2145','MARS'      ,'Hellas Area');  }
 
-   for i:=0 to LastMission do
+   {for i:=0 to LastMission do
    begin
-      setlength(str_camp_infol[i],0);
+      setlength(str_camp_MissionInfo[i],0);
       str_camp_infon[i]:=0;
-   end;
+   end; }
 
    ////   HELL #1 / Tutorial
 
-   cmp_AddPlot(0,false,
+   str_camp_SetMissionPlot(0,false,
 'This planet looks terrifying: fire everywhere, molten lava, and eerie creatures. It is located far among thousands of other worlds belonging to a powerful galactic Empire. Everything here remained unchanged for many centuries after the conquest...');
-   cmp_AddPlot(0,false,
+   str_camp_SetMissionPlot(0,false,
 'until suddenly the old teleporter, built by some ancient civilization, was activated. Technologically advanced aliens arrived from the portal, immediately starting to explore the new territory.');
 
-   cmp_AddPlot(0,true ,
+   str_camp_SetMissionPlot(0,true ,
 'You are one of the higher demons, whose calling is to lead the demonic army into battle. You were recently promoted to your current rank and have not yet had the chance to prove yourself.');
-   cmp_AddPlot(0,false,
+   str_camp_SetMissionPlot(0,false,
 'Your first task is to study the aliens, infiltrate their world, and subjugate it to the will of the Empire.');
 
-   cmp_AddPlot(0,true,
+   str_camp_SetMissionPlot(0,true,
 'The invaders have built a large camp near the Portal, and we don`t even have a small outpost in this region. It is necessary to quickly build a base, summon the army, and crush the violators!');
 
-   cmp_AddPlot(0,true ,'- Reach 2000 energy level');
-   cmp_AddPlot(0,false,'- Build 4 Demon`s Gates'  );
-   cmp_AddPlot(0,false,'- Summon 30 Hell warriors');
-   cmp_AddPlot(0,false,'- Do not lose Hell Keeps' );
-   cmp_AddPlot(0,false,'- Destroy all intruder creatures');
+   str_camp_SetMissionPlot(0,true ,'- Reach 2000 energy level');
+   str_camp_SetMissionPlot(0,false,'- Build 4 Demon`s Gates'  );
+   str_camp_SetMissionPlot(0,false,'- Summon 30 Hell warriors');
+   str_camp_SetMissionPlot(0,false,'- Do not lose Hell Keeps' );
+   str_camp_SetMissionPlot(0,false,'- Destroy all intruder creatures');
 
 
   {
@@ -713,7 +926,7 @@ begin
    str_camp_obj [23] := '- Destroy all bases and armies of hell';  }
 
 
-   str_makeHints;
+   str_makeAllHints;
 end;
 
 procedure lng_rus;
@@ -885,8 +1098,8 @@ begin
   str_hint_IncEnergyLevel    := 'Увеличивает уровень энергии';
   str_hint_CanRebuildTo      := 'Можно перестроить в ';
   str_hint_UnitArming        := 'Вооружение/Способности: ';
-  str_hint_hits              := 'Здоровье: ';
-  str_hint_BaseSightR            := 'Базовый радиус обзора: ';
+  //str_hint_hits              := 'Здоровье: ';
+  //str_hint_BaseSightR            := 'Базовый радиус обзора: ';
 
   str_uarm_melee      := 'ближний бой';
   str_uarm_ranged     := 'дальний бой';
@@ -894,7 +1107,7 @@ begin
   str_uarm_ressurect  := 'воскрешение';
   str_uarm_heal       := 'лечение/ремонт';
   str_uarm_spawn      := 'порождение';
-  str_uarm_suicide    := 'самоубийство';
+  //str_uarm_suicide    := 'самоубийство';
   str_uarm_targets    := 'цели: ';
   str_uarm_BaseImpact     := 'воздействие';
 
@@ -1069,7 +1282,6 @@ begin
   str_SetUnitBaseHint(UID_UComputerStation,'Компьютерная Станция'       ,'');
   str_SetUnitBaseHint(UID_URadar          ,'Радар'                      ,'');
   str_SetUnitBaseHint(UID_URMStation      ,'Станция Ракетного Залпа'    ,'');
-  str_SetUnitBaseHint(UID_UMine           ,'Мина'                       ,'');
 
   str_SetUnitBaseHint(UID_Sergant         ,'Сержант'                ,'');
   str_SetUnitBaseHint(UID_SSergant        ,'Старший Сержант'        ,'');
@@ -1085,15 +1297,13 @@ begin
   str_SetUnitBaseHint(UID_Terminator      ,'Терминатор'             ,'');
   str_SetUnitBaseHint(UID_Tank            ,'Танк'                   ,'');
   str_SetUnitBaseHint(UID_Flyer           ,'Истребитель'            ,'');
-  str_SetUnitBaseHint(UID_APC             ,'БТР'                    ,'');
-
 
   str_SetUpgrBaseHint(upgr_uac_DistDamage     ,'Улучшение Воружений'               ,'Увеличение урона от дальних атак всех юнитов и защитных сооружений');
   str_SetUpgrBaseHint(upgr_uac_BioArmor     ,'Улучшение Пехотной Брони'          ,'Увеличение защиты всех юнитов из Казарм'                     );
   str_SetUpgrBaseHint(upgr_uac_BuildArmor     ,'Бетонные Стены'                    ,'Увеличение защиты всех зданий'                               );
   str_SetUpgrBaseHint(upgr_uac_RepairTools      ,'Продвинутые Инструменты'           ,'Увеличение эффективности ремонта Инженера и лечения Медика'  );
   str_SetUpgrBaseHint(upgr_uac_BioSpeed     ,'Легковесная Броня'                 ,'Увеличение скорости передвижения всех юнитов из Казарм'      );
-  str_SetUpgrBaseHint(upgr_uac_ssgup      ,'Разрывные Пули'                    ,'Атака Сержанта, Старшего Сержанта и Терминатора чаще вызывают pain state' );
+  str_SetUpgrBaseHint(upgr_uac_SSMWeapon      ,'Разрывные Пули'                    ,'Атака Сержанта, Старшего Сержанта и Терминатора чаще вызывают pain state' );
   str_SetUpgrBaseHint(upgr_uac_TowerR     ,'Прожекторы'                        ,'Увеличение радиуса обзора и атаки для защитных сооружений'      );
   str_SetUpgrBaseHint(upgr_uac_CCFly      ,'Летные Двигатели Командного Центра','Командный Центр может летать'                                   );
   str_SetUpgrBaseHint(upgr_uac_CCAttack     ,'Турель Командного Центра'          ,'Командный Центр может атаковать'                                );
@@ -1175,31 +1385,31 @@ begin
   str_cmp_Location  := tc_gray+'Место: '+tc_default;
   str_cmp_Area      := tc_gray+'Район: '+tc_default;
 
-  for i:=0 to LastMission do
+  {for i:=0 to LastMission do
   begin
-     setlength(str_camp_infol[i],0);
+     setlength(str_camp_MissionInfo[i],0);
      str_camp_infon[i]:=0;
-  end;
+  end;    }
 
 
-  cmp_AddPlot(0,false,
+  str_camp_SetMissionPlot(0,false,
 'Эта планета выглядит устрашающе: повсюду огонь, раскаленная лава и жуткие существа. Она находится далеко среди тысяч других миров, принадлежащих могущественной галактической империи. Здесь все оставалось неизменным долгие столетия после завоевания...');
-  cmp_AddPlot(0,false,
+  str_camp_SetMissionPlot(0,false,
 'пока вдруг не заработал старый телепортатор, построенный какой-то древней цивилизацией. Из портала прибыли технически развитые пришельцы, сразу занявшиеся изучением новой местности.');
 
-  cmp_AddPlot(0,true ,
+  str_camp_SetMissionPlot(0,true ,
 'Вы - один из высших демонов, чье призвание - вести в бой демоническое воинство. Вы не так давно были повышены до своего нынешнего ранга и еще не успели проявить себя.');
-  cmp_AddPlot(0,false,
+  str_camp_SetMissionPlot(0,false,
 'Ваше первое задание - изучить пришельцев, проникнуть в их мир и подчинить его власти Империи.');
 
-  cmp_AddPlot(0,true,
+  str_camp_SetMissionPlot(0,true,
 'Захватчики построили крупный лагерь около Портала, а у нас в этом регионе нет даже небольшого форпоста. Необходимо быстро построить базу, призвать армию и сокрушить нарушителей!');
 
-  cmp_AddPlot(0,true ,'- Достичь уровня энергии 2000');
-  cmp_AddPlot(0,false,'- Построить 4 Врат Демонов'  );
-  cmp_AddPlot(0,false,'- Призвать 30 адских монстров');
-  cmp_AddPlot(0,false,'- Адская Крепость должна уцелеть' );
-  cmp_AddPlot(0,false,'- Уничтожить вторгшихся захватчиков');
+  str_camp_SetMissionPlot(0,true ,'- Достичь уровня энергии 2000');
+  str_camp_SetMissionPlot(0,false,'- Построить 4 Врат Демонов'  );
+  str_camp_SetMissionPlot(0,false,'- Призвать 30 адских монстров');
+  str_camp_SetMissionPlot(0,false,'- Адская Крепость должна уцелеть' );
+  str_camp_SetMissionPlot(0,false,'- Уничтожить вторгшихся захватчиков');
 
   {str_camp_MissionName[0]         := 'Hell #1: Вторжение на Фобос';
   str_camp_MissionName[1]         := 'Hell #2: Военная база';
@@ -1219,148 +1429,17 @@ begin
   str_camp_obj[6]         := '-Уничтожь все людские базы и армии';
   str_camp_obj[7]         := '-Уничтожь космодром'+tc_nl2+'-Ни один людской транспорт не должен'+tc_nl2+'уйти';
 
-  str_camp_map[0]         := tc_lime+'Дата:'+tc_default+tc_nl3+'15.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ФОБОС' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Аномалия';
-  str_camp_map[1]         := tc_lime+'Дата:'+tc_default+tc_nl3+'16.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ФОБОС' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Кратер Халл';
-  str_camp_map[2]         := tc_lime+'Дата:'+tc_default+tc_nl3+'15.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ДЕЙМОС'+tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Аномалия';
-  str_camp_map[3]         := tc_lime+'Дата:'+tc_default+tc_nl3+'16.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ДЕЙМОС'+tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Кратер Свифт';
-  str_camp_map[4]         := tc_lime+'Дата:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'МАРС'  +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Равнина Хеллас';
-  str_camp_map[5]         := tc_lime+'Дата:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'МАРС'  +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Равнина Хеллас';
-  str_camp_map[6]         := tc_lime+'Дата:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ЗЕМЛЯ' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Неизвестно';
-  str_camp_map[7]         := tc_lime+'Дата:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ЗЕМЛЯ' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Неизвестно';  }
+  str_camp_MissionMap[0]         := tc_lime+'Дата:'+tc_default+tc_nl3+'15.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ФОБОС' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Аномалия';
+  str_camp_MissionMap[1]         := tc_lime+'Дата:'+tc_default+tc_nl3+'16.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ФОБОС' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Кратер Халл';
+  str_camp_MissionMap[2]         := tc_lime+'Дата:'+tc_default+tc_nl3+'15.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ДЕЙМОС'+tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Аномалия';
+  str_camp_MissionMap[3]         := tc_lime+'Дата:'+tc_default+tc_nl3+'16.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ДЕЙМОС'+tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Кратер Свифт';
+  str_camp_MissionMap[4]         := tc_lime+'Дата:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'МАРС'  +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Равнина Хеллас';
+  str_camp_MissionMap[5]         := tc_lime+'Дата:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'МАРС'  +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Равнина Хеллас';
+  str_camp_MissionMap[6]         := tc_lime+'Дата:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ЗЕМЛЯ' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Неизвестно';
+  str_camp_MissionMap[7]         := tc_lime+'Дата:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'Место:'+tc_default+tc_nl3+'ЗЕМЛЯ' +tc_nl3+tc_lime+'Район:'+tc_default+tc_nl3+'Неизвестно';  }
 
-  str_makeHints;
+  str_makeAllHints;
 end;
-
-{
-procedure WriteUnitDescriptions;
-const fname = '_strings.txt';
-var
-f  :text;
-u,a:byte;
-procedure upgrLine(upid:byte;info:shortstring);
-begin
-   if(upid>0)then
-     with g_upids[upid] do
-       writeln(f,'- ',upgr_str_Name,' - ',info,';');
-end;
-begin
-   assign(f,fname);
-   rewrite(f);
-
-   for u:=0 to 255 do
-    with g_uids[u] do
-     if(length(uid_str_Name)>0)and(uid_r>0)then
-     begin
-        writeln(f,uid_str_name);
-        writeln(f);
-
-        writeln(f,'Hotkey: ',RemoveSpecChars(str_ProductionHotKey(uid_uibtn)));
-        writeln(f,'Categories/Attributes: ',RemoveSpecChars(str_UnitAttributes(nil,u)));
-        writeln(f,'Max hits: ',uid_MaxHits1);
-
-        if(uid_BaseRegen>0)then
-        writeln(f,'Base regeneration: ',uid_BaseRegen);
-
-        writeln(f,'Limit used: ', limit2s(uid_LimitUse,ul1));
-        writeln(f,'Size: ',uid_r);
-        if(uid_BaseSpeed>0)then
-        writeln(f,'Base movement speed: ' , uid_BaseSpeed);
-        writeln(f,'Base vision range: ', uid_BaseSightR);
-        writeln(f,'Build time: ' , uid_ProdTimeSec);
-        writeln(f,'Energy required: ' , uid_EnergyReq);
-        if(uid_PainC>0)then
-        writeln(f,'PainState base threshold: ' , uid_PainC);
-        if(not uid_isfly)and(not uid_isbuilding)then
-        writeln(f,'Places in transport: ',uid_TransportSize );
-        if(uid_TransportMax>0)then
-        writeln(f,'Base transport capacity: ',uid_TransportMax );
-
-        if(uid_ZombieUID>0)then
-        if(uid_ZombieHits>0)or(uid_FastDeathHits<0)then
-        begin
-        writeln(f,'Zombie: ',g_uids[uid_ZombieUID].uid_str_name );
-        writeln(f,'Zombification hits: ',uid_ZombieHits);
-        end;
-
-        writeln(f,RemoveSpecChars(uid_str_Reqs));
-
-        if(uid_CanAttack)then
-        begin
-           writeln(f,str_hint_UnitArming);
-
-           if(length(uid_str_ArmsCommon)>0)then
-             writeln(f,uid_str_ArmsCommon);
-
-           for a:=0 to LastUnitArms do
-             if(length(uid_str_Arms[a])>0)then writeln(f,uid_str_Arms[a],';');
-        end;
-
-
-        writeln(f,'Upgrades:');
-        upgrLine(uid_upgr_SightR,'vision range '+i2sSign(uid_upgr_SightStep));
-        if(not uid_isbuilding)then
-        upgrLine(upgr_race_unit_srange[uid_race],'vision range '+i2sSign(upgr_race_srange_unit_bonus[uid_race]));
-
-        if(uid_isbuilding)
-        then upgrLine(uid_upgr_Armor,'armor '+i2sSign(UpgradeBuildArmorBonus))
-        else upgrLine(uid_upgr_Armor,'armor '+i2sSign(UpgradeUnitArmorBonus ));
-
-        if(uid_isbuilding)
-        then upgrLine(upgr_race_armor_build[uid_race],'armor '+i2sSign(UpgradeBuildArmorBonus))
-        else
-          if(uid_ismech)
-          then upgrLine(upgr_race_armor_mech[uid_race],'armor '+i2sSign(UpgradeUnitArmorBonus))
-          else upgrLine(upgr_race_armor_bio [uid_race],'armor '+i2sSign(UpgradeUnitArmorBonus));
-
-        upgrLine(uid_upgr_Regen,'hits regeneration '+i2sSign(BaseArmorBonus1));
-        if(uid_isbuilding)
-        then upgrLine(upgr_race_regen_build[uid_race],'hits regeneration '+i2sSign(BaseArmorBonus1))
-        else
-          if(uid_ismech)
-          then upgrLine(upgr_race_regen_mech[uid_race],'hits regeneration '+i2sSign(BaseArmorBonus1))
-          else upgrLine(upgr_race_regen_bio [uid_race],'hits regeneration '+i2sSign(BaseArmorBonus1));
-
-        if(uid_isbuilding)
-        then
-        else
-          if(uid_ismech)
-          then upgrLine(upgr_race_mspeed_mech[uid_race],'movement speed '+i2sSign(2))
-          else upgrLine(upgr_race_mspeed_bio [uid_race],'movement speed '+i2sSign(2));
-
-        if(not uid_isbuilding)and(uid_PainC>0)and(uid_race=r_hell)then
-        upgrLine(upgr_hell_PainFactor,'PainState threshold '+i2sSign(uid_PainCUpgrStep));
-
-        writeln(f);
-
-        writeln(f,RemoveSpecChars(str_MakeUnitDefaultDescription(u,uid_str_BaseDescript,true)));
-
-        writeln(f);
-        {
-        Max count	Unlimited
-        }
-        writeln(f,'---------------------------');
-        writeln(f);
-     end;
-
-   writeln(f);
-
-   for u:=0 to 255 do
-    with g_upids[u] do
-     if(length(upgr_str_Name)>0)then
-     begin
-        writeln(f,RemoveSpecChars(str_makeUpgrCostHint(u,255)));
-        //writeln(f,RemoveSpecChars(upgr_txt_Hint));
-        writeln(f);
-     end;
-   writeln(f);
-{
-s1:=str_makeUpgrCostHint(uid,upgr[uid]+1);
-hs1:=@s1;
-hs4:=@g_upids[uid].upgr_txt_Hint;
-}
-
-   close(f);
-end;   }
 
 procedure SwitchLanguage;
 begin

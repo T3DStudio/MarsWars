@@ -164,7 +164,7 @@ begin
 
    net_writebyte(map_scenario  );
    net_writebyte(map_generators);
-   net_writeint (map_Size      );
+   net_writeint (map_Size1      );
    net_writebyte(map_ObstaclesF);
    net_writecard(map_seed      );
    net_writebool(map_Symmetry  );
@@ -520,7 +520,7 @@ begin
 
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_generators  ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrInt (@map_Size        ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrInt (@map_Size1        ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_ObstaclesF  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrBool(@map_Symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
@@ -728,6 +728,7 @@ procedure net_DiscoweringUpdate(aip:cardinal;aport:word;ainfo:shortstring);
 var i,e:word;
 begin
    e:=0;
+
    if(net_svsearch_size>0)then
      for i:=0 to net_svsearch_size-1 do
        with net_svsearch_listi[i] do

@@ -2,9 +2,10 @@
 procedure KeyPoints_Clear;
 var i:byte;
 begin
-   FillChar(g_KeyPoints,SizeOf(g_KeyPoints),0);
+   map_KeyPointsN:=0;
+   FillChar(map_KeyPointsL,SizeOf(map_KeyPointsL),0);
    for i:=0 to LastKeyPoint do
-     with g_KeyPoints[i] do
+     with map_KeyPointsL[i] do
      begin
         kpOwnerPlayer     :=255;
         kpOwnerTeam       :=255;
@@ -15,7 +16,7 @@ end;
 
 procedure KeyPoint_ChangeOwner(i,newOwnerPlayer:byte;log:boolean=true);
 begin
-   with g_KeyPoints[i] do
+   with map_KeyPointsL[i] do
      if(kpOwnerPlayer<>newOwnerPlayer)then
      begin
         if(kpOwnerPlayer<=LastPlayer)then
@@ -53,7 +54,7 @@ iPlayers,
 iTeams  : integer;
 begin
    for i:=0 to LastKeyPoint do
-     with g_KeyPoints[i] do
+     with map_KeyPointsL[i] do
        if(kpCaptureR>0)then
        begin
           p:=0;
@@ -102,7 +103,7 @@ begin
           end;
 
        if((iPlayers=0)and(kpEnergy>0))
-       or((i=0)and(map_scenario=mc_KotH)and(g_tick<g_step_koth_pause))then
+       or((i=0)and(map_scenario=mc_KotH)and(g_tick<keyPoint_KotH_pause))then
        begin
           iPlayers:=1;
           iOwnerPlayer:=255;
@@ -140,7 +141,7 @@ procedure Scenario_KeyPointsEndConditions;
 var i,
 wteam  ,
 wteam_n,
-kp_captured_n :integer;
+kp_captured_n:integer;
 begin
    // VICTORY CONDITIONS
    wteam        :=255;
@@ -148,19 +149,19 @@ begin
    kp_captured_n:=0;
 
    for i:=0 to LastKeyPoint do
-    with g_KeyPoints[i] do
-     if(kpCaptureR>0)and(kpEnergy<=0)then
-     begin
-        kp_captured_n+=1;
-        if(kpOwnerTeam<=LastPlayer)then
-        begin
-           if(wteam=255)
-           or(wteam<>kpOwnerTeam)
-           then wteam_n:=0;
-           wteam  :=kpOwnerTeam;
-           wteam_n+=1;
-        end;
-     end;
+     with map_KeyPointsL[i] do
+       if(kpCaptureR>0)and(kpEnergy<=0)then
+       begin
+          kp_captured_n+=1;
+          if(kpOwnerTeam<=LastPlayer)then
+          begin
+             if(wteam=255)
+             or(wteam<>kpOwnerTeam)
+             then wteam_n:=0;
+             wteam  :=kpOwnerTeam;
+             wteam_n+=1;
+          end;
+       end;
 
    if(kp_captured_n>0)and(wteam_n=kp_captured_n)and(wteam<=LastPlayer)then Game_SetStatusWinnerTeam(wteam);
 end;

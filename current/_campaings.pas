@@ -47,8 +47,8 @@ begin
 end;
 procedure cmp_SetPStartMir(p1,p2:byte);
 begin
-   map_PlayerStartX[p1]:=map_Size-map_PlayerStartX[p2];
-   map_PlayerStartY[p1]:=map_Size-map_PlayerStartY[p2];
+   map_PlayerStartX[p1]:=map_Size1-map_PlayerStartX[p2];
+   map_PlayerStartY[p1]:=map_Size1-map_PlayerStartY[p2];
 end;
 procedure cmp_FillPStartsCircle(pstart,pnum:byte;cx,cy,cr,cd:integer);
 var p:byte;
@@ -97,7 +97,7 @@ begin
         map_scenario      :=mc_ffa8;
         map_generators:=0;
         map_seed    :=666;
-        map_Size      :=4000;
+        map_Size1      :=4000;
         map_ObstaclesF     :=4;
         map_Symmetry:=false;
         map_BaseVars;
@@ -109,7 +109,7 @@ begin
         cmp_SetPlayer(4      ,r_uac ,ps_AI);
 
         cmp_ClearPStarts;
-        cmp_SetPStart(1,map_Size div 4,map_Size div 3);
+        cmp_SetPStart(1,map_Size1 div 4,map_Size1 div 3);
         cmp_SetPStartMir(4,1);
 
         cmp_CreateUnit(LocalPlayer,map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer],UID_HKeep);

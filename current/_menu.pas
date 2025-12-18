@@ -30,10 +30,11 @@ end;
 
 procedure menu_ControlPanelPosScroll(forward:boolean);
 begin
-   ScrollByte(@ui_ControlPanelPos,forward,0,vid_MaxControlPanelPos);
+   ScrollByte(@ui_ControlPanelPos,forward,0,ui_MaxControlPanelPos);
    vid_RemakeScreenSurfaces;
    theme_map_pTerrain:=255;
    gfx_MapMakeTerrain;
+   ui_InitControlPanelBTNActions;
 end;
 
 procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);
@@ -145,8 +146,11 @@ begin
 
              if(net_UpSocket(net_svLanAdv_port))then
              begin
-                net_status:=ns_client;
+                net_status  :=ns_client;
                 net_svsearch:=true;
+                net_svsearch_size:=0;
+                setlength(net_svsearch_lists,0);
+                setlength(net_svsearch_listi,0);
              end
              else menu_msgBox_Set(str_Caption_Multiplayer,str_net_LANSearch+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
@@ -157,8 +161,11 @@ begin
              if(check)then exit;
 
              net_dispose;
-             net_status:=ns_none;
+             net_status  :=ns_none;
              net_svsearch:=false;
+             net_svsearch_size:=0;
+             setlength(net_svsearch_lists,0);
+             setlength(net_svsearch_listi,0);
           end;
    end;
 end;
@@ -194,7 +201,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure menu_GetBarValByte(mi:byte;vvar:pbyte;vmin,vmax:byte;ClickOutSetMax:boolean);
+procedure menu_GetBarValByte(mi:byte;vvar:pbyte;vmin,vmax:byte);
 var
 bstartX,
 bendX  :integer;
@@ -206,16 +213,14 @@ begin
         bstartX:=bendX-(vmax-vmin);
 
         if(bendX<=mouse_x)and(mouse_x<=mi_x1)then
-          case ClickOutSetMax of
-          false: vvar^:=vmax;
-          true : if(vvar^<vmax)then vvar^+=1;
-          end
+        begin
+           if(vvar^<vmax)then vvar^+=1;
+        end
         else
           if(mi_x0<=mouse_x)and(mouse_x<=bstartX)then
-            case ClickOutSetMax of
-            false: vvar^:=vmin;
-            true : if(vvar^>vmin)then vvar^-=1;
-            end
+          begin
+             if(vvar^>vmin)then vvar^-=1;
+          end
           else vvar^:=(mouse_x-bstartX)+vmin;
      end;
 end;
@@ -240,6 +245,37 @@ begin
            menu_MouseXY2Item:=i;
 end;
 
+function menu_HelpSelectUID(mi:byte):byte;
+var
+tx,ty:integer;
+u    :byte;
+begin
+   menu_HelpSelectUID:=0;
+   menu_HelpScroll:=0;
+   with menu_items[mi] do
+   begin
+      tx:=mi_x0;
+      ty:=mi_y0;
+      for u:=1 to 255 do
+        with g_uids[u] do
+          if(uid_r>0)then
+          begin
+             if (tx<=mouse_x)and(mouse_x<=(tx+ui_ButtonWh))
+             and(ty<=mouse_y)and(mouse_y<=(ty+ui_ButtonWh))then
+             begin
+                menu_HelpSelectUID:=u;
+                exit;
+             end;
+
+             tx+=ui_ButtonWh;
+             if(tx>=mi_x1)then
+             begin
+                tx:=mi_x0;
+                ty+=ui_ButtonWh;
+             end;
+          end;
+   end;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -299,14 +335,14 @@ begin
 
    if(n=0)then exit;
 
-   mty0:=menu_h-menu_StepFromBottom-menu_BigButtonH;
+   mty0:=menu_LowerBorderY;
 
    gapX:=0;
    if(n>1)then
    begin
-      gapX:=(menu_w-(menu_BaseW1*2)-(menu_BigButtonW*n)) div (n-1);
+      gapX:=(menu_w-menu_BaseW1-(menu_BigButtonW*n)) div (n-1);
       if(gapX>menu_BaseW1)then gapX:=menu_BaseW1;
-      mtx0  :=menu_hw-((menu_BigButtonW*n)+gapX*(n-1)) div 2; //menu_BaseW1
+      mtx0  :=menu_hw-((menu_BigButtonW*n)+gapX*(n-1)) div 2;
    end
    else mtx0:=menu_hw-(menu_BigButtonW div 2);
 
@@ -437,19 +473,34 @@ begin
 end;
 
 procedure menu_page_Help;
+var tx:integer;
 begin
    menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Help);
 
-   mtx0:=menu_border1;
+   mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
    menu_Item_Set(mi_help_Basics      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
+   menu_Item_Set(mi_help_HotKeys     ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
    menu_Item_Set(mi_help_UnitsInfo   ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
    menu_Item_Set(mi_help_UnitsBalance,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
 
    case menu_HelpPage of
-   mi_help_Basics      :;
-   mi_help_UnitsInfo   :;
+   mi_help_Basics,
+   mi_help_HotKeys     : begin
+                            tx:=mtx0+menu_BigButtonW+menu_BaseW1;
+                            menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
+                                                           menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH,true);
+                         end;
+   mi_help_UnitsInfo   : begin
+                            tx:=mtx0+menu_BigButtonW+menu_BaseW1;
+                            menu_Item_Set(mi_help_InfoPanel,tx,menu_underCaptionY,
+                                                            tx+ui_ButtonWh*menu_HelpUnitsBTNsL,menu_LowerBorderY-menu_BigButtonH,true);
+
+                            tx:=menu_items[mi_help_InfoPanel].mi_x1+menu_BaseWh;
+                            menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
+                                                           menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH,true);
+                         end;
    mi_help_UnitsBalance:;
    end;
 
@@ -485,7 +536,7 @@ begin
       if(g_gplayers[p].state=ps_None)and(not g_started)then
       menu_Item_Set(mi_Players_Slot0    +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSwap         (p,LocalPlayer,true))
       else
-      menu_Item_Set(mi_Players_Player0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
+      menu_Item_Set(mi_Players_AIskil0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
 
       if(p<map_MaxPlayers)and(not g_gplayers[p].isobserver)then
       menu_Item_Set(mi_Players_Race0    +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll    (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
@@ -787,14 +838,14 @@ mi_settings_Sound      : if(not check)then menu_SettingsPage:=item;
 // SETTINGS GAME
 mi_SG_ColoredShadows   : if(not check)then ui_ColoredShadow:=not ui_ColoredShadow;
 mi_SG_ShowAPM          : if(not check)then ui_ShowAPM      :=not ui_ShowAPM;
-mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars,true,0,vid_MaxHealthBars);
+mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars,true,0,ui_MaxHealthBars);
 mi_SG_RightClickAction : if(not check)then m_RightClickAct :=not m_RightClickAct;
-mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(item,@ui_CamSpeed,1,vid_MaxCamSpeed,true);
+mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(item,@ui_CamSpeed,1,ui_MaxCamSpeed);
 mi_SG_MouseScroll      : if(not check)then ui_MouseScroll  :=not ui_MouseScroll;
 mi_SG_PlayerName       : ;
 mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;end;
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(true);
-mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,vid_MaxPlayersColor);
+mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,ui_MaxPlayersColor);
 
 // SETTINGS GAME RECORDING
 
@@ -824,18 +875,18 @@ mi_SV_SmoothScaled     : if(not check)then menu_ScaleSmooth:=not menu_ScaleSmoot
 
 mi_SS_SoundVolume      : if(not check)then
                          begin
-                            menu_GetBarValByte(item,@snd_SoundVolume,0,snd_MaxSoundVolume,true);
+                            menu_GetBarValByte(item,@snd_SoundVolume,0,snd_MaxSoundVolume);
                             snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
                             snd_SoundSourceUpdateGainAll;
                          end;
 mi_SS_MusicVolume      : if(not check)then
                          begin
-                            menu_GetBarValByte(item,@snd_MusicVolume,0,snd_MaxSoundVolume,true);
+                            menu_GetBarValByte(item,@snd_MusicVolume,0,snd_MaxSoundVolume);
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
                             snd_SoundSourceUpdateGainAll;
                          end;
 mi_SS_PlayerNext       : if(not check)then snd_SoundMusicControll(true);
-mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,true,1,snd_musicListSizeMax);
+mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,true,1,snd_MaxMusicListSize);
 mi_SS_ReloadPlaylist   : if(not check)then snd_GameMusicReLoad;
 
 // SAVE LOAD
@@ -863,8 +914,8 @@ mi_Replays_delete      : if(not check)then replay_DeleteInit(false);
 // SCIRMISH PLAYERS
 mi_Players_State0..
 mi_Players_State7      : if(not check)then PlayerAIToggle     (item-mi_Players_State0 ,LocalPlayer     ,false);
-mi_Players_Player0..
-mi_Players_Player7     : if(not check)then PlayerAILevelScroll(item-mi_Players_Player0,LocalPlayer,true,false);
+mi_Players_AIskil0..
+mi_Players_AIskil7     : if(not check)then PlayerAILevelScroll(item-mi_Players_AIskil0,LocalPlayer,true,false);
 mi_Players_Slot0..
 mi_Players_Slot7       : if(not check)then PlayersSwap        (item-mi_Players_Slot0  ,LocalPlayer     ,false);
 mi_Players_Race0..
@@ -902,6 +953,30 @@ mi_MP_ClientLANSearch  : if(not check)then GameNetServerSearch(true,false);
 // Net Search MULTIPLAYER
 mi_NetSearch_List      : if(not check)then menu_ListMouseXY2Line(item,@net_svsearch_sel,net_svsearch_scroll,menu_ListLineH2);
 mi_NetSearch_Connect   : if(not check)then GameNetServerListConnect(false);
+
+// HELP
+mi_help_Basics,
+mi_help_HotKeys,
+mi_help_UnitsInfo,
+mi_help_UnitsBalance   : if(not check)then
+                         begin
+                            menu_HelpPage  :=item;
+                            menu_HelpScroll:=0;
+                            menu_HelpIList :=nil;
+                            case menu_HelpPage of
+                            mi_help_Basics   : menu_HelpIList:=@str_doc_Basics1;
+                            mi_help_HotKeys  : menu_HelpIList:=@str_doc_HotKeys;
+                            mi_help_UnitsInfo: menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
+                            end;
+                         end;
+mi_help_InfoPanel      : case menu_HelpPage of
+                         mi_help_UnitsInfo : if(not check)then
+                                             begin
+                                                menu_HelpUID  :=menu_HelpSelectUID(item);
+                                                menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
+                                             end;
+                         else menu_Controls_MLB:=false;
+                         end;
    else
       menu_Controls_MLB:=false;
    end;
@@ -926,27 +1001,14 @@ function menu_Controls_MRB(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MRB:=true;
    case item of
-mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor  ,false,0,vid_MaxPlayersColor);
-mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars    ,false,0,vid_MaxHealthBars  );
+mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor  ,false,0,ui_MaxPlayersColor);
+mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars    ,false,0,ui_MaxHealthBars  );
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(false);
 mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality     ,false,0,rpls_MaxQuality    );
-mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,false,1,snd_musicListSizeMax);
+mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,false,1,snd_MaxMusicListSize);
 
-mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(item,@ui_CamSpeed,1,vid_MaxCamSpeed,false);
-mi_SS_SoundVolume      : if(not check)then
-                         begin
-                            menu_GetBarValByte(item,@snd_SoundVolume,0,snd_MaxSoundVolume,false);
-                            snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
-                            snd_SoundSourceUpdateGainAll;
-                         end;
-mi_SS_MusicVolume      : if(not check)then
-                         begin
-                            menu_GetBarValByte(item,@snd_MusicVolume,0,snd_MaxSoundVolume,false);
-                            snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
-                            snd_SoundSourceUpdateGainAll;
-                         end;
-mi_Players_Player0..
-mi_Players_Player7     : if(not check)then PlayerAILevelScroll(item-mi_Players_Player0,LocalPlayer,false,false);
+mi_Players_AIskil0..
+mi_Players_AIskil7     : if(not check)then PlayerAILevelScroll(item-mi_Players_AIskil0,LocalPlayer,false,false);
 mi_Players_Team0..
 mi_Players_Team7       : if(not check)then PlayerTeamScroll   (item-mi_Players_Team0  ,LocalPlayer,false,false);
 
@@ -980,6 +1042,23 @@ mi_NetSearch_List      : if(not check)then ScrollInt(@net_svsearch_scroll, 10,0,
 mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   , 10,0,svld_list_size   -menu_BaseList1H   ,false);
 mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   , 10,0,rpls_list_size   -menu_BaseList1H   ,false);
 mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    ,-2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
+mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
+                                           with menu_HelpIList^ do
+                                           ScrollInt(@menu_HelpScroll    , 2 ,0,slist_n          -ui_DocListH       ,false);
+
+mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,false,1,ui_MaxCamSpeed,false);
+mi_SS_SoundVolume      : if(not check)then
+                         begin
+                            ScrollByte(@snd_SoundVolume,false,0,snd_MaxSoundVolume,false);
+                            snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
+                            snd_SoundSourceUpdateGainAll;
+                         end;
+mi_SS_MusicVolume      : if(not check)then
+                         begin
+                            ScrollByte(@snd_MusicVolume,false,0,snd_MaxSoundVolume,false);
+                            snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
+                            snd_SoundSourceUpdateGainAll;
+                         end;
    else
       menu_Controls_MWD:=false;
    end;
@@ -993,6 +1072,23 @@ mi_NetSearch_List      : if(not check)then ScrollInt(@net_svsearch_scroll,-10,0,
 mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   ,-10,0,svld_list_size   -menu_BaseList1H   ,false);
 mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   ,-10,0,rpls_list_size   -menu_BaseList1H   ,false);
 mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    , 2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
+mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
+                                           with menu_HelpIList^ do
+                                           ScrollInt(@menu_HelpScroll    ,-2 ,0,slist_n          -ui_DocListH       ,false);
+
+mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,true,1,ui_MaxCamSpeed,false);
+mi_SS_SoundVolume      : if(not check)then
+                         begin
+                            ScrollByte(@snd_SoundVolume,true,0,snd_MaxSoundVolume,false);
+                            snd_svolume1:=snd_SoundVolume/snd_MaxSoundVolume;
+                            snd_SoundSourceUpdateGainAll;
+                         end;
+mi_SS_MusicVolume      : if(not check)then
+                         begin
+                            ScrollByte(@snd_MusicVolume,true,0,snd_MaxSoundVolume,false);
+                            snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
+                            snd_SoundSourceUpdateGainAll;
+                         end;
    else
       menu_Controls_MWU:=false;
    end;
@@ -1066,12 +1162,17 @@ mnx,
 mny       :integer;
 changed,
 clickSound:boolean;
-procedure SetSelectedItem(newItem:byte);
+procedure SetSelectedItem(newItem:byte;fromTarget:boolean=false);
 begin
-   if(menu_ItemSelected=0)then
-     if(menu_items[newItem].mi_state>as_off)then
-       menu_ItemSelected:=newItem;
+   if(menu_items[newItem].mi_state>as_off)then
+     case fromTarget of
+     false: if(menu_ItemSelected=0)then
+              menu_ItemSelected:=newItem;
+     true : if(newItem=menu_ItemTarget)then
+              menu_ItemSelected:=newItem;
+     end;
 end;
+
 begin
    mnx:=mouse_x;
    mny:=mouse_y;
@@ -1164,6 +1265,10 @@ begin
              SetSelectedItem(mi_SaveLoad_list );
              SetSelectedItem(mi_Replays_list  );
              SetSelectedItem(mi_MP_ChatList   );
+             SetSelectedItem(mi_help_InfoList );
+             SetSelectedItem(mi_SS_SoundVolume,true);
+             SetSelectedItem(mi_SS_MusicVolume,true);
+             SetSelectedItem(mi_SG_ScrollSpeed,true);
 
              if(menu_Controls_MWD(menu_ItemSelected,false))then
              begin
@@ -1182,6 +1287,10 @@ begin
              SetSelectedItem(mi_SaveLoad_list );
              SetSelectedItem(mi_Replays_list  );
              SetSelectedItem(mi_MP_ChatList   );
+             SetSelectedItem(mi_help_InfoList );
+             SetSelectedItem(mi_SS_SoundVolume,true);
+             SetSelectedItem(mi_SS_MusicVolume,true);
+             SetSelectedItem(mi_SG_ScrollSpeed,true);
              if(menu_Controls_MWU(menu_ItemSelected,false))then
              begin
                 SetBBit(@menu_ItemActs,miat_MWhell,true);
@@ -1199,6 +1308,11 @@ begin
 
   // if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
   // if(InputActionPressed(iAct_test_debug1      ))then ;
+
+   if(menu_ItemTargetP<>menu_ItemTarget)then
+     if(menu_hint_pos[menu_ItemTarget ]>0)
+     or(menu_hint_pos[menu_ItemTargetP]>0)then menu_update:=true;
+   menu_ItemTargetP:=menu_ItemTarget;
 
    if(clickSound)then snd_SoundPlayUI(snd_click);
 

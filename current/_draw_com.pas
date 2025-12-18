@@ -210,7 +210,7 @@ var i:byte;
     c:cardinal;
 begin
    for i:=0 to LastKeyPoint do
-     with g_KeyPoints[i] do
+     with map_KeyPointsL[i] do
        if(kpCaptureR>0)then
        begin
           if(colored)
@@ -266,8 +266,8 @@ begin
    }
    ui_AddMarker:=false;
 
-   ax:=mm3i(1,ax,map_Size);
-   ay:=mm3i(1,ay,map_Size);
+   ax:=mm3i(1,ax,map_Size1);
+   ay:=mm3i(1,ay,map_Size1);
 
    mx:=trunc(ax*map_MiniMap_cx);
    my:=trunc(ay*map_MiniMap_cx);

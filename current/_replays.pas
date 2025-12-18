@@ -9,11 +9,12 @@ begin
    rpls_str_info1:='';
    rpls_str_info2:='';
 
-   if(rpls_list_sel<0)or(rpls_list_sel>=rpls_list_size)then exit;
-
+   if(rpls_list_sel<0)
+   or(rpls_list_sel>=rpls_list_size)then exit;
    if(length(rpls_list[rpls_list_sel])=0)then exit;
 
    fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
+
    if(not FileExists(fn))then
    begin
       rpls_str_info1:=str_FileError_NExists;
@@ -104,7 +105,7 @@ begin
    AddItem(@map_scenario        ,SizeOf(map_scenario     ));
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
-   AddItem(@map_Size            ,SizeOf(map_Size         ));
+   AddItem(@map_Size1            ,SizeOf(map_Size1         ));
    AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
@@ -437,7 +438,7 @@ begin
             exit;
          end;
 
-         if(map_Size<map_MinSize)or(map_Size>map_MaxSize)
+         if(map_Size1<map_MinSize)or(map_Size1>map_MaxSize)
          or(map_ObstaclesF>map_MaxObstacles)
          or(map_Generators>map_MaxGenerators)
          or not(map_scenario in allmapscenarios)
@@ -456,8 +457,8 @@ begin
            with g_gplayers[p] do
              if(length(name)>MaxPlayerNameLen)
              or not(state in [ps_None,ps_human,ps_AI])
-             or(race >r_cnt)
-             or(mrace>r_cnt)
+             or(race >r_count)
+             or(mrace>r_count)
              or(team >LastPlayer)then
              begin
                 replay_Abort;
@@ -602,7 +603,7 @@ var Info : TSearchRec;
 begin
    rpls_list_scroll:=0;
    rpls_list_size  :=0;
-   setlength(rpls_list,0);
+   setlength(rpls_list,rpls_list_size);
    if(FindFirst(folder_replay+'*'+fileExt_Replay,faReadonly,info)=0)then
      repeat
         s:=info.Name;

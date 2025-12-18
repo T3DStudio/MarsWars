@@ -155,7 +155,7 @@ begin
    AddItem(@map_scenario        ,SizeOf(map_scenario     ));
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
-   AddItem(@map_Size            ,SizeOf(map_Size         ));
+   AddItem(@map_Size1            ,SizeOf(map_Size1         ));
    AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
@@ -179,7 +179,7 @@ begin
    AddItem(@g_effects           ,SizeOf(g_effects          ));
    AddItem(@g_random_i          ,SizeOf(g_random_i         ));
    AddItem(@g_random_p          ,SizeOf(g_random_p         ));
-   AddItem(@g_KeyPoints         ,SizeOf(g_KeyPoints        ));
+   AddItem(@map_KeyPointsL         ,SizeOf(map_KeyPointsL        ));
    AddItem(@g_royal_r           ,SizeOf(g_royal_r          ));
    AddItem(@g_status            ,SizeOf(g_status           ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));

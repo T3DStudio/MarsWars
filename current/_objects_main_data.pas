@@ -14,7 +14,7 @@ end;
 
 procedure unit_CalcFogR(pu:PTUnit);
 begin
-   with pu^ do fsr:=mm3i(1,srange div fog_cw,MFogM);
+   with pu^ do fsr:=mm3i(1,srange div fog_cw,fog_MaxR);
 end;
 
 procedure units_UpdateMiniMapR;
@@ -35,10 +35,10 @@ begin
       with uid^ do
       begin
          srange     :=uid_r+uid_r;
-         speed      :=uid_BaseSpeed;
+         speed      :=uid_MSpeed_Base;
          ukfly      :=uid_isfly;
-         transportM :=uid_TransportMax;
-         pains      :=uid_PainC;
+         transportM :=uid_TransportMax_Base;
+         pains      :=uid_Pain;
          solid      :=uid_issolid;
 
          if(uid_isbuilding)and(uid_isbarrack)then
@@ -101,7 +101,7 @@ begin
    for i:=0 to 255 do
    with g_uids[i] do
    begin
-      uid_MaxHits1     := 1000;
+      uid_MaxHits1     := 0;
       uid_ProdTimeSec  := 1;
       uid_uibtn        := 255;
       uid_race         := r_hell;
@@ -125,71 +125,76 @@ begin
       case i of
 //         HELL BUILDINGS   ////////////////////////////////////////////////////
 
-// MAIN BUILDER
+// BUILDERS
 UID_HKeep,
 UID_HAKeep:
 begin
-   uid_MaxHits1        := 15000;
+   uid_MaxHits1        := 12000;
    uid_EnergyReq       := 900;
    uid_r               := 66;
-   uid_BaseSightR      := 250;
    uid_uibtn           := 0;
    uid_ProdTimeSec     := ptime3;
-   uid_BaseRegen       := BaseRegen1;
+   uid_SightR_Base     := 250;
+   uid_SightR_upgr     := upgr_hell_BuilderR;
+   uid_SightR_upgrV    := 50;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isbuilder       := true;
-   uid_prod_Buildings  := [UID_HKeep..UID_HFortress]-[UID_HAKeep,UID_HSymbol2,UID_HSymbol3,UID_HSymbol4];
-   uid_upgr_SightR     := upgr_hell_BuilderR;
-   uid_upgr_SightStep  := 50;
+   uid_prod_Buildings  := [UID_HKeep..UID_HBarracks]-[UID_HAKeep,UID_HSymbol2,UID_HSymbol3,UID_HSymbol4,UID_HACommandCenter];
    uid_ability1        := uab_HKeepShift;
    uid_ability2        := uab_HKeepAura;
 
    case i of
 UID_HKeep : begin
-               uid_EnergyGen  := 300;
-               uid_ability3   := uab_ToHAKeep;
+               uid_EnergyGen:= 300;
+               uid_ability3 := uab_ToHAKeep;
             end;
 UID_HAKeep: begin
-               uid_EnergyGen  := 900;
-               uid_EnergyReq  := 300;
+               uid_EnergyGen:= 900;
+               uid_EnergyReq:= 300;
             end;
    end;
 end;
 
-// BASE PROD
+// UNIT&UPGRADES PRODS
 UID_HGate:
 begin
-   uid_MaxHits1        := 10000;
+   uid_MaxHits1        := 8000;
    uid_EnergyReq       := 300;
    uid_r               := 60;
    uid_uibtn           := 1;
    uid_ProdTimeSec     := ptime2;
-   uid_BaseRegen       := BaseRegen1;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_OutUnitsTeleBuff:= true;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isbarrack       := true;
-   uid_prod_Units      := [UID_Imp..UID_Archvile];
+   uid_prod_Units      := [UID_Imp..UID_Mastermind];
    uid_ability3        := uab_ToHGate;
 end;
 
 UID_HPools:
 begin
-   uid_MaxHits1        := 10000;
+   uid_MaxHits1        := 8000;
    uid_EnergyReq       := 300;
    uid_r               := 53;
    uid_uibtn           := 5;
    uid_ProdTimeSec     := ptime2;
-   uid_BaseRegen       := BaseRegen1;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_issmith         := true;
-   uid_prod_Upgrades   := [];
    uid_ability3        := uab_ToHPool;
 end;
 
-// BASE ENERGY PROD
+// ENERGY PROD
 UID_HSymbol1,
 UID_HSymbol2,
 UID_HSymbol3,
@@ -201,10 +206,13 @@ begin
    uid_r               := 22;
    uid_uibtn           := 2;
    uid_ProdTimeSec     := ptime1;
+   uid_Regen_Base      := BaseRegen1;
    uid_isbuilding      := true;
    uid_islight         := true;
    uid_ismech          := false;
    uid_SplashResist    := true;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
 
    case i of
 UID_HSymbol1: begin
@@ -227,28 +235,31 @@ UID_HSymbol4: begin
    end;
 end;
 
-// BASE TECH
-
+// TECH
 UID_HMonastery:
 begin
-   uid_MaxHits1        := 15000;
+   uid_MaxHits1        := 12000;
    uid_EnergyReq       := 1200;
    uid_r               := 65;
    uid_uibtn           := 9;
    uid_ProdTimeSec     := ptime5;
-   uid_BaseRegen       := BaseRegen1;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_req_uid1        := UID_HPools;
 end;
 UID_HPentagram:
 begin
-   uid_MaxHits1        := 15000;
+   uid_MaxHits1        := 12000;
    uid_EnergyReq       := 1200;
    uid_r               := 65;
    uid_uibtn           := 10;
    uid_ProdTimeSec     := ptime5;
-   uid_BaseRegen       := BaseRegen1;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_issolid         := false;
@@ -256,12 +267,14 @@ begin
 end;
 UID_HFortress:
 begin
-   uid_MaxHits1        := 15000;
+   uid_MaxHits1        := 12000;
    uid_EnergyReq       := 1200;
    uid_r               := 86;
    uid_uibtn           := 11;
    uid_ProdTimeSec     := ptime5;
-   uid_BaseRegen       := BaseRegen1;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_req_uid1        := UID_HPools;
@@ -274,17 +287,20 @@ begin
    uid_MaxHits1        := 50;
    uid_EnergyReq       := 50;
    uid_r               := 10;
-   uid_BaseSightR      := 300;
+   uid_SightR_Base     := 300;
+   uid_SightR_upgr     := upgr_hell_EvilEyeR;
+   uid_SightR_upgrV    := 50;
    uid_uibtn           := 12;
    uid_ProdTimeSec     := ptime1h;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_issolid         := false;
    uid_islight         := true;
    uid_ismech          := false;
    uid_SplashResist    := true;
    uid_isdetector      := true;
-   uid_upgr_SightR     := upgr_hell_EvilEyeR;
-   uid_upgr_SightStep  := 50;
    uid_ability1        := uab_HEyeBlink;
    uid_ability2        := uab_HEyeVision;
 end;
@@ -293,11 +309,13 @@ begin
    uid_MaxHits1        := 5000;
    uid_EnergyReq       := 400;
    uid_r               := 28;
-   uid_BaseSightR      := 100;
+   uid_SightR_Base     := 100;
    uid_uibtn           := 13;
    uid_ProdTimeSec     := ptime2;
-   uid_BaseRegen       := BaseRegen1;
-   uid_LimitUse        := ul4;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
+   uid_LimitUse        := ul3;
    uid_ability1        := uab_Teleport;
    uid_ability2        := uab_Recall;
    uid_isbuilding      := true;
@@ -313,7 +331,9 @@ begin
    uid_uibtn           := 14;
    uid_LimitUse        := ul10;
    uid_ProdTimeSec     := ptime10;
-   uid_BaseRegen       := BaseRegen1;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_req_uid1        := UID_HPentagram;
    uid_req_uid2        := UID_HMonastery;
    uid_req_uid3        := UID_HFortress;
@@ -327,27 +347,33 @@ end;
 
 UID_HTower:
 begin
-   uid_MaxHits1        := 5000;
+   uid_MaxHits1        := 3000;
    uid_EnergyReq       := 200;
    uid_r               := 20;
-   uid_BaseSightR      := 300;
+   uid_SightR_Base     := 300;
+   uid_SightR_upgr     := upgr_hell_TowerR;
+   uid_SightR_upgrV    := 25;
    uid_uibtn           := 6;
    uid_ProdTimeSec     := ptime1q;
+   uid_Regen_Base      := BaseRegen1;
+   uid_Regen_Upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_ability1        := uab_HTowerBlink;
    uid_ability3        := uab_ToHTotem;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_islight         := true;
-   uid_upgr_SightR     := upgr_hell_TowerR;
-   uid_upgr_SightStep  := 25;
+
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpst,MID_Imp,0,0,upgr_hell_DistDamage1,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Imp],[],0,-26,0,dm_AntiUnitBioHeavy2);
 end;
 UID_HTotem:
 begin
-   uid_MaxHits1        := 4000;
+   uid_MaxHits1        := 2000;
    uid_EnergyReq       := 400;
    uid_r               := 20;
-   uid_BaseSightR      := 350;
+   uid_SightR_Base     := 350;
+   uid_SightR_upgr     := upgr_hell_TowerR;
+   uid_SightR_upgrV    := 25;
    uid_uibtn           := 7;
    uid_ProdTimeSec     := ptime2;
    uid_req_uid1        := UID_HFortress;
@@ -356,8 +382,8 @@ begin
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_islight         := true;
-   uid_upgr_SightR     := upgr_hell_TowerR;
-   uid_upgr_SightStep  := 25;
+   uid_Regen_upgr      := upgr_hell_BuildRestore;
+   uid_Armor_upgr1     := upgr_hell_BuildArmor;
    SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,0);
 end;
 
@@ -369,10 +395,14 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSpeed       := 10;
-   uid_BaseSightR      := 200;
+   uid_MSpeed_Base     := 10;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 200;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 0;
-   uid_PainC           := 2;
+   uid_PainState_Base  := 2;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
@@ -385,10 +415,14 @@ begin
    uid_MaxHits1        := 1500;
    uid_EnergyReq       := 300;
    uid_r               := 14;
-   uid_BaseSpeed       := 16;
-   uid_BaseSightR      := 200;
+   uid_MSpeed_Base     := 16;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 200;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 1;
-   uid_PainC           := 8;
+   uid_PainState_Base  := 6;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1;
    SetWeapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpst2,0,0,0,upgr_hell_MeleeDamage,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,0,dm_AntiUnitBioHeavy2);
 end;
@@ -401,10 +435,14 @@ begin
    uid_MaxHits1        := 2500;
    uid_EnergyReq       := 300;
    uid_r               := 14;
-   uid_BaseSpeed       := 10;
-   uid_BaseSightR      := 250;
+   uid_MSpeed_Base     := 10;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 250;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 2;
-   uid_PainC           := 10;
+   uid_PainState_Base  := 6;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_LimitUse        := ul2;
    uid_islight         := true;
@@ -421,10 +459,14 @@ begin
    uid_MaxHits1        := 4500;
    uid_EnergyReq       := 500;
    uid_r               := 14;
-   uid_BaseSpeed       := 10;
-   uid_BaseSightR      := 275;
+   uid_MSpeed_Base     := 10;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 275;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 3;
-   uid_PainC           := 10;
+   uid_PainState_Base  := 8;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_LimitUse        := ul3;
    uid_islight         := false;
@@ -436,10 +478,14 @@ begin
    uid_MaxHits1        := 1500;
    uid_EnergyReq       := 300;
    uid_r               := 13;
-   uid_BaseSpeed       := 14;
-   uid_BaseSightR      := 225;
+   uid_MSpeed_Base     := 14;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 225;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 4;
-   uid_PainC           := 5;
+   uid_PainState_Base  := 4;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1;
    uid_LimitUse        := ul1h;
    uid_islight         := false;
@@ -452,10 +498,14 @@ begin
    uid_MaxHits1        := 2000;
    uid_EnergyReq       := 250;
    uid_r               := 14;
-   uid_BaseSpeed       := 10;
-   uid_BaseSightR      := 200;
+   uid_MSpeed_Base     := 10;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 200;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 5;
-   uid_PainC           := 8;
+   uid_PainState_Base  := 4;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1q;
    uid_LimitUse        := ul1h;
    uid_isfly           := uf_fly;
@@ -467,16 +517,19 @@ begin
 end;
 
 // 'T2' bio
-
-UID_Pain      :
+uid_Pain      :
 begin
    uid_MaxHits1        := 1500;
    uid_EnergyReq       := 500;
    uid_r               := 15;
-   uid_BaseSpeed       := 7;
-   uid_BaseSightR      := 225;
+   uid_MSpeed_Base     := 7;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 225;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 6;
-   uid_PainC           := 3;
+   uid_PainState_Base  := 3;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime2;
    uid_req_uid1        := UID_HMonastery;
    uid_req_uid2        := UID_HAKeep;
@@ -501,10 +554,14 @@ begin
    uid_MaxHits1        := 4000;
    uid_EnergyReq       := 500;
    uid_r               := 17;
-   uid_BaseSpeed       := 8;
-   uid_BaseSightR      := 275;
+   uid_MSpeed_Base     := 8;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 275;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 7;
-   uid_PainC           := 7;
+   uid_PainState_Base  := 8;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HMonastery;
    uid_LimitUse        := ul3;
@@ -516,16 +573,20 @@ begin
    uid_MaxHits1        := 5000;
    uid_EnergyReq       := 700;
    uid_r               := 14;
-   uid_BaseSpeed       := 16;
-   uid_BaseSightR      := 300;
+   uid_MSpeed_Base     := 16;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 350;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 8;
-   uid_PainC           := 12;
+   uid_PainState_Base  := 10;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HMonastery;
    uid_LimitUse        := ul4;
    uid_islight         := true;
    SetWeapon(0,wpt_resurect,aw_dmelee,0,3  ,fr_fpsh,0           ,0,upgr_hell_Resurrect,0,0,wtrset_resurect   ,wpr_any,uids_arch_res,[             ],0,0,0,0);
-   SetWeapon(1,wpt_missle  ,aw_fsr+50,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,0,0);
+   SetWeapon(1,wpt_missle  ,aw_fsr   ,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,0,0);
 end;
 
 // 'T2' mech
@@ -534,16 +595,18 @@ begin
    uid_MaxHits1        := 3000;
    uid_EnergyReq       := 500;
    uid_r               := 17;
-   uid_BaseSpeed       := 11;
-   uid_BaseSightR      := 275;
+   uid_MSpeed_Base     := 11;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 275;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 9;
-   uid_PainC           := 7;
+   uid_PainState_Base  := 8;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HPentagram;
    uid_LimitUse        := ul3;
    uid_ismech          := true;
-   uid_upgr_Regen      := upgr_race_regen_bio[r_hell];
-   uid_upgr_Armor      := upgr_race_armor_bio[r_hell];
    uid_arms_BonusAntiUnitRange:=50;
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpst,MID_YPlasma,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Arachnotron],[],0,0,2,dm_AntiUnitMech2);
 end;
@@ -552,16 +615,18 @@ begin
    uid_MaxHits1        := 14000;
    uid_EnergyReq       := 1200;
    uid_r               := 28;
-   uid_BaseSpeed       := 14;
-   uid_BaseSightR      := 300;
+   uid_MSpeed_Base     := 14;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 300;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 10;
-   uid_PainC           := 10;
+   uid_PainState_Base  := 12;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime4;
    uid_req_uid1        := UID_HPentagram;
    uid_LimitUse        := ul10;
    uid_ismech          := true;
-   uid_upgr_Regen      := upgr_race_regen_bio[r_hell];
-   uid_upgr_Armor      := upgr_race_armor_bio[r_hell];
    uid_arms_BonusAntiUnitRange:=50;
    SetWeapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fpss,MID_SChaingun,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,2,dm_AntiBio2);
 end;
@@ -570,16 +635,18 @@ begin
    uid_MaxHits1        := 15000;
    uid_EnergyReq       := 1200;
    uid_r               := 20;
-   uid_BaseSpeed       := 14;
-   uid_BaseSightR      := 275;
+   uid_MSpeed_Base     := 14;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 275;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 11;
-   uid_PainC           := 10;
+   uid_PainState_Base  := 12;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime4;
    uid_req_uid1        := UID_HPentagram;
    uid_LimitUse        := ul10;
    uid_ismech          := true;
-   uid_upgr_Regen      := upgr_race_regen_bio[r_hell];
-   uid_upgr_Armor      := upgr_race_armor_bio[r_hell];
    uid_arms_BonusAntiBuildingRange:=50;
    SetWeapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps1   ,MID_HRocket,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,dm_Siege4);
 end;
@@ -589,9 +656,13 @@ UID_LostSoul  :
 begin
    uid_MaxHits1        := 1000;
    uid_r               := 10;
-   uid_BaseSpeed       := 24;
-   uid_BaseSightR      := 175;
-   uid_PainC           := 1;
+   uid_MSpeed_Base     := 24;
+   uid_Armor_upgr1     := upgr_hell_UnitArmor;
+   uid_Regen_Upgr      := upgr_hell_Regeneration;
+   uid_SightR_Base     := 175;
+   uid_SightR_upgr     := upgr_hell_UnitSightR;
+   uid_PainState_Base  := 1;
+   uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_isfly           := uf_fly;
    uid_islight         := true;
    uid_FastDeathHits   := 1;
@@ -612,29 +683,35 @@ UID_Phantom : begin
 end;
 
 // ZOMBIE/UAC INFANTRY
-
 UID_Sergant,
 UID_ZSergant :
 begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSightR      := 175;
+   uid_SightR_Base     := 175;
    uid_ProdTimeSec     := ptime1;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
 
    case i of
 UID_Sergant : begin
-              uid_BaseSpeed:= 12;
-              uid_uibtn    := 0;
-              uid_ZombieUID:= UID_ZSergant;
+              uid_uibtn         := 0;
+              uid_MSpeed_Base   := 12;
+              uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+              uid_Armor_upgr1   := upgr_uac_BioArmor;
+              uid_SightR_upgr   := upgr_uac_UnitSightR;
+              uid_ZombieUID     := UID_ZSergant;
               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1,MID_SShot,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_AntiUnitBioHeavy2);
               end;
 UID_ZSergant: begin
-              uid_BaseSpeed:= 14;
-              uid_uibtn    := 14;
-              uid_PainC    := 1;
+              uid_uibtn         := 14;
+              uid_MSpeed_Base   := 14;
+              uid_Armor_upgr1   := upgr_hell_UnitArmor;
+              uid_Regen_Upgr    := upgr_hell_Regeneration;
+              uid_SightR_upgr   := upgr_hell_UnitSightR;
+              uid_PainState_Base:= 1;
+              uid_PainState_upgr:= upgr_hell_PainFactor;
               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1,MID_SShot,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_AntiUnitBioHeavy2);
               end;
    end;
@@ -646,7 +723,7 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 250;
    uid_r               := 11;
-   uid_BaseSightR      := 175;
+   uid_SightR_Base     := 175;
    uid_ProdTimeSec     := ptime1q;
    uid_LimitUse        := ul1h;
    uid_islight         := false;
@@ -654,15 +731,22 @@ begin
 
    case i of
 UID_SSergant : begin
-               uid_BaseSpeed:= 12;
-               uid_uibtn    := 1;
-               uid_ZombieUID:= UID_ZSSergant;
+               uid_uibtn         := 1;
+               uid_MSpeed_Base   := 12;
+               uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+               uid_Armor_upgr1   := upgr_uac_BioArmor;
+               uid_SightR_upgr   := upgr_uac_UnitSightR;
+               uid_ZombieUID     := UID_ZSSergant;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1h,MID_SSShot,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_SSGShot2);
                end;
 UID_ZSSergant: begin
-               uid_BaseSpeed:= 14;
-               uid_uibtn    := 15;
-               uid_PainC    := 1;
+               uid_uibtn         := 15;
+               uid_MSpeed_Base   := 14;
+               uid_Armor_upgr1   := upgr_hell_UnitArmor;
+               uid_Regen_Upgr    := upgr_hell_Regeneration;
+               uid_SightR_upgr   := upgr_hell_UnitSightR;
+               uid_PainState_Base:= 1;
+               uid_PainState_upgr:= upgr_hell_PainFactor;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1h,MID_SSShot,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_SSGShot2);
                end;
    end;
@@ -674,24 +758,30 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSightR      := 200;
+   uid_SightR_Base     := 200;
    uid_ProdTimeSec     := ptime1;
    uid_FastDeathHits   := hits_fdead_border;
    uid_arms_BonusAntiFlyRange:=-50;
    case i of
 UID_Commando : begin
-               uid_BaseSpeed:= 12;
-               uid_uibtn    := 2;
-               uid_ZombieUID:= UID_ZCommando;
-               uid_islight  := true;
-               uid_req_uid1 := UID_UWeaponFactory;
+               uid_uibtn         := 2;
+               uid_MSpeed_Base   := 12;
+               uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+               uid_Armor_upgr1   := upgr_uac_BioArmor;
+               uid_SightR_upgr   := upgr_uac_UnitSightR;
+               uid_ZombieUID     := UID_ZCommando;
+               uid_islight       := true;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,6,dm_AntiUnitBioLight2);
                end;
 UID_ZCommando: begin
-               uid_BaseSpeed:= 14;
-               uid_uibtn    := 16;
-               uid_PainC    := 1;
-               uid_islight  := false;
+               uid_uibtn         := 16;
+               uid_MSpeed_Base   := 14;
+               uid_Armor_upgr1   := upgr_hell_UnitArmor;
+               uid_Regen_Upgr    := upgr_hell_Regeneration;
+               uid_SightR_upgr   := upgr_hell_UnitSightR;
+               uid_PainState_Base:= 1;
+               uid_PainState_upgr:= upgr_hell_PainFactor;
+               uid_islight       := false;
                SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,6,dm_AntiUnitBioLight2);
                end;
    end;
@@ -703,25 +793,32 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSightR      := 175;
+   uid_SightR_Base     := 175;
    uid_ProdTimeSec     := ptime1;
    uid_FastDeathHits   := hits_fdead_border;
    uid_arms_BonusAntiFlyRange:=75;
    case i of
 UID_Antiaircrafter : begin
-                     uid_BaseSpeed:= 12;
-                     uid_uibtn    := 3;
-                     uid_ZombieUID:= UID_ZAntiaircrafter;
-                     uid_islight  := false;
-                     uid_req_uid1 := UID_UWeaponFactory;
-                     SetWeapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocket ,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,0,dm_AntiFly2);
+                     uid_uibtn         := 3;
+                     uid_MSpeed_Base   := 12;
+                     uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+                     uid_Armor_upgr1   := upgr_uac_BioArmor;
+                     uid_SightR_upgr   := upgr_uac_UnitSightR;
+                     uid_ZombieUID     := UID_ZAntiaircrafter;
+                     uid_islight       := false;
+                     SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1,MID_URocket ,0,0                 ,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,-4,0,dm_AntiFly2);
+                     SetWeapon(1,wpt_missle,aw_srange,0,0,fr_fps1,MID_URocket ,0,upgr_uac_SSMWeapon,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,dm_AntiUnitBioLight2);
                      end;
 UID_ZAntiaircrafter: begin
-                     uid_BaseSpeed:= 14;
-                     uid_uibtn    := 17;
-                     uid_PainC    := 1;
-                     uid_islight  := true;
-                     SetWeapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_URocketS,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,0,dm_AntiFly2);
+                     uid_uibtn         := 17;
+                     uid_MSpeed_Base   := 14;
+                     uid_Armor_upgr1   := upgr_hell_UnitArmor;
+                     uid_Regen_Upgr    := upgr_hell_Regeneration;
+                     uid_SightR_upgr   := upgr_hell_UnitSightR;
+                     uid_PainState_Base:= 1;
+                     uid_PainState_upgr:= upgr_hell_PainFactor;
+                     uid_islight       := true;
+                     SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fps1,MID_URocketS,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-4,0,dm_AntiFly2);
                      end;
    end;
 end;
@@ -732,23 +829,30 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSightR      := 175;
+   uid_SightR_Base     := 175;
    uid_ProdTimeSec     := ptime1;
    uid_FastDeathHits   := hits_fdead_border;
    case i of
 UID_SiegeMarine : begin
-                  uid_BaseSpeed:= 10;
-                  uid_uibtn    := 4;
-                  uid_ZombieUID:= UID_ZSiegeMarine;
-                  uid_islight  := false;
-                  uid_req_uid1 := UID_UWeaponFactory;
+                  uid_uibtn         := 4;
+                  uid_MSpeed_Base   := 10;
+                  uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+                  uid_Armor_upgr1   := upgr_uac_BioArmor;
+                  uid_SightR_upgr   := upgr_uac_UnitSightR;
+                  uid_ZombieUID     := UID_ZSiegeMarine;
+                  uid_islight       := false;
+                  uid_req_uid1      := UID_UWeaponFactory;
                   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_Granade,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,dm_Siege4);
                   end;
 UID_ZSiegeMarine: begin
-                  uid_BaseSpeed:= 12;
-                  uid_uibtn    := 18;
-                  uid_PainC    := 1;
-                  uid_islight  := true;
+                  uid_uibtn         := 18;
+                  uid_MSpeed_Base   := 12;
+                  uid_Armor_upgr1   := upgr_hell_UnitArmor;
+                  uid_Regen_Upgr    := upgr_hell_Regeneration;
+                  uid_SightR_upgr   := upgr_hell_UnitSightR;
+                  uid_PainState_Base:= 1;
+                  uid_PainState_upgr:= upgr_hell_PainFactor;
+                  uid_islight       := true;
                   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,0 ,fr_fps1,MID_Granade,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,dm_Siege4);
                   end;
    end;
@@ -761,29 +865,36 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 250;
    uid_r               := 11;
-   uid_BaseSightR      := 200;
+   uid_SightR_Base     := 200;
    uid_ProdTimeSec     := ptime1q;
+   uid_LimitUse        := ul1h;
    uid_FastDeathHits   := 1;
-   uid_arms_BonusAntiFlyRange:=50;
    uid_isfly           := uf_fly;
+   uid_arms_BonusAntiFlyRange:=50;
 
    case i of
 UID_FPlasmagunner : begin
-                    uid_BaseSpeed := 12;
-                    uid_uibtn     := 5;
-                    uid_ZombieUID := UID_ZFPlasmagunner;
-                    uid_ZombieHits:= uid_MaxHits1 div 10;
-                    uid_islight   := false;
-                    uid_req_uid1  := UID_UWeaponFactory;
-                    uid_req_uid2  := UID_UACommandCenter;
+                    uid_uibtn         := 5;
+                    uid_MSpeed_Base   := 12;
+                    uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+                    uid_Armor_upgr1   := upgr_uac_BioArmor;
+                    uid_SightR_upgr   := upgr_uac_UnitSightR;
+                    uid_ZombieUID     := UID_ZFPlasmagunner;
+                    uid_ZombieHits    := uid_MaxHits1 div 10;
+                    uid_islight       := false;
+                    uid_req_uid1      := UID_UACommandCenter;
                     SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsq,MID_BPlasma,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,2,dm_AntiUnitMech2);
                     end;
 UID_ZFPlasmagunner: begin
-                    uid_BaseSpeed := 14;
-                    uid_uibtn     := 19;
-                    uid_PainC     := 1;
-                    uid_islight   := true;
-                    uid_req_uid2  := UID_HACommandCenter;
+                    uid_uibtn         := 19;
+                    uid_MSpeed_Base   := 14;
+                    uid_Armor_upgr1   := upgr_hell_UnitArmor;
+                    uid_Regen_Upgr    := upgr_hell_Regeneration;
+                    uid_SightR_upgr   := upgr_hell_UnitSightR;
+                    uid_PainState_Base:= 1;
+                    uid_PainState_upgr:= upgr_hell_PainFactor;
+                    uid_islight       := true;
+                    uid_req_uid2      := UID_HACommandCenter;
                     SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsq,MID_BPlasma,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all,[],0,0,2,dm_AntiUnitMech2);
                     end;
    end;
@@ -796,7 +907,7 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 600;
    uid_r               := 11;
-   uid_BaseSightR      := 250;
+   uid_SightR_Base     := 250;
    uid_ProdTimeSec     := ptime3;
    uid_LimitUse        := ul5;
    uid_islight         := false;
@@ -805,19 +916,26 @@ begin
 
    case i of
 UID_BFGMarine : begin
-                uid_BaseSpeed:= 10;
-                uid_uibtn    := 6;
-                uid_ZombieUID:= UID_ZBFGMarine;
-                uid_req_uid1 := UID_UTechCenter;
-                uid_req_uid2 := UID_UComputerStation;
+                uid_uibtn         := 6;
+                uid_MSpeed_Base   := 10;
+                uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+                uid_Armor_upgr1   := upgr_uac_BioArmor;
+                uid_SightR_upgr   := upgr_uac_UnitSightR;
+                uid_ZombieUID     := UID_ZBFGMarine;
+                uid_req_uid1      := UID_UTechCenter;
+                uid_req_uid2      := UID_UComputerStation;
                 SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_BFG,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,0,dm_BFG);
                 end;
 UID_ZBFGMarine: begin
-                uid_BaseSpeed:= 12;
-                uid_uibtn    := 20;
-                uid_PainC    := 1;
-                uid_req_uid2 := UID_HACommandCenter;
-                uid_req_uid2n:= 2;
+                uid_uibtn         := 20;
+                uid_MSpeed_Base   := 12;
+                uid_Armor_upgr1   := upgr_hell_UnitArmor;
+                uid_Regen_Upgr    := upgr_hell_Regeneration;
+                uid_SightR_upgr   := upgr_hell_UnitSightR;
+                uid_PainState_Base:= 1;
+                uid_PainState_upgr:= upgr_hell_PainFactor;
+                uid_req_uid2      := UID_HACommandCenter;
+                uid_req_uid2n     := 2;
                 SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_BFG,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_fps1],0,0,0,dm_BFG);
                 end;
    end;
@@ -829,26 +947,32 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSightR      := 175;
+   uid_SightR_Base     := 175;
    uid_ProdTimeSec     := ptime1q;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
 
    case i of
 UID_Medic : begin
-            uid_BaseSpeed:= 12;
-            uid_uibtn    := 7;
-            uid_ZombieUID:= UID_ZMedic;
-            uid_req_uid1 := UID_UWeaponFactory;
-            uid_req_uid2 := UID_UACommandCenter;
+            uid_uibtn         := 7;
+            uid_MSpeed_Base   := 12;
+            uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+            uid_Armor_upgr1   := upgr_uac_BioArmor;
+            uid_SightR_upgr   := upgr_uac_UnitSightR;
+            uid_ZombieUID     := UID_ZMedic;
+            uid_req_uid1      := UID_UWeaponFactory;
             SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsh,0          ,0,0,upgr_uac_RepairTools ,BaseHealBonus1  ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,0,0);
             SetWeapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsh,MID_Bullet ,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,0);
             end;
 UID_ZMedic: begin
-            uid_BaseSpeed:= 14;
-            uid_uibtn    := 21;
-            uid_PainC    := 1;
-            uid_req_uid1 := UID_HACommandCenter;
+            uid_uibtn         := 21;
+            uid_MSpeed_Base   := 14;
+            uid_Armor_upgr1   := upgr_hell_UnitArmor;
+            uid_Regen_Upgr    := upgr_hell_Regeneration;
+            uid_SightR_upgr   := upgr_hell_UnitSightR;
+            uid_PainState_Base:= 1;
+            uid_PainState_upgr:= upgr_hell_PainFactor;
+            uid_req_uid1      := UID_HACommandCenter;
             SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseHeal1,fr_fpsh,0          ,0,0,0                    ,0               ,wtrset_heal              ,wpr_any,uids_all,[],0, 0,0,0);
             SetWeapon(1,wpt_missle,aw_srange,0,0        ,fr_fpsh,MID_Bullet ,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,0);
             end;
@@ -861,26 +985,32 @@ begin
    uid_MaxHits1        := 1000;
    uid_EnergyReq       := 200;
    uid_r               := 11;
-   uid_BaseSightR      := 175;
+   uid_SightR_Base     := 175;
    uid_ProdTimeSec     := ptime1q;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
 
    case i of
 UID_Engineer : begin
-               uid_BaseSpeed:= 12;
-               uid_uibtn    := 8;
-               uid_ZombieUID:= UID_ZEngineer;
-               uid_req_uid1 := UID_UWeaponFactory;
-               uid_req_uid2 := UID_UACommandCenter;
+               uid_uibtn         := 8;
+               uid_MSpeed_Base   := 12;
+               uid_MSpeed_Upgr   := upgr_uac_BioSpeed;
+               uid_Armor_upgr1   := upgr_uac_BioArmor;
+               uid_SightR_upgr   := upgr_uac_UnitSightR;
+               uid_ZombieUID     := UID_ZEngineer;
+               uid_req_uid1      := UID_UWeaponFactory;
                SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,upgr_uac_RepairTools ,BaseRepairBonus1,wtrset_repair            ,wpr_any,uids_all,[],0,0 ,0,0);
                SetWeapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsh,MID_Bullet,0,0,upgr_uac_DistDamage  ,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,0);
                end;
 UID_ZEngineer: begin
-               uid_BaseSpeed:= 14;
-               uid_uibtn    := 22;
-               uid_PainC    := 1;
-               uid_req_uid1 := UID_HACommandCenter;
+               uid_uibtn         := 22;
+               uid_MSpeed_Base   := 14;
+               uid_Armor_upgr1   := upgr_hell_UnitArmor;
+               uid_Regen_Upgr    := upgr_hell_Regeneration;
+               uid_SightR_upgr   := upgr_hell_UnitSightR;
+               uid_PainState_Base:= 1;
+               uid_PainState_upgr:= upgr_hell_PainFactor;
+               uid_req_uid1      := UID_HACommandCenter;
                SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,0                    ,0               ,wtrset_repair            ,wpr_any,uids_all,[],0,0 ,0,0);
                SetWeapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsh,MID_Bullet,0,0,upgr_hell_DistDamage2,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,0);
                end;
@@ -889,16 +1019,16 @@ end;
 
 //         UAC BUILDINGS   /////////////////////////////////////////////////////
 
-// MAIN BUILDER
+// BUILDERS
 UID_HCommandCenter,
 UID_HACommandCenter,
 UID_UCommandCenter,
 UID_UACommandCenter:
 begin
-   uid_MaxHits1        := 15000;
-   uid_BaseSpeed       := 5;
+   uid_MaxHits1        := 12000;
+   uid_MSpeed_Base     := 5;
    uid_r               := 66;
-   uid_BaseSightR      := 300;
+   uid_SightR_Base     := 300;
    uid_ProdTimeSec     := ptime3;
    uid_ability1        := uab_UACCCLand;
    uid_ability2        := uab_UACCCLandTo;
@@ -906,7 +1036,7 @@ begin
    uid_ismech          := true;
    uid_isbuilder       := true;
    uid_SlowTurn        := false;
-   uid_upgr_SightStep  := 50;
+   uid_SightR_upgrV    := 50;
 
    case i of
 UID_UCommandCenter : begin
@@ -915,8 +1045,9 @@ UID_UCommandCenter : begin
                      uid_uibtn           := 0;
                      uid_ZombieUID       := UID_HCommandCenter;
                      uid_ability3        := uab_ToUACommandCenter;
-                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_UComputerStation]-[UID_UGenerator2,UID_UACommandCenter];
-                     uid_upgr_SightR     := upgr_uac_BuilderR;
+                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_URMStation]-[UID_UGenerator2,UID_UGenerator3,UID_UGenerator4,UID_UACommandCenter];
+                     uid_SightR_upgr     := upgr_uac_BuilderR;
+                     uid_Armor_upgr1     := upgr_uac_BuildArmor;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fpsh,MID_BPlasma,0,upgr_uac_CCAttack,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all,[],3,-65,0,dm_AntiUnitMech2);
                      end;
 UID_UACommandCenter: begin
@@ -924,8 +1055,9 @@ UID_UACommandCenter: begin
                      uid_EnergyReq       := 300;
                      uid_uibtn           := 0;
                      uid_ZombieUID       := UID_HACommandCenter;
-                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_UComputerStation]-[UID_UGenerator2,UID_UACommandCenter];
-                     uid_upgr_SightR     := upgr_uac_BuilderR;
+                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_URMStation]-[UID_UGenerator2,UID_UGenerator3,UID_UGenerator4,UID_UACommandCenter];
+                     uid_SightR_upgr     := upgr_uac_BuilderR;
+                     uid_Armor_upgr1     := upgr_uac_BuildArmor;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fpsh,MID_BPlasma,0,upgr_uac_CCAttack,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all,[],3,-65,0,dm_AntiUnitMech2);
                      end;
 UID_HCommandCenter : begin
@@ -934,7 +1066,10 @@ UID_HCommandCenter : begin
                      uid_uibtn           := 3;
                      uid_ability3        := uab_ToHACommandCenter;
                      uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HTower,UID_HEye,UID_HBarracks];
-                     uid_upgr_SightR     := upgr_hell_BuilderR;
+                     uid_Regen_Base      := BaseRegen1;
+                     uid_Regen_Upgr      := upgr_hell_BuildRestore;
+                     uid_Armor_upgr1     := upgr_hell_BuildArmor;
+                     uid_SightR_upgr     := upgr_hell_BuilderR;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fpsh,MID_Imp,0,0,upgr_hell_DistDamage1,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,0,dm_AntiUnitBioHeavy2);
                      end;
 UID_HACommandCenter: begin
@@ -942,7 +1077,10 @@ UID_HACommandCenter: begin
                      uid_EnergyReq       := 300;
                      uid_uibtn           := 3;
                      uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HTower,UID_HEye,UID_HBarracks];
-                     uid_upgr_SightR     := upgr_hell_BuilderR;
+                     uid_Regen_Base      := BaseRegen1;
+                     uid_Regen_Upgr      := upgr_hell_BuildRestore;
+                     uid_Armor_upgr1     := upgr_hell_BuildArmor;
+                     uid_SightR_upgr     := upgr_hell_BuilderR;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fpsh,MID_Imp,0,0,upgr_hell_DistDamage1,BaseDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all-[UID_Imp],[],3,-65,0,dm_AntiUnitBioHeavy2);
                      end;
    end;
@@ -952,7 +1090,7 @@ end;
 UID_HBarracks,
 UID_UBarracks:
 begin
-   uid_MaxHits1        := 10000;
+   uid_MaxHits1        := 8000;
    uid_EnergyReq       := 300;
    uid_r               := 60;
    uid_ProdTimeSec     := ptime2;
@@ -962,40 +1100,44 @@ begin
 
    case i of
 UID_HBarracks: begin
-                  uid_uibtn       := 4;
-                  uid_prod_Units  := uids_zimbas+[UID_LostSoul,UID_Phantom];
-                  uid_ability3    := uab_ToHBarracks;
+                  uid_uibtn      := 4;
+                  uid_Regen_Base := BaseRegen1;
+                  uid_Regen_Upgr := upgr_hell_BuildRestore;
+                  uid_Armor_upgr1:= upgr_hell_BuildArmor;
+                  uid_prod_Units := uids_zimbas+[UID_LostSoul,UID_Phantom];
+                  uid_ability3   := uab_ToHBarracks;
                end;
 UID_UBarracks: begin
-                  uid_uibtn       := 1;
-                  uid_prod_Units  := uids_marines;
-                  uid_ZombieUID   := UID_HBarracks;
-                  uid_ability3    := uab_ToUBarracks;
+                  uid_uibtn      := 1;
+                  uid_Armor_upgr1:= upgr_uac_BuildArmor;
+                  uid_prod_Units := uids_marines;
+                  uid_ZombieUID  := UID_HBarracks;
+                  uid_ability3   := uab_ToUBarracks;
                end;
    end;
 end;
-
 UID_UFactory:
 begin
-   uid_MaxHits1        := 10000;
+   uid_MaxHits1        := 8000;
    uid_EnergyReq       := 300;
    uid_r               := 60;
    uid_uibtn           := 4;
    uid_ProdTimeSec     := ptime2;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isbarrack       := true;
    uid_ability3        := uab_ToUFactory;
-   uid_prod_Units      :=[UID_APC,UID_UTransport,UID_UACDron,UID_Terminator,UID_Tank,UID_Flyer];
+   uid_prod_Units      :=[UID_UTransport,UID_UACDron,UID_Terminator,UID_Tank,UID_Flyer];
 end;
-
 UID_UWeaponFactory:
 begin
-   uid_MaxHits1        := 10000;
+   uid_MaxHits1        := 8000;
    uid_EnergyReq       := 300;
    uid_r               := 62;
    uid_uibtn           := 5;
    uid_ProdTimeSec     := ptime2;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_issmith         := true;
@@ -1003,7 +1145,7 @@ begin
    uid_prod_Upgrades   := [];
 end;
 
-// BASE ENERGY PROD
+// ENERGY PROD
 UID_UGenerator1,
 UID_UGenerator2,
 UID_UGenerator3,
@@ -1015,6 +1157,7 @@ begin
    uid_r               := 38;
    uid_uibtn           := 2;
    uid_ProdTimeSec     := ptime1;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_LimitUse        := ul2;
@@ -1044,22 +1187,24 @@ end;
 // BASE TECH
 UID_UTechCenter :
 begin
-   uid_MaxHits1        := 15000;
+   uid_MaxHits1        := 12000;
    uid_EnergyReq       := 1200;
    uid_r               := 86;
    uid_uibtn           := 10;
    uid_ProdTimeSec     := ptime5;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_req_uid1        := UID_UWeaponFactory;
 end;
 UID_UComputerStation:
 begin
-   uid_MaxHits1        := 15000;
+   uid_MaxHits1        := 12000;
    uid_EnergyReq       := 1200;
    uid_r               := 70;
    uid_uibtn           := 11;
    uid_ProdTimeSec     := ptime5;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_req_uid1        := UID_UWeaponFactory;
@@ -1073,25 +1218,27 @@ begin
    uid_MaxHits1        := 3000;
    uid_EnergyReq       := 200;
    uid_r               := 35;
-   uid_BaseSightR      := 300;
+   uid_SightR_Base     := 300;
+   uid_SightR_upgr     := upgr_uac_RadarR;
+   uid_SightR_upgrV    := 25;
    uid_uibtn           := 12;
    uid_ProdTimeSec     := ptime2;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_LimitUse        := ul2;
    uid_ability1        := uab_UACScan;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isdetector      := true;
-   uid_upgr_SightR     := upgr_uac_RadarR;
-   uid_upgr_SightStep  := 25;
    uid_req_uid1        := UID_UWeaponFactory;
 end;
 UID_URMStation:
 begin
-   uid_MaxHits1        := 10000;
+   uid_MaxHits1        := 8000;
    uid_EnergyReq       := 2000;
    uid_r               := 40;
    uid_uibtn           := 14;
    uid_ProdTimeSec     := ptime10;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_LimitUse        := ul10;
    uid_req_uid1        := UID_UTechCenter;
    uid_req_uid2        := UID_UComputerStation;
@@ -1106,19 +1253,21 @@ begin
    uid_MaxHits1        := 6000;
    uid_EnergyReq       := 250;
    uid_r               := 15;
-   uid_BaseSightR      := 300;
+   uid_SightR_Base     := 300;
+   uid_SightR_upgr     := upgr_uac_TowerR;
+   uid_SightR_upgrV    := 25;
    uid_uibtn           := 6;
    uid_ProdTimeSec     := ptime1;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
+   uid_Armor_upgr2     := upgr_uac_TurretArmor;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
    uid_ismech          := true;
-   uid_upgr_Armor      := upgr_uac_TurretArmor;
    uid_islight         := true;
    uid_ability1        := uab_ToUACDron;
    uid_ability2        := 0;
    uid_ability3        := uab_ToUAATurret;
-   uid_upgr_SightR     := upgr_uac_TowerR;
-   uid_upgr_SightStep  := 25;
+
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_BPlasma ,0,upgr_uac_TurretPlasma,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground_mech,wpr_any,uids_all,[],0,-11,2,dm_AntiUnitMech2  );
    SetWeapon(1,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_Chaingun,0,0                    ,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground     ,wpr_any,uids_all,[],0,-11,2,dm_AntiUnitBioLight2);
 end;
@@ -1127,55 +1276,37 @@ begin
    uid_MaxHits1        := 6000;
    uid_EnergyReq       := 250;
    uid_r               := 15;
-   uid_BaseSightR      := 300;
+   uid_SightR_Base     := 300;
+   uid_SightR_upgr     := upgr_uac_TowerR;
+   uid_SightR_upgrV    := 25;
    uid_uibtn           := 7;
    uid_ProdTimeSec     := ptime1;
+   uid_Armor_upgr1     := upgr_uac_BuildArmor;
+   uid_Armor_upgr2     := upgr_uac_TurretArmor;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_islight         := true;
-   uid_upgr_Armor      := upgr_uac_TurretArmor;
    uid_ability1        := uab_ToUACDron;
    uid_ability2        := 0;
    uid_ability3        := uab_ToUAGTurret;
-   uid_upgr_SightR     := upgr_uac_TowerR;
-   uid_upgr_SightStep  := 25;
-   SetWeapon(0,wpt_missle,aw_fsr+25,0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,0,dm_AntiFly2);
+   SetWeapon(0,wpt_missle,aw_fsr+30,0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,0,dm_AntiFly2);
 end;
 
-// ????????
-UID_UMine:
-begin
-   uid_MaxHits1     := 100;
-   uid_EnergyReq   := 50;
-   uid_r         := 5;
-   uid_BaseSightR    := 100;
-   uid_uibtn       := 19;
-   uid_ProdTimeSec     := 5;
-   uid_CanAttack    := true;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
-   uid_islight   := true;
-   uid_isdetector  := true;
-   uid_issolid   := false;
-   uid_DeathMissile:=MID_Mine;
-   uid_FastDeathHits:=1;
-
-   SetWeapon(0,wpt_suicide,-mine_r,0,0,fr_fps1,0,0,0,0,0,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,0);
-end;
-
-///////////////////////////////////
+//  UAC MECH UNITS ///////////////////////////////////////////////////
 
 UID_UACDron:
 begin
    uid_MaxHits1        := 2000;
    uid_EnergyReq       := 400;
    uid_r               := 14;
-   uid_BaseSpeed       := 15;
-   uid_BaseSightR      := 250;
+   uid_MSpeed_Base     := 15;
+   uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
+   uid_Armor_upgr1     := upgr_uac_MechArmor;
+   uid_SightR_upgr     := upgr_uac_UnitSightR;
+   uid_SightR_Base     := 250;
    uid_uibtn           := 9;
    uid_ProdTimeSec     := ptime1;
-   uid_TransportSize   := 3;
    uid_LimitUse        := ul2;
    uid_CanAttack       := true;
    uid_ismech          := true;
@@ -1190,35 +1321,41 @@ begin
    uid_MaxHits1        := 2000;
    uid_EnergyReq       := 200;
    uid_r               := 33;
-   uid_BaseSpeed       := 18;
-   uid_BaseSightR      := 200;
+   uid_MSpeed_Base     := 18;
+   uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
+   uid_Armor_upgr1     := upgr_uac_MechArmor;
+   uid_SightR_upgr     := upgr_uac_UnitSightR;
+   uid_SightR_Base     := 200;
    uid_uibtn           := 10;
    uid_ProdTimeSec     := ptime1;
-   uid_TransportMax    := 8;
-   uid_TransportSize   := 8;
+   uid_TransportMax_Base:=8;
+   uid_TransportMax_Upgr:=upgr_uac_Transport;
+   uid_TransportMax_UpgrV:=4;
    uid_isfly           := uf_fly;
    uid_CanAttack       := false;
    uid_ismech          := true;
    uid_req_uid1        := UID_UACommandCenter;
    uid_FastDeathHits   := 1;
-   ups_TransportUIDs   := uids_marines+[UID_APC,UID_UACDron,UID_Terminator,UID_Tank];
+   ups_TransportUIDs   := uids_marines+[UID_UACDron,UID_Terminator,UID_Tank];
 end;
 UID_Terminator:
 begin
-   uid_MaxHits1     := 2000;
-   uid_EnergyReq   := 500;
-   uid_r         := 16;
-   uid_BaseSpeed     := 12;
-   uid_BaseSightR    := 275;
-   uid_uibtn       := 11;
+   uid_MaxHits1        := 2000;
+   uid_EnergyReq       := 500;
+   uid_r               := 16;
+   uid_MSpeed_Base     := 12;
+   uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
+   uid_Armor_upgr1     := upgr_uac_MechArmor;
+   uid_SightR_upgr     := upgr_uac_UnitSightR;
+   uid_SightR_Base     := 275;
+   uid_uibtn           := 11;
    uid_ProdTimeSec     := ptime1h;
-   uid_TransportSize:= 4;
-   uid_LimitUse  := ul3;
-   uid_CanAttack    := true;
-   uid_ismech    := true;
-   uid_req_uid1     := UID_UTechCenter;
-   uid_FastDeathHits:=1;
-   uid_islight   := false;
+   uid_LimitUse        := ul3;
+   uid_CanAttack       := true;
+   uid_ismech          := true;
+   uid_req_uid1        := UID_UTechCenter;
+   uid_FastDeathHits   :=1;
+   uid_islight         := false;
    uid_arms_BonusAntiFlyRange :=-50;
    uid_arms_BonusAntiUnitRange:=50;
    SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpsq ,MID_SShot  ,0,0                   ,upgr_uac_DistDamage,BaseDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_AntiUnitBio2);
@@ -1226,72 +1363,58 @@ begin
 end;
 UID_Tank:
 begin
-   uid_MaxHits1     := 5000;
-   uid_EnergyReq   := 600;
-   uid_r         := 20;
-   uid_BaseSpeed     := 8;
-   uid_BaseSightR    := 275;
-   uid_uibtn       := 12;
+   uid_MaxHits1        := 5000;
+   uid_EnergyReq       := 600;
+   uid_r               := 20;
+   uid_MSpeed_Base     := 8;
+   uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
+   uid_Armor_upgr1     := upgr_uac_MechArmor;
+   uid_SightR_upgr     := upgr_uac_UnitSightR;
+   uid_SightR_Base     := 275;
+   uid_uibtn           := 12;
    uid_ProdTimeSec     := ptime2;
-   uid_TransportSize:= 6;
-   uid_LimitUse  := ul4;
-   uid_CanAttack    := true;
-   uid_ismech    := true;
-   uid_req_uid1     := UID_UTechCenter;
-   uid_FastDeathHits:=1;
+   uid_LimitUse        := ul4;
+   uid_CanAttack       := true;
+   uid_ismech          := true;
+   uid_req_uid1        := UID_UTechCenter;
+   uid_FastDeathHits   :=1;
    uid_arms_BonusAntiBuildingRange:=50;
    SetWeapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fpst2,MID_Tank,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_Siege4);
 end;
 UID_Flyer:
 begin
-   uid_MaxHits1     := 4000;
-   uid_EnergyReq   := 600;
-   uid_r         := 18;
-   uid_BaseSpeed     := 17;
-   uid_BaseSightR    := 275;
-   uid_uibtn       := 13;
+   uid_MaxHits1        := 4000;
+   uid_EnergyReq       := 600;
+   uid_r               := 18;
+   uid_MSpeed_Base     := 17;
+   uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
+   uid_Armor_upgr1     := upgr_uac_MechArmor;
+   uid_SightR_upgr     := upgr_uac_UnitSightR;
+   uid_SightR_Base     := 275;
+   uid_uibtn           := 13;
    uid_ProdTimeSec     := ptime2;
-   uid_TransportSize:= 6;
-   uid_isfly     := uf_fly;
-   uid_LimitUse  := ul4;
-   uid_CanAttack    := true;
-   uid_ismech    := true;
-   uid_req_uid1     := UID_UTechCenter;
-   uid_req_uid2     := UID_UACommandCenter;
-   uid_FastDeathHits:=1;
+   uid_isfly           := uf_fly;
+   uid_LimitUse        := ul4;
+   uid_CanAttack       := true;
+   uid_ismech          := true;
+   uid_req_uid1        := UID_UTechCenter;
+   uid_req_uid2        := UID_UACommandCenter;
+   uid_FastDeathHits   := 1;
    uid_arms_BonusAntiUnitRange:=25;
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_Flyer  ,0,0,upgr_uac_DistDamage,BaseDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,dm_AntiGroundLight2);
-end;
-
-UID_APC:
-begin
-   uid_MaxHits1     := 3000;
-   uid_EnergyReq   := 200;
-   uid_r         := 25;
-   uid_BaseSpeed     := 15;
-   uid_BaseSightR    := 225;
-   uid_uibtn       := 14;
-   uid_ProdTimeSec     := ptime2;
-   uid_TransportMax:= 4;
-   uid_TransportSize:= 10;
-   uid_CanAttack    := false;
-   uid_ismech    := true;
-   uid_SlowTurn  := true;
-   uid_FastDeathHits:=1;
-   ups_TransportUIDs    :=uids_marines;
 end;
 
 UID_USPort  ,
 UID_UPortal :
 begin
-   uid_MaxHits1     := 20000;
-   uid_EnergyReq   := 2000;
-   uid_r         := 150;
-   uid_uibtn       := 20;
-   uid_ProdTimeSec     := ptime5;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
-   uid_issolid   := false;
+   uid_MaxHits1        := 20000;
+   uid_EnergyReq       := 2000;
+   uid_r               := 150;
+   uid_uibtn           := 20;
+   uid_ProdTimeSec     := ptime10;
+   uid_isbuilding      := true;
+   uid_ismech          := true;
+   uid_issolid         := false;
 end;
 
 UID_UBaseMil,
@@ -1300,26 +1423,25 @@ UID_UBaseRef,
 UID_UBaseNuc,
 UID_UBaseLab:
 begin
-   uid_MaxHits1     := 15000;
-   uid_EnergyReq   := 1000;
-   uid_r         := 100;
-   uid_uibtn       := 21;
-   uid_ProdTimeSec     := ptime5;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
+   uid_MaxHits1        := 15000;
+   uid_EnergyReq       := 1000;
+   uid_r               := 100;
+   uid_uibtn           := 21;
+   uid_ProdTimeSec     := ptime10;
+   uid_isbuilding      := true;
+   uid_ismech          := true;
 end;
 
 UID_UBaseGen:
 begin
-   uid_MaxHits1     := 6000;
-   uid_EnergyGen   := 1000;
-   uid_EnergyReq   := 500;
-   uid_r         := 55;
-   uid_uibtn       := 22;
-   uid_ProdTimeSec     := ptime2;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
-   uid_LimitUse  := ul1;
+   uid_MaxHits1        := 6000;
+   uid_EnergyGen       := 1000;
+   uid_EnergyReq       := 500;
+   uid_r               := 55;
+   uid_uibtn           := 22;
+   uid_ProdTimeSec     := ptime10;
+   uid_isbuilding      := true;
+   uid_ismech          := true;
 end;
 
 UID_UCBuild0,
@@ -1327,20 +1449,20 @@ UID_UCBuild1,
 UID_UCBuild2,
 UID_UCBuild3:
 begin
-   uid_MaxHits1     := 15000;
-   uid_EnergyReq   := 1000;
-   uid_r         := 100;
-   uid_uibtn       := 23;
-   uid_ProdTimeSec     := ptime5;
-   uid_isbuilding:= true;
-   uid_ismech    := true;
+   uid_MaxHits1        := 15000;
+   uid_EnergyReq       := 1000;
+   uid_r               := 100;
+   uid_uibtn           := 23;
+   uid_ProdTimeSec     := ptime10;
+   uid_isbuilding      := true;
+   uid_ismech          := true;
 end;
 
       end;
 
       uid_square:=round(pi*uid_r*uid_r);
 
-      if(uid_TransportMax>0)then
+      if(uid_TransportMax_Base>0)then
       begin
          uid_ability1:=uab_Unload;
          uid_ability2:=uab_UnloadTo;
@@ -1355,8 +1477,21 @@ end;
       if(uid_req_uid2>0)and(uid_req_uid2n=0)then uid_req_uid2n:=1;
       if(uid_req_uid3>0)and(uid_req_uid3n=0)then uid_req_uid3n:=1;
 
-      if(uid_PainCUpgrStep=0)
-      then uid_PainCUpgrStep:=(uid_PainC div 2)+(uid_PainC mod 2);
+      // default upgrade bonuses
+      if(uid_PainState_upgr>0)then
+        if(uid_PainState_upgrV=0)then
+          uid_PainState_upgrV:=(uid_PainState_Base div 2)+(uid_PainState_Base mod 2);
+      if(uid_Armor_upgr1>0)or(uid_Armor_upgr2>0)then
+        if(uid_Armor_upgrV=0)then
+          if(uid_isbuilding)
+          then uid_Armor_upgrV:=UpgradeBuildArmorBonus
+          else uid_Armor_upgrV:=UpgradeUnitArmorBonus;
+      if(uid_SightR_upgr>0)then
+        if(uid_SightR_upgrV=0)then
+          uid_SightR_upgrV:=25;
+      if(uid_MSpeed_upgr>0)then
+        if(uid_MSpeed_upgrV=0)then
+          uid_MSpeed_upgrV:=UnitSpeedBonus;
 
       uid_missileR:=trunc(uid_r/1.41);
       if(uid_MaxHits1<1)then uid_MaxHits1:=1;
@@ -1371,7 +1506,7 @@ end;
       if(uid_isbuilding)then
       begin
          uid_ZombieHits:=uid_MaxHits1 div 4;
-         uid_BaseSightR:=max2i(uid_r+uid_r,uid_BaseSightR);
+         uid_SightR_Base:=max2i(uid_r+uid_r,uid_SightR_Base);
       end;
 
       if(uid_TransportSize=0)then
@@ -1394,12 +1529,11 @@ end;
              break;
           end;
 
-      if(uid_LimitUse>=MinUnitLimit)then
+      if(uid_LimitUse>=MinUnitLimit)and(not uid_isbuilding)then
       begin
          if(uid_CanAttack)then
            uid_LevelBonusDamage:=round(BaseDamageLevel1*uid_LimitUse/ul1);
-         if(not uid_isbuilding)then
-           uid_LevelBonusArmor :=round(BaseArmorLevel1 *uid_LimitUse/ul1);
+         uid_LevelBonusArmor :=round(BaseArmorLevel1 *uid_LimitUse/ul1);
       end;
 
       uid_HaveAbility        :=(uid_ability1>0)
@@ -1439,8 +1573,7 @@ begin
 
 // speed
 case m of
-MID_ArchFire,
-MID_Mine           : mid_speed       :=32000;
+MID_ArchFire       : mid_speed       :=32000;
 MID_Tank           : mid_speed       :=100;
 MID_SChaingun,
 MID_Chaingun,
@@ -1485,14 +1618,12 @@ MID_SSShot         : mid_base_damage :=BaseDamage3;
 MID_HRocket        : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage6;
-MID_Mine           : mid_base_damage :=BaseDamage10;
 MID_Blizzard       : mid_base_damage :=BaseDamage10*4;
 end;
 
 // splash R
 case m of
 MID_Blizzard       : mid_base_SplashR:=blizzard_sr;
-MID_Mine           : mid_base_SplashR:=mine_sr;
 MID_HRocket        : mid_base_SplashR:=rocket_sr;
 MID_URocketS,
 MID_ArchFire,
@@ -1517,13 +1648,11 @@ MID_Baron          : mid_ImmuneUnits:=[UID_Knight,
 MID_Revenant       : mid_ImmuneUnits:=[UID_Revenant   ];
 MID_Mancubus       : mid_ImmuneUnits:=[UID_Mancubus   ];
 MID_YPlasma        : mid_ImmuneUnits:=[UID_Arachnotron];
-MID_Mine           : mid_ImmuneUnits:=[UID_UMine      ];
 end;
 
 // other
 case m of
 MID_Granade        : mid_ystep       :=3;
-MID_Mine           : mid_size        :=25;
 MID_URocketS,
 MID_BFG            : begin
                      mid_TeamDamage  :=false;
@@ -1640,7 +1769,7 @@ begin
    setUPGR(r_uac ,upgr_uac_BuildArmor   ,60 ,0,35,5   ,600 ,0,800 ,0            ,0                   ,false);
    setUPGR(r_uac ,upgr_uac_RepairTools  ,60 ,0,30,2   ,600 ,0,400 ,0            ,0                   ,false);
    setUPGR(r_uac ,upgr_uac_BioSpeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
-   setUPGR(r_uac ,upgr_uac_ssgup        ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   ,false);
+   setUPGR(r_uac ,upgr_uac_SSMWeapon        ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   ,false);
    setUPGR(r_uac ,upgr_uac_BuilderR     ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                   ,false);
    setUPGR(r_uac ,upgr_uac_CCFly        ,120,0,0 ,1   ,600 ,0,0   ,0            ,0                   ,false);
    setUPGR(r_uac ,upgr_uac_CCAttack     ,120,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter ,false);
@@ -1674,29 +1803,32 @@ begin
       ua_reload      :=0;
       ua_req_upgr    :=0;
       ua_req_uid     :=0;
+      ua_rldDec_level:=0;
 
       case a of
 uab_Teleport        : begin
                          ua_type        := uat_passive;
                          ua_reload      := 5*fr_fps1;
-                         ua_reload_upgr := upgr_hell_TeleportCD;
-                         ua_reload_upgrS:= fr_fps1;
+                         ua_rldDec_upgr := upgr_hell_TeleportCD;
+                         ua_rldDec_upgrS:= fr_fps1;
                       end;
 uab_Recall          : begin
                          ua_type        := uat_UnitOwn;
                          ua_reload      := 5*fr_fps1;
-                         ua_reload_upgr := upgr_hell_TeleportCD;
-                         ua_reload_upgrS:= fr_fps1;
+                         ua_rldDec_upgr := upgr_hell_TeleportCD;
+                         ua_rldDec_upgrS:= fr_fps1;
                          ua_req_upgr    := upgr_hell_Recall;
                       end;
 uab_UACScan         : begin
                          ua_type        := uat_Point;
                          ua_reload      := 60*fr_fps1;
+                         ua_rldDec_level:= 5*fr_fps1;
                          ua_req_uid     := UID_UACommandCenter;
                       end;
 uab_UACStrike       : begin
                          ua_type        := uat_Point;
                          ua_reload      := 60*fr_fps1;
+                         ua_rldDec_level:= 5*fr_fps1;
                       end;
 
 uab_HEyeVision      : begin

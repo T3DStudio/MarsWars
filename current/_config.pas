@@ -111,8 +111,8 @@ begin
       if(snd_musicListSize=0)
       then snd_musicListSize:=1
       else
-        if(snd_musicListSize>snd_musicListSizeMax)then snd_musicListSize:=snd_musicListSizeMax;
-      ui_CamSpeed:=byte(mm3i(1,ui_CamSpeed,vid_MaxCamSpeed));
+        if(snd_musicListSize>snd_MaxMusicListSize)then snd_musicListSize:=snd_MaxMusicListSize;
+      ui_CamSpeed:=byte(mm3i(1,ui_CamSpeed,ui_MaxCamSpeed));
 
       if(length(PlayerName)>MaxPlayerNameLen)then SetLength(PlayerName,MaxPlayerNameLen);
 
@@ -125,9 +125,9 @@ begin
       if(rpls_Quality   >rpls_MaxQuality  )then rpls_Quality  :=rpls_MaxQuality;
       if(net_cl_Quality >net_MaxQuality   )then net_cl_Quality:=net_MaxQuality;
 
-      if(ui_ControlPanelPos>vid_MaxControlPanelPos)then ui_ControlPanelPos:=0;
-      if(ui_HealthBars     >vid_MaxHealthBars     )then ui_HealthBars     :=0;
-      if(ui_PlayersColor   >vid_MaxPlayersColor   )then ui_PlayersColor   :=0;
+      if(ui_ControlPanelPos>ui_MaxControlPanelPos)then ui_ControlPanelPos:=0;
+      if(ui_HealthBars     >ui_MaxHealthBars     )then ui_HealthBars     :=0;
+      if(ui_PlayersColor   >ui_MaxPlayersColor   )then ui_PlayersColor   :=0;
    end;
    menu_ResolutionWi:=vid_vw;
    menu_ResolutionHi:=vid_vh;

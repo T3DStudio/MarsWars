@@ -2,9 +2,9 @@
 procedure InitRX2Y;
 var r,x:integer;
 begin
-   for r:=0 to MFogM do
-    for x:=0 to r do
-     CircleRX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
+   for r:=0 to fog_MaxR do
+     for x:=0 to r do
+       CircleRX2Y[r,x]:=trunc(sqrt(sqr(r)-sqr(x)));
 end;
 
 procedure gfx_MakeScreenshot;
@@ -65,18 +65,18 @@ begin
    c_mablack :=gfx_rgba2c(0  ,0  ,0  ,96 );
    c_lava    :=gfx_rgba2c(222,80 ,0  ,255);
 
-   ui_max_color    [false]:=c_dorange;
-   ui_max_color    [true ]:=c_gray;
-   ui_cenergy[false]:=c_white;
-   ui_cenergy[true ]:=c_red;
-   ui_limit  [false]:=c_white;
-   ui_limit  [true ]:=c_red;
+   ui_max_color[false]:=c_dorange;
+   ui_max_color[true ]:=c_gray;
+   ui_cenergy  [false]:=c_white;
+   ui_cenergy  [true ]:=c_red;
+   ui_limit    [false]:=c_white;
+   ui_limit    [true ]:=c_red;
 
-   ui_blink_color2 [false]:=c_black;
-   ui_blink_color2 [true ]:=c_yellow;
+   ui_blink_color2[false]:=c_black;
+   ui_blink_color2[true ]:=c_yellow;
 
-   ui_blink_color1 [false]:=c_black;
-   ui_blink_color1 [true ]:=c_gray;
+   ui_blink_color1[false]:=c_black;
+   ui_blink_color1[true ]:=c_gray;
 end;
 
 function gfx_CreateSDLSurface(tw,th:integer):pSDL_Surface;
@@ -507,14 +507,14 @@ begin
    end;
 end;
 
-procedure gfx_LoadFont;
+procedure gfx_LoadFont(fname:shortstring);
 var i:byte;
     c:char;
   ccc:cardinal;
  fspr:pSDL_Surface;
 begin
    ccc:=(1 shl 24)-1;
-   fspr:=gfx_LoadSDLSurface('font',false,true);
+   fspr:=gfx_LoadSDLSurface(fname,false,true);
    for i:=0 to 255 do
    begin
       c:=chr(i);
@@ -541,7 +541,7 @@ var
 x,r:integer;
 tst:pSDL_Surface;
 begin
-   spr_empty   :=gfx_CreateSDLSurface(1,1);
+   spr_empty  :=gfx_CreateSDLSurface(1,1);
    gfx_SetTransparent(spr_empty);
 
    ui_minimap :=gfx_CreateSDLSurface(ui_CtrlPanelW-1,ui_CtrlPanelW-1);
@@ -569,15 +569,16 @@ begin
    with spr_dmodel do
    begin
       sm_spritesLast:=0;
-      sm_spritesNum:=1;
+      sm_spritesNum :=1;
       setlength(sm_spritesL,sm_spritesNum);
       sm_spritesL[sm_spritesLast]:=spr_dummy;
       sm_kind :=smt_effect;
    end;
    spr_pdmodel:=@spr_dmodel;
 
-   gfx_LoadFont;
+   gfx_LoadFont('font');
 
+   //
    ui_fog_surf := gfx_CreateSDLSurface(fog_cr*2,fog_cr*2);
    boxColor(ui_fog_surf,0,0,ui_fog_surf^.w,ui_fog_surf^.h,c_purple);
    filledcircleColor(ui_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
@@ -589,7 +590,7 @@ begin
 
    with spr_cp_out do
    begin
-      hw:=gm_cptp_r-6;
+      hw:=keyPoint_r-6;
       hh:=hw;
       w:=hw*2;
       h:=w;
@@ -597,9 +598,24 @@ begin
       gfx_SetTransparent(surf);
    end;
 
-   spr_MenuBackground:= gfx_LoadSDLSurface('mback',false,true);
-   spr_MenuLogo      := gfx_LoadSDLSurface('mlogo',false,true);
-
+   spr_MenuBackgroundL:=gfx_LoadSDLSurface('mback',false,true);
+   spr_MenuBackgroundD:=gfx_CreateSDLSurface(spr_MenuBackgroundL^.w,spr_MenuBackgroundL^.h);
+   tst:= gfx_LoadSDLSurface('mlogo',false,true);
+   draw_sdlsurface(spr_MenuBackgroundD,0,0,spr_MenuBackgroundL);
+   with spr_MenuBackgroundD^ do
+   begin
+   boxColor(spr_MenuBackgroundD,0,0,w,h,c_mablack);
+   draw_sdlsurface(spr_MenuBackgroundD,(w div 2)-(tst^.w div 2),0,tst);
+   draw_text(spr_MenuBackgroundD,w      ,h,str_ver ,ta_RB,255,c_white);
+   draw_text(spr_MenuBackgroundD,w div 2,h,str_cprt,ta_MB,255,c_white);
+   end;
+   with spr_MenuBackgroundL^ do
+   begin
+   draw_sdlsurface(spr_MenuBackgroundL,(w div 2)-(tst^.w div 2),0,tst);
+   draw_text(spr_MenuBackgroundL,w      ,h,str_ver ,ta_RB,255,c_white);
+   draw_text(spr_MenuBackgroundL,w div 2,h,str_cprt,ta_MB,255,c_white);
+   end;
+   gfx_FreeSDLSurface(tst);
 
    menu_Surface:=gfx_CreateSDLSurface(menu_w, menu_h);
 
@@ -645,7 +661,7 @@ begin
   spr_uibtn_Tabs[2]:=gfx_ButtonLoad(folder_ui+'tab_upgrades',ui_TabButtonW-2,false);
   spr_uibtn_Tabs[3]:=gfx_ButtonLoad(folder_ui+'tab_controls',ui_TabButtonW-2,false);
 
-   for r:=1 to r_cnt do
+   for r:=1 to r_count do
    begin
       spr_RaceRank[r]:=gfx_LoadSDLSurface(folder_RaceUI[r]+'rank',true,true);
       spr_uipanel_EmptyBTN[r]:=gfx_ResizeSurfaceCMask(gfx_LoadSDLSurface(folder_RaceUI[r]+'EmptyBTN',false,true),ui_ButtonW1-2,gfx_rgba2c(0,0,0,160));
@@ -679,7 +695,6 @@ begin
 
    spr_cursorWh             := (spr_cursor^.w div 2)-(spr_cursorSubR^.w div 2);
    spr_cursorHh             := (spr_cursor^.h div 2)-(spr_cursorSubR^.h div 2);
-
 
    spr_camp_earth           := gfx_LoadSDLSurface('M_EARTH'  ,false,true);
    spr_camp_mars            := gfx_LoadSDLSurface('M_MARS'   ,false,true);
@@ -723,7 +738,6 @@ begin
    gfx_LoadMWSModel(@spr_FMajor             ,folder_RaceUnits[r_uac ]+'u_u5j_'         ,smt_fmajor   );
    gfx_LoadMWSModel(@spr_BFG                ,folder_RaceUnits[r_uac ]+'u_u6_'          ,smt_imp      );
    gfx_LoadMWSModel(@spr_FAPC               ,folder_RaceUnits[r_uac ]+'u_u8_'          ,smt_transport);
-   gfx_LoadMWSModel(@spr_APC                ,folder_RaceUnits[r_uac ]+'uac_tank_'      ,smt_apc      );
    gfx_LoadMWSModel(@spr_Terminator         ,folder_RaceUnits[r_uac ]+'u_u9_'          ,smt_terminat );
    gfx_LoadMWSModel(@spr_Tank               ,folder_RaceUnits[r_uac ]+'u_u10_'         ,smt_tank     );
    gfx_LoadMWSModel(@spr_Flyer              ,folder_RaceUnits[r_uac ]+'u_u11_'         ,smt_flyer    );
@@ -786,7 +800,6 @@ begin
    gfx_LoadMWSModel(@spr_UFactory3          ,folder_RaceBuildings[r_uac ] +'u_b12a'    ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UFactory4          ,folder_RaceBuildings[r_uac ] +'u_b12b'    ,smt_buiding  );
 
-   gfx_LoadMWSModel(@spr_Mine               ,folder_RaceBuildings[r_uac ] +'u_mine0'   ,smt_buiding);
    gfx_LoadMWSModel(@spr_portal             ,folder_RaceBuildings[r_uac ] +'u_portal0' ,smt_buiding);
    gfx_LoadMWSModel(@spr_starport           ,folder_RaceBuildings[r_uac ] +'u_starport',smt_buiding);
    gfx_LoadMWSModel(@spr_ubase0             ,folder_RaceBuildings[r_uac ] +'u_base00'  ,smt_buiding);
@@ -844,23 +857,20 @@ begin
    gfx_LoadMWTexture(@spr_effect_Scan       ,folder_effects+'scan'                     ,true);
    gfx_LoadMWTexture(@spr_effect_Decay      ,folder_effects+'decay'                    ,true);
 
-   gfx_LoadMWTexture(@spr_cp_koth           ,'cp_koth'                                 ,true);
-   gfx_LoadMWTexture(@spr_cp_gen            ,'cp_gen'                                  ,true);
+   gfx_LoadMWTexture(@spr_kp_koth           ,'kp_koth'                                 ,true);
+   gfx_LoadMWTexture(@spr_kp_gen            ,'kp_gen'                                  ,true);
 
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do sm_kind:=smt_effect2;
 
    for x:=0 to spr_upgrade_icons do
-   for r:=1 to r_cnt do
+   for r:=1 to r_count do
      with spr_uibtn_Upgrades[r,x] do
      begin
         surf:= gfx_ButtonLoad(folder_RaceUpgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
         w   := surf^.w;h := w;
         hw  := w div 2;hh:= hw;
      end;
-
-   for x:=0 to 255 do
-     spr_b_ab[x]:=spr_empty;
 
    initEffects;
    InitThemes;
@@ -890,21 +900,19 @@ begin
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
-      {$IFDEF UNITDATA}
-      with un_btn2 do
+      with uid_BTNDoc do
       begin
-         case _urace of
-         r_hell: surf:= LoadBtnFS(_uid2spr(u,315,0)^.surf,vid_BWd,1 );
-         r_uac : surf:= LoadBtnFS(_uid2spr(u,225,0)^.surf,vid_BWd,1 );
+         case uid_race of
+         r_hell: surf:= gfx_ButtonMakeFromSurface(uid2spr(u,315,0)^.surf,ui_ButtonWh,1 );
+         r_uac : surf:= gfx_ButtonMakeFromSurface(uid2spr(u,225,0)^.surf,ui_ButtonWh,1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
       end;
-      {$ENDIF}
    end;
 end;
 
-procedure save_surf(fname:shortstring;surf:pSDL_Surface);
+{procedure save_surf(fname:shortstring;surf:pSDL_Surface);
 begin
    if(surf=nil)then exit;
    fname:='temp\'+fname+'.bmp'+#0;
@@ -921,9 +929,9 @@ begin
          with uid_BTNBig do
            if(surf<>nil)and(surf<>spr_empty)then
              save_surf(b2s(u)+'_'+uid_str_name,surf);
-end;
+end; }
 
-procedure map_MakeDecals;
+procedure map_Decals_Create;
 var i,ix,iy,rn:integer;
 begin
    map_ter_decaln:=(ui_cam_w*ui_cam_h) div 19000;
@@ -933,7 +941,7 @@ begin
    ui_mha:= ui_cam_h+vid_ab*2;
 
    ix:=longint(map_seed) mod ui_mwa;
-   iy:=(g_random_i*5+ix)  mod ui_mha;
+   iy:=(g_random_i*5+ix) mod ui_mha;
    rn:=ix*iy;
    for i:=1 to map_ter_decaln do
     with map_ter_decalL[i-1] do
@@ -976,7 +984,7 @@ begin
                ui_MouseHintY:=ui_UIPanelW;
                end;
    cpp_right : begin
-               ui_MouseHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLen*font_w1;
+               ui_MouseHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLenUnit*font_w1;
                ui_MouseHintY:=ui_UIPanelW;
                end;
    cpp_top   : begin
@@ -1077,7 +1085,7 @@ begin
    map_MiniMap_CamH     := round(ui_cam_h*map_MiniMap_cx);
    ui_Camera_Bounds;
 
-   map_MakeDecals;
+   map_Decals_Create;
 end;
 
 procedure vid_RemakeScreenSurfaces;
@@ -1192,14 +1200,17 @@ begin
 end;
 
 procedure vid_MakeScreen;
+const windowed2flags: array[false..true] of cardinal = (vid_sdlvflags + SDL_FULLSCREEN,vid_sdlvflags);
 begin
    if(vid_screen<>nil)then sdl_freesurface(vid_screen);
 
-   if(vid_windowed)
-   then vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, vid_vflags)
-   else vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, vid_vflags + SDL_FULLSCREEN);
+   vid_screen:=SDL_SetVideoMode( vid_vw, vid_vh, vid_bpp, windowed2flags[vid_windowed]);
 
-   if(vid_screen=nil)then begin WriteSDLError; halt; end;
+   if(vid_screen=nil)then
+   begin
+      WriteSDLError;
+      halt;
+   end;
 
    vid_RemakeScreenSurfaces;
 end;

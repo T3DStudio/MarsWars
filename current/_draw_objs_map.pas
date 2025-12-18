@@ -55,7 +55,7 @@ begin
      if(RectInCam(o_x,o_y,o_r,o_r,0))then
      begin
         if(ui_DrawEdges)
-        then edgesR:=o_r-bld_dec_mr
+        then edgesR:=o_r-BuildObstacleStepR
         else edgesR:=0;
 
         if(not noanim)or(o_FrontSprite=pspr_dummy)then

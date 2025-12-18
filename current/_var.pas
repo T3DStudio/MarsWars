@@ -18,7 +18,6 @@ g_AISlots         : byte     = player_default_ai_level;
 g_DefeatedObs     : boolean  = true;
 
 g_royal_r         : integer  = 0;
-g_KeyPoints       : array[0..LastKeyPoint] of TKeyPoint;
 
 g_gplayers        : TPList;
 g_nplayers        : array[0..LastPlayer ] of TPlayerNetData;
@@ -49,8 +48,8 @@ g_LobbyTimer      : integer = 0;
 map_scenario      : byte     = mc_ffa8;
 map_generators    : byte     = 0;
 map_seed          : cardinal = 1;
-map_Size          : integer  = 5000;
-map_hSize         : integer  = 2500;
+map_Size1         : integer  = 5000;
+map_Sizeh         : integer  = 2500;
 map_ObstaclesGap  : integer  = 40;
 map_ObstaclesF    : byte     = 1;
 map_Symmetry      : boolean  = true;
@@ -60,7 +59,8 @@ map_PlayerStartY  : array[0..LastPlayer] of integer;
 map_ObstaclesL    : array[0..MaxObstacles] of TObstacle;
 map_ObstaclesN    : integer = 0;
 map_ObstaclesGrid : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TObstacleCell;
-map_pf_lastZone   : word = 0;
+map_KeyPointsN    : byte = 0;
+map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -152,7 +152,7 @@ g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
 missiles_UIDsBioEff         // units that trigger "bio" effect of missiles
                   : TSoB;
 
-CircleRX2Y        : array[0..MFogM,0..MFogM] of integer;
+CircleRX2Y        : array[0..fog_MaxR,0..fog_MaxR] of integer;
 
 TestMode          : byte = 0;
 sys_uncappedFPS   : boolean = false;
@@ -168,7 +168,6 @@ PlayerReady       : boolean = false;
 //
 
 vid_screen          : pSDL_SURFACE;
-vid_vflags          : cardinal = SDL_HWSURFACE+SDL_RESIZABLE;   //SDL_SWSURFACE
 vid_windowed        : boolean = true;
 vid_draw            : boolean = true;
 vid_RECT            : pSDL_RECT;
@@ -273,8 +272,9 @@ ui_UnitSelSound   : boolean = false;
 ui_UnitSelSoundA  : integer = 0;
 ui_tab            : byte = 0;
 ui_alarms         : array[0..ui_max_alarms] of TAlarm;
-ui_panel_uids     : array[0..r_cnt,0..2,0..ui_ButtonsNum] of byte;
+ui_panel_uids     : array[0..r_count,0..2,0..ui_ButtonsNum] of byte;
 ui_panel_CTabIActs: array[TTabControlContent,0..ui_ButtonsNum] of byte;
+ui_panel_PTabIActs: array[0..ui_ButtonsNum] of byte;
 
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
@@ -326,9 +326,7 @@ ui_timerX         : integer = 0;
 ui_timerY         : integer = 0;
 ui_MouseHintX     : integer = 0;
 ui_MouseHintY     : integer = 0;
-ui_MouseHintN     : integer = 0;
-ui_MouseHintW     : byte = 0;
-ui_MouseHintL     : TStringList;
+ui_MouseHintL     : TUIStringList;
 
 ui_ReplayBarW     : integer = 0;
 ui_ReplayBarH     : integer = font_w2;
@@ -370,9 +368,7 @@ menu_SurfaceSC,
 menu_Surface      : pSDL_SURFACE;
 
 menu_sc_x,
-menu_sc_y,
-menu_sc_hw,
-menu_sc_hh        : integer;
+menu_sc_y         : integer;
 menu_sc_cx        : single;
 
 MainMenu          : boolean = true;
@@ -380,10 +376,14 @@ MainMenu          : boolean = true;
 menu_DarkBack     : boolean = false;
 menu_Page         : byte = 0;
 menu_SettingsPage : byte = mi_settings_Game;
-menu_HelpPage     : byte = 0;
+menu_HelpPage     : byte = mi_help_UnitsInfo;
+menu_HelpUID      : byte = 0;
+menu_HelpScroll   : integer = 0;
+menu_HelpIList    : PTUIStringList = nil;
 menu_ItemActs     : byte = 0;
-menu_ItemTarget   : integer;
-menu_ItemSelected : integer;
+menu_ItemTarget   : byte = 0;
+menu_ItemTargetP  : byte = 0; // previous
+menu_ItemSelected : byte = 0;
 menu_items        : array[byte] of TMenuItem;
 menu_update       : boolean = true;
 menu_redraw       : boolean = true;
@@ -391,6 +391,8 @@ menu_redraw_pause : integer = 0;
 menu_msg_type     : TMenuMessageBoxType;
 menu_msg_Caption,
 menu_msg_Body     : shortstring;
+
+menu_hint_pos     : array[byte] of byte;
 
 menu_ResolutionWi,
 menu_ResolutionHi : integer;
@@ -452,9 +454,9 @@ net_chat_str      : shortstring = '';
 
 net_svsearch      : boolean = false;
 net_svsearch_listi: array of TServerInfo;
-net_svsearch_lists: TStringList;
-net_svsearch_size: integer = 0;
+net_svsearch_lists: TStringArray;
 net_svsearch_scroll: integer = 0;
+net_svsearch_size : integer = 0;
 net_svsearch_sel  : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -467,10 +469,10 @@ svld_str_info2    : shortstring = '';
 svld_str_fname    : shortstring = '';
 svld_items        : array of TSaveLoadItem;
 svld_itemn        : integer = 0;
-svld_list         : TStringList;
-svld_list_size    : integer = 0;
+svld_list         : TStringArray;
 svld_list_sel     : integer = 0;
 svld_list_scroll  : integer = 0;
+svld_list_size    : integer = 0;
 svld_file_size    : cardinal = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -487,10 +489,10 @@ rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
-rpls_list         : TStringList;
-rpls_list_size    : integer = 0;
+rpls_list         : TStringArray;
 rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
+rpls_list_size    : integer = 0;
 rpls_ReadPosN     : cardinal = 0;
 rpls_ReadPosL     : array of TReplayPos;
 rpls_ForwardSkip  : integer = 0;
@@ -499,7 +501,7 @@ rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
 rpls_showlog      : boolean = false;
-rpls_POVRecorder        : boolean = false;
+rpls_POVRecorder  : boolean = false;
 rpls_ticks        : byte = 0;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_head_itemn   : integer = 0;
@@ -700,7 +702,6 @@ spr_Siege,
 spr_FMajor,
 spr_BFG,
 spr_FAPC,
-spr_APC,
 spr_Terminator,
 spr_Tank,
 spr_Flyer,
@@ -763,7 +764,6 @@ spr_URTurret,
 spr_UNuclearPlant,
 spr_URocketL,
 
-spr_Mine,
 spr_portal,
 spr_starport,
 spr_ubase0,
@@ -809,7 +809,7 @@ spr_db_u1,
 spr_blood         : TMWSModel;
 spr_pdmodel       : PTMWSModel; // default empty model
 
-spr_RallyPoint    : array[1..r_cnt] of TMWTexture;
+spr_RallyPoint    : array[1..r_count] of TMWTexture;
 spr_b4_a,
 spr_b7_a,
 spr_b9_a,
@@ -862,8 +862,8 @@ spr_uibtn_F1,
 spr_uibtn_F2,
 spr_uibtn_ProdCancel,
 spr_uibtn_Delete,
-spr_MenuBackground,
-spr_MenuLogo,
+spr_MenuBackgroundL,
+spr_MenuBackgroundD,
 spr_cursor,
 spr_cursorSubR,
 spr_cursorSubG,
@@ -873,18 +873,17 @@ spr_CursorHint_MLB,
 spr_CursorHint_MRB,
 spr_CursorHint_MMB   : array[boolean ] of pSDL_Surface;
 spr_RaceRank,
-spr_uipanel_EmptyBTN : array[1..r_cnt] of pSDL_Surface;
-spr_uibtn_Upgrades   : array[1..r_cnt,0..spr_upgrade_icons] of TMWTexture;
-spr_b_ab             : array[byte] of pSDL_Surface;
+spr_uipanel_EmptyBTN : array[1..r_count] of pSDL_Surface;
+spr_uibtn_Upgrades   : array[1..r_count,0..spr_upgrade_icons] of TMWTexture;
 spr_uibtn_Tabs       : array[0..3] of pSDL_Surface;
-spr_cp_koth,
+spr_kp_koth,
 spr_cp_out,
-spr_cp_gen         : TMWTexture;
+spr_kp_gen         : TMWTexture;
 
 spr_cursorWh,
 spr_cursorHh       : integer;
 
-//spr_ui_oico       : array[1..r_cnt,false..true,byte] of pSDL_Surface;
+//spr_ui_oico       : array[1..r_count,false..true,byte] of pSDL_Surface;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -892,7 +891,11 @@ spr_cursorHh       : integer;
 //  TEXT
 //
 
-str_race            : array[0..r_cnt  ] of shortstring;
+str_doc_Basics1,
+str_doc_HotKeys
+                    : TUIStringList;
+
+str_race            : array[0..r_count  ] of shortstring;
 str_map_ScenarioL,
 str_replay_ScenarioL: array[0..mc_Last] of shortstring;
 
@@ -905,8 +908,42 @@ str_lobby_PlayerReady: array[false..true] of shortstring;
 str_lobby_GameResetIn,
 str_lobby_GameStartIn,
 str_lobby_ReadyToStart,
-str_lobby_BreakStarting
-                       : shortstring;
+str_lobby_BreakStarting,
+
+str_help_Basics,
+str_help_HotKeys,
+str_help_UnitsInfo,
+str_help_BalanceTable,
+
+str_doc_HotKey,
+str_doc_Attributes,
+str_doc_ProdEnergy,
+str_doc_ProdTime,
+str_doc_Limit,
+str_doc_MaxHits,
+str_doc_BaseRegen,
+str_doc_BaseSightR,
+str_doc_Size,
+str_doc_BaseMSpeed,
+str_doc_Role,
+str_doc_Description,
+str_doc_PainC,
+str_doc_TransportSize,
+str_doc_TransportCpst,
+str_doc_LevelArmorBonus,
+str_doc_LevelDamageBonus,
+str_doc_ZombieUID,
+str_doc_ZombieHits,
+str_doc_DeathUnit,
+str_doc_LMB,
+str_doc_RMB,
+str_doc_MWH,
+str_doc_UpgrArmor,
+str_doc_UpgrRegen,
+str_doc_UpgrSpeed,
+str_doc_UpgrPainS,
+str_doc_UpgrSightR,
+str_doc_UpgrTransport,
 
 str_menu_Campaings,
 str_menu_Scirmish,
@@ -987,6 +1024,8 @@ str_net_Connect,
 str_net_Disconnect,
 str_net_LANSearch,
 
+str_hint_upgrade,
+str_hint_sec,
 str_hint_TransformTo,
 str_hint_UpgradesLvl,
 str_hint_Demons,
@@ -994,8 +1033,6 @@ str_hint_Except,
 str_hint_UnitArming,
 str_hint_Abilities,
 str_hint_SplashResist,
-str_hint_hits,
-str_hint_BaseSightR,
 str_hint_SightR,
 str_hint_Ability,
 str_hint_builder,
@@ -1006,9 +1043,20 @@ str_hint_CanRebuildTo,
 str_hint_TargetLimit,
 str_hint_requirements,
 str_hint_req,
-str_hint_reload,
 str_hint_uprod,
 str_hint_bprod,
+
+str_ability_passive,
+str_ability_active,
+str_ability_notarget,
+str_ability_point,
+str_ability_UnitAny,
+str_ability_UnitOwn,
+str_ability_UnitAlly,
+str_ability_UnitEnemy,
+str_ability_reload,
+str_ability_ReloadFactors,
+str_ability_rldDecByLevel,
 
 str_uarm_melee,
 str_uarm_ranged,
@@ -1016,7 +1064,7 @@ str_uarm_zombie,
 str_uarm_ressurect,
 str_uarm_heal,
 str_uarm_spawn,
-str_uarm_suicide,
+//str_uarm_suicide,
 str_uarm_targets,
 str_uarm_BaseImpact,
 str_uarm_MinRange,
@@ -1174,17 +1222,16 @@ str_Camp_DifficultyL     : array[0..CMPMaxSkills  ] of shortstring;
 str_ui_Tab               : array[0..3] of shortstring;
 
 str_map_GeneratorsL      : array[0..map_MaxGenerators  ] of shortstring;
-str_SG_PlayersColorL     : array[0..vid_MaxPlayersColor] of shortstring;
+str_SG_PlayersColorL     : array[0..ui_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL       : array[0..2] of shortstring;
 str_SG_ControlPanelPosL  : array[0..3] of shortstring;
 
 str_action_hint,
 str_menu_hint            : array[byte] of shortstring;
 
-str_camp_MissionName,
-str_camp_map             : array[0..LastMission] of shortstring;
-str_camp_infol           : array[0..LastMission] of TStringList;
-str_camp_infon           : array[0..LastMission] of integer;
+str_camp_MissionName     : array[0..LastMission] of shortstring;
+str_camp_MissionMap,
+str_camp_MissionInfo     : array[0..LastMission] of TUIStringList;
 
 str_YesNoC,
 str_YesNoG,
@@ -1223,7 +1270,7 @@ snd_mmap_last      : PTSoundSet = nil;
 snd_mmap_ticks     : integer = 0;
 
 
-snd_under_attack   : array[false..true,1..r_cnt] of PTSoundSet;
+snd_under_attack   : array[false..true,1..r_count] of PTSoundSet;
 snd_build_place,
 snd_building,
 snd_cannot_build,
@@ -1237,11 +1284,10 @@ snd_victory,
 snd_unit_adv,
 snd_unit_promoted,
 snd_rally_point
-                   : array[1..r_cnt] of PTSoundSet;
+                   : array[1..r_count] of PTSoundSet;
 
 snd_RadarScan,
 
-snd_uac_mine,
 snd_uac_cc,
 snd_uac_barracks,
 snd_uac_generator,
@@ -1257,9 +1303,6 @@ snd_uac_suply,
 snd_uac_rescc,
 
 snd_uac_hdeath,
-
-snd_APC_ready,
-snd_APC_move,
 
 snd_bfgmarine_ready,
 snd_bfgmarine_annoy,

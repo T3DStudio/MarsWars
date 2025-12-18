@@ -53,7 +53,6 @@ begin
    input_SetAction(iAct_USetGroup8        ,ikt_keyboard,iAct_control,SDLK_8           );
    input_SetAction(iAct_USetGroup9        ,ikt_keyboard,iAct_control,SDLK_9           );
 
-   input_SetAction(iAct_UAddGroup0        ,ikt_keyboard,iAct_Alt    ,SDLK_0           );
    input_SetAction(iAct_UAddGroup1        ,ikt_keyboard,iAct_Alt    ,SDLK_1           );
    input_SetAction(iAct_UAddGroup2        ,ikt_keyboard,iAct_Alt    ,SDLK_2           );
    input_SetAction(iAct_UAddGroup3        ,ikt_keyboard,iAct_Alt    ,SDLK_3           );
@@ -64,7 +63,6 @@ begin
    input_SetAction(iAct_UAddGroup8        ,ikt_keyboard,iAct_Alt    ,SDLK_8           );
    input_SetAction(iAct_UAddGroup9        ,ikt_keyboard,iAct_Alt    ,SDLK_9           );
 
-   input_SetAction(iAct_UASlGroup0        ,ikt_keyboard,iAct_shift  ,SDLK_0           );
    input_SetAction(iAct_UASlGroup1        ,ikt_keyboard,iAct_shift  ,SDLK_1           );
    input_SetAction(iAct_UASlGroup2        ,ikt_keyboard,iAct_shift  ,SDLK_2           );
    input_SetAction(iAct_UASlGroup3        ,ikt_keyboard,iAct_shift  ,SDLK_3           );
@@ -75,7 +73,6 @@ begin
    input_SetAction(iAct_UASlGroup8        ,ikt_keyboard,iAct_shift  ,SDLK_8           );
    input_SetAction(iAct_UASlGroup9        ,ikt_keyboard,iAct_shift  ,SDLK_9           );
 
-   input_SetAction(iAct_USelGroup0        ,ikt_keyboard,0           ,SDLK_0           );
    input_SetAction(iAct_USelGroup1        ,ikt_keyboard,0           ,SDLK_1           );
    input_SetAction(iAct_USelGroup2        ,ikt_keyboard,0           ,SDLK_2           );
    input_SetAction(iAct_USelGroup3        ,ikt_keyboard,0           ,SDLK_3           );
@@ -262,54 +259,81 @@ end;
 //
 
 procedure ui_InitControlPanelBTNActions;
+var i:byte;
+function MPos(apos:byte):byte;
+var step:byte;
+begin
+   MPos:=0;
+   case ui_ControlPanelPos of
+   cpp_left,
+   cpp_right : MPos:=apos;
+   cpp_top,
+   cpp_bottom: begin
+               step:=(apos div ui_CtrlPanelBlock)*ui_CtrlPanelBlock;
+               apos:=apos mod ui_CtrlPanelBlock;
+               apos:=ui_CtrlPanelBW*(apos mod ui_CtrlPanelBW)+(apos div ui_CtrlPanelBW);
+               MPos:=step+apos;
+               case MPos of
+               24: MPos:=20;
+               25: MPos:=23;
+               end;
+               end;
+   end;
+   if(MPos>ui_ButtonsNum)then MPos:=ui_ButtonsNum;
+end;
+
 begin
    FillChar(ui_panel_CTabIActs,SizeOf(ui_panel_CTabIActs),0);
+   FillChar(ui_panel_PTabIActs,SizeOf(ui_panel_PTabIActs),0);
 
-   ui_panel_CTabIActs[tcc_controls,0 ]:=iAct_Control_UAbility1;
-   ui_panel_CTabIActs[tcc_controls,1 ]:=iAct_Control_UAbility2;
-   ui_panel_CTabIActs[tcc_controls,2 ]:=iAct_Control_UAbility3;
-   ui_panel_CTabIActs[tcc_controls,3 ]:=iAct_Control_UAMove;
-   ui_panel_CTabIActs[tcc_controls,4 ]:=iAct_Control_UAStop;
-   ui_panel_CTabIActs[tcc_controls,5 ]:=iAct_Control_UAPatrol;
-   ui_panel_CTabIActs[tcc_controls,6 ]:=iAct_Control_UMove;
-   ui_panel_CTabIActs[tcc_controls,7 ]:=iAct_Control_UStop;
-   ui_panel_CTabIActs[tcc_controls,8 ]:=iAct_Control_UPatrol;
-   ui_panel_CTabIActs[tcc_controls,9 ]:=iAct_Control_UProdCncl;
-   ui_panel_CTabIActs[tcc_controls,10]:=iAct_Control_UDestroy;
-   ui_panel_CTabIActs[tcc_controls,12]:=iAct_Control_USelBase;
-   ui_panel_CTabIActs[tcc_controls,13]:=iAct_Control_USelArmy;
+   for i:=0 to ui_ButtonsNum do
+     ui_panel_PTabIActs[MPos(i)]:=iAct_SProd1+i;
 
-   ui_panel_CTabIActs[tcc_replay  ,0 ]:=iAct_Replay_Fast;
-   ui_panel_CTabIActs[tcc_replay  ,1 ]:=iAct_Replay_Pause;
-   ui_panel_CTabIActs[tcc_replay  ,3 ]:=iAct_Replay_Back60;
-   ui_panel_CTabIActs[tcc_replay  ,4 ]:=iAct_Replay_Back10;
-   ui_panel_CTabIActs[tcc_replay  ,5 ]:=iAct_Replay_Back2;
-   ui_panel_CTabIActs[tcc_replay  ,6 ]:=iAct_Replay_Forward2;
-   ui_panel_CTabIActs[tcc_replay  ,7 ]:=iAct_Replay_Forward10;
-   ui_panel_CTabIActs[tcc_replay  ,8 ]:=iAct_Replay_Forward60;
-   ui_panel_CTabIActs[tcc_replay  ,9 ]:=iAct_Replay_POV;
-   ui_panel_CTabIActs[tcc_replay  ,10]:=iAct_Replay_Log;
-   ui_panel_CTabIActs[tcc_replay  ,11]:=iAct_Replay_Fog;
-   ui_panel_CTabIActs[tcc_replay  ,12]:=iAct_Replay_PlayerAll;
-   ui_panel_CTabIActs[tcc_replay  ,13]:=iAct_Replay_Player0;
-   ui_panel_CTabIActs[tcc_replay  ,14]:=iAct_Replay_Player1;
-   ui_panel_CTabIActs[tcc_replay  ,15]:=iAct_Replay_Player2;
-   ui_panel_CTabIActs[tcc_replay  ,16]:=iAct_Replay_Player3;
-   ui_panel_CTabIActs[tcc_replay  ,17]:=iAct_Replay_Player4;
-   ui_panel_CTabIActs[tcc_replay  ,18]:=iAct_Replay_Player5;
-   ui_panel_CTabIActs[tcc_replay  ,19]:=iAct_Replay_Player6;
-   ui_panel_CTabIActs[tcc_replay  ,20]:=iAct_Replay_Player7;
+   ui_panel_CTabIActs[tcc_controls,MPos(0 )]:=iAct_Control_UAbility1;
+   ui_panel_CTabIActs[tcc_controls,MPos(1 )]:=iAct_Control_UAbility2;
+   ui_panel_CTabIActs[tcc_controls,MPos(2 )]:=iAct_Control_UAbility3;
+   ui_panel_CTabIActs[tcc_controls,MPos(3 )]:=iAct_Control_UAMove;
+   ui_panel_CTabIActs[tcc_controls,MPos(4 )]:=iAct_Control_UAStop;
+   ui_panel_CTabIActs[tcc_controls,MPos(5 )]:=iAct_Control_UAPatrol;
+   ui_panel_CTabIActs[tcc_controls,MPos(6 )]:=iAct_Control_UMove;
+   ui_panel_CTabIActs[tcc_controls,MPos(7 )]:=iAct_Control_UStop;
+   ui_panel_CTabIActs[tcc_controls,MPos(8 )]:=iAct_Control_UPatrol;
+   ui_panel_CTabIActs[tcc_controls,MPos(9 )]:=iAct_Control_UProdCncl;
+   ui_panel_CTabIActs[tcc_controls,MPos(10)]:=iAct_Control_UDestroy;
+   ui_panel_CTabIActs[tcc_controls,MPos(12)]:=iAct_Control_USelBase;
+   ui_panel_CTabIActs[tcc_controls,MPos(13)]:=iAct_Control_USelArmy;
 
-   ui_panel_CTabIActs[tcc_observer,0 ]:=iAct_Observer_Fog;
-   ui_panel_CTabIActs[tcc_observer,3 ]:=iAct_Observer_PlayerAll;
-   ui_panel_CTabIActs[tcc_observer,4 ]:=iAct_Observer_Player0;
-   ui_panel_CTabIActs[tcc_observer,5 ]:=iAct_Observer_Player1;
-   ui_panel_CTabIActs[tcc_observer,6 ]:=iAct_Observer_Player2;
-   ui_panel_CTabIActs[tcc_observer,7 ]:=iAct_Observer_Player3;
-   ui_panel_CTabIActs[tcc_observer,8 ]:=iAct_Observer_Player4;
-   ui_panel_CTabIActs[tcc_observer,9 ]:=iAct_Observer_Player5;
-   ui_panel_CTabIActs[tcc_observer,10]:=iAct_Observer_Player6;
-   ui_panel_CTabIActs[tcc_observer,11]:=iAct_Observer_Player7;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(0 )]:=iAct_Replay_Fast;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(1 )]:=iAct_Replay_Pause;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(3 )]:=iAct_Replay_Back60;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(4 )]:=iAct_Replay_Back10;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(5 )]:=iAct_Replay_Back2;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(6 )]:=iAct_Replay_Forward2;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(7 )]:=iAct_Replay_Forward10;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(8 )]:=iAct_Replay_Forward60;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(9 )]:=iAct_Replay_POV;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(10)]:=iAct_Replay_Log;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(11)]:=iAct_Replay_Fog;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(12)]:=iAct_Replay_PlayerAll;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(13)]:=iAct_Replay_Player0;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(14)]:=iAct_Replay_Player1;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(15)]:=iAct_Replay_Player2;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(16)]:=iAct_Replay_Player3;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(17)]:=iAct_Replay_Player4;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(18)]:=iAct_Replay_Player5;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(19)]:=iAct_Replay_Player6;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(20)]:=iAct_Replay_Player7;
+
+   ui_panel_CTabIActs[tcc_observer,MPos(0 )]:=iAct_Observer_Fog;
+   ui_panel_CTabIActs[tcc_observer,MPos(3 )]:=iAct_Observer_PlayerAll;
+   ui_panel_CTabIActs[tcc_observer,MPos(4 )]:=iAct_Observer_Player0;
+   ui_panel_CTabIActs[tcc_observer,MPos(5 )]:=iAct_Observer_Player1;
+   ui_panel_CTabIActs[tcc_observer,MPos(6 )]:=iAct_Observer_Player2;
+   ui_panel_CTabIActs[tcc_observer,MPos(7 )]:=iAct_Observer_Player3;
+   ui_panel_CTabIActs[tcc_observer,MPos(8 )]:=iAct_Observer_Player4;
+   ui_panel_CTabIActs[tcc_observer,MPos(9 )]:=iAct_Observer_Player5;
+   ui_panel_CTabIActs[tcc_observer,MPos(10)]:=iAct_Observer_Player6;
+   ui_panel_CTabIActs[tcc_observer,MPos(11)]:=iAct_Observer_Player7;
 end;
 
 procedure iActSetDisabled(iAct:byte;isdisabled:boolean);
@@ -355,12 +379,12 @@ begin
 
    for ucl:=0 to ui_ButtonsNum do
    begin
-      act:=iAct_SProd1+ucl;
+      act:=ui_panel_PTabIActs[ucl];
       input_actions[act].ik_astate:=as_off;
       if(POVPlayer<>nil)then
         with POVPlayer^ do
         begin
-           uid:=ui_panel_uids[race,ui_tab,ucl];
+           uid:=ui_panel_uids[race,ui_tab,act-iAct_SProd1];
            case ui_tab of
            tab_buildings: if(ui_PanelBTNUnit   (POVPlayer,uid))then iActSetDisabled(act,(CheckUnitReqs   (POVPlayer,uid)>0)or not(uid in ui_bprod_possible));
            tab_units    : if(ui_PanelBTNUnit   (POVPlayer,uid))then iActSetDisabled(act,(CheckUnitReqs   (POVPlayer,uid)>0)or(prod_unit_Now>=prod_unit_Max)or(ui_uprod_cur>=ui_uprod_max)or(ui_uprod_uid_max[uid]<=0));
@@ -398,7 +422,7 @@ begin
    for ucl:=0 to LastPlayer do
    iActSetOnEnabled(iAct_Observer_Player0+ucl,ctabType=tcc_Observer,ui_SetUIPlayer(ucl,true));
 
-   // game controls
+   // unit controls
    if(iActIfOn(iAct_Control_UAbility1,(ctabType=tcc_Controls)and(ui_PanelBTNAbility(ui_CommandercPU,1))))then
      with ui_CommandercPU^ do
        with uid^ do
@@ -872,7 +896,7 @@ begin
 0..ui_ButtonsNum: case ui_tab of
                   tab_Buildings,
                   tab_Units,
-                  tab_Upgrades : ui_ExecInGameAction(iAct_SProd1+m_BtnN                          ,click_type,clickSound);
+                  tab_Upgrades : ui_ExecInGameAction(ui_panel_PTabIActs[m_BtnN                  ],click_type,clickSound);
                   tab_Controls : ui_ExecInGameAction(ui_panel_CTabIActs[ui_ControlTabType,m_BtnN],click_type,clickSound);
                   end;
 
@@ -1073,7 +1097,7 @@ begin
       ui_Camera_Bounds;
    end;
 
- //  if(k_mr=2)then effect_add(mouse_map_x,mouse_map_y-50,10000,UID_Pain);
+ //  if(k_mr=2)then effect_add(mouse_map_x,mouse_map_y-50,10000,UID_PainC);
    {if(ks_mright=1)and(ks_ctrl>2)then
    begin
       u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
@@ -1250,14 +1274,14 @@ begin
 
          // Groups
          for k:=iAct_USetGroup0 to iAct_USetGroup9 do if(InputActionPressed(k))then units_Grouping   (false,k-iAct_USetGroup0);
-         for k:=iAct_UAddGroup0 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_Grouping   (true ,k-iAct_UAddGroup0);
-         for k:=iAct_UASlGroup0 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup0);
-         for k:=iAct_USelGroup0 to iAct_USelGroup9 do
-           if(InputActionDPressed(k))and(k<>iAct_USelGroup0)
-           then ui_Camera_MoveToGroup(@ui_group_d[k-iAct_USelGroup0])
+         for k:=iAct_UAddGroup1 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_Grouping   (true ,k-iAct_UAddGroup1+1);
+         for k:=iAct_UASlGroup1 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup1+1);
+         for k:=iAct_USelGroup1 to iAct_USelGroup9 do
+           if(InputActionDPressed(k))
+           then ui_Camera_MoveToGroup(@ui_group_d[k-iAct_USelGroup1+1])
            else
              if(InputActionPressed(k))
-             then units_SelectGroup(false,k-iAct_USelGroup0);
+             then units_SelectGroup(false,k-iAct_USelGroup1+1);
 
          // Controls tab actions
          for k:=0 to ui_ButtonsNum do

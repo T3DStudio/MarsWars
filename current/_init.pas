@@ -76,9 +76,10 @@ begin
    {$IFDEF _FULLGAME}
 
    input_InitDefaultActionHotkeys;
-   ui_InitControlPanelBTNActions;
 
    cfg_read;
+
+   ui_InitControlPanelBTNActions;
 
    saveload_MakeSaveData;
    replay_MakeReplayHeaderData;
@@ -88,11 +89,11 @@ begin
 
    InitRX2Y;
    lng_eng;
-   SwitchLanguage;
    InitClientDataGame;
    InitClientDataMissiles;
    gfx_MakeUnitIcons;
    InitClientDataAbilities;
+   SwitchLanguage;
 
    //gfx_SaveUnitIcons;
 

@@ -14,7 +14,6 @@ MID_Imp      : mid_SpriteModel:=@spr_h_p0;
 MID_Cacodemon: mid_SpriteModel:=@spr_h_p1;
 MID_Baron    : mid_SpriteModel:=@spr_h_p2;
 MID_Blizzard,
-MID_Mine,
 MID_HRocket  : mid_SpriteModel:=@spr_h_p3;
 MID_Revenant : mid_SpriteModel:=@spr_h_p4;
 MID_Mancubus : mid_SpriteModel:=@spr_h_p5;
@@ -61,7 +60,6 @@ MID_Cacodemon,
 MID_Baron    : mid_snd_death[false]:=snd_explode_plasma;
 MID_ArchFire,
 MID_Blizzard,
-MID_Mine,
 MID_Tank,
 MID_Granade,
 MID_HRocket,
@@ -255,7 +253,7 @@ begin
           with g_gplayers[m_playeri] do
             case m_mid of
           MID_SSShot,
-          MID_SShot  : painX+=upgr[upgr_uac_ssgup]*2;
+          MID_SShot  : painX+=upgr[upgr_uac_SSMWeapon]*2;
             end; }
 
         if(ud<=0)and(m_dtars=0)then // direct target

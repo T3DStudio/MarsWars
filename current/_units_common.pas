@@ -253,8 +253,8 @@ begin
    begin
       _px:=x;
       _py:=y;
-      x:=mm3i(1,ax,map_Size);
-      y:=mm3i(1,ay,map_Size);
+      x:=mm3i(1,ax,map_Size1);
+      y:=mm3i(1,ay,map_Size1);
       if(x<>_px)or(y<>_py)then
       begin
          unit_UpdateXY(pu);
@@ -365,15 +365,15 @@ begin
    with pTeleporter^ do
      with player^ do
        with g_aids[uab_Teleport] do
-         rld:=integer(round(limit/MinUnitLimit*(ua_reload-(upgrs_cur[ua_reload_upgr]*ua_reload_upgrS))));
+         rld:=integer(round(limit/MinUnitLimit*(ua_reload-(upgrs_cur[ua_rldDec_upgr]*ua_rldDec_upgrS))));
 end;
 
 procedure unit_Teleport2Point(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
 begin
    with pu^ do
    begin
-      tx:=mm3i(0,tx,map_Size);
-      ty:=mm3i(0,ty,map_Size);
+      tx:=mm3i(0,tx,map_Size1);
+      ty:=mm3i(0,ty,map_Size1);
       {$IFDEF _FULLGAME}
       effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
       {$ENDIF}
@@ -804,7 +804,7 @@ begin
 
    if(check_obstacles)then
    begin
-      tr-=bld_dec_mr;
+      tr-=BuildObstacleStepR;
       dx:=tx div MapObstaclesGridW;
       dy:=ty div MapObstaclesGridW;
       if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
@@ -818,12 +818,12 @@ begin
               d:=point_dist_int(o_x,o_y,tx,ty)-o;
               add(o_x,o_y,d,o);
            end;
-      tr+=bld_dec_mr;
+      tr+=BuildObstacleStepR;
    end;
 
    if(not _ukfly)then
     for u:=0 to LastKeyPoint do
-     with g_KeyPoints[u] do
+     with map_KeyPointsL[u] do
       if(kpCaptureR>0)and(kpNoBuildR>0)then
       begin
          o:=kpNoBuildR+tr;
@@ -885,7 +885,7 @@ begin
    if(not _ukfly)then
    begin
       dx:=tr;
-      dy:=map_size-dx;
+      dy:=map_Size1-dx;
       tx:=mm3i(dx,tx,dy);
       ty:=mm3i(dx,ty,dy);
    end;
@@ -939,7 +939,7 @@ begin
    with g_uids[buid] do
    begin
       dx:=uid_r;
-      dy:=map_size-dx;
+      dy:=map_Size1-dx;
       tx:=mm3i(dx,tx,dy);
       ty:=mm3i(dx,ty,dy);
    end;
@@ -954,8 +954,8 @@ begin
    CheckCollisionR:=cbr_no;
 
    if(building)then
-     if(tx<tr)or((map_size-tr)<tx)
-     or(ty<tr)or((map_size-tr)<ty)then
+     if(tx<tr)or((map_Size1-tr)<tx)
+     or(ty<tr)or((map_Size1-tr)<ty)then
      begin
         CheckCollisionR:=cbr_mapSide;  // out of map bounds
         exit;
@@ -985,7 +985,7 @@ begin
    if(flylevel)then exit;
 
    for u:=0 to LastKeyPoint do
-    with g_KeyPoints[u] do
+    with map_KeyPointsL[u] do
      if(kpCaptureR>0)then
      begin
         if(building)
@@ -1001,7 +1001,7 @@ begin
 
    if(not check_obstacles)then exit;
 
-   tr-=bld_dec_mr;
+   tr-=BuildObstacleStepR;
 
    dx:=tx div MapObstaclesGridW;
    dy:=ty div MapObstaclesGridW;
@@ -1031,15 +1031,15 @@ begin
        end;
 
    with g_uids[buid] do
-     if(tx<uid_r)or((map_size-uid_r)<tx)
-     or(ty<uid_r)or((map_size-uid_r)<ty)then
+     if(tx<uid_r)or((map_Size1-uid_r)<tx)
+     or(ty<uid_r)or((map_Size1-uid_r)<ty)then
      begin
         CheckInBuildArea:=cba_outBuildArea;  // out of bounds
         exit;
      end;
 
    for u:=0 to LastKeyPoint do
-     with g_KeyPoints[u] do
+     with map_KeyPointsL[u] do
        if(kpCaptureR>0)and(kpNoBuildR>0)then
          if(point_dist_int(tx,ty,kpx,kpy)<kpNoBuildR)then
          begin
@@ -1111,8 +1111,8 @@ begin
       if(check)then exit;
 
       math_push_out(x0,y0,uid_r,unum,@x0,@y0,ukfly, true, team );
-      x0:=mm3i(1,x0,map_Size);
-      y0:=mm3i(1,y0,map_Size);
+      x0:=mm3i(1,x0,map_Size1);
+      y0:=mm3i(1,y0,map_Size1);
 
       rld:=fr_fps1;
 
@@ -1147,8 +1147,8 @@ begin
 
       if(srange<point_dist_int(x,y,x0,y0))then math_1c_push(@x0,@y0,x,y,srange-1);
       math_push_out(x0,y0,uid_r,unum,@x0,@y0,ukfly, true ,team );
-      x0:=mm3i(1,x0,map_Size);
-      y0:=mm3i(1,y0,map_Size);
+      x0:=mm3i(1,x0,map_Size1);
+      y0:=mm3i(1,y0,map_Size1);
 
       unit_ability_HTowerBlink:=ureq_landplace;
       if(point_dist_int(x,y,x0,y0)>srange)then exit;
@@ -1995,8 +1995,8 @@ begin
 
            with uid^ do
            begin
-              if(uid_DeathMissile>0)then
-                missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);
+              {if(uid_DeathMissile>0)then
+                missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);  }
               if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
                 for i:=1 to uid_DeathUIDn do
                   if(player_UIDLimitCheck(player,uid_DeathUID))then
@@ -2012,10 +2012,8 @@ begin
        end;
 end;
 
-
 procedure unit_Bonuses(pu:PTUnit);
-var tu:PTUnit;
-    t :integer;
+var t :integer;
 procedure SetSRange(newsr:integer);
 begin
    with pu^ do
@@ -2031,9 +2029,16 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-   if(iscomplete)and(hits>0)then
    begin
-      speed:=uid_BaseSpeed;
+      // SPEED
+      speed:=uid_MSpeed_Base;
+      if(uid_MSpeed_upgr>0)then
+        speed+=integer(upgrs_cur[uid_MSpeed_upgr])*uid_MSpeed_upgrV;
+
+      // TRANSPORT CAPASITY
+      transportM:=uid_TransportMax_Base;
+      if(uid_TransportMax_upgr>0)then
+        transportM+=integer(upgrs_cur[uid_TransportMax_upgr])*uid_TransportMax_upgrV;
 
       // DETECTION
       if(uid_isdetector)or(buffs[ub_HVision]>0)
@@ -2042,35 +2047,24 @@ begin
 
       // INVIS
       case uidi of
-UID_HTotem        : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_TotemInvis  ]>0];
-UID_Commando      : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_uac_CommandoInvis]>0];
-UID_Demon         : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_Spectre     ]>0];
-UID_HEye,
-UID_UMine         : buffs[ub_Invis]:=ub_infinity;
+      UID_HTotem  : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_TotemInvis  ]>0];
+      UID_Commando: buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_uac_CommandoInvis]>0];
+      UID_Demon   : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_Spectre     ]>0];
+      UID_HEye    : buffs[ub_Invis]:=ub_infinity;
       end;
 
       // OTHER
-      case uidi of
-UID_Phantom,
-UID_LostSoul      : begin
-                       tu:=nil;
-                       if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_SpecPause]:=fr_fpsh;
-                       if(buffs[ub_pain]<=0)then
-                         if(buffs[ub_SpecPause]>0)and(tu<>nil)then ukfly:=tu^.ukfly else ukfly:=uid_isfly;
-                       ukfloater:=not ukfly;
-                    end;
-//UID_UTransport    : begin level:=min2i(upgrs_cur[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+4*level;end;
-//UID_APC           : begin level:=min2i(upgrs_cur[upgr_uac_Transport],LastUnitLevel);transportM:=uid_TransportMax+2*level;end;
-      end;
       if(upgrs_cur[upgr_invuln]>0)then buffs[ub_Invuln]:=fr_fps1;
 
-      // SRANGE
-      t:=uid_BaseSightR;
-      if(uid_upgr_SightR>0)and(uid_upgr_SightStep>0)
-      then t+=upgrs_cur[uid_upgr_SightR]*uid_upgr_SightStep;
-      if(not uid_isbuilding)
-      then t+=upgrs_cur[upgr_race_unit_srange[uid_race]]*upgr_race_srange_unit_bonus[uid_race];
-      SetSRange(t);
+      // SIGHT RANGE
+      if(iscomplete)then
+      begin
+         t:=uid_SightR_Base;
+         if(uid_SightR_upgr>0)then
+           t+=integer(upgrs_cur[uid_SightR_upgr])*uid_SightR_upgrV;
+      end
+      else t:=uid_r+uid_r;
+      SetSRange(t)
    end;
 end;
 

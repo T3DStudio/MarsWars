@@ -51,8 +51,7 @@ begin
      UID_HSymbol2,
      UID_HSymbol3,
      UID_HSymbol4,
-     UID_HAltar,
-     UID_UMine     : unit_GetSpriteDepth:=sd_tcraters+vy;
+     UID_HAltar    : unit_GetSpriteDepth:=sd_tcraters+vy;
      else
        if(uid^.uid_isbuilding)and(not iscomplete)
        then unit_GetSpriteDepth:=sd_build+vy
@@ -74,7 +73,7 @@ procedure setFOGPoint(tx,ty:integer);
 begin if(0<=tx)and(0<=ty)and(tx<ui_fog_gridw)and(ty<ui_fog_gridh)then ui_fog_fgrid[tx,ty]:=true;end;
 begin
    if(r<0    )then r:=0;
-   if(r>MFogM)then r:=MFogM;
+   if(r>fog_MaxR)then r:=fog_MaxR;
    for i:=0 to r do
      for iy:=0 to CircleRX2Y[r,i] do
      begin
@@ -132,7 +131,7 @@ begin
       if (iscomplete        )then ui_CommanderGetWeight+=128;
       if (not uid_isbuilding)then ui_CommanderGetWeight+=64;
       if (uid_HaveAbility   )then ui_CommanderGetWeight+=32;
-      if (uid_BaseSpeed>0   )then ui_CommanderGetWeight+=16;
+      if (uid_MSpeed_Base>0 )then ui_CommanderGetWeight+=16;
       if (rld<=0            )then ui_CommanderGetWeight+=8;
       if (uo_id<>ua_ability1)
       and(uo_id<>ua_ability2)
@@ -491,7 +490,7 @@ end;
 
 procedure unit_UpdateStatusStrings(pu:PTUnit);
 var i,
-al,wl,sl:integer;
+al,wl,sl:byte;
    atset:TSoB;
 procedure WeaponUpgrInc(upgr:byte);
 begin
@@ -523,48 +522,35 @@ begin
       then lvlstr_r:=tc_aqua+i2s(it2s(rld))
       else lvlstr_r:='';
 
+      sl:=0;
+      wl:=0;
+      al:=0;
       // weapon/attack
-      sl      :=0;
-      wl      :=0;
       atset   :=[];
       for i:=0 to LastUnitArms do
-       with uid_arms[i] do
-        if(aw_reload>0)then
-        begin
-           if(aw_impact_upgr>0)then WeaponUpgrInc(aw_impact_upgr);
-           if(aw_req_upgr>0)and(upgrs_cur[aw_req_upgr]>0)then sl+=1;
-        end;
+        with uid_arms[i] do
+          if(aw_reload>0)then
+          begin
+             if(aw_impact_upgr>0)then WeaponUpgrInc(aw_impact_upgr);
+             if(aw_req_upgr>0)and(upgrs_cur[aw_req_upgr]>0)then sl+=1;
+          end;
       lvlstr_w:=i2s6(wl,uid_CanAttack);
       if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w+tc_default;
 
       // armor
-      al:=upgrs_cur[uid_upgr_Armor];
-      if(uid_isbuilding)then
+      if(iscomplete)then
       begin
-         if(iscomplete)then
-           al+=upgrs_cur[upgr_race_armor_build[uid_race]]
-      end
-      else
-        if(uid_ismech)
-        then al+=upgrs_cur[upgr_race_armor_mech[uid_race]]
-        else al+=upgrs_cur[upgr_race_armor_bio [uid_race]];
+         if(uid_Armor_upgr1>0)then al+=upgrs_cur[uid_Armor_upgr1];
+         if(uid_Armor_upgr2>0)then al+=upgrs_cur[uid_Armor_upgr2];
+      end;
       lvlstr_a:=tc_lime+i2s6(al,true)+tc_default;
 
       // other
-      sl+=integer(upgrs_cur[uid_upgr_Regen]+upgrs_cur[uid_upgr_SightR]);
-      if(uid_isbuilding)
-      then sl+=integer(upgrs_cur[upgr_race_regen_build[uid_race]])
-      else
-      begin
-         sl+=upgrs_cur[upgr_race_unit_srange[uid_race]];
-         if(uid_ismech)
-         then sl+=integer(upgrs_cur[upgr_race_regen_mech [uid_race]]+upgrs_cur[upgr_race_mspeed_mech[uid_race]])
-         else
-         begin
-            sl+=integer(upgrs_cur[upgr_race_regen_bio[uid_race]]+upgrs_cur[upgr_race_mspeed_bio [uid_race]]);
-            if(uid_race=r_hell)then sl+=upgrs_cur[upgr_hell_PainFactor];
-         end;
-      end;
+      if(uid_Regen_upgr       >0)then sl+=upgrs_cur[uid_Regen_upgr       ];
+      if(uid_SightR_upgr      >0)then sl+=upgrs_cur[uid_SightR_upgr      ];
+      if(uid_PainState_upgr   >0)then sl+=upgrs_cur[uid_PainState_upgr   ];
+      if(uid_TransportMax_upgr>0)then sl+=upgrs_cur[uid_TransportMax_upgr];
+      if(uid_MSpeed_upgr      >0)then sl+=upgrs_cur[uid_MSpeed_upgr      ];
       lvlstr_s:=tc_yellow+i2s6(sl,true)+tc_default;
    end;
 end;

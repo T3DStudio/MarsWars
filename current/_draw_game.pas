@@ -444,7 +444,7 @@ procedure D_LayerUnitsInfo(tar:pSDL_Surface);
 var t:integer;
 begin
    case map_scenario of
-   mc_royale: circleColor(tar,map_hSize-ui_cam_x,map_hSize-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
+   mc_royale: circleColor(tar,map_Sizeh-ui_cam_x,map_Sizeh-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
    end;
 
    while(vid_PrimitivesS>0)do
@@ -560,7 +560,7 @@ ccolor,
 scolor:cardinal;
 begin
    for t:=0 to LastKeyPoint do
-    with g_KeyPoints[t] do
+    with map_KeyPointsL[t] do
      if(kpCaptureR>0)and(RectInCam(kpx,kpy,kpCaptureR,kpCaptureR,0))then
      begin
         ccolor:=GetKeyPointColor(t,false);
@@ -568,14 +568,14 @@ begin
 
         if(kpEnergy>0)then
         begin
-           SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_cp_gen,255);
+           SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_kp_gen,255);
            for i:=1 to 6 do
            begin
               ddir:=(i*60)*degtorad;
               SpriteListAddEffect(
               kpx+round(kpCaptureR*cos(ddir)),
               kpy+round(kpCaptureR*sin(ddir)),
-              sd_fly+kpy,0,@spr_cp_koth,255);
+              sd_fly+kpy,0,@spr_kp_koth,255);
            end;
         end
         else
@@ -587,7 +587,7 @@ begin
                 SpriteListAddEffect(
                 kpx+round(kpCaptureR*cos(ddir)),
                 kpy+round(kpCaptureR*sin(ddir)),
-                sd_fly+kpy,scolor,@spr_cp_koth,255);
+                sd_fly+kpy,scolor,@spr_kp_koth,255);
              end;
           end
           else
@@ -598,7 +598,7 @@ begin
                 SpriteListAddEffect(
                 kpx+round(kpCaptureR*cos(ddir)),
                 kpy+round(kpCaptureR*sin(ddir)),
-                sd_fly+kpy,0,@spr_cp_koth,255);
+                sd_fly+kpy,0,@spr_kp_koth,255);
              end;
              SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_cp_out,255);
           end;

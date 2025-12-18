@@ -365,7 +365,7 @@ var  o,b: byte;
 wdcptime: pbyte;
 procedure WriteOwner;
 begin
-   with g_KeyPoints[kpi] do
+   with map_KeyPointsL[kpi] do
    begin
       b:=kpdata_owner;
       if(kpOwnerPlayer>MaxPlayers)
@@ -378,7 +378,7 @@ begin
 end;
 procedure WriteTimer;
 begin
-   with g_KeyPoints[kpi] do
+   with map_KeyPointsL[kpi] do
    begin
       b:=kpdata_timer;
       if(kpTimerOwnerPlayer>MaxPlayers)
@@ -392,7 +392,7 @@ begin
 end;
 procedure WriteLife;
 begin
-   with g_KeyPoints[kpi] do
+   with map_KeyPointsL[kpi] do
    begin
      b:=kpdata_life;
 
@@ -409,7 +409,7 @@ begin
 
    wdcptime^:=(wdcptime^+1) mod 3;
 
-   with g_KeyPoints[kpi] do
+   with map_KeyPointsL[kpi] do
      if(kpCaptureR<=0)
      then wudata_byte(0,rpl)
      else
@@ -848,9 +848,9 @@ begin
                    if(uid_isbuilding){and(uid_ability<>uab_HEyeVision)}then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(cu,hits<=hits_fdead,@vis);
 
-                 with uid^ do
+                { with uid^ do
                    if(uid_DeathMissile>0)
-                   then missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);
+                   then missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);   }
 
                  //if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
@@ -1268,7 +1268,7 @@ var
 b,t,p:byte;
 i    :integer;
 begin
-   with g_KeyPoints[kpi] do
+   with map_KeyPointsL[kpi] do
    begin
       b:=rudata_byte(rpl,0);
       t:=b and %11000000;

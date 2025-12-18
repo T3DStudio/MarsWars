@@ -16,8 +16,16 @@ TSoc = set of char;
 
 string6 = string[6];
 
-TStringList = array of shortstring;
-PTStringList = ^TStringList;
+TUIStringList = record
+   slist_l: array of shortstring;
+   slist_n: integer;
+   slist_w: byte;
+end;
+PTUIStringList = ^TUIStringList;
+
+TStringArray = array of shortstring;
+PTStringArray = ^TStringArray;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -228,8 +236,9 @@ TUnitAbility = record
    ua_req_upgr,
    ua_req_uid     : byte;
    ua_reload      : integer;
-   ua_reload_upgr : byte;
-   ua_reload_upgrS: integer;
+   ua_rldDec_upgr : byte;
+   ua_rldDec_upgrS,
+   ua_rldDec_level: integer;
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
    ua_mbrush_hint : byte;
@@ -237,7 +246,9 @@ TUnitAbility = record
    ua_str_name,
    ua_str_Reqs,
    ua_str_Common,
+   ua_str_ReloadFactors,
    ua_str_Descript: shortstring;
+   ua_HintinGame  : TUIStringList;
    {$ENDIF}
 end;
 
@@ -340,22 +351,15 @@ TUID = record
    uid_MaxHits1,
    uid_MaxHitsh,
    uid_MaxHitsq     : longint;
-   uid_BaseSpeed,
    uid_r,
    uid_missileR,
-   uid_BaseSightR,
-   uid_upgr_SightStep,
    uid_EnergyReq,
    uid_EnergyGen,
    uid_ProdTimeSec,
    uid_ProdTimeTick,
    uid_ProdHitStep,
-   uid_PainC,
-   uid_PainCUpgrStep,
    uid_zfall,
    uid_TransportSize,
-   uid_TransportMax,
-   uid_BaseRegen,
    uid_LimitUse,
    uid_LevelBonusDamage,
    uid_LevelBonusArmor
@@ -364,11 +368,6 @@ TUID = record
    uid_ZombieHits   : integer;
    uid_ZombieUID    : byte;
 
-   uid_upgr_SightR,
-   uid_upgr_Armor,
-   uid_upgr_Regen,
-   uid_DeathMissile,
-   uid_DeathMissile_dmod,
    uid_DeathUID,
    uid_DeathUIDn,
    uid_race,
@@ -380,6 +379,30 @@ TUID = record
    uid_req_uid3,
    uid_req_uid3n,
    uid_req_upgr     : byte;
+
+   uid_TransportMax_Base,
+   uid_TransportMax_upgrV: integer;
+   uid_TransportMax_upgr : byte;
+
+   uid_PainState_Base,
+   uid_PainState_upgrV   : integer;
+   uid_PainState_upgr    : byte;
+
+   uid_Regen_Base        : integer;
+   uid_Regen_upgr        : byte;
+
+   uid_Armor_upgr1,
+   uid_Armor_upgr2       : byte;
+   uid_Armor_upgrV       : integer;
+
+   uid_MSpeed_Base       : integer;
+   uid_MSpeed_upgrV,
+   uid_MSpeed_upgr       : byte;
+
+   uid_SightR_Base,
+   uid_SightR_upgrV      : integer;
+   uid_SightR_upgr       : byte;
+
 
    uid_CanAttack    : boolean;
    uid_arms_BonusAntiFlyRange,
@@ -432,15 +455,14 @@ TUID = record
    uid_AnimStepWalk,
    uid_FogcR        : integer;
    uid_BTNBig,
+   uid_BTNDoc,
    uid_BTNSmall     : TMWTexture;
-   {$IFDEF UNITDATA}
-   un_btn2          : TMWTexture;
-   {$ENDIF}
    uid_SpriteModel  : array[0..LastUnitLevel] of pTMWSModel;
 
    uid_str_name,
    uid_str_BaseDescript,
-   uid_str_FullDescript,
+   uid_str_1LineDescript,
+   uid_str_HK,
    uid_str_NameHK,
    uid_str_CostLimit,
    uid_str_DefaultAttr,
@@ -448,7 +470,8 @@ TUID = record
    uid_str_ArmsCommon,
    uid_str_Reqs,
    uid_str_Prod     : shortstring;
-   uid_str_Arms     : array[0..LastUnitArms] of shortstring;
+   uid_HintInGame,
+   uid_HintDoc      : TUIStringList;
 
    uid_eid_BuildHellType
                     : boolean;
