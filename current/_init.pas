@@ -17,9 +17,9 @@ begin
 
    gfx_InitColors;
    vid_MakeScreen;
-   vid_LoadingScreen(@str_loading_gfx,c_yellow);
+   draw_LoadingScreen(@str_loading_gfx,c_yellow);
    gfx_LoadAll;
-   cmp_Init;
+   camp_Init;
 
    InitVideo:=true;
 end;
@@ -94,6 +94,8 @@ begin
    gfx_MakeUnitIcons;
    InitClientDataAbilities;
    SwitchLanguage;
+
+   menu_HelpIList:=@str_doc_Credits;
 
    //gfx_SaveUnitIcons;
 

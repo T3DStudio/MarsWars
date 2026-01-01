@@ -315,7 +315,7 @@ begin
    ai_HighPriorityTarget:=false;
    if(player^.state=ps_AI)then
      if(player^.ai_flags and aif_army_smart_prio)>0 then
-       ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^.uid_EnergyGen>0);
+       ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^.uid_gen_EnergyLevel>0);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

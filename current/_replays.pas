@@ -272,7 +272,7 @@ var p:byte;
 begin
    replay_Abort;
 
-   rpls_str_path:=folder_replay+rpls_NamePrefix+'_'+str_replay_ScenarioL[map_scenario]+'_'+str_DateTime+fileExt_Replay;
+   rpls_str_path:=folder_replay+rpls_NamePrefix+'_'+str_fileinfo_ScenarioL[map_scenario]+'_'+str_DateTime+fileExt_Replay;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -667,7 +667,7 @@ end;
 
 function replay_IsPaused:boolean;
 begin
-   replay_IsPaused:=(G_Status=gs_replaypause)or(G_Status<MaxPlayers);
+   replay_IsPaused:=(G_Status=gs_replaypause)or((gs_paused0<=G_Status)and(G_Status<=gs_paused7));
 end;
 
 function replay_Pause(check:boolean):boolean;
@@ -683,7 +683,7 @@ begin
       rpls_ForwardSkip:=0;
    end
    else
-     if(G_Status=gs_replaypause)or(G_Status<MaxPlayers)then
+     if(replay_IsPaused)then
      begin
         replay_Pause:=true;
         if(check)then exit;

@@ -158,7 +158,7 @@ begin
          end;
 end;
 
-procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte);
+procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte;doubleDMG:boolean);
 var m,d:integer;
     tu:PTUnit;
 begin
@@ -180,7 +180,7 @@ begin
 
            m_dtars  := 0;
            m_dir    := point_dir(m_vx,m_vy,m_x,m_y);
-           d      := point_dist_rint(m_x,m_y,m_vx,m_vy);
+           d        := point_dist_rint(m_x,m_y,m_vx,m_vy);
 
            tu:=nil;
            IsUnitRange(m_tar,@tu);
@@ -191,11 +191,12 @@ begin
            m_damage:=adddmg;
            if(m_playeri<=LastPlayer)and(tu<>nil)then
              with g_gplayers[m_playeri] do
-               if(m_mid=MID_URocket)and(tu^.ukfly)and(upgrs_cur[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
+               if(m_mid=MID_URocket)and(tu^.isfly)and(upgrs_cur[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
 
            with g_mids[m_mid] do
            begin
               m_damage+=mid_base_damage;
+              if(doubleDMG)then m_damage*=2;
               m_homing:=mid_homing;
 
               if(mid_speed>0)
@@ -234,7 +235,7 @@ begin
     if(IsUnitRange(m_tar,@tu))then
      if(tu^.hits>0)and(not IsUnitRange(tu^.transportU,nil))then
      begin
-        if(not mid_noFlyCheck)and(m_mfs<>tu^.ukfly)then exit;
+        if(not mid_noFlyCheck)and(m_mfs<>tu^.isfly)then exit;
         if(tu^.uidi in mid_ImmuneUnits)then exit;
 
         teams  :=g_gplayers[m_playeri].team=tu^.player^.team;
@@ -249,12 +250,6 @@ begin
         if(ud<0)then ud:=0;
 
         rdamage:=ApplyDamageMod(tu,m_dmod,m_damage);
-        {if(m_playeri<=LastPlayer)and(tu<>nil)then
-          with g_gplayers[m_playeri] do
-            case m_mid of
-          MID_SSShot,
-          MID_SShot  : painX+=upgr[upgr_uac_SSMWeapon]*2;
-            end; }
 
         if(ud<=0)and(m_dtars=0)then // direct target
         begin
@@ -269,10 +264,10 @@ begin
            then unit_damage(tu,rdamage,m_playeri,false);
         end
         else
-          if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_SplashResist)and(not tu^.uid^.uid_ismech)then // splash m_damage
+          if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_isbuilding)and(not tu^.uid^.uid_ismech)then // splash m_damage
           begin
              {$IFDEF _FULLGAME}
-             if(mid_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_DefaultSpriteDepth(tu^.vy+1,tu^.ukfly),mid_eid_target_eff);
+             if(mid_eid_target_eff>0)then effect_add(tu^.vx,tu^.vy,draw_DefaultSpriteDepth(tu^.vy+1,tu^.isfly),mid_eid_target_eff);
              {$ENDIF}
 
              m_mtars-=1;
@@ -300,7 +295,7 @@ begin
       tu:=nil;
       if(IsUnitRange(m_tar,@tu))then
        if(m_homing>mh_none)then
-        if(tu^.buffs[ub_teleport]>0)
+        if(tu^.buffs[ub_Teleported]>0)
         then m_homing:=mh_none
         else
           if(tu^.x<>tu^.vx)
@@ -310,12 +305,12 @@ begin
 mh_magnetic : begin
                  m_x  +=sign(tu^.x-m_x)*3;
                  m_y  +=sign(tu^.y-m_y)*3;
-                 m_mfe:=tu^.ukfly;
+                 m_mfe:=tu^.isfly;
               end;
 mh_homing   : begin
                  m_x  :=tu^.x;
                  m_y  :=tu^.y;
-                 m_mfe:=tu^.ukfly;
+                 m_mfe:=tu^.isfly;
               end;
             end;
 

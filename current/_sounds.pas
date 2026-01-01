@@ -212,7 +212,7 @@ end;
 procedure snd_GameMusicReLoad;
 begin
    snd_StopSoundSource(sss_music);
-   vid_LoadingScreen(@str_loading_msc,c_aqua);
+   draw_LoadingScreen(@str_loading_msc,c_aqua);
    snd_SoundSetUnLoad(snd_music_game);
 
    snd_music_game:=snd_MusicSetLoad('music\game\',snd_musicListSize);
@@ -516,6 +516,7 @@ lmt_player_defeated     : if(lm_data_u<=LastPlayer)and(g_status=gs_running)then
                           snd_SoundPlayAnoncer(snd_player_defeated[race],true,false);
 lmt_unit_LevelUp        : snd_SoundPlayAnoncer(snd_unit_promoted  [race],true,false);
 lmt_unit_resurrected,
+lmt_unit_captured,
 lmt_unit_ready          : with g_uids[lm_data_u] do
                           snd_SoundPlayUnitCommand(uid_snd_ready);
 lmt_upgrade_complete    : snd_SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
@@ -537,12 +538,15 @@ lmt_invalid_Target,
 lmt_ability_BadPlace,
 lmt_ability_reload,
 lmt_unit_NeedBuilder,
+lmt_unit_lost,
 lmt_NeedProdUnit,
 lmt_Req_MaxCount,
 lmt_Req_Limit,
 lmt_Req_Common,
-lmt_prod_AllBusy,
+lmt_Req_HellPower,
+lmt_Req_UACLoot,
 lmt_upgrade_InProgress,
+lmt_prod_AllBusy,
 lmt_prod_BadOrder,
 lmt_Invalid_Order       : snd_SoundPlayAnoncer(snd_cant_order[race],true,false);
 
@@ -633,7 +637,7 @@ begin
    // COMMON
    //
 
-   vid_LoadingScreen(@str_loading_sfx,c_green);
+   draw_LoadingScreen(@str_loading_sfx,c_green);
 
    snd_click                :=snd_SoundSetLoad('click'           );
    snd_chat                 :=snd_SoundSetLoad('chat'            );
@@ -705,6 +709,7 @@ begin
    snd_uac_tech             :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'tech_center'    );
    snd_uac_rls              :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'rocketstation'  );
    snd_uac_nucl             :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'nuclear_plant'  );
+   snd_uac_academy          :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'academy'        );
 
    snd_uac_suply            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'supply-depot'   );
    snd_uac_rescc            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'resourse_senter');

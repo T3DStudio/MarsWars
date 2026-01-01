@@ -78,8 +78,9 @@ begin
    g_gplayers[pSlot  ].pnum:=pSlot;
    g_gplayers[pTarget].pnum:=pTarget;
 
-   g_gplayers[pSlot  ].isobserver:=pSlot  >=map_MaxPlayers;
-   g_gplayers[pTarget].isobserver:=pTarget>=map_MaxPlayers;
+   if(pSlot  >=map_MaxPlayers)then
+   g_gplayers[pSlot  ].isobserver:=true;
+   g_gplayers[pTarget].isobserver:=false;
 
    g_gplayers[pSlot  ].team:=PlayerValidateTeam(pSlot  ,t1);
    g_gplayers[pTarget].team:=PlayerValidateTeam(pTarget,t0);
@@ -132,6 +133,8 @@ begin
       isrevealed:=false;
       log_n     :=0;
       log_n_cl  :=0;
+      res_HellPower:=30000;
+      res_UACLoot  :=30000;
    end;
 end;
 
@@ -147,7 +150,7 @@ begin
         PlayerSetState(p,ps_None);
         PlayerSetSkirmishTech(p);
         PlayerClearLog(p);
-        log_EnergyCheckTime:=0;
+        log_EnergyCheckTimer:=0;
      end;
 
    {$IFDEF _FULLGAME}
@@ -444,7 +447,6 @@ begin
    {$IFDEF _FULLGAME}
    unit_UICountersAll;
    ui_EnableControlActs;
-   ui_update_now:=true;
    menu_ItemSelected:=0;
    MainMenu :=false;
    {$ELSE}
@@ -551,7 +553,6 @@ begin
    usel_max:=32000;
    if(CheckPointClick(x0,y0,x1,y1))then usel_max:=1;
    ui_CommanderClear;
-   ui_update_now:=true;
 
    SelectBuildings:=true;
    if(add)
@@ -587,8 +588,8 @@ begin
 
           if(wassel<>isselected)then
             if(isselected)
-            then unit_counters_inc_select(g_punits[u])
-            else unit_counters_dec_select(g_punits[u]);
+            then unit_IncCounters_Select(g_punits[u])
+            else unit_DecCounters_Select(g_punits[u]);
           if(isselected)and(usel_max>0)then
           begin
              usel_max-=1;
@@ -605,7 +606,6 @@ begin
    or(fgroup=0)then exit;
 
    ui_CommanderClear;
-   ui_update_now:=true;
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
@@ -624,8 +624,8 @@ begin
 
           if(wassel<>isselected)then
             if(isselected)
-            then unit_counters_inc_select(g_punits[u])
-            else unit_counters_dec_select(g_punits[u]);
+            then unit_IncCounters_Select(g_punits[u])
+            else unit_DecCounters_Select(g_punits[u]);
 
           if(isselected)then
           begin
@@ -652,183 +652,6 @@ begin
                 then group:=fgroup;
          end;
 end;
-
-
-{$IFDEF UNITDATA}
-function CheckUIDBaseFlags(tuid:PTUID;flags:cardinal):boolean;
-begin
-   CheckUIDBaseFlags:=false;
-
-   if((flags and wtr_unit    )=0)and(not tuid^._ukbuilding   )then exit;
-   if((flags and wtr_building)=0)and(    tuid^._ukbuilding   )then exit;
-
-   if((flags and wtr_bio     )=0)and(not tuid^._ukmech       )then exit;
-   if((flags and wtr_mech    )=0)and(    tuid^._ukmech       )then exit;
-
-   if((flags and wtr_light   )=0)and    (tuid^._uklight      )then exit;
-   if((flags and wtr_heavy   )=0)and not(tuid^._uklight      )then exit;
-
-   if (tuid<>@_uids[UID_LostSoul])
-   and(tuid<>@_uids[UID_Phantom ])then
-   begin
-   if((flags and wtr_ground  )=0)and(tuid^._ukfly=uf_ground  )then exit;
-   if((flags and wtr_fly     )=0)and(tuid^._ukfly=uf_fly     )then exit;
-   end;
-
-   CheckUIDBaseFlags:=true;
-end;
-
-function WeaponCanAttackUid(pweap:PTUWeapon;uid:byte):single;
-var dm:byte;
-begin
-   WeaponCanAttackUid:=0;
-
-   with pweap^ do
-   if(CheckUIDBaseFlags(@_uids[uid],aw_tarf))and(uid in aw_uids)then
-   if(aw_type=wpt_missle)
-   or(aw_type=wpt_directdmg)
-   or(aw_type=wpt_unit)then
-   begin
-      WeaponCanAttackUid:=1;
-
-      if(aw_dmod>0)then
-        for dm:=0 to MaxDamageModFactors do
-          with _dmods[aw_dmod][dm] do
-            if(CheckUIDBaseFlags(@_uids[uid],dm_flags))then WeaponCanAttackUid*=(dm_factor/100);
-   end;
-end;
-
-function TSOB2Surface(psob:PTSoB):pSDL_Surface;
-const row = 7;
-var
-u,n,
-x,y,
-w,h:byte;
-begin
-   TSOB2Surface:=nil;
-
-   n:=0;
-   for u:=0 to 255 do
-     if(u in psob^)then
-       n+=1;
-
-   if(n>0)then
-   begin
-      if(n<=row)then
-      begin
-         w:=n;
-         h:=1;
-      end
-      else
-      begin
-         w:=row;
-         h:=(n div row);
-         if(n mod row)>0 then h+=1;
-         //writeln(n,' ',w,' ',h,' ',(n mod row));
-      end;
-
-      TSOB2Surface:=_createSurf(vid_BWd*w,vid_BWd*h);
-      x:=0;
-      y:=0;
-      for u:=0 to 255 do
-        if(u in psob^)then
-        begin
-          _draw_surf(TSOB2Surface,x*vid_BWd,y*vid_BWd,_uids[u].un_btn2.surf);
-          x+=1;
-          if(x>=row)then
-          begin
-             x:=0;
-             y+=1;
-          end;
-        end;
-   end;
-end;
-
-
-
-procedure test_UnitsSpec;
-var
-unit2good,
-unit2fear,
-unit2usles : array[byte] of set of byte;
-var
-u1,u2,w:byte;
-dmg1,dmg2,t  :single;
-pu1,pu2:PTUID;
-begin
-   FillChar(unit2good ,SizeOf(unit2good  ),0);
-   FillChar(unit2fear ,SizeOf(unit2fear  ),0);
-   FillChar(unit2usles,SizeOf(unit2usles ),0);
-
-   for u1:=0 to 255 do
-   for u2:=0 to 255 do
-   begin
-      pu1:=@_uids[u1];
-      pu2:=@_uids[u2];
-
-      if(pu1^._mhits<=0)
-      or(pu2^._mhits<=0)
-      or(pu1^._ucl=255)
-      or(pu2^._ucl=255)then continue;
-
-      if(pu1^._attack=0)then continue;
-
-      dmg1:=0;
-      dmg2:=0;
-      for w:=0 to MaxUnitWeapons do
-      begin
-         t:=WeaponCanAttackUid(@pu1^._a_weap[w],u2);
-         if(t>dmg1)then dmg1:=t;
-
-         t:=WeaponCanAttackUid(@pu2^._a_weap[w],u1);
-         if(t>dmg2)then dmg2:=t;
-      end;
-
-      //if(dmg1>1)or((pu2^._attack>0)or(not pu2^._ukbuilding))then
-      //  if(dmg1>dmg2)and((dmg1>1)or(dmg2=0))then unit2good[u1]+=[u2];
-
-      if(dmg1=0)and(dmg2>0)
-      then unit2usles[u1]+=[u2]
-      else
-        if(dmg1<dmg2)then unit2fear[u1]+=[u2];
-
-      {if(u1=UID_Mastermind)and(u2=UID_HSymbol1)then writeln(dmg1:3:3,' ',dmg2:3:3,' ',pu2^._attack);
-}
-   end;
-
-  {for u1 in [UID_HTower] do
-   begin
-      writeln(_uids[u1].un_txt_name);
-      write('Good against: ');
-      for u2:=0 to 255 do
-        if(u2 in unit2good[u1])then write(_uids[u2].un_txt_name,', ');
-      writeln;
-      write('Bad against: ');
-      for u2:=0 to 255 do
-        if(u2 in unit2fear[u1])then write(_uids[u2].un_txt_name,', ');
-      writeln;
-      write('Usles against: ');
-      for u2:=0 to 255 do
-        if(u2 in unit2usles[u1])then write(_uids[u2].un_txt_name,', ');
-      writeln;
-   end;}
-
-   for u1 in [0..255] do     //
-   begin
-      pu1:=@_uids[u1];
-
-      if(pu1^._mhits<=0)
-      or(pu1^._ucl=255)then continue;
-      if(pu1^._attack=0)then continue;
-
-      save_surf(_uids[u1].un_txt_name+'_good' ,TSOB2Surface(@unit2good [u1]));
-      save_surf(_uids[u1].un_txt_name+'_bad'  ,TSOB2Surface(@unit2fear [u1]));
-      save_surf(_uids[u1].un_txt_name+'_usles',TSOB2Surface(@unit2usles[u1]));
-   end;
-   //for u1 in [0..255] do
-   //  save_surf('btn_'+_uids[u1].un_txt_name,_uids[u1].un_btn.surf);
-end;
-{$ENDIF}
 
 {$ELSE}
 {$include _ded.pas}
@@ -946,15 +769,15 @@ begin
                            if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transportU,nil))then
                            begin
                               case o_x0 of
-                              co_supgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0      ,true)=0,true ,true );
-                              co_cupgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true ,false);
+                              co_supgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0           ,true)=0,true ,true );
+                              co_cupgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
 
-                              co_sunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0      ,true)=0,true ,true );
-                              co_cunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true ,false);
+                              co_sunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0           ,true)=0,true ,true );
+                              co_cunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
                               co_pcancle  : if(isselected)then
                                             begin
-                                            if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true)=0,true ,false);
-                                            if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true)=0,true ,false);
+                                            if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
+                                            if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
                                             end;
                               end;
 
@@ -980,16 +803,16 @@ begin
                       if(tar_u<>nil)then
                         with tar_u^ do
                           case o_x0 of
-                          co_supgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0      ,false),x,y);
-                          co_cupgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,false),x,y);
-                          co_sunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0      ,false),x,y);
-                          co_cunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,false),x,y);
+                          co_supgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0           ,false),x,y);
+                          co_cupgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y);
+                          co_sunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0           ,false),x,y);
+                          co_cunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
 
                           co_pcancle :
-                                    if(GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,false),x,y))then
-                                       GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,false),x,y);
+                                    if(GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y))then
+                                       GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
                           co_ability :
-                                if(not GameLog_ReqBits(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false      ),x,y))then
+                                if(not GameLog_ReqBits(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false           ),x,y))then
                                   unit_SetAbilityOrder(tar_u,o_a0,o_y0,o_x1,o_y1,false);
                           end
                       else
@@ -1009,6 +832,7 @@ end;
 
 procedure game_PlayersCycle;
 var p:byte;
+trevealed:boolean;
 begin
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
@@ -1045,22 +869,35 @@ begin
           if(ServerSide)and(G_Started)and(G_Status=gs_running)and(not isobserver)and(not isdefeated)then
           begin
              if(build_cd>0)then build_cd-=1;
+             if(race=r_hell)and(res_HellPower<HellPower_Max)then
+               if((g_tick mod HellPower_AddPeriod)=p)then
+                 if(units_uid_c[UID_HAltar]>0)then
+                   case units_uid_c[UID_HAltar] of
+                   1  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add1);
+                   2  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add2);
+                   else res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add3);
+                   end;
 
-             isrevealed:=(units_builders_e=0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF};
+             trevealed:=(units_builders_e=0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF};
+             if(not isrevealed)and(trevealed)then
+             begin
+                GameLog_PlayerRevealed(p);
+                isrevealed:=trevealed;
+             end;
 
              game_PlayerExecuteOrder(p);
 
              if(state=ps_AI)
              then //ai_player_code(p)
              else
-               if(log_EnergyCheckTime>0)
-               then log_EnergyCheckTime-=1
+               if(log_EnergyCheckTimer>0)
+               then log_EnergyCheckTimer-=1
                else
-                 if(energyl_cur>=0)
-                 then log_EnergyCheckTime:=1
+                 if(res_energyl_cur>=0)
+                 then log_EnergyCheckTimer:=1
                  else
                  begin
-                    log_EnergyCheckTime:=fr_fps6;
+                    log_EnergyCheckTimer:=fr_fps6;
                     PlayersAddToLog(p,0,lmt_Req_Energy,0,0,'',-1,-1);
                  end;
           end;

@@ -147,36 +147,46 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure wudata_bstat(pu:PTUnit;rpl:boolean);
+procedure wudata_StateBits(pu:PTUnit;rpl:boolean);
 var byte1,
-    byte2:byte;
+    byte2,
+    byte3:byte;
 begin
    with pu^ do
    with uid^ do
    begin
       byte1:=0;
       byte2:=0;
+      byte3:=0;
 
-      SetBBit(@byte2,0, buffs[ub_Resurect   ]>0);
-      SetBBit(@byte2,1, buffs[ub_Summoned   ]>0);
-      SetBBit(@byte2,2, buffs[ub_Invuln     ]>0);
-      SetBBit(@byte2,3, buffs[ub_Teleport   ]>0);
-      SetBBit(@byte2,4, buffs[ub_HVision    ]>0);
-      SetBBit(@byte2,5, buffs[ub_Cast       ]>0);
-      SetBBit(@byte2,6, buffs[ub_Scaned     ]>0);
-      SetBBit(@byte2,7, buffs[ub_AltMode    ]>0);
+      SetBBit(@byte2,0, buffs[ub_Resurected   ]>0);
+      SetBBit(@byte2,1, buffs[ub_Summoned     ]>0);
+      SetBBit(@byte2,2, buffs[ub_Teleported   ]>0);
+      SetBBit(@byte2,3, buffs[ub_Cast         ]>0);
+      SetBBit(@byte2,4, buffs[ub_Scaned       ]>0);
+      SetBBit(@byte2,5, buffs[ub_AltMode      ]>0);
+      SetBBit(@byte2,6, buffs[ub_PainState    ]>0);
 
-      SetBBit(@byte1,0, iscomplete             );
-      SetBBit(@byte1,1, transportU>0           );
-      SetBBit(@byte1,2, (level and %01)      >0);
-      SetBBit(@byte1,3, (level and %10)      >0);
-      SetBBit(@byte1,4, buffs[ub_Pain       ]>0);
-      SetBBit(@byte1,5,(a_tar_cl>0)and(a_rld>0));
-      SetBBit(@byte1,6, isselected             );
-      SetBBit(@byte1,7, byte2>0                );
+      SetBBit(@byte3,0, buffs[ub_SphereInvuln ]>0);
+      SetBBit(@byte3,1, buffs[ub_SphereInvis  ]>0);
+      SetBBit(@byte3,2, buffs[ub_SphereRDamage]>0);
+      SetBBit(@byte3,3, buffs[ub_SphereDDamage]>0);
+      SetBBit(@byte3,4, buffs[ub_SphereTurbo  ]>0);
+      SetBBit(@byte3,5, buffs[ub_Heroic       ]>0);
+      SetBBit(@byte3,6, buffs[ub_HellVision   ]>0);
+
+      SetBBit(@byte1,0, iscomplete               );
+      SetBBit(@byte1,1, IsUnitRange(transportU,nil));
+      SetBBit(@byte1,2,(level and %01)>0         );
+      SetBBit(@byte1,3,(level and %10)>0         );
+      SetBBit(@byte1,4,(a_tar_cl>0)and(a_rld>0)  );
+      SetBBit(@byte1,5, isselected               );
+      SetBBit(@byte1,6, byte2>0                  );
+      SetBBit(@byte1,7, byte3>0                  );
 
       wudata_byte(byte1,rpl);
       if(byte2>0)then wudata_byte(byte2,rpl);
+      if(byte3>0)then wudata_byte(byte3,rpl);
    end;
 end;
 
@@ -193,13 +203,12 @@ var i: byte;
 begin
    with pu^ do
    with uid^ do
-     if(uid_isbuilding)and(iscomplete)then
-       for i:=0 to LastUnitLevel do
-       begin
-          if(i>level)then break;
-          if(uid_isbarrack)then if(wudata_reload(uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
-          if(uid_issmith  )then if(wudata_reload(pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
-       end;
+     for i:=0 to LastUnitLevel do
+     begin
+        if(i>level)then break;
+        if(uid_isbarrack)then if(wudata_reload(uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
+        if(uid_issmith  )then if(wudata_reload(pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
+     end;
 end;
 
 procedure wudata_OwnerUData(pu:PTUnit;rpl:boolean);
@@ -232,9 +241,12 @@ begin
 
       b:=group and %00001111;
 
-      if(uo_bx>0)
-      then uo:=ua_patrol
-      else uo:=uo_id;
+      uo:=uo_id;
+      if(uo_bx>0)then
+        case uo_id of
+        ua_move : uo:=ua_patrol;
+        ua_amove: uo:=ua_apatrol;
+        end;
 
       b:=b or ((uo and %00000111) shl 4);
 
@@ -242,14 +254,17 @@ begin
 
       wudata_byte(b,rpl);
 
+      // тут всетаки нужно записывать информацию для некоторых абилок - куда юнит едет их кастовать, например для летающего ЦЦ
+
       if(not wb)then exit;
 
       wudtick^:=g_tick;
 
-      if(iscomplete)and(uid_client_WReload)then
-        wudata_reload(rld,rpl);
-
-      wudata_prod(pu,rpl);
+      if(iscomplete)then
+      begin
+         if(uid_client_WReload)then wudata_reload(rld,rpl);
+         if(uid_isbuilding    )then wudata_prod(pu,rpl);
+      end;
 
       if(uid_HaveRallyPoint and(isselected or not rpl))then
         if(IsUnitRange(rpoint_tar,nil))
@@ -277,8 +292,8 @@ begin
       wudata_sint(hits_si,rpl);
       if(hits_si>-127)then
       begin
-         wudata_byte (uidi,rpl);
-         wudata_bstat(pu,rpl);
+         wudata_byte(uidi,rpl);
+         wudata_StateBits(pu,rpl);
 
          if(transportU>0)
          then wudata_int(transportU,rpl)
@@ -304,16 +319,15 @@ begin
                wudata_word(wt,rpl);
             end;
 
-            // (uid_client_WRPointCast and (buffs[ub_Cast]>0))
-            {if(buffs[ub_Cast]>0)then
-             if(uid_ability in client_cast_abils)then
-              if(wudata_reload(rld,rpl)>0)then
+            if(uid_client_WCastTarget)then
+              if(buffs[ub_Cast]>0)then
               begin
                  wudata_byte(byte(uo_x shr 5),rpl);
                  wudata_byte(byte(uo_y shr 5),rpl);
-              end; }
+              end;
 
-            if(playeri=POVPlayer)or(g_gplayers[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
+            if(playeri=POVPlayer)
+            or(g_gplayers[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
          end;
       end;
    end;
@@ -444,8 +458,8 @@ begin
 
    wtickb0:=(wtick mod fr_fpsh)=0;
    if(rpl)
-   then wtickb1:=(wtick mod fr_fps1 )=0  // every 2 second
-   else wtickb1:=wtickb0;                // every second
+   then wtickb1:=(wtick mod fr_fps1)=0  // every 2 second
+   else wtickb1:= wtickb0;              // every second
 
    if(not rpl)and(wtickb1)then
      with g_gplayers[POVPlayer] do wudata_reload(build_cd,rpl);
@@ -459,7 +473,7 @@ begin
 
    if(wtickb1)then
      case map_scenario of
-mc_royale   : wudata_int(g_royal_r,rpl);
+     mc_royale   : wudata_int(g_royal_r,rpl);
      end;
 
    if(rpl)then
@@ -532,9 +546,9 @@ begin
       units_all_e+=1;
       armylimit+=uid_LimitUse;
       units_ucl_e[uid_isbuilding,uid_uibtn]+=1;
-      units_bld_e[uid_isbuilding     ]+=1;
-      units_bld_l[uid_isbuilding     ]+=uid_LimitUse;
-      units_uid_e[uidi            ]+=1;
+      units_bld_e[uid_isbuilding          ]+=1;
+      units_bld_l[uid_isbuilding          ]+=uid_LimitUse;
+      units_uid_e[uidi                    ]+=1;
       if(uid_isbuilder)then units_builders_e+=1;
 
       ptransport:=nil;
@@ -542,12 +556,12 @@ begin
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(isselected)and(rpl)then unit_counters_inc_select(pu);
+         if(isselected)and(rpl)then unit_IncCounters_Select(pu);
          if(not iscomplete)
-         then energyl_cur-=uid_EnergyReq
+         then res_energyl_cur-=uid_req_EnergyLevel
          else
          begin
-            unit_bld_inc_cntrs(pu);
+            unit_IncCounters_Complete(pu);
 
             p:=@units_ucl_u[uid_isbuilding,uid_uibtn];
             if(p^=0)
@@ -571,7 +585,7 @@ begin
                  prod_unit_Now+=1;
                  prod_unit_ucl[g_uids[_puid].uid_uibtn]+=1;
                  prod_unit_uid[      _puid      ]+=1;
-                 energyl_cur-=g_uids[_puid].uid_EnergyReq;
+                 res_energyl_cur-=g_uids[_puid].uid_req_EnergyLevel;
               end;
             if(uid_issmith)then
              for i:=0 to LastUnitLevel do
@@ -582,7 +596,7 @@ begin
                  prod_upgr_Now+=1;
                  prod_upgr_upid[_puid]+=1;
                  pprod_e[i]:=GetUpgradeEnergy(_puid,upgrs_cur[_puid]+1);
-                 energyl_cur-=pprod_e[i];
+                 res_energyl_cur-=pprod_e[i];
               end;
          end;
       end;
@@ -610,19 +624,19 @@ begin
 
       if(hits>0)and(ptransport=nil)then
       begin
-         if(isselected)and(rpl)then unit_counters_dec_select(pu);
+         if(isselected)and(rpl)then unit_DecCounters_Select(pu);
          if(not iscomplete)
-         then energyl_cur+=uid_EnergyReq
+         then res_energyl_cur+=uid_req_EnergyLevel
          else
          begin
-            energyl_cur-=uid_EnergyGen;
-            energyl_max-=uid_EnergyGen;
+            res_energyl_cur-=uid_gen_EnergyLevel;
+            res_energyl_max-=uid_gen_EnergyLevel;
             units_uid_c[uidi]-=1;
             units_ucl_c[uid_isbuilding,uid_uibtn]-=1;
             if(units_ucl_u[uid_isbuilding,uid_uibtn]=unum)then units_ucl_u[uid_isbuilding,uid_uibtn]:=0;
             if(units_uid_u[uidi            ]=unum)then units_uid_u[uidi            ]:=0;
 
-            unit_done_dec_cntrs(pu);
+            unit_DecCounters_Prod(pu);
 
             if(uid_isbarrack)then
              for i:=0 to LastUnitLevel do
@@ -634,7 +648,7 @@ begin
                  prod_unit_Now-=1;
                  prod_unit_ucl[g_uids[_puid].uid_uibtn]-=1;
                  prod_unit_uid[      _puid      ]-=1;
-                 energyl_cur+=g_uids[_puid].uid_EnergyReq;
+                 res_energyl_cur+=g_uids[_puid].uid_req_EnergyLevel;
               end;
             if(uid_issmith)then
              for i:=0 to LastUnitLevel do
@@ -645,7 +659,7 @@ begin
                  prod_upgr_Now-=1;
                  prod_upgr_upid[_puid]-=1;
                  //pprod_e[i]:=GetUpgradeEnergy(_puid,upgrs_cur[_puid]+1);
-                 energyl_cur+=pprod_e[i];
+                 res_energyl_cur+=pprod_e[i];
               end;
          end;
       end;
@@ -669,17 +683,23 @@ begin
    begin
       vx:=x;
       vy:=y;
+      case uidi of
+      UID_HKeep : effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube);
+      UID_HAKeep: effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube);
+      else        effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     );
+      end;
+
       {if(uid^.uid_ability=uab_HKeepShift)then
       begin
          case uidi of
-UID_HKeep   : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube    );
-UID_HAKeep  : effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube    );
-         else effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_Teleport);
+UID_HKeep   :
+UID_HAKeep  :
+         else effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport);
          end;
          buffs[ub_CCast]:=fr_fps1;
          exit;
       end // default teleport effects
-      else} effect_teleport(pu^.vx,pu^.vy,vx,vy,ukfly,EID_Teleport,EID_Teleport,snd_Teleport)
+      else}
    end;
 end;
 
@@ -736,16 +756,18 @@ begin
         if(hits>0)then
         begin
            unit_CalcFogR(cu);
-           if(buffs[ub_Summoned]>0)then cleffect_UnitSummon(cu,            @vis);
-           if(buffs[ub_Teleport]>0)then cleffect_teleport  (cu,            @vis);
-           if(buffs[ub_HVision ]>0)then   effect_LevelUp   (cu,EID_HVision,@vis);
+           if(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(cu,             @vis);
+           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (cu,             @vis);
+           if(buffs[ub_HellVision   ]>0)then   effect_Common    (cu,EID_HVision ,@vis);
+           if(buffs[ub_Heroic       ]>0)then   effect_Common    (cu,EID_PowerUp ,@vis);
+           if(buffs[ub_SphereInvuln ]>0)
+           or(buffs[ub_SphereInvis  ]>0)then   effect_Common    (cu,EID_ULevelUp,@vis);
+           if(buffs[ub_SphereRDamage]>0)
+           or(buffs[ub_SphereDDamage]>0)
+           or(buffs[ub_SphereTurbo  ]>0)then   effect_Common    (cu,EID_HLevelUp,@vis);
 
-           if(playeri=UIPlayer)then
-           begin
-              if(not iscomplete)then
-                with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
-              //if(not rpl)and(isselected)then ui_UpdateLastSelectedUnit(unum);
-           end;
+           if(playeri=UIPlayer)and(not iscomplete)then
+             with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
         end;
 
         missiles_clear_tar(unum,true);
@@ -766,10 +788,10 @@ begin
           begin
              if(hits>hits_ndead)and(cuTransport=nil)then
              begin
-                if(buffs[ub_Teleport]>0)then cleffect_teleport(cu,@vis);
+                if(buffs[ub_Teleported]>0)then cleffect_teleport(cu,@vis);
 
                 with uid^ do
-                  if(uid_isbuilding){and(uid_ability<>uab_HEyeVision)}then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                  if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                 effect_UnitDeath(cu,true,@vis);
              end;
           end;
@@ -800,18 +822,23 @@ begin
             if(hits>0)then
             begin
                case(speed>0)of
-               false: if(buffs[ub_Teleport]>0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(cu,pu);
-               true : if(pu^.buffs[ub_Teleport]<=0)and(buffs[ub_Teleport]>0)then cleffect_teleport(cu,pu);
+               false: if(    buffs[ub_Teleported]> 0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(cu,pu);
+               true : if(pu^.buffs[ub_Teleported]<=0)and(buffs[ub_Teleported]>0)then cleffect_teleport(cu,pu);
                end;
-               if(pu^.buffs[ub_Summoned]<=0)and(buffs[ub_Summoned]>0)then cleffect_UnitSummon(cu,            @vis);
-               if(pu^.buffs[ub_HVision ]<=0)and(buffs[ub_HVision ]>0)then   effect_LevelUp   (cu,EID_HVision,@vis);
-               if(pu^.buffs[ub_Pain    ]<=0)and(buffs[ub_Pain    ]>0)then   effect_UnitPain  (cu,            @vis);
+               if (pu^.buffs[ub_Summoned     ]<=0)and(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(cu,             @vis);
+               if (pu^.buffs[ub_PainState    ]<=0)and(buffs[ub_PainState    ]>0)then   effect_UnitPain  (cu,             @vis);
+               if (pu^.buffs[ub_HellVision   ]<=0)and(buffs[ub_HellVision   ]>0)then   effect_Common    (cu,EID_HVision ,@vis);
+               if (pu^.buffs[ub_Heroic       ]<=0)and(buffs[ub_Heroic       ]>0)then   effect_Common    (cu,EID_PowerUp ,@vis);
+               if((pu^.buffs[ub_SphereInvuln ]<=0)and(buffs[ub_SphereInvuln ]>0))
+               or((pu^.buffs[ub_SphereInvis  ]<=0)and(buffs[ub_SphereInvis  ]>0))then  effect_Common    (cu,EID_ULevelUp,@vis);
+               if((pu^.buffs[ub_SphereRDamage]<=0)and(buffs[ub_SphereRDamage]>0))
+               or((pu^.buffs[ub_SphereDDamage]<=0)and(buffs[ub_SphereDDamage]>0))
+               or((pu^.buffs[ub_SphereTurbo  ]<=0)and(buffs[ub_SphereTurbo  ]>0))then  effect_Common    (cu,EID_HLevelUp,@vis);
 
                if(pu^.iscomplete)and(not iscomplete)then
                  if(playeri=UIPlayer)then
                    with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
 
-               //if(not rpl)and(not pu^.isselected)and(isselected)and(playeri=UIPlayer)then ui_UpdateLastSelectedUnit(unum);
                if(pu^.transportU<>transportU)and(vis)then snd_SoundPlayUnit(snd_Transport,nil,@vis);
 
                if(iscomplete)then
@@ -828,9 +855,9 @@ begin
 
                   if(not uid^.uid_isbuilding)then
                   begin
-                     if(pu^.level<level)then effect_LevelUp(cu,0,@vis);
+                     if(pu^.level<level)then effect_Common(cu,0,@vis);
 
-                     if(pu^.buffs[ub_Invuln]<=0)and(buffs[ub_Invuln]>0)then effect_LevelUp(cu,EID_Invuln,@vis);
+                     if(pu^.buffs[ub_SphereInvuln]<=0)and(buffs[ub_SphereInvuln]>0)then effect_Common(cu,EID_PowerUp,@vis);
                   end;
                end;
             end;
@@ -842,17 +869,12 @@ begin
                vy:=y;
             end
             else
-              if(pu^.hits>0)and(hits<=0)and(buffs[ub_Resurect]=0)then  // death
+              if(pu^.hits>0)and(hits<=0)and(buffs[ub_Resurected]=0)then  // death
               begin
                  with uid^ do
-                   if(uid_isbuilding){and(uid_ability<>uab_HEyeVision)}then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+                   if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(cu,hits<=hits_fdead,@vis);
 
-                { with uid^ do
-                   if(uid_DeathMissile>0)
-                   then missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);   }
-
-                 //if(not rpl)and(playeri=UIPlayer)and(unum=ui_UnitSelectedPU)then ui_UnitSelectedPU:=0;
                  rld:=0;
               end;
 
@@ -874,7 +896,7 @@ begin
                   vstp:=UnitStepTicks;
                   dir :=point_dir(move_px,move_py,x,y);
                end;
-               if(speed<=0)or(buffs[ub_Teleport]>0)then
+               if(speed<=0)or(buffs[ub_Teleported]>0)then
                begin
                   missiles_clear_tar(unum,true);
                   unit_clear_a_tar(unum);
@@ -1013,12 +1035,13 @@ end;
 
 procedure rudata_bstat(uu:PTUnit;POVPlayer:byte;rpl:boolean);
 var byte1,
-    byte2:byte;
+    byte2,
+    byte3:byte;
 begin
    with uu^ do
    begin
       a_weap:=255;
-      level:=0;
+      level :=0;
 
       byte1:=rudata_byte(rpl,0);
 
@@ -1026,34 +1049,52 @@ begin
       if(GetBBit(@byte1,1))then transportU:=1 else transportU:=0;
       if(GetBBit(@byte1,2))then level+=%01;
       if(GetBBit(@byte1,3))then level+=%10;
-      buffs[ub_Pain]:=buff_Bool2InfTime[GetBBit(@byte1,4)];
-      if(GetBBit(@byte1,5))then a_tar:=-1 else a_tar:=0;
-      if(rpl)then isselected:=GetBBit(@byte1,6);
-      if(GetBBit(@byte1,7))
-      then byte2:=rudata_byte(rpl,0)
-      else byte2:=0;
+      if(GetBBit(@byte1,4))then a_tar:=-1 else a_tar:=0;
+      if(rpl)then isselected:=GetBBit(@byte1,5);
+      if(GetBBit(@byte1,6))then byte2:=rudata_byte(rpl,0) else byte2:=0;
+      if(GetBBit(@byte1,7))then byte3:=rudata_byte(rpl,0) else byte3:=0;
 
       if(byte2>0)then
       begin
-         buffs[ub_Resurect]:=buff_Bool2InfTime[GetBBit(@byte2,0)];
+         buffs[ub_Resurected   ]:=buff_Bool2InfTime[GetBBit(@byte2,0)];
          if(GetBBit(@byte2,1))and(buffs[ub_Summoned]<=0)
          then buffs[ub_Summoned]:=fr_fps1;
-         buffs[ub_Invuln  ]:=buff_Bool2InfTime[GetBBit(@byte2,2)];
-         buffs[ub_Teleport]:=buff_Bool2InfTime[GetBBit(@byte2,3)];
-         buffs[ub_HVision ]:=buff_Bool2InfTime[GetBBit(@byte2,4)];
-         buffs[ub_Cast    ]:=buff_Bool2InfTime[GetBBit(@byte2,5)];
-         buffs[ub_Scaned  ]:=buff_Bool2InfTime[GetBBit(@byte2,6)];
-         buffs[ub_AltMode ]:=buff_Bool2InfTime[GetBBit(@byte2,7)];
+         buffs[ub_Teleported   ]:=buff_Bool2InfTime[GetBBit(@byte2,2)];
+         buffs[ub_Cast         ]:=buff_Bool2InfTime[GetBBit(@byte2,3)];
+         buffs[ub_Scaned       ]:=buff_Bool2InfTime[GetBBit(@byte2,4)];
+         buffs[ub_AltMode      ]:=buff_Bool2InfTime[GetBBit(@byte2,5)];
+         buffs[ub_PainState    ]:=buff_Bool2InfTime[GetBBit(@byte2,6)];
       end
       else
       begin
-         buffs[ub_Resurect]:=0;
-         buffs[ub_Invuln  ]:=0;
-         buffs[ub_Teleport]:=0;
-         buffs[ub_HVision ]:=0;
-         buffs[ub_Cast    ]:=0;
-         buffs[ub_Scaned  ]:=0;
-         buffs[ub_AltMode ]:=0;
+         buffs[ub_Resurected   ]:=0;
+         //buffs[ub_Summoned   ]:=0;
+         buffs[ub_Teleported   ]:=0;
+         buffs[ub_Cast         ]:=0;
+         buffs[ub_Scaned       ]:=0;
+         buffs[ub_AltMode      ]:=0;
+         buffs[ub_PainState    ]:=0;
+      end;
+
+      if(byte3>0)then
+      begin
+         buffs[ub_SphereInvuln ]:=buff_Bool2InfTime[GetBBit(@byte3,0)];
+         buffs[ub_SphereInvis  ]:=buff_Bool2InfTime[GetBBit(@byte3,1)];
+         buffs[ub_SphereRDamage]:=buff_Bool2InfTime[GetBBit(@byte3,2)];
+         buffs[ub_SphereDDamage]:=buff_Bool2InfTime[GetBBit(@byte3,3)];
+         buffs[ub_SphereTurbo  ]:=buff_Bool2InfTime[GetBBit(@byte3,4)];
+         buffs[ub_Heroic       ]:=buff_Bool2InfTime[GetBBit(@byte3,5)];
+         buffs[ub_HellVision   ]:=buff_Bool2InfTime[GetBBit(@byte3,6)];
+      end
+      else
+      begin
+         buffs[ub_SphereInvuln ]:=0;
+         buffs[ub_SphereInvis  ]:=0;
+         buffs[ub_SphereRDamage]:=0;
+         buffs[ub_SphereDDamage]:=0;
+         buffs[ub_SphereTurbo  ]:=0;
+         buffs[ub_Heroic       ]:=0;
+         buffs[ub_HellVision   ]:=0;
       end;
 
       if(not rpl)and(not g_gplayers[POVPlayer].isobserver)then
@@ -1064,7 +1105,7 @@ end;
 
 function rudata_reload(r:pinteger;rpl:boolean):byte;
 begin
-   rudata_reload  :=rudata_byte(rpl,0);
+   rudata_reload:=rudata_byte(rpl,0);
    if(rudata_reload=0)
    then r^:=0
    else r^:=rudata_reload*fr_fps1-1;
@@ -1106,18 +1147,27 @@ begin
 
       puo:=uo_id;
       uo_id:=(b and %01110000)shr 4;
-      if(uo_id=ua_patrol)then
-      begin
-         uo_bx:=1;
-         uo_id:=ua_amove;
-      end
+      case uo_id of
+      ua_patrol : begin
+                  uo_bx:=1;
+                  uo_id:=ua_move;
+                  end;
+      ua_apatrol: begin
+                  uo_bx:=1;
+                  uo_id:=ua_amove;
+                  end;
       else uo_bx:=-1;
+      end;
 
       //if(puo<>ua_psability)and(uo_id=ua_psability)then uo_x:=-1;
 
       if((b and %10000000)=0)then exit;
 
-      rudata_prod(uu,rpl);
+      if(iscomplete)then
+      begin
+         if(uid_client_WReload)then rudata_reload(@rld,rpl);
+         if(uid_isbuilding    )then rudata_prod(uu,rpl);
+      end;
 
       if(uid_HaveRallyPoint and(isselected or not rpl))then
       begin
@@ -1202,15 +1252,15 @@ begin
                a_weap:=(wt and %1111110000000000) shr 10;
             end;
 
-            {if(buffs[ub_Cast]>0)then
-             if(uid^.uid_ability in client_cast_abils)then
-              if(rudata_reload(@rld,rpl)>0)then
+            if(uid^.uid_client_WCastTarget)then
+              if(buffs[ub_Cast]>0)then
               begin
                  uo_x:=integer(rudata_byte(rpl,0) shl 5);
                  uo_y:=integer(rudata_byte(rpl,0) shl 5);
-              end;  }
+              end;
 
-            if(playeri=POVPlayer)or(g_gplayers[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
+            if(playeri=POVPlayer)
+            or(g_gplayers[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
          end;
       end
       else
@@ -1325,8 +1375,8 @@ begin
 
    wtickb0:=(wtick mod fr_fpsh)=0;
    if(rpl)
-   then wtickb1:=(wtick mod fr_fps1)=0
-   else wtickb1:=wtickb0;
+   then wtickb1:=(wtick mod fr_fps1)=0  // every 2 second
+   else wtickb1:= wtickb0;              // every second
 
    if(not rpl)and(wtickb1)then
      with g_gplayers[POVPlayer] do

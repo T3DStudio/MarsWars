@@ -9,14 +9,14 @@ const TVisSprSize =  SizeOf(TVisSpr);
 
 var slatemp : PTVisSpr;
 
-function SpriteListAdd:PTVisSpr;
+function SpriteList_Add:PTVisSpr;
 begin
-   SpriteListAdd:=nil;
-   if(vid_ScreenSpritesS<vid_MaxScreenSprites)and(MainMenu=false)then
+   SpriteList_Add:=nil;
+   if(vid_ScreenSpritesS<vid_MaxScreenSprites)and(not MainMenu)then
    begin
       vid_ScreenSpritesS+=1;
-      SpriteListAdd:=vid_ScreenSpritesL[vid_ScreenSpritesS];
-      FillChar(SpriteListAdd^,TVisSprSize,0);
+      SpriteList_Add:=vid_ScreenSpritesL[vid_ScreenSpritesS];
+      FillChar(SpriteList_Add^,TVisSprSize,0);
       with vid_ScreenSpritesL[vid_ScreenSpritesS]^ do
       begin
          alpha:=255;
@@ -24,9 +24,9 @@ begin
    end;
 end;
 
-procedure SpriteListAddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteList_AddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteList_Add;
    if(slatemp<>nil)then
      with slatemp^ do
      begin
@@ -40,9 +40,9 @@ begin
         alpha  := aalpha;
      end;
 end;
-procedure SpriteListAddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte;axo,ayo:integer);
+procedure SpriteList_AddDoodad(ax,ay,adepth,ashadowz:integer;aspr:PTMWTexture;aalpha:byte;axo,ayo:integer);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteList_Add;
    if(slatemp<>nil)then
      with slatemp^ do
      begin
@@ -57,27 +57,27 @@ begin
         yo     := ayo;
      end;
 end;
-procedure SpriteListAddMarker(ax,ay:integer;aspr:PTMWTexture);
+procedure SpriteList_AddMarker(ax,ay:integer;aspr:PTMWTexture);
 begin
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteList_Add;
    if(slatemp<>nil)then
      with slatemp^ do
      begin
         x      := ax-ui_cam_x;
         y      := ay-ui_cam_y;
-        depth  :=  sd_marker;
+        depth  := sd_marker;
         shadowz:= shadowz.MinValue;
         sprite := aspr;
         alpha  := 255;
         yo     := -aspr^.hh;
      end;
 end;
-procedure SpriteListAddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteList_AddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
 begin
    if(aspr=nil)
    or(aspr=pspr_dummy)then exit;
 
-   slatemp:=SpriteListAdd;
+   slatemp:=SpriteList_Add;
    if(slatemp<>nil)then
      with slatemp^ do
      begin
@@ -91,25 +91,25 @@ begin
      end;
 end;
 
-procedure SpriteListSort;
+procedure SpriteList_Sort;
 var i,u:word;
     dt :PTVisSpr;
 begin
    if(vid_ScreenSpritesS>1)then
-    for i:=1 to vid_ScreenSpritesS do
-     for u:=1 to (vid_ScreenSpritesS-1) do
-      if(vid_ScreenSpritesL[u]^.depth<vid_ScreenSpritesL[u+1]^.depth)then
-      begin
-        dt:=vid_ScreenSpritesL[u];
-        vid_ScreenSpritesL[u]:=vid_ScreenSpritesL[u+1];
-        vid_ScreenSpritesL[u+1]:=dt;
-      end;
+     for i:=1 to vid_ScreenSpritesS do
+       for u:=1 to (vid_ScreenSpritesS-1) do
+         if(vid_ScreenSpritesL[u]^.depth<vid_ScreenSpritesL[u+1]^.depth)then
+         begin
+           dt:=vid_ScreenSpritesL[u];
+           vid_ScreenSpritesL[u]:=vid_ScreenSpritesL[u+1];
+           vid_ScreenSpritesL[u+1]:=dt;
+         end;
 end;
 
-procedure D_LayerSpriteList(tar:pSDL_Surface);
+procedure draw_LayerSpriteList(tar:pSDL_Surface);
 var sx,sy:integer;
 begin
-   SpriteListSort;
+   SpriteList_Sort;
    while(vid_ScreenSpritesS>0)do
      with vid_ScreenSpritesL[vid_ScreenSpritesS]^ do
      begin
@@ -151,21 +151,21 @@ end;
 //  UnitsInfo
 //
 
-function UnitsInfoNew:boolean;
+function UnitsInfo_New:boolean;
 begin
-   UnitsInfoNew:=false;
+   UnitsInfo_New:=false;
 
    if(vid_PrimitivesS>=vid_MaxScreenSprites)then exit;
 
    FillChar(vid_PrimitivesL[vid_PrimitivesS],SizeOf(TVisPrim),0);
    vid_PrimitivesS+=1;
 
-   UnitsInfoNew:=true;
+   UnitsInfo_New:=true;
 end;
 
-procedure UnitsInfoAddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfo_AddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind :=uinfo_line;
@@ -176,9 +176,9 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfoAddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfo_AddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind :=uinfo_rect;
@@ -189,9 +189,9 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfoAddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
+procedure UnitsInfo_AddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind :=uinfo_rect;
@@ -207,9 +207,9 @@ begin
         text_ld :=sld;
      end;
 end;
-procedure UnitsInfoAddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfo_AddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind :=uinfo_box;
@@ -220,9 +220,9 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfoAddCircle(ax0,ay0,ar:integer;acolor:cardinal);
+procedure UnitsInfo_AddCircle(ax0,ay0,ar:integer;acolor:cardinal);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind :=uinfo_circle;
@@ -232,10 +232,10 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfoAddText(ax0,ay0:integer;text:string6;acolor:cardinal);
+procedure UnitsInfo_AddText(ax0,ay0:integer;text:string6;acolor:cardinal);
 var tw:integer;
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind   :=uinfo_text;
@@ -249,9 +249,9 @@ begin
         y0:=mm3i(ui_cam_y+font_wh,y0,ui_cam_y+ui_cam_h-font_w1);
      end;
 end;
-procedure UnitsInfoAddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6;abcolor:cardinal=0);
+procedure UnitsInfo_AddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6;abcolor:cardinal=0);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind    :=uinfo_rect;
@@ -291,9 +291,9 @@ begin
         text_ld :=sld;
      end;
 end;
-procedure UnitsInfoAddSprite(ax0,ay0:integer;aspr:PTMWTexture);
+procedure UnitsInfo_AddSprite(ax0,ay0:integer;aspr:PTMWTexture);
 begin
-   if(UnitsInfoNew)then
+   if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
      begin
         kind   :=uinfo_sprite;
@@ -303,7 +303,7 @@ begin
      end;
 end;
 
-procedure UnitsInfoProgressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
+procedure UnitsInfo_Progressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
 var v:integer;
 begin
    if(per<0)then per:=0;
@@ -334,23 +334,23 @@ begin
    end;
 
    if(per=0)
-   then UnitsInfoAddBox(ax0,ay0,ax1,ay1,c_black)
+   then UnitsInfo_AddBox(ax0,ay0,ax1,ay1,c_black)
    else
      if(per=1)
-     then UnitsInfoAddBox(ax0,ay0,ax1,ay1,acolor)
+     then UnitsInfo_AddBox(ax0,ay0,ax1,ay1,acolor)
      else
      begin
         v:=trunc((ax1-ax0)*per);
 
-        UnitsInfoAddBox(ax0  ,ay0,ax0+v,ay1,acolor );
-        UnitsInfoAddBox(ax0+v,ay0,ax1  ,ay1,c_black);
+        UnitsInfo_AddBox(ax0  ,ay0,ax0+v,ay1,acolor );
+        UnitsInfo_AddBox(ax0+v,ay0,ax1  ,ay1,c_black);
      end;
 end;
 
-procedure UnitsInfoAddBuff(ax,ay:integer;pspr:PTMWTexture);
+procedure UnitsInfo_AddBuff(ax,ay:integer;pspr:PTMWTexture);
 begin
    ay-=pspr^.hh;
-   UnitsInfoAddSprite(ax,ay,pspr);
+   UnitsInfo_AddSprite(ax,ay,pspr);
 end;
 
 function i2s6(i:integer;null:boolean):string6;
@@ -363,7 +363,7 @@ begin
      else i2s6:='';
 end;
 
-procedure UnitsInfoAddFromUnit(pu:PTUnit;usmodel:PTMWSModel);
+procedure UnitsInfo_AddFromUnit(pu:PTUnit;usmodel:PTMWSModel);
 const buff_sprite_w = 18;
 var
 srect,
@@ -380,11 +380,11 @@ begin
    begin
       acolor:=PlayerGetColor(playeri,false);
 
-      choosen:=((m_UnitTargetN=unum)or(ui_umark_u=unum))and(ui_blink1_colorb);
+      choosen:=(ui_blink1_colorb)and((m_UnitTargetN=unum)or(ui_umark_u=unum));
 
-      srect :=((isselected)and(playeri=UIPlayer))
-            or(InputAction(iact_Alt))
-            or(choosen);
+      srect  :=((isselected)and(playeri=UIPlayer))
+             or(InputAction(iact_Alt))
+             or(choosen);
 
       hbar  :=false;
       if(srect)
@@ -398,32 +398,37 @@ begin
       if(srect)then
       begin
          if(playeri=UIPlayer)
-         then UnitsInfoAddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-         else UnitsInfoAddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
-         UnitsInfoAddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
+         then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
+         else UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
+         UnitsInfo_AddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
       end;
-      if(hbar )then UnitsInfoProgressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/uid_MaxHits1,acolor);
+      if(hbar )then UnitsInfo_Progressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/uid_MaxHits1,acolor);
 
-      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfoAddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
+      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfo_AddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
 
       if(speed<=0)or(not iscomplete)then
         if(ui_DrawEdges)then
-          UnitsInfoAddCircle(x,y,uid_r,ui_blink2_color_BY);
+          UnitsInfo_AddCircle(x,y,uid_r,ui_blink2_color_BY);
 
-      if(srect)and(uid_isbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfoAddCircle(x,y,srange,ui_blink2_color_BG);
+      if(srect)and(uid_isbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfo_AddCircle(x,y,srange,ui_blink2_color_BG);
 
       //ub_Scaned
       case ui_blink3 of
-      0: if(buffs[ub_Scaned]>0)then UnitsInfoAddBuff(vx,vy,@spr_effect_Scan );
-      1: if(buffs[ub_Decay ]>0)then UnitsInfoAddBuff(vx,vy,@spr_effect_Decay);
+      0: if(buffs[ub_Scaned    ]>0)then UnitsInfo_AddBuff(vx,vy,@spr_buff_Scan );
+      1: if(buffs[ub_DecayAura ]>0)then UnitsInfo_AddBuff(vx,vy,@spr_buff_Decay);
       2:;
       end;
 
-      pain:=(buffs[ub_Pain]>0)and(uid_ismech)and(not uid_isbuilding);
+      pain:=(buffs[ub_PainState]>0)and(uid_ismech)and(not uid_isbuilding);
       buffx:=0;
-      if(buffs[ub_HVision]>0)then buffx+=1;
-      if(buffs[ub_Invuln ]>0)then buffx+=1;
-      if(pain               )then buffx+=1;
+      if(buffs[ub_HellVision   ]>0)then buffx+=1;
+      if(buffs[ub_SphereInvuln ]>0)then buffx+=1;
+      if(buffs[ub_SphereInvis  ]>0)then buffx+=1;
+      if(buffs[ub_SphereRDamage]>0)then buffx+=1;
+      if(buffs[ub_SphereDDamage]>0)then buffx+=1;
+      if(buffs[ub_SphereTurbo  ]>0)then buffx+=1;
+      if(buffs[ub_Heroic       ]>0)then buffx+=1;
+      if(pain                     )then buffx+=1;
 
       if(buffx=0)then exit;
 
@@ -431,16 +436,21 @@ begin
       buffx:=vx-((buffx*buff_sprite_w) div 2);
 
       if(uid_isbuilding)
-      then buffy:=vy
+      then buffy:=vy-ui_ButtonWh
       else buffy:=vy-sm_SelectionHH-font_w1;
 
-      if(buffs[ub_HVision]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_effect_HVision);buffx+=buff_sprite_w;end;
-      if(buffs[ub_Invuln ]>0)then begin UnitsInfoAddBuff(buffx,buffy,@spr_effect_Invuln );buffx+=buff_sprite_w;end;
-      if(pain               )then begin UnitsInfoAddBuff(buffx,buffy,@spr_stun   );buffx+=buff_sprite_w;end;
+      if(buffs[ub_HellVision   ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_HellVision   );buffx+=buff_sprite_w;end;
+      if(buffs[ub_SphereInvuln ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereInvuln );buffx+=buff_sprite_w;end;
+      if(buffs[ub_SphereInvis  ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereInvis  );buffx+=buff_sprite_w;end;
+      if(buffs[ub_SphereRDamage]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereDArmor );buffx+=buff_sprite_w;end;
+      if(buffs[ub_SphereDDamage]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereDDamage);buffx+=buff_sprite_w;end;
+      if(buffs[ub_SphereTurbo  ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereTurbo  );buffx+=buff_sprite_w;end;
+      if(buffs[ub_Heroic       ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_Heroic       );buffx+=buff_sprite_w;end;
+      if(pain                     )then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_Stun         );buffx+=buff_sprite_w;end;
    end;
 end;
 
-procedure D_LayerUnitsInfo(tar:pSDL_Surface);
+procedure draw_LayerUnitsInfo(tar:pSDL_Surface);
 var t:integer;
 begin
    case map_scenario of
@@ -501,7 +511,7 @@ end;
 //  Terrain
 //
 
-procedure D_LayerTerrain(tar:pSDL_Surface);
+procedure draw_LayerTerrain(tar:pSDL_Surface);
 var
 i,t,s,
 ix,iy,
@@ -568,11 +578,11 @@ begin
 
         if(kpEnergy>0)then
         begin
-           SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_kp_gen,255);
+           SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_kp_gen,255);
            for i:=1 to 6 do
            begin
               ddir:=(i*60)*degtorad;
-              SpriteListAddEffect(
+              SpriteList_AddEffect(
               kpx+round(kpCaptureR*cos(ddir)),
               kpy+round(kpCaptureR*sin(ddir)),
               sd_fly+kpy,0,@spr_kp_koth,255);
@@ -584,7 +594,7 @@ begin
              for i:=1 to 24 do
              begin
                 ddir:=(i*15)*degtorad;
-                SpriteListAddEffect(
+                SpriteList_AddEffect(
                 kpx+round(kpCaptureR*cos(ddir)),
                 kpy+round(kpCaptureR*sin(ddir)),
                 sd_fly+kpy,scolor,@spr_kp_koth,255);
@@ -595,18 +605,18 @@ begin
              for i:=1 to 8 do
              begin
                 ddir:=(i*45-integer((g_tick shr 2) mod 360))*degtorad;
-                SpriteListAddEffect(
+                SpriteList_AddEffect(
                 kpx+round(kpCaptureR*cos(ddir)),
                 kpy+round(kpCaptureR*sin(ddir)),
                 sd_fly+kpy,0,@spr_kp_koth,255);
              end;
-             SpriteListAddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_cp_out,255);
+             SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_kp_out,255);
           end;
 
         if(ui_CheckMapPointFogVision(kpx,kpy,true))then
         begin
-           if(kpTimer   >0)then UnitsInfoAddText(kpx,kpy+10,ir2s(kpCaptureTime-kpTimer),ccolor );
-           if(kplifetime>0)then UnitsInfoAddText(kpx,kpy   ,cr2s(kplifetime           ),c_white);
+           if(kpTimer   >0)then UnitsInfo_AddText(kpx,kpy+10,ir2s(kpCaptureTime-kpTimer),ccolor );
+           if(kplifetime>0)then UnitsInfo_AddText(kpx,kpy   ,cr2s(kplifetime           ),c_white);
         end;
      end;
 end;
@@ -617,36 +627,36 @@ end;
 //
 
 
-procedure D_LayerFog(tar:pSDL_Surface);
+procedure draw_LayerFog(tar:pSDL_Surface);
 var
 cx,cy,
-ssx,ssy,
+ssx,ssy,i,
 sty    : integer;
-fcell  : pboolean;
-temp   : boolean;
+function GV(fx,fy:integer):boolean;
 begin
-   ssx :=-ui_cam_fx-fog_cw;
-   sty :=-ui_cam_fy-fog_cw;
-   temp:=false;
+   GV:=true;
+   if (0<=fx)and(fx<ui_fog_gridw)
+   and(0<=fy)and(fy<ui_fog_gridh)then GV:=not ui_fog_pgrid[fx,fy];
+end;
+begin
+   for cx:=0 to ui_fog_gridw-1 do
+   for cy:=0 to ui_fog_gridh-1 do
+   ui_fog_pgrid[cx,cy]:=ui_fog_fgrid[cx,cy];
 
-   for cx:=-1 to ui_fog_gridw-1 do
+   ssx :=-ui_cam_fx;
+   sty :=-ui_cam_fy;
+
+   for cx:=0 to ui_fog_gridw-1 do
    begin
       ssy:=sty;
-      for cy:=-1 to ui_fog_gridh-1 do
+      for cy:=0 to ui_fog_gridh-1 do
       begin
-         if(cx>=0)and(cy>=0)then
-         begin
-            fcell:=@ui_fog_fgrid[cx,cy];
-            ui_fog_pgrid[cx,cy]:=fcell^;
-         end
-         else fcell:=@temp;
+         i:=TileSetGetN(GV(cx,cy-1),
+            GV(cx-1,cy),GV(cx,cy  ),GV(cx+1,cy),
+                        GV(cx,cy+1));
+         if(0<=i)and(i<=fog_TileSetSize)then draw_sdlsurface(tar,ssx, ssy, ui_fog_Tiles[i]);
 
-         if(not fcell^)
-         or((ui_cam_x+ssx)<0)
-         or((ui_cam_y+ssy)<0)
-         then draw_sdlsurface(tar,ssx-fog_ds, ssy-fog_ds, ui_fog_surf);
-
-         fcell^:=false;
+         ui_fog_fgrid[cx,cy]:=false;
          ssy+=fog_cw;
       end;
       ssx+=fog_cw;
@@ -694,7 +704,7 @@ begin
          draw_text(vid_screen,ix,90,b2s(units_all_e)+' '+b2s(units_bld_e[false]) , ta_MU,255, c);
 
          //draw_text(vid_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_MU,255, c);
-         draw_text(vid_screen,ix,110,b2s(energyl_cur  )+' '+b2s(energyl_max) , ta_MU,255, c);
+         draw_text(vid_screen,ix,110,b2s(res_energyl_cur  )+' '+b2s(res_energyl_max) , ta_MU,255, c);
 
 
          for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(units_ucl_e[true ,iy])+'/'+b2s(units_ucl_c[true ,iy])+' '+b2s(units_ucl_s[true ,iy])+' '+i2s(units_ucl_u[true,iy]), ta_LU,255, c);
@@ -739,7 +749,7 @@ begin
            draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
            draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColor(playeri,false));
-          // draw_text(vid_screen,ix,iy+30,b2c[ukfly], ta_LU,255, PlayerGetColor(playeri,false));
+          // draw_text(vid_screen,ix,iy+30,b2c[isfly], ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
@@ -829,7 +839,7 @@ begin
 end;
 
 
-procedure _drawMWSModel(mwsm:PTMWSModel);
+{procedure _drawMWSModel(mwsm:PTMWSModel);
 var i,x:integer;
 begin
    x:=0;
@@ -843,5 +853,5 @@ begin
        end;
       draw_text(vid_screen,0,48,i2s(sm_spritesNum), ta_LU,255, c_white);
    end;
-end;
+end; }
 

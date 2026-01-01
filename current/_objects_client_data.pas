@@ -774,10 +774,22 @@ begin
    setWeaponESND(0,nil,snd_shot_rocket,0,0);
    uid_eid_bcrater_y:=1;
 end;
+
+// SPECIAL
 UID_URadar:
 begin
    setMWSModel(0,@spr_URadar);
    setBuildingSND(snd_uac_radar);
+end;
+UID_UAcademy:
+begin
+   setMWSModel(0,@spr_UAcademy);
+   setBuildingSND(snd_uac_academy);
+end;
+UID_UHPowerConductor:
+begin
+   setMWSModel(0,@spr_UHPowerConductor);
+   setBuildingSND(snd_uac_rescc);
 end;
 UID_URMStation:
 begin
@@ -902,10 +914,10 @@ end;
       if(uid_FogcR<1)then uid_FogcR:=1;
    end;
 
-   u:=UID_HCommandCenter;  setEffectEID2(0,uid2spr(UID_UCommandCenter  ,0,0));
-   u:=UID_HACommandCenter; setEffectEID2(0,uid2spr(UID_UACommandCenter ,0,0));
-   u:=UID_HBarracks;       setEffectEID2(0,uid2spr(UID_UBarracks       ,0,0));
-                           setEffectEID2(1,uid2spr(UID_UBarracks       ,0,1));
+   u:=UID_HCommandCenter;  setEffectEID2(0,gfx_uid2spr(UID_UCommandCenter  ,0,0));
+   u:=UID_HACommandCenter; setEffectEID2(0,gfx_uid2spr(UID_UACommandCenter ,0,0));
+   u:=UID_HBarracks;       setEffectEID2(0,gfx_uid2spr(UID_UBarracks       ,0,0));
+                           setEffectEID2(1,gfx_uid2spr(UID_UBarracks       ,0,1));
 
    // ui panel
    for r:=1 to r_count do
@@ -989,51 +1001,61 @@ begin
       ua_mbrush_hint:= 0;
 
       case a of
-uab_Teleport           : ua_btn     :=spr_uibtn_Upgrades[r_hell,8 ].surf;
-uab_Recall             : ua_btn     :=spr_uibtn_Upgrades[r_hell,14].surf;
-uab_UACScan            : begin
-                         ua_btn     :=spr_uibtn_AbilityUACScan;
-                         ua_mbrush_r:=uambt_SightR;
-                         end;
-uab_UACStrike          : begin
-                         ua_btn     :=spr_uibtn_AbilityUACStrike;
-                         ua_mbrush_r:=blizzard_sr;
-                         end;
-uab_UACCCLand          : begin
-                         ua_btn     :=spr_uibtn_AbilityCCLand;
-                         ua_mbrush_r:=uambt_Self;
-                         end;
-uab_UACCCLandTo        : begin
-                         ua_btn     :=spr_uibtn_AbilityCCLandTo;
-                         ua_mbrush_r:=uambt_Self;
-                         end;
-uab_HEyeVision         : ua_btn     :=spr_uibtn_AbilityHVision;
-uab_HEyeBlink          : begin
-                         ua_btn     :=spr_uibtn_AbilityBlink;
-                         ua_mbrush_r:=uambt_Self;
-                         end;
-uab_HTowerBlink        : begin
-                         ua_btn     :=spr_uibtn_Upgrades[r_hell,18].surf;
-                         ua_mbrush_r:=uambt_Self;
-                         end;
+uab_Teleport         : ua_btn     :=spr_uibtn_Upgrades[r_hell,8 ].surf;
+uab_Recall           : ua_btn     :=spr_uibtn_Upgrades[r_hell,14].surf;
+uab_UACScan          : begin
+                       ua_btn     :=spr_uibtn_AbilityUACScan;
+                       ua_mbrush_r:=uambt_SightR;
+                       end;
+uab_UACStrike        : begin
+                       ua_btn     :=spr_uibtn_AbilityUACStrike;
+                       ua_mbrush_r:=uambt_Blizzard;
+                       end;
+uab_HellCCLand,
+uab_UACCCLand        : begin
+                       ua_btn     :=spr_uibtn_AbilityCCLand;
+                       ua_mbrush_r:=uambt_Self;
+                       end;
+uab_HellCCLandTo,
+uab_UACCCLandTo      : begin
+                       ua_btn     :=spr_uibtn_AbilityCCLandTo;
+                       ua_mbrush_r:=uambt_Self;
+                       end;
+uab_HEyeVision       : ua_btn     :=spr_uibtn_AbilityHVision;
+uab_HEyeBlink        : begin
+                       ua_btn     :=spr_uibtn_AbilityBlink;
+                       ua_mbrush_r:=uambt_Self;
+                       end;
+uab_HTowerBlink      : begin
+                       ua_btn     :=spr_uibtn_Upgrades[r_hell,18].surf;
+                       ua_mbrush_r:=uambt_Self;
+                       end;
 
-uab_HKeepShift         : begin
-                         ua_btn     :=spr_uibtn_Upgrades[r_hell,9 ].surf;
-                         ua_mbrush_r:=uambt_Self;
-                         end;
-uab_HKeepAura          : ua_btn     :=spr_uibtn_Upgrades[r_hell,10].surf;
+uab_HKeepShift       : begin
+                       ua_btn     :=spr_uibtn_Upgrades[r_hell,9 ].surf;
+                       ua_mbrush_r:=uambt_Self;
+                       end;
+uab_HKeepAura        : ua_btn     :=spr_uibtn_Upgrades[r_hell,10].surf;
 
-uab_SphereInvuln       : ua_btn     :=spr_uibtn_AbilityInvuln;
+uab_SphereSoul       : ua_btn     :=spr_uibtn_AbilitySSoul;
+uab_SphereInvis      : ua_btn     :=spr_uibtn_AbilitySInvis;
+uab_SphereInvuln     : ua_btn     :=spr_uibtn_AbilitySInvuln;
+uab_SphereRDamage    : ua_btn     :=spr_uibtn_AbilitySRDamage;
+uab_SphereDDamage    : ua_btn     :=spr_uibtn_AbilitySDDamage;
+uab_SphereTurbo      : ua_btn     :=spr_uibtn_AbilitySTurbo;
 
-uab_SpawnLost          : ua_btn     :=spr_uibtn_AbilitySpawnLost;
-uab_SpawnLostTo        : ua_btn     :=spr_uibtn_AbilitySpawnLostTo;
+uab_PretorEquip      : ua_btn     :=spr_uibtn_AbilityPretEquip;
+uab_Bribe            : ua_btn     :=spr_uibtn_AbilityBribe;
 
-uab_Unload             : ua_btn     :=spr_uibtn_AbilityUnload;
-uab_UnloadTo           : ua_btn     :=spr_uibtn_AbilityUnloadTo;
+uab_SpawnLost        : ua_btn     :=spr_uibtn_AbilitySpawnLost;
+uab_SpawnLostTo      : ua_btn     :=spr_uibtn_AbilitySpawnLostTo;
 
-uab_ToUACDron          : ua_mbrush_r:=-UID_UACDron;
-uab_ToUGTurretTo       : ua_mbrush_r:=-UID_UGTurret;
-uab_ToUATurretTo       : ua_mbrush_r:=-UID_UATurret;
+uab_Unload           : ua_btn     :=spr_uibtn_AbilityUnload;
+uab_UnloadTo         : ua_btn     :=spr_uibtn_AbilityUnloadTo;
+
+uab_ToUACDron        : ua_mbrush_r:=-UID_UACDron;
+uab_ToUGTurretTo     : ua_mbrush_r:=-UID_UGTurret;
+uab_ToUATurretTo     : ua_mbrush_r:=-UID_UATurret;
 
 uab_ToHAKeep         : ua_mbrush_r:=-UID_HAKeep;
 uab_ToHSymbol2       : ua_mbrush_r:=-UID_HSymbol2;
@@ -1057,6 +1079,9 @@ uab_ToUAATurret      : ua_mbrush_r:=-UID_UATurret;
 uab_ToUBarracks      : ua_mbrush_r:=-UID_UBarracks;
 uab_ToUFactory       : ua_mbrush_r:=-UID_UFactory;
 uab_ToUWeaponFactory : ua_mbrush_r:=-UID_UWeaponFactory;
+
+uab_URadarLvlUp      : ua_mbrush_r:=-UID_URadar;
+uab_URMStationLvlUp  : ua_mbrush_r:=-UID_URMStation;
       end;
 
       case a of
@@ -1082,6 +1107,16 @@ uab_ToUAATurret,
 uab_ToUBarracks,
 uab_ToUFactory,
 uab_ToUWeaponFactory : ua_mbrush_hint:=byte(-ua_mbrush_r);
+      end;
+
+      case a of
+uab_ToUAGTurret,
+uab_ToUAATurret,
+uab_ToUACDron,
+uab_ToUGTurretTo,
+uab_ToUATurretTo,
+uab_ToHTotem,
+uab_ToHTower : ua_mbrush_hint_HalfProdTime:=true;
       end;
 
       if(ua_btn=spr_empty)then

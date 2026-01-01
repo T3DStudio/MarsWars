@@ -40,7 +40,8 @@ begin
    c_ared    :=gfx_rgba2c(255,  0,  0,82 );
    c_orange  :=gfx_rgba2c(255,140,  0,255);
    c_dorange :=gfx_rgba2c(230, 96,  0,255);
-   c_brown   :=gfx_rgba2c(140, 90, 10,255);
+   c_aorange :=gfx_rgba2c(255,140,  0,82 );
+   c_brown   :=gfx_rgba2c(140,90 , 10,255);
    c_yellow  :=gfx_rgba2c(255,255,  0,255);
    c_dyellow :=gfx_rgba2c(220,220,  0,255);
    c_lime    :=gfx_rgba2c(0  ,255,  0,255);
@@ -50,10 +51,8 @@ begin
    c_purple  :=gfx_rgba2c(255,0  ,255,255);
    c_violet  :=gfx_rgba2c(147,100,255,255);
    c_green   :=gfx_rgba2c(0  ,150,0  ,255);
-   c_agreen  :=gfx_rgba2c(0  ,150,0  ,42 );
-   c_dblue   :=gfx_rgba2c(100,100,192,255);
+   c_ablue   :=gfx_rgba2c(0  ,0  ,255,82);
    c_blue    :=gfx_rgba2c(50 ,50 ,255,255);
-   c_ablue   :=gfx_rgba2c(50 ,50 ,255,24 );
    c_white   :=gfx_rgba2c(255,255,255,255);
    c_awhite  :=gfx_rgba2c(255,255,255,40 );
    c_gray    :=gfx_rgba2c(120,120,120,255);
@@ -63,7 +62,6 @@ begin
    c_black   :=gfx_rgba2c(0  ,0  ,0  ,255);
    c_ablack  :=gfx_rgba2c(0  ,0  ,0  ,128);
    c_mablack :=gfx_rgba2c(0  ,0  ,0  ,96 );
-   c_lava    :=gfx_rgba2c(222,80 ,0  ,255);
 
    ui_max_color[false]:=c_dorange;
    ui_max_color[true ]:=c_gray;
@@ -507,6 +505,48 @@ begin
    end;
 end;
 
+procedure gfx_MakeFogTileSet;
+var
+x,y,i:integer;
+fsurf:pSDL_Surface;
+b10,
+b01,b11,b21,
+b12  :boolean;
+begin
+   //   ui_fog_Tiles
+   fsurf := gfx_CreateSDLSurface(fog_cr*2,fog_cr*2);
+   boxColor(fsurf,0,0,fsurf^.w,fsurf^.h,c_purple);
+   filledcircleColor(fsurf,fog_cr,fog_cr,fog_cr,c_black);
+   gfx_SetTransparent(fsurf);
+   for x:=0 to fsurf^.w-1 do
+   for y:=0 to fsurf^.h-1 do
+     if((x+y)mod 4)=0 then
+       pixelColor(fsurf,x,y,c_purple);
+
+   for b10:=false to true do
+   for b01:=false to true do
+   for b11:=false to true do
+   for b21:=false to true do
+   for b12:=false to true do
+   begin
+      x:=TileSetGetN(b10,b01,b11,b21,b12);
+      if(0<=x)and(x<=fog_TileSetSize)then
+      begin
+         ui_fog_Tiles[x]:=gfx_CreateSDLSurface(fog_cw,fog_cw);
+         boxColor(ui_fog_Tiles[x],0,0,fog_cw,fog_cw,c_purple);
+         gfx_SetTransparent(ui_fog_Tiles[x]);
+
+         if(b10)then draw_sdlsurface(ui_fog_Tiles[x],       -fog_ds,-fog_cw-fog_ds,fsurf);
+         if(b01)then draw_sdlsurface(ui_fog_Tiles[x],-fog_cw-fog_ds,       -fog_ds,fsurf);
+         if(b11)then draw_sdlsurface(ui_fog_Tiles[x],       -fog_ds,       -fog_ds,fsurf);
+         if(b21)then draw_sdlsurface(ui_fog_Tiles[x], fog_cw-fog_ds,       -fog_ds,fsurf);
+         if(b12)then draw_sdlsurface(ui_fog_Tiles[x],       -fog_ds, fog_cw-fog_ds,fsurf);
+      end;
+   end;
+
+   gfx_FreeSDLSurface(fsurf);
+end;
+
 procedure gfx_LoadFont(fname:shortstring);
 var i:byte;
     c:char;
@@ -578,22 +618,14 @@ begin
 
    gfx_LoadFont('font');
 
-   //
-   ui_fog_surf := gfx_CreateSDLSurface(fog_cr*2,fog_cr*2);
-   boxColor(ui_fog_surf,0,0,ui_fog_surf^.w,ui_fog_surf^.h,c_purple);
-   filledcircleColor(ui_fog_surf,fog_cr,fog_cr,fog_cr,c_black);
-   gfx_SetTransparent(ui_fog_surf);
-   for x:=0 to ui_fog_surf^.w-1 do
-   for r:=0 to ui_fog_surf^.h-1 do
-     if((x+r)mod 4)=0 then
-       pixelColor(ui_fog_surf,x,r,c_purple);
+   gfx_MakeFogTileSet;
 
-   with spr_cp_out do
+   with spr_kp_out do
    begin
       hw:=keyPoint_r-6;
       hh:=hw;
-      w:=hw*2;
-      h:=w;
+      w :=hw*2;
+      h :=w;
       surf:=gfx_CreateSDLSurface(1,1);
       gfx_SetTransparent(surf);
    end;
@@ -619,42 +651,46 @@ begin
 
    menu_Surface:=gfx_CreateSDLSurface(menu_w, menu_h);
 
-   spr_uibtn_Delete            := gfx_ButtonLoad(folder_ui+'b_destroy'    ,ui_ButtonW1);
-   spr_uibtn_Attack            := gfx_ButtonLoad(folder_ui+'b_attack'     ,ui_ButtonW1);
-   spr_uibtn_Move              := gfx_ButtonLoad(folder_ui+'b_move'       ,ui_ButtonW1);
-   spr_uibtn_Patrol            := gfx_ButtonLoad(folder_ui+'b_patrol'     ,ui_ButtonW1);
-   spr_uibtn_APatrol           := gfx_ButtonLoad(folder_ui+'b_apatrol'    ,ui_ButtonW1);
-   spr_uibtn_Stop              := gfx_ButtonLoad(folder_ui+'b_stop'       ,ui_ButtonW1);
-   spr_uibtn_Hold              := gfx_ButtonLoad(folder_ui+'b_hold'       ,ui_ButtonW1);
-   spr_uibtn_F1                := gfx_ButtonLoad(folder_ui+'b_F1'         ,ui_ButtonW1);
-   spr_uibtn_F2                := gfx_ButtonLoad(folder_ui+'b_F2'         ,ui_ButtonW1);
-   spr_uibtn_ProdCancel        := gfx_ButtonLoad(folder_ui+'b_cancle'     ,ui_ButtonW1);
-   spr_uibtn_ReplayFast        := gfx_ButtonLoad(folder_ui+'b_rfast'      ,ui_ButtonW1);
-   spr_uibtn_ReplayForw1       := gfx_ButtonLoad(folder_ui+'b_rforw1'     ,ui_ButtonW1);
-   spr_uibtn_ReplayForw2       := gfx_ButtonLoad(folder_ui+'b_rforw2'     ,ui_ButtonW1);
-   spr_uibtn_ReplayForw3       := gfx_ButtonLoad(folder_ui+'b_rforw3'     ,ui_ButtonW1);
-   spr_uibtn_ReplayBack1       := gfx_ButtonLoad(folder_ui+'b_rback1'     ,ui_ButtonW1);
-   spr_uibtn_ReplayBack2       := gfx_ButtonLoad(folder_ui+'b_rback2'     ,ui_ButtonW1);
-   spr_uibtn_ReplayBack3       := gfx_ButtonLoad(folder_ui+'b_rback3'     ,ui_ButtonW1);
-   spr_uibtn_ReplayFog         := gfx_ButtonLoad(folder_ui+'b_fog'        ,ui_ButtonW1);
-   spr_uibtn_ReplayLog         := gfx_ButtonLoad(folder_ui+'b_log'        ,ui_ButtonW1);
-   spr_uibtn_ReplayPause       := gfx_ButtonLoad(folder_ui+'b_rstop'      ,ui_ButtonW1);
-   spr_uibtn_ReplayPOV         := gfx_ButtonLoad(folder_ui+'b_rvis'       ,ui_ButtonW1);
-   spr_uibtn_mmark             := gfx_ButtonLoad(folder_ui+'b_mmark'      ,ui_ButtonW1);
-   spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'    ,ui_ButtonW1);
-   spr_uibtn_AbilityUACScan    := gfx_ButtonLoad(folder_ui+'b_scan'       ,ui_ButtonW1);
-   spr_uibtn_AbilityInvuln     := gfx_ButtonLoad(folder_ui+'b_invuln'     ,ui_ButtonW1);
-   spr_uibtn_AbilityBlink      := gfx_ButtonLoad(folder_ui+'b_blink'      ,ui_ButtonW1);
-   spr_uibtn_AbilitySpawnLost  := gfx_ButtonLoad(folder_ui+'b_SpawnLost'  ,ui_ButtonW1);
-   spr_uibtn_AbilitySpawnLostTo:= gfx_ButtonLoad(folder_ui+'b_SpawnLostTo',ui_ButtonW1);
-   spr_uibtn_AbilityHVision    := gfx_ButtonLoad(folder_ui+'b_HVision'    ,ui_ButtonW1);
-   spr_uibtn_AbilityUnload     := gfx_ButtonLoad(folder_ui+'b_unload'     ,ui_ButtonW1);
-   spr_uibtn_AbilityUnloadTo   := gfx_ButtonLoad(folder_ui+'b_unloadto'   ,ui_ButtonW1);
-   spr_uibtn_AbilityCCLand     := gfx_ButtonLoad(folder_ui+'b_CCland'     ,ui_ButtonW1);
-   spr_uibtn_AbilityCCLandTo   := gfx_ButtonLoad(folder_ui+'b_CClandTo'   ,ui_ButtonW1);
-   spr_uibtn_AbilityLvlUp      := gfx_ButtonLoad(folder_ui+'b_ProdUp'     ,ui_ButtonW1);
-   spr_uibtn_AbilityUACLvlUp   := gfx_ButtonLoad(folder_ui+'b_UACProdUp'  ,ui_ButtonW1);
-   spr_uibtn_AbilityHellLvlUp  := gfx_ButtonLoad(folder_ui+'b_HellProdUp' ,ui_ButtonW1);
+   spr_uibtn_Delete            := gfx_ButtonLoad(folder_ui+'b_destroy'         ,ui_ButtonW1);
+   spr_uibtn_Attack            := gfx_ButtonLoad(folder_ui+'b_attack'          ,ui_ButtonW1);
+   spr_uibtn_Move              := gfx_ButtonLoad(folder_ui+'b_move'            ,ui_ButtonW1);
+   spr_uibtn_Patrol            := gfx_ButtonLoad(folder_ui+'b_patrol'          ,ui_ButtonW1);
+   spr_uibtn_APatrol           := gfx_ButtonLoad(folder_ui+'b_apatrol'         ,ui_ButtonW1);
+   spr_uibtn_Stop              := gfx_ButtonLoad(folder_ui+'b_stop'            ,ui_ButtonW1);
+   spr_uibtn_Hold              := gfx_ButtonLoad(folder_ui+'b_hold'            ,ui_ButtonW1);
+   spr_uibtn_F1                := gfx_ButtonLoad(folder_ui+'b_F1'              ,ui_ButtonW1);
+   spr_uibtn_F2                := gfx_ButtonLoad(folder_ui+'b_F2'              ,ui_ButtonW1);
+   spr_uibtn_ProdCancel        := gfx_ButtonLoad(folder_ui+'b_cancle'          ,ui_ButtonW1);
+   spr_uibtn_ReplayFast        := gfx_ButtonLoad(folder_ui+'b_rfast'           ,ui_ButtonW1);
+   spr_uibtn_ReplayForw1       := gfx_ButtonLoad(folder_ui+'b_rforw1'          ,ui_ButtonW1);
+   spr_uibtn_ReplayForw2       := gfx_ButtonLoad(folder_ui+'b_rforw2'          ,ui_ButtonW1);
+   spr_uibtn_ReplayForw3       := gfx_ButtonLoad(folder_ui+'b_rforw3'          ,ui_ButtonW1);
+   spr_uibtn_ReplayBack1       := gfx_ButtonLoad(folder_ui+'b_rback1'          ,ui_ButtonW1);
+   spr_uibtn_ReplayBack2       := gfx_ButtonLoad(folder_ui+'b_rback2'          ,ui_ButtonW1);
+   spr_uibtn_ReplayBack3       := gfx_ButtonLoad(folder_ui+'b_rback3'          ,ui_ButtonW1);
+   spr_uibtn_ReplayFog         := gfx_ButtonLoad(folder_ui+'b_fog'             ,ui_ButtonW1);
+   spr_uibtn_ReplayLog         := gfx_ButtonLoad(folder_ui+'b_log'             ,ui_ButtonW1);
+   spr_uibtn_ReplayPause       := gfx_ButtonLoad(folder_ui+'b_rstop'           ,ui_ButtonW1);
+   spr_uibtn_ReplayPOV         := gfx_ButtonLoad(folder_ui+'b_rvis'            ,ui_ButtonW1);
+   spr_uibtn_mmark             := gfx_ButtonLoad(folder_ui+'b_mmark'           ,ui_ButtonW1);
+   spr_uibtn_AbilityPretEquip  := gfx_ButtonLoad(folder_ui+'b_PretorianEquip'  ,ui_ButtonW1);
+   spr_uibtn_AbilityBribe      := gfx_ButtonLoad(folder_ui+'b_Bribe'           ,ui_ButtonW1);
+   spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'         ,ui_ButtonW1);
+   spr_uibtn_AbilityUACScan    := gfx_ButtonLoad(folder_ui+'b_scan'            ,ui_ButtonW1);
+   spr_uibtn_AbilityBlink      := gfx_ButtonLoad(folder_ui+'b_blink'           ,ui_ButtonW1);
+   spr_uibtn_AbilitySpawnLost  := gfx_ButtonLoad(folder_ui+'b_SpawnLost'       ,ui_ButtonW1);
+   spr_uibtn_AbilitySpawnLostTo:= gfx_ButtonLoad(folder_ui+'b_SpawnLostTo'     ,ui_ButtonW1);
+   spr_uibtn_AbilityHVision    := gfx_ButtonLoad(folder_ui+'b_HVision'         ,ui_ButtonW1);
+   spr_uibtn_AbilityUnload     := gfx_ButtonLoad(folder_ui+'b_unload'          ,ui_ButtonW1);
+   spr_uibtn_AbilityUnloadTo   := gfx_ButtonLoad(folder_ui+'b_unloadto'        ,ui_ButtonW1);
+   spr_uibtn_AbilityCCLand     := gfx_ButtonLoad(folder_ui+'b_CCland'          ,ui_ButtonW1);
+   spr_uibtn_AbilityCCLandTo   := gfx_ButtonLoad(folder_ui+'b_CClandTo'        ,ui_ButtonW1);
+   spr_uibtn_AbilitySInvuln    := gfx_ButtonLoad(folder_ui+'b_SInvulnerability',ui_ButtonW1);
+   spr_uibtn_AbilitySInvis     := gfx_ButtonLoad(folder_ui+'b_SInvisibility'   ,ui_ButtonW1);
+   spr_uibtn_AbilitySSoul      := gfx_ButtonLoad(folder_ui+'b_SSoul'           ,ui_ButtonW1);
+   spr_uibtn_AbilitySDDamage   := gfx_ButtonLoad(folder_ui+'b_SDoubleDamage'   ,ui_ButtonW1);
+   spr_uibtn_AbilitySRDamage   := gfx_ButtonLoad(folder_ui+'b_SResistDamage'   ,ui_ButtonW1);
+   spr_uibtn_AbilitySTurbo     := gfx_ButtonLoad(folder_ui+'b_STurbo'          ,ui_ButtonW1);
 
   spr_uibtn_Tabs[0]:=gfx_ButtonLoad(folder_ui+'b_F1'        ,ui_TabButtonW-2,false);
   spr_uibtn_Tabs[1]:=gfx_ButtonLoad(folder_ui+'b_F2'        ,ui_TabButtonW-2,false);
@@ -799,6 +835,9 @@ begin
    gfx_LoadMWSModel(@spr_UFactory2          ,folder_RaceBuildings[r_uac ] +'u_b12_'    ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UFactory3          ,folder_RaceBuildings[r_uac ] +'u_b12a'    ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UFactory4          ,folder_RaceBuildings[r_uac ] +'u_b12b'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UAcademy           ,folder_RaceBuildings[r_uac ] +'u_b15_'    ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_UHPowerConductor   ,folder_RaceBuildings[r_uac ] +'u_b14_'    ,smt_buiding  );
+
 
    gfx_LoadMWSModel(@spr_portal             ,folder_RaceBuildings[r_uac ] +'u_portal0' ,smt_buiding);
    gfx_LoadMWSModel(@spr_starport           ,folder_RaceBuildings[r_uac ] +'u_starport',smt_buiding);
@@ -851,11 +890,16 @@ begin
    gfx_LoadMWTexture(@spr_b7_a              ,folder_RaceBuildings[r_uac ]+'u_b7_a'     ,true);
    gfx_LoadMWTexture(@spr_b9_a              ,folder_RaceBuildings[r_uac ]+'u_b9_a'     ,true);
 
-   gfx_LoadMWTexture(@spr_stun              ,folder_effects+'stun'                     ,true);
-   gfx_LoadMWTexture(@spr_effect_Invuln     ,folder_effects+'invuln'                   ,true);
-   gfx_LoadMWTexture(@spr_effect_HVision    ,folder_effects+'hvision'                  ,true);
-   gfx_LoadMWTexture(@spr_effect_Scan       ,folder_effects+'scan'                     ,true);
-   gfx_LoadMWTexture(@spr_effect_Decay      ,folder_effects+'decay'                    ,true);
+   gfx_LoadMWTexture(@spr_buff_SphereInvuln ,folder_effects+'buff_SphereInvuln'        ,true);
+   gfx_LoadMWTexture(@spr_buff_SphereInvis  ,folder_effects+'buff_SphereInvis'         ,true);
+   gfx_LoadMWTexture(@spr_buff_SphereDArmor ,folder_effects+'buff_SphereDArmor'        ,true);
+   gfx_LoadMWTexture(@spr_buff_SphereDDamage,folder_effects+'buff_SphereDDamage'       ,true);
+   gfx_LoadMWTexture(@spr_buff_SphereTurbo  ,folder_effects+'buff_SphereTurbo'         ,true);
+   gfx_LoadMWTexture(@spr_buff_HellVision   ,folder_effects+'buff_HellVision'          ,true);
+   gfx_LoadMWTexture(@spr_buff_Scan         ,folder_effects+'buff_scan'                ,true);
+   gfx_LoadMWTexture(@spr_buff_Decay        ,folder_effects+'buff_decay'               ,true);
+   gfx_LoadMWTexture(@spr_buff_Stun         ,folder_effects+'buff_stun'                ,true);
+   gfx_LoadMWTexture(@spr_buff_Heroic       ,folder_effects+'buff_heroic'              ,true);
 
    gfx_LoadMWTexture(@spr_kp_koth           ,'kp_koth'                                 ,true);
    gfx_LoadMWTexture(@spr_kp_gen            ,'kp_gen'                                  ,true);
@@ -885,8 +929,8 @@ begin
       with uid_BTNBig do
       begin
          case uid_race of
-         r_hell: surf:= gfx_ButtonMakeFromSurface(uid2spr(u,315,0)^.surf,ui_ButtonW1 );
-         r_uac : surf:= gfx_ButtonMakeFromSurface(uid2spr(u,225,0)^.surf,ui_ButtonW1 );
+         r_hell: surf:= gfx_ButtonMakeFromSurface(gfx_uid2spr(u,315,0)^.surf,ui_ButtonW1 );
+         r_uac : surf:= gfx_ButtonMakeFromSurface(gfx_uid2spr(u,225,0)^.surf,ui_ButtonW1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -894,8 +938,8 @@ begin
       with uid_BTNSmall do
       begin
          case uid_race of
-         r_hell: surf:= gfx_ButtonMakeFromSurface(uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1,false);
-         r_uac : surf:= gfx_ButtonMakeFromSurface(uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1,false);
+         r_hell: surf:= gfx_ButtonMakeFromSurface(gfx_uid2spr(u,315,0)^.surf,ui_GroupIcoW1,1,false);
+         r_uac : surf:= gfx_ButtonMakeFromSurface(gfx_uid2spr(u,225,0)^.surf,ui_GroupIcoW1,1,false);
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -903,8 +947,8 @@ begin
       with uid_BTNDoc do
       begin
          case uid_race of
-         r_hell: surf:= gfx_ButtonMakeFromSurface(uid2spr(u,315,0)^.surf,ui_ButtonWh,1 );
-         r_uac : surf:= gfx_ButtonMakeFromSurface(uid2spr(u,225,0)^.surf,ui_ButtonWh,1 );
+         r_hell: surf:= gfx_ButtonMakeFromSurface(gfx_uid2spr(u,315,0)^.surf,ui_ButtonWh,1 );
+         r_uac : surf:= gfx_ButtonMakeFromSurface(gfx_uid2spr(u,225,0)^.surf,ui_ButtonWh,1 );
          end;
          w   := surf^.w;h := w;
          hw  := w div 2;hh:= hw;
@@ -912,14 +956,7 @@ begin
    end;
 end;
 
-{procedure save_surf(fname:shortstring;surf:pSDL_Surface);
-begin
-   if(surf=nil)then exit;
-   fname:='temp\'+fname+'.bmp'+#0;
-   sdl_saveBMP(surf,@fname[1]);
-   sdl_freesurface(surf);
-end;
-
+{
 procedure gfx_SaveUnitIcons;
 var u:byte;
 begin
@@ -1022,11 +1059,15 @@ begin
    end;
    ui_log_ListSize:=((ui_UIPortY1-ui_UIPortY0)-ui_CtrlPanelW-ui_ReplayBarH-txt_line_h1) div txt_line_h2;
 
-   // FPS
+   // FPS  APM REC-status
    ui_FPSX       := ui_UIPortX1-(font_w1*font_w1h);
    if(ui_ControlPanelPos=cpp_top)
    then ui_FPSY  := font_wh
    else ui_FPSY  := ui_timerY;
+
+   ui_APMx      := ui_FPSX;
+   ui_APMy      := ui_FPSY+txt_line_h2;
+   ui_RECy      := ui_APMy+txt_line_h2;
 
    // hotkey groups icons
    case ui_ControlPanelPos of
@@ -1034,13 +1075,14 @@ begin
    cpp_bottom,
    cpp_left  : begin
                ui_groupX:=vid_vw-font_w1;
-               ui_groupY:=ui_FPSY+txt_line_h1;
+               ui_groupY:=ui_RECy+txt_line_h2;
                end;
    cpp_right : begin
                ui_groupX:=ui_UIPanelX-font_w1;
-               ui_groupY:=ui_FPSY+txt_line_h1;
+               ui_groupY:=ui_RECy+txt_line_h2;
                end;
    end;
+   ui_RECx      := ui_groupX;
 
    // Replay progress bar
    ui_ReplayBarY := ui_UIPortY1;
@@ -1066,15 +1108,16 @@ begin
    cpp_bottom: ui_ReplayBarX:=ui_UIPanelX;
    end;
 
+   // OTHER
+
    ui_EnergyX   := ui_UIPortXC-font_w2;
    ui_EnergyY   := ui_timerY;
+   ui_HellPowerY:= ui_EnergyY+txt_line_h2;
+   ui_UACLootY  := ui_HellPowerY+txt_line_h2; ;
    ui_ArmyX     := ui_UIPortXC;
    ui_ArmyY0    := ui_timerY;
-   ui_ArmyY1    := ui_timerY+txt_line_h2;
-   ui_ArmyY2    := ui_timerY+txt_line_h2*2;
-
-   ui_Apmx      := ui_FPSX;
-   ui_Apmy      := ui_FPSY+txt_line_h2;
+   ui_ArmyY1    := ui_ArmyY0+txt_line_h2;
+   ui_ArmyY2    := ui_ArmyY1+txt_line_h2;
 
    ui_fog_gridw :=(ui_cam_w div fog_cw)+2;
    ui_fog_gridh :=(ui_cam_h div fog_cw)+2;
@@ -1106,8 +1149,8 @@ end;
 begin
    gfx_FreeSDLSurface(ui_UIPanel);
    gfx_FreeSDLSurface(ui_UIPanelTemplate);
+
    ui_panel_race:=255;
-   ui_update_now:=true;
 
    case ui_ControlPanelPos of
    cpp_left  : ui_UIPortX0:=ui_CtrlPanelW;

@@ -1,21 +1,14 @@
 
-procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);
+////////////////////////////////////////////////////////////////////////////////
+//
+//  COMMON DRAW PROCEDURES
+//
+
+procedure draw_LoadingScreen(load_str:pshortstring;color:cardinal);
 begin
    SDL_FillRect(vid_screen,nil,0);
    stringColor(vid_screen,(vid_vw div 2)-(length(load_str^)*font_w1 div 2), vid_vh div 2,@(load_str^[1]),color);
    SDL_FLIP(vid_screen);
-end;
-
-procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;sur:PTMWTexture);
-begin
-   with sur^ do
-   begin
-      vid_RECT^.x:=x;
-      vid_RECT^.y:=y;
-      vid_RECT^.w:=sur^.w;
-      vid_RECT^.h:=sur^.h;
-      SDL_BLITSURFACE(surf,nil,tar,vid_RECT);
-   end;
 end;
 
 procedure draw_sdlsurface(tar:pSDL_Surface;x,y:integer;sur:PSDL_SURFACE);
@@ -25,6 +18,18 @@ begin
    vid_RECT^.w:=sur^.w;
    vid_RECT^.h:=sur^.h;
    SDL_BLITSURFACE(sur,nil,tar,vid_RECT);
+end;
+
+procedure draw_mwtexture(tar:pSDL_Surface;x,y:integer;mwtex:PTMWTexture);
+begin
+   with mwtex^ do
+   begin
+      vid_RECT^.x:=x;
+      vid_RECT^.y:=y;
+      vid_RECT^.w:=w;
+      vid_RECT^.h:=h;
+      SDL_BLITSURFACE(surf,nil,tar,vid_RECT);
+   end;
 end;
 
 procedure draw_rectw(tar:pSDL_Surface;x0,y0,x1,y1,border,borderSkip:integer;color:cardinal);
@@ -40,27 +45,24 @@ begin
    end;
 end;
 
-procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal;lastLineY:pinteger=nil);
+procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal;lastLineY:pinteger=nil;EdgeY:integer=integer.MaxValue);
 var
-strLen,
-i,
+strLen,i,
 lines_n,
-line   :byte;
-textH,
-textW,
-ix     :integer;
-charc  :char;
-color  :cardinal;
+line      : byte;
+textH,textW,
+ix        : integer;
+charc     : char;
+color     : cardinal;
 lines_spos,
 lines_epos,
 lines_endc,
-lines_len :shortstring;
-
+lines_len : shortstring;
 begin
-   if(BaseColor=0)then exit;
+   if(BaseColor=0)
+   or(MaxLineChars=0)then exit;
    strLen:=length(str);
    if(strLen=0)then exit;
-   if(MaxLineChars<1)then MaxLineChars:=1;
 
    // text analize
    lines_spos:='';
@@ -105,6 +107,8 @@ begin
          charc:=str[i];
 
          case charc of
+         tc_docbr,
+         tc_doccpt,
          tc_nl1..
          tc_nl3      : ;
          tc_RankUAC  : begin
@@ -145,98 +149,15 @@ begin
 
       case lines_endc[line] of
       tc_nl1 : y+=txt_line_h1;
-      tc_nl3 : y+=txt_line_h3;
       tc_nl2 : y+=txt_line_h2;
+      tc_nl3 : y+=txt_line_h3;
       end;
+      if((y+font_w1)>=EdgeY)then break;
    end;
    if(lastLineY<>nil)then lastLineY^:=y;
 end;
 
-procedure map_MinimapBackgroundObj(sd:TSob);
-var d:integer;
-begin
-   for d:=1 to MaxObstacles do
-    with map_ObstaclesL[d] do
-     if(o_type in sd)then
-      if(o_mmr>0)
-      then FilledcircleColor(ui_bminimap,o_mmx,o_mmy,o_mmr,o_mmc)
-      else pixelColor       (ui_bminimap,o_mmx,o_mmy,    o_mmc);
-end;
-
-procedure map_MinimapUpdateBackground;
-begin
-   sdl_FillRect(ui_bminimap,nil,0);
-   map_MinimapBackgroundObj(dids_liquids);
-   map_MinimapBackgroundObj([DID_other,DID_srock,DID_brock]);
-end;
-
-procedure map_minimap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
-begin
-   circleColor   (tar,x  ,y  ,r  ,color);
-   if(sym<>#0)then
-   characterColor(tar,x-3,y-3,sym,color);
-end;
-
-procedure map_MinimapPlayerStarts(tar:pSDL_Surface);
-var p    :byte;
-    x,y  :integer;
-    color:cardinal;
-    pc   :char;
-begin
-   if(map_MaxPlayers>0)then
-     for p:=0 to map_MaxPlayers-1 do
-     begin
-        if(g_FixedPositions)then
-        begin
-           if(g_gplayers[p].state=ps_none)and(g_AISlots=0)then continue;
-           color:=PlayerGetColor(p,false);
-           pc:=i2s(p+1)[1];
-        end
-        else
-        begin
-           pc:='?';
-           color:=c_white;
-        end;
-
-        x:=round(map_PlayerStartX[p]*map_MiniMap_cx);
-        y:=round(map_PlayerStartY[p]*map_MiniMap_cx);
-
-        map_minimap_KeyPoint(tar,x,y,trunc(base_1r*map_MiniMap_cx),pc,color);
-     end;
-end;
-
-procedure map_MinimapKeyPoints(tar:pSDL_Surface;colored:boolean);
-var i:byte;
-    c:cardinal;
-begin
-   for i:=0 to LastKeyPoint do
-     with map_KeyPointsL[i] do
-       if(kpCaptureR>0)then
-       begin
-          if(colored)
-          then c:=GetKeyPointColor(i,false)
-          else c:=c_white;
-          if((i=0)and(map_scenario=mc_KotH))
-          then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_koth,c)
-          else
-            if(kpEnergy<=0)
-            then map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_kp ,c)
-            else map_minimap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_gen,c);
-       end;
-end;
-
-procedure map_RedrawMenuMinimap;
-begin
-   sdl_FillRect(ui_minimap,nil,0);
-   map_MinimapUpdateBackground;
-   draw_sdlsurface(ui_minimap ,0,0,ui_bminimap);
-   draw_sdlsurface(ui_mminimap,0,0,ui_minimap );
-   map_MinimapPlayerStarts(ui_mminimap);
-   map_MinimapKeyPoints   (ui_mminimap,false);
-   menu_update:=menu_update or MainMenu;
-end;
-
-procedure d_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;talign,tlength:byte;str:shortstring;color:cardinal;lastLineY:pinteger=nil);
+procedure draw_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;talign,tlength:byte;str:shortstring;color:cardinal;lastLineY:pinteger=nil);
 var m,s,h:cardinal;
     hs,ms,ss:shortstring;
 begin
@@ -256,87 +177,5 @@ begin
    draw_text(tar,x,y,str,talign,tlength,color,lastLineY);
 end;
 
-function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;
-var i,ni,mx,my:integer;
-begin
-   {
-   new  false - not required new alarm point
-        true  - required
-   return - true if alarm created
-   }
-   ui_AddMarker:=false;
-
-   ax:=mm3i(1,ax,map_Size1);
-   ay:=mm3i(1,ay,map_Size1);
-
-   mx:=trunc(ax*map_MiniMap_cx);
-   my:=trunc(ay*map_MiniMap_cx);
-
-   if(not new)then
-    for i:=0 to ui_max_alarms do
-     with ui_alarms[i] do
-      if(al_t>0)and(al_v=av)then
-       if(point_dist_rint(al_mx,al_my,mx,my)<=ui_alarm_time)then
-       begin
-          al_x :=(al_x +ax) div 2;
-          al_y :=(al_y +ay) div 2;
-          al_mx:=(al_mx+mx) div 2;
-          al_my:=(al_my+my) div 2;
-          al_t :=ui_alarm_time;
-          exit;
-       end;
-
-   ni:=0;
-   for i:=0 to ui_max_alarms do
-    if(ui_alarms[i].al_t<ui_alarms[ni].al_t)
-    then ni:=i;
-
-   with ui_alarms[ni] do
-    if(al_t<=0)or(not new)then
-    begin
-       al_x :=ax;
-       al_y :=ay;
-       al_mx:=mx;
-       al_my:=my;
-       al_v :=av;
-       al_t :=ui_alarm_time;
-       case al_v of
-aummat_attacked_u,
-aummat_attacked_b : al_c:=c_red;
-aummat_created_u,
-aummat_created_b  : al_c:=c_lime;
-aummat_advance    : al_c:=c_aqua;
-aummat_upgrade    : al_c:=c_yellow;
-aummat_info       : al_c:=c_white;
-       end;
-       ui_AddMarker:=true;
-    end;
-end;
-
-function LogMes2UIAlarm:boolean;
-begin
-   // true  - need announcer sound
-   // false - no need announcer sound
-   LogMes2UIAlarm:=true;
-   if(UIPlayer<=LastPlayer)then
-     with g_gplayers[UIPlayer] do
-       with log_l[log_i] do
-         case lm_type of
-lmt_unit_LevelUp    :      ui_AddMarker(lm_x,lm_y,aummat_advance   ,true);
-lmt_unit_ready       : if(g_uids[lm_data_u].uid_isbuilding)
-                       then ui_AddMarker(lm_x,lm_y,aummat_created_b ,true)
-                       else ui_AddMarker(lm_x,lm_y,aummat_created_u ,true);
-lmt_upgrade_complete :      ui_AddMarker(lm_x,lm_y,aummat_upgrade   ,true);
-lmt_map_mark         :      ui_AddMarker(lm_x,lm_y,aummat_info      ,true);
-lmt_allies_attacked,
-lmt_unit_attacked    : begin
-                       if(g_uids[lm_data_u].uid_isbuilding)
-                       then ui_AddMarker(lm_x,lm_y,aummat_attacked_b,false)
-                       else ui_AddMarker(lm_x,lm_y,aummat_attacked_u,false);
-
-                       LogMes2UIAlarm:=not PointInCam(lm_x,lm_y);
-                       end;
-         end;
-end;
 
 

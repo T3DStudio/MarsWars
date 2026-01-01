@@ -1,9 +1,9 @@
 
 
-procedure cmp_Init;
+procedure camp_Init;
 var x:byte;
 begin
-   for x:=0 to LastMission do cmp_mmap[x]:=spr_camp_phobos;
+   {for x:=0 to LastMission do cmp_mmap[x]:=spr_camp_phobos;
 
    cmp_mmap[0 ]:=spr_camp_hell;
    cmp_mmap[1 ]:=spr_camp_phobos;
@@ -29,28 +29,28 @@ begin
    cmp_mmap[20]:=spr_camp_hell;
    cmp_mmap[21]:=spr_camp_mars;
    cmp_mmap[22]:=spr_camp_mars;
-   cmp_mmap[23]:=spr_camp_mars;
+   cmp_mmap[23]:=spr_camp_mars;   }
 end;
-procedure cmp_ClearPStarts;
-var i:byte;
+procedure camp_ClearPStarts;
+var p:byte;
 begin
-   for i:=0 to LastPlayer do
+   for p:=0 to LastPlayer do
    begin
-      map_PlayerStartX[i]:=-5000;
-      map_PlayerStartY[i]:=-5000;
+      map_PlayerStartX[p]:=-5000;
+      map_PlayerStartY[p]:=-5000;
    end;
 end;
-procedure cmp_SetPStart(p:byte;px,py:integer);
+procedure camp_SetPStart(p:byte;px,py:integer);
 begin
    map_PlayerStartX[p]:=px;
    map_PlayerStartY[p]:=py;
 end;
-procedure cmp_SetPStartMir(p1,p2:byte);
+procedure camp_SetPStartMir(p1,p2:byte);
 begin
    map_PlayerStartX[p1]:=map_Size1-map_PlayerStartX[p2];
    map_PlayerStartY[p1]:=map_Size1-map_PlayerStartY[p2];
 end;
-procedure cmp_FillPStartsCircle(pstart,pnum:byte;cx,cy,cr,cd:integer);
+procedure camp_FillPStartsCircle(pstart,pnum:byte;cx,cy,cr,cd:integer);
 var p:byte;
 dstep,
 ddir :integer;
@@ -69,7 +69,7 @@ begin
       if(pstart>LastPlayer)then break;
    end;
 end;
-procedure cmp_SetPlayer(p,r,t:byte);
+procedure camp_SetPlayer(p,r,t:byte);
 begin
    with g_gplayers[p] do
    begin
@@ -78,48 +78,47 @@ begin
       if(p=LocalPlayer)then name:=PlayerName;
    end;
 end;
-procedure cmp_CreateUnit(playeri:byte;ux,uy:integer;uuid:byte);
+procedure camp_CreateUnit(playeri:byte;ux,uy:integer;uuid:byte);
 begin
    unit_add(ux,uy,0,uuid,playeri,true,false,0);
 end;
 
 procedure cmp_StartMission;
 begin
-   cmp_data_b1:= 0;
-   cmp_data_b2:= 0;
-   cmp_data_b3:= 0;
-   cmp_data_c1:= 0;
-   g_type:=gt_campaing;
+   FillChar(camp_data,SizeOf(camp_data),0);
 
    g_DefeatedObs:=false;
-   case cmp_sel of
-0  : begin
-        map_scenario      :=mc_ffa8;
-        map_generators:=0;
-        map_seed    :=666;
-        map_Size1      :=4000;
-        map_ObstaclesF     :=4;
-        map_Symmetry:=false;
-        map_BaseVars;
+   case camp_sel of
+   0 : case camp_mis_sel of
+       0 : begin
+              map_scenario  :=mc_ffa8;
+              map_generators:=0;
+              map_seed      :=666;
+              map_Size1     :=4000;
+              map_ObstaclesF:=4;
+              map_Symmetry  :=false;
+              map_BaseVars;
 
-        LocalPlayer :=0;
-        UIPlayer:=0;
+              LocalPlayer:=0;
+              UIPlayer   :=0;
 
-        cmp_SetPlayer(LocalPlayer,r_hell,ps_human);
-        cmp_SetPlayer(4      ,r_uac ,ps_AI);
+              camp_SetPlayer(LocalPlayer,r_hell,ps_human);
+              camp_SetPlayer(4          ,r_uac ,ps_AI   );
 
-        cmp_ClearPStarts;
-        cmp_SetPStart(1,map_Size1 div 4,map_Size1 div 3);
-        cmp_SetPStartMir(4,1);
+              camp_ClearPStarts;
+              camp_SetPStart(1,map_Size1 div 4,map_Size1 div 3);
+              camp_SetPStartMir(4,1);
 
-        cmp_CreateUnit(LocalPlayer,map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer],UID_HKeep);
+              camp_CreateUnit(LocalPlayer,map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer],UID_HKeep);
 
-        cmp_CreateUnit(4,map_PlayerStartX[4]-150,map_PlayerStartY[4]-150,UID_UCommandCenter);
-        cmp_CreateUnit(4,map_PlayerStartX[4]+150,map_PlayerStartY[4]+150,UID_UPortal);
+              camp_CreateUnit(4,map_PlayerStartX[4]-150,map_PlayerStartY[4]-150,UID_UCommandCenter);
+              camp_CreateUnit(4,map_PlayerStartX[4]+150,map_PlayerStartY[4]+150,UID_UPortal);
 
-        PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HTower,
-                                        UID_Imp,UID_Demon], MaxUnits,true);
-     end;
+              PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HTower,
+                                                  UID_Imp,UID_Demon], MaxUnits,true);
+           end;
+       end;
+
    end;
 
    Map_Make;
@@ -129,20 +128,21 @@ end;
 procedure cmp_MissionCode;
 var i:integer;
 begin
-   case cmp_sel of
-0  : begin
-        // tutorial stages, subtasks
-        with g_gplayers[LocalPlayer] do
-        begin
-           {if(energyl_max<2000)
-           then cmp_data_b1:=1
-           else
-             if(energyl_max<2000)}
+   case camp_sel of
+   0 : case camp_mis_sel of
+       0 : begin
+              // tutorial stages, subtasks
+              with g_gplayers[LocalPlayer] do
+              begin
+                 {if(res_energyl_max<2000)
+                 then cmp_data_b1:=1
+                 else
+                   if(res_energyl_max<2000)}
 
-        end;
-        if(g_gplayers[4].units_ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_gplayers[LocalPlayer].team);
-
-     end;
+              end;
+              if(g_gplayers[4].units_ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_gplayers[LocalPlayer].team);
+           end;
+       end;
    end;
 end;
 

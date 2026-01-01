@@ -6,7 +6,7 @@
 
 procedure unit_DrawMiniMap(pu:PTUnit);
 begin
-   if(ui_blink_timer1=0)and(not MainMenu)and(vid_draw)then
+   if(ui_blink_timer1=(pu^.unum mod ui_update_period1))and(not MainMenu)and(vid_draw)then
      with pu^  do
      with uid^ do
      begin
@@ -56,9 +56,9 @@ begin
        if(uid^.uid_isbuilding)and(not iscomplete)
        then unit_GetSpriteDepth:=sd_build+vy
        else
-         if(hits>0)or(buffs[ub_Resurect]>0)
-         then unit_GetSpriteDepth:=draw_DefaultSpriteDepth(vy,ukfly or (zfall>0))
-         else unit_GetSpriteDepth:=draw_DefaultSpriteDepth(vy,ukfly);
+         if(hits>0)or(buffs[ub_Resurected]>0)
+         then unit_GetSpriteDepth:=draw_DefaultSpriteDepth(vy,isfly or (zfall>0))
+         else unit_GetSpriteDepth:=draw_DefaultSpriteDepth(vy,isfly);
     end;
 end;
 
@@ -181,8 +181,10 @@ end;
 //    UI COUNTERS
 //
 
-procedure ui_UICountersProduction(pu:PTUnit;pn:integer);
-var i,t:byte;
+procedure ui_UICountersProduction(pu:PTUnit;pline:integer);
+var
+i,t:byte;
+r  :integer;
 begin
    with pu^     do
    with uid^    do
@@ -193,12 +195,16 @@ begin
         begin
            ui_uprod_max+=1;
 
-           if(uprod_r[pn]>0)then
+           if(uprod_r[pline]>0)then
            begin
               ui_uprod_cur+=1;
-              i:=uprod_u[pn];
-              if(ui_uprod_first      <=0)or(uprod_r[pn]<ui_uprod_first      )then ui_uprod_first      :=uprod_r[pn];
-              if(ui_uprod_uid_time[i]<=0)or(uprod_r[pn]<ui_uprod_uid_time[i])then ui_uprod_uid_time[i]:=uprod_r[pn];
+              if(buffs[ub_SphereTurbo]>0)
+              or(buffs[ub_Heroic     ]>0)
+              then r:=uprod_r[pline] div 2
+              else r:=uprod_r[pline];
+              i:=uprod_u[pline];
+              if(ui_uprod_first      <=0)or(r<ui_uprod_first      )then ui_uprod_first      :=uprod_r[pline];
+              if(ui_uprod_uid_time[i]<=0)or(r<ui_uprod_uid_time[i])then ui_uprod_uid_time[i]:=uprod_r[pline];
            end
            else
              for t:=1 to 255 do
@@ -210,12 +216,16 @@ begin
         begin
            ui_pprod_max+=1;
 
-           if(pprod_r[pn]>0)then
+           if(pprod_r[pline]>0)then
            begin
               ui_pprod_cur+=1;
-              i:=pprod_u[pn];
-              if(ui_pprod_first      <=0)or(pprod_r[pn]<ui_pprod_first      )then ui_pprod_first      :=pprod_r[pn];
-              if(ui_pprod_upg_time[i]<=0)or(pprod_r[pn]<ui_pprod_upg_time[i])then ui_pprod_upg_time[i]:=pprod_r[pn];
+              if(buffs[ub_SphereTurbo]>0)
+              or(buffs[ub_Heroic     ]>0)
+              then r:=pprod_r[pline] div 2
+              else r:=pprod_r[pline];
+              i:=pprod_u[pline];
+              if(ui_pprod_first      <=0)or(r<ui_pprod_first      )then ui_pprod_first      :=pprod_r[pline];
+              if(ui_pprod_upg_time[i]<=0)or(r<ui_pprod_upg_time[i])then ui_pprod_upg_time[i]:=pprod_r[pline];
            end
            else
              for t:=1 to 255 do
@@ -278,7 +288,7 @@ begin
          if(iscomplete)then
          begin
             // building area and possible buildings for UI
-            if(uid_isbuilder)and(not ukfly)then
+            if(uid_isbuilder)and(not isfly)then
               if(units_builders_s=0)or(isselected)then
                 ui_bprod_possible+=uid_prod_Buildings;
 
@@ -409,18 +419,18 @@ begin
       if(uid_isbuilding)then
       begin
          // building areas
-         if(iscomplete)and(uid_isbuilder)and(not ukfly)then
+         if(iscomplete)and(uid_isbuilder)and(not isfly)then
            if(units_builders_s=0)or(isselected)then
              case m_brush of
              1..255 : if(m_brush in uid_prod_Buildings)then
                         if(RectInCam(x,y,srange,srange,0))then
-                          UnitsInfoAddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
+                          UnitsInfo_AddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
              end;
          // rally points
          if(isselected)and(uid_HaveRallyPoint)then
          begin
-            UnitsInfoAddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
-            SpriteListAddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
+            UnitsInfo_AddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
+            SpriteList_AddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
          end;
       end;
 
@@ -429,7 +439,7 @@ begin
           case uo_id of
           ua_move,
           ua_amove   : if(uo_bx>0)and(isselected)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
-                         UnitsInfoAddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+                         UnitsInfo_AddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
           ua_ability1,
           ua_ability2,
           ua_ability3: begin
@@ -438,15 +448,15 @@ begin
                             with g_aids[i] do
                               case ua_type of
                               uat_point    : begin
-                                                SpriteListAddEffect(uo_x,uo_y,0,0,ui_AbilityGetBrushSpr(i,uidi),128);
+                                                SpriteList_AddEffect(uo_x,uo_y,0,0,ui_AbilityGetBrushSpr(i,uidi),128);
                                                 if(ui_DrawEdges)then
                                                 begin
                                                    t:=ui_AbilityGetBrushR(i,pu);
                                                    if(t>0)then
-                                                     UnitsInfoAddCircle(uo_x,uo_y,t,ui_blink2_color_BY);
+                                                     UnitsInfo_AddCircle(uo_x,uo_y,t,ui_blink2_color_BY);
                                                 end;
 
-                                                if(isselected)then UnitsInfoAddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+                                                if(isselected)then UnitsInfo_AddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
                                              end;
                               uat_UnitAny,
                               uat_UnitOwn,
@@ -469,7 +479,9 @@ begin
    with uid^ do
      if(uid_AnimStepWalk>0)then
      begin
-        animf-=1;
+        if(buffs[ub_SphereTurbo]>0)
+        then animf-=2
+        else animf-=1;
         if(animf<=0)then
         begin
            snd_SoundPlayUnit(uid_snd_Foot,nil,nil);
@@ -507,10 +519,13 @@ begin
    begin
       // buffs and level
       lvlstr_b:='';
-      if(buffs[ub_Detect]>0)then lvlstr_b+=char_detect;
+      if(buffs[ub_Detector]>0)then lvlstr_b+=char_detect;
 
       lvlstr_l:='';
-      if(not uid_isbuilding)or(uid_isbarrack)or(uid_issmith)then
+      if(not uid_isbuilding)
+      or(uid_isbarrack)
+      or(uid_issmith)
+      or(uid_ability_RldReducByLvl)then
         case level of
         1: lvlstr_l:=str_UnitLevel1[uid_race];
         2: lvlstr_l:=str_UnitLevel2[uid_race];
@@ -573,7 +588,7 @@ begin
 /////////      Visible in fog of war
       unit_DrawMiniMap(pu);
 
-      if(uid_ability_ishkeep)then
+      if(uid_ability_HKeepShift)then
         if(buffs[ub_Cast]>0)then exit;
 
       wanim:=false;
@@ -597,7 +612,7 @@ begin
       if((unum mod ui_blink_period2)=ui_blink_timer2)then
         unit_UpdateStatusStrings(pu);
 
-      UnitsInfoAddFromUnit(pu,uid_SpriteModel[level]);
+      UnitsInfo_AddFromUnit(pu,uid_SpriteModel[level]);
 
       spr_depth:=unit_GetSpriteDepth(pu);
       spr_alpha:=255;
@@ -605,17 +620,16 @@ begin
 
       if(wanim)then unit_FootEffect(pu);
 
-      if(buffs[ub_Invis ]>0 )then spr_alpha:=128;
+      if(buffs[ub_Invisibility ]>0)then spr_alpha:=128;
 
-      if(buffs[ub_Invuln]>fr_fpss)then ColorAura:=c_awhite;
+      if(buffs[ub_SphereInvuln ]>0)then ColorAura:=c_awhite;
+      if(buffs[ub_SphereRDamage ]>0)then ColorAura:=c_agray;
+      if(buffs[ub_SphereDDamage]>0)then ColorAura:=c_ared;
+      if(buffs[ub_SphereTurbo  ]>0)then ColorAura:=c_aorange;
 
       if(uid_eid_SummonSpr[level]<>nil)then
         if(buffs[ub_Summoned]>0)then
-          SpriteListAddUnit(vx,vy,spr_depth+1,0,0,ColorAura,uid_eid_SummonSpr[level],mm3i(0,buffs[ub_Summoned]*4,255));
-
-      if(buffs[ub_ArchFire]>0)then
-        with spr_h_p6 do
-          if(sm_spritesNum>0)then SpriteListAddUnit(vx-g_randomr(uid_missileR),vy-g_randomr(uid_missileR),spr_depth+1,0,0,0,@sm_spritesL[(g_tick div 4) mod cardinal(sm_spritesNum)],255);
+          SpriteList_AddUnit(vx,vy,spr_depth+1,0,0,ColorAura,uid_eid_SummonSpr[level],mm3i(0,buffs[ub_Summoned]*4,255));
 
       if(iscomplete)then
       begin
@@ -623,8 +637,8 @@ begin
            if(uid_isbarrack)or(uid_issmith)then
              for t:=0 to LastUnitLevel do
              begin
-                if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
-                if(uid_issmith  )and(pprod_r[t]>0)then UnitsInfoAddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
+                if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
+                if(uid_issmith  )and(pprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
              end;
 
          if(a_rld<=0)and(not noanim)then
@@ -639,32 +653,32 @@ begin
          case uidi of
          UID_UGTurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then
                                if(upgrs_cur[upgr_uac_TurretPlasma]>0)
-                               then SpriteListAddUnit(vx  ,vy   ,spr_depth,0,0,0,@spr_b7_a,spr_alpha)
-                               else SpriteListAddUnit(vx  ,vy   ,spr_depth,0,0,0,@spr_b4_a,spr_alpha);
+                               then SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b7_a,spr_alpha)
+                               else SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b4_a,spr_alpha);
          UID_UATurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then
-                                    SpriteListAddUnit(vx  ,vy   ,spr_depth,0,0,0,@spr_b9_a,spr_alpha);
+                                    SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b9_a,spr_alpha);
          UID_UACommandCenter,
          UID_UCommandCenter: if(upgrs_cur[upgr_uac_CCAttack]>0)then
                                with uid_arms[0] do
-                                    SpriteListAddUnit(vx+aw_offset_x,vy+aw_offset_y,
+                                    SpriteList_AddUnit(vx+aw_offset_x,vy+aw_offset_y,
                                                                 spr_depth,0,0,0,@spr_ptur,spr_alpha);
          end;
       end
       else
         if(uid_eid_bcrater>0)and(uid_eid_BuildHellType)then
         begin
-           if(buffs[ub_Invis]>0)
+           if(buffs[ub_Invisibility]>0)
            then spr_alphab:=128
            else spr_alphab:=255;
 
-           SpriteListAddEffect(vx,vy+uid_eid_bcrater_y,sd_liquid+uid_eid_bcrater_y+y,0,EID2Spr(uid_eid_bcrater),spr_alphab);
+           SpriteList_AddEffect(vx,vy+uid_eid_bcrater_y,sd_liquid+uid_eid_bcrater_y+y,0,EID2Spr(uid_eid_bcrater),spr_alphab);
         end;
 
       if(ui_ColoredShadow)
       then ColorShadow:=PlayerGetColor(playeri,true)
       else ColorShadow:=c_ablack;
 
-      SpriteListAddUnit(vx,vy,spr_depth,shadowz,ColorShadow,ColorAura,spr,spr_alpha);
+      SpriteList_AddUnit(vx,vy,spr_depth,shadowz,ColorShadow,ColorAura,spr,spr_alpha);
    end;
 end;
 
@@ -681,7 +695,7 @@ begin
         if(spr<>pspr_dummy)then
           if(unit_FogReveal(pu))then
             if(RectInCam(vx,vy,spr^.hw,spr^.hh,0))then
-              SpriteListAddDoodad(vx,vy,unit_GetSpriteDepth(pu),-32000,spr,byte(mm3i(0,abs(hits-hits_fdead)*4,255)),0,0);
+              SpriteList_AddDoodad(vx,vy,unit_GetSpriteDepth(pu),-32000,spr,byte(mm3i(0,abs(hits-hits_fdead)*4,255)),0,0);
      end;
 end;
 
@@ -707,7 +721,7 @@ begin
    if(ui_CommandercPU<>nil)then
      case m_brush of
      -255..-1: with ui_CommandercPU^ do
-                 UnitsInfoAddLine(x,y,m_brushx,m_brushy,ui_blink_color1[ui_blink2_colorb]);
+                 UnitsInfo_AddLine(x,y,m_brushx,m_brushy,ui_blink_color1[ui_blink2_colorb]);
      end;
 end;
 

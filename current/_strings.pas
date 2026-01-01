@@ -279,6 +279,7 @@ begin
          begin
             case charc of
             ' ',
+            '&',
             '/',
             '\',
             ':',
@@ -357,29 +358,30 @@ begin
    end;
 end;
 procedure str_StringListCopy(plistFrom,plistTo:PTUIStringList;add:boolean=false);
-var i:integer;
+var i,o:integer;
 begin
-   with plistTo^ do
-   begin
-      if(add)then
-      begin
-         if(slist_w>plistFrom^.slist_w)
-         then slist_w:=plistFrom^.slist_w
-         else plistFrom^.slist_w:=slist_w;
-         i:=slist_n;
-         slist_n+=plistFrom^.slist_n;
-      end
-      else
-      begin
-         str_StringListClear(plistTo);
-         slist_n:=plistFrom^.slist_n;
-         slist_w:=plistFrom^.slist_w;
-         i:=0;
-      end;
-      setlength(slist_l,slist_n);
-      if(plistFrom^.slist_n>0)then
-        for i:=i to plistFrom^.slist_n-1 do
-          slist_l[i]:=plistFrom^.slist_l[i];
+   case add of
+   true : if(plistFrom^.slist_n>0)then
+            with plistTo^ do
+            begin
+               if(slist_w<plistFrom^.slist_w)then
+                 slist_w:=plistFrom^.slist_w;
+               o:=slist_n;
+               slist_n+=plistFrom^.slist_n;
+               setlength(slist_l,slist_n);
+               for i:=0 to  plistFrom^.slist_n-1 do
+                 slist_l[o+i]:=plistFrom^.slist_l[i];
+            end;
+   false: with plistTo^ do
+          begin
+             str_StringListClear(plistTo);
+             slist_n:=plistFrom^.slist_n;
+             slist_w:=plistFrom^.slist_w;
+             setlength(slist_l,slist_n);
+             if(slist_n>0)then
+               for i:=0 to slist_n-1 do
+                 slist_l[i]:=plistFrom^.slist_l[i];
+          end;
    end;
 end;
 
@@ -441,6 +443,7 @@ begin
   begin
      ua_str_name    :=NAME;
      ua_str_Descript:=DESCR;
+     str_EndDot(@ua_str_Descript);
   end;
 end;
 
@@ -490,6 +493,25 @@ begin
      str_DocUpgradeLine:=baseStr+str_UpgradeNameBonus(upid,bonus);
 end;
 
+function str_UnitsNamesList(list:TSoB):shortstring;
+var i,c:byte;
+begin
+   str_UnitsNamesList:='';
+   if(list=[])then exit;
+   c:=0;
+   for i in list do c+=1;
+   for i in list do
+   begin
+      if(length(str_UnitsNamesList)=0)
+      then str_UnitsNamesList:=g_uids[i].uid_str_name
+      else
+        if(c=1)
+        then str_UnitsNamesList+=' '+str_and+' '+g_uids[i].uid_str_name
+        else str_UnitsNamesList+=', '           +g_uids[i].uid_str_name;
+      c-=1;
+   end;
+end;
+
 function str_UnitProductBy(uid:byte):shortstring;
 var i:byte;
 ITEMP:shortstring;
@@ -515,11 +537,11 @@ begin
       pu:=@g_units[0];
       with pu^ do
       begin
-         uidi:=auid;
+         uidi   :=auid;
          playeri:=0;
          player :=@g_gplayers[playeri];
          unit_ApplyUID(pu);
-         hits:=-32000;
+         hits   :=hits_fdead-1;
       end;
    end;
    str_UnitAttributes:='';
@@ -527,36 +549,31 @@ begin
    with uid^ do
    begin
       if(hits>hits_fdead)then
-        if(hits>0)
-        then STRADD(@str_UnitAttributes,str_attr_alive  ,sep_comma)
-        else STRADD(@str_UnitAttributes,str_attr_dead   ,sep_comma);
+      if(hits>0                   )then STRADD(@str_UnitAttributes,str_attr_alive    ,sep_comma)
+                                   else STRADD(@str_UnitAttributes,str_attr_dead     ,sep_comma);
 
-      if(uid_isbuilding)
-      then STRADD(@str_UnitAttributes,str_attr_building ,sep_comma)
-      else STRADD(@str_UnitAttributes,str_attr_unit     ,sep_comma);
-      if(uid_ismech)
-      then STRADD(@str_UnitAttributes,str_attr_mech     ,sep_comma)
-      else STRADD(@str_UnitAttributes,str_attr_bio      ,sep_comma);
-      if(uid_islight)
-      then STRADD(@str_UnitAttributes,str_attr_light    ,sep_comma)
-      else STRADD(@str_UnitAttributes,str_attr_heavy    ,sep_comma);
-      if(ukfly)
-      then STRADD(@str_UnitAttributes,str_attr_fly      ,sep_comma)
-      else
-        if(ukfloater)
-        then STRADD(@str_UnitAttributes,str_attr_floater,sep_comma)
-        else STRADD(@str_UnitAttributes,str_attr_ground ,sep_comma);
-      if(transportM>0)
-      then STRADD(@str_UnitAttributes,str_attr_transport,sep_comma);
-      if(level>0)
-      then STRADD(@str_UnitAttributes,str_attr_level+b2s(level+1),sep_comma);
-      if(buffs[ub_Detect]>0)or(uid_isdetector)
-      then STRADD(@str_UnitAttributes,str_attr_detector,sep_comma);
-      if(buffs[ub_Invuln]>0)
-      then STRADD(@str_UnitAttributes,str_attr_invuln,sep_comma)
-      else
-        if(buffs[ub_Pain]>0)
-        then STRADD(@str_UnitAttributes,str_attr_stuned,sep_comma);
+      if(uid_isbuilding           )then STRADD(@str_UnitAttributes,str_attr_building ,sep_comma)
+                                   else STRADD(@str_UnitAttributes,str_attr_unit     ,sep_comma);
+      if(uid_ismech               )then STRADD(@str_UnitAttributes,str_attr_mech     ,sep_comma)
+                                   else STRADD(@str_UnitAttributes,str_attr_bio      ,sep_comma);
+      if(uid_islight              )then STRADD(@str_UnitAttributes,str_attr_light    ,sep_comma)
+                                   else STRADD(@str_UnitAttributes,str_attr_heavy    ,sep_comma);
+      if(isfly                    )then STRADD(@str_UnitAttributes,str_attr_fly      ,sep_comma)
+                                   else STRADD(@str_UnitAttributes,str_attr_ground   ,sep_comma);
+      if(level>0                  )then STRADD(@str_UnitAttributes,str_attr_level
+                                                                        +b2s(level+1),sep_comma);
+      if(buffs[ub_Heroic       ]>0)then STRADD(@str_UnitAttributes,str_attr_heroic   ,sep_comma);
+      if(buffs[ub_Detector     ]>0)
+      or(uid_isdetector           )then STRADD(@str_UnitAttributes,str_attr_detector ,sep_comma);
+      if(buffs[ub_PainState    ]>0)then STRADD(@str_UnitAttributes,str_attr_stuned   ,sep_comma);
+      if(buffs[ub_SphereInvuln ]>0)then STRADD(@str_UnitAttributes,str_attr_SInvuln  ,sep_comma);
+      if(buffs[ub_SphereInvis  ]>0)then STRADD(@str_UnitAttributes,str_attr_SInvis   ,sep_comma);
+      if(buffs[ub_SphereRDamage]>0)then STRADD(@str_UnitAttributes,str_attr_SRDamage ,sep_comma);
+      if(buffs[ub_SphereDDamage]>0)then STRADD(@str_UnitAttributes,str_attr_SDDamage ,sep_comma);
+      if(buffs[ub_SphereTurbo  ]>0)then STRADD(@str_UnitAttributes,str_attr_STurbo   ,sep_comma);
+      if(buffs[ub_HellVision   ]>0)then STRADD(@str_UnitAttributes,str_attr_HVision  ,sep_comma);
+      if(buffs[ub_Scaned       ]>0)then STRADD(@str_UnitAttributes,str_attr_Scaned   ,sep_comma);
+      if(buffs[ub_DecayAura    ]>0)then STRADD(@str_UnitAttributes,str_attr_Decay    ,sep_comma);
 
       str_UnitAttributes:='['+str_UnitAttributes+tc_default+']';
    end;
@@ -634,10 +651,10 @@ begin
        STRADD(@str_Unit1LineDescript,str_doc_BaseSightR+i2s(uid_SightR_Base),sep_sdot);
        STRADD(@str_Unit1LineDescript,str_UnitRole(uid)                      ,sep_sdot);
 
-       if(uid_EnergyGen>0)then
-         STRADD(@str_Unit1LineDescript,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_EnergyGen)+tc_default+')',sep_sdot);
+       if(uid_gen_EnergyLevel>0)then
+         STRADD(@str_Unit1LineDescript,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_sdot);
 
-       if(uid_SplashResist)
+       if(uid_isbuilding)
        or(uid_ismech)then STRADD(@str_Unit1LineDescript,str_hint_SplashResist,sep_sdot);
 
        STRADD(@str_Unit1LineDescript,basedesc,sep_sdot);
@@ -721,12 +738,6 @@ begin
      BaseDmg:=0;
      ocount :=0;
      case aw_type of
-     {wpt_suicide   : if(uid_DeathMissile>0)then
-                     begin
-                        BaseDmg:=g_mids[uid_DeathMissile].mid_base_damage;
-                        ocount:=1;
-                     end
-                     else exit;    }
      wpt_missle    : begin
                      BaseDmg:=g_mids[aw_object_id].mid_base_damage;
                      if(aw_object_count>=0)
@@ -737,13 +748,11 @@ begin
      wpt_directdmgZ,
      wpt_heal      : BaseDmg:=aw_object_count;
      end;
-     {if(aw_type=wpt_suicide)
-     then n:=1
-     else }
      begin
         n:=0;
-        for i:=0 to aw_reload do
-          if(i in aw_ShotPoints)then n+=1;
+        for i:=aw_reload downto 1 do
+          if(i in aw_ShotPoints)then
+            if (aw_reload=255) or not((i+1) in aw_ShotPoints)then n+=1;
      end;
 
      if(BaseDmg>0)then
@@ -756,12 +765,9 @@ begin
         then str_UnitArmDPS+='x'+i2s(ocount);
      end;
 
-     {if(aw_type=wpt_suicide)
-     then sps:=1
-     else }
-       if(aw_FakeShotsN>0)
-       then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
-       else sps:=(fr_fps1*n/aw_reload);
+     if(aw_FakeShotsN>0)
+     then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
+     else sps:=(fr_fps1*n/aw_reload);
      STRADD(@str_UnitArmDPS,'*'+Float2Str(sps),'');
   end;
 end;
@@ -920,12 +926,26 @@ begin
      str_AbilityHintName:=str_AbilityHintName+' ('+HK+')';
 end;
 
+function str_UIDCostLimit(uid:byte;halfProdTime:boolean=false):shortstring;
+begin
+   str_UIDCostLimit:='';
+   with g_uids[uid] do
+   begin
+      if(uid_req_EnergyLevel>0)then STRADD(@str_UIDCostLimit,tc_aqua  +i2s(uid_req_EnergyLevel)          +tc_default,sep_comma);
+      if(uid_req_HellPower  >0)then STRADD(@str_UIDCostLimit,tc_yellow+i2s(uid_req_HellPower  )          +tc_default,sep_comma);
+      if(uid_req_UACLoot    >0)then STRADD(@str_UIDCostLimit,tc_lime  +i2s(uid_req_UACLoot    )          +tc_default,sep_comma);
+                                    STRADD(@str_UIDCostLimit,tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default,sep_comma);
+      if(uid_ProdTimeSec    >0)then
+                               if(halfProdTime)
+                               then STRADD(@str_UIDCostLimit,tc_white +i2s(uid_ProdTimeSec div 2)        +tc_default,sep_comma)
+                               else STRADD(@str_UIDCostLimit,tc_white +i2s(uid_ProdTimeSec      )        +tc_default,sep_comma);
+      if(length(str_UIDCostLimit)>0)then str_UIDCostLimit:='('+str_UIDCostLimit+')';
+   end;
+end;
+
 procedure str_makeAllHints;
 var
 uid,arm: byte;
-IENRG,
-ILIMIT,
-ITIME,
 ITEMP  : shortstring;
 procedure AddLineUnitGameHint(line:shortstring);
 begin
@@ -933,20 +953,17 @@ begin
      with g_uids[uid] do
        str_AddToStrList(@uid_HintInGame,ui_HintLineLenUnit,false,false,line); //
 end;
-procedure AddLineUnitDocHint(line1:shortstring;step:boolean=false);
+procedure AddLineUnitDocHint(line1:shortstring);
 begin
    if(length(line1)>0)then
      with g_uids[uid] do
-     begin
-        if(step)then line1:='  '+line1;
-        str_AddToStrList(@uid_HintDoc,ui_DocLineLen1,false,false,line1);
-     end;
+       str_AddToStrList(@uid_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
 end;
-procedure AddLineAbilityHint(line:shortstring);
+procedure AddLineAbilityGameHint(line:shortstring);
 begin
    if(length(line)>0)then
      with g_aids[uid] do
-       str_AddToStrList(@ua_HintInGame,ui_DocLineLen1,false,false,line); // ui_DocLineLen
+       str_AddToStrList(@ua_HintInGame,ui_HintLineLenUnit,false,false,tc_docbr+line); //
 end;
 function DocValI(val:integer;cchar:char=#0):shortstring;
 begin
@@ -969,26 +986,19 @@ begin
    //   UNITS
    for uid:=0 to 255 do
      with g_uids[uid] do
+     if(uid_r>0)then
      begin
         // Basics
-        IENRG :='';
-        ITIME :='';
-        ILIMIT:='';
         ITEMP :='';
 
+        uid_str_NameHK:=uid_str_Name;
         uid_str_HK:=str_ProductionHotKey(uid_uibtn);
-        if(length(uid_str_HK)>0)
-        then uid_str_NameHK:=uid_str_Name+' ('+uid_str_HK+')'
-        else uid_str_NameHK:=uid_str_Name;
+        if(length(uid_str_HK)>0)then
+          uid_str_NameHK+=' ('+uid_str_HK+')';
 
-        if(uid_EnergyReq  >0)then IENRG:=tc_aqua +i2s(uid_EnergyReq  )+tc_default;
-        if(uid_ProdTimeSec>0)then ITIME:=tc_white+i2s(uid_ProdTimeSec)+tc_default;
-        ILIMIT:=tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default;
-        if(length(IENRG )>0)then STRADD(@ITEMP,IENRG ,sep_comma);
-        if(length(ILIMIT)>0)then STRADD(@ITEMP,ILIMIT,sep_comma);
-        if(length(ITIME )>0)then STRADD(@ITEMP,ITIME ,sep_comma);
-        uid_str_CostLimit   :='('+ITEMP+')';
-        uid_str_DefaultAttr :=str_UnitAttributes(nil,uid);
+        uid_str_CostLimit:=str_UIDCostLimit(uid);
+
+        uid_str_DefaultAttr:=str_UnitAttributes(nil,uid);
 
         uid_str_Prod:='';
         ITEMP:=str_UnitProductBy(uid);
@@ -1043,31 +1053,49 @@ begin
         AddLineUnitGameHint(uid_str_Reqs);
         AddLineUnitGameHint(uid_str_Prod);
 
-        // Basic Doc hint
-        AddLineUnitDocHint(str_doc_HotKey         +uid_str_HK                );
-        AddLineUnitDocHint(str_doc_Attributes     +tc_nl1+uid_str_DefaultAttr);
-        AddLineUnitDocHint(str_doc_MaxHits        +li2s(uid_MaxHits1)        );
-        AddLineUnitDocHint(str_doc_ProdEnergy     +IENRG                     );
-        AddLineUnitDocHint(str_doc_ProdTime       +ITIME                     );
-        AddLineUnitDocHint(str_doc_Limit          +ILIMIT                    );
+        // Basic Doc hint //////////////////////////////////////////////////////
+        AddLineUnitDocHint(str_doc_HotKey         +uid_str_HK        );
+        AddLineUnitDocHint(str_doc_Attributes     );
+        AddLineUnitDocHint(uid_str_DefaultAttr    );
+        AddLineUnitDocHint(str_doc_MaxHits        +li2s(uid_MaxHits1));
+        if(uid_req_EnergyLevel>0)then
+        AddLineUnitDocHint(str_doc_ReqEnergy      +DocValI(uid_req_EnergyLevel,tc_aqua  ));
+        if(uid_req_HellPower>0)then
+        AddLineUnitDocHint(str_doc_ReqHellPower   +DocValI(uid_req_HellPower  ,tc_yellow));
+        if(uid_req_UACLoot  >0)then
+        AddLineUnitDocHint(str_doc_ReqUACLoot     +DocValI(uid_req_UACLoot    ,tc_lime  ));
+        AddLineUnitDocHint(str_doc_Limit          +tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default);
+        AddLineUnitDocHint(str_doc_ProdTime       +DocValI(uid_ProdTimeSec    ,tc_white ));
         AddLineUnitDocHint(str_doc_Size           +i2s(uid_r)                );
+        if(uid_MSpeed_Base>0)then
         AddLineUnitDocHint(str_doc_BaseMSpeed     +DocValI(uid_MSpeed_Base)  );
         AddLineUnitDocHint(str_doc_BaseSightR     +i2s(uid_SightR_Base)      );
+        if(uid_Regen_Base>0)then
         AddLineUnitDocHint(str_doc_BaseRegen      +DocValI(uid_Regen_Base   ));
         if(not uid_isbuilding)then
         begin
-        AddLineUnitDocHint(str_doc_PainC          +DocValI(uid_PainState_Base   ));
-        AddLineUnitDocHint(str_doc_TransportSize  +DocValI(uid_TransportSize    ));
-        AddLineUnitDocHint(str_doc_LevelDamageBonus+DocValI(uid_LevelBonusDamage));
-        AddLineUnitDocHint(str_doc_LevelArmorBonus+DocValI(uid_LevelBonusArmor  ));
+           AddLineUnitDocHint(str_doc_PainC           +DocValI(uid_PainState_Base   ));
+           AddLineUnitDocHint(str_doc_TransportSize   +DocValI(uid_TransportSize    ));
+           if(uid_LevelBonusDamage>0)then
+           AddLineUnitDocHint(str_doc_LevelDamageBonus+DocValI(uid_LevelBonusDamage ));
+           if(uid_LevelBonusArmor>0)then
+           AddLineUnitDocHint(str_doc_LevelArmorBonus +DocValI(uid_LevelBonusArmor  ));
+           if(uid_PainState_Base>0)then
+           AddLineUnitDocHint(str_doc_LevelPainSBonus +DocValI(uid_LevelBonusPainC  ));
         end;
+        if(uid_TransportMax_Base>0)then
         AddLineUnitDocHint(str_doc_TransportCpst  +DocValI(uid_TransportMax_Base));
-        AddLineUnitDocHint(str_hint_SplashResist  +': '+str_YesNoG[uid_SplashResist or uid_ismech]);
-        AddLineUnitDocHint(str_hint_IncEnergyLevel+': '+DocValI(uid_EnergyGen,tc_aqua));
+        AddLineUnitDocHint(str_hint_SplashResist  +': '+str_YesNoG[uid_isbuilding or uid_ismech]);
+        if(uid_gen_EnergyLevel >0)then
+        AddLineUnitDocHint(str_hint_IncEnergyLevel+': '+DocValI(uid_gen_EnergyLevel ,tc_aqua  ));
+        if(uid_bounty_HellPower>0)then
+        AddLineUnitDocHint(str_doc_BountyHellPower+': '+DocValI(uid_bounty_HellPower,tc_yellow));
+        if(uid_bounty_UACLoot  >0)then
+        AddLineUnitDocHint(str_doc_BountyUACLoot  +': '+DocValI(uid_bounty_UACLoot  ,tc_lime  ));
         if(uid_ZombieUID>0)then
         begin
-        AddLineUnitDocHint(str_doc_ZombieUID      +'"'+g_uids[uid_ZombieUID].uid_str_name+'"');
-        AddLineUnitDocHint(str_doc_ZombieHits     +i2s(uid_ZombieHits)       );
+           AddLineUnitDocHint(str_doc_ZombieUID   +'"'+g_uids[uid_ZombieUID].uid_str_name+'"');
+           AddLineUnitDocHint(str_doc_ZombieHits  +i2s(uid_ZombieHits)       );
         end;
         if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
         AddLineUnitDocHint(str_doc_DeathUnit+'"'+g_uids[uid_DeathUID].uid_str_name+'"x'+b2s(uid_DeathUIDn));
@@ -1080,14 +1108,14 @@ begin
 
         if(uid_CanAttack)then
         begin
-           AddLineUnitDocHint(' ');
+           AddLineUnitDocHint(tc_docbr);
            AddLineUnitDocHint(str_hint_UnitArming);
            for arm:=0 to LastUnitArms do
              AddLineUnitDocHint(str_UnitArmLine(uid,arm,false));
            AddLineUnitDocHint(uid_str_ArmsCommon);
         end;
 
-        AddLineUnitDocHint(' ');
+        AddLineUnitDocHint(tc_docbr);
         AddLineUnitDocHint(str_ui_Tab[tab_Upgrades]+':');
         AddLineUnitDocHint(str_DocUpgradeLine('- '+str_doc_UpgrArmor    ,uid_Armor_upgr1      ,uid_Armor_upgrV       ));
         AddLineUnitDocHint(str_DocUpgradeLine('- '+str_doc_UpgrArmor    ,uid_Armor_upgr2      ,uid_Armor_upgrV       ));
@@ -1145,6 +1173,8 @@ begin
           uat_UnitEnemy: STRADD(@ua_str_Common,str_ability_UnitEnemy,sep_sdot);
           end;
 
+          if(ua_req_HellPower>0)then STRADD(@ua_str_Common,str_doc_ReqHellPower+tc_yellow+i2s(ua_req_HellPower)+tc_default,sep_sdot);
+          if(ua_req_UACLoot  >0)then STRADD(@ua_str_Common,str_doc_ReqUACLoot  +tc_lime  +i2s(ua_req_UACLoot  )+tc_default,sep_sdot);
           if(ua_reload>0)then
           begin
              STRADD(@ua_str_Common,str_ability_reload+tc_aqua+ir2s(ua_reload)+tc_default+' '+str_hint_sec,sep_sdot);
@@ -1158,18 +1188,18 @@ begin
 
           str_StringListClear(@ua_HintInGame);
 
-          AddLineAbilityHint(ua_str_Descript);
-          AddLineAbilityHint(ua_str_Common);
-          AddLineAbilityHint(ua_str_ReloadFactors);
-          AddLineAbilityHint(ua_str_Reqs);
+          AddLineAbilityGameHint(ua_str_Descript);
+          AddLineAbilityGameHint(ua_str_Common);
+          AddLineAbilityGameHint(ua_str_ReloadFactors);
+          AddLineAbilityGameHint(ua_str_Reqs);
 
           if(ua_mbrush_hint>0)then
             with g_uids[ua_mbrush_hint] do
             begin
-               AddLineAbilityHint(' ');
-               AddLineAbilityHint(uid_str_name);
-               AddLineAbilityHint(uid_str_CostLimit);
-               AddLineAbilityHint(uid_str_1LineDescript);
+               AddLineAbilityGameHint(tc_docbr);
+               AddLineAbilityGameHint(uid_str_name);
+               AddLineAbilityGameHint(str_UIDCostLimit(ua_mbrush_hint,ua_mbrush_hint_HalfProdTime));
+               AddLineAbilityGameHint(uid_str_1LineDescript);
             end;
        end;
 
@@ -1177,34 +1207,35 @@ begin
    //   UNITS ABITIES (DOC)
    for uid:=0 to 255 do
      with g_uids[uid] do
+     if(uid_r>0)then
      begin
         if(uid_HaveAbility)then
         begin
-           AddLineUnitDocHint(' ');
+           AddLineUnitDocHint(tc_docbr);
            AddLineUnitDocHint(str_hint_Abilities);
            if(uid_ability1>0)then
              with g_aids[uid_ability1] do
              begin
                 AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability1,255)+': '+ua_str_Descript);
-                AddLineUnitDocHint(ua_str_Common       ,true);
-                AddLineUnitDocHint(ua_str_ReloadFactors,true);
-                AddLineUnitDocHint(ua_str_Reqs         ,true);
+                AddLineUnitDocHint(ua_str_Common       );
+                AddLineUnitDocHint(ua_str_ReloadFactors);
+                AddLineUnitDocHint(ua_str_Reqs         );
              end;
            if(uid_ability2>0)then
              with g_aids[uid_ability2] do
              begin
                 AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability2,255)+': '+ua_str_Descript);
-                AddLineUnitDocHint(ua_str_Common       ,true);
-                AddLineUnitDocHint(ua_str_ReloadFactors,true);
-                AddLineUnitDocHint(ua_str_Reqs         ,true);
+                AddLineUnitDocHint(ua_str_Common       );
+                AddLineUnitDocHint(ua_str_ReloadFactors);
+                AddLineUnitDocHint(ua_str_Reqs         );
              end;
            if(uid_ability3>0)then
              with g_aids[uid_ability3] do
              begin
                 AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability3,255)+': '+ua_str_Descript);
-                AddLineUnitDocHint(ua_str_Common       ,true);
-                AddLineUnitDocHint(ua_str_ReloadFactors,true);
-                AddLineUnitDocHint(ua_str_Reqs         ,true);
+                AddLineUnitDocHint(ua_str_Common       );
+                AddLineUnitDocHint(ua_str_ReloadFactors);
+                AddLineUnitDocHint(ua_str_Reqs         );
              end;
         end;
         AddLineUnitDocHint(' ');
@@ -1213,17 +1244,17 @@ end;
 
 procedure str_camp_SetMissionPlot(mission:byte;newPara:boolean;text:shortstring);
 begin
-   str_AddToStrList(@str_camp_MissionInfo[mission],37,newPara,true,text);
+   //str_AddToStrList(@str_camp_MissionInfo[mission],37,newPara,true,text);
 end;
 
 function str_camp_SetMapInfo(date,location,area:shortstring):shortstring;
 begin
-   str_camp_SetMapInfo:=str_cmp_Date    +tc_nl3+
+   str_camp_SetMapInfo:='';{str_cmp_Date    +tc_nl3+
                           str_Center0(date    ,14)+tc_nl3+
                         str_cmp_Location+tc_nl3+
                           str_Center0(location,14)+tc_nl3+
                         str_cmp_Area    +tc_nl3+
-                          str_Center0(area    ,14);
+                          str_Center0(area    ,14)};
 end;
 
 procedure menu_set_hint(item,itemPos:byte;itemHint:shortstring);

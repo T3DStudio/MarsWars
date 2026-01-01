@@ -66,12 +66,16 @@ begin
                             setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_alime;
                             end;
-        EID_Invuln        : begin
+        EID_UnitCaptured  : begin
+                            setEID(@spr_eff_gtel       ,sms_death);
+                            smask :=c_ablue;
+                            end;
+        EID_PowerUp       : begin
                             setEID(@spr_eff_gtel       ,sms_death);
                             smask :=c_awhite;
                             end;
         EID_Teleport      : setEID(@spr_eff_tel        ,sms_death);
-        EID_InfantryGibs         : setEID(@spr_eff_g          ,sms_death);
+        EID_InfantryGibs  : setEID(@spr_eff_g          ,sms_death);
         MID_Blizzard,
         EID_BExp          : setEID(@spr_eff_eb         ,sms_death);
         EID_BBExp         : setEID(@spr_eff_ebb        ,sms_death);
@@ -172,7 +176,7 @@ MID_Flyer         : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Imp           : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Cacodemon     : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
-MID_Baron,//         : setEff(6 ,0 ,-1 ,-1       ,false,0 );
+MID_Baron,
 MID_URocketS,
 MID_URocket,
 MID_Revenant      : setEff(7 ,0 , 8 ,-1       ,false,0 );
@@ -195,9 +199,10 @@ EID_ArchFire      : setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 EID_HLevelUp,
 EID_ULevelUp,
 EID_HVision,
-EID_Invuln,
+EID_UnitCaptured,
+EID_PowerUp,
 EID_Teleport      : setEff(10,0 ,-1 ,-1       ,true ,0 );
-EID_InfantryGibs         : setEff(7 ,0 ,-1 ,dead_time,true ,0 );
+EID_InfantryGibs  : setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
 EID_BExp          : setEff(5 ,0 ,-1 ,-1       ,true ,0 );
 MID_Blizzard,
@@ -213,7 +218,7 @@ UID_UATurret,
 EID_db_h0,
 EID_db_h1,
 EID_db_u0,
-EID_db_u1         : setEff(0 ,0 ,0  ,dead_time,false,0 );
+EID_db_u1         : setEff(0 ,0 ,0  ,dead_time ,false,0 );
       else exit;
       end;
 
@@ -264,8 +269,8 @@ begin
          with g_mids[m_mid] do
            if(m_vstep>0)then
            begin
-              spr:=_sm2s(mid_SpriteModel,sms_stand,m_dir,0,nil);
-              SpriteListAddEffect(m_vx,m_vy,draw_DefaultSpriteDepth(m_vy,m_mfs)+100,0,spr,255);
+              spr:=SpriteModel2Sprite(mid_SpriteModel,sms_stand,m_dir,0,nil);
+              SpriteList_AddEffect(m_vx,m_vy,draw_DefaultSpriteDepth(m_vy,m_mfs)+100,0,spr,255);
            end;
 end;
 
@@ -319,10 +324,10 @@ EID_HAKeep_S  : alpha:=255-(anim_last_i_t*4);
         end;
 
         if(anim_step>0)
-        then spr:=_sm2s(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
-        else spr:=_sm2s(smodel,anim_smstate,270,anim_i              ,@anim_stat);
+        then spr:=SpriteModel2Sprite(smodel,anim_smstate,270,anim_i div anim_step,@anim_stat)
+        else spr:=SpriteModel2Sprite(smodel,anim_smstate,270,anim_i              ,@anim_stat);
 
-        if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteListAddEffect(x,y,d,smask,spr,alpha);
+        if(RectInCam(x,y,spr^.hw,spr^.hh,0))then SpriteList_AddEffect(x,y,d,smask,spr,alpha);
      end;
 end;
 

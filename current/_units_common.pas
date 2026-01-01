@@ -1,3 +1,8 @@
+
+
+function unit_ProdStopUpgrade(uSmith  :PTUnit;upid:byte;all,         check:boolean):cardinal;forward;
+function unit_ProdStopUnit   (uBarrack:PTUnit;puid:byte;all,canceled,check:boolean):cardinal;forward;
+
 {$IFDEF _FULLGAME}
 procedure unit_UpdateMiniMapXY(pu:PTUnit);
 begin
@@ -17,46 +22,52 @@ begin
    end;
 end;
 
-procedure effect_LevelUp(pu:PTUnit;etype:byte;pUIVision:pboolean);
-begin
-   with pu^ do
-   begin
-      if(pUIVision<>nil)then
-      begin
-         if(not pUIVision^)then exit;
-      end
-      else
-         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-      case etype of
-EID_HVision : begin
-              snd_SoundPlayUnit(snd_hell_eye,pu,nil);
-              effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_HVision);
-              end;
-EID_Invuln  : begin
-              snd_SoundPlayUnit(snd_PowerUp,pu,nil);
-              effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_Invuln);
-              end;
-      else
+procedure effect_Common(pu:PTUnit;etype:byte;pUIVision:pboolean);
+begin
+   if(pUIVision<>nil)then
+   begin
+      if(not pUIVision^)then exit;
+   end
+   else
+      if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
+
+   with pu^ do
+     case etype of
+     EID_PowerUp,
+     EID_UnitCaptured,
+     EID_HVision,
+     EID_HLevelUp,
+     EID_ULevelUp    : begin
+                          case etype of
+                          EID_HLevelUp,
+                          EID_ULevelUp,
+                          EID_PowerUp     : snd_SoundPlayUnit(snd_PowerUp        ,pu,nil);
+                          EID_UnitCaptured: snd_SoundPlayUnit(snd_KeyPointCapture,pu,nil);
+                          EID_HVision     : snd_SoundPlayUnit(snd_hell_eye       ,pu,nil);
+                          end;
+
+                          effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),etype);
+                       end;
+     else
                case uid^.uid_race of
-      r_hell : begin
-                  snd_SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
-                  effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_HLevelUp);
+               r_hell: begin
+                          snd_SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
+                          effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),EID_HLevelUp);
+                       end;
+               r_uac : begin
+                          snd_SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
+                          effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),EID_ULevelUp);
+                       end;
                end;
-      r_uac  : begin
-                  snd_SoundPlayUnit(snd_unit_adv[uid^.uid_race],pu,nil);
-                  effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),EID_ULevelUp);
-               end;
-               end;
-      end;
-   end;
+     end;
 end;
 
 procedure effect_RStationShot(pu:PTUnit);
 begin
    with pu^ do
    begin
-      effect_add(vx,vy-15,draw_DefaultSpriteDepth(vy+10,ukfly),EID_Exp2);
+      effect_add(vx,vy-15,draw_DefaultSpriteDepth(vy+10,isfly),EID_Exp2);
       snd_SoundPlayUnit(snd_bomblaunch,nil,nil)
    end;
 end;
@@ -85,7 +96,7 @@ begin
              if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
           snd_SoundPlayUnit(uid_snd_Summon,nil,nil);
-          effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),uid_eid_Summon[level]);
+          effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_Summon[level]);
 
           if(playeri=UIPlayer)then snd_SoundPlayUnit(uid_snd_ready,nil,nil);
        end;
@@ -96,7 +107,7 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(not ukfly)and(uid_eid_bcrater>0)and(uid_isbuilding)then
+      if(not isfly)and(uid_eid_bcrater>0)and(uid_isbuilding)then
         effect_add(vx,vy+uid_eid_bcrater_y,sd_liquid+vy,uid_eid_bcrater);
 
       if(pUIVision<>nil)then
@@ -108,7 +119,7 @@ begin
 
       if(fastdeath)then
       begin
-         effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),uid_eid_DeathFast[level]);
+         effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_DeathFast[level]);
          snd_SoundPlayUnit(uid_snd_DeathFast,nil,nil);
       end
       else
@@ -131,7 +142,7 @@ begin
       else
         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),uid_eid_Pain[level]);
+      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_Pain[level]);
       snd_SoundPlayUnit(uid_snd_Pain,nil,nil);
    end;
 end;
@@ -164,12 +175,12 @@ begin
 
       if(start)then
       begin
-         effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),aw_eid_start);
+         effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),aw_eid_start);
          snd_SoundPlayUnit(aw_snd_start,nil,nil);
       end
       else
       begin
-         effect_add(vx+aw_offset_x,vy+aw_offset_y,draw_DefaultSpriteDepth(vy+1,ukfly),aw_eid_shot );
+         effect_add(vx+aw_offset_x,vy+aw_offset_y,draw_DefaultSpriteDepth(vy+1,isfly),aw_eid_shot );
          snd_SoundPlayUnit(aw_snd_shot,nil,nil);
       end;
    end;
@@ -206,7 +217,7 @@ begin
               if((aw_req_flags and wpr_move)=0)then exit;
 
         if(not uid_isbuilding)then
-          if(buffs[ub_Pain]>0)
+          if(buffs[ub_PainState]>0)
           or(buffs[ub_Cast]>0)then exit;
 
         unit_canMove:=true;
@@ -225,7 +236,7 @@ begin
 
       if(check_buffs)then
         if(not uid_isbuilding)then
-          if(buffs[ub_Pain]>0)
+          if(buffs[ub_PainState]>0)
           or(buffs[ub_Cast]>0)then exit;
 
       if(IsUnitRange(transportU,nil))then exit;
@@ -375,9 +386,9 @@ begin
       tx:=mm3i(0,tx,map_Size1);
       ty:=mm3i(0,ty,map_Size1);
       {$IFDEF _FULLGAME}
-      effect_teleport(vx,vy,tx,ty,ukfly,eidstart,eidend,snd);
+      effect_teleport(vx,vy,tx,ty,isfly,eidstart,eidend,snd);
       {$ENDIF}
-      buffs[ub_Teleport]:=fr_fps1;
+      buffs[ub_Teleported]:=fr_fps1;
       unit_SetXY(pu,tx,ty,mvxy_strict);
       unit_OrderClear(pu,255);
       unit_clear_tar(unum);
@@ -413,6 +424,24 @@ begin
      end;
 end;
 
+function unit_CheckWeapons(pu:PTUnit):boolean;
+var a:byte;
+begin
+   unit_CheckWeapons:=false;
+   with pu^ do
+   with player^ do
+   with uid^ do
+     for a:=0 to LastUnitArms do
+       with uid_arms[a] do
+         if(aw_type>0)then
+         begin
+            if(aw_req_uid >0)and(units_uid_c[aw_req_uid ]<=0)then continue;
+            if(aw_req_upgr>0)and(upgrs_cur  [aw_req_upgr] =0)then continue;
+            unit_CheckWeapons:=true;
+            break;
+         end;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   ABILITY
@@ -442,6 +471,9 @@ begin
       unit_ability_HellVision:=ureq_other;
       if(not iscomplete)
       or(hits<=0)then exit;
+
+      unit_ability_HellVision:=ureq_reloading;
+      if(rld>0)then exit;
    end;
 
    unit_ability_HellVision:=0;
@@ -452,22 +484,19 @@ begin
 
    with pTarget^ do
      if(not iscomplete)
+     or(IsUnitRange(TransportU,nil))
      or(hits<=0)
-     or(pCaster^.player^.team<>player^.team)
-     or(buffs[ub_HVision]>fr_fps1)
-     or(buffs[ub_Detect ]>0)then exit;
+     or(player^.team<>pCaster^.player^.team)
+     or(buffs[ub_HellVision]>0)
+     or(buffs[ub_Detector    ]>0)then exit;
 
    unit_ability_HellVision:=0;
 
-   with pCaster^ do
-   with player^  do
-   begin
-      pTarget^.buffs[ub_HVision]:=hell_vision_time;
-      {$IFDEF _FULLGAME}
-      effect_LevelUp(pTarget,EID_Hvision,nil);
-      {$ENDIF}
-      unit_kill(pCaster,false,true,false,true,true);
-   end;
+   pTarget^.buffs[ub_HellVision]:=hell_vision_time;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_Hvision,nil);
+   {$ENDIF}
+   unit_kill(pCaster,false,true,false,true,true);
 end;
 
 function unit_ability_Recall(pTeleporter:PTUnit;tar,tard:integer;check:boolean):cardinal;
@@ -491,9 +520,9 @@ begin
    with uid^ do
      if(uid_isbuilding)
      or(not iscomplete)
-     or(ukfly)
+     or(isfly)
      or(hits<=0)
-     or(buffs[ub_Teleport]>0)
+     or(buffs[ub_Teleported]>0)
      or(pTeleporter^.playeri<>playeri)
      then exit;
 
@@ -525,15 +554,15 @@ begin
    unit_ability_teleport:=false;
    with pTarget^  do
    with uid^ do
-     if(not uid_isbuilding)and(iscomplete)and(not ukfly)and(pTeleporter^.hits>0)and(pTeleporter^.iscomplete)then
-       if(playeri=pTeleporter^.playeri)and(buffs[ub_Teleport]<=0)then
+     if(not uid_isbuilding)and(iscomplete)and(not isfly)and(pTeleporter^.hits>0)and(pTeleporter^.iscomplete)then
+       if(playeri=pTeleporter^.playeri)and(buffs[ub_Teleported]<=0)then
          if(td<=pTeleporter^.uid^.uid_r)and(pTeleporter^.rld<=0)then
          begin
             if(not IsUnitRange(pTeleporter^.rpoint_tar,@pTBeacon))then exit;
             if(pTeleporter^.player^.team<>pTBeacon^.player^.team)
             or(pTBeacon^.hits<=0)then exit;
 
-            if(ukfly=uf_ground)then
+            if(isfly=uf_ground)then
               if(map_IfObstacleZone(pTBeacon^.mapZone))then exit;
 
             pTeleporter^.rpoint_x:=pTBeacon^.x;
@@ -571,43 +600,348 @@ begin
      end;
 end;
 
-function unit_ability_HInvuln(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+function unit_ability_SphereSoul(pCaster:PTUnit;target:integer;check:boolean):cardinal;
 var pTarget:PTUnit;
 begin
    // pCaster - caster
    // pTarget - target
    with pCaster^ do
    begin
-      unit_ability_HInvuln:=ureq_other;
+      unit_ability_SphereSoul:=ureq_other;
       if(not iscomplete)
       or(hits<=0)then exit;
 
-      unit_ability_HInvuln:=ureq_reloading;
+      unit_ability_SphereSoul:=ureq_reloading;
       if(rld>0)then exit;
    end;
 
-   unit_ability_HInvuln:=0;
+   unit_ability_SphereSoul:=0;
    if(check)then exit;
 
-   unit_ability_HInvuln:=ureq_InvalidTarget;
+   unit_ability_SphereSoul:=ureq_InvalidTarget;
    if(not IsUnitRange(target,@pTarget))then exit;
 
-   if(pTarget^.hits<=0)
-   or(pTarget^.buffs[ub_Invuln]>0)then exit;
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(hits>=uid_MaxHits1)
+      or(IsUnitRange(TransportU,nil))
+      or(not iscomplete)
+      or(uid_isbuilding)then exit;
 
-   unit_ability_HInvuln:=0;
+      unit_ability_SphereSoul:=0;
 
-   pTarget^.buffs[ub_Invuln]:=invuln_time;
+      hits:=mm3i(1,hits+soul_heal,uid_MaxHits1);
+   end;
+
    {$IFDEF _FULLGAME}
-   effect_LevelUp(pTarget,EID_Invuln,nil);
+   effect_Common(pTarget,EID_ULevelUp,nil);
    {$ENDIF}
+end;
+
+function unit_ability_SphereInvis(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_SphereInvis:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_SphereInvis:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_SphereInvis:=0;
+   if(check)then exit;
+
+   unit_ability_SphereInvis:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(IsUnitRange(TransportU,nil))
+      or(not iscomplete)
+      or(uid_isbuilding)
+      or(buffs[ub_SphereInvis ]>0)
+      or(buffs[ub_Invisibility]>0)then exit;
+
+      unit_ability_SphereInvis:=0;
+
+      buffs[ub_SphereInvis ]:=invis_time;
+      buffs[ub_Invisibility]:=invis_time;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_ULevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereInvuln(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_SphereInvuln:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_SphereInvuln:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_SphereInvuln:=0;
+   if(check)then exit;
+
+   unit_ability_SphereInvuln:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(IsUnitRange(TransportU,nil))
+      or(not iscomplete)
+      or(uid_isbuilding)
+      or(buffs[ub_SphereInvuln]>0)then exit;
+
+      unit_ability_SphereInvuln:=0;
+
+      buffs[ub_SphereInvuln]:=invuln_time;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_ULevelUp,nil);
+   {$ENDIF}
+end;
+
+
+function unit_ability_SphereRDamage(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_SphereRDamage:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_SphereRDamage:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_SphereRDamage:=0;
+   if(check)then exit;
+
+   unit_ability_SphereRDamage:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(IsUnitRange(TransportU,nil))
+      or(buffs[ub_SphereRDamage]>0)
+      or(buffs[ub_Heroic       ]>0)then exit;
+
+      unit_ability_SphereRDamage:=0;
+
+      buffs[ub_SphereRDamage]:=rdamage_time;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_HLevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereDDamage(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_SphereDDamage:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_SphereDDamage:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_SphereDDamage:=0;
+   if(check)then exit;
+
+   unit_ability_SphereDDamage:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(IsUnitRange(TransportU,nil))
+      or(not iscomplete)
+      or(not unit_CheckWeapons(pTarget))
+      or(buffs[ub_SphereDDamage]>0)
+      or(buffs[ub_Heroic       ]>0)then exit;
+
+      unit_ability_SphereDDamage:=0;
+
+      buffs[ub_SphereDDamage]:=ddamage_time;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_HLevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereTurbo(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_SphereTurbo:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_SphereTurbo:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_SphereTurbo:=0;
+   if(check)then exit;
+
+   unit_ability_SphereTurbo:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(IsUnitRange(TransportU,nil))
+      or(buffs[ub_Heroic     ]>0)
+      or(buffs[ub_SphereTurbo]>0)then exit;
+
+      if not(
+      (unit_CheckWeapons(pTarget))or
+      (uid_MSpeed_Base>0)or
+      ((uid_Regen_Base>0)and(hits<UID_MaxHits1))or
+      (not iscomplete   )or
+      (unit_ProdStopUpgrade(pTarget,255,true      ,true)=0)or
+      (unit_ProdStopUnit   (pTarget,255,true,false,true)=0)or
+      (rld>0            )
+      )then exit;
+
+      unit_ability_SphereTurbo:=0;
+
+      buffs[ub_SphereTurbo]:=dturbo_time;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_HLevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_UACHeroic(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_UACHeroic:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_UACHeroic:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_UACHeroic:=0;
+   if(check)then exit;
+
+   unit_ability_UACHeroic:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(IsUnitRange(TransportU,nil))
+      or(uid_race<>r_uac)
+      or(uid_isbuilding)
+      or(buffs[ub_Heroic]>0)then exit;
+
+      unit_ability_UACHeroic:=0;
+
+      buffs[ub_SphereTurbo  ]:=0;
+      buffs[ub_SphereDDamage]:=0;
+      buffs[ub_SphereRDamage]:=0;
+      buffs[ub_Heroic       ]:=ub_infinity;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_PowerUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_Bribe(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+var
+pTarget: PTUnit;
+u      : integer;
+begin
+   // pCaster - caster
+   // pTarget - target
+   with pCaster^ do
+   begin
+      unit_ability_Bribe:=ureq_other;
+      if(not iscomplete)
+      or(hits<=0)then exit;
+
+      unit_ability_Bribe:=ureq_reloading;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_Bribe:=0;
+   if(check)then exit;
+
+   unit_ability_Bribe:=ureq_InvalidTarget;
+   if(not IsUnitRange(target,@pTarget))then exit;
+
+   with pTarget^ do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(player^.team=pCaster^.player^.team)
+      or(IsUnitRange(TransportU,nil))
+      or(uid_race<>r_uac)
+      or(uid_isbuilding)
+      or(buffs[ub_Heroic]>0)then exit;
+   end;
+
+   for u:=1 to MaxUnits do
+     with g_units[u] do
+       if(hits>0)and(playeri=pCaster^.playeri)then
+         if(point_dist_int(x,y,pTarget^.x,pTarget^.y)<=(srange+uid^.uid_r+pTarget^.uid^.uid_r))then
+         begin
+            unit_ability_Bribe:=0;
+            break;
+         end;
+
+   if(unit_ability_Bribe>0)then exit;
+
+   unit_ability_Bribe:=unit_TryChangeOwner(pTarget,pCaster^.player,true,false);
 end;
 
 procedure unit_UACStrike_missile(pu:PTUnit);
 begin
    with pu^ do
    begin
-      missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
+      missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot,false);
       {$IFDEF _FULLGAME}
       effect_RStationShot(pu);
       {$ENDIF}
@@ -662,12 +996,7 @@ begin
       {$IFDEF _FULLGAME}
       else
         with g_uids[auid] do
-          effect_InPoint(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),nil,uid_eid_DeathFast[0],uid_snd_DeathFast);
-
-        {case auid of
-//UID_Phantom : effect_InPoint(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),nil,auid,snd_explode_plasmasnd_explode_plasma);
-UID_LostSoul:
-        end; } //
+          effect_InPoint(tx,ty,draw_DefaultSpriteDepth(ty+1,isfly),nil,uid_eid_DeathFast[0],uid_snd_DeathFast);
       {$ENDIF};
    end;
 end;
@@ -707,6 +1036,31 @@ begin
       buffs[ub_Cast]:=rld div 2;
    end;
 end;
+
+function unit_AddExp(pu:PTUnit;exp:cardinal;forceUp,check:boolean):cardinal;
+begin
+   unit_AddExp:=ureq_MaxLevel;
+   with pu^ do
+     if(level<LastUnitLevel)then
+       with uid^ do
+       begin
+          unit_AddExp:=0;
+          if(check)then exit;
+
+          a_exp+=exp;
+          if(a_exp>=ExpLevel1)or(forceUp)then
+          begin
+             level+=1;
+             a_exp:=0;
+             GameLog_UnitPromoted(pu);
+             {$IFDEF _FULLGAME}
+             effect_Common(pu,0,nil);
+             {$ENDIF}
+          end;
+       end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
 
 procedure math_1c_push(tx,ty:pinteger;x0,y0,r0:integer);
 var vx,vy,a:single;
@@ -834,7 +1188,7 @@ begin
    for u:=1 to MaxUnits do
     with g_units[u] do
      with uid^ do
-      if(hits>0)and(ukfly=uid_isfly)and(unum<>ignore_unum)then
+      if(hits>0)and(isfly=uid_isfly)and(unum<>ignore_unum)then
        if(speed<=0)or(not iscomplete)then
         if(not IsUnitRange(transportU,nil))then
         begin
@@ -915,7 +1269,7 @@ begin
    for u:=1 to MaxUnits do
     with g_units[u] do
      with uid^ do
-      if(hits>0)and(speed<=0)and(ukfly=aukfly)and(iscomplete)and(playeri=pl)and(uid_isbuilder)and(not ukfly)then
+      if(hits>0)and(speed<=0)and(isfly=aukfly)and(iscomplete)and(playeri=pl)and(uid_isbuilder)and(not isfly)then
        if(player^.units_builders_s=0)or(isselected)then
         if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
         begin
@@ -965,7 +1319,7 @@ begin
     if(u<>skipunit)then
      with g_punits[u]^ do
       with uid^ do
-       if(hits>0)and(ukfly=flylevel)and(IsUnitRange(transportU,nil)=false)then
+       if(hits>0)and(isfly=flylevel)and(IsUnitRange(transportU,nil)=false)then
         if(speed<=0)or(not iscomplete)then
          if(point_dist_int(x,y,tx,ty)<(tr+uid_r))then
          begin
@@ -1054,7 +1408,7 @@ begin
    for u:=1 to MaxUnits do
     with g_punits[u]^ do
      with uid^ do
-      if(hits>0)and(iscomplete)and(uid_isbuilder)and(not ukfly)and(playeri=playerN)then
+      if(hits>0)and(iscomplete)and(uid_isbuilder)and(not isfly)and(playeri=playerN)then
        if(player^.units_builders_s=0)or(isselected)then
         if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
          if(buid in uid_prod_Buildings)and(IsUnitRange(transportU,nil)=false)then
@@ -1084,20 +1438,6 @@ cba_outBuildArea: CheckBuildPlace:=cbp_out;
    end;
 end;
 
-{function unit_ability_SpecReload(pu:PTUnit;ability:byte;newReload:integer):integer;
-var u:integer;
-begin
-   unit_ability_SpecReload:=0;
-   for u:=1 to MaxUnits do
-     with g_punits[u]^ do
-       if(hits>0)and(playeri=pu^.playeri)and(uid^.uid_ability=ability)then
-         if(newReload>0)
-         then rld:=newReload
-         else
-           if(rld>0)
-           then unit_ability_SpecReload:=max2i(rld,unit_ability_SpecReload);
-end;}
-
 function unit_ability_HKeepBlink(pu:PTUnit;x0,y0:integer;check:boolean):cardinal;
 begin
    with pu^ do
@@ -1110,23 +1450,23 @@ begin
       unit_ability_HKeepBlink:=0;
       if(check)then exit;
 
-      math_push_out(x0,y0,uid_r,unum,@x0,@y0,ukfly, true, team );
+      math_push_out(x0,y0,uid_r,unum,@x0,@y0,isfly, true, team );
       x0:=mm3i(1,x0,map_Size1);
       y0:=mm3i(1,y0,map_Size1);
 
       rld:=fr_fps1;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly,true,false,pu)<>cbr_no)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,false,pu)<>cbr_no)then
       begin
          unit_ability_HKeepBlink:=ureq_landplace;
-
          exit;
       end;
 
       buffs[ub_Cast]:=fr_fps1;
 
+      // нет эффекта когда телепортируемся в неразведанную область
       case uidi of
-      UID_HKeep : unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube{$ENDIF});   // нет эффекта когда телепортируемся в неразведанную область
+      UID_HKeep : unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube{$ENDIF});
       UID_HAKeep: unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube{$ENDIF});
       end;
    end;
@@ -1146,7 +1486,7 @@ begin
       if(rld>0)then exit;
 
       if(srange<point_dist_int(x,y,x0,y0))then math_1c_push(@x0,@y0,x,y,srange-1);
-      math_push_out(x0,y0,uid_r,unum,@x0,@y0,ukfly, true ,team );
+      math_push_out(x0,y0,uid_r,unum,@x0,@y0,isfly, true ,team );
       x0:=mm3i(1,x0,map_Size1);
       y0:=mm3i(1,y0,map_Size1);
 
@@ -1156,7 +1496,7 @@ begin
       unit_ability_HTowerBlink:=0;
       if(check)then exit;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,ukfly,true,false,pu )<>cbr_no)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,false,pu )<>cbr_no)then
       begin
          unit_ability_HTowerBlink:=ureq_landplace;
          rld:=fr_fps1;
@@ -1166,6 +1506,8 @@ begin
       unit_Teleport2Point(pu,x0,y0{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});  // нет эффекта когда телепортируемся в неразведанную область
    end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
 
 procedure unit_SetDefaults(pu:PTUnit;Client:boolean);
 begin
@@ -1193,7 +1535,6 @@ begin
       a_weap_cl:= 0;
       a_tar_cl := 0;
       a_exp    := 0;
-      a_exp_next:=ExpLevel1;
 
       aiu_alarm_timer :=0;
       aiu_alarm_d     :=NOTSET;
@@ -1219,38 +1560,38 @@ begin
    end;
 end;
 
-procedure unit_done_inc_cntrs(pu:PTUnit);
+procedure unit_IncCounters_Prod(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      if(uid_isbuilder  )then units_builders_ec  +=1;
-      if(uid_isbarrack  )then
+      if(uid_isbuilder)then units_builders_ec+=1;
+      if(uid_isbarrack)then
       begin
          units_unitProds_ec+=1;
          prod_unit_Max+=level+1;
       end;
-      if(uid_issmith    )then
+      if(uid_issmith  )then
       begin
          units_upgrProds_ec+=1;
          prod_upgr_Max+=level+1;
       end;
    end;
 end;
-procedure unit_done_dec_cntrs(pu:PTUnit);
+procedure unit_DecCounters_Prod(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      if(uid_isbuilder  )then units_builders_ec  -=1;
-      if(uid_isbarrack  )then
+      if(uid_isbuilder)then units_builders_ec-=1;
+      if(uid_isbarrack)then
       begin
          units_unitProds_ec-=1;
          prod_unit_Max-=level+1;
       end;
-      if(uid_issmith    )then
+      if(uid_issmith  )then
       begin
          units_upgrProds_ec-=1;
          prod_upgr_Max-=level+1;
@@ -1258,7 +1599,7 @@ begin
    end;
 end;
 
-procedure unit_bld_inc_cntrs(pu:PTUnit);
+procedure unit_IncCounters_Complete(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
@@ -1268,13 +1609,13 @@ begin
       if(units_ucl_u[uid_isbuilding,uid_uibtn]<=0)then units_ucl_u[uid_isbuilding,uid_uibtn]:=unum;
       units_ucl_c[uid_isbuilding,uid_uibtn]+=1;
       units_uid_c[uidi            ]+=1;
-      energyl_max+=uid_EnergyGen;
-      energyl_cur+=uid_EnergyGen;
-      unit_done_inc_cntrs(pu);
+      res_energyl_max+=uid_gen_EnergyLevel;
+      res_energyl_cur+=uid_gen_EnergyLevel;
+      unit_IncCounters_Prod(pu);
    end;
 end;
 
-procedure unit_inc_cntrs(pu:PTUnit;ubld,summoned:boolean);
+procedure unit_IncCounters(pu:PTUnit;ucomplete,usummoned:boolean);
 begin
    with pu^     do
    with uid^    do
@@ -1288,20 +1629,22 @@ begin
       units_uid_e[uidi                    ]+=1;
       if(uid_isbuilder)then units_builders_e+=1;
 
-      iscomplete:=ubld;
+      iscomplete:=ucomplete;
 
       if(iscomplete)
-      then unit_bld_inc_cntrs(pu)
+      then unit_IncCounters_Complete(pu)
       else
       begin
          hits  := 1;
-         energyl_cur-=uid_EnergyReq;
+         res_energyl_cur-=uid_req_EnergyLevel;
+         res_HellPower  -=uid_req_HellPower;
+         res_UACLoot    -=uid_req_UACLoot;
          {$IFDEF _FULLGAME}
          if(playeri=UIPlayer)then snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
          {$ENDIF}
       end;
 
-      if(summoned)and(iscomplete)then
+      if(usummoned)and(iscomplete)then
       begin
          buffs[ub_Summoned]:=fr_fps1;
          {$IFDEF _FULLGAME}
@@ -1311,22 +1654,78 @@ begin
    end;
 end;
 
-function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;
-var m,i:integer;
-procedure FindNotExistedUnit;
+function player_FindNotExistedUnit(playerN:byte):integer;
+var i,m:integer;
 begin
-   i:=MaxPlayerUnits*UplayerN+1;
+   player_FindNotExistedUnit:=0;
+   if(playerN>LastPlayer)then exit;
+   i:=MaxPlayerUnits*playerN+1;
    m:=i+MaxPlayerUnits;
    while(i<m)do
    begin
       with g_units[i] do
         if(hits<=hits_dead)then
         begin
-           LastCreatedUnit :=i;
-           LastCreatedUnitP:=g_punits[i];
+           player_FindNotExistedUnit :=i;
            break;
         end;
       i+=1;
+   end;
+end;
+
+function unit_TryChangeOwner(pTarget:PTUnit;newOwner:PTPlayerGameData;log,check:boolean):cardinal;
+var
+newPos:integer;
+begin
+   with pTarget^ do
+   with uid^ do
+   with newOwner^ do
+   begin
+      unit_TryChangeOwner:=ureq_Limit;
+      if((armylimit+uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
+
+      newPos:=player_FindNotExistedUnit(pnum);
+      if(newPos=0)then exit;
+   end;
+
+   unit_TryChangeOwner:=0;
+   if(check)then exit;
+
+   if(log)then GameLog_UnitLost(pTarget);
+
+   g_units[0]:=pTarget^;
+   unit_kill(pTarget,true,false,false,true,false);
+
+   g_units[newPos]:=g_units[0];
+   with g_units[newPos] do
+   begin
+      unum       :=newPos;
+      cycle_order:=unum mod order_period;
+      playeri    :=newOwner^.pnum;
+      player     :=newOwner;
+      isselected :=false;
+
+      unit_TeamReveal (g_punits[newPos],true);
+      unit_IncCounters(g_punits[newPos],iscomplete,buffs[ub_summoned]>0);
+   end;
+   if(log)then
+   begin
+      GameLog_UnitCaptured(g_punits[newPos]);
+      {$IFDEF _FULLGAME}
+      effect_Common(g_punits[newPos],EID_UnitCaptured,nil);
+      {$ENDIF}
+   end;
+end;
+
+function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;
+procedure FindNotExistedUnit;
+var u:integer;
+begin
+   u:=player_FindNotExistedUnit(UplayerN);
+   if(u>0)then
+   begin
+      LastCreatedUnit :=u;
+      LastCreatedUnitP:=g_punits[LastCreatedUnit];
    end;
 end;
 begin
@@ -1355,8 +1754,8 @@ begin
 
          with LastCreatedUnitP^ do
          begin
-            cycle_order:= LastCreatedUnit mod order_period;
             unum       := LastCreatedUnit;
+            cycle_order:= unum mod order_period;
 
             unit_SetXY(LastCreatedUnitP,Ux,Uy,mvxy_strict);
             uidi       := Uuid;
@@ -1381,7 +1780,7 @@ begin
             unit_SetDefaults(LastCreatedUnitP,false);
             unit_TeamReveal (LastCreatedUnitP,false);
             unit_ApplyUID   (LastCreatedUnitP);
-            unit_inc_cntrs  (LastCreatedUnitP,Ucomplete,Usummoned);
+            unit_IncCounters(LastCreatedUnitP,Ucomplete,Usummoned);
             unit_UpdateXY   (LastCreatedUnitP);
 
             if(altMode)then buffs[ub_altMode]:=ub_infinity;
@@ -1435,11 +1834,11 @@ begin
 
          if(uid_OutUnitsTeleBuff)then
          begin
-            LastCreatedUnitP^.buffs[ub_Teleport]:=fr_fps1;
+            LastCreatedUnitP^.buffs[ub_Teleported]:=fr_fps1;
             {$IFDEF _FULLGAME}
             if(snd_SoundPlayUnit(snd_Teleport,pu,nil))
             then effect_add(LastCreatedUnitP^.vx,
-                            LastCreatedUnitP^.vy,draw_DefaultSpriteDepth(LastCreatedUnitP^.vy+1,LastCreatedUnitP^.ukfly),EID_Teleport);
+                            LastCreatedUnitP^.vy,draw_DefaultSpriteDepth(LastCreatedUnitP^.vy+1,LastCreatedUnitP^.isfly),EID_Teleport);
             {$ENDIF}
          end;
          barrack_out:=true;
@@ -1493,8 +1892,10 @@ begin
                prod_unit_Now+=1;
                prod_unit_Limit+=g_uids[puid].uid_LimitUse;
                prod_unit_ucl[g_uids[puid].uid_uibtn]+=1;
-               prod_unit_uid[puid             ]+=1;
-               energyl_cur-=g_uids[puid].uid_EnergyReq;
+               prod_unit_uid[puid                  ]+=1;
+               res_energyl_cur-=g_uids[puid].uid_req_EnergyLevel;
+               res_HellPower  -=g_uids[puid].uid_req_HellPower;
+               res_UACLoot    -=g_uids[puid].uid_req_UACLoot;
                uprod_u[pn]:=puid;
                uprod_r[pn]:=g_uids[puid].uid_ProdTimeTick;
             end;
@@ -1527,7 +1928,7 @@ begin
    end;
 end;
 /// Stop unit prod
-function unit_ProdStopUnitLine(uBarrack:PTUnit;puid,pn:byte;check:boolean):cardinal;
+function unit_ProdStopUnitLine(uBarrack:PTUnit;puid,pn:byte;canceled,check:boolean):cardinal;
 begin
    unit_ProdStopUnitLine:=ureq_other;
    with uBarrack^ do
@@ -1544,13 +1945,18 @@ begin
 
               prod_unit_Now-=1;
               prod_unit_Limit-=g_uids[puid].uid_LimitUse;
-              prod_unit_ucl[ g_uids[puid].uid_uibtn]-=1;
-              prod_unit_uid[ puid           ]-=1;
-              energyl_cur+=g_uids[puid].uid_EnergyReq;
+              prod_unit_ucl[g_uids[puid].uid_uibtn]-=1;
+              prod_unit_uid[puid                  ]-=1;
+              res_energyl_cur+=g_uids[puid].uid_req_EnergyLevel;
+              if(canceled)then
+              begin
+              res_HellPower  +=g_uids[puid].uid_req_HellPower;
+              res_UACLoot    +=g_uids[puid].uid_req_UACLoot;
+              end;
               uprod_r[pn]:=0;
            end;
 end;
-function unit_ProdStopUnit(uBarrack:PTUnit;puid:byte;all,check:boolean):cardinal;
+function unit_ProdStopUnit(uBarrack:PTUnit;puid:byte;all,canceled,check:boolean):cardinal;
 var pn:byte;
 begin
    with uBarrack^ do
@@ -1566,7 +1972,7 @@ begin
 
    for pn:=LastUnitLevel downto 0 do
    begin
-      unit_ProdStopUnit:=unit_ProdStopUnitLine(uBarrack,puid,pn,check);
+      unit_ProdStopUnit:=unit_ProdStopUnitLine(uBarrack,puid,pn,canceled,check);
       if(unit_ProdStopUnit>0)then continue;
       if(not all)or(check)then break;
    end;
@@ -1598,7 +2004,7 @@ begin
                prod_upgr_Now+=1;
                prod_upgr_upid[upid]+=1;
                pprod_e[pn]:=GetUpgradeEnergy(upid,upgrs_cur[upid]+1);
-               energyl_cur-=pprod_e[pn];
+               res_energyl_cur-=pprod_e[pn];
                pprod_r[pn]:=GetUpgradeTime(upid,upgrs_cur[upid]+1);
                pprod_u[pn]:=upid;
             end;
@@ -1647,11 +2053,11 @@ begin
 
               prod_upgr_Now-=1;
               prod_upgr_upid[upid]-=1;
-              energyl_cur+=pprod_e[pn];
+              res_energyl_cur+=pprod_e[pn];
               pprod_r[pn]:=0;
            end;
 end;
-function unit_ProdStopUpgrade(uSmith:PTUnit;upid:byte;all:boolean;check:boolean):cardinal;
+function unit_ProdStopUpgrade(uSmith:PTUnit;upid:byte;all,check:boolean):cardinal;
 var pn:byte;
 begin
    with uSmith^ do
@@ -1673,33 +2079,33 @@ begin
    end;
 end;
 
-procedure unit_counters_inc_select(pu:PTUnit);
+procedure unit_IncCounters_Select(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      units_ucl_s [uid_isbuilding,uid_uibtn]+=1;
-      units_bld_s[uid_isbuilding     ]+=1;
-      units_uid_s [uidi            ]+=1;
-      if(uid_isbuilder)then units_builders_s+=1;
+      units_ucl_s[uid_isbuilding,uid_uibtn  ]+=1;
+      units_bld_s[uid_isbuilding            ]+=1;
+      units_uid_s[uidi                      ]+=1;
+      if(uid_isbuilder)then units_builders_s +=1;
       if(uid_isbarrack)then units_unitProds_s+=1;
-      if(uid_issmith  )then units_upgrProds_s  +=1;
+      if(uid_issmith  )then units_upgrProds_s+=1;
       units_all_s+=1;
    end;
 end;
-procedure unit_counters_dec_select(pu:PTUnit);
+procedure unit_DecCounters_Select(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      units_ucl_s [uid_isbuilding,uid_uibtn]-=1;
-      units_bld_s[uid_isbuilding     ]-=1;
-      units_uid_s [uidi            ]-=1;
-      if(uid_isbuilder)then units_builders_s-=1;
+      units_ucl_s[uid_isbuilding,uid_uibtn  ]-=1;
+      units_bld_s[uid_isbuilding            ]-=1;
+      units_uid_s[uidi                      ]-=1;
+      if(uid_isbuilder)then units_builders_s -=1;
       if(uid_isbarrack)then units_unitProds_s-=1;
-      if(uid_issmith  )then units_upgrProds_s  -=1;
+      if(uid_issmith  )then units_upgrProds_s-=1;
       units_all_s-=1;
    end;
 end;
@@ -1709,7 +2115,7 @@ begin
    with pu^ do
    if(isselected)then
    begin
-      unit_counters_dec_select(pu);
+      unit_DecCounters_Select(pu);
       isselected:=false;
    end;
 end;
@@ -1718,12 +2124,12 @@ begin
    with pu^ do
    if(not isselected)then
    begin
-      unit_counters_inc_select(pu);
+      unit_IncCounters_Select(pu);
       isselected:=true;
    end;
 end;
 
-procedure unit_dec_Kcntrs(pu:PTUnit);
+procedure unit_DecCounters_Kill(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
@@ -1731,19 +2137,23 @@ begin
    begin
       unit_UnSelect(pu);
 
-      if(not iscomplete)
-      then energyl_cur+=g_uids[uidi].uid_EnergyReq
+      if(not iscomplete)then
+      begin
+         res_energyl_cur+=uid_req_EnergyLevel;
+         res_HellPower  +=round(uid_req_HellPower*(uid_MaxHits1-hits)/uid_MaxHits1);
+         res_UACLoot    +=round(uid_req_UACLoot  *(uid_MaxHits1-hits)/uid_MaxHits1);
+      end
       else
       begin
-         unit_ProdStopUnit   (pu,255,true,false);
-         unit_ProdStopUpgrade(pu,255,true,false);
+         unit_ProdStopUnit   (pu,255,true,true,false);
+         unit_ProdStopUpgrade(pu,255,true     ,false);
 
          units_ucl_c[uid_isbuilding,uid_uibtn]-=1;
          units_uid_c[uidi            ]-=1;
-         energyl_max-=uid_EnergyGen;
-         energyl_cur-=uid_EnergyGen;
+         res_energyl_max-=uid_gen_EnergyLevel;
+         res_energyl_cur-=uid_gen_EnergyLevel;
 
-         unit_done_dec_cntrs(pu);
+         unit_DecCounters_Prod(pu);
       end;
 
       if(units_ucl_u[uid_isbuilding,uid_uibtn]=unum)then units_ucl_u[uid_isbuilding,uid_uibtn]:=0;
@@ -1751,25 +2161,26 @@ begin
    end;
 end;
 
-procedure unit_dec_Rcntrs(pu:PTUnit);
+procedure unit_DecCounters_Remove(pu:PTUnit);
 begin
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      units_all_e     -=1;
-      armylimit-=uid_LimitUse;
+      units_all_e-=1;
+      armylimit  -=uid_LimitUse;
       units_ucl_e[uid_isbuilding,uid_uibtn]-=1;
-      units_bld_e[uid_isbuilding     ]-=1;
-      units_bld_l[uid_isbuilding     ]-=uid_LimitUse;
-      units_uid_e[uidi            ]-=1;
+      units_bld_e[uid_isbuilding          ]-=1;
+      units_bld_l[uid_isbuilding          ]-=uid_LimitUse;
+      units_uid_e[uidi                    ]-=1;
       if(uid_isbuilder)then units_builders_e-=1;
    end;
 end;
 
-procedure unit_end_uprod(pu:PTUnit);
+procedure unit_end_UnitProd(pu:PTUnit);
 var
 i,puid:byte;
+step  :integer;
 begin
    with pu^ do
    with uid^ do
@@ -1782,21 +2193,31 @@ begin
 
             if((units_all_e+prod_unit_Now)>MaxPlayerUnits)
             or((armylimit+prod_unit_Limit)>MaxPlayerLimit)
-            or(energyl_cur<0)
+            or(res_energyl_cur<0)
             or(units_uid_e[puid]>=units_uid_m[puid])
             then
             else
               if(uprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
               begin
                  barrack_spawn(pu,uprod_u[i],upgrs_cur[upgr_mult_product]);
-                 unit_ProdStopUnitLine(pu,255,i,false);
+                 unit_ProdStopUnitLine(pu,255,i,false,false);
               end
-              else uprod_r[i]:=max2i(1,uprod_r[i]-1*(upgrs_cur[upgr_fast_product]+1) );
+              else
+              begin
+                 step:=1;
+                 if(buffs[ub_SphereTurbo]>0)
+                 or(buffs[ub_Heroic     ]>0)then step+=1;
+                 step+=upgrs_cur[upgr_fast_product];
+
+                 uprod_r[i]:=max2i(1,uprod_r[i]-step);
+              end;
          end;
 end;
 
-procedure unit_end_pprod(pu:PTUnit);
-var i,tuid:byte;
+procedure unit_end_UpgrProd(pu:PTUnit);
+var
+i,tuid:byte;
+step  :integer;
 begin
    with pu^ do
    with uid^ do
@@ -1806,7 +2227,7 @@ begin
          if(pprod_r[i]>0)then
          begin
             tuid:=pprod_u[i];
-            if(energyl_cur<0)
+            if(res_energyl_cur<0)
             or(upgrs_cur[tuid]>=g_upids[tuid].upgr_max)
             or(upgrs_cur[tuid]>=upgrs_max[tuid])
             then
@@ -1817,16 +2238,23 @@ begin
                  unit_ProdStopUpgradeLine(pu,255,i,false);
                  GameLog_UpgradeComplete(playeri,tuid,x,y);
               end
-              else pprod_r[i]:=max2i(1,pprod_r[i]-1*(upgrs_cur[upgr_fast_product]+1) );
+              else
+              begin
+                 step:=1;
+                 if(buffs[ub_SphereTurbo]>0)
+                 or(buffs[ub_Heroic     ]>0)then step+=1;
+                 step+=upgrs_cur[upgr_fast_product];
+
+                 pprod_r[i]:=max2i(1,pprod_r[i]-step);
+              end;
          end;
 end;
-
 
 
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;
 begin
    unit_CheckTransport:=false;
-   if(pPassenger^.ukfly=uf_fly)or(pTransport=pPassenger)then exit;
+   if(pPassenger^.isfly=uf_fly)or(pTransport=pPassenger)then exit;
 
    if(pTransport^.player<>pPassenger^.player)then
      if(pTransport^.player^.team<>pPassenger^.player^.team)then exit;
@@ -1851,8 +2279,12 @@ begin
 
       if(iscomplete)then
       begin
-         if(  rld>0)then   rld-=1;
-         if(a_rld>0)then a_rld-=1;
+         if(buffs[ub_SphereTurbo]>0)
+         then i:=2
+         else i:=1;
+
+         if(  rld>=i)then   rld-=i else   rld:=0;
+         if(a_rld>=i)then a_rld-=i else a_rld:=0;
       end;
    end;
 end;
@@ -1878,14 +2310,14 @@ begin
         else td:=udist;
 
       if(td<=(uDetector^.srange+uid^.uid_r))then
-        if(buffs[ub_Invis]<=0)then
+        if(buffs[ub_Invisibility]<=0)then
         begin
            AddToInt(@TeamVision[uDetector^.player^.team],MinVisionTime);
            if(scan_buff<=LastUnitBuff)and(player^.team<>uDetector^.player^.team)
            then AddToInt(@buffs[scan_buff],MinVisionTime);
         end
         else
-          if(uDetector^.buffs[ub_Detect]>0)and(uDetector^.iscomplete)and(uDetector^.hits>0)then
+          if(uDetector^.buffs[ub_Detector]>0)and(uDetector^.iscomplete)and(uDetector^.hits>0)then
           begin
              AddToInt(@TeamVision   [uDetector^.player^.team],MinVisionTime);
              AddToInt(@TeamDetection[uDetector^.player^.team],MinVisionTime);
@@ -1901,7 +2333,7 @@ begin
    with pu^ do
    with player^ do
    begin
-      unit_dec_Rcntrs(pu);
+      unit_DecCounters_Remove(pu);
 
       if(units_all_e<=0)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
       begin
@@ -1923,7 +2355,7 @@ begin
         if(not instant)then
         begin
            with uid^ do fastdeath:=(fastdeath)or(uid_FastDeathHits>=0)or(uid_isbuilding);
-           buffs[ub_Pain]:=fr_fps1; // prevent fast resurrecting
+           buffs[ub_PainState]:=fr_fps1; // prevent fast resurrecting
 
            if(not suicide)then GameLog_UnitAttacked(pu);
            {$IFDEF _FULLGAME}
@@ -1931,12 +2363,11 @@ begin
            {$ENDIF}
         end;
 
-        unit_dec_Kcntrs(pu);
+        unit_DecCounters_Kill(pu);
 
         with uid^ do
         begin
-           if(uid_isbuilding)and(buildcd)then   //
-             if{(uid_ability<>uab_HEyeVision)or}(not iscomplete)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
+           if(uid_isbuilding)and(buildcd)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
            zfall:=uid_zfall;
         end;
 
@@ -1964,7 +2395,7 @@ begin
              then tu^.transportU:=0
              else
                if(transportC>0)and(tu^.transportU=unum)then
-                 if(ukfly<>uf_ground)or(transportU>0)or(KillAllInside)
+                 if(isfly<>uf_ground)or(transportU>0)or(KillAllInside)
                    then unit_kill(tu,true,false,true,KillAllInside,suicide)
                    else
                    begin
@@ -1975,8 +2406,8 @@ begin
                       tu^.uo_x  :=tu^.x;
                       tu^.uo_y  :=tu^.y;
                       tu^.uo_tar:=0;
-                      if(tu^.hits>apc_exp_damage)
-                      then tu^.hits-=apc_exp_damage
+                      if(tu^.hits>transport_exp_damage)
+                      then tu^.hits-=transport_exp_damage
                       else unit_kill(tu,true,false,true,false,suicide);
                    end;
           end;
@@ -1994,14 +2425,10 @@ begin
            else hits:=0;
 
            with uid^ do
-           begin
-              {if(uid_DeathMissile>0)then
-                missile_add(x,y,x,y,0,uid_DeathMissile,playeri,ukfly,ukfly,false,0,uid_DeathMissile_dmod);  }
-              if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
-                for i:=1 to uid_DeathUIDn do
-                  if(player_UIDLimitCheck(player,uid_DeathUID))then
-                    unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0);
-           end;
+             if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
+               for i:=1 to uid_DeathUIDn do
+                 if(player_UIDLimitCheck(player,uid_DeathUID))then
+                   unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0);
         end;
      end
      else
@@ -2017,13 +2444,13 @@ var t :integer;
 procedure SetSRange(newsr:integer);
 begin
    with pu^ do
-   if(srange<>newsr)then
-   begin
-      srange:=newsr;
-      {$IFDEF _FULLGAME}
-      unit_CalcFogR(pu);
-      {$ENDIF}
-   end;
+     if(srange<>newsr)then
+     begin
+        srange:=newsr;
+        {$IFDEF _FULLGAME}
+        unit_CalcFogR(pu);
+        {$ENDIF}
+     end;
 end;
 begin
    with pu^ do
@@ -2041,20 +2468,23 @@ begin
         transportM+=integer(upgrs_cur[uid_TransportMax_upgr])*uid_TransportMax_upgrV;
 
       // DETECTION
-      if(uid_isdetector)or(buffs[ub_HVision]>0)
-      then buffs[ub_Detect]:=ub_infinity
-      else buffs[ub_Detect]:=0;
+      if(uid_isdetector)or(buffs[ub_HellVision]>0)
+      then buffs[ub_Detector]:=ub_infinity
+      else buffs[ub_Detector]:=0;
 
       // INVIS
-      case uidi of
-      UID_HTotem  : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_TotemInvis  ]>0];
-      UID_Commando: buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_uac_CommandoInvis]>0];
-      UID_Demon   : buffs[ub_Invis]:=b2ib[upgrs_cur[upgr_hell_Spectre     ]>0];
-      UID_HEye    : buffs[ub_Invis]:=ub_infinity;
-      end;
+      if(buffs[ub_SphereInvis]>0)
+      then buffs[ub_Invisibility]:=fr_fps1
+      else
+        case uidi of
+        UID_HTotem  : buffs[ub_Invisibility]:=b2ib[upgrs_cur[upgr_hell_TotemInvis  ]>0];
+        UID_Commando: buffs[ub_Invisibility]:=b2ib[upgrs_cur[upgr_uac_CommandoInvis]>0];
+        UID_Demon   : buffs[ub_Invisibility]:=b2ib[upgrs_cur[upgr_hell_Spectre     ]>0];
+        UID_HEye    : buffs[ub_Invisibility]:=ub_infinity;
+        end;
 
       // OTHER
-      if(upgrs_cur[upgr_invuln]>0)then buffs[ub_Invuln]:=fr_fps1;
+      if(upgrs_cur[upgr_invuln]>0)then buffs[ub_SphereInvuln]:=fr_fps1;
 
       // SIGHT RANGE
       if(iscomplete)then

@@ -3,9 +3,10 @@
 procedure saveload_MenuSelectedInfo;
 var f :file;
    fn :shortstring;
+vcdata:TCampaignData;
 vbyte1:byte;
-vint  :integer=0;
-vcard :cardinal;
+vint1,
+vint2 :integer;
 begin
    svld_str_info1:='';
    svld_str_info2:='';
@@ -36,7 +37,6 @@ begin
       exit;
    end;
 
-   vcard :=0;
    vbyte1:=255;
    {$I-}
    BlockRead(f,vbyte1,SizeOf(g_version));
@@ -47,33 +47,36 @@ begin
       case vbyte1 of
       gt_campaing : begin
                        vbyte1:=255;
-                       vint  :=-1;
-                       BlockRead(f,vint,sizeof(cmp_sel));
+                       vint1 :=-1;
+                       BlockRead(f,vint1,sizeof(camp_sel));
 
-                       if(vint<0)
-                       or(LastMission<vint)
+                       if(vint1<0)
+                       or(camp_size<=vint1)
                        then svld_str_info1:=str_FileError_WVer
                        else
                        begin
-                          BlockRead(f,vbyte1,sizeof(cmp_skill));
-                          if(CMPMaxSkills<vbyte1)
+                          vint2  :=-1;
+                          BlockRead(f,vint2,sizeof(camp_mis_sel));
+                          if(vint2<0)
+                          or(camp_mis_size[vint1]<=vint1)
                           then svld_str_info1:=str_FileError_WVer
-                          else svld_str_info1:=str_camp_MissionName[vint]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
+                          else
+                          begin
+                             BlockRead(f,vbyte1,sizeof(camp_diff));
+                             if(camp_MaxDiff<vbyte1)
+                             then svld_str_info1:=str_FileError_WVer
+                             else svld_str_info1:=camp_list[vint1]+tc_nl1+camp_mis_list[vint1,vint2]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
 
-                          BlockRead(f,vbyte1,sizeof(cmp_data_b1));
-                          BlockRead(f,vbyte1,sizeof(cmp_data_b2));
-                          BlockRead(f,vbyte1,sizeof(cmp_data_b3));
-                          BlockRead(f,vcard ,sizeof(cmp_data_c1));
+                             BlockRead(f,vcdata,sizeof(camp_data));
+                          end;
                        end;
 
                     end;
       gt_scirmish : begin
-                       BlockRead(f,vint  ,sizeof(cmp_sel    ));
-                       BlockRead(f,vbyte1,sizeof(cmp_skill  ));
-                       BlockRead(f,vbyte1,sizeof(cmp_data_b1));
-                       BlockRead(f,vbyte1,sizeof(cmp_data_b2));
-                       BlockRead(f,vbyte1,sizeof(cmp_data_b3));
-                       BlockRead(f,vcard ,sizeof(cmp_data_c1));
+                       BlockRead(f,vint1 ,sizeof(camp_sel    ));
+                       BlockRead(f,vint1 ,sizeof(camp_mis_sel));
+                       BlockRead(f,vbyte1,sizeof(camp_diff   ));
+                       BlockRead(f,vcdata,sizeof(camp_data   ));
 
                        if(not FileReadBaseGameInfo(f,@svld_str_info1,@svld_str_info2))then svld_str_info1:=str_FileError_WData;
                     end;
@@ -146,16 +149,14 @@ begin
    // 'CAPTION' part
    AddItem(@g_version           ,SizeOf(g_version        ));
    AddItem(@g_type              ,SizeOf(g_type           ));
-   AddItem(@cmp_sel             ,SizeOf(cmp_sel          ));
-   AddItem(@cmp_skill           ,SizeOf(cmp_skill        ));
-   AddItem(@cmp_data_b1         ,sizeof(cmp_data_b1      ));
-   AddItem(@cmp_data_b2         ,sizeof(cmp_data_b2      ));
-   AddItem(@cmp_data_b3         ,sizeof(cmp_data_b3      ));
-   AddItem(@cmp_data_c1         ,sizeof(cmp_data_c1      ));
+   AddItem(@camp_sel            ,SizeOf(camp_sel         ));
+   AddItem(@camp_mis_sel        ,SizeOf(camp_mis_sel     ));
+   AddItem(@camp_diff           ,SizeOf(camp_diff        ));
+   AddItem(@camp_data           ,sizeof(camp_data        ));
    AddItem(@map_scenario        ,SizeOf(map_scenario     ));
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
-   AddItem(@map_Size1            ,SizeOf(map_Size1         ));
+   AddItem(@map_Size1           ,SizeOf(map_Size1        ));
    AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
@@ -164,10 +165,10 @@ begin
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
      begin
-        AddItem(@state   ,SizeOf(state   ));
-        AddItem(@name    ,SizeOf(name    ));
-        AddItem(@mrace   ,SizeOf(mrace   ));
-        AddItem(@team    ,SizeOf(team    ));
+        AddItem(@state     ,SizeOf(state     ));
+        AddItem(@name      ,SizeOf(name      ));
+        AddItem(@mrace     ,SizeOf(mrace     ));
+        AddItem(@team      ,SizeOf(team      ));
         AddItem(@isobserver,SizeOf(isobserver));
      end;
 
@@ -179,11 +180,11 @@ begin
    AddItem(@g_effects           ,SizeOf(g_effects          ));
    AddItem(@g_random_i          ,SizeOf(g_random_i         ));
    AddItem(@g_random_p          ,SizeOf(g_random_p         ));
-   AddItem(@map_KeyPointsL         ,SizeOf(map_KeyPointsL        ));
    AddItem(@g_royal_r           ,SizeOf(g_royal_r          ));
    AddItem(@g_status            ,SizeOf(g_status           ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));
    AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen      ));
+   AddItem(@map_KeyPointsL      ,SizeOf(map_KeyPointsL     ));
    AddItem(@map_ObstaclesL      ,SizeOf(map_ObstaclesL     ));
    AddItem(@map_PlayerStartX    ,SizeOf(map_PlayerStartX   ));
    AddItem(@map_PlayerStartY    ,SizeOf(map_PlayerStartY   ));
@@ -311,14 +312,14 @@ begin
 
          map_BaseVars;
          case g_type of
-         gt_campaing: SetThemeCampaing(cmp_sel);
+         gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
          gt_scirmish: map_seed2theme;
          end;
 
          map_MakeThemeSprites;
          map_RefreshDoodadsCells;
          map_RedrawMenuMinimap;
-         map_DoodadsDrawData;
+         map_DoodadsSetDrawData;
          ui_Camera_Bounds;
 
          G_Started:=true;

@@ -569,7 +569,7 @@ begin
    with pu^  do
    with uid^ do
    begin
-      if(ukfly)then local_GetWeight+=16;
+      if(isfly)then local_GetWeight+=16;
       if(btar_pu<>nil)then
       begin
          if(uid_r<btar_pu^.uid^.uid_r)then local_GetWeight+=8;
@@ -729,7 +729,7 @@ begin
                 then PlayerSendOrder(co_ability,target,x,y,byte(-m_brush),
                                                      uo_corder,LocalPlayer)   // ability
                 else GameLog_ReqBits(LocalPlayer,byte(-m_brush),lmt_argt_ability,ureq_InvalidTarget,mouse_map_x,mouse_map_y);
-                exit;
+                if(g_gplayers[LocalPlayer].units_all_s>1)then exit;
              end;
 co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // move
 co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // attack
@@ -906,6 +906,8 @@ end;
 
 procedure WindowEvents;
 var i:byte;
+nvid_vw,
+nvid_vh:integer;
 begin
    for i:=0 to 255 do inputAction_TimerProc(i);
 
@@ -915,6 +917,8 @@ begin
      if(0<k_LastChar_t)and(k_LastChar_t<k_LastChar_t.MaxValue)then k_LastChar_t+=1;
 
    k_KeyboardString:='';
+   nvid_vw:=vid_vw;
+   nvid_vh:=vid_vh;
 
    if(k_LastChar_t>k_LastCharStuckDelay)then
      if(length(k_KeyboardString)<255)then k_KeyboardString+=k_LastChar;
@@ -923,13 +927,8 @@ begin
      case (sys_EVENT^.type_) of
       SDL_QUITEV         : GameCycle:=false;
       SDL_VIDEORESIZE    : begin
-                           vid_vw:=max2i(vid_minw,sys_EVENT^.resize.w);menu_ResolutionWi:=vid_vw;
-                           vid_vh:=max2i(vid_minh,sys_EVENT^.resize.h);menu_ResolutionWi:=vid_vh;
-
-                           vid_MakeScreen;
-                           theme_map_pTerrain:=255;
-                           gfx_MapMakeTerrain;
-                           menu_update:=true;
+                              nvid_vw:=max2i(vid_minw,sys_EVENT^.resize.w);
+                              nvid_vh:=max2i(vid_minh,sys_EVENT^.resize.h);
                            end;
       SDL_MOUSEMOTION    : begin
                               if(m_DragCamMove)and(not MainMenu)and(G_Started)then
@@ -961,6 +960,18 @@ begin
                             end;
      else
      end;
+
+   if(nvid_vw<>vid_vw)
+   or(nvid_vh<>vid_vh)then
+   begin
+      vid_vw:=nvid_vw;menu_ResolutionWi:=vid_vw;
+      vid_vh:=nvid_vh;menu_ResolutionWi:=vid_vh;
+
+      vid_MakeScreen;
+      theme_map_pTerrain:=255;
+      gfx_MapMakeTerrain;
+      menu_update:=true;
+   end;
 end;
 
 procedure GameControlsMouse;
@@ -1042,7 +1053,7 @@ begin
                                else
                                begin
                                   if(m_UnitTargetP<>nil)then
-                                    if(d_UpdateUIPlayer(m_UnitTargetN))then exit;
+                                    if(ui_UpdateUIPlayer(m_UnitTargetN))then exit;
                                   mouse_select_xs0:=mouse_map_x;
                                   mouse_select_ys0:=mouse_map_y;
                                end;
@@ -1125,11 +1136,7 @@ begin
    if(InputActionReleased(iact_MMB))then           // MMB up
      m_DragCamMove:=false;
 
-   if(clickSound<>nil)then
-   begin
-      snd_SoundPlayUI(clickSound);
-      ui_update_now:=true;
-   end;
+   if(clickSound<>nil)then snd_SoundPlayUI(clickSound);
 end;
 
 procedure GameControlsCameraMove;
@@ -1304,11 +1311,7 @@ begin
       end;
    end;
 
-   if(clickSound)then
-   begin
-      snd_SoundPlayUI(snd_click);
-      ui_update_now:=true;
-   end;
+   if(clickSound)then snd_SoundPlayUI(snd_click);
 end;
 
 
@@ -1324,10 +1327,10 @@ begin
    end
    else
    begin
-      unit_UICountersAll;
-      ui_EnableControlActs;
       GameControlsKeyboard;
       GameControlsMouse;
+      unit_UICountersAll;
+      ui_EnableControlActs;
    end;
 
    // rebuild menu

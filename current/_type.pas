@@ -16,15 +16,17 @@ TSoc = set of char;
 
 string6 = string[6];
 
+TStringArray = array of shortstring;
+PTStringArray = ^TStringArray;
+
 TUIStringList = record
-   slist_l: array of shortstring;
+   slist_l: TStringArray;
    slist_n: integer;
    slist_w: byte;
 end;
 PTUIStringList = ^TUIStringList;
 
-TStringArray = array of shortstring;
-PTStringArray = ^TStringArray;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,8 @@ TMWTexture = record
    hw,hh:integer;
 end;
 PTMWTexture = ^TMWTexture;
+
+TFogTileSet = array[0..fog_TileSetSize] of pSDL_Surface;
 
 TUSpriteList  = array of TMWTexture;
 PTUSpriteList = ^TUSpriteList;
@@ -218,6 +222,10 @@ TServerInfo = record
    info     : shortstring;
 end;
 
+TCampaignData = record
+   cd_byte1:byte;
+end;
+
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,6 +243,8 @@ TUnitAbility = record
    ua_type        : TUnitAbilityTargetType;
    ua_req_upgr,
    ua_req_uid     : byte;
+   ua_req_HellPower,
+   ua_req_UACLoot,
    ua_reload      : integer;
    ua_rldDec_upgr : byte;
    ua_rldDec_upgrS,
@@ -242,6 +252,8 @@ TUnitAbility = record
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
    ua_mbrush_hint : byte;
+   ua_mbrush_hint_HalfProdTime
+                  : boolean;
    ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Reqs,
@@ -344,7 +356,7 @@ TUnitArms = record
   aw_AnimStay : byte;
   {$ENDIF}
 end;
-PTUWeapon = ^TUnitArms;
+PTUnitArm = ^TUnitArms;
 
 TUID = record
    uid_square,
@@ -353,17 +365,22 @@ TUID = record
    uid_MaxHitsq     : longint;
    uid_r,
    uid_missileR,
-   uid_EnergyReq,
-   uid_EnergyGen,
+   uid_req_HellPower,
+   uid_req_UACLoot,
+   uid_req_EnergyLevel,
+   uid_bounty_HellPower,
+   uid_bounty_UACLoot,
+   uid_gen_EnergyLevel,
    uid_ProdTimeSec,
    uid_ProdTimeTick,
    uid_ProdHitStep,
-   uid_zfall,
    uid_TransportSize,
    uid_LimitUse,
    uid_LevelBonusDamage,
-   uid_LevelBonusArmor
+   uid_LevelBonusArmor,
+   uid_LevelBonusPainC
                     : integer;
+   uid_zfall        : shortint;
 
    uid_ZombieHits   : integer;
    uid_ZombieUID    : byte;
@@ -418,8 +435,9 @@ TUID = record
    uid_ability2,
    uid_ability3
                     : byte;
-   uid_ability_ishkeep,
+   uid_ability_HKeepShift,
    uid_ability_isradar,
+   uid_ability_RldReducByLvl,
    uid_ability_isteleport,
    uid_ability_isCanLiftUp
                     : boolean;
@@ -427,11 +445,10 @@ TUID = record
    uid_client_WReload,
    uid_client_WCastTarget,
    uid_NoOrderWhenCast,
+   uid_FlyLevelLikeTarget,
    uid_HaveRallyPoint,
    uid_HaveAbility,
    uid_OutUnitsTeleBuff,
-   uid_SlowTurn,
-   uid_SplashResist,
    uid_isbuilding,
    uid_ismech,
    uid_islight,
@@ -443,6 +460,10 @@ TUID = record
    uid_isfly
                     : boolean;
    uid_FastDeathHits: integer;
+
+   uid_balance_Good,
+   uid_balance_Bad,
+   uid_balance_Useless,
 
    uid_prod_Buildings,
    uid_prod_Units,
@@ -554,8 +575,12 @@ TPlayerGameData = record
    pnum            : byte;
 
    build_cd,
-   energyl_cur,
-   energyl_max     : integer;
+   res_energyl_cur,
+   res_energyl_max,
+   res_HellPower,
+   res_UACLoot
+
+                   : integer;
    armylimit
                    : longint;
 
@@ -622,7 +647,7 @@ TPlayerGameData = record
    log_n_cl
                    : cardinal;
 
-   log_EnergyCheckTime
+   log_EnergyCheckTimer
                    : integer;
 
 
@@ -677,12 +702,12 @@ TUnit = record
    hits     : longint;
    vx,vy,
    x,y,
-   zfall,
    srange,
    speed,dir,
    rld,vstp,
    unum     : integer;
    mapZone  : word;
+   zfall    : shortint;
 
    level,
    cycle_order,
@@ -697,12 +722,10 @@ TUnit = record
    pprod_u  : array[0..LastUnitLevel] of byte;
 
    a_exp,
-   a_exp_next,
    a_shots  : cardinal;
    a_rld,
    a_weap_cl,
    a_weap   : byte;
-   a_tx,a_ty,
    a_tar,
    a_tar_cl,
 
@@ -730,14 +753,13 @@ TUnit = record
    buffs    : array[0..LastUnitBuff] of integer;
 
    TeamDetection,
-   TeamVision     : TUnitVisionData;
+   TeamVision: TUnitVisionData;
 
    StayWaitForNewTarget:byte;
-   ukfly,
-   ukfloater,
+   isfly,
    solid,
    iscomplete,
-   isselected      : boolean;
+   isselected: boolean;
 
    aiu_FiledSquareNear,
    aiu_limitaround_ally,

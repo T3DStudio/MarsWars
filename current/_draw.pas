@@ -1,23 +1,5 @@
 
-function d_UpdateUIPlayer(u:integer):boolean;
-var tu:PTUnit;
-function TryUpd(pplayer:pbyte):boolean;
-begin
-   TryUpd:=false;
-   if(IsUnitRange(u,@tu))then
-   begin
-      pplayer^:=tu^.playeri;
-      TryUpd  :=true;
-   end;
-end;
-begin
-   d_UpdateUIPlayer:=false;
-   if(not g_gplayers[LocalPlayer].isobserver)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
-   then UIPlayer:=LocalPlayer
-   else d_UpdateUIPlayer:=TryUpd(@UIPlayer);
-end;
-
-procedure D_AddAllSprites(noanim:boolean);
+procedure draw_AddAllSprites(noanim:boolean);
 begin
   doodads_AddSprites(noanim);
      unit_AddSpritesAndMarks(noanim);
@@ -26,27 +8,25 @@ begin
 keyPoints_AddSprites;
 end;
 
-procedure d_Game;
+procedure draw_Game;
 begin
-   d_UpdateUIPlayer(0);
+   ui_UpdateUIPlayer(0);
    PlayersUpdateColorSchema(UIPlayer);
-   if(ui_update_timer=0)
-   or(ui_update_now)then unit_UICountersAll;
 
    ui_DrawEdges:=ui_MouseBrushNeedDrawEdges;
 
-   D_AddAllSprites(G_Status<>gs_running);
+   draw_AddAllSprites(G_Status<>gs_running);
 
-   D_LayerTerrain   (vid_screen);
-   D_LayerSpriteList(vid_screen);
+   draw_LayerTerrain   (vid_screen);
+   draw_LayerSpriteList(vid_screen);
 
    if (ui_fog)
    and(ui_fog_gridw>0)
    and(ui_fog_gridh>0)then
-   D_LayerFog       (vid_screen);
+   draw_LayerFog      (vid_screen);
 
-   D_LayerUnitsInfo (vid_screen);
-   d_LayerUI        (vid_screen);
+   draw_LayerUnitsInfo(vid_screen);
+   draw_LayerUI       (vid_screen);
 
    if(TestMode>1)and(net_status=0)then draw_debug;
 end;
@@ -77,13 +57,17 @@ begin
    sdl_FillRect(vid_screen,nil,0);
 
    if(MainMenu)
-   then d_Menu
-   else d_Game;
+   then draw_Menu
+   else draw_Game;
 
    //_drawMWSModel(@spr_HCommandCenter);
 
    if(TestMode>1)then
    begin
+      //
+     // for i:=0 to fog_TileSetSize do
+      //  draw_sdlsurface(vid_screen,20+i*fog_cr*2,20,ui_fog_Tiles[i] );
+
    {n:=0;
    if(UIPlayer<=LastPlayer)then
     with g_gplayers[UIPlayer] do

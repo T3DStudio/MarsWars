@@ -145,28 +145,19 @@ end;
 function map_IfPlayerStartHere(x,y,gap:integer):boolean;
 var p:byte;
 begin
-   if(gap<=0)then
+   if(gap<=0)
+   then map_IfPlayerStartHere:=true
+   else
    begin
-      map_IfPlayerStartHere:=true;
-      exit;
+      map_IfPlayerStartHere:=false;
+
+      for p:=0 to LastPlayer do
+        if(point_dist_int(x,y,map_PlayerStartX[p],map_PlayerStartY[p])<gap)then
+        begin
+           map_IfPlayerStartHere:=true;
+           break;
+        end;
    end;
-   if(not IfInMapRect(x,y,-base_1r))then exit;
-   map_IfPlayerStartHere:=false;
-
-   if(map_symmetry)then
-     if(point_dist_int(x,y,map_Size1-x,map_Size1-y)<gap)then
-     begin
-        map_IfPlayerStartHere:=true;
-        exit;
-     end;
-
-   for p:=0 to LastPlayer do
-     if(IfInMapRect(map_PlayerStartX[p],map_PlayerStartY[p],-base_1r))then
-       if(point_dist_int(x,y,map_PlayerStartX[p],map_PlayerStartY[p])<gap)then
-       begin
-          map_IfPlayerStartHere:=true;
-          break;
-       end;
 end;
 
 function map_IfKeyPointHere(x,y,gap:integer):boolean;
@@ -412,7 +403,7 @@ begin
    end;
 end;
 
-procedure map_Starts_Rect(cx,cy,cr,cdir:integer;pInCenter:byte);
+procedure map_Starts_Rect(cx,cy,cr,cdir:integer);
 var
 adir,
 astep: single;
@@ -425,64 +416,10 @@ begin
    for p:=0 to map_MaxPlayers-1 do
    begin
       adir+=astep;
-      if(p=pInCenter)then continue;
       project2rect(@map_PlayerStartX[p],@map_PlayerStartY[p],adir,cr);
       map_PlayerStartX[p]+=map_Sizeh;
       map_PlayerStartY[p]+=map_Sizeh;
    end;
-   if(pInCenter>LastPlayer)then exit;
-   map_PlayerStartX[pInCenter]:=cx;
-   map_PlayerStartY[pInCenter]:=cy;
-end;
-
-procedure map_Starts_Random;
-const max_attempts = 500;
-var
-p,ph   : byte;
-ix,iy,
-attempts,
-bb0,bb1,
-gap: integer;
-begin
-   if(map_MaxPlayers=0)then exit;
-   ph:=(map_MaxPlayers div 2)+(map_MaxPlayers mod 2);
-
-   bb0:=base_1r+(map_Size1-map_MinSize) div 7;
-   bb1:=map_Size1-(bb0*2);
-   gap:=(map_Size1 div 5)+base_1r;
-
-   for p:=0 to map_MaxPlayers-1 do
-   begin
-      if(map_Symmetry)and(p>=ph)then break;
-      attempts:=0;
-      while true do
-      begin
-         ix:=bb0+g_random(bb1);
-         iy:=bb0+g_random(bb1);
-         attempts+=1;
-
-         if(attempts>max_attempts)
-         or(not map_IfPlayerStartHere(ix,iy,gap))then break;
-      end;
-
-      map_PlayerStartX[p]:=ix;
-      map_PlayerStartY[p]:=iy;
-      if(map_Symmetry)then
-      begin
-         map_PlayerStartX[p+ph]:=map_Size1-map_PlayerStartX[p];
-         map_PlayerStartY[p+ph]:=map_Size1-map_PlayerStartY[p];
-      end;
-   end;
-
-   for ix:=0 to map_MaxPlayers-1 do
-   for iy:=0 to map_MaxPlayers-1 do
-     if(ix<>iy)then
-       if(point_dist_int(map_PlayerStartX[ix],map_PlayerStartY[ix],
-                         map_PlayerStartX[iy],map_PlayerStartY[iy])<base_3r)then
-       begin
-          map_Starts_Rect(map_Sizeh,map_Sizeh,map_Size1 div 3,integer(map_seed mod 360),map_seed mod (MaxPlayers*2));
-          exit;
-       end;
 end;
 
 procedure map_Starts_Teams(cx,cy,cr,cdir,teamN:integer);
@@ -518,6 +455,60 @@ begin
    end;
 end;
 
+procedure map_Starts_Random(freeZoneR:integer);
+const max_attempts = 500;
+var
+p,ph   : byte;
+ix,iy,
+attempts,
+bb0,bb1,
+gap: integer;
+begin
+   if(map_MaxPlayers=0)then exit;
+   ph:=(map_MaxPlayers div 2)+(map_MaxPlayers mod 2);
+
+   bb0:=freeZoneR+(map_Size1-map_MinSize) div 7;
+   bb1:=map_Size1-(bb0*2);
+   gap:=(map_Size1 div 5)+freeZoneR;
+
+   for p:=0 to map_MaxPlayers-1 do
+   begin
+      if(map_Symmetry)and(p>=ph)then break;
+      attempts:=0;
+      while true do
+      begin
+         ix:=bb0+g_random(bb1);
+         iy:=bb0+g_random(bb1);
+         attempts+=1;
+
+         if(attempts>max_attempts)then break;
+
+         if(map_Symmetry)then
+           if(point_dist_int(ix,iy,map_Size1-ix,map_Size1-iy)<gap)then continue;
+
+         if(not map_IfPlayerStartHere(ix,iy,gap))then break;
+      end;
+
+      map_PlayerStartX[p]:=ix;
+      map_PlayerStartY[p]:=iy;
+      if(map_Symmetry)then
+      begin
+         map_PlayerStartX[p+ph]:=map_Size1-map_PlayerStartX[p];
+         map_PlayerStartY[p+ph]:=map_Size1-map_PlayerStartY[p];
+      end;
+   end;
+
+   for ix:=0 to map_MaxPlayers-1 do
+   for iy:=0 to map_MaxPlayers-1 do
+     if(ix<>iy)then
+       if(point_dist_int(map_PlayerStartX[ix],map_PlayerStartY[ix],
+                         map_PlayerStartX[iy],map_PlayerStartY[iy])<base_3r)then
+       begin
+          map_Starts_Rect(map_Sizeh,map_Sizeh,map_Size1 div 3,integer(map_seed mod 360));
+          exit;
+       end;
+end;
+
 procedure map_PlayersStarts;
 var
 map_dir,i:integer;
@@ -530,17 +521,16 @@ begin
    map_dir:=integer(map_seed mod 360);
 
    case map_scenario of
-mc_1x1,
-mc_2x2,
-mc_3x3,
-mc_4x4    : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,2);
-mc_2x2x2  : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,3);
-mc_2x2x2x2: map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,4);
-mc_KotH   : map_Starts_Circle(map_Sizeh,map_Sizeh,integer(map_seed),map_Sizeh-(map_Size1 div 8));
-mc_royale : map_Starts_Circle(map_Sizeh,map_Sizeh,integer(map_seed),map_Sizeh-(map_Size1 div 5));
-   else     map_Starts_Random;
+   mc_1x1,
+   mc_2x2,
+   mc_3x3,
+   mc_4x4    : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,2);
+   mc_2x2x2  : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,3);
+   mc_2x2x2x2: map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_dir,4);
+   mc_KotH   : map_Starts_Circle(map_Sizeh,map_Sizeh,integer(map_seed),map_Sizeh-(map_Size1 div 8));
+   mc_royale : map_Starts_Circle(map_Sizeh,map_Sizeh,integer(map_seed),map_Sizeh-(map_Size1 div 5));
+   else        map_Starts_Random(base_1r);
    end;
-
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -672,9 +662,10 @@ begin
    // create
    n_obstacles:=trunc(MaxObstacles*((sqr(map_Size1) div ddc_div)/ddc_cf))+1;
 
-   if(map_Symmetry)
-   then n_obstacles:=mm3i(1,round(n_obstacles/2),MaxObstacles)
-   else n_obstacles:=mm3i(1,      n_obstacles   ,MaxObstacles);
+   n_obstacles:=mm3i(4,n_obstacles,MaxObstacles);
+
+   if(map_Symmetry)then
+     n_obstacles:=n_obstacles div 2;
 
    n_rocks  :=0;
    n_liquids:=0;
@@ -709,13 +700,12 @@ end;
 
 procedure map_CreateObjects;
 begin
-   map_Obstacles_Create;
    map_Seed2RandomBase;
+   map_Obstacles_Create;
    map_KeyPoints_Create;
    map_KeyPoints_UpdateZone;
    {$IFDEF _FULLGAME}
-   map_DoodadsDrawData;
-   map_RedrawMenuMinimap;
+   map_DoodadsSetDrawData;
    map_Decals_Create;
    {$ENDIF}
 end;
@@ -748,18 +738,18 @@ gt_scirmish: begin
 
              map_ObstaclesGap:=40;
              case map_scenario of
-             mc_ffa3     : map_MaxPlayers:=3;
-             mc_ffa4     : map_MaxPlayers:=4;
-             mc_ffa5     : map_MaxPlayers:=5;
-             mc_ffa6     : map_MaxPlayers:=6;
-             mc_ffa7     : map_MaxPlayers:=7;
-             mc_1x1      : map_MaxPlayers:=2;
-             mc_2x2      : map_MaxPlayers:=4;
-             mc_3x3      : map_MaxPlayers:=6;
-             mc_4x4      : map_MaxPlayers:=8;
-             mc_2x2x2    : map_MaxPlayers:=6;
-             mc_2x2x2x2  : map_MaxPlayers:=8;
-             else          map_MaxPlayers:=MaxPlayers;
+             mc_ffa3   : map_MaxPlayers:=3;
+             mc_ffa4   : map_MaxPlayers:=4;
+             mc_ffa5   : map_MaxPlayers:=5;
+             mc_ffa6   : map_MaxPlayers:=6;
+             mc_ffa7   : map_MaxPlayers:=7;
+             mc_1x1    : map_MaxPlayers:=2;
+             mc_2x2    : map_MaxPlayers:=4;
+             mc_3x3    : map_MaxPlayers:=6;
+             mc_4x4    : map_MaxPlayers:=8;
+             mc_2x2x2  : map_MaxPlayers:=6;
+             mc_2x2x2x2: map_MaxPlayers:=8;
+             else        map_MaxPlayers:=MaxPlayers;
              end;
              GameRemoveAIObservers;
 
@@ -767,12 +757,15 @@ gt_scirmish: begin
              {$IFDEF _FULLGAME}
              map_seed2theme;
              end;
-gt_campaing: SetThemeCampaing(cmp_sel);
+gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
    end;
 
    map_MakeThemeSprites;
    {$ENDIF}
    map_CreateObjects;
+   {$IFDEF _FULLGAME}
+    map_RedrawMenuMinimap;
+   {$ENDIF}
 end;
 
 

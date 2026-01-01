@@ -7,7 +7,8 @@
 procedure unit_damage (pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);forward;
 procedure unit_Bonuses(pu:PTUnit);forward;
 procedure unit_kill   (pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);forward;
-function unit_add(Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;forward;
+function unit_TryChangeOwner(pTarget:PTUnit;newOwner:PTPlayerGameData;log,check:boolean):cardinal;forward;
+function unit_add      (Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
@@ -34,16 +35,16 @@ procedure KeyPoints_Clear;   forward;
 procedure GameRemoveAIObservers; forward;
 
 {$IFDEF _FULLGAME}
-procedure vid_LoadingScreen(load_str:pshortstring;color:cardinal);forward;
+procedure draw_LoadingScreen(load_str:pshortstring;color:cardinal);forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 procedure ui_EnableControlActs;forward;
 procedure ui_InitControlPanelBTNActions;forward;
-function uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function LogMes2UIAlarm:boolean; forward;
 procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
 
 procedure unit_UICountersAll; forward;
 
+function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function gfx_ShadowColor(c:cardinal):cardinal;forward;
 
 function GamePauseToggle(check:boolean):boolean;forward;
@@ -74,6 +75,7 @@ function replay_GetProgress:single;forward;
 procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
 function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 
+procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;colored:boolean);forward;
 
 function Float2Str(s:single):shortstring;
 var l:byte;
@@ -185,15 +187,33 @@ end;
 //   basic math
 //
 
-function max2i(x1,x2   :integer):integer;begin if(x1>x2)then max2i:=x1 else max2i:=x2;end;
-function max3i(x1,x2,x3:integer):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
-function min2i(x1,x2   :integer):integer;begin if(x1<x2)then min2i:=x1 else min2i:=x2;end;
-function min3i(x1,x2,x3:integer):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
+function max2i(x1,x2   :longint):integer;
+var r:longint;
+begin
+   if(x1>x2)
+   then r:=x1
+   else r:=x2;
+   if(r>max2i.MaxValue)then r:=max2i.MaxValue;
+   if(r<max2i.MinValue)then r:=max2i.MinValue;
+   max2i:=r;
+end;
+function min2i(x1,x2   :longint):integer;
+var r:longint;
+begin
+   if(x1<x2)
+   then r:=x1
+   else r:=x2;
+   if(r>min2i.MaxValue)then r:=min2i.MaxValue;
+   if(r<min2i.MinValue)then r:=min2i.MinValue;
+   min2i:=r;
+end;
+function max3i(x1,x2,x3:longint):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
+function min3i(x1,x2,x3:longint):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
 
 function min2c(x1,x2   :cardinal):cardinal;begin if(x1<x2)then min2c:=x1 else min2c:=x2;end;
 function min3c(x1,x2,x3:cardinal):cardinal;begin min3c:=min2c(min2c(x1,x2),x3);end;
 
-function mm3i(mnx,x,mxx:integer):integer;begin mm3i:=min2i(mxx,max2i(x,mnx)); end;
+function mm3i(mnx,x,mxx:longint ):integer;begin mm3i:=min2i(mxx,max2i(x,mnx)); end;
 
 function GetBBit(pb:pbyte;nb:byte):boolean;
 begin
@@ -545,6 +565,7 @@ lmt_player_leave,
 lmt_player_surrender,
 lmt_player_timeout,
 lmt_player_defeated,
+lmt_player_revealed,
 lmt_player_ready,
 lmt_player_nready,
 lmt_replay_RecStart,
@@ -688,6 +709,12 @@ begin
    if(player<=LastPlayer)then
    PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,g_gplayers[player].name,0,0);
 end;
+procedure GameLog_PlayerRevealed(player:byte);
+begin
+   if(player<=LastPlayer)then
+   PlayersAddToLog(player,log_to_all,lmt_player_revealed,0,player,g_gplayers[player].name,0,0);
+end;
+
 procedure GameLog_PlayerSurrender(player:byte);
 begin
    if(player<=LastPlayer)then
@@ -768,48 +795,26 @@ begin
 
    if(check)then exit;
 
-   if((bits and ureq_place)>0)
-   then bt:=lmt_prod_BadPlace
-   else
-     if((bits and ureq_landplace)>0)
-     then bt:=lmt_ability_BadPlace
-     else
-       if((bits and ureq_ruid )>0)
-       or((bits and ureq_rupid)>0)
-       then bt:=lmt_Req_Common
-       else
-         if((bits and ureq_reloading)>0)
-         then bt:=lmt_ability_reload
-         else
-           if((bits and ureq_InProgress)>0)
-           then bt:=lmt_upgrade_InProgress
-           else
-             if((bits and ureq_max )>0)
-             then bt:=lmt_Req_MaxCount
-             else
-               if((bits and ureq_armylimit )>0)
-               or((bits and ureq_limit )>0)
-               then bt:=lmt_Req_Limit
-               else
-                 if((bits and ureq_energy)>0)
-                 then bt:=lmt_Req_Energy
-                 else
-                   if((bits and ureq_smiths  )>0)
-                   or((bits and ureq_barracks)>0)
-                   then bt:=lmt_NeedProdUnit
-                   else
-                     if((bits and ureq_builders)>0)
-                     then bt:=lmt_unit_NeedBuilder
-                     else
-                       if((bits and ureq_busy)>0)
-                       then bt:=lmt_prod_AllBusy
-                       else
-                         if((bits and ureq_InvalidTarget)>0)
-                         then bt:=lmt_invalid_Target
-                         else
-                           if((bits and ureq_other   )>0)
-                           then bt:=lmt_Invalid_Order
-                           else bt:=lmt_prod_BadOrder;
+   if((bits and ureq_place        )>0)then bt:=lmt_prod_BadPlace      else
+   if((bits and ureq_landplace    )>0)then bt:=lmt_ability_BadPlace   else
+   if((bits and ureq_uid          )>0)
+   or((bits and ureq_upgr         )>0)then bt:=lmt_Req_Common         else
+   if((bits and ureq_HellPower    )>0)then bt:=lmt_Req_HellPower      else
+   if((bits and ureq_UACLoot      )>0)then bt:=lmt_Req_UACLoot        else
+   if((bits and ureq_reloading    )>0)then bt:=lmt_ability_reload     else
+   if((bits and ureq_InProgress   )>0)then bt:=lmt_upgrade_InProgress else
+   if((bits and ureq_max          )>0)then bt:=lmt_Req_MaxCount       else
+   if((bits and ureq_armylimit    )>0)
+   or((bits and ureq_limit        )>0)then bt:=lmt_Req_Limit          else
+   if((bits and ureq_energy       )>0)then bt:=lmt_Req_Energy         else
+   if((bits and ureq_smiths       )>0)
+   or((bits and ureq_barracks     )>0)then bt:=lmt_NeedProdUnit       else
+   if((bits and ureq_builders     )>0)then bt:=lmt_unit_NeedBuilder   else
+   if((bits and ureq_busy         )>0)then bt:=lmt_prod_AllBusy       else
+   if((bits and ureq_MaxLevel     )>0)then bt:=lmt_unit_MaxLevel      else
+   if((bits and ureq_InvalidTarget)>0)then bt:=lmt_invalid_Target     else
+   if((bits and ureq_other        )>0)then bt:=lmt_Invalid_Order      else
+                                           bt:=lmt_prod_BadOrder;
 
    PlayersAddToLog(playerN,0,bt,atype,auid,'',x,y);
 end;
@@ -827,6 +832,16 @@ procedure GameLog_UnitReady(pu:PTunit);
 begin
    if(pu<>nil)then
    with pu^ do PlayersAddToLog(playeri,0,lmt_unit_ready,lmt_argt_unit ,uidi,'',x,y);
+end;
+procedure GameLog_UnitCaptured(pu:PTunit);
+begin
+   if(pu<>nil)then
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_captured,lmt_argt_unit ,uidi,'',x,y);
+end;
+procedure GameLog_UnitLost(pu:PTunit);
+begin
+   if(pu<>nil)then
+   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_lost,lmt_argt_unit ,uidi,'',x,y);
 end;
 procedure GameLog_UnitResurrected(pu:PTunit);
 begin
@@ -1149,19 +1164,22 @@ begin
    begin
       if(not forRebuildCheck)then
       begin
-      AddBits(ureq_limit     ,(units_all_e+prod_unit_Now             )>=MaxPlayerUnits);
-      AddBits(ureq_armylimit ,(armylimit+prod_unit_Limit+uid_LimitUse)> MaxPlayerLimit);
+      AddBits(ureq_limit    ,(units_all_e+prod_unit_Now             )>=MaxPlayerUnits);
+      AddBits(ureq_armylimit,(armylimit+prod_unit_Limit+uid_LimitUse)> MaxPlayerLimit);
       end;
-      AddBits(ureq_ruid      ,(uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n));
-      AddBits(ureq_ruid      ,(uid_req_uid2>0)and(units_uid_c[uid_req_uid2]<uid_req_uid2n));
-      AddBits(ureq_ruid      ,(uid_req_uid3>0)and(units_uid_c[uid_req_uid3]<uid_req_uid3n));
-      AddBits(ureq_rupid     ,(uid_req_upgr>0)and(upgrs_cur  [uid_req_upgr]=0            ));
-      AddBits(ureq_energy    ,(energyl_cur<uid_EnergyReq)or(uid_isbuilding and(energyl_max<=0)));
-      AddBits(ureq_time      , uid_ProdTimeSec<=0   );
+      AddBits(ureq_uid      ,(uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n));
+      AddBits(ureq_uid      ,(uid_req_uid2>0)and(units_uid_c[uid_req_uid2]<uid_req_uid2n));
+      AddBits(ureq_uid      ,(uid_req_uid3>0)and(units_uid_c[uid_req_uid3]<uid_req_uid3n));
+      AddBits(ureq_upgr     ,(uid_req_upgr>0)and(upgrs_cur  [uid_req_upgr]=0            ));
+
+      AddBits(ureq_energy   ,(res_energyl_cur<uid_req_EnergyLevel)or(uid_isbuilding and(res_energyl_max<=0)));
+      AddBits(ureq_HellPower,(res_HellPower  <uid_req_HellPower ));
+      AddBits(ureq_UACLoot  ,(res_UACLoot    <uid_req_UACLoot   ));
+      AddBits(ureq_BadProd  , uid_ProdTimeSec<=0   );   //
 
       if(not forRebuildCheck)then
-      AddBits(ureq_max       ,((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])or
-                              ((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders)));
+      AddBits(ureq_max      ,((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])or
+                             ((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders)));
 
       case uid_isbuilding of
 true  : begin
@@ -1177,28 +1195,28 @@ function GetUpgradeEnergy(upgr,lvl:byte):integer;
 begin
    GetUpgradeEnergy:=0;
    with g_upids[upgr] do
-    if(0<lvl)and(lvl<=upgr_max)then
-     if(upgr_mfrg)or((upgr_renerg_xpl<=0)and(upgr_renerg_apl<=0))
-     then GetUpgradeEnergy:=upgr_renerg
-     else
-     begin
-        lvl-=1;
-        GetUpgradeEnergy:=(upgr_renerg*ipower(upgr_renerg_xpl,lvl))+(upgr_renerg_apl*lvl);
-     end;
+     if(0<lvl)and(lvl<=upgr_max)then
+       if(upgr_mfrg)or((upgr_renerg_xpl<=0)and(upgr_renerg_apl<=0))
+       then GetUpgradeEnergy:=upgr_renerg
+       else
+       begin
+          lvl-=1;
+          GetUpgradeEnergy:=(upgr_renerg*ipower(upgr_renerg_xpl,lvl))+(upgr_renerg_apl*lvl);
+       end;
 end;
 function GetUpgradeTime(upgr,lvl:byte):integer;
 const upgr_max_time = fr_fps1*255;
 begin
    GetUpgradeTime:=0;
    with g_upids[upgr] do
-    if(0<lvl)and(lvl<=upgr_max)then
-     if(upgr_mfrg)or((upgr_time_xpl<=0)and(upgr_time_apl<=0))
-     then GetUpgradeTime:=upgr_time
-     else
-     begin
-        lvl-=1;
-        GetUpgradeTime:=min2i(upgr_max_time,upgr_time*ipower(upgr_time_xpl,lvl)+(upgr_time_apl*lvl));
-     end;
+     if(0<lvl)and(lvl<=upgr_max)then
+       if(upgr_mfrg)or((upgr_time_xpl<=0)and(upgr_time_apl<=0))
+       then GetUpgradeTime:=upgr_time
+       else
+       begin
+          lvl-=1;
+          GetUpgradeTime:=min2i(upgr_max_time,upgr_time*ipower(upgr_time_xpl,lvl)+(upgr_time_apl*lvl));
+       end;
 end;
 
 function CheckUpgradeReqs(player:PTPlayerGameData;up:byte):cardinal;
@@ -1209,10 +1227,10 @@ begin
    with player^ do
    with g_upids[up] do
    begin
-      AddBits(ureq_ruid      ,(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)  );
-      AddBits(ureq_rupid     ,(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)  );
-      AddBits(ureq_energy    , energyl_cur<GetUpgradeEnergy(up,upgrs_cur[up]+1) );
-      AddBits(ureq_time      , upgr_time<=0                            );
+      AddBits(ureq_uid       ,(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)  );
+      AddBits(ureq_upgr      ,(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)  );
+      AddBits(ureq_energy    , res_energyl_cur<GetUpgradeEnergy(up,upgrs_cur[up]+1) );
+      AddBits(ureq_BadProd   , upgr_time<=0                            );
       AddBits(ureq_max       ,(integer(upgrs_cur[up]+prod_upgr_upid[up])>=min2i(upgr_max,upgrs_max[up])));
       AddBits(ureq_InProgress,(not upgr_mfrg)and(prod_upgr_upid[up]>0) );
       AddBits(ureq_smiths    , units_upgrProds_ec<=0                             );
@@ -1336,7 +1354,7 @@ begin
 
       if(IsUnitRange(uo_tar,@puo_tar))then
       begin
-         if(puo_tar^.uid^.uid_ability_isteleport)and(not ukfly)then exit;
+         if(puo_tar^.uid^.uid_ability_isteleport)and(not isfly)then exit;
 
          if(unit_CheckTransport(pu,puo_tar))
          or(unit_CheckTransport(puo_tar,pu))then exit;
@@ -1345,9 +1363,7 @@ begin
    unit_F2SelectFilter:=true;
 end;
 
-
-
-function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal):boolean;
+function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal;skipFlyCheck:boolean=false):boolean;
 begin
    CheckUnitBaseFlags:=false;
 
@@ -1360,8 +1376,11 @@ begin
    if((flags and wtr_light   )=0)and    (tu^.uid^.uid_islight   )then exit;
    if((flags and wtr_heavy   )=0)and not(tu^.uid^.uid_islight   )then exit;
 
-   if((flags and wtr_ground  )=0)and(tu^.ukfly = uf_ground      )then exit;
-   if((flags and wtr_fly     )=0)and(tu^.ukfly = uf_fly         )then exit;
+   if(not skipFlyCheck)then
+   begin
+   if((flags and wtr_ground  )=0)and(tu^.isfly = uf_ground      )then exit;
+   if((flags and wtr_fly     )=0)and(tu^.isfly = uf_fly         )then exit;
+   end;
 
    CheckUnitBaseFlags:=true;
 end;
@@ -1369,7 +1388,7 @@ end;
 function CheckUnitTeamVision(POVTeam:byte;pTarget:PTUnit;SkipInvisCheck:boolean):boolean;
 begin
    with pTarget^ do
-     if(buffs[ub_Invis]<=0)or(hits<=0)or(SkipInvisCheck)
+     if(buffs[ub_Invisibility]<=0)or(hits<=0)or(SkipInvisCheck)
      then CheckUnitTeamVision:=(TeamVision[POVTeam]>0)
      else CheckUnitTeamVision:=(TeamVision[POVTeam]>0)and(TeamDetection[POVTeam]>0);
 end;
@@ -1461,13 +1480,6 @@ begin
    {$ENDIF}
    Close(f);
 end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//   COMMON STRING
-//
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1644,7 +1656,6 @@ begin
       if(check)then exit;
 
       MainMenu     :=false;
-      ui_update_now:=false;
       menu_update  :=true;
       menu_ItemSelected:=0;
    end;
@@ -1656,7 +1667,7 @@ begin
    MainMenu   :=true;
    menu_update:=true;
    menu_redraw_pause:=0;
-   ui_update_timer:=0;
+   ui_update_mmap:=0;
    menu_ItemSelected:=0;
 end;
 
@@ -1776,7 +1787,7 @@ begin
    with pu^  do
     with uid^ do
      ui_UnitNeedDrawRange:=(uid_CanAttack)
-                         or(uid_isbuilder and not ukfly)
+                         or(uid_isbuilder and not isfly)
                          or(uid_isdetector);
 end;
 
@@ -1809,8 +1820,8 @@ begin
    ui_AbilityGetBrushSpr:=pspr_dummy;
    with g_aids[aid] do
      case ua_mbrush_r of
-     -255..-1   : ui_AbilityGetBrushSpr:=uid2spr(-ua_mbrush_r,270,0);
-     uambt_self : ui_AbilityGetBrushSpr:=uid2spr(casterUID   ,270,0);
+     -255..-1   : ui_AbilityGetBrushSpr:=gfx_uid2spr(-ua_mbrush_r,270,0);
+     uambt_self : ui_AbilityGetBrushSpr:=gfx_uid2spr(casterUID   ,270,0);
      end;
 end;
 function unit_AbilityGetUIDRef(aid,casterUID:byte):byte;
@@ -2034,11 +2045,17 @@ lmt_Req_Limit         : ParseLogMessage:=str_warn_MaxLimitReached;
 lmt_Req_MaxCount      : ParseLogMessage:=str_warn_MaxCountReached;
 lmt_Req_Common,
 lmt_Req_Energy,
+lmt_Req_HellPower,
+lmt_Req_UACLoot,
+lmt_unit_MaxLevel,
 lmt_prod_BadOrder,
 lmt_prod_BadPlace     : begin
                            case lm_type of
                            lmt_Req_Common   : ParseLogMessage:=str_warn_Req_Common;
                            lmt_Req_Energy   : ParseLogMessage:=str_warn_Req_Energy;
+                           lmt_Req_HellPower: ParseLogMessage:=str_warn_Req_HellPower;
+                           lmt_Req_UACLoot  : ParseLogMessage:=str_warn_Req_UACLoot;
+                           lmt_unit_MaxLevel: ParseLogMessage:=str_warn_unit_MaxLevel;
                            lmt_prod_BadOrder: ParseLogMessage:=str_warn_prod_BadOrder;
                            lmt_prod_BadPlace: ParseLogMessage:=str_warn_prod_BadPlace;
                            end;
@@ -2051,6 +2068,7 @@ lmt_player_leave      : ParseLogMessage:=lm_string+str_gmsg_PlayerLeave;
 lmt_player_timeout    : ParseLogMessage:=lm_string+str_gmsg_PlayerTimeOut;
 lmt_player_surrender  : ParseLogMessage:=lm_string+str_gmsg_PlayerSurrender;
 lmt_player_defeated   : ParseLogMessage:=lm_string+str_gmsg_PlayerDefeat;
+lmt_player_revealed   : ParseLogMessage:=lm_string+str_gmsg_PlayerRevealed;
 lmt_player_ready,
 lmt_player_nready     : ParseLogMessage:=lm_string+str_lobby_PlayerReady[lm_type=lmt_player_ready];
 lmt_game_Paused       : ParseLogMessage:=lm_string+str_gmsg_PlayerPaused;
@@ -2082,6 +2100,14 @@ lmt_unit_ready        : begin
 lmt_unit_resurrected  : begin
                         mcolor^:=c_dorange;
                         ParseLogMessage:=str_warn_unit_resurrected;
+                        AddDataStr;
+                        end;
+lmt_unit_captured     : begin
+                        ParseLogMessage:=str_warn_unit_captured;
+                        AddDataStr;
+                        end;
+lmt_unit_lost         : begin
+                        ParseLogMessage:=str_warn_unit_lost;
                         AddDataStr;
                         end;
 lmt_unit_LevelUp      : begin
@@ -2250,10 +2276,76 @@ begin
    while(ui_log_n<listHeight)do addLine('',0,0);
 end;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   UNITS
+//
+
+function unit_CalcShadowZ(pu:PTUnit):integer;
+begin
+   with pu^  do
+   with uid^ do
+     if(not uid_isbuilding)
+     then unit_CalcShadowZ:=fly_height[isfly]
+     else
+       if(speed<=0)or(not iscomplete)
+       then unit_CalcShadowZ:=-fly_hz   // no shadowz
+       else unit_CalcShadowZ:=0;
+end;
+
+procedure unit_CalcFogR(pu:PTUnit);
+begin
+   with pu^ do fsr:=mm3i(1,srange div fog_cw,fog_MaxR);
+end;
+
+procedure units_UpdateMiniMapR;
+var u:byte;
+begin
+   for u:=1 to 255 do
+     with g_uids[u] do
+       uid_MiniMapR:=trunc(uid_r*map_MiniMap_cx)+1;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   OTHER
 //
+
+function TileSetGetN(    b10,
+                     b01,b11,b21,
+                         b12    :boolean):integer;
+begin
+   TileSetGetN:=-1;// empty
+   if(b11)
+   then TileSetGetN:=0 // full filled
+   else
+   begin
+      TileSetGetN:=0;
+      if(b10)then TileSetGetN+=1;
+      if(b01)then TileSetGetN+=2;
+      if(b21)then TileSetGetN+=4;
+      if(b12)then TileSetGetN+=8;
+      if(TileSetGetN=0)then TileSetGetN:=-1;
+   end;
+end;
+
+function IsUIDValidForHelpTable(uid:byte;forBalance:boolean):boolean;
+begin
+   IsUIDValidForHelpTable:=false;
+   with g_uids[uid] do
+     if(uid_r>0)then
+     begin
+        if(forBalance)then
+        begin
+           if (uid_balance_Good   =[])
+           and(uid_balance_Bad    =[])
+           and(uid_balance_Useless=[])then exit;
+           if(not uid_CanAttack)then exit;
+        end;
+        IsUIDValidForHelpTable:=true;
+     end;
+end;
 
 function hits_si2li(sh:shortint;mh:integer;s:single):longint;
 begin

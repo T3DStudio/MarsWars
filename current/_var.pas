@@ -74,8 +74,6 @@ UnitStepTicks     : byte = 10;
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 
-DID_Square        : array[0..MaxDIDs] of longint;
-
 net_status        : byte = 0;
 net_ServerPort    : word = 10666;
 net_period        : byte = 0;
@@ -191,8 +189,7 @@ UIPlayer          : byte = 1;
 
 ui_InGameChat     : byte = 0;
 
-ui_update_timer   : integer = 0;
-ui_update_now     : boolean = false;
+ui_update_mmap    : integer = 0;
 
 ui_blink_timer1   : integer = 0;
 ui_blink_timer2   : integer = 0;
@@ -256,7 +253,8 @@ ui_fog_pgrid      : array of array of boolean;
 ui_fog_gridw      : integer = 0;
 ui_fog_gridh      : integer = 0;
 ui_fog            : boolean = true;
-ui_fog_surf       : pSDL_Surface;
+//ui_fog_surf       : pSDL_Surface;
+ui_fog_Tiles      : TFogTileSet;
 ui_fog_sx         : integer = 0;
 ui_fog_sy         : integer = 0;
 ui_fog_ex         : integer = 0;
@@ -336,14 +334,18 @@ ui_GameStatusX    : integer = 0;
 ui_GameStatusY    : integer = 0;
 ui_EnergyX        : integer = 0;
 ui_EnergyY        : integer = 0;
+ui_HellPowerY     : integer = 0;
+ui_UACLootY       : integer = 0;
 ui_ArmyX          : integer = 0;
 ui_ArmyY0         : integer = 0;
 ui_ArmyY1         : integer = 0;
 ui_ArmyY2         : integer = 0;
-ui_Apmx           : integer = 0;
-ui_Apmy           : integer = 0;
 ui_FPSX           : integer = 0;
 ui_FPSY           : integer = 0;
+ui_APMx           : integer = 0;
+ui_APMy           : integer = 0;
+ui_RECx           : integer = 0;
+ui_RECy           : integer = 0;
 
 ui_objectivesx    : integer = 0;
 ui_objectivesy    : integer = 0;
@@ -376,8 +378,8 @@ MainMenu          : boolean = true;
 menu_DarkBack     : boolean = false;
 menu_Page         : byte = 0;
 menu_SettingsPage : byte = mi_settings_Game;
-menu_HelpPage     : byte = mi_help_UnitsInfo;
-menu_HelpUID      : byte = 0;
+menu_HelpPage     : byte = mi_help_Credits;
+menu_HelpUID      : byte = UID_HKeep;
 menu_HelpScroll   : integer = 0;
 menu_HelpIList    : PTUIStringList = nil;
 menu_ItemActs     : byte = 0;
@@ -430,14 +432,17 @@ map_ter_decalL    : array of TDecal;
 //  CAMPAINGS
 //
 
-cmp_skill         : byte = 3;
-cmp_data_b1       : byte = 0;
-cmp_data_b2       : byte = 0;
-cmp_data_b3       : byte = 0;
-cmp_data_c1       : cardinal = 0;
-cmp_mmap          : array[0..LastMission] of pSDL_Surface;
-camp_list_scroll  : integer = 0;
-cmp_sel           : integer = 0;
+camp_diff     : byte = 1;
+camp_data     : TCampaignData;
+camp_size     : integer = 0;
+camp_scroll   : integer = 0;
+camp_list     : TStringArray;
+camp_sel      : integer = 0;
+
+camp_mis_sel  : integer = 0;
+camp_mis_scroll:integer = 0;
+camp_mis_list : array of TStringArray;
+camp_mis_size : array of integer;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -553,18 +558,17 @@ c_dred,
 c_awhite,
 c_red,
 c_ared,
-c_ablue,
 c_orange,
 c_dorange,
+c_aorange,
 c_brown,
 c_yellow,
 c_dyellow,
-c_lava,
+
 c_lime,
 c_alime,
 c_green,
-c_agreen,
-c_dblue,
+c_ablue,
 c_blue,
 c_aqua,
 c_aaqua,
@@ -757,6 +761,8 @@ spr_UWeaponFactory3,
 spr_UWeaponFactory4,
 spr_UTurret,
 spr_URadar,
+spr_UAcademy,
+spr_UHPowerConductor,
 
 spr_UTechCenter,
 spr_UPTurret,
@@ -806,19 +812,24 @@ spr_db_h1,
 spr_db_u0,
 spr_db_u1,
 
-spr_blood         : TMWSModel;
-spr_pdmodel       : PTMWSModel; // default empty model
+spr_blood            : TMWSModel;
+spr_pdmodel          : PTMWSModel; // default empty model
 
-spr_RallyPoint    : array[1..r_count] of TMWTexture;
+spr_RallyPoint       : array[1..r_count] of TMWTexture;
 spr_b4_a,
 spr_b7_a,
 spr_b9_a,
 spr_ptur,
-spr_effect_Scan,
-spr_effect_Decay,
-spr_effect_Invuln,
-spr_effect_HVision,
-spr_stun          : TMWTexture;
+spr_buff_Scan,
+spr_buff_Decay,
+spr_buff_SphereInvuln,
+spr_buff_SphereInvis,
+spr_buff_SphereDArmor,
+spr_buff_SphereDDamage,
+spr_buff_SphereTurbo,
+spr_buff_HellVision,
+spr_buff_Stun,
+spr_buff_Heroic      : TMWTexture;
 
 
 spr_camp_mars,
@@ -838,7 +849,14 @@ spr_uibtn_ReplayFog,
 spr_uibtn_ReplayLog,
 spr_uibtn_ReplayPause,
 spr_uibtn_ReplayPOV,
-spr_uibtn_AbilityInvuln,
+spr_uibtn_AbilitySInvuln,
+spr_uibtn_AbilitySInvis,
+spr_uibtn_AbilitySSoul,
+spr_uibtn_AbilitySDDamage,
+spr_uibtn_AbilitySRDamage,
+spr_uibtn_AbilitySTurbo,
+spr_uibtn_AbilityPretEquip,
+spr_uibtn_AbilityBribe,
 spr_uibtn_AbilityUACStrike,
 spr_uibtn_AbilityUACScan,
 spr_uibtn_AbilityBlink,
@@ -849,9 +867,6 @@ spr_uibtn_AbilityUnload,
 spr_uibtn_AbilityUnloadTo,
 spr_uibtn_AbilityCCLand,
 spr_uibtn_AbilityCCLandTo,
-spr_uibtn_AbilityLvlUp,
-spr_uibtn_AbilityUACLvlUp,
-spr_uibtn_AbilityHellLvlUp,
 spr_uibtn_Attack,
 spr_uibtn_Move,
 spr_uibtn_Patrol,
@@ -877,13 +892,13 @@ spr_uipanel_EmptyBTN : array[1..r_count] of pSDL_Surface;
 spr_uibtn_Upgrades   : array[1..r_count,0..spr_upgrade_icons] of TMWTexture;
 spr_uibtn_Tabs       : array[0..3] of pSDL_Surface;
 spr_kp_koth,
-spr_cp_out,
-spr_kp_gen         : TMWTexture;
+spr_kp_out,
+spr_kp_gen           : TMWTexture;
 
 spr_cursorWh,
-spr_cursorHh       : integer;
+spr_cursorHh         : integer;
 
-//spr_ui_oico       : array[1..r_count,false..true,byte] of pSDL_Surface;
+//spr_ui_oico        : array[1..r_count,false..true,byte] of pSDL_Surface;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -891,13 +906,17 @@ spr_cursorHh       : integer;
 //  TEXT
 //
 
-str_doc_Basics1,
-str_doc_HotKeys
+str_doc_BaseControls,
+str_doc_BaseMechanics,
+str_doc_HotKeys,
+str_doc_Other,
+str_doc_Credits
+
                     : TUIStringList;
 
 str_race            : array[0..r_count  ] of shortstring;
 str_map_ScenarioL,
-str_replay_ScenarioL: array[0..mc_Last] of shortstring;
+str_fileinfo_ScenarioL: array[0..mc_Last] of shortstring;
 
 str_ps_AI,
 str_ps_Hum,
@@ -910,14 +929,20 @@ str_lobby_GameStartIn,
 str_lobby_ReadyToStart,
 str_lobby_BreakStarting,
 
-str_help_Basics,
-str_help_HotKeys,
+str_help_Credits,
+str_help_GameControls,
+str_help_GameHotKeys,
+str_help_GameUI,
+str_help_GameMechanics,
 str_help_UnitsInfo,
 str_help_BalanceTable,
+str_help_Other,
 
 str_doc_HotKey,
 str_doc_Attributes,
-str_doc_ProdEnergy,
+str_doc_ReqEnergy,
+str_doc_ReqHellPower,
+str_doc_ReqUACLoot,
 str_doc_ProdTime,
 str_doc_Limit,
 str_doc_MaxHits,
@@ -932,6 +957,9 @@ str_doc_TransportSize,
 str_doc_TransportCpst,
 str_doc_LevelArmorBonus,
 str_doc_LevelDamageBonus,
+str_doc_LevelPainSBonus,
+str_doc_BountyHellPower,
+str_doc_BountyUACLoot,
 str_doc_ZombieUID,
 str_doc_ZombieHits,
 str_doc_DeathUnit,
@@ -944,6 +972,10 @@ str_doc_UpgrSpeed,
 str_doc_UpgrPainS,
 str_doc_UpgrSightR,
 str_doc_UpgrTransport,
+str_doc_BalanceGood,
+str_doc_BalanceBad,
+str_doc_BalanceUseless,
+str_doc_unitBalanceNote,
 
 str_menu_Campaings,
 str_menu_Scirmish,
@@ -1064,7 +1096,6 @@ str_uarm_zombie,
 str_uarm_ressurect,
 str_uarm_heal,
 str_uarm_spawn,
-//str_uarm_suicide,
 str_uarm_targets,
 str_uarm_BaseImpact,
 str_uarm_MinRange,
@@ -1087,6 +1118,7 @@ str_gmsg_PlayerLeave,
 str_gmsg_PlayerTimeOut,
 str_gmsg_PlayerSurrender,
 str_gmsg_PlayerDefeat,
+str_gmsg_PlayerRevealed,
 str_gmsg_GameSaved,
 str_gmsg_GameLoaded,
 str_gmsg_WrongVersion,
@@ -1110,8 +1142,16 @@ str_gstat_Lose,
 str_attr_alive,
 str_attr_dead,
 str_attr_detector,
-str_attr_invuln,
+str_attr_heroic,
 str_attr_stuned,
+str_attr_SInvuln,
+str_attr_SInvis,
+str_attr_SRDamage,
+str_attr_SDDamage,
+str_attr_STurbo,
+str_attr_HVision,
+str_attr_Scaned,
+str_attr_Decay,
 str_attr_level,
 str_attr_building,
 str_attr_unit,
@@ -1121,17 +1161,20 @@ str_attr_light,
 str_attr_heavy,
 str_attr_fly,
 str_attr_ground,
-str_attr_floater,
-str_attr_transport,
 
 str_warn_prod_BadPlace,
 str_warn_prod_BadOrder,
 str_warn_Req_Energy,
+str_warn_Req_HellPower,
+str_warn_Req_UACLoot,
 str_warn_Req_Common,
+str_warn_unit_MaxLevel,
 str_warn_unit_Levelup,
 str_warn_unit_complete,
 str_warn_unit_attacked,
 str_warn_unit_resurrected,
+str_warn_unit_captured,
+str_warn_unit_lost,
 str_warn_upgrade_complete,
 str_warn_building_complete,
 str_warn_base_attacked,
@@ -1175,7 +1218,10 @@ str_ui_LimitArmy,
 str_ui_LimitBuildings,
 str_ui_LimitUnits,
 str_ui_EnergyLevel,
+str_ui_HellPower,
+str_ui_UACLoot,
 str_ui_objectives,
+str_ui_SelectTarget,
 
 str_objective_Scirmish,
 str_objective_RoyalBattle,
@@ -1183,10 +1229,8 @@ str_objective_KotH,
 str_objective_KeyPoints,
 
 str_Camp_Difficulty,
-str_cmp_unk,
-str_cmp_Date,
-str_cmp_Location,
-str_cmp_Area,
+str_Camp_Campaign,
+str_Camp_Mission,
 
 str_all,
 str_Players,
@@ -1218,10 +1262,10 @@ str_Caption_Players      : shortstring;
 
 str_NetQualityL,
 str_ReplayQualityL       : array[0..net_MaxQuality] of shortstring;
-str_Camp_DifficultyL     : array[0..CMPMaxSkills  ] of shortstring;
+str_Camp_DifficultyL     : array[0..camp_Maxdiff  ] of shortstring;
 str_ui_Tab               : array[0..3] of shortstring;
 
-str_map_GeneratorsL      : array[0..map_MaxGenerators  ] of shortstring;
+str_map_GeneratorsL      : array[0..map_MaxGenerators ] of shortstring;
 str_SG_PlayersColorL     : array[0..ui_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL       : array[0..2] of shortstring;
 str_SG_ControlPanelPosL  : array[0..3] of shortstring;
@@ -1229,10 +1273,7 @@ str_SG_ControlPanelPosL  : array[0..3] of shortstring;
 str_action_hint,
 str_menu_hint            : array[byte] of shortstring;
 
-str_camp_MissionName     : array[0..LastMission] of shortstring;
-str_camp_MissionMap,
-str_camp_MissionInfo     : array[0..LastMission] of TUIStringList;
-
+str_and                  : shortstring;
 str_YesNoC,
 str_YesNoG,
 str_SG_LanguageL,
@@ -1287,6 +1328,7 @@ snd_rally_point
                    : array[1..r_count] of PTSoundSet;
 
 snd_RadarScan,
+snd_PowerUp,
 
 snd_uac_cc,
 snd_uac_barracks,
@@ -1301,6 +1343,7 @@ snd_uac_rls,
 snd_uac_nucl,
 snd_uac_suply,
 snd_uac_rescc,
+snd_uac_academy,
 
 snd_uac_hdeath,
 
@@ -1401,7 +1444,6 @@ snd_zimba_ready,
 snd_zimba_pain,
 snd_zimba_move,
 
-snd_PowerUp,
 snd_hell_pain,
 snd_hell_melee,
 snd_hell_attack,

@@ -28,7 +28,7 @@ fr_fps1h               = fr_fpsh*3;     // 1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
 fr_fps4                = fr_fps1*4;
-fr_fps5                = fr_fps1*6;
+fr_fps5                = fr_fps1*5;
 fr_fps6                = fr_fps1*6;
 fr_fps10               = fr_fps1*10;
 fr_fpst2               = fr_fpst*2; //2/3
@@ -147,8 +147,9 @@ g_GameStartTime        = fr_fps1*5+fr_fps1-1;
 //
 
 str_ver                = 'v54';
-str_wcaption           : shortstring = 'MarsWars: HELL vs UAC, '+str_ver+#0;
-str_cprt               : shortstring = 'TGA[T3DStudio] (c) 2016-2025';
+str_gcaption           = 'MarsWars: HELL vs UAC';
+str_wcaption           : shortstring = str_gcaption+', '+str_ver+#0;
+str_cprt               : shortstring = 'TGA[T3DStudio] (c) 2016-2026';
 str_ps_ttl             : char = '?';
 str_ps_Me              : char = '>';
 b2c                    : array[false..true] of char = ('-','+');
@@ -187,40 +188,45 @@ lmt_player_connected   = 17;
 lmt_player_leave       = 18;
 lmt_player_timeout     = 19;
 lmt_player_defeated    = 20;
-lmt_player_surrender   = 21;
-lmt_player_ready       = 22;
-lmt_player_nready      = 23;
-lmt_prod_BadPlace      = 24;
-lmt_prod_BadOrder      = 25;
-lmt_prod_AllBusy       = 26;
-lmt_unit_ready         = 27;
-lmt_unit_LevelUp       = 28;
-lmt_unit_attacked      = 29;
-lmt_unit_NeedBuilder   = 30;
-lmt_unit_resurrected   = 31;
-lmt_upgrade_InProgress = 32;
-lmt_upgrade_complete   = 33;
-lmt_Req_Energy         = 34;
-lmt_Req_Common         = 35;
-lmt_Req_Limit          = 36;
-lmt_Req_MaxCount       = 37;
-lmt_map_mark           = 38;
-lmt_allies_attacked    = 39;
-lmt_NeedProdUnit       = 40;
-lmt_ability_reload     = 41;
-lmt_ability_BadPlace   = 42;
-lmt_kpoint_captured    = 43;
-lmt_kpoint_lost        = 44;
-lmt_ngen_exh           = 45;
-lmt_ngen_captured      = 46;
-lmt_ngen_lost          = 47;
-lmt_koth_control       = 48;
-lmt_invalid_Target     = 49;
-lmt_Invalid_Order      = 50;
-lmt_replay_RecStart    = 51;
-lmt_replay_RecStop     = 52;
-lmt_replay_RecError    = 53;
-
+lmt_player_revealed    = 21;
+lmt_player_surrender   = 22;
+lmt_player_ready       = 23;
+lmt_player_nready      = 24;
+lmt_prod_BadPlace      = 25;
+lmt_prod_BadOrder      = 26;
+lmt_prod_AllBusy       = 27;
+lmt_unit_ready         = 28;
+lmt_unit_captured      = 29;
+lmt_unit_lost          = 30;
+lmt_unit_LevelUp       = 31;
+lmt_unit_attacked      = 32;
+lmt_unit_NeedBuilder   = 33;
+lmt_unit_resurrected   = 34;
+lmt_unit_MaxLevel      = 35;
+lmt_upgrade_InProgress = 36;
+lmt_upgrade_complete   = 37;
+lmt_Req_Energy         = 38;
+lmt_Req_HellPower      = 39;
+lmt_Req_UACLoot        = 40;
+lmt_Req_Common         = 41;
+lmt_Req_Limit          = 42;
+lmt_Req_MaxCount       = 43;
+lmt_map_mark           = 44;
+lmt_allies_attacked    = 45;
+lmt_NeedProdUnit       = 46;
+lmt_ability_reload     = 47;
+lmt_ability_BadPlace   = 48;
+lmt_kpoint_captured    = 49;
+lmt_kpoint_lost        = 50;
+lmt_ngen_exh           = 51;
+lmt_ngen_captured      = 52;
+lmt_ngen_lost          = 53;
+lmt_koth_control       = 54;
+lmt_invalid_Target     = 55;
+lmt_Invalid_Order      = 56;
+lmt_replay_RecStart    = 57;
+lmt_replay_RecStop     = 58;
+lmt_replay_RecError    = 59;
 
 lmts_menu_chat         = [
                           0..LastPlayer,
@@ -237,6 +243,7 @@ lmts_menu_chat         = [
                           lmt_player_leave,
                           lmt_player_timeout,
                           lmt_player_defeated,
+                          lmt_player_revealed,
                           lmt_player_surrender,
                           lmt_player_ready,
                           lmt_player_nready,
@@ -324,24 +331,27 @@ nmid_ping_Answer          = 41;
 //
 
 ureq_limit             : cardinal = 1;
-ureq_ruid              : cardinal = 1 shl 1;
-ureq_rupid             : cardinal = 1 shl 2;
-ureq_energy            : cardinal = 1 shl 3;
-ureq_time              : cardinal = 1 shl 4;
-ureq_max               : cardinal = 1 shl 5;
-ureq_builders          : cardinal = 1 shl 6;
-ureq_BuildCD           : cardinal = 1 shl 7;
-ureq_barracks          : cardinal = 1 shl 8;
-ureq_smiths            : cardinal = 1 shl 9;
-ureq_InProgress        : cardinal = 1 shl 10;
-ureq_armylimit         : cardinal = 1 shl 11;
-ureq_place             : cardinal = 1 shl 12;
-ureq_busy              : cardinal = 1 shl 13;
-ureq_other             : cardinal = 1 shl 14;
-ureq_common            : cardinal = 1 shl 15;
-ureq_reloading         : cardinal = 1 shl 16;
-ureq_landplace         : cardinal = 1 shl 17;
-ureq_InvalidTarget     : cardinal = 1 shl 18;
+ureq_uid               : cardinal = 1 shl 1;
+ureq_upgr              : cardinal = 1 shl 2;
+ureq_HellPower         : cardinal = 1 shl 3;
+ureq_UACLoot           : cardinal = 1 shl 4;
+ureq_energy            : cardinal = 1 shl 5;
+ureq_BadProd           : cardinal = 1 shl 6;
+ureq_max               : cardinal = 1 shl 7;
+ureq_builders          : cardinal = 1 shl 8;
+ureq_BuildCD           : cardinal = 1 shl 9;
+ureq_barracks          : cardinal = 1 shl 10;
+ureq_smiths            : cardinal = 1 shl 11;
+ureq_InProgress        : cardinal = 1 shl 12;
+ureq_armylimit         : cardinal = 1 shl 13;
+ureq_place             : cardinal = 1 shl 14;
+ureq_busy              : cardinal = 1 shl 15;
+ureq_other             : cardinal = 1 shl 16;
+ureq_reloading         : cardinal = 1 shl 17;
+ureq_landplace         : cardinal = 1 shl 18;
+ureq_InvalidTarget     : cardinal = 1 shl 19;
+ureq_MaxLevel          : cardinal = 1 shl 20;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -380,11 +390,10 @@ co_pcancle             = -420;
 //
 
 wpr_any                : cardinal =  0;
-//wpr_avis               : cardinal =  1;
-wpr_ground             : cardinal =  1 shl 1;
-wpr_air                : cardinal =  1 shl 2;
-wpr_move               : cardinal =  1 shl 3;
-wpr_reload             : cardinal =  1 shl 4;
+wpr_ground             : cardinal =  1;
+wpr_air                : cardinal =  2;
+wpr_move               : cardinal =  4;
+wpr_reload             : cardinal =  8;
 
 aw_fsr0                = 15000;
 
@@ -467,25 +476,28 @@ aif_army_smart_prio    : cardinal = 1 shl 13;
 //  UNIT BUFFs
 //
 
-MaxUnitBuffs           = 16;
+MaxUnitBuffs           = 19;
 LastUnitBuff           = MaxUnitBuffs-1;
 
-ub_Pain                = 0;
-ub_Resurect            = 1;
+ub_PainState           = 0;
+ub_Resurected          = 1;
 ub_Cast                = 2;
 ub_AltMode             = 3;
-ub_Invis               = 4;
-ub_Detect              = 5;
-ub_Invuln              = 6;
-ub_Summoned            = 7;
-ub_Teleport            = 8;
-ub_HVision             = 9;
-ub_Damaged             = 10;
-ub_Heal                = 11;
-ub_Scaned              = 12;
-ub_Decay               = 13;
-ub_SpecPause           = 14;
-ub_ArchFire            = 15;
+ub_Invisibility        = 4;
+ub_Detector            = 5;
+ub_Summoned            = 6;
+ub_Teleported          = 7;
+ub_HellVision          = 8;
+ub_Damaged             = 9;
+ub_Scaned              = 10;
+ub_DecayAura           = 11;
+ub_SpecPause           = 12;
+ub_Heroic              = 13;
+ub_SphereInvuln        = 14;
+ub_SphereInvis         = 15;
+ub_SphereRDamage        = 16;
+ub_SphereDDamage       = 17;
+ub_SphereTurbo         = 18;
 
 ub_infinity            = NOTSET;
 b2ib                   : array[false..true] of smallint = (0,ub_infinity);
@@ -695,26 +707,26 @@ BaseDamage6            = BaseDamage1*6;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
-BaseDamageBonus1       = 7;
-BaseDamageLevel1       = 3;
-BaseArmorBonus1        = 7;
-BaseArmorLevel1        = 3;
-
 BaseRegen1             = 5;
 
-UnitSpeedBonus         = 3;
+BaseDamageLevel1       = 2.5;
+BaseArmorLevel1        = 2.5;
 
-UpgradeUnitArmorBonus  = BaseArmorBonus1;
-UpgradeBuildArmorBonus = BaseArmorBonus1*2+round(BaseArmorBonus1/2);
+UpgradeUnitSpeedBonus  = 3;
+UpgradeDamageBonus1    = 7;
+UpgradeArmorBonus1     = 7;
+UpgradeUnitArmorBonus  = UpgradeArmorBonus1;
+UpgradeBuildArmorBonus = UpgradeArmorBonus1*2+round(UpgradeArmorBonus1/2);
 
 BaseHeal1              = BaseRegen1*2;
 BaseHealBonus1         = BaseHeal1 div 2;
 BaseRepair1            = BaseRegen1*2;
 BaseRepairBonus1       = BaseHeal1 div 2;
 
-DecayAuraDamage        = BaseDamageBonus1;
+DecayAuraDamage        = UpgradeDamageBonus1;
 
-ExpLevel1              = fr_fps1*ptime2;
+ExpLevel1sec           = ptime2;
+ExpLevel1              = fr_fps1*ExpLevel1sec;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -784,20 +796,22 @@ UID_UComputerStation   = 60;
 UID_UGTurret           = 61;
 UID_UATurret           = 62;
 UID_URadar             = 63;
-UID_URMStation         = 64;
+UID_UAcademy           = 64;
+UID_UHPowerConductor   = 65;
+UID_URMStation         = 66;
 
-UID_UPortal            = 66;
-UID_UBaseMil           = 67;
-UID_UBaseCom           = 68;
-UID_UBaseGen           = 69;
-UID_UBaseRef           = 70;
-UID_UBaseNuc           = 71;
-UID_UBaseLab           = 72;
-UID_UCBuild0           = 73;
-UID_UCBuild1           = 74;
-UID_UCBuild2           = 75;
-UID_UCBuild3           = 76;
-UID_USPort             = 77;
+UID_UPortal            = 67;
+UID_UBaseMil           = 68;
+UID_UBaseCom           = 69;
+UID_UBaseGen           = 70;
+UID_UBaseRef           = 71;
+UID_UBaseNuc           = 72;
+UID_UBaseLab           = 73;
+UID_UCBuild0           = 74;
+UID_UCBuild1           = 75;
+UID_UCBuild2           = 76;
+UID_UCBuild3           = 77;
+UID_USPort             = 78;
 
 UID_Engineer           = 80;
 UID_Medic              = 81;
@@ -855,38 +869,52 @@ uab_HEyeBlink          = 5;
 uab_HTowerBlink        = 6;
 uab_HKeepShift         = 7;
 uab_HKeepAura          = 8;
-uab_SphereInvuln       = 9;
-uab_SpawnLost          = 10;
-uab_SpawnLostTo        = 11;
-uab_HEyeVision         = 12;
-uab_UACCCLand          = 13;
-uab_UACCCLandTo        = 14;
-uab_Unload             = 15;
-uab_UnloadTo           = 16;
+uab_SpawnLost          = 9;
+uab_SpawnLostTo        = 10;
+uab_HEyeVision         = 11;
+uab_UACCCLand          = 12;
+uab_UACCCLandTo        = 13;
+uab_HellCCLand         = 14;
+uab_HellCCLandTo       = 15;
 
-uab_ToHAKeep           = 20;
-uab_ToHGate            = 21;
-uab_ToHSymbol2         = 22;
-uab_ToHSymbol3         = 23;
-uab_ToHSymbol4         = 24;
-uab_ToHPool            = 25;
-uab_ToHACommandCenter  = 26;
-uab_ToHBarracks        = 27;
-uab_ToHTower           = 28;
-uab_ToHTotem           = 29;
+uab_Unload             = 16;
+uab_UnloadTo           = 17;
 
-uab_ToUACommandCenter  = 30;
-uab_ToUBarracks        = 31;
-uab_ToUFactory         = 32;
-uab_ToUWeaponFactory   = 33;
-uab_ToUGenerator2      = 34;
-uab_ToUGenerator3      = 35;
-uab_ToUGenerator4      = 36;
-uab_ToUAGTurret        = 37;
-uab_ToUAATurret        = 38;
-uab_ToUACDron          = 39;
-uab_ToUGTurretTo       = 40;
-uab_ToUATurretTo       = 41;
+uab_SphereSoul         = 20;
+uab_SphereInvis        = 21;
+uab_SphereInvuln       = 22;
+uab_SphereRDamage      = 23;
+uab_SphereDDamage      = 24;
+uab_SphereTurbo        = 25;
+
+uab_PretorEquip        = 26;
+uab_Bribe              = 27;
+
+uab_ToHAKeep           = 30;
+uab_ToHGate            = 31;
+uab_ToHSymbol2         = 32;
+uab_ToHSymbol3         = 33;
+uab_ToHSymbol4         = 34;
+uab_ToHPool            = 35;
+uab_ToHACommandCenter  = 36;
+uab_ToHBarracks        = 37;
+uab_ToHTower           = 38;
+uab_ToHTotem           = 39;
+
+uab_ToUACommandCenter  = 40;
+uab_ToUBarracks        = 41;
+uab_ToUFactory         = 42;
+uab_ToUWeaponFactory   = 43;
+uab_ToUGenerator2      = 44;
+uab_ToUGenerator3      = 45;
+uab_ToUGenerator4      = 46;
+uab_ToUAGTurret        = 47;
+uab_ToUAATurret        = 48;
+uab_ToUACDron          = 49;
+uab_ToUGTurretTo       = 50;
+uab_ToUATurretTo       = 51;
+uab_URadarLvlUp           = 52;
+uab_URMStationLvlUp       = 53;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -938,51 +966,49 @@ base_4r                = base_1r*4;
 base_5r                = base_1r*5;
 base_6r                = base_1r*6;
 
-apc_exp_damage         = BaseDamage4;
+transport_exp_damage   = BaseDamage4;
 regen_period           = fr_fps1;
 order_period           = fr_fpsh+1;
 MinVisionTime          = fr_fps2;
 
+HellPower_Max          = 15000;
+HellPower_PerLimit     = 100;
+HellPower_PerHP        = 10;
+HellPower_AddPeriod    = fr_fps1;
+HellPower_Add1         = HellPower_PerLimit;
+HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 4);
+HellPower_Add3         = HellPower_Add1+(HellPower_Add1 div 2);
+UACLoot_Max            = 30000;
+
 detection_time_sec     = 8;
 detection_time         = fr_fps1*detection_time_sec;
 
-radar_reload_sec       = 60;
-radar_reload           = fr_fps1*radar_reload_sec;
-
 hell_vision_time       = fr_fps1*detection_time_sec;
-hell_vision_reload_sec = ptime3;
-hell_vision_reload     = fr_fps1*hell_vision_reload_sec;
-
-hteleport_rldPerLimit  = 5;
-
-mstrike_reload_sec     = 60;
-haltar_reload_sec      = 60;
-
-mstrike_reload         = fr_fps1*mstrike_reload_sec;
-haltar_reload          = fr_fps1*haltar_reload_sec;
 
 step_build_reload      = fr_fps1*5;
 max_build_reload       = step_build_reload*3;
 
 melee_r                = 8;
-mine_r                 = melee_r*3;
 
-dir_stepX              : array[0..7] of integer = (1,1,0,-1,-1,-1,0,1);
-dir_stepY              : array[0..7] of integer = (0,-1,-1,-1,0,1,1,1);
+dir_stepX              : array[0..7] of integer = (1, 1, 0,-1,-1,-1,0,1);
+dir_stepY              : array[0..7] of integer = (0,-1,-1,-1, 0, 1,1,1);
 
+soul_heal              = 1000;
+invis_time_sec         = 60;
+invis_time             = fr_fps1*invis_time_sec;
 invuln_time_sec        = 30;
 invuln_time            = fr_fps1*invuln_time_sec;
-
-hblink_reload_sec      = 30;
-hblink_reload          = hblink_reload_sec*fr_fps1;
-hkeep_reload_sec       = 60;
-hkeep_reload           = hkeep_reload_sec*fr_fps1;
+rdamage_time_sec       = 20;
+rdamage_time           = fr_fps1*rdamage_time_sec;
+ddamage_time_sec       = 10;
+ddamage_time           = fr_fps1*ddamage_time_sec;
+dturbo_time_sec        = 10;
+dturbo_time            = fr_fps1*dturbo_time_sec;
 
 tank_sr                = 20;
 rocket_sr              = tank_sr*2;
-mine_sr                = rocket_sr*2;
 bfg_sr                 = rocket_sr*4;
-blizzard_sr            = mine_sr;
+blizzard_sr            = rocket_sr*3;
 
 BuildObstacleStepR     = 6;
 player_default_ai_level= 7;
@@ -1290,7 +1316,8 @@ EID_ArchFire           = 216;
 EID_ULevelUp           = 217;
 EID_HLevelUp           = 218;
 EID_HVision            = 219;
-EID_Invuln             = 220;
+EID_PowerUp            = 220;
+EID_UnitCaptured       = 221;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1318,6 +1345,8 @@ ta_MB                  = 5;
 ta_RU                  = 6;
 ta_RM                  = 7;
 ta_RB                  = 8;
+ta_LA                  = 9;
+ta_MA                  = 10;
 
 font_w1                = 8;
 font_wh                = font_w1 div 2;
@@ -1418,6 +1447,7 @@ aummat_info            = 7;
 
 uambt_self             = -257;
 uambt_sightR           = -258;
+uambt_Blizzard         = -259;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1456,6 +1486,8 @@ fog_cw                 = 48;
 fog_chw                = fog_cw div 2;
 fog_cr                 = round(fog_chw*1.45);
 fog_ds                 = fog_cw-fog_cr;
+
+fog_TileSetSize        = 15;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1648,13 +1680,24 @@ mi_SubCaptionInfoLine  = 220;
 mi_UnderBottomInfoLine = 221;
 
 ////  HELP
-mi_help_Basics         = 230;
-mi_help_HotKeys        = 231;
-mi_help_UnitsInfo      = 232;
-mi_help_UnitsBalance   = 233;
+mi_help_Credits        = 230;
+mi_help_GameControls   = 231;
+mi_help_GameHotKeys    = 232;
+mi_help_GameUI         = 233;
+mi_help_GameMechanics  = 234;
+mi_help_UnitsInfo      = 235;
+mi_help_UnitsBalance   = 236;
+mi_help_Other          = 237;
 
 mi_help_InfoPanel      = 240;
 mi_help_InfoList       = 241;
+
+//// CAMPAIGNs
+
+mi_camp_Difficulty     = 245;
+mi_camp_Campaigns      = 246;
+mi_camp_Missions       = 247;
+mi_camp_MissionInfo    = 248;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1710,6 +1753,15 @@ menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
 menu_ListWh            = menu_ListW1 div 2;
 menu_ListWq            = menu_ListWh div 2;
 
+menu_CampListW         = menu_ListWh;
+menu_CampLineH         = menu_BaseList1H;
+menu_CampListSize      = 5;
+menu_CampListH         = menu_CampLineH*menu_CampListSize;
+menu_MissLineH         = menu_BaseList1H;
+menu_MissListSize      = 11;
+menu_MissListH         = menu_BaseList1H*menu_MissListSize;
+
+
 menu_PlayersStateW     = font_w1h+menu_ListLineH;
 menu_PlayersNameW      = font_w2+MaxPlayerNameLen*font_w1;
 menu_PlayersRaceW      = font_w1h+6*font_w1+font_wh;
@@ -1742,10 +1794,7 @@ ui_DocLineLen1         = 56;//(menu_w-(menu_BaseW1*3+menu_BigButtonW)) div font_
 ui_DocLineLen2         = 76;
 ui_DocListH            = 35;
 
-
-
-LastMission            = 23;
-CMPMaxSkills           = 4;
+camp_MaxDiff           = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1789,6 +1838,8 @@ tc_player7             = #7;
 tc_nl1                 = #8;
 tc_nl2                 = #9;
 tc_nl3                 = #10;
+tc_docbr               = #11;
+tc_doccpt              = #12;
 tc_purple              = #14;
 tc_red                 = #15;
 tc_orange              = #16;
@@ -1898,7 +1949,7 @@ str_ping                 : shortstring = 'Ping';
 str_ps_AI                : shortstring = 'AI';
 str_ps_Hum               : shortstring = 'Hum.';
 
-str_race                 : array[0..r_cnt] of shortstring = ('RANDOM','HELL','UAC');
+str_race                 : array[0..r_count] of shortstring = ('RANDOM','HELL','UAC');
 str_observer             : shortstring = 'OBSERVER';
 
 {$ENDIF}

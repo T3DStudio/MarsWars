@@ -495,9 +495,9 @@ begin
    SetTLBlC;
 end;
 
-procedure SetThemeCampaing(theme_id:byte);
+procedure SetThemeCampaign(campaign,mission:byte);
 begin
-   case theme_id of
+  { case theme_id of
    0
     : begin  // CAMPAINGS:  HELL
          SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
@@ -544,7 +544,7 @@ begin
          end;
 
       end;
-   end;
+   end;  }
    theme_map_Terrain :=theme_terrains[0];
    theme_map_LiquidBack:=theme_bliquids[0];
    theme_map_Crater :=theme_craters [0];

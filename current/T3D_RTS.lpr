@@ -1,14 +1,16 @@
 program T3D_RTS;
 
+
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
+{ $IFOPT ded+   // illegal compiler switch ded ??????????
 // add ifopt
+}
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE DEBUG0}
-  //{$DEFINE UNITDATA}
   //{$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
@@ -33,6 +35,7 @@ uses SysUtils, SDL, SDL_Net,crt
      {$IFDEF _FULLGAME}
         {$include _objects_client_data.pas}
         {$include _strings.pas}
+        {$include _html_doc.pas}
         {$include _lang.pas}
         {$include _config.pas}
         {$include _sprite_model.pas}
@@ -73,9 +76,7 @@ begin
    {$IFDEF _FULLGAME}
    if(TestMode=2)then
    begin
-   {$IFDEF UNITDATA}
-   test_UnitsSpec;
-   {$ENDIF}
+   htmldoc_make;
    end;
    {$ENDIF}
 

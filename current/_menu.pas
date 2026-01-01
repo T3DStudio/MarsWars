@@ -245,7 +245,7 @@ begin
            menu_MouseXY2Item:=i;
 end;
 
-function menu_HelpSelectUID(mi:byte):byte;
+function menu_HelpSelectUID(mi:byte;forBalance:boolean=false):byte;
 var
 tx,ty:integer;
 u    :byte;
@@ -258,7 +258,7 @@ begin
       ty:=mi_y0;
       for u:=1 to 255 do
         with g_uids[u] do
-          if(uid_r>0)then
+          if(IsUIDValidForHelpTable(u,forBalance))then
           begin
              if (tx<=mouse_x)and(mouse_x<=(tx+ui_ButtonWh))
              and(ty<=mouse_y)and(mouse_y<=(ty+ui_ButtonWh))then
@@ -480,28 +480,36 @@ begin
 
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_help_Basics      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
-   menu_Item_Set(mi_help_HotKeys     ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
-   menu_Item_Set(mi_help_UnitsInfo   ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
-   menu_Item_Set(mi_help_UnitsBalance,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
+   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
 
    case menu_HelpPage of
-   mi_help_Basics,
-   mi_help_HotKeys     : begin
+   mi_help_GameControls,
+   mi_help_GameMechanics,
+   mi_help_GameHotKeys,
+   mi_help_GameUI,
+   mi_help_Other,
+   mi_help_Credits     : begin
                             tx:=mtx0+menu_BigButtonW+menu_BaseW1;
                             menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
-                                                           menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH,true);
+                                                           tx+(ui_DocLineLen2*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH,true);
                          end;
+   mi_help_UnitsBalance,
    mi_help_UnitsInfo   : begin
                             tx:=mtx0+menu_BigButtonW+menu_BaseW1;
                             menu_Item_Set(mi_help_InfoPanel,tx,menu_underCaptionY,
-                                                            tx+ui_ButtonWh*menu_HelpUnitsBTNsL,menu_LowerBorderY-menu_BigButtonH,true);
+                                                            tx+ui_ButtonWh*menu_HelpUnitsBTNsL,menu_underCaptionY+ui_ButtonWh*15,true);
 
                             tx:=menu_items[mi_help_InfoPanel].mi_x1+menu_BaseWh;
                             menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
-                                                           menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH,true);
+                                                           tx+(ui_DocLineLen1*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH,true);
                          end;
-   mi_help_UnitsBalance:;
    end;
 
    menu_page_BottomButtons(mi_back,0,0,0,0,0,0);
@@ -719,9 +727,17 @@ begin
    menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Campaings);
 
+   mtx0:=menu_BaseW1;
+   mty0:=menu_underCaptionY;
+   menu_Item_Set(mi_camp_Difficulty ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_BigButtonH,not g_started);mty0+=menu_BigButtonH+menu_BigButtonH;
+   menu_Item_Set(mi_camp_Campaigns  ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_CampListH ,not g_started);mty0+=menu_BigButtonH+menu_CampListH;
+   menu_Item_Set(mi_camp_Missions   ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_MissListH ,not g_started);//mty0+=menu_BigButtonH+menu_MissListH;
+   mtx0:=menu_BaseW2+menu_CampListW;
+   menu_Item_Set(mi_camp_MissionInfo,mtx0,menu_underCaptionY,menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH,not g_started);
+
    if(g_started)
    then menu_page_BottomButtons(mi_back,mi_SaveLoad,mi_Settings,mi_Help,mi_Break   ,0,0)
-   else menu_page_BottomButtons(mi_back,            mi_Settings,mi_Help,mi_StartNow,0,0,0);
+   else menu_page_BottomButtons(mi_back,0          ,mi_Settings,mi_Help,mi_StartNow,0,0);
 end;
 
 procedure net_LANSearch;
@@ -955,28 +971,43 @@ mi_NetSearch_List      : if(not check)then menu_ListMouseXY2Line(item,@net_svsea
 mi_NetSearch_Connect   : if(not check)then GameNetServerListConnect(false);
 
 // HELP
-mi_help_Basics,
-mi_help_HotKeys,
+mi_help_GameControls,
+mi_help_GameMechanics,
+mi_help_GameHotKeys,
+mi_help_GameUI,
 mi_help_UnitsInfo,
-mi_help_UnitsBalance   : if(not check)then
+mi_help_UnitsBalance,
+mi_help_Other,
+mi_help_Credits
+                       : if(not check)then
                          begin
                             menu_HelpPage  :=item;
                             menu_HelpScroll:=0;
                             menu_HelpIList :=nil;
                             case menu_HelpPage of
-                            mi_help_Basics   : menu_HelpIList:=@str_doc_Basics1;
-                            mi_help_HotKeys  : menu_HelpIList:=@str_doc_HotKeys;
-                            mi_help_UnitsInfo: menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
+                            mi_help_GameControls : menu_HelpIList:=@str_doc_BaseControls;
+                            mi_help_GameMechanics: menu_HelpIList:=@str_doc_BaseMechanics;
+                            mi_help_GameHotKeys  : menu_HelpIList:=@str_doc_HotKeys;
+                            mi_help_GameUI       : ;
+                            mi_help_UnitsBalance : if(not IsUIDValidForHelpTable(menu_HelpUID,true))then menu_HelpUID:=0;
+                            mi_help_UnitsInfo    : menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
+                            mi_help_Other        : menu_HelpIList:=@str_doc_Other;
+                            mi_help_Credits      : menu_HelpIList:=@str_doc_Credits;
                             end;
                          end;
 mi_help_InfoPanel      : case menu_HelpPage of
+                         mi_help_UnitsBalance,
                          mi_help_UnitsInfo : if(not check)then
                                              begin
-                                                menu_HelpUID  :=menu_HelpSelectUID(item);
+                                                menu_HelpUID  :=menu_HelpSelectUID(item,menu_HelpPage=mi_help_UnitsBalance);
                                                 menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
                                              end;
                          else menu_Controls_MLB:=false;
                          end;
+// CAMPAIGNS
+mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,true,0,camp_Maxdiff);
+mi_camp_Campaigns      : if(not check)then menu_ListMouseXY2Line(item,@camp_sel    ,camp_scroll    ,menu_CampLineH);
+mi_camp_Missions       : if(not check)then menu_ListMouseXY2Line(item,@camp_mis_sel,camp_mis_scroll,menu_MissLineH);
    else
       menu_Controls_MLB:=false;
    end;
@@ -1021,6 +1052,8 @@ mi_Map_Obstacles       : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_
 mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots   ,false,false);
 
 mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,false,0,net_MaxQuality);
+
+mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,false,0,camp_Maxdiff);
    else
       menu_Controls_MRB:=false;
    end;
@@ -1059,6 +1092,11 @@ mi_SS_MusicVolume      : if(not check)then
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
                             snd_SoundSourceUpdateGainAll;
                          end;
+mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll    , 1,0,camp_size              -menu_CampListSize,false);
+mi_camp_Missions       : if(not check)then
+                           if(0<=camp_sel)and(camp_sel<camp_size)then
+                                           ScrollInt(@camp_mis_scroll, 1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
+
    else
       menu_Controls_MWD:=false;
    end;
@@ -1089,6 +1127,10 @@ mi_SS_MusicVolume      : if(not check)then
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
                             snd_SoundSourceUpdateGainAll;
                          end;
+mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll    ,-1,0,camp_size              -menu_CampListSize,false);
+mi_camp_Missions       : if(not check)then
+                           if(0<=camp_sel)and(camp_sel<camp_size)then
+                                           ScrollInt(@camp_mis_scroll,-1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
    else
       menu_Controls_MWU:=false;
    end;
@@ -1098,20 +1140,20 @@ function menu_Controls_Text(item:byte;check:boolean;changed:pboolean):boolean;
 begin
    menu_Controls_Text:=true;
    case item of
-mi_SG_PlayerName       : if(not check)then PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen   ,changed);
-mi_SR_RecordPrefix     : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,MaxReplayPrefixLen ,changed);
+mi_SG_PlayerName       : if(not check)then PlayerName        :=    StringApplyInput(PlayerName            ,CharSetCommon,MaxPlayerNameLen    ,changed);
+mi_SR_RecordPrefix     : if(not check)then rpls_NamePrefix   :=    StringApplyInput(rpls_NamePrefix       ,CharSetCommon,MaxReplayPrefixLen  ,changed);
 
-mi_SV_ResolutionW      : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                  ,changed));
-mi_SV_ResolutionH      : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                  ,changed));
+mi_SV_ResolutionW      : if(not check)then menu_ResolutionWi :=s2i(StringApplyInput(i2s(menu_ResolutionWi),CharSetDigits,4                   ,changed));
+mi_SV_ResolutionH      : if(not check)then menu_ResolutionHi :=s2i(StringApplyInput(i2s(menu_ResolutionHi),CharSetDigits,4                   ,changed));
 
 mi_SaveLoad_fname      : if(not check)then svld_str_fname    :=    StringApplyInput(svld_str_fname        ,CharSetCommon,menu_ListLineWChars1,changed);
 
-mi_Map_Seed            : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                 ,changed);
+mi_Map_Seed            : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                  ,changed);
 
-mi_MP_ServerPort       : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                  ,changed);
-mi_MP_ClientAddress    : if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                 ,changed);
+mi_MP_ServerPort       : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                   ,changed);
+mi_MP_ClientAddress    : if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                  ,changed);
 mi_MP_ChatLine,
-mi_MP_ChatList         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                ,changed);
+mi_MP_ChatList         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                 ,changed);
    else
       menu_Controls_Text:=false;
    end;
@@ -1269,6 +1311,8 @@ begin
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);
+             SetSelectedItem(mi_camp_Campaigns,true);
+             SetSelectedItem(mi_camp_Missions ,true);
 
              if(menu_Controls_MWD(menu_ItemSelected,false))then
              begin
@@ -1291,6 +1335,9 @@ begin
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);
+             SetSelectedItem(mi_camp_Campaigns,true);
+             SetSelectedItem(mi_camp_Missions ,true);
+
              if(menu_Controls_MWU(menu_ItemSelected,false))then
              begin
                 SetBBit(@menu_ItemActs,miat_MWhell,true);
