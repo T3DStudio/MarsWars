@@ -929,7 +929,7 @@ keyPoint_CaptTime_Gen  = fr_fps1*ptimeq;
 keyPoint_CaptTime_Def  = fr_fps1*ptimeh;
 keyPoint_CaptTime_KotH = fr_fps1*ptime3;
 keyPoint_r             = 100;
-keyPoint_SolidR        = keyPoint_r-(keyPoint_r div 3);
+keyPoint_GenR          = 75;
 
 keyPoint_KotH_pause     = fr_fps1*180;
 
@@ -1255,7 +1255,7 @@ smt_lost               = 5;  //UID_Lost
 smt_imp                = 6;  //UID_Imp,UID_Demon,UID_ZFormer,UID_ZSergant,UID_ZBomber,UID_ZBFG,UID_Baron,UID_Cyberdemon:
 smt_zengineer          = 7;  //UID_ZEngineer
 smt_zcommando          = 8;  //UID_ZCommando
-smt_fmajor             = 9;  //UID_Majot,UID_ZMajor
+smt_fplasmag           = 9;  //UID_Majot,UID_ZMajor
 smt_caco               = 10; //UID_Cacodemon
 smt_mmind              = 11; //UID_Mastermind
 smt_pain               = 12; //UID_Pain

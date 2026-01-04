@@ -618,7 +618,7 @@ lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]
                lmt_game_StartsIn     : g_LobbyTimer:=adatau*fr_fps1-1;
                lmt_game_BreakStarting: g_LobbyTimer:=0;
                end;
-        true : case amtype of
+        {true : case amtype of
                lmt_player_leave,
                lmt_player_surrender,
                lmt_player_timeout,
@@ -636,7 +636,7 @@ lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]
                                                                  if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
                                                                  end;
                                            end;
-               end;
+               end;   }
         end;
 
         if(net_status=ns_client)or(not g_started)

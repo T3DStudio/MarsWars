@@ -347,12 +347,12 @@ begin
    str_ui_Tab[tab_Units    ]     := 'Units';
    str_ui_Tab[tab_Upgrades ]     := 'Upgrades';
    str_ui_Tab[tab_Controls ]     := 'Controls';
-   str_ui_LimitArmy              := tc_orange+'Army limit'  +tc_white+': ';
-   str_ui_LimitBuildings         := tc_red   +'Units'       +tc_white+': ';
-   str_ui_LimitUnits             := tc_gray  +'Buildings'   +tc_white+': ';
-   str_ui_EnergyLevel            := tc_aqua  +'Energy level'+tc_white+': ';
-   str_ui_HellPower              := tc_yellow+'Hell power'  +tc_white+': ';
-   str_ui_UACLoot                := tc_lime  +'UAC Loot'    +tc_white+': ';
+   str_ui_LimitArmy              := tc_orange+'Army limit'  +tc_white;
+   str_ui_LimitBuildings         := tc_red   +'Units'       +tc_white;
+   str_ui_LimitUnits             := tc_gray  +'Buildings'   +tc_white;
+   str_ui_EnergyLevel            := tc_aqua  +'Energy level'+tc_white;
+   str_ui_HellPower              := tc_yellow+'Hell power'  +tc_white;
+   str_ui_UACLoot                := tc_lime  +'UAC Loot'    +tc_white;
    str_ui_objectives             := 'Objectives:';
    str_ui_SelectTarget           := 'Select target for ';
 
@@ -545,8 +545,8 @@ begin
    str_SetAbilityBaseHint(uab_ToUBarracks        ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUFactory         ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUWeaponFactory   ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_URadarLvlUp        ,t1                         ,'Upgrades the Radar to lower its ability reload time');
-   str_SetAbilityBaseHint(uab_URMStationLvlUp    ,t1                         ,'Upgrades the Rocket Launcher Station to lower its ability reload time');
+   str_SetAbilityBaseHint(uab_URadarLvlUp        ,t1+'"Radar"'               ,'Upgrades the Radar to lower its ability reload time');
+   str_SetAbilityBaseHint(uab_URMStationLvlUp    ,t1+'"Rocket Launcher Station"','Upgrades the Rocket Launcher Station to lower its ability reload time');
 
 
    /////////////////////////////////////////////////////////////////////////////
@@ -850,18 +850,18 @@ begin
    str_StringListClear(@str_doc_BaseMechanics);
 
    DocHelp_AddBaseMchanics(tc_orange+'RESOURCES'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics( '');
+   DocHelp_AddBaseMchanics(' ');
    DocHelp_AddBaseMchanics(tc_docbr+'There are 3 types of resources in the game:');
-   DocHelp_AddBaseMchanics(tc_docbr+'- The main resource of the game is the "'+tc_aqua+'energy level'+tc_default+'". Almost all production (building construction, unit creation, or upgrade research) in the game consumes this resource.');
+   DocHelp_AddBaseMchanics(tc_docbr+'- The main resource of the game is the "'+str_ui_EnergyLevel+'". Almost all production (building construction, unit creation, or upgrade research) in the game consumes this resource.');
    DocHelp_AddBaseMchanics('In the user interface, it is displayed as two numbers: the level of free energy and the '+tc_aqua+'maximum energy level'+tc_default+'.');
    DocHelp_AddBaseMchanics('When a player starts any production that requires this resource, the game reduces the free energy level by the production cost and restores this amount after the production is completed.');
    DocHelp_AddBaseMchanics('The energy level can be increased by specific buildings, as well as special objects on the game map that need to be captured and held.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr+'There are also 2 additional types of resources used for special technologies and abilities:');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_ui_HellPower+' when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.');
-   DocHelp_AddBaseMchanics('The replenishment rate increases with each additional "Altar," but constructing more than three "Altars" does not provide any further benefit. When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_ui_HellPower+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.');
+   DocHelp_AddBaseMchanics('The replenishment rate increases with each additional "Altar of Pain", but constructing more than three "Altars of Pain" does not provide any further benefit. When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.');
    DocHelp_AddBaseMchanics('Maximum quantity: '+i2s(HellPower_Max)+'. ');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_ui_UACLoot+' this resource is acquired by both factions through the destruction of enemy UAC units and buildings. Maximum quantity: '+i2s(UACLoot_Max)+'.');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_ui_UACLoot+' - this resource is acquired by both factions through the destruction of enemy UAC units and buildings. Maximum quantity: '+i2s(UACLoot_Max)+'.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'ARMY LIMIT'+tc_default+tc_doccpt);
@@ -909,9 +909,9 @@ begin
    DocHelp_AddBaseMchanics(tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(' ');
    DocHelp_AddBaseMchanics(tc_docbr+'1) The game takes the attacking unit`s base damage and adds bonuses from upgrades and veteran level;');
-   DocHelp_AddBaseMchanics(tc_docbr+'2) Special effects of the attacking unit that affect its damage amount are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SDDamage+'");');
+   DocHelp_AddBaseMchanics(tc_docbr+'2) Special effects of the attacking unit that affect its damage amount are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SDDamage+'" effect);');
    DocHelp_AddBaseMchanics(tc_docbr+'3) A damage modifier for the attacking unit is applied to the resulting value;');
-   DocHelp_AddBaseMchanics(tc_docbr+'4) Special effects reducing the received damage by the target unit are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SRDamage+'");');
+   DocHelp_AddBaseMchanics(tc_docbr+'4) Special effects reducing the received damage by the target unit are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SRDamage+'" effect);');
    DocHelp_AddBaseMchanics(tc_docbr+'5) The armor of the target unit is calculated (bonuses from upgrades and its veteran level are summed up) and subtracted from the inflicted damage; if the damage drops below 1, it is raised to 1;');
    DocHelp_AddBaseMchanics(tc_docbr+'6) The target unit receives the final calculated damage.');
    DocHelp_AddBaseMchanics(tc_docbr+'Special cases:');
@@ -1051,7 +1051,7 @@ begin
    DocHelp_AddOther(tc_docbr);
    DocHelp_AddOther('Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:');
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther('MarsWars_ded.exe [X]');
+   DocHelp_AddOther('   MarsWars_ded.exe [X]');
    DocHelp_AddOther(tc_docbr);
    DocHelp_AddOther('where X - UDP port (optional argument, default value - 10666). Any connected player can change the game settings in a dedicated server`s lobby.');
    DocHelp_AddOther('The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.');
@@ -1082,13 +1082,8 @@ begin
    str_camp_Add('Hell March');
    str_camp_Add('Payback time');
    str_camp_Add('Corporate wars');
-   str_camp_Add('test1');
-   str_camp_Add('test1');
-   str_camp_Add('test1');
 
    str_camp_MisAdd(0,'Tutorial');
-   for i:=0 to 20 do
-   str_camp_MisAdd(1,'Tutorial'+b2s(i));
 
 
    {str_cmp_unk       := 'UNKNOWN';

@@ -386,7 +386,7 @@ begin
       tx:=mm3i(0,tx,map_Size1);
       ty:=mm3i(0,ty,map_Size1);
       {$IFDEF _FULLGAME}
-      effect_teleport(vx,vy,tx,ty,isfly,eidstart,eidend,snd);
+      effect_teleport(vx,vy,tx,ty,isfly,eidstart,eidend,snd,pu);
       {$ENDIF}
       buffs[ub_Teleported]:=fr_fps1;
       unit_SetXY(pu,tx,ty,mvxy_strict);
@@ -1302,7 +1302,7 @@ begin
 end;
 {$ENDIF}
 
-function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles,check_castPoint:boolean;reveal_u:PTUnit=nil):TCheckCollisionR;
+function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean;checkTeamVis:byte;reveal_u:PTUnit=nil):TCheckCollisionR;
 var u,dx,dy:integer;
 begin
    CheckCollisionR:=cbr_no;
@@ -1316,42 +1316,39 @@ begin
      end;
 
    for u:=1 to MaxUnits do
-    if(u<>skipunit)then
-     with g_punits[u]^ do
-      with uid^ do
-       if(hits>0)and(isfly=flylevel)and(IsUnitRange(transportU,nil)=false)then
-        if(speed<=0)or(not iscomplete)then
-         if(point_dist_int(x,y,tx,ty)<(tr+uid_r))then
-         begin
-            CheckCollisionR:=cbr_unit;
-            if(reveal_u<>nil)then
-            begin
-               AddToInt(@TeamVision[reveal_u^.player^.team],MinVisionTime);
-               AddToInt(@TeamDetection[reveal_u^.player^.team],MinVisionTime);
-               AddToInt(@reveal_u^.TeamVision[player^.team],MinVisionTime);
-               AddToInt(@reveal_u^.TeamDetection[player^.team],MinVisionTime);
-            end;
-            exit;
-         end
-         else
-           if(check_castPoint)then ;
+     if(u<>skipunit)then
+       with g_punits[u]^ do
+         with uid^ do
+           if(hits>0)and(isfly=flylevel)and(not IsUnitRange(transportU,nil))then
+           begin
+              if(checkTeamVis<=LastPlayer)then
+                if(TeamVision[checkTeamVis]<=0)then continue;
+              if(speed<=0)or(not iscomplete)then
+                if(point_dist_int(x,y,tx,ty)<(tr+uid_r))then
+                begin
+                   CheckCollisionR:=cbr_unit;
+                   if(reveal_u<>nil)then
+                   begin
+                      AddToInt(@TeamVision   [reveal_u^.player^.team],MinVisionTime);
+                      AddToInt(@TeamDetection[reveal_u^.player^.team],MinVisionTime);
+                      AddToInt(@reveal_u^.TeamVision   [player^.team],MinVisionTime);
+                      AddToInt(@reveal_u^.TeamDetection[player^.team],MinVisionTime);
+                   end;
+                   exit;
+                end;
+           end;
 
    if(flylevel)then exit;
 
-   for u:=0 to LastKeyPoint do
-    with map_KeyPointsL[u] do
-     if(kpCaptureR>0)then
-     begin
-        if(building)
-        then dx:=max2i(kpSolidr,kpNoBuildR)
-        else dx:=kpSolidr;
-        if(dx<=0)then continue;
-        if(point_dist_int(tx,ty,kpx,kpy)<dx)then
-        begin
-           CheckCollisionR:=cbr_cpoint;
-           exit;
-        end;
-     end;
+   if(building)then
+     for u:=0 to LastKeyPoint do
+       with map_KeyPointsL[u] do
+         if(kpCaptureR>0)and(kpNoBuildR>0)then
+           if(point_dist_int(tx,ty,kpx,kpy)<kpNoBuildR)then
+           begin
+              CheckCollisionR:=cbr_cpoint;
+              exit;
+           end;
 
    if(not check_obstacles)then exit;
 
@@ -1360,17 +1357,18 @@ begin
    dx:=tx div MapObstaclesGridW;
    dy:=ty div MapObstaclesGridW;
 
-   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-    with map_ObstaclesGrid[dx,dy] do
-     if(oc_n>0)then
-      for u:=0 to oc_n-1 do
-       with oc_l[u]^ do
-        if(o_r>0)and(o_type>0)then
-         if(point_dist_int(o_x,o_y,tx,ty)<(tr+o_r))then
-         begin
-            CheckCollisionR:=cbr_obstacle;
-            exit;
-         end;
+   if (0<=dx)and(dx<=MapObstaclesGridN)
+   and(0<=dy)and(dy<=MapObstaclesGridN)then
+     with map_ObstaclesGrid[dx,dy] do
+       if(oc_n>0)then
+         for u:=0 to oc_n-1 do
+           with oc_l[u]^ do
+             if(o_r>0)and(o_type>0)then
+               if(point_dist_int(o_x,o_y,tx,ty)<(tr+o_r))then
+               begin
+                  CheckCollisionR:=cbr_obstacle;
+                  exit;
+               end;
 end;
 
 function CheckInBuildArea(tx,ty,tr:integer;buid,playerN:byte):TCheckBuildArea;
@@ -1430,7 +1428,7 @@ begin
    }
    case CheckInBuildArea(tx,ty,0,buid,playern) of
 cba_inBuildArea : with g_uids[buid] do
-                    if(CheckCollisionR(tx,ty,tr+uid_r,skip_unit,uid_isbuilding,uid_isfly,true,false)<>cbr_no)then
+                    if(CheckCollisionR(tx,ty,tr+uid_r,skip_unit,uid_isbuilding,uid_isfly,true,255)<>cbr_no)then
                       CheckBuildPlace:=cbp_noplace;
 cba_NoBuildArea : CheckBuildPlace:=cbp_noplace;
 cba_outBuildArea: CheckBuildPlace:=cbp_out;
@@ -1456,7 +1454,7 @@ begin
 
       rld:=fr_fps1;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,false,pu)<>cbr_no)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,255,pu)<>cbr_no)then
       begin
          unit_ability_HKeepBlink:=ureq_landplace;
          exit;
@@ -1496,7 +1494,7 @@ begin
       unit_ability_HTowerBlink:=0;
       if(check)then exit;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,false,pu )<>cbr_no)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,255,pu )<>cbr_no)then
       begin
          unit_ability_HTowerBlink:=ureq_landplace;
          rld:=fr_fps1;
@@ -2486,6 +2484,16 @@ begin
       // OTHER
       if(upgrs_cur[upgr_invuln]>0)then buffs[ub_SphereInvuln]:=fr_fps1;
 
+      case uidi of
+      UID_UTransport: if(transportM>uid_TransportMax_Base)
+                      then level:=1
+                      else level:=0;
+      UID_UGTurret  : if(upgrs_cur[upgr_uac_TurretPlasma]>0)
+                      then level:=1
+                      else level:=0;
+      end;
+
+
       // SIGHT RANGE
       if(iscomplete)then
       begin
@@ -2494,7 +2502,7 @@ begin
            t+=integer(upgrs_cur[uid_SightR_upgr])*uid_SightR_upgrV;
       end
       else t:=uid_r+uid_r;
-      SetSRange(t)
+      SetSRange(t);
    end;
 end;
 

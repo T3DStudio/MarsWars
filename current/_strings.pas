@@ -442,6 +442,9 @@ begin
   with g_aids[aid] do
   begin
      ua_str_name    :=NAME;
+     if(ua_mbrush_hint>0)then
+       with g_uids[ua_mbrush_hint] do
+         ua_str_name+='"'+uid_str_name+'"';
      ua_str_Descript:=DESCR;
      str_EndDot(@ua_str_Descript);
   end;
@@ -916,14 +919,9 @@ var HK:shortstring;
 begin
    HK:=str_AbilityHotKey(aid,uipos);
    with g_aids[aid] do
-   begin
-      str_AbilityHintName:=ua_str_name;
-      if(ua_mbrush_hint>0)then
-        with g_uids[ua_mbrush_hint] do
-          str_AbilityHintName+='"'+uid_str_name+'"';
-   end;
-   if(length(HK)>0)then
-     str_AbilityHintName:=str_AbilityHintName+' ('+HK+')';
+     if(length(HK)>0)
+     then str_AbilityHintName:=ua_str_name+' ('+HK+')'
+     else str_AbilityHintName:=ua_str_name;
 end;
 
 function str_UIDCostLimit(uid:byte;halfProdTime:boolean=false):shortstring;

@@ -497,26 +497,28 @@ end;
 
 procedure SetThemeCampaign(campaign,mission:byte);
 begin
+   case campaign of
+   0 : case mission of
+       0 : begin  // CAMPAINGS:  HELL
+              SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+              SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'9_12'                  );
+              SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'5_8,13,14'             );
+              SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'3,9,13,14,16,20,21,28,36,42_47');
+
+              theme_liquid_style:=0;
+              theme_crater_style:=0;
+
+              SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'23');
+              SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1' );
+              SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'27');
+              SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4' );
+           end;
+       end;
+   end;
+
   { case theme_id of
    0
-    : begin  // CAMPAINGS:  HELL
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'9_12'                  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'5_8,13,14'             );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'3,9,13,14,16,20,21,28,36,42_47');
-
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-
-         case theme_id of
-         0: begin
-            SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'23');
-            SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1' );
-            SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'27');
-            SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4' );
-            end;
-         end;
-      end;
+    :
 
    1,2
     : begin  // CAMPAINGS: PHOBOS

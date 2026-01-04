@@ -135,10 +135,13 @@ begin
 end;
 
 function unit_morph(pu:PTUnit;ouid:byte;ocomplete:boolean;bhits:integer;ulevel:byte;check:boolean):cardinal;
-var pTempU:PTUnit;
+var
+pOldU  :PTUnit;
+pNewUID:PTUID;
 begin
    unit_morph:=0;
    with pu^     do
+   with uid^    do
    with player^ do
    begin
       if(hits<=0)then
@@ -146,20 +149,21 @@ begin
          unit_morph:=ureq_other;
          exit;
       end;
-      pTempU:=g_punits[0];
-      pTempU^:=pu^;
+      pOldU  :=g_punits[0];
+      pOldU^ :=pu^;
+      pNewUID:=@g_uids[ouid];
 
       if(units_uid_m[ouid]<=0)then
       begin
          unit_morph:=ureq_max;
          exit;
       end;
-      if((armylimit-pu^.uid^.uid_LimitUse+pTempU^.uid^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then
+      if((armylimit-uid_LimitUse+pNewUID^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then
       begin
          unit_morph:=ureq_armylimit;
          exit;
       end;
-      if(not ocomplete)or(pTempU^.uid^.uid_isbuilding)then
+      if(not ocomplete)or(pNewUID^.uid_isbuilding)then
         if(res_energyl_max<=0)then
         begin
            unit_morph:=ureq_energy;
@@ -172,22 +176,22 @@ begin
             unit_morph:=ureq_other;
             exit;
          end;
-         if((res_energyl_cur-uid^.uid_gen_EnergyLevel)<pTempU^.uid^.uid_req_EnergyLevel)or(res_energyl_max<=uid^.uid_gen_EnergyLevel)then
+         if((res_energyl_cur-uid_gen_EnergyLevel)<pNewUID^.uid_req_EnergyLevel)or(res_energyl_max<=uid_gen_EnergyLevel)then
          begin
             unit_morph:=ureq_energy;
             exit;
          end;
-         if(res_HellPower<uid^.uid_req_HellPower)then
+         if(res_HellPower<pNewUID^.uid_req_HellPower)then
          begin
             unit_morph:=ureq_HellPower;
             exit;
          end;
-         if(res_UACLoot<uid^.uid_req_UACLoot)then
+         if(res_UACLoot<pNewUID^.uid_req_UACLoot)then
          begin
             unit_morph:=ureq_UACLoot;
             exit;
          end;
-         if(CheckCollisionR(x,y,pTempU^.uid^.uid_r,unum,pTempU^.uid^.uid_isbuilding,pTempU^.uid^.uid_isfly,true,false)<>cbr_no)then
+         if(CheckCollisionR(x,y,pNewUID^.uid_r,unum,pNewUID^.uid_isbuilding,pNewUID^.uid_isfly,true,255)<>cbr_no)then
          begin
             unit_morph:=ureq_place;
             exit;
@@ -206,30 +210,38 @@ begin
 
       vx:=x;
       vy:=y;
+   end;
+
+   with pOldU^ do
+   with player^ do
+   begin
       units_all_e+=1;   // ??? костыль что бы игрок не проигрывал если трансформируется единственное здание/юнит
       unit_kill(pu,true,true,false,false,true);
       units_all_e-=1;
       unit_add(x,y,unum,ouid,playeri,ocomplete,true,ulevel);
+
+      res_HellPower-=pNewUID^.uid_req_HellPower;
+      res_UACLoot  -=pNewUID^.uid_req_UACLoot;
    end;
 
-   if(bhits<0)then bhits:=pTempU^.uid^.uid_MaxHits1 div abs(bhits);
    if(LastCreatedUnitP<>nil)then
      with LastCreatedUnitP^ do
      begin
+        if(bhits<0)then bhits:=pNewUID^.uid_MaxHits1 div abs(bhits);
         with uid^ do
           if(uid_HaveRallyPoint)then
           begin
-             rpoint_tar:=pTempU^.rpoint_tar;
-             rpoint_x  :=pTempU^.rpoint_x;
-             rpoint_y  :=pTempU^.rpoint_y;
+             rpoint_tar:=pOldU^.rpoint_tar;
+             rpoint_x  :=pOldU^.rpoint_x;
+             rpoint_y  :=pOldU^.rpoint_y;
           end;
-        TeamDetection:=pTempU^.TeamDetection;
-        TeamVision   :=pTempU^.TeamVision;
+        TeamDetection:=pOldU^.TeamDetection;
+        TeamVision   :=pOldU^.TeamVision;
         if(bhits>0)then
-          if(not iscomplete)then hits:=mm3i(1,bhits,pTempU^.uid^.uid_MaxHits1-1);
-        if(pTempU^.isselected)then unit_select(LastCreatedUnitP);
-        buffs[ub_Heroic]:=pTempU^.buffs[ub_Heroic];
-        if(pTempU^.uidi=uidi)then rld:=pTempU^.rld;
+          if(not iscomplete)then hits:=mm3i(1,bhits,uid^.uid_MaxHits1-1);
+        if(pOldU^.isselected)then unit_select(LastCreatedUnitP);
+        buffs[ub_Heroic]:=pOldU^.buffs[ub_Heroic];
+        if(pOldU^.uidi=uidi)then rld:=pOldU^.rld;
      end;
 end;
 
@@ -1925,8 +1937,10 @@ begin
                               uo_by :=-1;
                               move_x:=uo_x;
                               move_y:=uo_y;
-                              if(x=uo_x)and(y=uo_y)then
+                              //if(x=uo_x)and(y=uo_y)then
+                              if(max2i(abs(x-uo_x),abs(y-uo_y))<speed)then
                               begin
+                                 unit_SetXY(pCaster,uo_x,uo_y,mvxy_none);
                                  case aid of
                                  uab_ToUATurretTo: unit_AbilityExec:=unit_morph(pCaster,uid_UATurret,false,-2,0,false);
                                  uab_ToUGTurretTo: unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret,false,-2,0,false);
@@ -2030,7 +2044,7 @@ begin
                                      speed:=0;
 
                                      if(ServerSide)and(zfall<>0)then
-                                       if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,false,pu)<>cbr_no)then
+                                       if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,255,pu)<>cbr_no)then
                                        begin
                                           buffs[ub_AltMode]:=ub_infinity;
                                           rld:=fr_fps1;

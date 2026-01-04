@@ -427,19 +427,21 @@ begin
                           UnitsInfo_AddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
              end;
          // rally points
-         if(isselected)and(uid_HaveRallyPoint)then
-         begin
-            UnitsInfo_AddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
-            SpriteList_AddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
-         end;
+         if(uid_HaveRallyPoint)then
+           if(isselected)or(m_UnitTargetN=unum)then
+           begin
+              UnitsInfo_AddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
+              SpriteList_AddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
+           end;
       end;
 
       if(speed>0)then
         if(uo_x<>x)or(uo_y<>y)then // unit is moving or casting
           case uo_id of
           ua_move,
-          ua_amove   : if(uo_bx>0)and(isselected)and(speed>0)and(rpls_pstate<rpls_read)and(net_status<>ns_client)then
-                         UnitsInfo_AddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+          ua_amove   : if(uo_bx>0)then
+                         if(isselected)or(m_UnitTargetN=unum)then
+                           UnitsInfo_AddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
           ua_ability1,
           ua_ability2,
           ua_ability3: begin
@@ -456,7 +458,8 @@ begin
                                                      UnitsInfo_AddCircle(uo_x,uo_y,t,ui_blink2_color_BY);
                                                 end;
 
-                                                if(isselected)then UnitsInfo_AddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+                                                if(isselected)or(m_UnitTargetN=unum)then
+                                                  UnitsInfo_AddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
                                              end;
                               uat_UnitAny,
                               uat_UnitOwn,
@@ -623,7 +626,7 @@ begin
       if(buffs[ub_Invisibility ]>0)then spr_alpha:=128;
 
       if(buffs[ub_SphereInvuln ]>0)then ColorAura:=c_awhite;
-      if(buffs[ub_SphereRDamage ]>0)then ColorAura:=c_agray;
+      if(buffs[ub_SphereRDamage]>0)then ColorAura:=c_agray;
       if(buffs[ub_SphereDDamage]>0)then ColorAura:=c_ared;
       if(buffs[ub_SphereTurbo  ]>0)then ColorAura:=c_aorange;
 

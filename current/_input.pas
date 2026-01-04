@@ -308,9 +308,9 @@ begin
    ui_panel_CTabIActs[tcc_replay  ,MPos(3 )]:=iAct_Replay_Back60;
    ui_panel_CTabIActs[tcc_replay  ,MPos(4 )]:=iAct_Replay_Back10;
    ui_panel_CTabIActs[tcc_replay  ,MPos(5 )]:=iAct_Replay_Back2;
-   ui_panel_CTabIActs[tcc_replay  ,MPos(6 )]:=iAct_Replay_Forward2;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(6 )]:=iAct_Replay_Forward60;
    ui_panel_CTabIActs[tcc_replay  ,MPos(7 )]:=iAct_Replay_Forward10;
-   ui_panel_CTabIActs[tcc_replay  ,MPos(8 )]:=iAct_Replay_Forward60;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(8 )]:=iAct_Replay_Forward2;
    ui_panel_CTabIActs[tcc_replay  ,MPos(9 )]:=iAct_Replay_POV;
    ui_panel_CTabIActs[tcc_replay  ,MPos(10)]:=iAct_Replay_Log;
    ui_panel_CTabIActs[tcc_replay  ,MPos(11)]:=iAct_Replay_Fog;
@@ -699,7 +699,7 @@ begin
                                                     with g_uids[tuid] do
                                                     begin
                                                        math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
-                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,true)<>cbr_no)
+                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,g_gplayers[LocalPlayer].team)<>cbr_no)
                                                        then m_brushc:=c_red;
                                                     end;
                                                end

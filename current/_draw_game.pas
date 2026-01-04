@@ -557,6 +557,23 @@ begin
        end;
 end;
 
+{procedure draw_FilledRing(rx,ry,rOutR,rInR:integer);
+var
+sx,sy:integer;
+begin
+   {sx:=
+
+   cellhw:=round(did_r[1]/1.27);
+   cellw :=cellhw*2;
+
+   cx:=(map_hSize mod cellw);
+   if(cx>=cellhw)then cx-=cellw;
+   cx:=map_Size-cx;
+   odd:=false;
+
+   iy:=map_hSize;
+   }
+end;}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -578,7 +595,8 @@ begin
 
         if(kpEnergy>0)then
         begin
-           SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_kp_gen,255);
+           SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy  ,scolor,@spr_kp_outG        ,255);
+           SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy+1,0     ,@spr_kp_gen[t mod 2],255);
            for i:=1 to 6 do
            begin
               ddir:=(i*60)*degtorad;
@@ -630,6 +648,7 @@ end;
 procedure draw_LayerFog(tar:pSDL_Surface);
 var
 cx,cy,
+sx,sy,
 ssx,ssy,i,
 sty    : integer;
 function GV(fx,fy:integer):boolean;
@@ -646,16 +665,19 @@ begin
    ssx :=-ui_cam_fx;
    sty :=-ui_cam_fy;
 
-   for cx:=0 to ui_fog_gridw-1 do
+   if(ui_cam_x>=0)then sx:=0 else begin sx:=-1;ssx-=fog_cw;end;
+   if(ui_cam_y>=0)then sy:=0 else begin sy:=-1;sty-=fog_cw;end;
+
+   for cx:=sx to ui_fog_gridw-1 do
    begin
       ssy:=sty;
-      for cy:=0 to ui_fog_gridh-1 do
+      for cy:=sy to ui_fog_gridh-1 do
       begin
          i:=TileSetGetN(GV(cx,cy-1),
             GV(cx-1,cy),GV(cx,cy  ),GV(cx+1,cy),
                         GV(cx,cy+1));
          if(0<=i)and(i<=fog_TileSetSize)then draw_sdlsurface(tar,ssx, ssy, ui_fog_Tiles[i]);
-
+         if(cx>=0)and(cy>=0)then
          ui_fog_fgrid[cx,cy]:=false;
          ssy+=fog_cw;
       end;

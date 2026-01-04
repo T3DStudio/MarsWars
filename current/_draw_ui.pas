@@ -776,15 +776,15 @@ begin
        if(state<>ps_none)and(not isdefeated)and(not isobserver)then
        begin
           limit:=armylimit+prod_unit_Limit;
-          draw_text(tar,ui_EnergyX,ui_EnergyY   ,str_ui_EnergyLevel   +tc_default+i2s(res_energyl_cur           )+tc_white+' / '+tc_aqua  +i2s(res_energyl_max)
+          draw_text(tar,ui_EnergyX,ui_EnergyY   ,str_ui_EnergyLevel   +': '+tc_default+i2s(res_energyl_cur           )+tc_white+' / '+tc_aqua  +i2s(res_energyl_max)
                                                                                                                                ,ta_RU,255,ui_cenergy[res_energyl_cur<=0] );
-          draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +tc_default+i2s(res_HellPower)                           ,ta_RU,255,c_white);
-          draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,c_white);
+          draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,c_white);
+          draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,c_white);
 
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr
                                                                                                                                ,ta_LU,255,ui_limit[limit>=MaxPlayerLimit]);
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY1    ,str_ui_LimitUnits    +limit2s(units_bld_l[true ]                ,MinUnitLimit),ta_LU,255,c_white);
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY2    ,str_ui_LimitBuildings+limit2s(units_bld_l[false]+prod_unit_Limit,MinUnitLimit),ta_LU,255,c_white);
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY1    ,str_ui_LimitUnits    +': '+limit2s(units_bld_l[true ]                ,MinUnitLimit),ta_LU,255,c_white);
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY2    ,str_ui_LimitBuildings+': '+limit2s(units_bld_l[false]+prod_unit_Limit,MinUnitLimit),ta_LU,255,c_white);
 
           draw_UIGroupsIcons(tar);
        end;
@@ -856,8 +856,44 @@ begin
 end;
 
 procedure draw_UIMouseCursor(tar:pSDL_Surface);   //cursor/brash
+function UIMouseEdgeCursor:boolean;
 begin
-   draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
+   UIMouseEdgeCursor:=false;
+   if(not ui_MouseScroll)then exit;
+
+   if(mouse_x>ui_vmb_x1)and(mouse_y<ui_vmb_y0)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[2],mouse_y-spr_cursor_movey[2],spr_cursor_move[2])
+   else
+   if(mouse_x<ui_vmb_x0)and(mouse_y<ui_vmb_y0)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[4],mouse_y-spr_cursor_movey[4],spr_cursor_move[4])
+   else
+   if(mouse_x<ui_vmb_x0)and(mouse_y>ui_vmb_y1)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[6],mouse_y-spr_cursor_movey[6],spr_cursor_move[6])
+   else
+   if(mouse_x>ui_vmb_x1)and(mouse_y>ui_vmb_y1)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[8],mouse_y-spr_cursor_movey[8],spr_cursor_move[8])
+   else
+   if(mouse_x>ui_vmb_x1)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[1],mouse_y-spr_cursor_movey[1],spr_cursor_move[1])
+   else
+   if(mouse_x<ui_vmb_x0)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[5],mouse_y-spr_cursor_movey[5],spr_cursor_move[5])
+   else
+   if(mouse_y<ui_vmb_y0)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[3],mouse_y-spr_cursor_movey[3],spr_cursor_move[3])
+   else
+   if(mouse_y>ui_vmb_y1)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[7],mouse_y-spr_cursor_movey[7],spr_cursor_move[7])
+   else exit;
+   UIMouseEdgeCursor:=true;
+end;
+begin
+   if(m_DragCamMove)
+   then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[0],mouse_y-spr_cursor_movey[0],spr_cursor_move[0])
+   else
+     if(not UIMouseEdgeCursor)then
+       draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
+
    case m_brush of
    co_empty  :;
    co_move,

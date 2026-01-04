@@ -133,8 +133,6 @@ begin
       isrevealed:=false;
       log_n     :=0;
       log_n_cl  :=0;
-      res_HellPower:=30000;
-      res_UACLoot  :=30000;
    end;
 end;
 
@@ -418,7 +416,13 @@ begin
 
    {$IFDEF _FULLGAME}
    case g_type of
-   gt_campaing: ;
+   gt_campaing: if(camp_sel<0)
+                or(camp_size<=camp_sel)
+                then exit
+                else
+                  if(camp_mis_sel<0)
+                  or(camp_mis_size[camp_sel]<=camp_mis_sel)
+                  then exit;
    gt_scirmish: if(not PlayersAllReady)
                 or(PlayersNonObserversCount<2)
                 then exit;

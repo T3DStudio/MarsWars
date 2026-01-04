@@ -332,7 +332,7 @@ procedure drawmenu_BlockHelpInfo(tar:pSDL_Surface);   // HELP INFO
 begin
    if(menu_HelpIList<>nil)then
      with menu_HelpIList^ do
-       drawmenu_StringArray(tar,mi_help_InfoList,@slist_l,slist_n,menu_HelpScroll,-1,txt_line_h1,-1,ui_DocListH,true);
+       drawmenu_StringArray(tar,mi_help_InfoList,@slist_l,slist_n,menu_HelpScroll,-1,txt_line_h1,-1,ui_DocListH,false,true);
 end;
 
 procedure drawmenu_BlockHelpUnitsInfo(tar:pSDL_Surface;forBalance:boolean=false);  // HELP UNITS TABLE

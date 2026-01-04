@@ -629,6 +629,16 @@ begin
       surf:=gfx_CreateSDLSurface(1,1);
       gfx_SetTransparent(surf);
    end;
+   with spr_kp_outG do
+   begin
+      hw:=keyPoint_GenR-6;
+      hh:=hw;
+      w :=hw*2;
+      h :=w;
+      surf:=gfx_CreateSDLSurface(1,1);
+      gfx_SetTransparent(surf);
+   end;
+
 
    spr_MenuBackgroundL:=gfx_LoadSDLSurface('mback',false,true);
    spr_MenuBackgroundD:=gfx_CreateSDLSurface(spr_MenuBackgroundL^.w,spr_MenuBackgroundL^.h);
@@ -711,6 +721,26 @@ begin
    spr_CursorHint_MRB[true ]:= gfx_LoadSDLSurface('h_MRB1'   ,true ,true);
    spr_CursorHint_MMB[false]:= gfx_LoadSDLSurface('h_MMB0'   ,true ,true);
    spr_CursorHint_MMB[true ]:= gfx_LoadSDLSurface('h_MMB1'   ,true ,true);
+   for x:=0 to 8 do
+   spr_cursor_move[x]       := gfx_LoadSDLSurface('cursor_move_'+i2s(x),true ,true);
+   spr_cursor_movex[0]:=spr_cursor_move[0]^.w div 2;
+   spr_cursor_movey[0]:=spr_cursor_move[0]^.h div 2;
+   spr_cursor_movex[1]:=spr_cursor_move[1]^.w;
+   spr_cursor_movey[1]:=spr_cursor_move[1]^.h div 2;
+   spr_cursor_movex[2]:=spr_cursor_move[2]^.w;
+   spr_cursor_movey[2]:=0;
+   spr_cursor_movex[3]:=spr_cursor_move[3]^.w div 2;
+   spr_cursor_movey[3]:=0;
+   spr_cursor_movex[4]:=0;
+   spr_cursor_movey[4]:=0;
+   spr_cursor_movex[5]:=0;
+   spr_cursor_movey[5]:=spr_cursor_move[5]^.h div 2;
+   spr_cursor_movex[6]:=0;
+   spr_cursor_movey[6]:=spr_cursor_move[6]^.h;
+   spr_cursor_movex[7]:=spr_cursor_move[7]^.w div 2;
+   spr_cursor_movey[7]:=spr_cursor_move[7]^.h;
+   spr_cursor_movex[8]:=spr_cursor_move[8]^.w;
+   spr_cursor_movey[8]:=spr_cursor_move[8]^.h;
 
    tst                      := gfx_LoadSDLSurface('cursor_sub',true ,true);
    spr_cursorSubR           := gfx_CreateSDLSurface(tst^.w,tst^.h);
@@ -755,30 +785,29 @@ begin
 
    gfx_LoadMWSModel(@spr_ZFormer            ,folder_RaceUnits[r_hell]+'h_z0_'          ,smt_imp      );
    gfx_LoadMWSModel(@spr_ZEngineer          ,folder_RaceUnits[r_hell]+'h_z0s_'         ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZSergant           ,folder_RaceUnits[r_hell]+'h_z1_'          ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZSSergant          ,folder_RaceUnits[r_hell]+'h_z1s_'         ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZShotgunner        ,folder_RaceUnits[r_hell]+'h_z1_'          ,smt_imp      );
+   gfx_LoadMWSModel(@spr_ZSSGunner          ,folder_RaceUnits[r_hell]+'h_z1s_'         ,smt_imp      );
    gfx_LoadMWSModel(@spr_ZCommando          ,folder_RaceUnits[r_hell]+'h_z2_'          ,smt_zcommando);
    gfx_LoadMWSModel(@spr_ZAntiaircrafter    ,folder_RaceUnits[r_hell]+'h_zr_'          ,smt_imp      );
    gfx_LoadMWSModel(@spr_ZSiege             ,folder_RaceUnits[r_hell]+'h_z3_'          ,smt_imp      );
-   gfx_LoadMWSModel(@spr_ZFMajor            ,folder_RaceUnits[r_hell]+'h_z4j_'         ,smt_fmajor   );
+   gfx_LoadMWSModel(@spr_ZPlasmagunner      ,folder_RaceUnits[r_hell]+'h_z4j_'         ,smt_fplasmag );
    gfx_LoadMWSModel(@spr_ZBFG               ,folder_RaceUnits[r_hell]+'h_z5_'          ,smt_imp      );
 
    gfx_LoadMWSModel(@spr_Medic              ,folder_RaceUnits[r_uac ]+'u_u0_'          ,smt_medic    );
    gfx_LoadMWSModel(@spr_Engineer           ,folder_RaceUnits[r_uac ]+'u_u1_'          ,smt_marine0  );
-   gfx_LoadMWSModel(@spr_Scout              ,folder_RaceUnits[r_uac ]+'u_u1s_'         ,smt_imp      );
-   gfx_LoadMWSModel(@spr_Sergant            ,folder_RaceUnits[r_uac ]+'u_u2_'          ,smt_imp      );
-   gfx_LoadMWSModel(@spr_SSergant           ,folder_RaceUnits[r_uac ]+'u_u2s_'         ,smt_imp      );
+   gfx_LoadMWSModel(@spr_Shotgunner         ,folder_RaceUnits[r_uac ]+'u_u2_'          ,smt_imp      );
+   gfx_LoadMWSModel(@spr_SSGunner           ,folder_RaceUnits[r_uac ]+'u_u2s_'         ,smt_imp      );
    gfx_LoadMWSModel(@spr_Commando           ,folder_RaceUnits[r_uac ]+'u_u3_'          ,smt_zcommando);
    gfx_LoadMWSModel(@spr_Antiaircrafter     ,folder_RaceUnits[r_uac ]+'u_u4r_'         ,smt_imp      );
    gfx_LoadMWSModel(@spr_Siege              ,folder_RaceUnits[r_uac ]+'u_u4_'          ,smt_imp      );
-   gfx_LoadMWSModel(@spr_FMajor             ,folder_RaceUnits[r_uac ]+'u_u5j_'         ,smt_fmajor   );
+   gfx_LoadMWSModel(@spr_Plasmagunner       ,folder_RaceUnits[r_uac ]+'u_u5j_'         ,smt_fplasmag );
    gfx_LoadMWSModel(@spr_BFG                ,folder_RaceUnits[r_uac ]+'u_u6_'          ,smt_imp      );
-   gfx_LoadMWSModel(@spr_FAPC               ,folder_RaceUnits[r_uac ]+'u_u8_'          ,smt_transport);
+   gfx_LoadMWSModel(@spr_Transport          ,folder_RaceUnits[r_uac ]+'u_u8_'          ,smt_transport);
    gfx_LoadMWSModel(@spr_Terminator         ,folder_RaceUnits[r_uac ]+'u_u9_'          ,smt_terminat );
    gfx_LoadMWSModel(@spr_Tank               ,folder_RaceUnits[r_uac ]+'u_u10_'         ,smt_tank     );
    gfx_LoadMWSModel(@spr_Flyer              ,folder_RaceUnits[r_uac ]+'u_u11_'         ,smt_flyer    );
-   gfx_LoadMWSModel(@spr_Transport          ,folder_RaceUnits[r_uac ]+'transport'      ,smt_transport);
-   gfx_LoadMWSModel(@spr_UACBot             ,folder_RaceUnits[r_uac ]+'uacd'           ,smt_flyer    );
+   gfx_LoadMWSModel(@spr_ATransport         ,folder_RaceUnits[r_uac ]+'transport'      ,smt_transport);
+   gfx_LoadMWSModel(@spr_UACDron            ,folder_RaceUnits[r_uac ]+'uacd'           ,smt_flyer    );
 
 
    gfx_LoadMWSModel(@spr_HKeep              ,folder_RaceBuildings[r_hell]+'h_b0_'      ,smt_buiding  );
@@ -902,7 +931,8 @@ begin
    gfx_LoadMWTexture(@spr_buff_Heroic       ,folder_effects+'buff_heroic'              ,true);
 
    gfx_LoadMWTexture(@spr_kp_koth           ,'kp_koth'                                 ,true);
-   gfx_LoadMWTexture(@spr_kp_gen            ,'kp_gen'                                  ,true);
+   gfx_LoadMWTexture(@spr_kp_gen[0]         ,'kp_gen0'                                 ,true);
+   gfx_LoadMWTexture(@spr_kp_gen[1]         ,'kp_gen1'                                 ,true);
 
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do sm_kind:=smt_effect2;
@@ -1026,7 +1056,7 @@ begin
                end;
    cpp_top   : begin
                ui_MouseHintX:=ui_UIPanelX+ui_UIPanelH;
-               ui_MouseHintY:=ui_UIPanelY1+txt_line_h2*2;
+               ui_MouseHintY:=ui_UIPanelY1+txt_line_h2*4;
                end;
    cpp_bottom: begin
                ui_MouseHintX:=ui_UIPanelX+ui_UIPanelH;

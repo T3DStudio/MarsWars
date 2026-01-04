@@ -275,10 +275,11 @@ INSERT: toggle screen redraw
 <br><center><h2><b>Game UI</b></h2></center><br>
 <br><center><h2><b>Game Mechanics</b></h2></center><br>
 <b>RESOURCES</b> 
+  
 <br>
 There are 3 types of resources in the game: 
 <br>
-- The main resource of the game is the "energy level". Almost all  
+- The main resource of the game is the "Energy level". Almost all  
 production (building construction, unit creation, or upgrade research) in  
 the game consumes this resource. 
 In the user interface, it is displayed as two numbers: the level of free  
@@ -293,15 +294,15 @@ objects on the game map that need to be captured and held.
 There are also 2 additional types of resources used for special  
 technologies and abilities: 
 <br>
-- Hell power:  when playing as the Hell faction, this resource is  
+- Hell power - when playing as the Hell faction, this resource is  
 automatically replenished by the "Altar of Pain" building. 
-The replenishment rate increases with each additional "Altar," but  
-constructing more than three "Altars" does not provide any further benefit.  
-When playing as UAC, the resource is generated from destroyed enemy units  
-and Hell structures. 
+The replenishment rate increases with each additional "Altar of Pain", but  
+constructing more than three "Altars of Pain" does not provide any further  
+benefit. When playing as UAC, the resource is generated from destroyed  
+enemy units and Hell structures. 
 Maximum quantity: 15000.  
 <br>
-- UAC Loot:  this resource is acquired by both factions through the  
+- UAC Loot - this resource is acquired by both factions through the  
 destruction of enemy UAC units and buildings. Maximum quantity: 30000. 
 <br>
 <br>
@@ -383,13 +384,13 @@ level. In melee it will take half as long for the unit to reach next level.
 upgrades and veteran level; 
 <br>
 2) Special effects of the attacking unit that affect its damage amount are  
-applied ("HEROIC" attribute and "DOUBLE DAMAGE SPHERE"); 
+applied ("HEROIC" attribute and "DOUBLE DAMAGE SPHERE" effect); 
 <br>
 3) A damage modifier for the attacking unit is applied to the resulting  
 value; 
 <br>
 4) Special effects reducing the received damage by the target unit are  
-applied ("HEROIC" attribute and "DAMAGE RESISTANCE SPHERE"); 
+applied ("HEROIC" attribute and "DAMAGE RESISTANCE SPHERE" effect); 
 <br>
 5) The armor of the target unit is calculated (bonuses from upgrades and  
 its veteran level are summed up) and subtracted from the inflicted damage;  
@@ -1269,8 +1270,8 @@ Requirements: Castle of Damned
 <br>
 Constructed by: Hell Keep,Great Hell Keep 
 <br>
-Description: Uses "Hell power: " to perform special  
-abilities. Generates "Hell power: " 
+Description: Uses "Hell power" to perform special  
+abilities. Generates "Hell power" 
 <br>
 <br>
 <br>
@@ -3783,8 +3784,8 @@ Reload time reduction factors: unit level(-5)
 <br>
 Requirements: Advanced Command Center 
 <br>
-- Advanced : Upgrades the Radar to lower its ability  
-reload time. 
+- Advanced "Radar": Upgrades the Radar to lower its  
+ability reload time. 
 <br>
 Active ability. Self-targeted. UAC Loot required: 1000. 
 <br>
@@ -3823,7 +3824,7 @@ Requirements: Weapon Factory
 <br>
 Constructed by: Command Center,Advanced Command Center 
 <br>
-Description: Uses "UAC Loot: " to perform special  
+Description: Uses "UAC Loot" to perform special  
 abilities 
 <br>
 <br>
@@ -3881,7 +3882,7 @@ Requirements: Weapon Factory
 <br>
 Constructed by: Command Center,Advanced Command Center 
 <br>
-Description: Uses "Hell power: " to perform special  
+Description: Uses "Hell power" to perform special  
 abilities 
 <br>
 <br>
@@ -3959,8 +3960,9 @@ Ground-targeted. Base reloading time: 60 sec.
 <br>
 Reload time reduction factors: unit level(-5) 
 <br>
-- Advanced : Upgrades the Rocket Launcher Station to  
-lower its ability reload time. 
+- Advanced "Rocket Launcher Station": Upgrades the  
+Rocket Launcher Station to lower its ability reload  
+time. 
 <br>
 Active ability. Self-targeted. UAC Loot required: 2000. 
 <br>
@@ -7061,7 +7063,7 @@ Dedicated server - a special version of the game that does not load any
 game resources and immediately starts working as a server. To start a  
 dedicated server, run it with the following parameters: 
 <br>
-MarsWars_ded.exe [X] 
+   MarsWars_ded.exe [X] 
 <br>
 where X - UDP port (optional argument, default value - 10666). Any  
 connected player can change the game settings in a dedicated server`s lobby. 

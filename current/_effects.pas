@@ -101,7 +101,7 @@ begin
    ui_mc_c:=cc;
 end;
 
-procedure effect_add(ex,ey,ed:integer;ee:byte);
+procedure effect_add(ex,ey,ed:integer;ee:byte;skipVisionCheck:boolean=false);
 var e:integer;
 
 procedure setEff(ans,si,ei,it:integer;revanim:boolean;az:integer);
@@ -150,7 +150,8 @@ begin
    or(ee=0)
    or(g_eids[ee].smodel=nil)then exit;
 
-   if not ui_CheckMapPointFogVision(ex,ey,true)then exit;
+   if(not skipVisionCheck)then
+     if(not ui_CheckMapPointFogVision(ex,ey,true))then exit;
 
    for e:=1 to vid_MaxScreenSprites do
    with g_effects[e] do
@@ -275,12 +276,17 @@ begin
 end;
 
 
-procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet);
+procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet;pUnitVis:PTUnit);
 begin
-   if ui_CheckMapPointFogVision(vx,vy,true)
-   or ui_CheckMapPointFogVision(tx,ty,true) then snd_SoundPlayUnit(snd,nil,nil);
-   effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart);
-   effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  );
+   //
+   if(ui_CheckUnitUIPlayerVision(pUnitVis,false))then
+   //if(ui_CheckMapPointFogVision(vx,vy,true)
+   //or ui_CheckMapPointFogVision(tx,ty,true))then
+   begin
+      snd_SoundPlayUnit(snd,nil,nil);
+      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart,true);
+      effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  ,true);
+   end;
 end;
 
 procedure effects_AddSprites(noanim:boolean);

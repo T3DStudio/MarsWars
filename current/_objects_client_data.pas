@@ -344,7 +344,7 @@ begin
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_InfantryGibs,0             );
    setEffectSND (  nil,snd_zimba_death,snd_Gibs ,snd_zimba_pain);
-   setMWSModel  (0,@spr_ZSergant);
+   setMWSModel  (0,@spr_ZShotgunner);
    setWeaponESND(0,nil,snd_shot_shotgun,0,0);
 end;
 UID_ZSSergant:
@@ -354,7 +354,7 @@ begin
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,0              ,EID_InfantryGibs,0             );
    setEffectSND (  nil,snd_zimba_death,snd_Gibs ,snd_zimba_pain);
-   setMWSModel  (0,@spr_ZSSergant);
+   setMWSModel  (0,@spr_ZSSGunner);
    setWeaponESND(0,nil,snd_shot_ssg    ,0,0);
 end;
 UID_ZCommando:
@@ -391,7 +391,7 @@ UID_ZFPlasmagunner:
 begin
    uid_AnimStepWalk :=14;
    uid_AnimStepDeath:=8;
-   setMWSModel  (0,@spr_ZFMajor);
+   setMWSModel  (0,@spr_ZPlasmagunner);
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
    setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,nil);
@@ -569,7 +569,7 @@ UID_Sergant:
 begin
    uid_AnimStepWalk:=17;
    uid_AnimStepDeath:=8;
-   setMWSModel(0,@spr_Sergant);
+   setMWSModel(0,@spr_Shotgunner);
    setCommandSND(snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
    setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
    setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
@@ -579,7 +579,7 @@ UID_SSergant:
 begin
    uid_AnimStepWalk:=17;
    uid_AnimStepDeath:=8;
-   setMWSModel(0,@spr_SSergant);
+   setMWSModel(0,@spr_SSGunner);
    setCommandSND(snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
    setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
    setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
@@ -618,7 +618,7 @@ end;
 UID_FPlasmagunner:
 begin
    uid_AnimStepDeath:=8;
-   setMWSModel(0,@spr_FMajor);
+   setMWSModel(0,@spr_Plasmagunner);
    setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
    setEffectEID (0,0         ,EID_Exp,EID_Exp,0  );
    setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,nil);
@@ -638,15 +638,15 @@ begin
 end;
 UID_UTransport:
 begin
-   setMWSModel(0,@spr_FAPC);
-   setMWSModel(1,@spr_Transport);
+   setMWSModel(0,@spr_Transport);
+   setMWSModel(1,@spr_ATransport);
    setCommandSND(snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
    setEffectSND (  nil,snd_explode ,snd_explode ,nil);
 end;
 UID_UACDron:
 begin
-   setMWSModel(0,@spr_UACBot);
+   setMWSModel(0,@spr_UACDron);
    setCommandSND(snd_uacbot_move,snd_uacbot_move,snd_uacbot_attack,snd_uacbot_annoy,snd_uacbot_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
    setEffectSND (  nil,snd_explode ,snd_explode ,nil);

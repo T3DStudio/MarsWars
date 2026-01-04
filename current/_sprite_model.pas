@@ -106,7 +106,7 @@ smt_zcommando:case animk of
               else exit;
               end;
 
-smt_fmajor   :case animk of
+smt_fplasmag :case animk of
         sms_dready,
         sms_dattack,
         sms_mattack,

@@ -687,30 +687,29 @@ spr_Arachnotron,
 spr_ArchVile,
 spr_ZFormer,
 spr_ZEngineer,
-spr_ZSergant,
-spr_ZSSergant,
+spr_ZShotgunner,
+spr_ZSSGunner,
 spr_ZCommando,
 spr_ZAntiaircrafter,
 spr_ZSiege,
-spr_ZFMajor,
+spr_ZPlasmagunner,
 spr_ZBFG,
 
 spr_Engineer,
-spr_Scout,
 spr_Medic,
-spr_Sergant,
-spr_SSergant,
+spr_Shotgunner,
+spr_SSGunner,
 spr_Commando,
 spr_Antiaircrafter,
 spr_Siege,
-spr_FMajor,
+spr_Plasmagunner,
 spr_BFG,
-spr_FAPC,
+spr_Transport,
 spr_Terminator,
 spr_Tank,
 spr_Flyer,
-spr_Transport,
-spr_UACBot,
+spr_ATransport,
+spr_UACDron,
 
 spr_HKeep,
 spr_HAKeep,
@@ -887,13 +886,17 @@ spr_CursorHint_Edit  : pSDL_Surface;
 spr_CursorHint_MLB,
 spr_CursorHint_MRB,
 spr_CursorHint_MMB   : array[boolean ] of pSDL_Surface;
+spr_cursor_move      : array[0..8] of pSDL_Surface;
+spr_cursor_movex,
+spr_cursor_movey     : array[0..8] of integer;
 spr_RaceRank,
 spr_uipanel_EmptyBTN : array[1..r_count] of pSDL_Surface;
 spr_uibtn_Upgrades   : array[1..r_count,0..spr_upgrade_icons] of TMWTexture;
 spr_uibtn_Tabs       : array[0..3] of pSDL_Surface;
 spr_kp_koth,
 spr_kp_out,
-spr_kp_gen           : TMWTexture;
+spr_kp_outG          : TMWTexture;
+spr_kp_gen           : array[0..1] of TMWTexture;
 
 spr_cursorWh,
 spr_cursorHh         : integer;

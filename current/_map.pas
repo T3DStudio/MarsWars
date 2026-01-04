@@ -180,7 +180,7 @@ begin
    for p:=0 to LastKeyPoint do
      with map_KeyPointsL[p] do
        if(kpCaptureR>0)then
-         if(point_dist_int(x,y,kpx,kpy)<(gap+max2i(kpSolidr,kpCaptureR)))then
+         if(point_dist_int(x,y,kpx,kpy)<(gap+kpCaptureR))then
          begin
             map_IfKeyPointHere:=true;
             break;
@@ -244,7 +244,7 @@ begin
        if(kpCaptureR>0)then kpzone:=map_GetZone(kpx,kpy,kpCaptureR);
 end;
 
-function map_KeyPoints_Add(akpx,akpy,aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal):boolean;
+function map_KeyPoints_Add(akpx,akpy,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal):boolean;
 var kp:integer;
 begin
    map_KeyPoints_Add:=false;
@@ -255,7 +255,6 @@ begin
           kpx          :=akpx;
           kpy          :=akpy;
           kpToCenterD  :=point_dist_int(kpx,kpy,map_Sizeh,map_Sizeh);
-          kpSolidr     :=aSolidR;
           kpNoBuildR   :=aNoBuildR;
           kpEnergy     :=aEnergy;
           kpCaptureR   :=aCaptureR;
@@ -272,7 +271,7 @@ begin
        end;
 end;
 
-procedure map_KeyPoints_Random(acount,aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
 const max_attempts = 500;
 var
 ix,iy,
@@ -298,15 +297,15 @@ begin
          if(map_IfPlayerStartHere(ix,iy,base_1rh))
          or(map_IfKeyPointHere   (ix,iy,base_1rh))then continue;
 
-         if(not map_KeyPoints_Add(ix,iy,aSolidR,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
+         if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
          if(map_Symmetry)then
-           if(not map_KeyPoints_Add(map_Size1-ix,map_Size1-iy,aSolidR,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
+           if(not map_KeyPoints_Add(map_Size1-ix,map_Size1-iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
          break;
       end;
    end;
 end;
 
-procedure map_KeyPoints_AddAtStarts(aSolidR,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+procedure map_KeyPoints_AddAtStarts(aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
 var   p:byte;
 r,sx,sy:integer;
 begin
@@ -322,7 +321,7 @@ begin
            sy:=1;
         end;
         map_KeyPoints_Add(map_PlayerStartX[p]+r*sx,
-                          map_PlayerStartY[p]+r*sy,aSolidR,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+                          map_PlayerStartY[p]+r*sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
      end;
 end;
 
@@ -331,14 +330,14 @@ begin
    KeyPoints_Clear;
 
    case map_scenario of
-mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,0,base_1r,0,0,keyPoint_CaptTime_KotH,0);
-mc_KeyPoints: map_KeyPoints_Random(4,0,keyPoint_r,base_1r,0,keyPoint_CaptTime_Def,0);
+mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,base_1r,0,0,keyPoint_CaptTime_KotH,0);
+mc_KeyPoints: map_KeyPoints_Random(4,keyPoint_r,base_1r,0,keyPoint_CaptTime_Def,0);
    end;
 
    if(map_generators>0)then
    begin
-      map_KeyPoints_AddAtStarts(50,keyPoint_SolidR,keyPoint_SolidR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
-      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),50,keyPoint_SolidR,keyPoint_SolidR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+      map_KeyPoints_AddAtStarts(keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
    end;
 end;
 

@@ -798,7 +798,7 @@ PPTUnit = ^PTUnit;
 
 TKeyPoint = record
    kpx ,kpy ,
-   kpSolidr,kpCaptureR,kpNoBuildR,
+   kpCaptureR,kpNoBuildR,
    kpToCenterD,
    kpmmx,kpmmy,kpmmr,
    kpEnergy,
