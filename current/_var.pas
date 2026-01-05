@@ -50,8 +50,9 @@ map_generators    : byte     = 0;
 map_seed          : cardinal = 1;
 map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
+map_ObstaclesS    : byte     = 1;
 map_ObstaclesGap  : integer  = 40;
-map_ObstaclesF    : byte     = 1;
+map_PStartsGap    : integer  = base_1r;
 map_Symmetry      : boolean  = true;
 map_MaxPlayers    : byte     = MaxPlayers;
 map_PlayerStartX,
@@ -427,6 +428,8 @@ map_ter_h         : integer;
 map_ter_decaln    : integer = 0;
 map_ter_decalL    : array of TDecal;
 
+map_ObstaclesVis  : array[0..MaxObstacles] of TObstacleVis;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  CAMPAINGS
@@ -594,60 +597,57 @@ PlayerColorDefaultShadow : cardinal = 0;
 //  THEMES
 //
 
+theme_n              : integer = 0;
 theme_i              : integer = 0;
 
-theme_liquid_animt   : byte;
-theme_liquid_animm   : byte;
-theme_liquid_color   : cardinal = 0;
+theme_liquid_animStyle: TThemeAnimStyle;
+theme_liquid_animTime : byte;
+theme_liquid_color    : cardinal = 0;
+
+theme_liquid_style,
+theme_crater_style   : TThemeCircleStyle;
 
 theme_map_Terrain    : integer = 0;
 theme_map_pTerrain   : integer = -1;
 theme_map_Crater     : integer = 0;
 theme_map_pCrater    : integer = -1;
-theme_map_Liquid     : integer = 0;
-theme_map_pLiquid    : integer = -1;
+theme_map_LiquidFront: integer = 0;
+theme_map_pLiquidFront:integer = -1;
 theme_map_LiquidBack : integer = 0;
 theme_map_pLiquidBack: integer = -1;
-theme_liquid_style   : byte = 0;
-theme_crater_style   : byte = 0;
 
-theme_decals,
-theme_decors,
-theme_srocks,
-theme_brocks,
-theme_craters,
-theme_liquids,
-theme_bliquids,
-theme_terrains    : TIntList;
-theme_decaln,
-theme_decorn,
-theme_srockn,
-theme_brockn,
-theme_cratern,
-theme_liquidn,
-theme_bliquidn,
-theme_terrainn    : integer;
 
-theme_spr_decals,
-theme_spr_decors,
-theme_spr_srocks,
-theme_spr_brocks,
-theme_spr_liquids,
-theme_spr_terrains: TUSpriteList;
-theme_spr_decaln,
-theme_spr_decorn,
-theme_spr_srockn,
-theme_spr_brockn,
-theme_spr_liquidn,
-theme_spr_terrainn: integer;
+theme_decalL,
+theme_obstacle0L,
+theme_obstacle1L,
+theme_obstacle2L,
+theme_craterL,
+theme_liquidFrontL,
+theme_liquidBackL,
+theme_terrainL    : TIntList;
+theme_decalN,
+theme_obstacle0N,
+theme_obstacle1N,
+theme_obstacle2N,
+theme_craterN,
+theme_liquidFrontN,
+theme_liquidBackN,
+theme_terrainN    : integer;
 
-theme_anm_decors,
-theme_anm_srocks,
-theme_anm_brocks  : TThemeAnimL;
+theme_spr_decalL,
+theme_spr_obstaclesL,
+theme_spr_liquidL,
+theme_spr_terrainL: TUSpriteList;
+theme_spr_decalN,
+theme_spr_obstaclesN,
+theme_spr_liquidN,
+theme_spr_terrainN: integer;
 
-theme_anm_liquids : array of byte;     // animation type
-theme_ant_liquids : array of byte;     // animation period
-theme_clr_liquids : array of cardinal; // minimap color
+theme_obstacles_Anims: TThemeObstacleAnimL;
+
+theme_liquids_AnimStyle : array of TThemeAnimStyle;
+theme_liquids_AnimTime : array of byte;
+theme_liquids_MMColor   : array of cardinal;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -661,9 +661,11 @@ theme_DefSprite,
 spr_empty         : pSDL_SURFACE;
 font_1            : array[char] of TMWTexture;
 
-spr_liquidb       : array[1..LiquidRs ] of TMWTexture;
-spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWTexture;
-spr_crater        : array[1..crater_ri] of TMWTexture;
+//spr_liquidb       : array[1..LiquidRs ] of TMWTexture;
+//spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWTexture;
+spr_liquidBack    : TMWTexture;
+spr_liquidFront   : array[1..LiquidAnimCount] of TMWTexture;
+spr_crater        : array[1..crater_ri      ] of TMWTexture;
 
 
 spr_dummy         : TMWTexture;
@@ -914,8 +916,9 @@ str_doc_BaseMechanics,
 str_doc_HotKeys,
 str_doc_Other,
 str_doc_Credits
-
                     : TUIStringList;
+
+str_themes          : array of shortstring;
 
 str_race            : array[0..r_count  ] of shortstring;
 str_map_ScenarioL,

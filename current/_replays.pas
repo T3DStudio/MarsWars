@@ -105,8 +105,8 @@ begin
    AddItem(@map_scenario        ,SizeOf(map_scenario     ));
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
-   AddItem(@map_Size1            ,SizeOf(map_Size1         ));
-   AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
+   AddItem(@map_Size1           ,SizeOf(map_Size1        ));
+   AddItem(@map_ObstaclesS      ,SizeOf(map_ObstaclesS   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
@@ -439,7 +439,7 @@ begin
          end;
 
          if(map_Size1<map_MinSize)or(map_Size1>map_MaxSize)
-         or(map_ObstaclesF>map_MaxObstacles)
+         or(map_ObstaclesS>map_MaxObstacles)
          or(map_Generators>map_MaxGenerators)
          or not(map_scenario in allmapscenarios)
          or(rpls_player>LastPlayer)then

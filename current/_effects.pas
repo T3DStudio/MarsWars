@@ -251,7 +251,7 @@ begin
         for i:=1 to o do effect_add(m_vx-g_randomr(r),
                                     m_vy-g_randomr(r),draw_DefaultSpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
 
-        if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_vx,m_vy,sd_liquid+m_vy,mid_eid_Decal);
+        if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_vx,m_vy,sd_liquidFront+m_vy,mid_eid_Decal);
 
         if(mid_snd_DeathSkip[m_eid_DeathType]>0)then
           if(random(mid_snd_DeathSkip[m_eid_DeathType])>0)then exit;
@@ -278,10 +278,7 @@ end;
 
 procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet;pUnitVis:PTUnit);
 begin
-   //
    if(ui_CheckUnitUIPlayerVision(pUnitVis,false))then
-   //if(ui_CheckMapPointFogVision(vx,vy,true)
-   //or ui_CheckMapPointFogVision(tx,ty,true))then
    begin
       snd_SoundPlayUnit(snd,nil,nil);
       effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart,true);

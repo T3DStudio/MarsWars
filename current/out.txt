@@ -1,6 +1,0 @@
-Couldn't bind to local port
-Couldn't bind to local port
-Couldn't bind to local port
-Invalid width or height
-Invalid width or height
-graphic\kp_gen

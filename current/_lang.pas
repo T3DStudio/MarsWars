@@ -262,6 +262,16 @@ begin
    str_Players                   := 'Players';
    str_all                       := 'All';
 
+   str_themes[0]                 :=tc_lime  +'UAC BASE';
+   str_themes[1]                 :=tc_blue  +'TECH BASE' ;
+   str_themes[2]                 :=tc_white +'UNKNOWN PLANET';
+   str_themes[3]                 :=tc_aqua  +'UNKNOWN MOON';
+   str_themes[4]                 :=tc_gray  +'CAVES';
+   str_themes[5]                 :=tc_aqua  +'ICE CAVES';
+   str_themes[6]                 :=tc_orange+'HELL PLANET';
+   str_themes[7]                 :=tc_yellow+'HELL CAVES';
+   str_themes[8]                 :=tc_red   +'HELL CITY';
+
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
    str_FileLoad                  := 'Load';
@@ -765,7 +775,7 @@ begin
    // MAP
    menu_set_hint(mi_Map_Generators,mi_Map_Panel,': generators life time');
    menu_set_hint(mi_Map_Seed      ,mi_Map_Panel,': select for edition/make random value');
-   menu_set_hint(mi_Map_Obstacles ,mi_Map_Panel,': obstacles density');
+   menu_set_hint(mi_Map_Obstacles ,mi_Map_Panel,': obstacles max size');
 
    /////////////////////////////////////////////////////////////////////////////
    //  Help docs  CREDITS

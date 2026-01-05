@@ -135,7 +135,7 @@ map_MaxSize            = 8000;
 map_MinSize            = 2500;
 map_SizeMenuStep       = 250;
 
-map_MaxObstacles       = 5;
+map_MaxObstacles       = 10;
 
 zone_solid             : word = word.MaxValue;
 
@@ -508,29 +508,14 @@ b2ib                   : array[false..true] of smallint = (0,ub_infinity);
 //  OBSTACLES
 //
 
-MaxObstacles             = 800;
-
-//
-ddc_div                = 1000000;
-ddc_cf                 = (map_MaxSize*map_MaxSize) div ddc_div; // 36
+MaxObstacles           = 800;
 
 // Obstacles grid
 MapObstaclesGridW      = 200;
 MapObstaclesGridN      = map_MaxSize div MapObstaclesGridW;
 
-DID_LiquidR1           = 1;
-DID_LiquidR2           = 2;
-DID_LiquidR3           = 3;
-DID_LiquidR4           = 4;
-DID_BRock              = 5;
-DID_SRock              = 6;
-DID_Other              = 7;
-
-dids_liquids           = [DID_LiquidR1..DID_LiquidR4];
-
-MaxDIDs                = 7;
-
-DID_R                  : array[0..MaxDIDs] of smallint = (0,380,300,220,160,102,57,17);
+ObstaclesRMin          = 18;
+ObstaclesRStep         = 45;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -687,8 +672,6 @@ ptime10                = ptime1*10;
 
 uf_ground              = false;
 uf_fly                 = true;
-
-MaxUnitGroups          = 9;
 
 mvxy_none              = 0;
 mvxy_relative          = 1;
@@ -1220,23 +1203,23 @@ char_detect            = #7;
 
 spr_upgrade_icons      = 20;
 
+MaxUnitGroups          = 9;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SPRITE DEPTH
 //
 
 // terrain
-sd_liquid_back         = -32500;
-sd_liquid              = -32000;
-// neytral generators
-sd_tcraters            = map_MaxSize+sd_liquid;    // -24000
-// doodads
-sd_brocks              = map_MaxSize+sd_tcraters;  // -16000
-sd_srocks              = map_MaxSize+sd_brocks;    // -8000
-sd_build               = map_MaxSize+sd_srocks;    //  0
-sd_ground              = map_MaxSize+sd_build;     //  8000
-sd_fly                 = map_MaxSize+sd_ground;    //  16000
-sd_marker              = map_MaxSize+sd_fly;       //  24000
+sd_liquidBack          = -32001;
+sd_liquidFront         = -32000;
+sd_decals              = map_MaxSize+sd_liquidFront;      // -24000
+sd_Obstacles2          = map_MaxSize+sd_decals;      // -16000
+sd_Obstacles1          = map_MaxSize+sd_Obstacles2;  // -8000
+sd_build               = map_MaxSize+sd_Obstacles1;  //  0
+sd_ground              = map_MaxSize+sd_build;       //  8000
+sd_fly                 = map_MaxSize+sd_ground;      //  16000
+sd_marker              = map_MaxSize+sd_fly;         //  24000
 
 map_flydepths          : array[false..true] of smallint = (sd_ground,sd_fly);
 
@@ -1882,21 +1865,15 @@ chat_allies            = 254;
 //  MAP THEME
 //
 
-LiquidAnim             = 4;
-LiquidRs               = 4;
-
 crater_ri              = 4;
 crater_r               : array[1..crater_ri] of smallint = (33,60,88,110);
 
-theme_n                = 8;
-theme_name             : array[0..theme_n-1] of shortstring = (tc_lime  +'TECH BASE'  ,
-                                                               tc_blue  +'TECH BASE'  ,
-                                                               tc_white +'UNKNOWN PLANET',
-                                                               tc_white +'UNKNOWN MOON',
-                                                               tc_gray  +'CAVES'      ,
-                                                               tc_aqua  +'ICE CAVES'  ,
-                                                               tc_orange+'HELL'       ,
-                                                               tc_yellow+'HELL CAVES' );
+LiquidAnimCount        = 4;
+
+ov_obstacle0           = 1;
+ov_obstacle1           = 2;
+ov_obstacle2           = 3;
+ov_liquid              = 4;
 
 {$ELSE }
 

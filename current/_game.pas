@@ -1250,7 +1250,7 @@ begin
                                   end;
                                   Map_Make;
                                end;
-   nmid_lobby_MObstacles     : begin ScrollByte(@map_ObstaclesF,forward,0,map_MaxObstacles); Map_Make; end;
+   nmid_lobby_MObstacles     : begin ScrollByte(@map_ObstaclesS,forward,0,map_MaxObstacles); Map_Make; end;
    nmid_lobby_MSymmetry      : begin map_Symmetry:=not map_Symmetry; Map_Make; end;
    nmid_lobby_MRandom        : begin Map_randommap; Map_Make;end;
    nmid_lobby_GFixedPositions: begin

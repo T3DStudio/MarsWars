@@ -16,7 +16,15 @@ begin
    if(trans)then SDL_SetColorKey(gfx_FlipSurface,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(gfx_FlipSurface,0,0));
 end;
 
-procedure LPTUSpriteL(l:PTUSpriteList;str:shortstring;it:pinteger);
+procedure gfx_ThemeSetTransparent(spr:PTMWTexture;xa:boolean);
+begin
+   with spr^ do
+     if(xa)
+     then SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,w-1,0))
+     else SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0  ,0));
+end;
+
+procedure theme_LoadSprites(l:PTUSpriteList;str:shortstring;it:pinteger);
 var t:TMWTexture;
     i:integer;
 procedure next;begin it^+=1;setlength(l^,it^);l^[it^-1]:=t;end;
@@ -37,9 +45,7 @@ begin
       next;
 
       with t do
-      begin
-         surf:=gfx_FlipSurface(surf,true,false,false);
-      end;
+        surf:=gfx_FlipSurface(surf,true,false,false);
       next;
 
       i+=1;
@@ -52,19 +58,19 @@ begin
    end;
 end;
 
-procedure IntListAdd(_il:PTIntList;_iln:pinteger;k:integer);
+procedure IntListAdd(pList:pTIntList;pSize:pinteger;value:integer);
 begin
-   _iln^+=1;
-   setlength(_il^,_iln^);
-   _il^[_iln^-1]:=k;
+   pSize^+=1;
+   setlength(pList^,pSize^);
+   pList^[pSize^-1]:=value;
 end;
 
-procedure Str2IntList(s:shortstring;_il:PTIntList;_iln:pinteger);
+procedure Str2IntList(s:shortstring;pList:pTIntList;pSize:pinteger);
 var p,l:integer;
     v,u:shortstring;
 begin
-   _iln^:=0;
-   setlength(_il^,_iln^);
+   pSize^:=0;
+   setlength(pList^,pSize^);
 
    l:=length(s);
    while (l>0) do
@@ -103,394 +109,409 @@ begin
                l:=s2i(v);
                while (true) do
                begin
-                  IntListAdd(_il,_iln,p);
+                  IntListAdd(pList,pSize,p);
                   if(p=l)
                   then break
                   else p+=sign(l-p);
                end;
             end;
          end
-         else IntListAdd(_il,_iln,s2i(v));
+         else IntListAdd(pList,pSize,s2i(v));
       end;
 
       l:=length(s);
    end;
 end;
 
-procedure _SetTrans(spr:PTMWTexture;xa:boolean);
-begin
-   with spr^ do
-    if(xa)
-    then SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,w-1,0))
-    else SDL_SetColorKey(surf,SDL_SRCCOLORKEY+SDL_RLEACCEL,sdl_getpixel(surf,0  ,0));
-end;
-
-procedure ThemeSetTrans(l:PTUSpriteList;it:pinteger;str:shortstring);
+procedure theme_SetTransparent(l:PTUSpriteList;it:pinteger;str:shortstring);
 var i,o,
- _iln:integer;
- _il :TIntList;
+ tSize:integer;
+ tList:TIntList;
 begin
    if(str<>'all')then
    begin
-      Str2IntList(str,@_il,@_iln);
+      Str2IntList(str,@tList,@tSize);
 
-      for i:=1 to _iln do
+      for i:=1 to tSize do
       begin
-         o:=_il[i-1]*2;
+         o:=tList[i-1]*2;
          if(o<it^)then
          begin
-            _SetTrans( @(l^[o  ]), ( o    mod 2)=1);
-            _SetTrans( @(l^[o+1]), ((o+1) mod 2)=1);
+            gfx_ThemeSetTransparent( @(l^[o  ]), ( o    mod 2)=1);
+            gfx_ThemeSetTransparent( @(l^[o+1]), ((o+1) mod 2)=1);
          end;
       end;
    end
    else
-    for o:=1 to it^ do _SetTrans( @(l^[o-1]), ((o-1) mod 2)=1 );
+    for o:=1 to it^ do gfx_ThemeSetTransparent( @(l^[o-1]), ((o-1) mod 2)=1 );
 end;
 
-procedure DecAnim(l:PTThemeAnimL;it:pinteger;str:shortstring;_at,_an,_xo,_yo,_sh,_dp:integer);
-var i,o,
- _iln:integer;
- _il :TIntList;
-procedure _SetDecAnim(p:integer;xa:boolean);
+procedure theme_SetObstaclesData(a_xo,a_yo,a_shadow,a_depth:integer;istr:shortstring);
+var
+i,o,
+tSize:integer;
+tList :TIntList;
+procedure SetData(oid:integer;xa:boolean);
 begin
-   with l^[p] do
+   if(oid<0)or(theme_spr_obstaclesN<=oid)then   exit;
+
+   with theme_obstacles_Anims[oid] do
    begin
-      atime:=_at;
       if(xa)then
       begin
-         anext:=_an*2+1;
-         xo   :=-_xo;
+         if(a_xo <>NOTSET)then toa_xo    :=-a_xo;
       end
       else
       begin
-         anext:=_an*2;
-         xo   :=_xo;
+         if(a_xo <>NOTSET)then toa_xo    :=a_xo;
       end;
-      yo   :=_yo;
-      sh   :=_sh;
-      depth:=_dp;
+      if(a_yo    <>NOTSET)then toa_yo    :=a_yo;
+      if(a_shadow<>NOTSET)then toa_shadow:=a_shadow;
+      if(a_depth <>NOTSET)then toa_depth :=a_depth;
    end;
 end;
 begin
-   Str2IntList(str,@_il,@_iln);
+   if(theme_spr_obstaclesN<=0)then exit;
 
-   for i:=1 to _iln do
+   if(istr<>'all')then
    begin
-      o:=_il[i-1]*2;
-      if(o<it^)then
-      begin
-         _SetDecAnim(o  ,false);
-         _SetDecAnim(o+1,true );
-      end;
+      Str2IntList(istr,@tList,@tSize);
+      if(tSize>0)then
+        for i:=1 to tSize do
+        begin
+           o:=tList[i-1]*2;
+           SetData(o  ,false);
+           SetData(o+1,true );
+        end;
+   end
+   else
+     for i:=0 to theme_spr_obstaclesN-1 do
+       SetData(i,(i mod 2)=1);
+end;
+
+procedure theme_SetObstaclesAnim(a_atime:integer;istr:shortstring);
+var
+i,o1,o2,
+tSize:integer;
+tList:TIntList;
+procedure SetNext(oid1,oid2:integer);
+begin
+   if(oid1<0)or(theme_spr_obstaclesN<=oid1)
+   or(oid2<0)or(theme_spr_obstaclesN<=oid2)then exit;
+
+   with theme_obstacles_Anims[oid1] do
+   begin
+      toa_anext:=oid2;
+      toa_atime:=a_atime;
    end;
 end;
-
-procedure _liqAnim(i:integer;r,g,b:byte;atp,animt:byte);
 begin
-   theme_clr_liquids[i]:=gfx_rgba2c(r,g,b,255);
-   theme_anm_liquids[i]:=atp;
-   theme_ant_liquids[i]:=animt;
+   Str2IntList(istr,@tList,@tSize);
+   if(tSize>0)then
+     for i:=0 to tSize-1 do
+     begin
+        o1:=tList[i              ]*2;
+        o2:=tList[(i+1) mod tSize]*2;
+        SetNext(o1  ,o2  );
+        SetNext(o1+1,o2+1);
+     end;
 end;
 
-procedure LiquidAnims(i:integer;r,g,b:byte;atp,animt:byte);
+
+procedure theme_SetLiquidAnims(i:integer;r,g,b:byte;animStyle:TThemeAnimStyle;animTime:byte);
+procedure liqAnim(i:integer);
 begin
-   _liqAnim(i*2  ,r,g,b,atp,animt);
-   _liqAnim(i*2+1,r,g,b,atp,animt);
+   theme_liquids_MMColor  [i]:=gfx_rgba2c(r,g,b,255);
+   theme_liquids_AnimStyle[i]:=animStyle;
+   theme_liquids_AnimTime[i]:=animTime;
+end;
+begin
+   liqAnim(i*2  );
+   liqAnim(i*2+1);
 end;
 
 procedure InitThemes;
 var o:integer;
 begin
+   theme_n:=9;
+
+   setlength(str_themes,theme_n);
+
    // load graph
-   LPTUSpriteL(@theme_spr_decals  , folder_map+'decals\adt'      , @theme_spr_decaln  );
-   LPTUSpriteL(@theme_spr_decors  , folder_map+'decors\dec_'     , @theme_spr_decorn  );
-   LPTUSpriteL(@theme_spr_srocks  , folder_map+'srocks\rocks'    , @theme_spr_srockn  );
-   LPTUSpriteL(@theme_spr_brocks  , folder_map+'brocks\rockb'    , @theme_spr_brockn  );
-   LPTUSpriteL(@theme_spr_liquids , folder_map+'liquids\liquid_' , @theme_spr_liquidn );
-   LPTUSpriteL(@theme_spr_terrains, folder_map+'terrains\ter'    , @theme_spr_terrainn);
+   theme_LoadSprites(@theme_spr_decalL    , folder_map+'decals\adt'     , @theme_spr_decalN    );
+   theme_LoadSprites(@theme_spr_obstaclesL, folder_map+'obstacles\dec_' , @theme_spr_obstaclesN);
+   theme_LoadSprites(@theme_spr_liquidL   , folder_map+'liquids\liquid_', @theme_spr_liquidN   );
+   theme_LoadSprites(@theme_spr_terrainL  , folder_map+'terrains\ter'   , @theme_spr_terrainN  );
 
    // transparent
-   ThemeSetTrans(@theme_spr_decals,@theme_spr_decaln,'0_20,23_34');
-   ThemeSetTrans(@theme_spr_decors,@theme_spr_decorn,'all');
-   ThemeSetTrans(@theme_spr_srocks,@theme_spr_srockn,'all');
-   ThemeSetTrans(@theme_spr_brocks,@theme_spr_brockn,'all');
+   theme_SetTransparent(@theme_spr_decalL    ,@theme_spr_decalN    ,'0_20,23_34');
+   theme_SetTransparent(@theme_spr_obstaclesL,@theme_spr_obstaclesN,'all'       );
 
    // animation and effects
-   setlength(theme_anm_decors  ,theme_spr_decorn  );
-   setlength(theme_anm_srocks  ,theme_spr_srockn  );
-   setlength(theme_anm_brocks  ,theme_spr_brockn  );
+   setlength(theme_obstacles_Anims,theme_spr_obstaclesN);
 
-   for o:=1 to theme_spr_decorn do begin FillChar(theme_anm_decors[o-1],SizeOf(theme_anm_decors[o-1]),0);with theme_anm_decors[o-1] do begin sh:=1;               end;end;
-   for o:=1 to theme_spr_srockn do begin FillChar(theme_anm_srocks[o-1],SizeOf(theme_anm_srocks[o-1]),0);with theme_anm_srocks[o-1] do begin depth:=0;sh:=-32000; end;end;
-   for o:=1 to theme_spr_brockn do begin FillChar(theme_anm_brocks[o-1],SizeOf(theme_anm_brocks[o-1]),0);with theme_anm_brocks[o-1] do begin depth:=0;sh:=-32000; end;end;
+   for o:=1 to theme_spr_obstaclesN do
+   begin
+      FillChar(theme_obstacles_Anims[o-1],SizeOf(TThemeObstacleAnim),0);
+      with theme_obstacles_Anims[o-1] do toa_shadow:=1;
+   end;
 
-   //    DECORS
-   //                                          ns         atm ana xo  yo   shadow  depth
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'13,35'   ,0  ,0  ,0  ,-3  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'30,31,20,21'
-                                                         ,0  ,0  ,0  ,-4  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'15_17,39,41'
-                                                         ,0  ,0  ,0  ,-5  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'1,2,6,13'
-                                                         ,0  ,0  ,0  ,-8  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'24_27'   ,0  ,0  ,0  ,-8  ,-32000,0);
+   //// OBSTACLES DATA
 
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'34,36,29',0  ,0  ,0  ,-10 ,1      ,0);
+   // SHADOW                            SHADOW
+   theme_SetObstaclesData(NOTSET,NOTSET,1     ,NOTSET,'0_53'          );
+   theme_SetObstaclesData(NOTSET,NOTSET,-32000,NOTSET,'24_27,54_120'  );
 
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'3'       ,0  ,0  ,0  ,-14 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'7_12,18' ,0  ,0  ,0  ,-18 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'5,11'    ,0  ,0  ,12 ,-18 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'32'      ,0  ,0  ,0  ,-20 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'19'      ,0  ,0  ,0  ,-21 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'33'      ,0  ,0  ,5  ,-22 ,1      ,0);
+   // X Y offset          X      Y
+   theme_SetObstaclesData(NOTSET,-3    ,NOTSET,NOTSET,'13,35'         );
+   theme_SetObstaclesData(NOTSET,-4    ,NOTSET,NOTSET,'30,31,20,21'   );
+   theme_SetObstaclesData(NOTSET,-5    ,NOTSET,NOTSET,'15_17,39,41'   );
+   theme_SetObstaclesData(NOTSET,-5    ,NOTSET,NOTSET,'15_17,39,41'   );
+   theme_SetObstaclesData(NOTSET,-8    ,NOTSET,NOTSET,'1,2,6,13,24_27');
+   theme_SetObstaclesData(NOTSET,-10   ,NOTSET,NOTSET,'34,36,29'      );
+   theme_SetObstaclesData(NOTSET,-14   ,NOTSET,NOTSET,'3'             );
+   theme_SetObstaclesData(NOTSET,-18   ,NOTSET,NOTSET,'7_12,18'       );
+   theme_SetObstaclesData(12    ,-18   ,NOTSET,NOTSET,'5,11'          );
 
-   // Anims
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'14'      ,-1 ,51 ,0  , 0  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'51'      ,-1 ,14 ,0  , 0  ,1      ,0);
+   theme_SetObstaclesData(NOTSET,-20   ,NOTSET,NOTSET,'32'            );
+   theme_SetObstaclesData(NOTSET,-21   ,NOTSET,NOTSET,'19'            );
+   theme_SetObstaclesData(5     ,-22   ,NOTSET,NOTSET,'33'            );
 
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'22'      ,-6 ,52 ,0  ,-9  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'52'      ,-2 ,22 ,0  ,-9  ,1      ,0);
+   theme_SetObstaclesData(5     ,-22   ,NOTSET,NOTSET,'33'            );
 
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'23'      ,-5 ,53 ,0  ,-8  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'53'      ,-2 ,23 ,0  ,-8  ,1      ,0);
+   theme_SetObstaclesData(NOTSET,-9    ,NOTSET,NOTSET,'52,22'         );
+   theme_SetObstaclesData(NOTSET,-8    ,NOTSET,NOTSET,'53,23'         );
+   theme_SetObstaclesData(4     ,-8    ,NOTSET,NOTSET,'48_50'         );
+   theme_SetObstaclesData(0     ,-17   ,NOTSET,NOTSET,'42_47'         );
 
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'48'      ,15 ,49 ,4  ,-8  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'49'      ,15 ,50 ,4  ,-8  ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'50'      ,15 ,48 ,4  ,-8  ,1      ,0);
-
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'42'      ,15 ,43 ,0  ,-17 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'43'      ,15 ,42 ,0  ,-17 ,1      ,0);
-
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'44'      ,15 ,45 ,0  ,-17 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'45'      ,15 ,44 ,0  ,-17 ,1      ,0);
-
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'46'      ,15 ,47 ,0  ,-17 ,1      ,0);
-   DecAnim(@theme_anm_decors,@theme_spr_decorn,'47'      ,15 ,46 ,0  ,-17 ,1      ,0);
+   // DEPTH
+   theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_ground    ,'all' );
+   theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_Obstacles2,'54_75,117_120' );
+   theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_Obstacles1,'76_105,107_116');
 
 
-   // S ROCKS                                  ns         atm ana xo  yo   shadow  depth
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'3'       ,20 ,22 ,0  ,0   ,-32000 ,0); // rock with pool 1
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'22'      ,20 ,3  ,0  ,0   ,-32000 ,0);
+   //// OBSTACLES ANIM
+   theme_SetObstaclesAnim(-1  ,'51,14');
+   theme_SetObstaclesAnim(-6  ,'52,22');
+   theme_SetObstaclesAnim(-5  ,'53,23');
+   theme_SetObstaclesAnim(15  ,'48_50');
+   theme_SetObstaclesAnim(15  ,'43,42');
+   theme_SetObstaclesAnim(15  ,'44,45');
+   theme_SetObstaclesAnim(15  ,'46,47');
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'4'       ,20 ,23 ,0  ,0   ,-32000 ,0); // rock with pool 2
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'23'      ,20 ,4  ,0  ,0   ,-32000 ,0);
+   theme_SetObstaclesAnim(20  ,'76,80');
+   theme_SetObstaclesAnim(20  ,'78,94');
+   theme_SetObstaclesAnim(20  ,'79,95');
+   theme_SetObstaclesAnim(20  ,'91,96');
+   theme_SetObstaclesAnim(20  ,'92,97');
+   theme_SetObstaclesAnim(20  ,'93,102');
+   theme_SetObstaclesAnim(20  ,'114,115');
+   theme_SetObstaclesAnim(20  ,'113,116');
 
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'9'       ,-1 ,24 ,0  ,0   ,-32000 ,0); // hell rocks 1
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'24'      ,-1 ,9  ,0  ,0   ,-32000 ,0);
-
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'10'      ,-1 ,25 ,0  ,0   ,-32000 ,0); // hell rocks 2
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'25'      ,-1 ,10 ,0  ,0   ,-32000 ,0);
-
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'11'      ,-1 ,26 ,0  ,0   ,-32000 ,0); // hell rocks 3
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'26'      ,-1 ,11 ,0  ,0   ,-32000 ,0);
-
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'12'      ,-1 ,0  ,0  ,0   ,-32000 ,0); // hell rocks 4
-   DecAnim(@theme_anm_srocks,@theme_spr_srockn,'0'       ,-1 ,12 ,0  ,0   ,-32000 ,0);
-
-
-   // B ROCKS                                  ns         atm ana xo  yo   shadow  depth
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'9'       ,-1 ,19 ,0  ,0   ,-32000 ,0); // tech slime canister
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'19'      ,-1 , 9 ,0  ,0   ,-32000 ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'11'      ,-1 ,20 ,0  ,0   ,-32000 ,0); // tech water canister
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'20'      ,-1 ,11 ,0  ,0   ,-32000 ,0);
-
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'5'       ,-1 ,15 ,0  ,0   ,-32000 ,0); // hell rocks 1
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'15'      ,-1 ,5  ,0  ,0   ,-32000 ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'6'       ,-1 ,16 ,0  ,0   ,-32000 ,0); // hell rocks 2
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'16'      ,-1 ,6  ,0  ,0   ,-32000 ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'7'       ,-1 ,17 ,0  ,0   ,-32000 ,0); // hell rocks 3
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'17'      ,-1 ,7  ,0  ,0   ,-32000 ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'8'       ,-1 ,18 ,0  ,0   ,-32000 ,0); // hell rocks 4
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'18'      ,-1 ,8  ,0  ,0   ,-32000 ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'13'      ,-1 ,21 ,0  ,0   ,-32000 ,0); // hell rocks 5
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'21'      ,-1 ,13 ,0  ,0   ,-32000 ,0);
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'14'      ,-1 ,0  ,0  ,0   ,-32000 ,0); // hell rocks 6
-   DecAnim(@theme_anm_brocks,@theme_spr_brockn,'0'       ,-1 ,14 ,0  ,0   ,-32000 ,0);
+   theme_SetObstaclesAnim(20  ,'54,60');
+   theme_SetObstaclesAnim(20  ,'57,67');
+   theme_SetObstaclesAnim(20  ,'59,68');
+   theme_SetObstaclesAnim(20  ,'61,71');
+   theme_SetObstaclesAnim(20  ,'62,72');
+   theme_SetObstaclesAnim(20  ,'63,73');
+   theme_SetObstaclesAnim(20  ,'64,74');
+   theme_SetObstaclesAnim(20  ,'65,75');
 
    // liquids
-   setlength(theme_anm_liquids ,theme_spr_liquidn );
-   setlength(theme_ant_liquids ,theme_spr_liquidn );
-   setlength(theme_clr_liquids ,theme_spr_liquidn );
+   setlength(theme_liquids_AnimStyle,theme_spr_liquidN);
+   setlength(theme_liquids_AnimTime ,theme_spr_liquidN);
+   setlength(theme_liquids_MMColor  ,theme_spr_liquidN);
 
-   //              minimap color anim  anim     animstyle: 0=default; 1=1 frame + lava bliks; 2=static 1 frame
-   //          n   R    G    B   style time
-   LiquidAnims(0,  16 , 16 , 150  , 0, 30);  // doom water
-   LiquidAnims(1,  10 , 150, 10   , 0, 30);  // doom slime
-   LiquidAnims(2,  136, 68 , 32   , 0, 30);  // doom brown
-   LiquidAnims(3,  136, 0  , 16   , 0, 30);  // doom blood
-   LiquidAnims(4,  220, 100, 15   , 0, 30);  // doom lava
-   LiquidAnims(5,  163, 82 , 82   , 1, 20);  // doom clifs
-   LiquidAnims(6,  30 , 30 , 150  , 0, 15);  // heretic water
-   LiquidAnims(7,  64 , 128, 128  , 0, 15);  // blood brown
-   LiquidAnims(8,  210, 168, 0    , 0, 15);  // blood magma
-   LiquidAnims(9,  160, 120, 15   , 1, 15);  // blood lava
-   LiquidAnims(10, 140, 20 , 0    , 0, 15);  // blood blood
-   LiquidAnims(11, 255, 180, 15   , 1, 15);  // heretic lava
-   LiquidAnims(12, 0  , 128, 64   , 0, 15);  // blood slime
-   LiquidAnims(13, 200, 82 , 0    , 0, 15);  // blood orange water
-   LiquidAnims(14, 0  , 128, 192  , 0, 10);  // duke3d water
-   LiquidAnims(15, 100, 180, 100  , 0, 10);  // duke3d slime
-   LiquidAnims(16, 100, 100, 100  , 2, 10);  // doom pl2 ice
+   //                       minimap color    anim        anim
+   //                   n   R    G    B      style       time
+   theme_SetLiquidAnims(0,  16 , 16 , 150  , tas_liquid, 30);  // doom water
+   theme_SetLiquidAnims(1,  10 , 150, 10   , tas_liquid, 30);  // doom slime
+   theme_SetLiquidAnims(2,  136, 68 , 32   , tas_liquid, 30);  // doom brown
+   theme_SetLiquidAnims(3,  136, 0  , 16   , tas_liquid, 30);  // doom blood
+   theme_SetLiquidAnims(4,  220, 100, 15   , tas_liquid, 30);  // doom lava
+   theme_SetLiquidAnims(5,  163, 82 , 82   , tas_magma , 20);  // doom clifs
+   theme_SetLiquidAnims(6,  30 , 30 , 150  , tas_liquid, 15);  // heretic water
+   theme_SetLiquidAnims(7,  64 , 128, 128  , tas_liquid, 15);  // blood brown
+   theme_SetLiquidAnims(8,  210, 168, 0    , tas_liquid, 15);  // blood magma
+   theme_SetLiquidAnims(9,  160, 120, 15   , tas_magma , 15);  // blood lava
+   theme_SetLiquidAnims(10, 140, 20 , 0    , tas_liquid, 15);  // blood blood
+   theme_SetLiquidAnims(11, 255, 180, 15   , tas_magma , 15);  // heretic lava
+   theme_SetLiquidAnims(12, 0  , 128, 64   , tas_liquid, 15);  // blood slime
+   theme_SetLiquidAnims(13, 200, 82 , 0    , tas_liquid, 15);  // blood orange water
+   theme_SetLiquidAnims(14, 0  , 128, 192  , tas_liquid, 10);  // duke3d water
+   theme_SetLiquidAnims(15, 100, 180, 100  , tas_liquid, 10);  // duke3d slime
+   theme_SetLiquidAnims(16, 100, 100, 100  , tas_noanim, 10);  // doom pl2 ice
 end;
 
-procedure SetThemeList(lst:PTIntList;lstn,smax:pinteger;str:shortstring);
-var i,o,
- _iln:integer;
- _il :TIntList;
+procedure SetThemeList(pList:pTIntList;pSize,pMax:pinteger;str:shortstring);
+var
+i,o,
+tSize:integer;
+tList:TIntList;
 begin
-   Str2IntList(str,@_il,@_iln);
+   Str2IntList(str,@tList,@tSize);
 
-   lstn^:=0;
-   setlength(lst^,lstn^);
+   pSize^:=0;
+   setlength(pList^,pSize^);
 
-   for i:=1 to _iln do
-   begin
-      o:=_il[i-1];
-      if(o>=0)then
-      begin
-         o:=o*2;
-         if(o<smax^)then
-         begin
-            IntListAdd(lst,lstn,o  );
-            IntListAdd(lst,lstn,o+1);
-         end;
-      end
-      else IntListAdd(lst,lstn,o);
-   end;
+   if(tSize>0)then
+     for i:=1 to tSize do
+     begin
+        o:=tList[i-1];
+        if(o>=0)then
+        begin
+           o:=o*2;
+           if(o<pMax^)then
+           begin
+              IntListAdd(pList,pSize,o  );
+              IntListAdd(pList,pSize,o+1);
+           end;
+        end
+        else IntListAdd(pList,pSize,o);
+     end;
 end;
 
-{
-theme_decors,
-theme_srocks,
-theme_brocks,
-theme_craters,
-theme_liquids,
-theme_bliquids,
-theme_terrains    : TIntList;
-}
+procedure SetThemeDecals  (istr:shortstring);begin SetThemeList(@theme_decalL      ,@theme_decalN      ,@theme_spr_decalN    ,istr);end;
+procedure SetThemeCraters (istr:shortstring);begin SetThemeList(@theme_craterL     ,@theme_craterN     ,@theme_spr_terrainN  ,istr);end;
+procedure SetThemeTerrains(istr:shortstring);begin SetThemeList(@theme_terrainL    ,@theme_terrainN    ,@theme_spr_terrainN  ,istr);end;
+procedure SetThemeLiquidsB(istr:shortstring);begin SetThemeList(@theme_liquidBackL ,@theme_liquidBackN ,@theme_spr_terrainN  ,istr);end;
+procedure SetThemeLiquidsF(istr:shortstring);begin SetThemeList(@theme_liquidFrontL,@theme_liquidFrontN,@theme_spr_liquidN   ,istr);end;
+procedure SetThemeObs0    (istr:shortstring);begin SetThemeList(@theme_obstacle0L  ,@theme_obstacle0N  ,@theme_spr_obstaclesN,istr);end;
+procedure SetThemeObs1    (istr:shortstring);begin SetThemeList(@theme_obstacle1L  ,@theme_obstacle1N  ,@theme_spr_obstaclesN,istr);end;
+procedure SetThemeObs2    (istr:shortstring);begin SetThemeList(@theme_obstacle2L  ,@theme_obstacle2N  ,@theme_spr_obstaclesN,istr);end;
 
-procedure SetTheme(nTheme,nTerrain,nLiquid,nLiquidBack,nCrater:integer);
+procedure SetTheme(nTheme,nTerrain,nLiquidFront,nLiquidBack,nCrater:integer);
 procedure SetTLBlC;
 begin
-   if(theme_terrainn<=0)then theme_map_Terrain   :=-1 else begin if(nTerrain   <0)then theme_map_Terrain   :=abs(nTerrain    mod theme_terrainn) else theme_map_Terrain   :=min2i(theme_terrainn-1,nTerrain   ); theme_map_Terrain   :=theme_terrains[theme_map_Terrain   ];end;
-   if(theme_bliquidn<=0)then theme_map_LiquidBack:=-1 else begin if(nLiquidBack<0)then theme_map_LiquidBack:=abs(nLiquidBack mod theme_bliquidn) else theme_map_LiquidBack:=min2i(theme_bliquidn-1,nLiquidBack); theme_map_LiquidBack:=theme_bliquids[theme_map_LiquidBack];end;
-   if(theme_cratern <=0)then theme_map_Crater    :=-1 else begin if(nCrater    <0)then theme_map_Crater    :=abs(nCrater     mod theme_cratern ) else theme_map_Crater    :=min2i(theme_cratern -1,nCrater    ); theme_map_Crater    :=theme_craters [theme_map_Crater    ];end;
-   if(theme_liquidn <=0)then theme_map_Liquid    :=-1 else begin if(nLiquid    <0)then theme_map_Liquid    :=abs(nLiquid     mod theme_liquidn ) else theme_map_Liquid    :=min2i(theme_liquidn -1,nLiquid    ); theme_map_Liquid    :=theme_liquids [theme_map_Liquid    ];end;
+   if(theme_craterN     <=0)then theme_map_Crater     :=-1 else begin if(nCrater     <0)then theme_map_Crater     :=abs(nCrater      mod theme_craterN     ) else theme_map_Crater     :=min2i(theme_craterN     -1,nCrater     ); theme_map_Crater     :=theme_craterL     [theme_map_Crater     ];end;
+   if(theme_terrainN    <=0)then theme_map_Terrain    :=-1 else begin if(nTerrain    <0)then theme_map_Terrain    :=abs(nTerrain     mod theme_terrainN    ) else theme_map_Terrain    :=min2i(theme_terrainN    -1,nTerrain    ); theme_map_Terrain    :=theme_terrainL    [theme_map_Terrain    ];end;
+   if(theme_liquidBackN <=0)then theme_map_LiquidBack :=-1 else begin if(nLiquidBack <0)then theme_map_LiquidBack :=abs(nLiquidBack  mod theme_liquidBackN ) else theme_map_LiquidBack :=min2i(theme_liquidBackN -1,nLiquidBack ); theme_map_LiquidBack :=theme_liquidBackL [theme_map_LiquidBack ];end;
+   if(theme_liquidFrontN<=0)then theme_map_LiquidFront:=-1 else begin if(nLiquidFront<0)then theme_map_LiquidFront:=abs(nLiquidFront mod theme_liquidFrontN) else theme_map_LiquidFront:=min2i(theme_liquidFrontN-1,nLiquidFront); theme_map_LiquidFront:=theme_liquidFrontL[theme_map_LiquidFront];end;
 end;
 begin
    if(nTheme<0)or(nTheme>=theme_n)then nTheme:=abs(nTheme) mod theme_n;
    theme_i:=nTheme;
-   case nTheme of
-   0: begin  // TECH BASE
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1_3,21,22,26,27,29,31,32');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'17,18'      );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'19,26'      );
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'17,18,19,26');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_2,6,13_15');
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'13_19'      );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'9_12'       );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'19,22_27,29_32,35,37_41,52_53');
+   case theme_i of
+   0 : begin  // UAC BASE
+          SetThemeDecals  ('-1_-4,1_3,21,22,26,27,29,31,32');
+          SetThemeCraters ('17,18,19,26');
+          SetThemeTerrains('17,18'      );
+          SetThemeLiquidsB('19,26'      );
+          SetThemeLiquidsF('0_2,6,13_15');
+          SetThemeObs0    ('19,22_27,32,35,37_41,52_53');
+          SetThemeObs1    ('81_87'      );
+          SetThemeObs2    ('56_58,65,67,75');
 
-         theme_liquid_style:=1;
-         theme_crater_style:=2;
-      end;
-   1: begin  // TECH BLUE BASE
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1_3,21,22,26,27,29,31,32');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'19'         );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'17,18,26'   );
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'17,18,19,26');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_2,6,13_15');
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'13_19'      );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'9_12'       );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'19,22_27,29_32,35,37_41,52_53');
+          theme_liquid_style:=tcs_smooth;
+          theme_crater_style:=tcs_square;
+       end;
+   1 : begin  // TECH BLUE BASE
+          SetThemeDecals  ('-1_-4,1_3,21,22,26,27,29,31,32');
+          SetThemeCraters ('17,18,19,26');
+          SetThemeTerrains('19'         );
+          SetThemeLiquidsB('17,18,26'   );
+          SetThemeLiquidsF('0_2,6,13_15');
+          SetThemeObs0    ('19,22_27,32,35,37_41,30,48');
+          SetThemeObs1    ('81_87'      );
+          SetThemeObs2    ('56_58,65,67,75'       );
 
-         theme_liquid_style:=1;
-         theme_crater_style:=1;
-      end;
+          theme_liquid_style:=tcs_smooth;
+          theme_crater_style:=tcs_smooth;
+       end;
 
-   2: begin  // PLANET
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4_17,23_25');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0,2_16,20_25'   );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0,2_16,20_25,28');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0,2_16,20_25,28');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_15'           );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1_8,20,21'      );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4'            );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'0_12,18,28_29,36,48_50 ');
+   2 : begin  // UNKNOWN PLANET
+          SetThemeDecals  ('-1_-4,1,4_17,23_25');
+          SetThemeCraters ('0,2_16,20_25,28' );
+          SetThemeTerrains('0,2_16,20_25'    );
+          SetThemeLiquidsB('0,2_16,20_25,28' );
+          SetThemeLiquidsF('0_15'            );
+          SetThemeObs0    ('0_12,18,28,48_50');
+          SetThemeObs1    ('77,88_92,96_101' );
+          SetThemeObs2    ('55,58,66,69,70'  );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end;
-   3: begin  // PLANET MOON
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4_17,23_25'       );
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0,2_4,8,10_13,20_23,25'   );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0,2_4,8,10_13,20_23,25,28');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0,2_4,8,10_13,20_23,25,28');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0,4,6,8,9,11,14'          );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1_8,20,21'   );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4'         );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'0_12,29_34 ' );
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
+   3 : begin  // UNKNOWN MOON
+          SetThemeDecals  ('-1_-4,1,4_17,23_25'       );
+          SetThemeCraters ('0,2_4,8,10_13,20_23,25,28');
+          SetThemeTerrains('0,2_4,8,10_13,20_23,25'   );
+          SetThemeLiquidsF('0,4,6,8,9,11,14'          );
+          SetThemeLiquidsB('0,2_4,8,10_13,20_23,25,28');
+          SetThemeObs0    ('0_12,18,28_32,48_50'      );
+          SetThemeObs1    ('77,88_92,96_101,33,34'    );
+          SetThemeObs2    ('55,58,66,69,70'           );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end;
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
 
-   4: begin  // CAVES
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4_20,23_25,28,30,33,34'   );
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0_4,8_16,20_25'   );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0_4,8_16,20_25,28_30');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0_4,8_16,20_25,28_30');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0_14'             );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1_8,13,14,20,21'  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4,12'           );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'0_22,28,35,36,42_47,48_50');
+   4 : begin  // CAVES
+          SetThemeDecals  ('-1_-4,1,4_20,23_25,28,30,33,34');
+          SetThemeCraters ('0_4,8_16,20_25,28_30');
+          SetThemeTerrains('0_4,8_16,20_25'      );
+          SetThemeLiquidsB('0_4,8_16,20_25,28_30');
+          SetThemeLiquidsF('0_14'                );
+          SetThemeObs0    ('0_13,15_28,35,36,42_47,48');
+          SetThemeObs1    ('77,88_92,96_101'          );
+          SetThemeObs2    ('55,58,66,69,70'           );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end;
-   5: begin  // ICE CAVES
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'0,2,11_13,20,25');
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0,2,11_13,20,25,28');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'0,2,11_13,20,25,28');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'16'             );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1,2,5_8,20,21'  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4'            );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'0_23,28,35,36,42_47,48_50');
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
+   5 : begin  // ICE CAVES
+          SetThemeDecals  ('-1_-4,1_20,23_25,28,30,33,34');
+          SetThemeCraters ('0,2,11_13,20,25,28');
+          SetThemeTerrains('0,2,11_13,20,25');
+          SetThemeLiquidsB('0,2,11_13,20,25,28');
+          SetThemeLiquidsF('16'             );
+          SetThemeObs0    ('0_13,15_28,35,36,42_47,48');
+          SetThemeObs1    ('77,88_92,96_101'  );
+          SetThemeObs2    ('55,56,58,66,69,70');
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end;
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
 
-   6: begin  // HELL
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'1,27,23'               );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1,27,23'               );
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'1,27,23'               );
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4,8_9,11'              );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'9_12'                  );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'5_8,13,14'             );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'3,13_17,20,21,36,42_47');
+   6 : begin  // HELL PLANET
+          SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+          SetThemeCraters ('1,27,23'               );
+          SetThemeTerrains('1,27,23'               );
+          SetThemeLiquidsB('1,27,23'               );
+          SetThemeLiquidsF('4,8_9,11'              );
+          SetThemeObs0    ('3,13_17,20,21,36,42_47,112');
+          SetThemeObs1    ('76,78_80,93_95,102,103_105,107_111,113,114');
+          SetThemeObs2    ('54,59_64,68,71_74,117_120'             );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end;
-   7: begin  // HELL CAVES
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-         SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'4,10,14,16,21,23'      );
-         SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'4,10,14,16,21,23,29,30');
-         SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'4,10,14,16,21,23,29,30');
-         SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4,5,8_9,11'            );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1_8'                   );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4'                   );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'3,13_17,20,21,36,42_47');
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
+   7 : begin  // HELL CAVES
+          SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+          SetThemeCraters ('4,10,14,16,21,23,29,30,35');
+          SetThemeTerrains('4,10,14,16,21,23'         );
+          SetThemeLiquidsB('4,10,14,16,21,23,29,30,35');
+          SetThemeLiquidsF('4,5,8_9,11'               );
+          SetThemeObs0    ('3,13_17,20,21,36,42_47,106,112');
+          SetThemeObs1    ('77,88_92,96_101,103_105,107_111,113,114');
+          SetThemeObs2    ('55,66,69,70,117_120'                    );
 
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-      end;
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
+   8 : begin  // HELL CITY
+          SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+          SetThemeCraters ('31_35');
+          SetThemeTerrains('31_34');
+          SetThemeLiquidsB('31_35');
+          SetThemeLiquidsF('4,5,8_11');
+          SetThemeObs0    ('13_17,20,21,36,42_47,106,112');
+          SetThemeObs1    ('103_105,107_111,113_116'     );
+          SetThemeObs2    ('117_120'                     );
 
-
+          theme_liquid_style:=tcs_smooth;
+          theme_crater_style:=tcs_square;
+       end;
    end;
    SetTLBlC;
 end;
@@ -500,57 +521,26 @@ begin
    case campaign of
    0 : case mission of
        0 : begin  // CAMPAINGS:  HELL
-              SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-              SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'9_12'                  );
-              SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'5_8,13,14'             );
-              SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'3,9,13,14,16,20,21,28,36,42_47');
+              SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+              SetThemeObs0    ('3,9,13,14,16,20,21,28,36,42_47');
+              SetThemeObs1    ('9_12'                  );
+              SetThemeObs2    ('5_8,13,14'             );
 
-              theme_liquid_style:=0;
-              theme_crater_style:=0;
+              theme_liquid_style:=tcs_default;
+              theme_crater_style:=tcs_default;
 
-              SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'23');
-              SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'1' );
-              SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'27');
-              SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'4' );
+              SetThemeTerrains('23');
+              SetThemeLiquidsB('1' );
+              SetThemeCraters ('27');
+              SetThemeLiquidsF('4' );
            end;
        end;
    end;
 
-  { case theme_id of
-   0
-    :
-
-   1,2
-    : begin  // CAMPAINGS: PHOBOS
-         SetThemeList(@theme_decals  ,@theme_decaln  ,@theme_spr_decaln  ,'-1_-4,1,4_17,23_25' );
-         SetThemeList(@theme_srocks  ,@theme_srockn  ,@theme_spr_srockn  ,'1_8,20_23'          );
-         SetThemeList(@theme_brocks  ,@theme_brockn  ,@theme_spr_brockn  ,'1_4,9_12'           );
-         SetThemeList(@theme_decors  ,@theme_decorn  ,@theme_spr_decorn  ,'0_12,18,22_27,29_34');
-
-         theme_liquid_style:=0;
-         theme_crater_style:=0;
-
-         case theme_id of
-         1: begin
-            SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'3' );
-            SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'0' );
-            SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'23');
-            SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'0' );
-            end;
-         2: begin
-            SetThemeList(@theme_terrains,@theme_terrainn,@theme_spr_terrainn,'4' );
-            SetThemeList(@theme_bliquids,@theme_bliquidn,@theme_spr_terrainn,'2' );
-            SetThemeList(@theme_craters ,@theme_cratern ,@theme_spr_terrainn,'22');
-            SetThemeList(@theme_liquids ,@theme_liquidn ,@theme_spr_liquidn ,'1' );
-            end;
-         end;
-
-      end;
-   end;  }
-   theme_map_Terrain :=theme_terrains[0];
-   theme_map_LiquidBack:=theme_bliquids[0];
-   theme_map_Crater :=theme_craters [0];
-   theme_map_Liquid :=theme_liquids [0];
+   theme_map_Terrain    :=theme_terrainL    [0];
+   theme_map_LiquidBack :=theme_liquidBackL [0];
+   theme_map_Crater     :=theme_craterL     [0];
+   theme_map_LiquidFront:=theme_liquidFrontL[0];
 end;
 
 

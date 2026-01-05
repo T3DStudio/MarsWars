@@ -51,7 +51,7 @@ begin
      UID_HSymbol2,
      UID_HSymbol3,
      UID_HSymbol4,
-     UID_HAltar    : unit_GetSpriteDepth:=sd_tcraters+vy;
+     UID_HAltar    : unit_GetSpriteDepth:=sd_decals+vy;
      else
        if(uid^.uid_isbuilding)and(not iscomplete)
        then unit_GetSpriteDepth:=sd_build+vy
@@ -674,7 +674,7 @@ begin
            then spr_alphab:=128
            else spr_alphab:=255;
 
-           SpriteList_AddEffect(vx,vy+uid_eid_bcrater_y,sd_liquid+uid_eid_bcrater_y+y,0,EID2Spr(uid_eid_bcrater),spr_alphab);
+           SpriteList_AddEffect(vx,vy+uid_eid_bcrater_y,sd_liquidFront+uid_eid_bcrater_y+y,0,EID2Spr(uid_eid_bcrater),spr_alphab);
         end;
 
       if(ui_ColoredShadow)
@@ -716,7 +716,7 @@ begin
           then unit_AddSpriteDead (pu)
           else
           begin
-             unit_UIMarks(pu);
+             if(playeri=UIPlayer)then unit_UIMarks(pu);
              unit_AddSpriteAlive(pu,noanim);
           end;
    end;

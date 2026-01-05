@@ -308,17 +308,17 @@ procedure unit_PushFromObstacle(pu:PTUnit;pObstacle:PTObstacle);
 var
 t,
 uds:single;
-i,
 udi:integer;
+procedure push_Outside;
 begin
    with pu^ do
    with uid^ do
    begin
-      t  :=point_dist_real(x,y,pObstacle^.o_x,pObstacle^.o_y);
-      uds:=t-(uid_r+pObstacle^.o_r);
-      udi:=round(uds);
+      uds:=t-(uid_r+pObstacle^.o_rO);
 
       if(uds>=0)then exit;
+
+      udi:=round(uds);
 
       if((pObstacle^.o_x=x)and(pObstacle^.o_y=y))then
       begin
@@ -348,35 +348,87 @@ begin
       end;
 
       uds:=point_dist_real(uo_x,uo_y,pObstacle^.o_x,pObstacle^.o_y);
-      i  :=uid_r+pObstacle^.o_r;
-      if(uds<=i)then
+      udi:=uid_r+pObstacle^.o_rO;
+      if(uds<=udi)then
       begin
-         i+=2;
-         uo_x:=pObstacle^.o_x-round((pObstacle^.o_x-uo_x)/uds*i);
-         uo_y:=pObstacle^.o_y-round((pObstacle^.o_y-uo_y)/uds*i);
+         udi+=2;
+         uo_x:=pObstacle^.o_x-round((pObstacle^.o_x-uo_x)/uds*udi);
+         uo_y:=pObstacle^.o_y-round((pObstacle^.o_y-uo_y)/uds*udi);
+      end;
+   end;
+end;
+procedure push_InSide;
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      udi:=pObstacle^.o_rI-uid_r;
+      if(t<udi)then exit;
+
+      unit_SetXY(pu,pObstacle^.o_x-round(udi*(pObstacle^.o_x-x)/t),
+                    pObstacle^.o_y-round(udi*(pObstacle^.o_y-y)/t),mvxy_none);
+
+
+      vstp+=round(udi/speed*UnitStepTicks);
+
+      if(a_rld<=0)then
+        if(vx<>x)or(vy<>y)then dir:=dir_MOD360(dir-(dir_diff(dir,point_dir(vx,vy,x,y)) div 2 ));
+
+      if(uo_id=ua_ability1)
+      or(uo_id=ua_ability2)
+      or(uo_id=ua_ability3)then exit;
+
+      uds:=point_dist_real(uo_x,uo_y,pObstacle^.o_x,pObstacle^.o_y);
+      udi:=pObstacle^.o_rI-uid_r;
+      if(uds>udi)then
+      begin
+         udi-=2;
+         uo_x:=pObstacle^.o_x-round((pObstacle^.o_x-uo_x)/uds*udi);
+         uo_y:=pObstacle^.o_y-round((pObstacle^.o_y-uo_y)/uds*udi);
       end;
    end;
 end;
 
+begin
+   with pu^ do
+   with uid^ do
+   begin
+      t  :=point_dist_real(x,y,pObstacle^.o_x,pObstacle^.o_y);
+
+      if(pObstacle^.o_rI<=0)
+      or(pObstacle^.o_rM<=t)
+      then push_Outside
+      else push_InSide;
+   end;
+end;
+
 procedure unit_PushFromObstacles(pu:PTUnit);
-var i,dx,dy:integer;
+var i,
+dx,dy,
+dx0,dy0,
+dx1,dy1:integer;
 begin
    with pu^ do
      if(speed<=0)
      or(isfly<>uf_ground)
      or(uid^.uid_isfly)
      or(not solid)
+     or(zfall<>0)
      or(not iscomplete)then exit;
 
-   dx:=pu^.x div MapObstaclesGridW;
-   dy:=pu^.y div MapObstaclesGridW;
-
-   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-     with map_ObstaclesGrid[dx,dy] do
-       if(oc_n>0)then
-         for i:=0 to oc_n-1 do
-           with oc_l[i]^ do
-             if(o_r>0)and(o_type>0)then unit_PushFromObstacle(pu,oc_l[i]);
+   dx0:=(pu^.x-pu^.uid^.uid_r) div MapObstaclesGridW;
+   dy0:=(pu^.y-pu^.uid^.uid_r) div MapObstaclesGridW;
+   dx1:=(pu^.x+pu^.uid^.uid_r) div MapObstaclesGridW;
+   dy1:=(pu^.y+pu^.uid^.uid_r) div MapObstaclesGridW;
+   for dx:=dx0 to dx1 do
+   for dy:=dy0 to dy1 do
+     if (0<=dx)and(dx<=MapObstaclesGridN)
+     and(0<=dy)and(dy<=MapObstaclesGridN)then
+       with map_ObstaclesGrid[dx,dy] do
+         if(oc_n>0)then
+           for i:=0 to oc_n-1 do
+             with oc_l[i]^ do
+               if(o_rO>0)then unit_PushFromObstacle(pu,oc_l[i]);
 end;
 
 procedure unit_move(pu:PTUnit);

@@ -31,7 +31,6 @@ begin
    if(TestMode>1)and(net_status=0)then draw_debug;
 end;
 
-
 procedure GameDraw;
 var i,n:integer;
 begin
@@ -74,6 +73,8 @@ begin
      for i:=0 to LastPlayer do
       with ai_alarms[i] do
        if(aia_enemy_limit>0)then n+=1;  }
+
+
 
 
      draw_text(vid_screen,ui_cam_w,ui_cam_h-10,

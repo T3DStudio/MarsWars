@@ -74,7 +74,7 @@ end;
 
 procedure effect_KPointExplode(vx,vy:integer);
 begin
-   effect_add(vx,vy,sd_liquid+vy,EID_db_u0);
+   effect_add(vx,vy,sd_liquidFront+vy,EID_db_u0);
    if(ui_CheckMapPointFogVision(vx,vy,true))then
    begin
       effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,false),EID_BBExp);
@@ -108,7 +108,7 @@ begin
    with uid^ do
    begin
       if(not isfly)and(uid_eid_bcrater>0)and(uid_isbuilding)then
-        effect_add(vx,vy+uid_eid_bcrater_y,sd_liquid+vy,uid_eid_bcrater);
+        effect_add(vx,vy+uid_eid_bcrater_y,sd_liquidFront+vy,uid_eid_bcrater);
 
       if(pUIVision<>nil)then
       begin
@@ -1106,83 +1106,107 @@ begin
    else math_1c_push(tx,ty,x0,y0,r0);
 end;
 
-procedure math_push_out(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;_ukfly,check_obstacles:boolean;UnitObsTeamVis:byte=255);
-const nrl = 1;
-var nrx,
-    nry,
-    nrd,
-    nrt : array[0..nrl] of integer;
+procedure math_push_out(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;flyLevel,check_obstacles:boolean;UnitObsTeamVis:byte=255);
+const pout_max = 1;
+var pout_x,
+    pout_y,
+    pout_d,
+    pout_t : array[0..pout_max] of integer;
+pin_x,
+pin_y,
+pin_d,
 dx,dy,
+dx0,dy0,
+dx1,dy1,
 o,u,d   : integer;
 {$IFDEF _FULLGAME}
 a       : byte;
 {$ENDIF}
-procedure add(ax,ay,ad,at:integer);
+procedure POutAdd(ax,ay,ad,at:integer);
 var i,n:integer;
 begin
    // find insert i
    i:=0;
-   while(i<=nrl)do
+   while(i<=pout_max)do
    begin
-      if(ad<nrd[i])then break;
+      if(ad<pout_d[i])then break;
       i+=1;
    end;
 
-   if(i>nrl)then exit;
+   if(i>pout_max)then exit;
 
-   if(i<>nrl)then
-     for n:=nrl-1 downto i do
+   if(i<>pout_max)then
+     for n:=pout_max-1 downto i do
      begin
-        nrd[i+1]:=nrd[i];
-        nrx[i+1]:=nrx[i];
-        nry[i+1]:=nry[i];
-        nrt[i+1]:=nrt[i];
+        pout_d[i+1]:=pout_d[i];
+        pout_x[i+1]:=pout_x[i];
+        pout_y[i+1]:=pout_y[i];
+        pout_t[i+1]:=pout_t[i];
      end;
 
-   nrd[i]:=ad;
-   nrx[i]:=ax;
-   nry[i]:=ay;
-   nrt[i]:=at;
+   pout_d[i]:=ad;
+   pout_x[i]:=ax;
+   pout_y[i]:=ay;
+   pout_t[i]:=at;
 end;
-
+procedure PInAdd(ax,ay,ad:integer);
 begin
-   for u:=0 to nrl do
-   begin
-      nrd[u]:= NOTSET;
-      nrx[u]:=-2000;
-      nry[u]:=-2000;
-      nrt[u]:=0;
-   end;
+   if(ad>=pin_d)then exit;
 
-   if(_ukfly)then check_obstacles:=false;
+   pin_x:=ax;
+   pin_y:=ay;
+   pin_d:=ad;
+end;
+begin
+   for u:=0 to pout_max do
+   begin
+      pout_d[u]:= NOTSET;
+      pout_x[u]:=-2000;
+      pout_y[u]:=-2000;
+      pout_t[u]:=0;
+   end;
+   pin_x:=0;
+   pin_y:=0;
+   pin_d:=pin_d.MaxValue;
+
+   if(flyLevel)then check_obstacles:=false;
 
    if(check_obstacles)then
    begin
       tr-=BuildObstacleStepR;
-      dx:=tx div MapObstaclesGridW;
-      dy:=ty div MapObstaclesGridW;
-      if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-       with map_ObstaclesGrid[dx,dy] do
-        if(oc_n>0)then
-         for u:=0 to oc_n-1 do
-          with oc_l[u]^ do
-           if(o_r>0)and(o_type>0)then
-           begin
-              o:=tr+o_r;
-              d:=point_dist_int(o_x,o_y,tx,ty)-o;
-              add(o_x,o_y,d,o);
-           end;
+      dx0:=(tx-tr) div MapObstaclesGridW;
+      dy0:=(ty-tr) div MapObstaclesGridW;
+      dx1:=(tx+tr) div MapObstaclesGridW;
+      dy1:=(ty+tr) div MapObstaclesGridW;
+      for dx:=dx0 to dx1 do
+      for dy:=dy0 to dy1 do
+        if (0<=dx)and(dx<=MapObstaclesGridN)
+        and(0<=dy)and(dy<=MapObstaclesGridN)then
+          with map_ObstaclesGrid[dx,dy] do
+            if(oc_n>0)then
+              for u:=0 to oc_n-1 do
+                with oc_l[u]^ do
+                  if(o_rO>0)then
+                  begin
+                     o:=tr+o_rO;
+                     d:=point_dist_int(o_x,o_y,tx,ty);
+                     if(o_rI<=0)
+                     or(o_rM<=d)then POutAdd(o_x,o_y,d-o,o);
+                     if (o_rI>0)
+                     and(o_rI<(d+tr))
+                     and(o_rM>d)then PInAdd(o_x,o_y,o_rI-tr);
+                  end;
       tr+=BuildObstacleStepR;
    end;
 
-   if(not _ukfly)then
+   if(not flyLevel)then
     for u:=0 to LastKeyPoint do
      with map_KeyPointsL[u] do
       if(kpCaptureR>0)and(kpNoBuildR>0)then
       begin
          o:=kpNoBuildR+tr;
          d:=point_dist_int(kpx,kpy,tx,ty)-o;
-         add(kpx,kpy,d,o);
+         POutAdd(kpx,kpy,d,o);
       end;
 
    for u:=1 to MaxUnits do
@@ -1197,7 +1221,7 @@ begin
 
            o:=tr+uid_r;
            d:=point_dist_int(x,y,tx,ty);
-           add(x,y,d-o,o);
+           POutAdd(x,y,d-o,o);
         end;
 
    {$IFDEF _FULLGAME}
@@ -1222,7 +1246,7 @@ begin
                                                begin
                                                   o+=tr;
                                                   d:=point_dist_int(uo_x,uo_y,tx,ty);
-                                                  add(uo_x,uo_y,d-o,o);
+                                                  POutAdd(uo_x,uo_y,d-o,o);
                                                end;
                                             end;
                              end;
@@ -1230,19 +1254,19 @@ begin
          end;
    {$ENDIF}
 
-   if(nrd[1]<=-1)
-   then math_2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],nrx[1],nry[1],nrt[1])
+   if(pout_d[1]<=-1)
+   then math_2c_push(@tx,@ty,pout_x[0],pout_y[0],pout_t[0],pout_x[1],pout_y[1],pout_t[1])
    else
-     if(nrd[0]<=-1)
-     then math_2c_push(@tx,@ty,nrx[0],nry[0],nrt[0],-2000,-2000,-2000);
+     if(pout_d[0]<=-1)
+     then math_2c_push(@tx,@ty,pout_x[0],pout_y[0],pout_t[0],NOTSET,NOTSET,NOTSET)
+     else
+       if(pin_d<>NOTSET)then
+         math_1c_push(@tx,@ty,pin_x,pin_y,pin_d);
 
-   if(not _ukfly)then
-   begin
-      dx:=tr;
-      dy:=map_Size1-dx;
-      tx:=mm3i(dx,tx,dy);
-      ty:=mm3i(dx,ty,dy);
-   end;
+   dx:=tr;
+   dy:=map_Size1-dx;
+   tx:=mm3i(dx,tx,dy);
+   ty:=mm3i(dx,ty,dy);
 
    newx^:=tx;
    newy^:=ty;
@@ -1267,21 +1291,21 @@ begin
    sr:=NOTSET;
    dr:=NOTSET;
    for u:=1 to MaxUnits do
-    with g_units[u] do
-     with uid^ do
-      if(hits>0)and(speed<=0)and(isfly=aukfly)and(iscomplete)and(playeri=pl)and(uid_isbuilder)and(not isfly)then
-       if(player^.units_builders_s=0)or(isselected)then
-        if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
-        begin
-           o:=point_dist_int(x,y,tx,ty)-srange;
-           if(o<dr)then
-           begin
-              dx:=x;
-              dy:=y;
-              dr:=o;
-              sr:=srange;
-           end;
-        end;
+     with g_units[u] do
+       with uid^ do
+         if(hits>0)and(speed<=0)and(isfly=aukfly)and(iscomplete)and(playeri=pl)and(uid_isbuilder)and(not isfly)then
+           if(player^.units_builders_s=0)or(isselected)then
+             if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
+             begin
+                o:=point_dist_int(x,y,tx,ty)-srange;
+                if(o<dr)then
+                begin
+                   dx:=x;
+                   dy:=y;
+                   dr:=o;
+                   sr:=srange;
+                end;
+             end;
 
    if(dr<NOTSET)then
    begin
@@ -1303,7 +1327,10 @@ end;
 {$ENDIF}
 
 function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean;checkTeamVis:byte;reveal_u:PTUnit=nil):TCheckCollisionR;
-var u,dx,dy:integer;
+var u,
+dx,dy,
+dx0,dy0,
+dx1,dy1:integer;
 begin
    CheckCollisionR:=cbr_no;
 
@@ -1354,21 +1381,25 @@ begin
 
    tr-=BuildObstacleStepR;
 
-   dx:=tx div MapObstaclesGridW;
-   dy:=ty div MapObstaclesGridW;
+   dx0:=(tx-tr) div MapObstaclesGridW;
+   dy0:=(ty-tr) div MapObstaclesGridW;
+   dx1:=(tx+tr) div MapObstaclesGridW;
+   dy1:=(ty+tr) div MapObstaclesGridW;
 
-   if (0<=dx)and(dx<=MapObstaclesGridN)
-   and(0<=dy)and(dy<=MapObstaclesGridN)then
-     with map_ObstaclesGrid[dx,dy] do
-       if(oc_n>0)then
-         for u:=0 to oc_n-1 do
-           with oc_l[u]^ do
-             if(o_r>0)and(o_type>0)then
-               if(point_dist_int(o_x,o_y,tx,ty)<(tr+o_r))then
-               begin
-                  CheckCollisionR:=cbr_obstacle;
-                  exit;
-               end;
+   for dx:=dx0 to dx1 do
+   for dy:=dy0 to dy1 do
+     if (0<=dx)and(dx<=MapObstaclesGridN)
+     and(0<=dy)and(dy<=MapObstaclesGridN)then
+       with map_ObstaclesGrid[dx,dy] do
+         if(oc_n>0)then
+           for u:=0 to oc_n-1 do
+             with oc_l[u]^ do
+               if(o_rO>0)then
+                 if(RingCollision(o_x,o_y,o_rO,o_rI,tx,ty,tr-1,0))then
+                 begin
+                    CheckCollisionR:=cbr_obstacle;
+                    exit;
+                 end;
 end;
 
 function CheckInBuildArea(tx,ty,tr:integer;buid,playerN:byte):TCheckBuildArea;

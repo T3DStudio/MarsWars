@@ -157,7 +157,7 @@ begin
    AddItem(@map_generators      ,SizeOf(map_generators   ));
    AddItem(@map_seed            ,SizeOf(map_seed         ));
    AddItem(@map_Size1           ,SizeOf(map_Size1        ));
-   AddItem(@map_ObstaclesF      ,SizeOf(map_ObstaclesF   ));
+   AddItem(@map_ObstaclesS      ,SizeOf(map_ObstaclesS   ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
    AddItem(@theme_i             ,SizeOf(theme_i          ));
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
@@ -318,8 +318,8 @@ begin
 
          map_MakeThemeSprites;
          map_RefreshDoodadsCells;
-         map_RedrawMenuMinimap;
          map_DoodadsSetDrawData;
+         map_RedrawMenuMinimap;
          ui_Camera_Bounds;
 
          G_Started:=true;

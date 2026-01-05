@@ -4,7 +4,7 @@ procedure map_MakeThemeSprites;
 begin
    gfx_MapMakeTerrain;
    gfx_MapMakeCrater;
-   gfx_MapMakeLiquid;
+   gfx_MapMakeLiquidFront;
    gfx_MapMakeLiquidBack;
 end;
 
@@ -13,7 +13,7 @@ begin
    SetTheme(
       map_seed and $0000000F,            // theme number
    -((map_seed and $00000FF0) shr 4 ),   // terrain
-   -((map_seed and $000FF000) shr 12),   // liquid
+   -((map_seed and $000FF000) shr 12),   // liquid front
    -((map_seed and $0FF00000) shr 20),   // liquid back
    -((map_seed and $F0000000) shr 28));  // crater
 end;
@@ -36,12 +36,12 @@ begin
 
    for d:=1 to MaxObstacles do
      with map_ObstaclesL[d] do
-     if(o_type>0)then
+       if(o_rO>0)then
        begin
-          dx0:=(o_x-o_r-MapObstaclesGridW) div MapObstaclesGridW;
-          dy0:=(o_y-o_r-MapObstaclesGridW) div MapObstaclesGridW;
-          dx1:=(o_x+o_r+MapObstaclesGridW) div MapObstaclesGridW;
-          dy1:=(o_y+o_r+MapObstaclesGridW) div MapObstaclesGridW;
+          dx0:=(o_x-o_rO) div MapObstaclesGridW;
+          dy0:=(o_y-o_rO) div MapObstaclesGridW;
+          dx1:=(o_x+o_rO) div MapObstaclesGridW;
+          dy1:=(o_y+o_rO) div MapObstaclesGridW;
           for dx:=dx0 to dx1 do
             if(0<=dx)and(dx<=MapObstaclesGridN)then
               for dy:=dy0 to dy1 do
@@ -60,6 +60,17 @@ end;
 //   COMMON
 //
 
+function map_ObstacleR(obs_f:byte):integer;
+begin
+   map_ObstacleR:=ObstaclesRMin;
+   case obs_f of
+   0  : ;
+   1  : map_ObstacleR+=ObstaclesRStep;
+   2  : map_ObstacleR+=ObstaclesRStep*2;
+   else map_ObstacleR+=integer(obs_f*obs_f*ObstaclesRStep)
+   end;
+end;
+
 function map_IfObstacleZone(zone:word):boolean;
 begin
    map_IfObstacleZone:=(zone=zone_solid);
@@ -67,22 +78,34 @@ end;
 
 function map_GetZone(mx,my:integer;mr:integer=0):word;
 var
-i,dx,dy:integer;
+i    :word;
+d,orm,
+dx,dy:integer;
 begin
-   map_GetZone:=zone_solid;
+   map_GetZone:=0;
 
    dx:=mx div MapObstaclesGridW;
    dy:=my div MapObstaclesGridW;
+   orm:=orm.MaxValue;
 
    if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-    with map_ObstaclesGrid[dx,dy] do
-     if(oc_n>0)then
-      for i:=0 to oc_n-1 do
-       with oc_l[i]^ do
-        if(o_r>0)and(o_type>0)then
-          if(point_dist_int(mx,my,o_x,o_y)<=o_r)and(mr<=o_r)then exit;
+     with map_ObstaclesGrid[dx,dy] do
+       if(oc_n>0)then
+         for i:=0 to oc_n-1 do
+           with oc_l[i]^ do
+             if(o_rO>0)and(mr<=o_rO)then
+             begin
+                d:=point_dist_int(mx,my,o_x,o_y);
+                if(d>o_rO)then continue;
+                if(o_rI<d)and(d<o_rO)then
+                begin
+                   map_GetZone:=zone_solid;
+                   exit;
+                end;
 
-   map_GetZone:=0;
+                if(o_rO>=orm)then continue;
+                map_GetZone:=o_zone;
+             end;
 end;
 
 procedure map_Seed2RandomBase;
@@ -105,12 +128,23 @@ begin
    {$ENDIF}
 end;
 
-procedure map_addObstacle(ox,oy:integer;otype:byte);
+procedure map_Obstacle_Add(ox,oy,orO,orI:integer);
 begin
    if(map_ObstaclesN<0)then map_ObstaclesN:=0;
    if(map_ObstaclesN>=MaxObstacles)then exit;
 
-   case otype of
+   map_ObstaclesN+=1;
+   with map_ObstaclesL[map_ObstaclesN] do
+   begin
+      o_rO  :=orO;
+      o_rI  :=orI;
+      o_rM  :=(orO+orI) div 2;
+      o_x   :=ox;
+      o_y   :=oy;
+      o_zone:=word(map_ObstaclesN);
+   end;
+
+   {case otype of
    DID_LiquidR1,
    DID_LiquidR2,
    DID_LiquidR3,
@@ -128,7 +162,7 @@ begin
                       end;
                    end;
    else
-   end;
+   end; }
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,28 +170,23 @@ end;
 //   BASE CHECKS
 //
 
-function IfInMapRect(tx,ty,sideBorder:integer):boolean;
+{function IfInMapRect(tx,ty,sideBorder:integer):boolean;
 begin
    IfInMapRect:=(sideBorder<tx)and(tx<(map_Size1-sideBorder))
              and(sideBorder<ty)and(ty<(map_Size1-sideBorder));
-end;
+end; }
 
-function map_IfPlayerStartHere(x,y,gap:integer):boolean;
+function map_IfPlayerStartHere(x,y,rO,rI,pStartR:integer):boolean;
 var p:byte;
 begin
-   if(gap<=0)
-   then map_IfPlayerStartHere:=true
-   else
-   begin
-      map_IfPlayerStartHere:=false;
+   map_IfPlayerStartHere:=false;
 
-      for p:=0 to LastPlayer do
-        if(point_dist_int(x,y,map_PlayerStartX[p],map_PlayerStartY[p])<gap)then
-        begin
-           map_IfPlayerStartHere:=true;
-           break;
-        end;
-   end;
+   for p:=0 to LastPlayer do
+     if(RingCollision(map_PlayerStartX[p],map_PlayerStartY[p],pStartR,0,x,y,rO,rI))then
+     begin
+        map_IfPlayerStartHere:=true;
+        break;
+     end;
 end;
 
 function map_IfKeyPointHere(x,y,gap:integer):boolean;
@@ -187,48 +216,63 @@ begin
          end;
 end;
 
-function map_IfObstacleHere(did:byte;ix,iy:integer):boolean;
+function map_IfObstacleHere(ix,iy,irO,irI:integer):boolean;
 var d:integer;
+procedure Clear0;
+begin
+   with map_ObstaclesL[0] do
+   begin
+      o_rO:=0;
+      o_rI:=0;
+      o_x :=o_x.MinValue;
+      o_y :=o_y.MinValue;
+   end;
+end;
 begin
    map_IfObstacleHere:=false;
 
    with map_ObstaclesL[0] do
      if(map_symmetry)then
      begin
-        o_type:=did;
-        o_r   :=DID_R[did];
-        o_x   :=map_Size1-ix;
-        o_y   :=map_Size1-iy;
+        o_rO:=irO;
+        o_rI:=irI;
+        o_x :=map_Size1-ix;
+        o_y :=map_Size1-iy;
      end
-     else
-     begin
-        o_type:=0;
-        o_x   :=o_x.MinValue;
-        o_y   :=o_y.MinValue;
-     end;
+     else Clear0;
 
    for d:=0 to map_ObstaclesN do
      with map_ObstaclesL[d] do
-       if(o_type>0)then
-         if(point_dist_int(o_x,o_y,ix,iy)<(DID_R[o_type]+DID_R[did]+map_ObstaclesGap))then
+       if(o_rO>0)then
+         if(RingCollision(ix,iy,irO,irI,o_x,o_y,o_rO,o_rI))then
          begin
             map_IfObstacleHere:=true;
             break;
          end;
 
-   with map_ObstaclesL[0] do
-   begin
-      o_type:=0;
-      o_x   :=o_x.MinValue;
-      o_y   :=o_y.MinValue;
-   end;
+   Clear0;
 end;
 
-function map_IfSomethingHere(did:byte;ix,iy,doodad_r:integer):boolean;
+function map_PointInObsN(x,y:integer):boolean;
+var d:integer;
 begin
-   map_IfSomethingHere:=(map_IfObstacleHere(did,ix,iy))
-                      or(map_IfPlayerStartHere(ix,iy,doodad_r));
+   map_PointInObsN:=false;
+   for d:=0 to map_ObstaclesN do
+     with map_ObstaclesL[d] do
+       if(o_rO>0)then
+         if(point_dist_int(x,y,o_x,o_y)<o_rO)then
+         begin
+            map_PointInObsN:=true;
+            break;
+         end;
+end;
 
+function map_IfObsObsStartHere(x,y,rO,rI,pStartR:integer):boolean;
+begin
+   map_IfObsObsStartHere:=(map_IfObstacleHere   (x,y,rO,rI))
+                        or(map_IfPlayerStartHere(x,y,rO,rI,pStartR));
+   if(map_symmetry)and(not map_IfObsObsStartHere)then
+   map_IfObsObsStartHere:=(map_IfPlayerStartHere(map_size1-x,map_size1-y,rO,rI,pStartR));
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -294,8 +338,8 @@ begin
          ix:=u+g_random(b);
          iy:=u+g_random(b);
 
-         if(map_IfPlayerStartHere(ix,iy,base_1rh))
-         or(map_IfKeyPointHere   (ix,iy,base_1rh))then continue;
+         if(map_IfPlayerStartHere(ix,iy,base_1rh,0,map_PStartsGap))
+         or(map_IfKeyPointHere   (ix,iy,base_1rh  ))then continue;
 
          if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
          if(map_Symmetry)then
@@ -416,8 +460,8 @@ begin
    begin
       adir+=astep;
       project2rect(@map_PlayerStartX[p],@map_PlayerStartY[p],adir,cr);
-      map_PlayerStartX[p]+=map_Sizeh;
-      map_PlayerStartY[p]+=map_Sizeh;
+      map_PlayerStartX[p]+=cx;
+      map_PlayerStartY[p]+=cy;
    end;
 end;
 
@@ -485,7 +529,7 @@ begin
          if(map_Symmetry)then
            if(point_dist_int(ix,iy,map_Size1-ix,map_Size1-iy)<gap)then continue;
 
-         if(not map_IfPlayerStartHere(ix,iy,gap))then break;
+         if(not map_IfPlayerStartHere(ix,iy,gap,0,gap))then break;
       end;
 
       map_PlayerStartX[p]:=ix;
@@ -537,61 +581,6 @@ end;
 //    GENERATOR
 //
 
-
-function map_TryAddObstacle(di:byte;ix,iy:integer;obstacleGapR:integer):boolean;
-begin
-   map_TryAddObstacle:=false;
-   if (map_ObstaclesGap<(ix-DID_R[di]))and((ix+DID_R[di])<(map_Size1-map_ObstaclesGap))
-   and(map_ObstaclesGap<(iy-DID_R[di]))and((iy+DID_R[di])<(map_Size1-map_ObstaclesGap))then
-     if(not map_IfSomethingHere(di,ix,iy,obstacleGapR+DID_R[di]))then
-     begin
-        map_addObstacle(ix,iy,di);
-        if(map_symmetry)then
-          map_addObstacle(map_Size1-ix,map_Size1-iy,di);
-        map_TryAddObstacle:=true;
-     end;
-end;
-
-function map_PickAndAddObstacle(ix,iy:integer;n_liquids,n_rocks:pinteger;obstacleGapR:integer):boolean;
-var di:byte;
-begin
-   map_PickAndAddObstacle:=false;
-   for di:=DID_liquidR1 to DID_Other do
-     case di of
-     DID_LiquidR1,
-     DID_LiquidR2,
-     DID_LiquidR3,
-     DID_LiquidR4: if(n_liquids^<=0)
-                   then continue
-                   else
-                     if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
-                     begin
-                        map_PickAndAddObstacle:=true;
-                        n_liquids^-=1;
-                        break;
-                     end
-                     else continue;
-     DID_SRock,
-     DID_BRock   : if(n_rocks^<=0)
-                   then continue
-                   else
-                     if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
-                     begin
-                        map_PickAndAddObstacle:=true;
-                        n_rocks^-=1;
-                        break;
-                     end
-                     else continue;
-     else
-       if(map_TryAddObstacle(di,ix,iy,obstacleGapR))then
-       begin
-          map_PickAndAddObstacle:=true;
-          break;
-       end
-       else continue;
-     end;
-end;
-
 {function map_FillSea:integer;
 var
 odd:boolean;
@@ -638,14 +627,36 @@ begin
 end; }
 
 procedure map_Obstacles_Create;
-const attempts_max = 200;
+const attempts_max = 2;
 var
-i,ir,
-ix,iy,
-n_liquids,
-n_rocks,
 n_obstacles,
+obs_f,
+irO,
+ix,iy,
 attempts:integer;
+function TryAddObstacle:boolean;
+var irI:integer;
+begin
+   TryAddObstacle:=false;
+   attempts:=attempts_max;
+   while(attempts>0)do
+   begin
+      attempts-=1;
+      ix:=g_randomx(ix,map_Size1);
+      iy:=g_randomx(iy,map_Size1);
+      irI:=0;
+      if((map_ObstaclesN mod 2)=0)then
+        if(not map_PointInObsN(ix,iy))then
+          if(irO>=base_2r)then irI:=irO-(irO div 5);
+      if(map_IfObsObsStartHere(ix,iy,irO+map_ObstaclesGap,irI,map_PStartsGap))then continue;
+      map_Obstacle_Add(ix,iy,irO,irI);
+      if(map_symmetry)then
+        map_Obstacle_Add(map_size1-ix,map_size1-iy,irO,irI);
+      TryAddObstacle:=true;
+      break;
+   end;
+end;
+
 begin
    // clear
    map_ObstaclesN:=0;
@@ -658,39 +669,23 @@ begin
         setlength(oc_l,oc_n);
      end;
 
-   // create
-   n_obstacles:=trunc(MaxObstacles*((sqr(map_Size1) div ddc_div)/ddc_cf))+1;
+   n_obstacles:=trunc(MaxObstacles*map_Size1/map_MaxSize);
 
-   n_obstacles:=mm3i(4,n_obstacles,MaxObstacles);
-
-   if(map_Symmetry)then
-     n_obstacles:=n_obstacles div 2;
-
-   n_rocks  :=0;
-   n_liquids:=0;
-
-   i  :=(n_obstacles div (map_MaxObstacles+2));
-   ix :=i*map_ObstaclesF;
-   n_liquids:=ix div 4;
-   n_rocks  :=ix-n_liquids;
-
-   ir :=base_1r+(map_Size1 div 100);
-   ix :=map_seed;
+   ix :=integer(map_seed);
    iy :=0;
 
    while(n_obstacles>0)do
    begin
       n_obstacles-=1;
-      attempts:=0;
-      while true do
+      obs_f:=map_ObstaclesS;
+      irO  :=map_ObstacleR(obs_f);
+
+      while(obs_f>=0)do
       begin
-         ix:=g_randomx(ix,map_Size1);
-         iy:=g_randomx(iy,map_Size1);
-
-         if(map_PickAndAddObstacle(ix,iy,@n_liquids,@n_rocks,ir))then break;
-
-         attempts+=1;
-         if(attempts>=attempts_max)then break;
+         irO:=map_ObstacleR(obs_f);
+         if(TryAddObstacle)
+         then break
+         else obs_f-=1;
       end;
    end;
 
@@ -722,20 +717,21 @@ begin
    Map_RandomSeed;
 
    map_Size1     :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
-   map_ObstaclesF:=random(map_MaxObstacles+1);
+   map_ObstaclesS:=random(map_MaxObstacles+1);
    map_Symmetry :=random(2)>0;
 end;
 
 procedure Map_Make;
 begin
    {$IFDEF _FULLGAME}
-   case g_type of //map_MaxPlayers
+   case g_type of
 gt_none,
 gt_scirmish: begin
    {$ENDIF}
              map_BaseVars;
 
-             map_ObstaclesGap:=40;
+             map_ObstaclesGap:=50;
+             map_PStartsGap  := base_1r;
              case map_scenario of
              mc_ffa3   : map_MaxPlayers:=3;
              mc_ffa4   : map_MaxPlayers:=4;

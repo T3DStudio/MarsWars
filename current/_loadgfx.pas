@@ -184,7 +184,7 @@ begin
    end;
 end;
 
-procedure gfx_LoadMWSModel(mwsm:PTMWSModel;name:shortstring;_mkind:byte);
+procedure gfx_LoadMWSModel(pMWSModel:PTMWSModel;name:shortstring;mkind:byte);
 var t:TMWTexture;
 procedure AddSelRect(ip:pinteger;vl:integer);
 begin
@@ -193,7 +193,7 @@ begin
    else ip^:=(ip^+vl) div 2;
 end;
 begin
-   with mwsm^ do
+   with pMWSModel^ do
    begin
       sm_SelectionHW:=0;
       sm_SelectionHH:=0;
@@ -221,56 +221,56 @@ begin
          AddSelRect(@sm_SelectionHW,t.hw);
          AddSelRect(@sm_SelectionHH,t.hh);
       end;
-      sm_spritesLast   :=sm_spritesNum-1;
-      sm_kind:=_mkind;
+      sm_spritesLast:=sm_spritesNum-1;
+      sm_kind:=mkind;
    end;
 end;
 
-procedure gfx_MakeLiquidTemplate(surf,ts:pSDL_Surface;xs,ys,d,r:integer;animst,animstyle:byte;itb:boolean);
+procedure gfx_MakeLiquidTemplate(pTarget,pTemplate:pSDL_Surface;shiftX,shiftY,d,r:integer;animStyle:TThemeAnimStyle;style:TThemeCircleStyle;itb:boolean);
 var x,y,dir,i,e,p,rand:integer;
 begin
-   boxColor(surf,0,0,d,d,c_purple);
+   boxColor(pTarget,0,0,d,d,c_purple);
 
-   x:=xs;
+   x:=shiftX;
    while (x<d) do
    begin
-      y:=ys;
+      y:=shiftY;
       while (y<d) do
       begin
-         draw_sdlsurface(surf,x,y,ts);
-         y+=ts^.h;
+         draw_sdlsurface(pTarget,x,y,pTemplate);
+         y+=pTemplate^.h;
       end;
-      x+=ts^.w;
+      x+=pTemplate^.w;
    end;
 
-   if(animstyle>1)then exit;
+   if(style=tcs_square)then exit;
 
-   if(animstyle=0)then
+   if(style=tcs_default)then
    begin
-      if(animst=0)
-      then e:=12
+      if(animStyle=tas_liquid)
+      then e:=8
       else e:=d div 32;
       rand:=0;
       dir :=0;
       i   :=r+e;
       while(dir<=360)do
       begin
-         case animst of
-         0:   p:=e+random(e);
-         else p:=e+((dir*i+rand) mod e);
+         case animStyle of
+         tas_liquid: p:=e+random(e);
+         else        p:=e+((dir*i+rand) mod e);
          end;
          x:=r+trunc(i*cos(dir*degtorad));
          y:=r+trunc(i*sin(dir*degtorad));
-         filledcircleColor(surf,x,y,p,c_purple);
+         filledcircleColor(pTarget,x,y,p,c_purple);
          dir+=max2i(1,(trunc(p*180/(pi*r)) div 3)*4 );
          rand+=13;
       end;
    end;
 
    dir:=0;
-   case animstyle of
-   0: i:=r div 17;
-   1: i:=-5;
+   case style of
+   tcs_default: i:=r div 17;
+   tcs_smooth : i:=-5;
    end;
 
    while(dir<=360)do
@@ -279,61 +279,60 @@ begin
       dir+=3;
       x:=r+trunc(d*cos(dir*degtorad));
       y:=r+trunc(d*sin(dir*degtorad));
-      filledcircleColor(surf,x,y,p,c_purple);
+      filledcircleColor(pTarget,x,y,p,c_purple);
    end;
-   if(itb)then filledcircleColor(surf,r,r,r-(r div 6)-10,c_purple);
+   if(itb)then filledcircleColor(pTarget,r,r,r-(r div 6)-10,c_purple);
 end;
 
-procedure gfx_MapMakeLiquid;
+procedure gfx_MapMakeLiquidFront;
 var
 ts : psdl_surface;
-a,i,
+a,
 wsp,
 hsp: integer;
 begin
-   if(theme_map_pLiquid=theme_map_Liquid)and(theme_map_pLiquid>0)then exit;
-   theme_map_pLiquid:=theme_map_Liquid;
+   if(theme_map_pLiquidFront=theme_map_LiquidFront)and(theme_map_pLiquidFront>=0)then exit;
+   theme_map_pLiquidFront:=theme_map_LiquidFront;
 
-   if(theme_map_Liquid<0)or(theme_map_Liquid>=theme_spr_liquidn)then
+   if(theme_map_LiquidFront<0)or(theme_map_LiquidFront>=theme_spr_liquidN)then
    begin
-      ts                :=theme_DefSprite;
-      theme_liquid_animt:=0;
-      theme_liquid_color:=c_gray;
-      theme_liquid_animm:=fr_fpsh;
+      ts                    :=theme_DefSprite;
+      theme_liquid_animStyle:=tas_liquid;
+      theme_liquid_color    :=c_gray;
+      theme_liquid_animTime :=fr_fpsh;
    end
    else
    begin
-      ts                :=theme_spr_liquids[theme_map_Liquid].surf;
-      theme_liquid_animt:=theme_anm_liquids[theme_map_Liquid];
-      theme_liquid_color:=theme_clr_liquids[theme_map_Liquid];
-      theme_liquid_animm:=theme_ant_liquids[theme_map_Liquid];
+      ts                    :=theme_spr_liquidL[theme_map_LiquidFront].surf;
+      theme_liquid_animStyle:=theme_liquids_AnimStyle[theme_map_LiquidFront];
+      theme_liquid_color    :=theme_liquids_MMColor  [theme_map_LiquidFront];
+      theme_liquid_animTime :=theme_liquids_AnimTime[theme_map_LiquidFront];
    end;
 
-   case theme_liquid_animt of
-   0: begin
-         wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
-         hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
-         if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
-      end;
+   case theme_liquid_animStyle of
+   tas_liquid: begin
+                  wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
+                  hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
+                  if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
+               end;
    else
       wsp:=0;
       hsp:=0;
    end;
 
-   for i:=1 to LiquidRs do
-    for a:=1 to LiquidAnim do
-     with spr_liquid[a,i] do
+   for a:=1 to LiquidAnimCount do
+     with spr_liquidFront[a] do
      begin
-        w:=DID_R[i]*2+10;
+        w:=map_ObstacleR(1)*2;
         h:=w;
         gfx_FreeSDLSurface(surf);
         surf:=gfx_CreateSDLSurface(w,w);
         hw:=w div 2;
         hh:=hw;
 
-        gfx_MakeLiquidTemplate(surf,ts,-ts^.w-(a*wsp),-ts^.h-(a*hsp),w,hh,theme_liquid_animt,0,false);
+        gfx_MakeLiquidTemplate(surf,ts,-ts^.w-(a*wsp),-ts^.h-(a*hsp),w,hh,theme_liquid_animStyle,tcs_default,false);
 
-        if(theme_liquid_animt=1)then
+        if(theme_liquid_animStyle=tas_magma)then
          case a of
          1,3 : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,30));
          2   : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,60));
@@ -345,55 +344,53 @@ end;
 
 procedure gfx_MapMakeLiquidBack;
 var ts:psdl_surface;
-    i :byte;
 begin
-   if(theme_map_pLiquidBack=theme_map_LiquidBack)and(theme_map_LiquidBack>0)then exit;
+   if(theme_map_pLiquidBack=theme_map_LiquidBack)and(theme_map_LiquidBack>=0)then exit;
    theme_map_pLiquidBack:=theme_map_LiquidBack;
 
-   if(theme_map_LiquidBack<0)or(theme_map_LiquidBack>=theme_spr_terrainn)
+   if(theme_map_LiquidBack<0)or(theme_map_LiquidBack>=theme_spr_terrainN)
    then ts := theme_DefSprite
-   else ts := theme_spr_terrains[theme_map_LiquidBack].surf;
+   else ts := theme_spr_terrainL[theme_map_LiquidBack].surf;
 
-   for i:=1 to LiquidRs do
-    with spr_liquidb[i] do
-    begin
-       w:=DID_R[i]*2+30;
-       h:=w;
-       gfx_FreeSDLSurface(surf);
-       surf:=gfx_CreateSDLSurface(w,w);
-       hw:=w div 2;
-       hh:=hw;
-       gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_liquid_style,true);
-       boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,50));
-       gfx_SetTransparent(surf);
-    end;
+   with spr_liquidBack do
+   begin
+      w:=map_ObstacleR(1)*2+20;
+      h:=w;
+      gfx_FreeSDLSurface(surf);
+      surf:=gfx_CreateSDLSurface(w,w);
+      hw:=w div 2;
+      hh:=hw;
+      gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,tas_liquid,theme_liquid_style,true);
+      boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,50));
+      gfx_SetTransparent(surf);
+   end;
 end;
 
 procedure gfx_MapMakeCrater;
 var ts:psdl_surface;
     i :integer;
 begin
-   if(theme_map_pCrater=theme_map_Crater)and(theme_map_pCrater>0)then exit;
+   if(theme_map_pCrater=theme_map_Crater)and(theme_map_pCrater>=0)then exit;
    theme_map_pCrater:=theme_map_Crater;
 
-   if(theme_map_Crater<0)or(theme_map_Crater>=theme_spr_terrainn)
+   if(theme_map_Crater<0)or(theme_map_Crater>=theme_spr_terrainN)
    then ts := theme_DefSprite
-   else ts := theme_spr_terrains[theme_map_Crater].surf;
+   else ts := theme_spr_terrainL[theme_map_Crater].surf;
 
    for i:=1 to crater_ri do
-    with spr_crater[i] do
-    begin
-       w:=crater_r[i]*2;
-       h:=w;
-       gfx_FreeSDLSurface(surf);
-       surf:=gfx_CreateSDLSurface(w,w);
-       hw:=crater_r[i];
-       hh:=hw;
-       gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,0,theme_crater_style,false);
-       boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,70));
-       if(theme_crater_style<2)then
-         gfx_SetTransparent(surf);
-    end;
+     with spr_crater[i] do
+     begin
+        w:=crater_r[i]*2;
+        h:=w;
+        gfx_FreeSDLSurface(surf);
+        surf:=gfx_CreateSDLSurface(w,w);
+        hw:=crater_r[i];
+        hh:=hw;
+        gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,tas_liquid,theme_crater_style,false);
+        boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,70));
+        if(theme_crater_style<>tcs_square)then
+          gfx_SetTransparent(surf);
+     end;
 end;
 
 procedure gfx_MapMakeTerrain;
@@ -411,9 +408,9 @@ begin
       map_terrain:=nil;
    end;
 
-   if(theme_map_Terrain<0)or(theme_map_Terrain>=theme_spr_terrainn)
+   if(theme_map_Terrain<0)or(theme_map_Terrain>=theme_spr_terrainN)
    then ts:=theme_DefSprite
-   else ts:=theme_spr_terrains[theme_map_Terrain].surf;
+   else ts:=theme_spr_terrainL[theme_map_Terrain].surf;
 
    map_ter_w:=ts^.w;
    map_ter_h:=ts^.h;

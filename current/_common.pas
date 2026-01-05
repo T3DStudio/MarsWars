@@ -76,6 +76,7 @@ procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
 function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 
 procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;colored:boolean);forward;
+function map_ObstacleR(obs_f:byte):integer;forward;
 
 function Float2Str(s:single):shortstring;
 var l:byte;
@@ -402,6 +403,17 @@ begin
    1    : ipower:=base;
    else   ipower:=base; while(n>1)do begin ipower*=base;n-=1;end;
    end;
+end;
+
+function RingCollision(x1,y1,rO1,rI1,x2,y2,rO2,rI2:integer):boolean;
+var d:integer;
+begin
+   RingCollision:=false;
+   d:=point_dist_int(x1,y1,x2,y2);
+   if(d>(rO1+rO2))then exit;
+   if((d+rO1)<rI2)
+   or((d+rO2)<rI1)then exit;
+   RingCollision:=true;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1066,12 +1078,12 @@ begin
    end;
 end;
 
-function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
+{function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
    if(map_scenario=mc_royale)
    then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_Sizeh,map_Sizeh)+d)>=g_royal_r
    else g_CheckRoyalBattlePoint:=false;
-end;
+end;}
 
 procedure Game_SetStatusWinnerTeam(team:byte);
 begin
@@ -1318,51 +1330,6 @@ begin
      {$ENDIF}
 end;
 
-function unit_F1SelectFilter(pu:PTUnit):boolean;
-begin
-   unit_F1SelectFilter:=false;
-   with pu^  do
-   with uid^ do
-     if(hits<=0)
-     or(not iscomplete)
-     or(IsUnitRange(transportU,nil))
-     or(not uid_isbuilder)then exit;
-   unit_F1SelectFilter:=true;
-end;
-
-
-function unit_F2SelectFilter(pu:PTUnit):boolean;
-var puo_tar:PTUnit;
-begin
-   unit_F2SelectFilter:=false;
-   with pu^  do
-   with uid^ do
-   begin
-      if(hits<=0)
-      or(not iscomplete    )then exit;
-
-      if(IsUnitRange(transportU,nil))then exit;
-
-      if(speed          <=0)then exit;
-      if(uid_isbuilding    )then exit;
-      if(not uid_CanAttack )then exit;
-      if(uo_id=ua_ability1 )
-      or(uo_id=ua_ability2 )
-      or(uo_id=ua_ability3 )
-      or(uo_id=ua_hold     )
-      or(uo_bx>0           )then exit;
-
-      if(IsUnitRange(uo_tar,@puo_tar))then
-      begin
-         if(puo_tar^.uid^.uid_ability_isteleport)and(not isfly)then exit;
-
-         if(unit_CheckTransport(pu,puo_tar))
-         or(unit_CheckTransport(puo_tar,pu))then exit;
-      end;
-   end;
-   unit_F2SelectFilter:=true;
-end;
-
 function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal;skipFlyCheck:boolean=false):boolean;
 begin
    CheckUnitBaseFlags:=false;
@@ -1419,24 +1386,6 @@ begin
                  ptaru^:=taru;
               end;
        end;
-end;
-
-function ui_HaveAttack(pu:PTunit):boolean;
-var w:byte;
-begin
-   ui_HaveAttack:=false;
-   with pu^.uid^ do
-   with pu^.player^ do
-     if(uid_CanAttack)then
-       for w:=0 to LastUnitArms do
-         with uid_arms[w] do
-           if(aw_reload>0)then
-           begin
-              if(aw_req_uid >0)and(units_uid_c[aw_req_uid ]<=0)then continue;
-              if(aw_req_upgr>0)and(upgrs_cur  [aw_req_upgr] =0)then continue;
-              ui_HaveAttack:=true;
-              break;
-           end;
 end;
 
 function unit_GetCastingAbility(pu:PTUnit):byte;
@@ -2011,6 +1960,24 @@ begin
    end;
 end;
 
+function ui_HaveAttack(pu:PTunit):boolean;
+var w:byte;
+begin
+   ui_HaveAttack:=false;
+   with pu^.uid^ do
+   with pu^.player^ do
+     if(uid_CanAttack)then
+       for w:=0 to LastUnitArms do
+         with uid_arms[w] do
+           if(aw_reload>0)then
+           begin
+              if(aw_req_uid >0)and(units_uid_c[aw_req_uid ]<=0)then continue;
+              if(aw_req_upgr>0)and(upgrs_cur  [aw_req_upgr] =0)then continue;
+              ui_HaveAttack:=true;
+              break;
+           end;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   UI LOG
@@ -2282,6 +2249,52 @@ end;
 //   UNITS
 //
 
+function unit_F1SelectFilter(pu:PTUnit):boolean;
+begin
+   unit_F1SelectFilter:=false;
+   with pu^  do
+   with uid^ do
+     if(hits<=0)
+     or(not iscomplete)
+     or(IsUnitRange(transportU,nil))
+     or(not uid_isbuilder)then exit;
+   unit_F1SelectFilter:=true;
+end;
+
+
+function unit_F2SelectFilter(pu:PTUnit):boolean;
+var puo_tar:PTUnit;
+begin
+   unit_F2SelectFilter:=false;
+   with pu^  do
+   with uid^ do
+   begin
+      if(hits<=0)
+      or(not iscomplete    )then exit;
+
+      if(IsUnitRange(transportU,nil))then exit;
+
+      if(speed          <=0)then exit;
+      if(uid_isbuilding    )then exit;
+      if(not uid_CanAttack )then exit;
+      if(uo_id=ua_ability1 )
+      or(uo_id=ua_ability2 )
+      or(uo_id=ua_ability3 )
+      or(uo_id=ua_hold     )
+      or(uo_bx>0           )then exit;
+
+      if(IsUnitRange(uo_tar,@puo_tar))then
+      begin
+         if(puo_tar^.uid^.uid_ability_isteleport)and(not isfly)then exit;
+
+         if(unit_CheckTransport(pu,puo_tar))
+         or(unit_CheckTransport(puo_tar,pu))then exit;
+      end;
+   end;
+   unit_F2SelectFilter:=true;
+end;
+
+
 function unit_CalcShadowZ(pu:PTUnit):integer;
 begin
    with pu^  do
@@ -2400,7 +2413,7 @@ begin
    if(vint<map_MinSize)or(map_MaxSize<vint )then exit
                                             else strInfoVar1^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl2;
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_ObstaclesF ));
+   BlockRead(f,vbyte1,sizeof(map_ObstaclesS ));
    if(vbyte1>map_MaxObstacles              )then exit
                                             else strInfoVar1^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
 
@@ -2410,7 +2423,7 @@ begin
    vint:=-1;
    BlockRead(f,vint  ,sizeof(theme_i       ));
    if(vint>=theme_n                        )then exit
-                                            else strInfoVar1^+=' '+theme_name[vint]+tc_default+tc_nl2;
+                                            else strInfoVar1^+=' '+str_themes[vint]+tc_default+tc_nl2;
 
    lplayer:=255;
    BlockRead(f,lplayer,sizeof(LocalPlayer  ));

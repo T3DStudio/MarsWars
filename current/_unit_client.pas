@@ -6,9 +6,6 @@ kpdata_timer  = %11000000;
 kpdata_life   = %01000000;
 kpdata_pmask  = %00001111;
 
-var
-rpoint_ChangeAnnoncer: boolean = false;
-
 function unit_UO2Ability(pu:PTUnit;uo:byte):byte;
 begin
    unit_UO2Ability:=0;
@@ -608,9 +605,16 @@ begin
    end;
 end;
 
-////////////////////////////////////////////////////////////////////////////////
-
 {$IFDEF _FULLGAME}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CLIENT (READ)
+//
+
+var
+rpoint_ChangeAnnoncer: boolean = false;
+
 
 procedure client_UnitCountersInc(pu:PTUnit;rpl:boolean);
 var i,_puid:byte;

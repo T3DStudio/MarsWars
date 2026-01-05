@@ -527,22 +527,23 @@ begin
 
    draw_sdlsurface(tar,cx,cy,map_terrain);
 
+   // decals
    vx:=ui_cam_x-vid_ab;
    vy:=ui_cam_y-vid_ab;
 
-   if(theme_decaln>0)then
+   if(theme_decalN>0)then
      for i:=0 to map_ter_decaln-1 do
        with map_ter_decalL[i] do
        begin
           ix:=decal_x-vx+ui_mwa;
           iy:=decal_y-vy+ui_mha;
 
-          s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decaln;
+          s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decalN;
 
-          t:=theme_decals[s];
+          t:=theme_decalL[s];
           if(t<0)
           then spr:=@spr_crater[-t]
-          else spr:=@theme_spr_decals[t];
+          else spr:=@theme_spr_decalL[t];
 
           ix:=ix mod ui_mwa;
           iy:=iy mod ui_mha;
@@ -553,27 +554,9 @@ begin
           ix-=vid_ab;
           iy-=vid_ab;
 
-          with spr^ do draw_sdlsurface(tar,ix-hw,iy-hh,spr^.surf);
+          with spr^ do draw_sdlsurface(tar,ix-hw,iy-hh,surf);
        end;
 end;
-
-{procedure draw_FilledRing(rx,ry,rOutR,rInR:integer);
-var
-sx,sy:integer;
-begin
-   {sx:=
-
-   cellhw:=round(did_r[1]/1.27);
-   cellw :=cellhw*2;
-
-   cx:=(map_hSize mod cellw);
-   if(cx>=cellhw)then cx-=cellw;
-   cx:=map_Size-cx;
-   odd:=false;
-
-   iy:=map_hSize;
-   }
-end;}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -595,8 +578,8 @@ begin
 
         if(kpEnergy>0)then
         begin
-           SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy  ,scolor,@spr_kp_outG        ,255);
-           SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy+1,0     ,@spr_kp_gen[t mod 2],255);
+           SpriteList_AddEffect(kpx,kpy,sd_decals+kpy  ,scolor,@spr_kp_outG        ,255);
+           SpriteList_AddEffect(kpx,kpy,sd_decals+kpy+1,0     ,@spr_kp_gen[t mod 2],255);
            for i:=1 to 6 do
            begin
               ddir:=(i*60)*degtorad;
@@ -628,7 +611,7 @@ begin
                 kpy+round(kpCaptureR*sin(ddir)),
                 sd_fly+kpy,0,@spr_kp_koth,255);
              end;
-             SpriteList_AddEffect(kpx,kpy,sd_tcraters+kpy,scolor,@spr_kp_out,255);
+             SpriteList_AddEffect(kpx,kpy,sd_decals+kpy,scolor,@spr_kp_out,255);
           end;
 
         if(ui_CheckMapPointFogVision(kpx,kpy,true))then
@@ -698,6 +681,8 @@ begin
    end; }
 end;
 
+function map_IfObstacleHere(ix,iy,irO,irI:integer):boolean; forward;
+
 procedure draw_debug;
 var u,ix,iy:integer;
     c:cardinal;
@@ -712,6 +697,14 @@ begin
       draw_text(vid_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
       draw_text(vid_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
    end;       }
+
+   //ui_blink2_color_BY
+
+  { circleColor(vid_screen,mouse_x,mouse_y,150,c_white);
+   circleColor(vid_screen,mouse_x,mouse_y,100,c_white);
+   if(map_IfObstacleHere(mouse_map_x,mouse_map_y,150,100))
+   then circleColor(vid_screen,mouse_x,mouse_y,5,c_red )
+   else circleColor(vid_screen,mouse_x,mouse_y,5,c_lime); }
 
    if(InputAction(iact_Shift))then
      for u:=0 to LastPlayer do
@@ -826,6 +819,8 @@ begin
 
         //if(isselected)then  circleColor(vid_screen,ix,iy,r+5,plcolor[player]);
      end;
+
+
 
   { for u:=1 to MaxObstacles do
     with map_ObstaclesL[u] do

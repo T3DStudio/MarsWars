@@ -104,17 +104,21 @@ end;
 PTVisSpr = ^TVisSpr;
 
  TIntList = array of integer;
-PTIntList = ^TIntList;
+pTIntList = ^TIntList;
 
-TThemeAnim = record
-   depth,
-   xo,yo,
-   sh,
-   anext,
-   atime:integer
+TThemeObstacleAnim = record
+   toa_depth,
+   toa_xo,
+   toa_yo,
+   toa_shadow,
+   toa_anext,
+   toa_atime:integer
 end;
- TThemeAnimL = array of TThemeAnim;
-PTThemeAnimL = ^TThemeAnimL;
+ TThemeObstacleAnimL = array of TThemeObstacleAnim;
+PTThemeObstacleAnimL = ^TThemeObstacleAnimL;
+
+TThemeCircleStyle = (tcs_default=0,tcs_smooth,tcs_square);
+TThemeAnimStyle   = (tas_liquid =0,tas_magma ,tas_noanim);
 
 TAlarm = record
    al_x,
@@ -125,6 +129,23 @@ TAlarm = record
    al_t      : integer;
    al_v      : byte;
    al_c      : cardinal;
+end;
+
+TObstacleVis = record
+   ov_animNext,
+   ov_animTime,
+   ov_SpriteDepth,
+   ov_ShadowZ,
+   ov_OffsetX,
+   ov_OffsetY,
+   ov_mmx,
+   ov_mmy,
+   ov_mmrO,
+   ov_mmrI    : integer;
+   ov_mmc     : cardinal;
+   ov_type    : byte;
+   ov_SpriteFront,
+   ov_SpriteBack : PTMWTexture;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -800,7 +821,6 @@ TKeyPoint = record
    kpx ,kpy ,
    kpCaptureR,kpNoBuildR,
    kpToCenterD,
-   kpmmx,kpmmy,kpmmr,
    kpEnergy,
    kpCaptureTime,
    kpTimer      : integer;
@@ -814,30 +834,23 @@ TKeyPoint = record
    kpUnitsTeam,
    kpunitsp_pstate,
    kpUnitsPlayer     : array[0..LastPlayer] of longint;
+   {$IFDEF _FULLGAME}
+   kpmmx,
+   kpmmy,
+   kpmmr        : integer;
+   {$ENDIF}
 end;
 pTKeyPoint = ^TKeyPoint;
 
 TObstacle = record
    o_x,
    o_y,
-   o_r    : integer;
-   o_type : byte;
-
-   {$IFDEF _FULLGAME}
-   o_animn,
-   o_animt,
-   o_SpriteDepth,
-   o_ShadowZ,
-   o_OffsetX,
-   o_OffsetY,
-   o_mmx,
-   o_mmy,
-   o_mmr  : integer;
-   o_mmc  : cardinal;
-   o_FrontSprite,
-   o_BackSprite : PTMWTexture;
-   {$ENDIF}
+   o_rO,
+   o_rM,
+   o_rI  : integer;
+   o_zone: word;
 end;
+
 PTObstacle = ^TObstacle;
 TObstacleCell = record
    oc_n:integer;

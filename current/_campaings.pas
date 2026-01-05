@@ -95,7 +95,7 @@ begin
               map_generators:=0;
               map_seed      :=666;
               map_Size1     :=4000;
-              map_ObstaclesF:=4;
+              map_ObstaclesS:=4;
               map_Symmetry  :=false;
               map_BaseVars;
 
