@@ -341,6 +341,8 @@ begin
    theme_SetLiquidAnims(14, 0  , 128, 192  , tas_liquid, 10);  // duke3d water
    theme_SetLiquidAnims(15, 100, 180, 100  , tas_liquid, 10);  // duke3d slime
    theme_SetLiquidAnims(16, 100, 100, 100  , tas_noanim, 10);  // doom pl2 ice
+   theme_SetLiquidAnims(17, 255, 60 , 60   , tas_magma , 30);  // doom static red lava
+   theme_SetLiquidAnims(18, 222, 222, 100  , tas_magma , 35);  // doom static yellow lava
 end;
 
 procedure SetThemeList(pList:pTIntList;pSize,pMax:pinteger;str:shortstring);
@@ -397,7 +399,7 @@ begin
           SetThemeCraters ('17,18,19,26');
           SetThemeTerrains('17,18'      );
           SetThemeLiquidsB('19,26'      );
-          SetThemeLiquidsF('0_2,6,13_15');
+          SetThemeLiquidsF('0_2,6'      );
           SetThemeObs0    ('19,22_27,32,35,37_41,52_53');
           SetThemeObs1    ('81_87'      );
           SetThemeObs2    ('56_58,65,67,75');
@@ -410,7 +412,7 @@ begin
           SetThemeCraters ('17,18,19,26');
           SetThemeTerrains('19'         );
           SetThemeLiquidsB('17,18,26'   );
-          SetThemeLiquidsF('0_2,6,13_15');
+          SetThemeLiquidsF('13_15'      );
           SetThemeObs0    ('19,22_27,32,35,37_41,30,48');
           SetThemeObs1    ('81_87'      );
           SetThemeObs2    ('56_58,65,67,75'       );
@@ -424,7 +426,7 @@ begin
           SetThemeCraters ('0,2_16,20_25,28' );
           SetThemeTerrains('0,2_16,20_25'    );
           SetThemeLiquidsB('0,2_16,20_25,28' );
-          SetThemeLiquidsF('0_15'            );
+          SetThemeLiquidsF('0,2,3,6,14'      );
           SetThemeObs0    ('0_12,18,28,48_50');
           SetThemeObs1    ('77,88_92,96_101' );
           SetThemeObs2    ('55,58,66,69,70'  );
@@ -478,7 +480,7 @@ begin
           SetThemeCraters ('1,27,23'               );
           SetThemeTerrains('1,27,23'               );
           SetThemeLiquidsB('1,27,23'               );
-          SetThemeLiquidsF('4,8_9,11'              );
+          SetThemeLiquidsF('5,9,11'                );
           SetThemeObs0    ('3,13_17,20,21,36,42_47,112');
           SetThemeObs1    ('76,78_80,93_95,102,103_105,107_111,113,114');
           SetThemeObs2    ('54,59_64,68,71_74,117_120'             );
@@ -491,7 +493,7 @@ begin
           SetThemeCraters ('4,10,14,16,21,23,29,30,35');
           SetThemeTerrains('4,10,14,16,21,23'         );
           SetThemeLiquidsB('4,10,14,16,21,23,29,30,35');
-          SetThemeLiquidsF('4,5,8_9,11'               );
+          SetThemeLiquidsF('4,8,17,18'               );
           SetThemeObs0    ('3,13_17,20,21,36,42_47,106,112');
           SetThemeObs1    ('77,88_92,96_101,103_105,107_111,113,114');
           SetThemeObs2    ('55,66,69,70,117_120'                    );
@@ -504,7 +506,7 @@ begin
           SetThemeCraters ('31_35');
           SetThemeTerrains('31_34');
           SetThemeLiquidsB('31_35');
-          SetThemeLiquidsF('4,5,8_11');
+          SetThemeLiquidsF('3,4,5,8_11,18');
           SetThemeObs0    ('13_17,20,21,36,42_47,106,112');
           SetThemeObs1    ('103_105,107_111,113_116'     );
           SetThemeObs2    ('117_120'                     );
@@ -513,6 +515,7 @@ begin
           theme_crater_style:=tcs_square;
        end;
    end;
+   theme_map_RBattleFront:=72;
    SetTLBlC;
 end;
 

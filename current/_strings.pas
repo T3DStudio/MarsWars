@@ -640,7 +640,7 @@ begin
       str_UnitRole:='';
       if(uid_isbuilder)then STRADD(@str_UnitRole,str_hint_builder,sep_scomma);
       if(uid_isbarrack)then STRADD(@str_UnitRole,str_hint_barrack,sep_scomma);
-      if(uid_issmith  )then STRADD(@str_UnitRole,str_hint_smith  ,sep_scomma);
+      if(uid_isforge  )then STRADD(@str_UnitRole,str_hint_forge  ,sep_scomma);
       if(length(str_UnitRole)>0)then str_UnitRole:=str_doc_Role+str_UnitRole;
    end;
 end;

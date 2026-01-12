@@ -101,7 +101,7 @@ begin
       case newState of
 ps_None : begin isready:=false;if(not g_started)then
                                name :='';       end;
-ps_AI   : begin isready:=true; name :=ai_name(ai_skill);isobserver:=false;end;
+ps_AI   : begin isready:=true; name :=ai_name(aip_skill);isobserver:=false;end;
 ps_human: begin isready:=false;name :='';               end;
       end;
       team :=PlayerValidateTeam(playerN,team);
@@ -122,7 +122,7 @@ procedure PlayerSetDefault(p:byte);
 begin
    with g_gplayers[p] do
    begin
-      ai_skill  :=player_default_ai_level;
+      aip_skill  :=player_default_ai_level;
       race      :=r_random;
       mrace     :=r_random;
       team      :=p;
@@ -381,14 +381,14 @@ begin
           if(state=ps_None)then
             if(g_AISlots>0)then
             begin
-               ai_skill:=g_AISlots;
+               aip_skill:=g_AISlots;
                race    :=r_random;
                PlayerSetState(p,ps_AI);
             end;
 
           if(race=r_random)then race:=1+random(r_count);
 
-          if(state=ps_human)then ai_skill:=player_default_ai_level;//g_AISlots
+          if(state=ps_human)then aip_skill:=player_default_ai_level;//g_AISlots
        end;
 
    for p:=0 to LastPlayer do
@@ -711,14 +711,33 @@ begin
    0:   map_scenario:=mc_royale;
    1:   map_scenario:=mc_KeyPoints;
    2:   map_scenario:=mc_KotH;
-   else map_scenario:=mc_ffa8;
+   else
+     case random(6) of
+     0: map_scenario:=mc_ffa3;
+     1: map_scenario:=mc_ffa4;
+     2: map_scenario:=mc_ffa5;
+     3: map_scenario:=mc_ffa6;
+     4: map_scenario:=mc_ffa7;
+     5: map_scenario:=mc_ffa8;
+     end;
    end;
 
    if(random(3)=0)
    then map_generators:=random(map_MaxGenerators)+1
    else map_generators:=0;
 
+   Map_SetScenarioMaxPlayers;
+
+   {$IFDEF _FULLGAME}
    for p:=0 to LastPlayer do
+     with g_gplayers[p] do
+       if(state=ps_AI)then
+         PlayerSetState(p,ps_None);
+
+   PlayersSwap(random(map_MaxPlayers),LocalPlayer,false);
+   {$ENDIF}
+
+   for p:=0 to map_MaxPlayers-1 do
      with g_gplayers[p] do
        if(state<>ps_human)then
        begin
@@ -727,16 +746,12 @@ begin
 
           team:=random(6);
 
-          ai_skill:=random(6)+2;
+          aip_skill:=random(6)+2;
 
           if(random(2)=0)
           then PlayerSetState(p,ps_None)
           else PlayerSetState(p,ps_AI);
        end;
-
-   {$IFDEF _FULLGAME}
-   PlayersSwap(random(MaxPlayers),LocalPlayer,false);
-   {$ENDIF}
 
    if(random(3)=0)
    then g_AISlots:=0
@@ -773,15 +788,15 @@ begin
                            if(hits>0)and(tPlayer=playeri)and(not IsUnitRange(transportU,nil))then
                            begin
                               case o_x0 of
-                              co_supgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0           ,true)=0,true ,true );
-                              co_cupgrade : if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
+                              co_supgrade : if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0           ,true)=0,true ,true );
+                              co_cupgrade : if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
 
                               co_sunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0           ,true)=0,true ,true );
                               co_cunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
                               co_pcancle  : if(isselected)then
                                             begin
                                             if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
-                                            if(unit_OrderCheckSmith  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
+                                            if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
                                             end;
                               end;
 
@@ -822,7 +837,7 @@ begin
                       else
                         case o_x0 of
                         co_supgrade,
-                        co_cupgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,ureq_smiths  ,-1,-1);
+                        co_cupgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,ureq_forges  ,-1,-1);
                         co_sunit,
                         co_cunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
                         co_pcancle : GameLog_ReqBits(tPlayer,0   ,255             ,ureq_other   ,-1,-1);
@@ -1003,8 +1018,8 @@ begin
              exit;
           end;
           {$ENDIF}
-          ScrollByte(@ai_skill,forward,1,g_MaxAISlots);
-          name:=ai_name(ai_skill);
+          ScrollByte(@aip_skill,forward,1,g_MaxAISlots);
+          name:=ai_name(aip_skill);
        end;
 end;
 
@@ -1303,27 +1318,27 @@ begin
       begin
          g_tick+=1;
 
-         Scenario_KeyPointsCode;
+         Scenario_KeyPointsCodeServer;
+         case g_type of
+         gt_scirmish: begin
+                         Scenario_KeyPointsEndConditions;
+                         case map_scenario of
+                         mc_royale    : begin
+                                           if(g_cycle_order=0)then
+                                             if(g_royal_r>0)then g_royal_r-=1;
+                                           Scenario_DefaultEndConditions;
+                                        end;
+                         mc_KeyPoints,
+                         mc_KotH      : Scenario_DefaultDefeatConditions;
+                         else           Scenario_DefaultEndConditions;
+                         end;
+                      end;
          {$IFDEF _FULLGAME}
-         if(g_type=gt_scirmish)then
-         begin
+         gt_campaing: cmp_MissionCode;
          {$ENDIF}
-            Scenario_KeyPointsEndConditions;
-            case map_scenario of
-            mc_royale    : begin
-                              if(g_cycle_order=0)then
-                                if(g_royal_r>0)then g_royal_r-=1;
-                              Scenario_DefaultEndConditions;
-                           end;
-            mc_KeyPoints,
-            mc_KotH      : Scenario_DefaultDefeatConditions;
-            else           Scenario_DefaultEndConditions;
-            end;
-         {$IFDEF _FULLGAME}
-         end
-         else cmp_MissionCode;
-         {$ENDIF}
-      end;
+         end;
+      end
+      else Scenario_KeyPointsTeam;
       GameObjectsCode;
    end;
 

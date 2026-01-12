@@ -120,6 +120,10 @@ PTThemeObstacleAnimL = ^TThemeObstacleAnimL;
 TThemeCircleStyle = (tcs_default=0,tcs_smooth,tcs_square);
 TThemeAnimStyle   = (tas_liquid =0,tas_magma ,tas_noanim);
 
+TLiquidTextureArray = array[1..LiquidAnimCount] of TMWTexture;
+PTLiquidTextureArray = ^TLiquidTextureArray;
+
+
 TAlarm = record
    al_x,
    al_y,
@@ -143,9 +147,14 @@ TObstacleVis = record
    ov_mmrO,
    ov_mmrI    : integer;
    ov_mmc     : cardinal;
-   ov_type    : byte;
-   ov_SpriteFront,
-   ov_SpriteBack : PTMWTexture;
+   ov_SpriteFront: PTMWTexture;
+end;
+
+
+TKeyPointVis = record
+   kpmmx,
+   kpmmy,
+   kpmmr        : integer;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,8 +345,7 @@ TMissile = record
    {$ENDIF}
 end;
 
-TWUDataTime  = array[1..MaxUnits    ] of cardinal;
-TWCPDataTime = array[0..LastKeyPoint] of byte;
+TWUDataTime = array[1..MaxUnits    ] of cardinal;
 
 TUnitArms = record
   aw_type,
@@ -475,7 +483,7 @@ TUID = record
    uid_islight,
    uid_isdetector,
    uid_isbuilder,
-   uid_issmith,
+   uid_isforge,
    uid_isbarrack,
    uid_issolid,
    uid_isfly
@@ -567,10 +575,8 @@ TUPID = record  // upgrade
 end;
 
 TAIAlarm = record
-   aia_enemy_base
-                : boolean;
-   aia_enemy_limit
-                : longint;
+   aia_base     : boolean;
+   aia_limit    : longint;
    aia_x,
    aia_y        : integer;
    aia_zone     : word;
@@ -642,7 +648,7 @@ TPlayerGameData = record
    units_builders_s,
    units_unitProds_ec,// 'barracks'
    units_unitProds_s,
-   units_upgrProds_ec,// 'smiths'
+   units_upgrProds_ec,// 'forges'
    units_upgrProds_s
                    : integer;
 
@@ -672,7 +678,7 @@ TPlayerGameData = record
                    : integer;
 
 
-   ai_max_ulimit,
+   {ai_max_ulimit,
    ai_maxcount_energy,
    ai_maxcount_mains,
    ai_maxcount_unitps,
@@ -696,12 +702,29 @@ TPlayerGameData = record
    ai_detection_pause  : integer;
    ai_maxcount_upgrlvl : byte;
    ai_hptargets        : TSoB;
-   ai_skill            : byte;
-   ai_flags            : cardinal;
-   ai_alarms           : array[0..LastPlayer] of TAIAlarm;
    ai_attack_timer,
    ai_scout_timer      : integer;
-   ai_ReadyForAttack   : boolean;
+   ai_ReadyForAttack   : boolean; }
+
+
+   // operative data
+   aip_alarms          : array[0..LastPlayer] of TAIAlarm;
+
+   // settings
+   aip_skill           : byte;
+   aip_flags           : cardinal;
+
+   aip_MaxEnergy,
+   aip_MaxBuilders,
+   aip_MaxBarracks,
+   aip_MaxForges,
+   aip_MaxDetectors,
+   aip_MinTowers,
+   aip_MaxTowers,
+   aip_MaxArmyLimit
+                       : integer;
+
+
 end;
 PTPlayerGameData = ^TPlayerGameData;
 TPList = array[0..LastPlayer] of TPlayerGameData;
@@ -778,15 +801,14 @@ TUnit = record
 
    StayWaitForNewTarget:byte;
    isfly,
-   solid,
+   issolid,
    iscomplete,
    isselected: boolean;
 
-   aiu_FiledSquareNear,
    aiu_limitaround_ally,
-   aiu_limitaround_enemy,
-   aiu_need_detect
+   aiu_limitaround_enemy
             : longint;
+   aiu_need_detect,
    aiu_alarm_timer,
    aiu_alarm_d,
    aiu_alarm_x,
@@ -814,31 +836,36 @@ TUnit = record
    player   : PTPlayerGameData;
    uid      : PTUID;
 end;
-PTUnit = ^TUnit;
+PTUnit  = ^TUnit;
 PPTUnit = ^PTUnit;
 
+TKeyPointTeamData = record
+   kptd_Active  : boolean;
+   kptd_TimerOwnerTeam,
+   kptd_TimerOwnerPlayer,
+   kptd_OwnerPlayer,
+   kptd_OwnerTeam
+                : byte;
+   kptd_VisTimer,
+   kptd_Timer   : integer;
+   kptd_lifeTime: cardinal;
+end;
+PTKeyPointTeamData = ^TKeyPointTeamData;
+
 TKeyPoint = record
-   kpx ,kpy ,
-   kpCaptureR,kpNoBuildR,
-   kpToCenterD,
-   kpEnergy,
-   kpCaptureTime,
-   kpTimer      : integer;
-   kplifetime   : cardinal;
-   kpTimerOwnerTeam,
-   kpTimerOwnerPlayer,
-   kpOwnerPlayer,
-   kpOwnerTeam  : byte;
-   kpzone       : word;
-   kpunitst_pstate,
-   kpUnitsTeam,
-   kpunitsp_pstate,
-   kpUnitsPlayer     : array[0..LastPlayer] of longint;
-   {$IFDEF _FULLGAME}
-   kpmmx,
-   kpmmy,
-   kpmmr        : integer;
-   {$ENDIF}
+   kp_x,kp_y,
+   kp_RCapture,
+   kp_RNoBuild,
+   kp_ToCenterD,
+   kp_Energy,
+   kp_CaptureTime: integer;
+   kp_Zone       : word;
+   kp_LimitTeamP,
+   kp_LimitTeamC,
+   kp_LimitPlayerP,
+   kp_LimitPlayerC
+                 : array[0..LastPlayer] of longint;
+   kp_TeamData   : array[0..MaxPlayers] of TKeyPointTeamData;
 end;
 pTKeyPoint = ^TKeyPoint;
 

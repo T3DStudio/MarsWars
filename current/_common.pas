@@ -14,12 +14,12 @@ function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
 function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):cardinal;forward;
 
-{procedure ai_Local_InitVars(pu:PTUnit);forward;
-procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
-procedure ai_Local_Code(pu:PTUnit);forward;
+procedure ai_Local_InitVars(pu:PTUnit);forward;
+//procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
+//procedure ai_Local_Code(pu:PTUnit);forward;
 
 procedure ai_Global_InitVars(pu:PTUnit);forward;
-procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
+{procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure ai_Global_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_Global_ScoutPick(pu:PTUnit);forward;
 procedure ai_Global_Code(pu:PTUnit);forward;}
@@ -75,7 +75,7 @@ function replay_GetProgress:single;forward;
 procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
 function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 
-procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;colored:boolean);forward;
+procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);forward;
 function map_ObstacleR(obs_f:byte):integer;forward;
 
 function Float2Str(s:single):shortstring;
@@ -819,7 +819,7 @@ begin
    if((bits and ureq_armylimit    )>0)
    or((bits and ureq_limit        )>0)then bt:=lmt_Req_Limit          else
    if((bits and ureq_energy       )>0)then bt:=lmt_Req_Energy         else
-   if((bits and ureq_smiths       )>0)
+   if((bits and ureq_forges       )>0)
    or((bits and ureq_barracks     )>0)then bt:=lmt_NeedProdUnit       else
    if((bits and ureq_builders     )>0)then bt:=lmt_unit_NeedBuilder   else
    if((bits and ureq_busy         )>0)then bt:=lmt_prod_AllBusy       else
@@ -891,9 +891,9 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with map_KeyPointsL[kpoint] do
-     if(kpEnergy>0)
-     then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kpx,kpy)
-     else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kpx,kpy);
+     if(kp_Energy>0)
+     then PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kp_x,kp_y)
+     else PlayersAddToLog(from_player,0,lmt_kpoint_captured,0,0,'',kp_x,kp_y);
 end;
 procedure GameLog_KeyPointLost(from_player,kpoint:byte);
 begin
@@ -903,16 +903,17 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with map_KeyPointsL[kpoint] do
-     if(kpEnergy>0)
-     then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kpx,kpy)
-     else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kpx,kpy);
+     if(kp_Energy>0)
+     then PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kp_x,kp_y)
+     else PlayersAddToLog(from_player,0,lmt_kpoint_lost,0,0,'',kp_x,kp_y);
 end;
 procedure GameLog_KotHControl;
 begin
    if(map_scenario<>mc_KotH)then exit;
 
    with map_KeyPointsL[0] do
-     PlayersAddToLog(255,255,lmt_koth_control,0,kpTimerOwnerTeam,'',kpx,kpy);
+     with kp_TeamData[MaxPlayers] do
+       PlayersAddToLog(255,255,lmt_koth_control,0,kptd_TimerOwnerTeam,'',kp_x,kp_y);
 end;
 procedure GameLog_NgenExh(from_player,kpoint:byte);
 begin
@@ -922,7 +923,7 @@ begin
    if(kpoint=0)and(map_scenario=mc_KotH)then exit;
 
    with map_KeyPointsL[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kpx,kpy);
+     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kp_x,kp_y);
 end;
 
 // PLAYER LOG COMMON
@@ -1245,20 +1246,20 @@ begin
       AddBits(ureq_BadProd   , upgr_time<=0                            );
       AddBits(ureq_max       ,(integer(upgrs_cur[up]+prod_upgr_upid[up])>=min2i(upgr_max,upgrs_max[up])));
       AddBits(ureq_InProgress,(not upgr_mfrg)and(prod_upgr_upid[up]>0) );
-      AddBits(ureq_smiths    , units_upgrProds_ec<=0                             );
+      AddBits(ureq_forges    , units_upgrProds_ec<=0                             );
    end;
 end;
 
-function unit_OrderCheckSmith(pu:pTunit;oid:byte):boolean;
+function unit_OrderCheckForge(pu:pTunit;oid:byte):boolean;
 begin
-   unit_OrderCheckSmith:=true;
+   unit_OrderCheckForge:=true;
    with pu^     do
    with uid^    do
    with player^ do
-     if(uid_issmith)then
+     if(uid_isforge)then
        if(oid in uid_prod_Upgrades)or(oid=255)then
          if(units_upgrProds_s<=0)or(isselected)then exit;
-   unit_OrderCheckSmith:=false;
+   unit_OrderCheckForge:=false;
 end;
 function unit_OrderCheckBarrack(pu:pTunit;oid:byte):boolean;
 begin
@@ -1687,18 +1688,26 @@ begin
      end;
 end;
 
-function GetKeyPointColor(keyPoint:byte;shadow:boolean):cardinal;
+function KeyPoint_GetPlayerTeam(playerN:byte):byte;
+begin
+   KeyPoint_GetPlayerTeam:=MaxPlayers;
+   if(playerN<MaxPlayers)then
+     KeyPoint_GetPlayerTeam:=g_gplayers[playerN].team;
+end;
+
+function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):cardinal;
 begin
    case shadow of
-   false: GetKeyPointColor:=PlayerColorDefaultCurrent;
-   true : GetKeyPointColor:=PlayerColorDefaultShadow;
+   false: KeyPoint_GetColor:=PlayerColorDefaultCurrent;
+   true : KeyPoint_GetColor:=PlayerColorDefaultShadow;
    end;
    if(keyPoint>LastKeyPoint)then exit;
    with map_KeyPointsL[keyPoint] do
-     if(kpCaptureR>0)then
-       if(kpTimer>0)and(ui_blink3=0)
-       then GetKeyPointColor:=PlayerGetColor(kpTimerOwnerPlayer,shadow)
-       else GetKeyPointColor:=PlayerGetColor(kpOwnerPlayer     ,shadow);
+     with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
+       if(kptd_Active)then
+         if(kptd_Timer>0)and(ui_blink3=0)
+         then KeyPoint_GetColor:=PlayerGetColor(kptd_TimerOwnerPlayer,shadow)
+         else KeyPoint_GetColor:=PlayerGetColor(kptd_OwnerPlayer     ,shadow);
 end;
 
 function ui_SetUIPlayer(NewPlayerN:byte;check:boolean):boolean;
@@ -1955,7 +1964,7 @@ begin
       if(not uid_isbuilding)then ui_CommanderWeight+=1024;
       if(not uid_isbuilder )then ui_CommanderWeight+=512;
       if(not uid_isbarrack )then ui_CommanderWeight+=256;
-      if(not uid_issmith   )then ui_CommanderWeight+=128;
+      if(not uid_isforge   )then ui_CommanderWeight+=128;
       if(not rld        <=0)then ui_CommanderWeight+=64;
    end;
 end;

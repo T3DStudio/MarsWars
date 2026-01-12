@@ -381,7 +381,7 @@ begin
    str_hint_TargetLimit          := 'target limit';
    str_hint_builder              := 'Builder';
    str_hint_barrack              := 'Unit production';
-   str_hint_smith                := 'Upgrades facility';
+   str_hint_forge                := 'Upgrades facility';
    str_hint_IncEnergyLevel       := 'Increase energy level';
    str_hint_CanRebuildTo         := 'Can be rebuilt into ';
    str_hint_UnitArming           := 'Arming: ';
@@ -463,7 +463,7 @@ begin
    str_help_Other                := 'Other';
 
    str_doc_HotKey                := 'Hot key: ';
-   str_doc_Attributes            := 'Categories/Attributes: ';
+   str_doc_Attributes            := 'Attributes: ';
    str_doc_ReqEnergy             := 'Energy required: ';
    str_doc_ReqHellPower          := 'Hell Power required: ';
    str_doc_ReqUACLoot            := 'UAC Loot required: ';
@@ -1384,7 +1384,7 @@ begin
 
   str_hint_builder           := 'Строитель';
   str_hint_barrack           := 'Производит юнитов';
-  str_hint_smith             := 'Исследует улучшения и апгрейды';
+  str_hint_forge             := 'Исследует улучшения и апгрейды';
   str_hint_IncEnergyLevel    := 'Увеличивает уровень энергии';
   str_hint_CanRebuildTo      := 'Можно перестроить в ';
   str_hint_UnitArming        := 'Вооружение/Способности: ';

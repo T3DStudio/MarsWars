@@ -4,7 +4,6 @@ const
 kpdata_owner  = %10000000;
 kpdata_timer  = %11000000;
 kpdata_life   = %01000000;
-kpdata_pmask  = %00001111;
 
 function unit_UO2Ability(pu:PTUnit;uo:byte):byte;
 begin
@@ -218,7 +217,7 @@ begin
      begin
         if(i>level)then break;
         if(uid_isbarrack)then if(wudata_reload(uprod_r[i],rpl)>0)then wudata_byte(uprod_u[i],rpl);
-        if(uid_issmith  )then if(wudata_reload(pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
+        if(uid_isforge  )then if(wudata_reload(pprod_r[i],rpl)>0)then wudata_byte(pprod_u[i],rpl);
      end;
 end;
 
@@ -436,70 +435,57 @@ begin
    if((b and %00000001)>0)then b2bs[8]:='1';
 end;}
 
-procedure wclinet_KeyPoint(kpi:byte;rpl:boolean);
-var  o,b: byte;
-wdcptime: pbyte;
-procedure WriteOwner;
+procedure wclinet_KeyPoint(rpl:boolean;POVPlayer:byte);
+var
+kpteam,
+a,b  : byte;
+w    : word;
+wdkpi: pbyte;
 begin
-   with map_KeyPointsL[kpi] do
-   begin
-      b:=kpdata_owner;
-      if(kpOwnerPlayer>MaxPlayers)
-      then o:=kpdata_pmask
-      else o:=kpOwnerPlayer;
-      o:=o and kpdata_pmask;
-
-      wudata_byte(b or o,rpl);
-   end;
-end;
-procedure WriteTimer;
-begin
-   with map_KeyPointsL[kpi] do
-   begin
-      b:=kpdata_timer;
-      if(kpTimerOwnerPlayer>MaxPlayers)
-      then o:=kpdata_pmask
-      else o:=kpTimerOwnerPlayer;
-      o:=o and kpdata_pmask;
-
-      wudata_byte(b or o,rpl);
-      wudata_reload(kpTimer,rpl);
-   end;
-end;
-procedure WriteLife;
-begin
-   with map_KeyPointsL[kpi] do
-   begin
-     b:=kpdata_life;
-
-     wudata_byte(b,rpl);
-     wudata_reload(integer(kplifetime div 5),rpl);
-   end;
-end;
-
-begin
-   b:=0;
    if(rpl)
-   then wdcptime:=@rpls_kpoints_t[kpi]
-   else wdcptime:= @net_kpoints_t[kpi];
+   then wdkpi:=@rpls_kpoints_kpi
+   else wdkpi:= @net_kpoints_kpi;
 
-   wdcptime^:=(wdcptime^+1) mod 3;
+   wdkpi^:=(wdkpi^+1) mod MaxKeyPoints;
 
-   with map_KeyPointsL[kpi] do
-     if(kpCaptureR<=0)
-     then wudata_byte(0,rpl)
-     else
-       case wdcptime^ of
-       0 : WriteOwner;
-       1 : WriteTimer;
-       2 : if(map_generators=mapg_inf)or((map_scenario=mc_KotH)and(kpi=0))then
-           begin
-              if(kpTimer>0)
-              then WriteTimer
-              else WriteOwner;
-           end
-           else WriteLife;
-       end;
+   if(g_gplayers[POVPlayer].isobserver)
+   then kpteam:=MaxPlayers
+   else kpteam:=g_gplayers[POVPlayer].team;
+
+   with map_KeyPointsL[wdkpi^] do
+     with kp_TeamData[kpteam] do
+     begin
+        {a:=wdkpi^ and %00001111;
+        if(kptd_Active)then
+        a:=a or %00010000;
+        wudata_byte(a,rpl); }
+
+        w:=(wdkpi^) and %0000000000001111;
+        if(kptd_Active)then w:=w or %0000000000010000;
+        if(kptd_Active)then
+        begin
+           w:=w or ((word(ct2s(kptd_lifeTime)) and %0000011111111111) shl 5);
+           wudata_word(w,rpl);
+
+           if(kptd_OwnerPlayer>=MaxPlayers)
+           then a:=%00001111
+           else a:=kptd_OwnerPlayer;
+
+           if(kptd_TimerOwnerPlayer>=MaxPlayers)
+           then b:=%1111
+           else b:=(kptd_TimerOwnerPlayer and %00001111) shl 4;
+
+           a:=a or b;
+           wudata_byte(a,rpl);
+        end
+        else wudata_byte(w and %0000000000011111,rpl);
+     end;
+   {
+   kpi
+   kptd_Active
+   kptd_lifeTime
+   kptd_OwnerPlayer
+   kptd_TimerOwnerPlayer}
 end;
 
 procedure wclinet_gframe(POVPlayer:byte;rpl:boolean);
@@ -524,13 +510,6 @@ begin
    if(rpl)
    then wtickb1:=(wtick mod fr_fps1)=0  // every 2 second
    else wtickb1:= wtickb0;              // every second
-
-   if(wtickb0)then
-     if(map_scenario=mc_KeyPoints)
-     or(map_scenario=mc_KotH)
-     or(map_generators>0)then
-       for i:=0 to LastKeyPoint do
-         wclinet_KeyPoint(i,rpl);
 
    if(wtickb1)then
      case map_scenario of
@@ -579,6 +558,11 @@ begin
       if(units_now=0)then exit;
 
       units_now:=min2i(units_ingame,units_now*4);
+
+      if(map_scenario=mc_KeyPoints)
+      or(map_scenario=mc_KotH)
+      or(map_generators>0)then
+        wclinet_KeyPoint(rpl,POVPlayer);
 
       if(wtickb0)then
       begin
@@ -669,7 +653,7 @@ begin
                    prod_unit_uid[       _puid           ]+=1;
                    res_energyl_cur-=g_uids[_puid].uid_req_EnergyLevel;
                 end;
-            if(uid_issmith)then
+            if(uid_isforge)then
               for i:=0 to LastUnitLevel do
                 if(pprod_r[i]>0)then
                 begin
@@ -732,7 +716,7 @@ begin
                    prod_unit_uid[       _puid           ]-=1;
                    res_energyl_cur+=g_uids[_puid].uid_req_EnergyLevel;
                 end;
-            if(uid_issmith)then
+            if(uid_isforge)then
               for i:=0 to LastUnitLevel do
                 if(pprod_r[i]>0)then
                 begin
@@ -1187,7 +1171,7 @@ begin
          if(i<=level)then
          begin
             if(uid_isbarrack)then if(rudata_reload(@uprod_r[i],rpl)>0)then uprod_u[i]:=rudata_byte(rpl,0);
-            if(uid_issmith  )then if(rudata_reload(@pprod_r[i],rpl)>0)then pprod_u[i]:=rudata_byte(rpl,0);
+            if(uid_isforge  )then if(rudata_reload(@pprod_r[i],rpl)>0)then pprod_u[i]:=rudata_byte(rpl,0);
          end
          else
          begin
@@ -1430,48 +1414,67 @@ begin
    end;
 end;
 
-procedure rclinet_KeyPoint(kpi:byte;rpl,no_effect:boolean);
+procedure rclinet_KeyPoint(POVPlayer:byte;rpl,no_effect:boolean);
 var
-b,t,p:byte;
-i    :integer;
+kpi,a,b:byte;
+w      :word;
+//active :boolean;
 begin
-   with map_KeyPointsL[kpi] do
-   begin
-      b:=rudata_byte(rpl,0);
-      t:=b and %11000000;
-      case t of
-      0 : if(kpCaptureR>0)then
-          begin
-             KeyPoint_ChangeOwner(kpi,255);
-             kpCaptureR:=-kpCaptureR;
-             if(not no_effect)then
-               effect_KPointExplode(kpx,kpy);
-          end;
-      else
+   a     :=rudata_byte(rpl,0);
+   kpi   :=a and %00001111;
 
-        if(kpCaptureR<0)then kpCaptureR:=-kpCaptureR;
-        if(map_generators=mapg_inf)
-        or((map_scenario=mc_koth)and(kpi=0))then kplifetime:=0;
+   if(kpi<=LastKeyPoint)then
+     with map_KeyPointsL[kpi] do
+     with kp_TeamData[MaxPlayers] do
+     begin
+        kptd_Active:=(a and %00010000)>0;
+        if(not kptd_Active)then exit;
+        b:=rudata_byte(rpl,0);
+        w:=word(a) or (b shl 8);
+        kptd_lifeTime:=((w shr 5) and %0000011111111111)*fr_fps1;
+        if(kptd_lifeTime>0)then kptd_lifeTime-=1;
+        b:=rudata_byte(rpl,0);
+        KeyPoint_ChangeOwner(kpi,b and %00001111,false);
+        kptd_TimerOwnerPlayer:= b and %1111;
 
-        case t of
-        kpdata_owner: begin
-                         p:=b and kpdata_pmask;
-                         if(p>LastPlayer)then p:=255;
-                         KeyPoint_ChangeOwner(kpi,p);
-                      end;
-        kpdata_timer: begin
-                         p:=b and kpdata_pmask;
-                         if(p>LastPlayer)then p:=255;
-                         kpTimerOwnerPlayer:=p;
-                         rudata_reload(@kpTimer,rpl);
-                      end;
-        kpdata_life : begin
-                         rudata_reload(@i,rpl);
-                         kplifetime:=i*5;
-                      end;
-        end;
-      end;
-   end;
+        //kp_TeamData[POVPlayer]:=kp_TeamData[MaxPlayers];
+     end;
+      {
+
+      w:=(wdkpi^) and %0000000000001111;
+      if(kptd_Active)then
+      begin
+         w:=w or %0000000000010000;
+         w:=w or ((ct2s(kptd_lifeTime) and %11111111111) shl 5);
+
+         kptd_OwnerPlayer
+         kptd_TimerOwnerPlayer
+
+         if(kptd_OwnerPlayer>=MaxPlayers)
+         then b:=%00001111
+         else b:=kptd_OwnerPlayer;
+
+         if(kptd_TimerOwnerPlayer>=MaxPlayers)
+         then o:=%1111
+         else o:=(kptd_OwnerPlayer and %00001111) shl 4;
+
+
+         kpdata_owner: begin
+                          p:=b and kpdata_pmask;
+                          if(p>LastPlayer)then p:=255;
+                          KeyPoint_ChangeOwner(kpi,p);
+                       end;
+         kpdata_timer: begin
+                          p:=b and kpdata_pmask;
+                          if(p>LastPlayer)then p:=255;
+                          kpTimerOwnerPlayer:=p;
+                          rudata_reload(@kpTimer,rpl);
+                       end;
+         kpdata_life : begin
+                          rudata_reload(@i,rpl);
+                          kplifetime:=i*5;
+                       end;
+ }
 end;
 
 procedure rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
@@ -1497,13 +1500,6 @@ begin
    if(rpl)
    then wtickb1:=(wtick mod fr_fps1)=0  // every 2 second
    else wtickb1:= wtickb0;              // every second
-
-   if(wtickb0)then
-     if(map_scenario=mc_KeyPoints)
-     or(map_scenario=mc_KotH)
-     or(map_generators>0)then
-       for i:=0 to LastKeyPoint do
-         rclinet_KeyPoint(i,rpl,fast_skip);
 
    if(wtickb1)then
      case map_scenario of
@@ -1541,6 +1537,11 @@ mc_royale   : g_royal_r:=rudata_int(rpl,0);
          UnitStepTicks:=round(units_ingame/rpls_pnu*NetTickN)+1;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
+
+      if(map_scenario=mc_KeyPoints)
+      or(map_scenario=mc_KotH)
+      or(map_generators>0)then
+        rclinet_KeyPoint(POVPlayer,rpl,fast_skip);
 
       if(wtickb0)then
       begin

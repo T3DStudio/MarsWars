@@ -174,8 +174,8 @@ begin
    if(TestMode>1)and(UIPlayer<=LastPlayer)then
     with g_gplayers[UIPlayer] do
      for i:=0 to LastPlayer do
-      with ai_alarms[i] do
-       if(aia_enemy_limit>0)then
+      with aip_alarms[i] do
+       if(aia_limit>0)then
         circleColor(ui_minimap,round(aia_x*map_MiniMap_cx),round(aia_y*map_MiniMap_cx),5,c_orange);
 
    draw_sdlsurface(tar       ,1,1,ui_minimap );
@@ -194,11 +194,12 @@ begin
    // points areas
    for i:=0 to LastKeyPoint do
      with map_KeyPointsL[i] do
-       if(kpCaptureR>0)and(kpNoBuildR>0)then
-         circleColor(tar,
-         kpx-ui_cam_x,
-         kpy-ui_cam_y,
-         kpNoBuildR,c_blue);
+       with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
+         if(kptd_Active)and(kp_RNoBuild>0)then
+           circleColor(tar,
+           kp_x-ui_cam_x,
+           kp_y-ui_cam_y,
+           kp_RNoBuild,c_blue);
 
    // map build rect
    rectangleColor(tar,
@@ -814,15 +815,16 @@ begin
                                if(g_tick<keyPoint_KotH_pause)
                                then draw_timer(tar,ui_objectivesx,y,keyPoint_KotH_pause-g_tick,ta_LU,ui_Objectives_LineLen,str_ui_KotHTime_act,c_gray,@y)
                                else
-                                 if(kpOwnerPlayer<=LastPlayer)
-                                 then draw_text(tar,ui_objectivesx,y,g_gplayers[kpOwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColor(kpOwnerPlayer,false),@y)
-                                 else
-                                   if(kpTimer<=0)
-                                   then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
+                                 with kp_TeamData[MaxPlayers] do
+                                   if(kptd_OwnerPlayer<=LastPlayer)
+                                   then draw_text(tar,ui_objectivesx,y,g_gplayers[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColor(kptd_OwnerPlayer,false),@y)
                                    else
-                                     if(ui_blink2_colorb)
-                                     then draw_timer(tar,ui_objectivesx,y,kpCaptureTime-kpTimer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
-                                     else draw_timer(tar,ui_objectivesx,y,kpCaptureTime-kpTimer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColor(kpTimerOwnerPlayer,false),@y);
+                                     if(kptd_Timer<=0)
+                                     then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
+                                     else
+                                       if(ui_blink2_colorb)
+                                       then draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
+                                       else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColor(kptd_TimerOwnerPlayer,false),@y);
                               end;
                 mc_KeyPoints: draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white);
                 mc_royale   : draw_text(tar,ui_objectivesx,y,str_objective_RoyalBattle,ta_LU,ui_Objectives_LineLen,c_white);

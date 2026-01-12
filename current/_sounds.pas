@@ -701,7 +701,7 @@ begin
    snd_uac_cc               :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'command_center' );
    snd_uac_barracks         :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'barraks'        );
    snd_uac_generator        :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'generator'      );
-   snd_uac_smith            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'weapon_factory' );
+   snd_uac_forge            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'weapon_factory' );
    snd_uac_ctower           :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'chaingun_tower' );
    snd_uac_radar            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'radar_on'       );
    snd_uac_rtower           :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'rocket_turret'  );

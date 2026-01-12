@@ -136,6 +136,9 @@ begin
       if (uo_id<>ua_ability1)
       and(uo_id<>ua_ability2)
       and(uo_id<>ua_ability3)then ui_CommanderGetWeight+=4;
+      if(uid_ability3<>0)then
+      if(unit_AbilityCheck(pu,uid_ability3,false)=0)
+                             then ui_CommanderGetWeight+=2;
    end;
 end;
 
@@ -211,7 +214,7 @@ begin
                if(t in uid_prod_Units)then ui_uprod_uid_max[t]+=1;
         end;
 
-      if(uid_issmith)then
+      if(uid_isforge)then
         if(units_upgrProds_s<=0)or(isselected)then
         begin
            ui_pprod_max+=1;
@@ -527,7 +530,7 @@ begin
       lvlstr_l:='';
       if(not uid_isbuilding)
       or(uid_isbarrack)
-      or(uid_issmith)
+      or(uid_isforge)
       or(uid_ability_RldReducByLvl)then
         case level of
         1: lvlstr_l:=str_UnitLevel1[uid_race];
@@ -637,11 +640,11 @@ begin
       if(iscomplete)then
       begin
          if(playeri=UIPlayer)then
-           if(uid_isbarrack)or(uid_issmith)then
+           if(uid_isbarrack)or(uid_isforge)then
              for t:=0 to LastUnitLevel do
              begin
                 if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
-                if(uid_issmith  )and(pprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
+                if(uid_isforge  )and(pprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
              end;
 
          if(a_rld<=0)and(not noanim)then

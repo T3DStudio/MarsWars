@@ -341,7 +341,7 @@ ureq_max               : cardinal = 1 shl 7;
 ureq_builders          : cardinal = 1 shl 8;
 ureq_BuildCD           : cardinal = 1 shl 9;
 ureq_barracks          : cardinal = 1 shl 10;
-ureq_smiths            : cardinal = 1 shl 11;
+ureq_forges            : cardinal = 1 shl 11;
 ureq_InProgress        : cardinal = 1 shl 12;
 ureq_armylimit         : cardinal = 1 shl 13;
 ureq_place             : cardinal = 1 shl 14;
@@ -455,21 +455,22 @@ TargetCheckSRangeBonus = 50;
 //  AI bits
 //
 
-ai_limit_border        = MaxPlayerLimit-(7*MinUnitLimit);
+//ai_limit_border        = MaxPlayerLimit-(7*MinUnitLimit);
 
-aif_base_smart_order   : cardinal = 1 shl 1;
-aif_base_suicide       : cardinal = 1 shl 2;
-aif_base_advance       : cardinal = 1 shl 3;
-aif_army_smart_order   : cardinal = 1 shl 4;
-aif_army_scout         : cardinal = 1 shl 5;
-aif_army_advance       : cardinal = 1 shl 6;
-aif_army_smart_micro   : cardinal = 1 shl 7;
-aif_army_teleport      : cardinal = 1 shl 8;
-aif_upgr_smart_opening : cardinal = 1 shl 9;
-aif_ability_detection  : cardinal = 1 shl 10;
-aif_ability_other      : cardinal = 1 shl 11;
-aif_ability_mainsave   : cardinal = 1 shl 12;
-aif_army_smart_prio    : cardinal = 1 shl 13;
+aif_base_smart_order   : cardinal = 1;
+aif_base_suicide       : cardinal = 1 shl 1;
+aif_base_advance       : cardinal = 1 shl 2;
+aif_base_SaveBuilder   : cardinal = 1 shl 3;
+aif_army_scout         : cardinal = 1 shl 4;
+aif_army_smart_order   : cardinal = 1 shl 5;
+aif_army_smart_micro   : cardinal = 1 shl 6;
+aif_army_smart_Target  : cardinal = 1 shl 7;
+aif_upgr_smart_order   : cardinal = 1 shl 8;
+aif_ability_detection  : cardinal = 1 shl 9;
+aif_ability_other      : cardinal = 1 shl 10;
+aif_allies_help        : cardinal = 1 shl 11;
+aif_cheat_VisBuildings : cardinal = 1 shl 12;
+aif_cheat_VisUnits     : cardinal = 1 shl 13;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -514,7 +515,7 @@ MaxObstacles           = 800;
 MapObstaclesGridW      = 200;
 MapObstaclesGridN      = map_MaxSize div MapObstaclesGridW;
 
-ObstaclesRMin          = 18;
+ObstaclesRMin          = 10;
 ObstaclesRStep         = 45;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -570,7 +571,6 @@ upgr_uac_TurretPlasma  = 50; // plasma weapons fro anti-ground turret
 upgr_uac_TurretArmor   = 51; // turrets armor
 
 
-upgr_AI_FogVision      = 250;
 upgr_fast_build        = 251;
 upgr_fast_product      = 252;
 upgr_mult_product      = 253;
@@ -695,7 +695,7 @@ BaseRegen1             = 5;
 BaseDamageLevel1       = 2.5;
 BaseArmorLevel1        = 2.5;
 
-UpgradeUnitSpeedBonus  = 3;
+UpgradeUnitSpeedBonus  = 2;
 UpgradeDamageBonus1    = 7;
 UpgradeArmorBonus1     = 7;
 UpgradeUnitArmorBonus  = UpgradeArmorBonus1;
@@ -993,7 +993,7 @@ rocket_sr              = tank_sr*2;
 bfg_sr                 = rocket_sr*4;
 blizzard_sr            = rocket_sr*3;
 
-BuildObstacleStepR     = 6;
+BuildObstacleStepR     = 0;
 player_default_ai_level= 7;
 sintMaxHits            = 126;
 _d2shi                 = abs(hits_dead div 125)+1;   // 5
@@ -1211,7 +1211,7 @@ MaxUnitGroups          = 9;
 //
 
 // terrain
-sd_liquidBack          = -32001;
+sd_liquidBack          = -32002;
 sd_liquidFront         = -32000;
 sd_decals              = map_MaxSize+sd_liquidFront;      // -24000
 sd_Obstacles2          = map_MaxSize+sd_decals;      // -16000
@@ -1729,7 +1729,7 @@ menu_BarStepX          = font_w1h;
 
 menu_BaseList1H        = 16;
 menu_SvSearchListH     = 10;
-menu_ListLineWChars1   = 40;
+menu_ListLineWChars1   = 60;
 menu_ListLineWCharsh   = menu_ListLineWChars1 div 2;
 menu_ListLineWChars2   = menu_ListLineWChars1*2;
 menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
@@ -1869,11 +1869,6 @@ crater_ri              = 4;
 crater_r               : array[1..crater_ri] of smallint = (33,60,88,110);
 
 LiquidAnimCount        = 4;
-
-ov_obstacle0           = 1;
-ov_obstacle1           = 2;
-ov_obstacle2           = 3;
-ov_liquid              = 4;
 
 {$ELSE }
 

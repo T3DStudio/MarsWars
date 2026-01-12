@@ -16,7 +16,7 @@ begin
          isfly      :=uid_isfly;
          transportM :=uid_TransportMax_Base;
          pains      :=uid_Pain;
-         solid      :=uid_issolid;
+         issolid      :=uid_issolid;
 
          if(uid_isbuilding)and(uid_isbarrack)then
            rpoint_y:=y+uid_r;
@@ -96,7 +96,7 @@ begin
       uid_isdetector   := false;
 
       uid_isbuilder    := false;
-      uid_issmith      := false;
+      uid_isforge      := false;
       uid_isbarrack    := false;
       uid_issolid      := true;
 
@@ -168,7 +168,7 @@ begin
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
-   uid_issmith         := true;
+   uid_isforge         := true;
    uid_ability3        := uab_ToHPool;
 end;
 
@@ -1144,7 +1144,7 @@ begin
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_isbuilding      := true;
    uid_ismech          := true;
-   uid_issmith         := true;
+   uid_isforge         := true;
    uid_ability3        := uab_ToUWeaponFactory;
    uid_prod_Upgrades   := [];
 end;
@@ -1329,24 +1329,23 @@ end;
 
 UID_UACDron:
 begin
-   uid_MaxHits1        := 2000;
-   uid_req_EnergyLevel := 400;
+   uid_MaxHits1        := 1000;
+   uid_req_EnergyLevel := 200;
    uid_r               := 14;
    uid_MSpeed_Base     := 15;
    uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
    uid_Armor_upgr1     := upgr_uac_MechArmor;
    uid_SightR_upgr     := upgr_uac_UnitSightR;
-   uid_SightR_Base     := 250;
+   uid_SightR_Base     := 200;
    uid_uibtn           := 9;
    uid_ProdTimeSec     := ptime1;
-   uid_LimitUse        := ul2;
    uid_CanAttack       := true;
    uid_ismech          := true;
    uid_islight         := true;
    uid_ability1        := uab_ToUGTurretTo;
    uid_ability2        := uab_ToUATurretTo;
    uid_FastDeathHits   := 1;
-   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsq,MID_BPlasma,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,2,dm_AntiUnitMech2);
+   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_BPlasma,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,2,dm_AntiUnitMech2);
 end;
 UID_UTransport:
 begin
@@ -1530,7 +1529,7 @@ end;
       uid_MaxHitsh:=uid_MaxHits1 div 2; if(uid_MaxHitsh<1)then uid_MaxHitsh:=1;
       uid_MaxHitsq:=uid_MaxHitsh div 2; if(uid_MaxHitsq<1)then uid_MaxHitsq:=1;
 
-      if(uid_issmith)and(uid_prod_Upgrades=[])then
+      if(uid_isforge)and(uid_prod_Upgrades=[])then
         for u:=1 to 255 do
           with g_upids[u] do
             if(upgr_time>0)and(uid_race=upgr_race)then uid_prod_Upgrades+=[u];

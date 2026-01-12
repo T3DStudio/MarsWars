@@ -82,7 +82,7 @@ net_svLanAdv      : boolean = true;
 net_svLanAdv_timer: integer = 0;
 net_ping_timer    : integer = 0;
 net_wudata_t      : TWUDataTime;
-net_kpoints_t     : TWCPDataTime;
+net_kpoints_kpi   : byte = 0;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
@@ -91,7 +91,7 @@ rpls_file         : file;
 rpls_u            : integer = 0;
 rpls_Quality      : byte = 0;
 rpls_wudata_t     : TWUDataTime;
-rpls_kpoints_t    : TWCPDataTime;
+rpls_kpoints_kpi  : byte = 0;
 
 fr_FPSSecond,
 fr_FPSSecondD,
@@ -429,6 +429,8 @@ map_ter_decaln    : integer = 0;
 map_ter_decalL    : array of TDecal;
 
 map_ObstaclesVis  : array[0..MaxObstacles] of TObstacleVis;
+map_KeyPointsVis  : array[0..LastKeyPoint] of TKeyPointVis;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -615,6 +617,9 @@ theme_map_LiquidFront: integer = 0;
 theme_map_pLiquidFront:integer = -1;
 theme_map_LiquidBack : integer = 0;
 theme_map_pLiquidBack: integer = -1;
+theme_map_RBattleFront: integer = 0;
+theme_map_pRBattleFront:integer = -1;
+
 
 
 theme_decalL,
@@ -624,7 +629,7 @@ theme_obstacle2L,
 theme_craterL,
 theme_liquidFrontL,
 theme_liquidBackL,
-theme_terrainL    : TIntList;
+theme_terrainL          : TIntList;
 theme_decalN,
 theme_obstacle0N,
 theme_obstacle1N,
@@ -632,21 +637,21 @@ theme_obstacle2N,
 theme_craterN,
 theme_liquidFrontN,
 theme_liquidBackN,
-theme_terrainN    : integer;
+theme_terrainN          : integer;
 
 theme_spr_decalL,
 theme_spr_obstaclesL,
 theme_spr_liquidL,
-theme_spr_terrainL: TUSpriteList;
+theme_spr_terrainL      : TUSpriteList;
 theme_spr_decalN,
 theme_spr_obstaclesN,
 theme_spr_liquidN,
-theme_spr_terrainN: integer;
+theme_spr_terrainN      : integer;
 
-theme_obstacles_Anims: TThemeObstacleAnimL;
+theme_obstacles_Anims   : TThemeObstacleAnimL;
 
 theme_liquids_AnimStyle : array of TThemeAnimStyle;
-theme_liquids_AnimTime : array of byte;
+theme_liquids_AnimTime  : array of byte;
 theme_liquids_MMColor   : array of cardinal;
 
 
@@ -661,10 +666,10 @@ theme_DefSprite,
 spr_empty         : pSDL_SURFACE;
 font_1            : array[char] of TMWTexture;
 
-//spr_liquidb       : array[1..LiquidRs ] of TMWTexture;
-//spr_liquid        : array[1..LiquidAnim,1..LiquidRs] of TMWTexture;
 spr_liquidBack    : TMWTexture;
-spr_liquidFront   : array[1..LiquidAnimCount] of TMWTexture;
+spr_liquidFront   : TLiquidTextureArray;
+spr_fireblueBack  : TMWTexture;
+spr_fireblueFront : TLiquidTextureArray;
 spr_crater        : array[1..crater_ri      ] of TMWTexture;
 
 
@@ -1075,7 +1080,7 @@ str_hint_SightR,
 str_hint_Ability,
 str_hint_builder,
 str_hint_barrack,
-str_hint_smith,
+str_hint_forge,
 str_hint_IncEnergyLevel,
 str_hint_CanRebuildTo,
 str_hint_TargetLimit,
@@ -1339,7 +1344,7 @@ snd_PowerUp,
 snd_uac_cc,
 snd_uac_barracks,
 snd_uac_generator,
-snd_uac_smith,
+snd_uac_forge,
 snd_uac_ctower,
 snd_uac_radar,
 snd_uac_rtower,

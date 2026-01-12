@@ -1,6 +1,6 @@
 
 
-function unit_ProdStopUpgrade(uSmith  :PTUnit;upid:byte;all,         check:boolean):cardinal;forward;
+function unit_ProdStopUpgrade(uForge  :PTUnit;upid:byte;all,         check:boolean):cardinal;forward;
 function unit_ProdStopUnit   (uBarrack:PTUnit;puid:byte;all,canceled,check:boolean):cardinal;forward;
 
 {$IFDEF _FULLGAME}
@@ -1195,34 +1195,45 @@ begin
                      if (o_rI>0)
                      and(o_rI<(d+tr))
                      and(o_rM>d)then PInAdd(o_x,o_y,o_rI-tr);
+                     {begin
+                        o:=o_rI+tr;
+                        pin_x:=o_x+round(o*(tx-o_x)/d);
+                        pin_y:=o_y+round(o*(ty-o_y)/d);
+                        o:=tr*2;
+                        d:=point_dist_int(pin_x,pin_y,tx,ty)-o;
+                        POutAdd(pin_x,
+                                pin_y,
+                                d,o);
+                     end; }
                   end;
       tr+=BuildObstacleStepR;
    end;
 
    if(not flyLevel)then
-    for u:=0 to LastKeyPoint do
-     with map_KeyPointsL[u] do
-      if(kpCaptureR>0)and(kpNoBuildR>0)then
-      begin
-         o:=kpNoBuildR+tr;
-         d:=point_dist_int(kpx,kpy,tx,ty)-o;
-         POutAdd(kpx,kpy,d,o);
-      end;
+     for u:=0 to LastKeyPoint do
+       with map_KeyPointsL[u] do
+       with kp_TeamData[min2i(UnitObsTeamVis,MaxPlayers)] do
+         if(kptd_Active)and(kp_RNoBuild>0)then
+         begin
+            o:=kp_RNoBuild+tr;
+            d:=point_dist_int(kp_x,kp_y,tx,ty)-o;
+            POutAdd(kp_x,kp_y,d,o);
+         end;
 
    for u:=1 to MaxUnits do
-    with g_units[u] do
+     with g_units[u] do
      with uid^ do
-      if(hits>0)and(isfly=uid_isfly)and(unum<>ignore_unum)then
-       if(speed<=0)or(not iscomplete)then
-        if(not IsUnitRange(transportU,nil))then
-        begin
-           if(UnitObsTeamVis<=LastPlayer)then
-             if(TeamVision[UnitObsTeamVis]<=0)then continue;
+       if(hits>0)and(isfly=uid_isfly)and(unum<>ignore_unum)then
+         if(speed<=0)or(not iscomplete)then
+           if(not IsUnitRange(transportU,nil))then
+           begin
+              if(UnitObsTeamVis<=LastPlayer)then
+                if(TeamVision[UnitObsTeamVis]<=0)then continue;
 
-           o:=tr+uid_r;
-           d:=point_dist_int(x,y,tx,ty);
-           POutAdd(x,y,d-o,o);
-        end;
+              o:=tr+uid_r+1;
+              d:=point_dist_int(x,y,tx,ty);
+              POutAdd(x,y,d-o,o);
+           end;
 
    {$IFDEF _FULLGAME}
    for u:=1 to MaxUnits do
@@ -1370,8 +1381,9 @@ begin
    if(building)then
      for u:=0 to LastKeyPoint do
        with map_KeyPointsL[u] do
-         if(kpCaptureR>0)and(kpNoBuildR>0)then
-           if(point_dist_int(tx,ty,kpx,kpy)<kpNoBuildR)then
+       with kp_TeamData[min2i(checkTeamVis,MaxPlayers)] do
+         if(kptd_Active)and(kp_RNoBuild>0)then
+           if(point_dist_int(tx,ty,kp_x,kp_y)<kp_RNoBuild)then
            begin
               CheckCollisionR:=cbr_cpoint;
               exit;
@@ -1423,8 +1435,9 @@ begin
 
    for u:=0 to LastKeyPoint do
      with map_KeyPointsL[u] do
-       if(kpCaptureR>0)and(kpNoBuildR>0)then
-         if(point_dist_int(tx,ty,kpx,kpy)<kpNoBuildR)then
+     with kp_TeamData[KeyPoint_GetPlayerTeam(playerN)] do
+       if(kptd_Active)and(kp_RNoBuild>0)then
+         if(point_dist_int(tx,ty,kp_x,kp_y)<kp_RNoBuild)then
          begin
             CheckInBuildArea:=cba_NoBuildArea;
             exit;
@@ -1435,17 +1448,17 @@ begin
    CheckInBuildArea:=cba_outBuildArea;
 
    for u:=1 to MaxUnits do
-    with g_punits[u]^ do
+     with g_punits[u]^ do
      with uid^ do
-      if(hits>0)and(iscomplete)and(uid_isbuilder)and(not isfly)and(playeri=playerN)then
-       if(player^.units_builders_s=0)or(isselected)then
-        if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
-         if(buid in uid_prod_Buildings)and(IsUnitRange(transportU,nil)=false)then
-          if(point_dist_int(x,y,tx,ty)<srange)then
-          begin
-             CheckInBuildArea:=cba_inBuildArea; // inside build area
-             break;
-          end;
+       if(hits>0)and(iscomplete)and(uid_isbuilder)and(not isfly)and(playeri=playerN)then
+         if(player^.units_builders_s=0)or(isselected)then
+           if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
+             if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
+               if(point_dist_int(x,y,tx,ty)<srange)then
+               begin
+                  CheckInBuildArea:=cba_inBuildArea; // inside build area
+                  break;
+               end;
 end;
 
 function CheckBuildPlace(tx,ty,tr,skip_unit:integer;playern,buid:byte):TCheckBuildPlace;
@@ -1572,7 +1585,6 @@ begin
       aiu_need_detect :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
-      aiu_FiledSquareNear  :=0;
 
       FillChar(uprod_r,SizeOf(uprod_r),0);
       FillChar(pprod_r,SizeOf(pprod_r),0);
@@ -1601,7 +1613,7 @@ begin
          units_unitProds_ec+=1;
          prod_unit_Max+=level+1;
       end;
-      if(uid_issmith  )then
+      if(uid_isforge  )then
       begin
          units_upgrProds_ec+=1;
          prod_upgr_Max+=level+1;
@@ -1620,7 +1632,7 @@ begin
          units_unitProds_ec-=1;
          prod_unit_Max-=level+1;
       end;
-      if(uid_issmith  )then
+      if(uid_isforge  )then
       begin
          units_upgrProds_ec-=1;
          prod_upgr_Max-=level+1;
@@ -2010,13 +2022,13 @@ end;
 
 //////   Start upgrade production
 //
-function unit_ProdStartUpgradeLine(uSmith:PTUnit;upid,pn:byte;check:boolean):cardinal;
+function unit_ProdStartUpgradeLine(uForge:PTUnit;upid,pn:byte;check:boolean):cardinal;
 begin
    unit_ProdStartUpgradeLine:=0;
    if(pn>LastUnitLevel)
    then unit_ProdStartUpgradeLine:=ureq_other
    else
-     with uSmith^ do
+     with uForge^ do
      with uid^ do
      with player^ do
      begin
@@ -2039,10 +2051,10 @@ begin
             end;
      end;
 end;
-function unit_ProdStartUpgrade(uSmith:PTUnit;upid:integer;check:boolean):cardinal;
+function unit_ProdStartUpgrade(uForge:PTUnit;upid:integer;check:boolean):cardinal;
 var pn:byte;
 begin
-   with uSmith^ do
+   with uForge^ do
    with uid^ do
    begin
       unit_ProdStartUpgrade:=ureq_other;
@@ -2050,25 +2062,25 @@ begin
       or(upid=0  )
       or(hits<=0)
       or(not iscomplete)
-      or(not uid_issmith)
+      or(not uid_isforge)
       or(not uid_isbuilding)then exit;
 
-      unit_ProdStartUpgrade:=ureq_smiths;
+      unit_ProdStartUpgrade:=ureq_forges;
       if not(upid in uid_prod_Upgrades)
       then exit;
    end;
 
    for pn:=0 to LastUnitLevel do
    begin
-      if(pn>uSmith^.level)then break;
-      unit_ProdStartUpgrade:=unit_ProdStartUpgradeLine(uSmith,upid,pn,check);
+      if(pn>uForge^.level)then break;
+      unit_ProdStartUpgrade:=unit_ProdStartUpgradeLine(uForge,upid,pn,check);
       if(unit_ProdStartUpgrade=0)then break;
    end;
 end;
-function unit_ProdStopUpgradeLine(uSmith:PTUnit;upid:byte;pn:integer;check:boolean):cardinal;
+function unit_ProdStopUpgradeLine(uForge:PTUnit;upid:byte;pn:integer;check:boolean):cardinal;
 begin
    unit_ProdStopUpgradeLine:=ureq_other;
-   with uSmith^ do
+   with uForge^ do
    with uid^ do
      if(pn<=LastUnitLevel)then
        if(pprod_r[pn]>0)then
@@ -2086,23 +2098,23 @@ begin
               pprod_r[pn]:=0;
            end;
 end;
-function unit_ProdStopUpgrade(uSmith:PTUnit;upid:byte;all,check:boolean):cardinal;
+function unit_ProdStopUpgrade(uForge:PTUnit;upid:byte;all,check:boolean):cardinal;
 var pn:byte;
 begin
-   with uSmith^ do
+   with uForge^ do
    with uid^ do
    begin
       unit_ProdStopUpgrade:=ureq_other;
       if(upid=0 )
       or(hits<=0)
       or(not iscomplete)
-      or(not uid_issmith)
+      or(not uid_isforge)
       or(not uid_isbuilding)then exit;
    end;
 
    for pn:=LastUnitLevel downto 0 do
    begin
-      unit_ProdStopUpgrade:=unit_ProdStopUpgradeLine(uSmith,upid,pn,check);
+      unit_ProdStopUpgrade:=unit_ProdStopUpgradeLine(uForge,upid,pn,check);
       if(unit_ProdStopUpgrade>0)then continue;
       if(not all)or(check)then break;
    end;
@@ -2119,7 +2131,7 @@ begin
       units_uid_s[uidi                      ]+=1;
       if(uid_isbuilder)then units_builders_s +=1;
       if(uid_isbarrack)then units_unitProds_s+=1;
-      if(uid_issmith  )then units_upgrProds_s+=1;
+      if(uid_isforge  )then units_upgrProds_s+=1;
       units_all_s+=1;
    end;
 end;
@@ -2134,7 +2146,7 @@ begin
       units_uid_s[uidi                      ]-=1;
       if(uid_isbuilder)then units_builders_s -=1;
       if(uid_isbarrack)then units_unitProds_s-=1;
-      if(uid_issmith  )then units_upgrProds_s-=1;
+      if(uid_isforge  )then units_upgrProds_s-=1;
       units_all_s-=1;
    end;
 end;
@@ -2251,7 +2263,7 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-     if(uid_issmith)then
+     if(uid_isforge)then
        for i:=0 to LastUnitLevel do
          if(pprod_r[i]>0)then
          begin

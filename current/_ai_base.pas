@@ -1,5 +1,5 @@
 
-const
+{ const
 
 aiucl_main0      : array[1..r_count] of byte = (UID_HKeep          ,UID_UCommandCenter  );
 aiucl_main0A     : array[1..r_count] of byte = (UID_HAKeep         ,UID_UACommandCenter );
@@ -12,9 +12,9 @@ aiucl_smith      : array[1..r_count] of byte = (UID_HPools         ,UID_UWeaponF
 aiucl_tech0      : array[1..r_count] of byte = (UID_HPentagram     ,UID_UComputerStation);
 aiucl_tech1      : array[1..r_count] of byte = (UID_HMonastery     ,UID_UTechCenter     );
 aiucl_tech2      : array[1..r_count] of byte = (UID_HFortress      ,UID_UComputerStation);
-aiucl_detect     : array[1..r_count] of byte = (UID_HEye       ,UID_URadar          );
-aiucl_spec1      : array[1..r_count] of byte = (UID_HAltar         ,UID_URMStation      );
-aiucl_spec2      : array[1..r_count] of byte = (UID_HTeleport      ,0                   );
+aiucl_detect     : array[1..r_count] of byte = (UID_HEye           ,UID_URadar          );
+aiucl_spec0      : array[1..r_count] of byte = (UID_HAltar         ,UID_URMStation      );
+aiucl_spec1      : array[1..r_count] of byte = (UID_HTeleport      ,0                   );
 aiucl_twr_air1   : array[1..r_count] of byte = (UID_HTower         ,UID_UATurret        );
 aiucl_twr_air2   : array[1..r_count] of byte = (UID_HTotem         ,UID_UATurret        );
 aiucl_twr_ground1: array[1..r_count] of byte = (UID_HTower         ,UID_UGTurret        );
@@ -31,16 +31,16 @@ ai_MinArmyForScout        = ul10;
 ai_BasePatrolRange        = 50;
 ai_MinBaseSaveCountBorder = 3;
 ai_MinChoosenCount        = 3;
-ai_FiledSquareBorder      = 150000;//145000;
+ai_FiledSquareBorder      = 150000;//145000;   }
 
 // ai groups
-aio_home       = 0;
+{aio_home       = 0;
 aio_home_busy  = 1;
 aio_attack     = 2;
 aio_attack_busy= 3;
-aio_scout      = 4;
+aio_scout      = 4; }
 
-var
+{var
 
 ai_alarm_zone    : word;
 
@@ -146,7 +146,7 @@ ai_limitaround_enemy_fly,
 ai_limitaround_enemy_grd,
 ai_limitaround_teleports,
 ai_limitaround_fly,
-ai_limitaround_grd   : longint;
+ai_limitaround_grd   : longint;    }
 
 
 
@@ -157,22 +157,22 @@ afree  :byte;
 begin
    afree  :=255;
    anobase:=255;  //no base alarm, low priority, can be replaced by base alarm
-   ax:=mm3i(1,ax,map_Size1);
-   ay:=mm3i(1,ay,map_Size1);
+   ax     :=mm3i(1,ax,map_Size1);
+   ay     :=mm3i(1,ay,map_Size1);
    with pplayer^ do
      for a:=0 to LastPlayer do
-       with ai_alarms[a] do
+       with aip_alarms[a] do
          if(alimit<=0)then
          begin
-            if(aia_enemy_limit>0)then
-              if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then aia_enemy_limit:=0
+            if(aia_limit>0)then
+              if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then aia_limit:=0
          end
          else
-           if(aia_enemy_limit<=0)
+           if(aia_limit<=0)
            then afree:=a
            else
            begin
-              if(not aia_enemy_base)then anobase:=a;
+              if(not aia_base)then anobase:=a;
               if(point_dist_rint(ax,ay,aia_x,aia_y)<arange)then exit;
            end;
 
@@ -186,23 +186,27 @@ begin
         then a:=anobase
         else exit;
 
-      with pplayer^.ai_alarms[a] do
+      with pplayer^.aip_alarms[a] do
       begin
          aia_x:=ax;
          aia_y:=ay;
-         aia_enemy_limit:=alimit;
-         aia_enemy_base :=abase;
-         aia_zone:=apfzone;
+         aia_limit:=alimit;
+         aia_base :=abase;
+         aia_zone :=apfzone;
       end;
    end;
 end;
 
-procedure ai_MakeScirmishStartAlarms(p:byte);
+procedure ai_SetScirmishStartAlarms(p:byte);
 var i:byte;
 begin
    if(not g_FixedPositions)then
    begin
-      if(map_Symmetry)then ai_PlayerSetAlarm(@g_gplayers[p],map_Size1-map_PlayerStartX[p],map_Size1-map_PlayerStartY[p],1,base_1r,true,map_GetZone(map_Size1-map_PlayerStartX[p],map_Size1-map_PlayerStartY[p]));
+      if(map_Symmetry)then
+        ai_PlayerSetAlarm(@g_gplayers[p],map_Size1-map_PlayerStartX[p],
+                                         map_Size1-map_PlayerStartY[p],1,base_1r,true,
+                                         map_GetZone(map_Size1-map_PlayerStartX[p],
+                                                     map_Size1-map_PlayerStartY[p]));
    end
    else
       for i:=0 to LastPlayer do
@@ -213,112 +217,108 @@ begin
 end;
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
-procedure SetBaseOpt(me,m,unp,upp,t0,t1,t2,dl,s1,s2,mint,maxt,atl,att,l:integer;mupl:byte;hpt:TSoB);
+procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxArmyLimit:integer);
 begin
    with g_gplayers[p] do
    begin
-      ai_maxcount_energy  :=me;
-      ai_maxcount_mains   :=m;
-      ai_maxcount_unitps  :=unp;
-      ai_maxcount_upgrps  :=upp;
-      ai_maxcount_tech0   :=t0;
-      ai_maxcount_tech1   :=t1;
-      ai_maxcount_tech2   :=t2;
-      ai_maxlimit_detect  :=dl*MinUnitLimit;
-      ai_maxcount_spec1   :=random(s1+1);
-      ai_maxcount_spec2   :=s2;
-      ai_mincount_towers  :=mint;
-      ai_maxcount_towers  :=maxt;
+      aip_MaxEnergy     :=aMaxEnergy;
+      aip_MaxBuilders   :=aMaxBuilders;
+      aip_MaxBarracks   :=aMaxBarracks;
+      aip_MaxForges     :=aMaxForges;
+      aip_MaxDetectors  :=aMaxDetectors*ul1;
+      aip_MinTowers     :=aMinTowers;
+      aip_MaxTowers     :=aMaxTowers;
+      aip_MaxArmyLimit  :=aMaxArmyLimit*ul1;
+      {
       ai_attack_limit     :=atl*MinUnitLimit;
       ai_attack_delay     :=att;
       ai_maxlimit_blimit  :=l*MinUnitLimit;
       ai_maxcount_upgrlvl :=mupl;
       ai_hptargets        :=hpt;
+
+      ,t0,t1,t2,dl,s1,s2,mint,maxt,atl,att,l:integer;mupl:byte;hpt:TSoB
+      }
    end;
 end;
 begin
    with g_gplayers[p] do
    begin
-      case ai_skill of
-      //              energ buil uprod  pprod tech0 tech1 tech2 radar rsta    telepo  min    max    attack attack     max           upgrs_cur first
-      //                    ders                                heye  altar           towers towers limit  delay      units_all_e          lvl  targets
-      //                                                        limit
-      0  : SetBaseOpt(0    ,0   ,0     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(300  ,1   ,1     ,0    ,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
-      2  : SetBaseOpt(2000 ,1   ,3     ,1    ,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,25    ,fr_fps1*80 ,30            ,0  ,[]);
-      3  : SetBaseOpt(3500 ,2   ,5     ,1    ,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
-      4  : SetBaseOpt(5000 ,3   ,8     ,2    ,0    ,1    ,0    ,8    ,0      ,1       ,10   ,10    ,55    ,1          ,60            ,2  ,[]);
-      5  : SetBaseOpt(6000 ,3   ,12    ,3    ,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      6  : SetBaseOpt(7500 ,4   ,16    ,4    ,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(9000 ,4   ,20    ,6    ,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      case aip_skill of
+      //              energy buil bar   forges dete  min   max
+      //                     ders racks        ctors tower tower
+      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
+      1  : SetBaseOpt(300   ,1   ,1    ,0     ,0    ,0    ,0    ,10 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
+      2  : SetBaseOpt(1500  ,1   ,3    ,1     ,1    ,0    ,4    ,25 );//,0    ,0    ,0    ,2    ,0      ,0       ,3    ,3     ,25    ,fr_fps1*80 ,30            ,0  ,[]);
+      3  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,40 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
+      4  : SetBaseOpt(4500  ,3   ,8    ,2     ,6    ,6    ,8    ,55 );//,0    ,1    ,0    ,8    ,0      ,1       ,10   ,10    ,55    ,1          ,60            ,2  ,[]);
+      5  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,65 );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      6  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,125);//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(9000  ,4   ,20   ,6     ,12   ,6    ,14   ,125);//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
       end;
-      ai_max_specialist:=ai_skill-1;
-      case ai_skill of
+      //ai_max_specialist:=aip_skill-1;
+
+      case aip_skill of
       0  :;
       1,
-      2  : ai_flags:=aif_army_scout;
-      3  : ai_flags:=aif_army_scout
+      2  : aip_flags:=aif_army_scout
+                    +aif_allies_help;
+      3  : aip_flags:=aif_army_scout
                     +aif_base_smart_order
                     +aif_base_advance
+                    +aif_ability_detection
+                    +aif_allies_help;
+      4  : aip_flags:=aif_army_scout
                     +aif_army_smart_order
-                    +aif_ability_mainsave
-                    +aif_ability_detection;
-      4  : ai_flags:=aif_army_scout
                     +aif_base_smart_order
                     +aif_base_advance
-                    +aif_base_suicide
-                    +aif_army_smart_order
-                    +aif_army_advance
-                    +aif_army_teleport
+                    +aif_base_SaveBuilder
                     +aif_ability_detection
                     +aif_ability_other
-                    +aif_ability_mainsave
-                    +aif_army_smart_prio;
-      else ai_flags:=aif_base_smart_order
+                    +aif_allies_help;
+      else aip_flags:=aif_base_smart_order
                     +aif_base_suicide
                     +aif_base_advance
-                    +aif_army_smart_order
+                    +aif_base_SaveBuilder
                     +aif_army_scout
-                    +aif_army_advance
+                    +aif_army_smart_order
                     +aif_army_smart_micro
-                    +aif_army_teleport
-                    +aif_upgr_smart_opening
+                    +aif_army_smart_Target
+                    +aif_upgr_smart_order
                     +aif_ability_detection
                     +aif_ability_other
-                    +aif_ability_mainsave
-                    +aif_army_smart_prio; //all
+                    +aif_allies_help;
+           if(aip_skill>7)then
+           aip_flags+=aif_cheat_VisBuildings;
+
+           if(aip_skill>8)then
+           aip_flags+=aif_cheat_VisUnits;
       end;
-      case ai_skill of
-      8 : upgrs_cur[upgr_AI_FogVision  ]:=1;
-      9 : begin
-          upgrs_cur[upgr_AI_FogVision  ]:=1;
-          upgrs_cur[upgr_mult_product]:=1;
-          end;
+      case aip_skill of
+      9 : upgrs_cur[upgr_mult_product]:=1;
       10: begin
-          upgrs_cur[upgr_AI_FogVision  ]:=1;
           upgrs_cur[upgr_mult_product]:=1;
           upgrs_cur[upgr_fast_product]:=1;
           end;
       11: begin
-          upgrs_cur[upgr_AI_FogVision  ]:=1;
           upgrs_cur[upgr_mult_product]:=1;
           upgrs_cur[upgr_fast_product]:=1;
           upgrs_cur[upgr_fast_build  ]:=1;
           end;
       end;
    end;
-   ai_MakeScirmishStartAlarms(p);
+   ai_SetScirmishStartAlarms(p);
 end;
 
 function ai_HighPriorityTarget(player:PTPlayerGameData;tu:PTUnit):boolean;
 begin
    ai_HighPriorityTarget:=false;
-   if(player^.state=ps_AI)then
-     if(player^.ai_flags and aif_army_smart_prio)>0 then
-       ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^.uid_gen_EnergyLevel>0);
+   {if(player^.state=ps_AI)then
+     if(player^.aip_flags and aif_army_smart_prio)>0 then
+       ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^.uid_gen_EnergyLevel>0);}
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
+
 {
 procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);
 begin
@@ -336,29 +336,7 @@ begin
       ai_alarm_zone:=zone;
    end;
 end;
-
-procedure ai_CollectDIDSquare(square:plongint;tx,ty,tr:integer);
-var dx,dy,u,dist,dm:integer;
-begin
-   dx:=tx div MapObstaclesGridW;
-   dy:=ty div MapObstaclesGridW;
-
-   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-    with map_ObstaclesGrid[dx,dy] do
-     if(oc_n>0)then
-      for u:=0 to oc_n-1 do
-       with oc_l[u]^ do
-        if(o_r>0)and(o_type>0)then
-        begin
-           dist:=point_dist_int(o_x,o_y,tx,ty)+o_r-tr;
-           dm:=o_r+o_r;
-
-           if(dist<=dm)then
-             if(dist<=0)
-             then square^+=DID_Square[o_type]
-             else square^+=DID_Square[o_type]-round(DID_Square[o_type]*(dist/dm));
-        end;
-end;
+}
 
 procedure ai_Local_InitVars(pu:PTUnit);
 var tx,ty,srs:integer;
@@ -373,39 +351,20 @@ begin
       aiu_need_detect      :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
-      aiu_FiledSquareNear  :=0;
-
-
-      if(uidi=aiucl_main0 [race])
-      or(uidi=aiucl_main0A[race])
-      or(uidi=aiucl_main1 [race])
-      or(uidi=aiucl_main1A[race])then
-      begin
-         ai_CollectDIDSquare(@aiu_FiledSquareNear,x,y,srange);
-
-         tx:=min2i(x,map_Size-x);
-         ty:=min2i(y,map_Size-y);
-         if(tx<srange)or(ty<srange)then
-         begin
-            srs:=round(pi*sqr(srange));
-            if(tx<srange)then aiu_FiledSquareNear+=srs-round(srs*(tx/srange));
-            if(ty<srange)then aiu_FiledSquareNear+=srs-round(srs*(ty/srange));
-         end;
-      end;
    end;
 
-   // alarm
+  { // alarm
    ai_alarm_zone     :=0;
    ai_alarm_d        :=NOTSET;
    ai_alarm_x        :=-1;
-   ai_alarm_y        :=-1;
+   ai_alarm_y        :=-1; }
 end;
 
 procedure ai_Global_InitVars(pu:PTUnit);
 var i,d   :integer;
 koth_point:boolean;
 begin
-   with pu^ do
+   {with pu^ do
    with uid^ do
    with player^ do
    begin
@@ -653,9 +612,9 @@ begin
    ai_towers_need_type:=0;
 
    ai_inprogress_uid  :=0;
-   ai_inprogress_auid :=0;
+   ai_inprogress_auid :=0;  }
 end;
-
+ {
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   AI DATA

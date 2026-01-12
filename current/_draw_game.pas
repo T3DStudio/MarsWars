@@ -566,60 +566,62 @@ end;
 procedure keyPoints_AddSprites;
 var t,i:integer;
    ddir:single;
-ccolor,
-scolor:cardinal;
+colorN,
+colorS :cardinal;
 begin
    for t:=0 to LastKeyPoint do
-    with map_KeyPointsL[t] do
-     if(kpCaptureR>0)and(RectInCam(kpx,kpy,kpCaptureR,kpCaptureR,0))then
-     begin
-        ccolor:=GetKeyPointColor(t,false);
-        scolor:=GetKeyPointColor(t,true );
+     with map_KeyPointsL[t] do
+     with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
+       if(kptd_Active)and(RectInCam(kp_x,kp_y,kp_RCapture,kp_RCapture,0))then
+       begin
+          colorN:=KeyPoint_GetColor(t,false);
+          colorS:=KeyPoint_GetColor(t,true );
 
-        if(kpEnergy>0)then
-        begin
-           SpriteList_AddEffect(kpx,kpy,sd_decals+kpy  ,scolor,@spr_kp_outG        ,255);
-           SpriteList_AddEffect(kpx,kpy,sd_decals+kpy+1,0     ,@spr_kp_gen[t mod 2],255);
-           for i:=1 to 6 do
-           begin
-              ddir:=(i*60)*degtorad;
-              SpriteList_AddEffect(
-              kpx+round(kpCaptureR*cos(ddir)),
-              kpy+round(kpCaptureR*sin(ddir)),
-              sd_fly+kpy,0,@spr_kp_koth,255);
-           end;
-        end
-        else
-          if(t=0)and(map_scenario=mc_KotH)then
+          if(kp_Energy>0)then
           begin
-             for i:=1 to 24 do
+             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG        ,255);
+             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y+1,0     ,@spr_kp_gen[t mod 2],255);
+             for i:=1 to 6 do
              begin
-                ddir:=(i*15)*degtorad;
+                ddir:=(i*60)*degtorad;
                 SpriteList_AddEffect(
-                kpx+round(kpCaptureR*cos(ddir)),
-                kpy+round(kpCaptureR*sin(ddir)),
-                sd_fly+kpy,scolor,@spr_kp_koth,255);
+                kp_x+round(kp_RCapture*cos(ddir)),
+                kp_y+round(kp_RCapture*sin(ddir)),
+                sd_fly+kp_y,0,@spr_kp_koth,255);
              end;
           end
           else
-          begin
-             for i:=1 to 8 do
-             begin
-                ddir:=(i*45-integer((g_tick shr 2) mod 360))*degtorad;
-                SpriteList_AddEffect(
-                kpx+round(kpCaptureR*cos(ddir)),
-                kpy+round(kpCaptureR*sin(ddir)),
-                sd_fly+kpy,0,@spr_kp_koth,255);
-             end;
-             SpriteList_AddEffect(kpx,kpy,sd_decals+kpy,scolor,@spr_kp_out,255);
-          end;
+            if(t=0)and(map_scenario=mc_KotH)then
+            begin
+               for i:=1 to 24 do
+               begin
+                  ddir:=(i*15)*degtorad;
+                  SpriteList_AddEffect(
+                  kp_x+round(kp_RCapture*cos(ddir)),
+                  kp_y+round(kp_RCapture*sin(ddir)),
+                  sd_fly+kp_y,colorS,@spr_kp_koth,255);
+               end;
+            end
+            else
+            begin
+               for i:=1 to 8 do
+               begin
+                  ddir:=(i*45-integer((g_tick shr 2) mod 360))*degtorad;
+                  SpriteList_AddEffect(
+                  kp_x+round(kp_RCapture*cos(ddir)),
+                  kp_y+round(kp_RCapture*sin(ddir)),
+                  sd_fly+kp_y,0,@spr_kp_koth,255);
+               end;
+               SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y,colorS,@spr_kp_out,255);
+            end;
 
-        if(ui_CheckMapPointFogVision(kpx,kpy,true))then
-        begin
-           if(kpTimer   >0)then UnitsInfo_AddText(kpx,kpy+10,ir2s(kpCaptureTime-kpTimer),ccolor );
-           if(kplifetime>0)then UnitsInfo_AddText(kpx,kpy   ,cr2s(kplifetime           ),c_white);
-        end;
-     end;
+          //if(ui_CheckMapPointFogVision(kp_x,kp_y,true))then
+          if(kptd_VisTimer>0)then
+          begin
+             if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y+txt_line_h1,ir2s(kp_CaptureTime-kptd_Timer),colorN );
+             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y            ,cr2s(kptd_lifeTime           ),c_white);
+          end;
+       end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -718,7 +720,7 @@ begin
 
          draw_text(vid_screen,ix,90,b2s(units_all_e)+' '+b2s(units_bld_e[false]) , ta_MU,255, c);
 
-         //draw_text(vid_screen,ix,100,b2s(ai_skill)+' '+b2s(ai_maxunits)+' '+b2s(ai_flags) , ta_MU,255, c);
+         //draw_text(vid_screen,ix,100,b2s(aip_skill)+' '+b2s(ai_maxunits)+' '+b2s(aip_flags) , ta_MU,255, c);
          draw_text(vid_screen,ix,110,b2s(res_energyl_cur  )+' '+b2s(res_energyl_max) , ta_MU,255, c);
 
 
@@ -731,7 +733,7 @@ begin
     with g_units[u] do
     with player^ do
     with uid^ do
-     if(hits>hits_dead)or(u=ai_scout_u_cur)then
+     if(hits>hits_dead){or(u=ai_scout_u_cur)}then
      begin
         ix:=x-ui_cam_x;
         iy:=y-ui_cam_y;

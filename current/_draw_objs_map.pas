@@ -66,24 +66,37 @@ begin
      end;
 end;
 
-procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;colored:boolean);
+procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);
 var i:byte;
     c:cardinal;
+   ch:char;
 begin
    for i:=0 to LastKeyPoint do
-     with map_KeyPointsL[i] do
-       if(kpCaptureR>0)then
-       begin
-          if(colored)
-          then c:=GetKeyPointColor(i,false)
-          else c:=c_white;
-          if((i=0)and(map_scenario=mc_KotH))
-          then map_MiniMap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_koth,c)
-          else
-            if(kpEnergy<=0)
-            then map_MiniMap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_kp ,c)
-            else map_MiniMap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,char_gen,c);
-       end;
+     with map_KeyPointsL  [i] do
+     with map_KeyPointsVis[i] do
+     begin
+        case forGame of
+        true : begin
+                  with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
+                    if(not kptd_Active)then continue;
+                  c:=KeyPoint_GetColor(i,false);
+               end;
+        false: begin
+                  with kp_TeamData[MaxPlayers] do
+                    if(not kptd_Active)then continue;
+                  c:=c_white;
+               end;
+        end;
+
+        if((i=0)and(map_scenario=mc_KotH))
+        then ch:=char_koth
+        else
+          if(kp_Energy<=0)
+          then ch:=char_kp
+          else ch:=char_gen;
+
+        map_MiniMap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,ch,c);
+     end;
 end;
 
 procedure map_RedrawMenuMinimap;
@@ -97,7 +110,7 @@ begin
    menu_update:=menu_update or MainMenu;
 end;
 
-procedure draw_FilledRing(rx,ry,rOutR,rInR:integer;sTemplateF,sTemplateB:PTMWTexture);
+procedure draw_FilledRing(rx,ry,rOutR,rInR,fdepth,bdepth:integer;animStep:byte;sTemplateAF:PTLiquidTextureArray;sTemplateB:PTMWTexture);
 var
 sx,sy,
 ex,ey,
@@ -106,31 +119,46 @@ x,y,d,
 oGO,oGI,
 oRO,orI,
 cellw1,
-cellwh:integer;
+cellwh,
+depth,
+visBorder
+      :integer;
 odd   :boolean;
+animX,
+animN:byte;
 begin
-   cellwh:=round(sTemplateF^.hw/1.36);
+   cellwh:=round(sTemplateAF^[1].hw/1.36);
    cellw1:=cellwh*2;
-   sx:=rx-rOutR-cellwh;
-   sy:=ry-rOutR-cellwh;
-   ex:=rx+rOutR+cellwh;
-   ey:=ry+rOutR+cellwh;
-   odd:=false;
+   sx:=mm3i(ui_cam_x,rx-rOutR-cellwh,ui_cam_x+ui_cam_w);
+   sy:=mm3i(ui_cam_y,ry-rOutR-cellwh,ui_cam_y+ui_cam_h);
+   ex:=mm3i(ui_cam_x,rx+rOutR+cellwh,ui_cam_x+ui_cam_w);
+   ey:=mm3i(ui_cam_y,ry+rOutR+cellwh,ui_cam_y+ui_cam_h);
+   if(sx=ex)
+   or(sy=ey)then exit;
+   if(sx<0)then sx-=cellw1;
+   if(sy<0)then sy-=cellw1;
+   sx-= sx mod cellw1;
+   sy-= sy mod cellw1;
+   ex+=(ex mod cellw1)+cellwh;
+   ey+=(ey mod cellw1)+cellwh;
+   odd:=((sx div cellw1)mod 2)=0;
    oRO:=rOutR-cellwh-5;
    oRI:=rInR +cellwh+5;
    oGO:=rOutR+(cellwh div 2);
    oGI:=rInR -(cellwh div 2);
+   visBorder:=max2i(sTemplateB^.w,sTemplateAF^[1].w);
 
    x:=sx;
    while(x<=ex)do
    begin
+      animX:=byte(x div cellw1);
       if(odd)
       then y:=sy
       else y:=sy-cellwh;
       odd:=not odd;
       while(y<=ey)do
       begin
-         if(RectInCam(x,y,sTemplateB^.w,sTemplateB^.h,0))then
+         if(RectInCam(x,y,visBorder,visBorder,0))then
          begin
             d:=point_dist_int(x,y,rx,ry);
             if(oGI<=d)and(d<=oGO)then
@@ -139,28 +167,39 @@ begin
                begin
                   nx:=rx+round(oRO*(x-rx)/d);
                   ny:=ry+round(oRO*(y-ry)/d);
+                  depth:=fdepth-1;
                end
                else
                  if(abs(rInR-d)<=cellwh)and(rInR>0)then
                  begin
                     nx:=rx+round(oRI*(x-rx)/d);
                     ny:=ry+round(oRI*(y-ry)/d);
+                    depth:=fdepth-1;
                  end
                  else
                  begin
                     nx:=x;
                     ny:=y;
+                    depth:=fdepth;
                  end;
 
                if((abs(rInR-d)<=cellw1)and(rInR>0))
                or(abs(rOutR-d)<=cellw1)then
-               SpriteList_AddDoodad(nx,ny,sd_liquidBack ,-32000,sTemplateB,255,0,0);
+               SpriteList_AddDoodad(nx,ny,bdepth ,-32000,sTemplateB,255,0,0);
+
+               animN:=(abs(animStep+animX+byte(y div cellw1)) mod LiquidAnimCount)+1;
+               //animStep:=(abs(x+x+y) mod LiquidAnimCount)+1;
+               //animStep+=1;
+                //if(animStep>LiquidAnimCount)then animStep:=1;
 
                if(not InputAction(iact_Alt))then
-               SpriteList_AddDoodad(nx,ny,sd_liquidFront,-32000,sTemplateF,255,0,0);
+               SpriteList_AddDoodad(nx,ny,depth,-32000,@sTemplateAF^[animN],255,0,0);
 
                if(InputAction(iact_Control))then
-               UnitsInfo_AddCircle(nx,ny,sTemplateF^.hw,ui_blink2_color_BY);
+               begin
+               UnitsInfo_AddCircle(nx,ny,sTemplateAF^[1].hw,ui_blink2_color_BY);
+               UnitsInfo_AddText(nx,ny,i2s(animN),c_white);
+               end;
             end;
          end;
 
@@ -214,30 +253,29 @@ begin
        end;
 end;
 
-procedure doodads_AddSprites(skipAnim:boolean);
-var o:integer;
+procedure obstacles_AddSprites(skipAnim:boolean);
+var
+o:integer;
+animStep:byte;
 begin
+   animStep:=((g_tick div theme_liquid_animTime) mod LiquidAnimCount)+1;
    for o:=1 to MaxObstacles do
      with map_ObstaclesL[o] do
        if(o_rO>0)then
        if(RectInCam(o_x,o_y,o_rO,o_rO,0))then
          with map_ObstaclesVis[o] do
          begin
-            case ov_type of
-            ov_obstacle0,
-            ov_obstacle1,
-            ov_obstacle2: if(not skipAnim)then
-                            obstacle_Animation(o);
-            ov_liquid   : draw_FilledRing(o_x,o_y,o_rO,o_rI,@spr_liquidFront[((g_tick div theme_liquid_animTime) mod LiquidAnimCount)+1],@spr_liquidBack);
-            end;
-
             if(ov_SpriteFront<>nil)and(ov_SpriteFront<>pspr_dummy)then
-              if(RectInCam(o_x+ov_OffsetX,o_y+ov_OffsetY,ov_SpriteFront^.hw,ov_SpriteFront^.hh,0))then
-              begin
+            begin
+               if(not skipAnim)then
+                 obstacle_Animation(o);
+               if(RectInCam(o_x+ov_OffsetX,o_y+ov_OffsetY,ov_SpriteFront^.hw,ov_SpriteFront^.hh,0))then
                  SpriteList_AddDoodad(o_x,o_y,ov_SpriteDepth,ov_ShadowZ,ov_SpriteFront,255,ov_OffsetX,ov_OffsetY);
-                 if(ov_SpriteBack<>nil)and(ov_SpriteBack<>pspr_dummy)then
-                 SpriteList_AddDoodad(o_x,o_y,sd_liquidBack,-32000  ,ov_SpriteBack ,255,ov_OffsetX,ov_OffsetY);
-              end;
+            end
+            else draw_FilledRing(o_x,o_y,o_rO,o_rI,sd_liquidFront,sd_liquidBack,
+                                 animStep,
+                                 @spr_liquidFront,
+                                 @spr_liquidBack);
 
             if(ui_DrawEdges)then
             begin
@@ -246,6 +284,12 @@ begin
                UnitsInfo_AddCircle(o_x,o_y,o_rI+BuildObstacleStepR,ui_blink2_color_BY);
             end;
          end;
+
+   if(map_scenario=mc_royale)then
+     draw_FilledRing(map_sizeh,map_sizeh,map_size1,g_royal_r,sd_decals,sd_decals-2,
+                     animStep,
+                     @spr_fireblueFront,
+                     @spr_fireblueBack);
 end;
 
 procedure map_DoodadsSetDrawData;
@@ -257,46 +301,36 @@ begin
        if(o_rO>0)then
          with map_ObstaclesVis[d] do
          begin
-            ov_mmx :=round(o_x *map_MiniMap_cx);
-            ov_mmy :=round(o_y *map_MiniMap_cx);
-            ov_mmrO:=round(o_rO*map_MiniMap_cx);
-            ov_mmrI:=round(o_rI*map_MiniMap_cx);
-            ov_mmc :=c_gray;
+            ov_mmx        :=round(o_x *map_MiniMap_cx);
+            ov_mmy        :=round(o_y *map_MiniMap_cx);
+            ov_mmrO       :=round(o_rO*map_MiniMap_cx);
+            ov_mmrI       :=round(o_rI*map_MiniMap_cx);
+            ov_mmc        :=c_gray;
             ov_animNext   :=-1;
             ov_animTime   :=0;
             ov_SpriteFront:=nil;
-            ov_SpriteBack :=nil;
 
-            if(o_rO=map_ObstacleR(0))
-            then ov_type:=ov_obstacle0
+            if(o_rO=map_ObstacleR(0))then
+            begin
+               ov_mmc:=c_ltgray;
+               if(theme_obstacle0N>0)then
+                 obstacle_SetAnimData(d,theme_obstacle0L[d mod theme_obstacle0N]);
+            end
             else
-              if(o_rO=map_ObstacleR(1))
-              then ov_type:=ov_obstacle1
+              if(o_rO=map_ObstacleR(1))then
+              begin
+                 ov_mmc:=c_gray;
+                 if(theme_obstacle1N>0)then
+                   obstacle_SetAnimData(d,theme_obstacle1L[d mod theme_obstacle1N]);
+              end
               else
-                if(o_rO=map_ObstacleR(2))
-                then ov_type:=ov_obstacle2
-                else ov_type:=ov_liquid;
-
-            case ov_type of
-            ov_obstacle0: begin
-                             ov_mmc :=c_ltgray;
-                             if(theme_obstacle0N>0)then
-                             obstacle_SetAnimData(d,theme_obstacle0L[d mod theme_obstacle0N]);
-                          end;
-            ov_obstacle1: begin
-                             ov_mmc :=c_gray;
-                             if(theme_obstacle1N>0)then
-                             obstacle_SetAnimData(d,theme_obstacle1L[d mod theme_obstacle1N]);
-                          end;
-            ov_obstacle2: begin
-                             ov_mmc :=c_gray;
-                             if(theme_obstacle2N>0)then
-                             obstacle_SetAnimData(d,theme_obstacle2L[d mod theme_obstacle2N]);
-                          end;
-            ov_liquid   : begin
-                             ov_mmc :=theme_liquid_color;
-                          end;
-            end;
+                if(o_rO=map_ObstacleR(2))then
+                begin
+                   ov_mmc:=c_gray;
+                   if(theme_obstacle2N>0)then
+                     obstacle_SetAnimData(d,theme_obstacle2L[d mod theme_obstacle2N]);
+                end
+                else ov_mmc:=theme_liquid_color;
          end;
 end;
 

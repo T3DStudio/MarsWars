@@ -367,14 +367,14 @@ begin
    menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_SaveLoad);
 
-   mtx0:=menu_border1;
+   mtx0:=menu_BaseW1;
    mtx1:=mtx0+menu_ListW1;
    mty0:=menu_ListLineH*menu_BaseList1H;
 
    menu_Item_Set(mi_SaveLoad_list   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true);
 
-   mtx0:=mtx1+menu_BasehW;
-   mtx1:=menu_w-menu_border1;
+   mtx0:=mtx1+menu_BaseW1;
+   mtx1:=menu_w-menu_BaseW1;
    menu_Item_Set(mi_SaveLoad_info   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
 
    with menu_items[mi_SaveLoad_list] do
@@ -394,14 +394,14 @@ begin
    menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Replays);
 
-   mtx0:=menu_border1;
+   mtx0:=menu_BaseW1;
    mtx1:=mtx0+menu_ListW1;
    mty0:=menu_ListLineH*menu_BaseList1H;
 
    menu_Item_Set(mi_Replays_list    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true);
 
-   mtx0:=mtx1+menu_BasehW;
-   mtx1:=menu_w-menu_border1;
+   mtx0:=mtx1+menu_BaseW1;
+   mtx1:=menu_w-menu_BaseW1;
    menu_Item_Set(mi_Replays_info    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
 
    menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0,0);

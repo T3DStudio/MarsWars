@@ -114,10 +114,10 @@ begin
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
      begin
-        AddItem(@state   ,SizeOf(state   ));
-        AddItem(@name    ,SizeOf(name    ));
-        AddItem(@mrace   ,SizeOf(mrace   ));
-        AddItem(@team    ,SizeOf(team    ));
+        AddItem(@state     ,SizeOf(state     ));
+        AddItem(@name      ,SizeOf(name      ));
+        AddItem(@mrace     ,SizeOf(mrace     ));
+        AddItem(@team      ,SizeOf(team      ));
         AddItem(@isobserver,SizeOf(isobserver));
      end;
 
@@ -621,15 +621,24 @@ begin
 end;
 
 function replay_Play(check:boolean):boolean;
+var fn:shortstring;
 begin
    replay_Play:=false;
 
    if(g_started)
    or(rpls_list_sel<0)
-   or(rpls_list_sel>=rpls_list_size)then exit;
+   or(rpls_list_sel>=rpls_list_size)
+   or(menu_msg_type<>mmbt_none)then exit;
 
    replay_Play:=true;
    if(check)then exit;
+
+   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
+   if(not FileExists(fn))then
+   begin
+      menu_msgBox_Set(str_FileError_NExists,rpls_list[rpls_list_sel],mmbt_nothing);
+      exit;
+   end;
 
    g_type     :=gt_scirmish;
    rpls_pstate:=rpls_read;
@@ -651,6 +660,7 @@ begin
 end;
 
 function replay_DeleteInit(check:boolean):boolean;
+var fn:shortstring;
 begin
    replay_DeleteInit:=false;
 
@@ -661,6 +671,13 @@ begin
 
    replay_DeleteInit:=true;
    if(check)then exit;
+
+   fn:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
+   if(not FileExists(fn))then
+   begin
+      menu_msgBox_Set(str_FileError_NExists,rpls_list[rpls_list_sel],mmbt_nothing);
+      exit;
+   end;
 
    menu_msgBox_Set(str_FileDelete,rpls_list[rpls_list_sel],mmbt_DeleteReplay);
 end;

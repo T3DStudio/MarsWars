@@ -269,67 +269,72 @@ begin
    if(check)then exit;
 
    fn:=folder_save+svld_str_fname+fileExt_save;
-   if(FileExists(fn))then
+
+   if(not FileExists(fn))then
    begin
-      assign(f,fn);
+      menu_msgBox_Set(str_FileError_NExists,svld_str_fname,mmbt_nothing);
+      exit;
+   end;
+
+   assign(f,fn);
+   {$I-}
+   reset(f,1);
+   {$I+}
+   if(ioresult<>0)then exit;
+   if(FileSize(f)<>svld_file_size)then
+   begin
+      close(f);
+      exit;
+   end;
+   {$I-}
+   BlockRead(f,vr,SizeOf(g_version));
+   {$I+}
+   if(vr=g_version)then
+   begin
+      Game_DefaultAll;
+
       {$I-}
-      reset(f,1);
+      if(svld_itemn>1)then
+        for u:=1 to svld_itemn-1 do
+          with svld_items[u] do
+            BlockRead(f,byte(data_p^),data_s);
       {$I+}
-      if(ioresult<>0)then exit;
-      if(FileSize(f)<>svld_file_size)then
-      begin
-         close(f);
-         exit;
-      end;
-      {$I-}
-      BlockRead(f,vr,SizeOf(g_version));
-      {$I+}
-      if(vr=g_version)then
+
+      for u:=1 to MaxUnits do
+        with g_units[u] do
+        begin
+           player:=@g_gplayers[playeri];
+           uid   :=@g_uids[uidi];
+        end;
+
+      if(ioresult<>0)then
       begin
          Game_DefaultAll;
-
-         {$I-}
-         if(svld_itemn>1)then
-           for u:=1 to svld_itemn-1 do
-             with svld_items[u] do
-               BlockRead(f,byte(data_p^),data_s);
-         {$I+}
-
-         for u:=1 to MaxUnits do
-           with g_units[u] do
-           begin
-              player:=@g_gplayers[playeri];
-              uid   :=@g_uids[uidi];
-           end;
-
-         if(ioresult<>0)then
-         begin
-            Game_DefaultAll;
-            svld_str_info1:=str_FileError_Open;
-            svld_str_info2:='';
-            exit;
-         end;
-
-         map_BaseVars;
-         case g_type of
-         gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
-         gt_scirmish: map_seed2theme;
-         end;
-
-         map_MakeThemeSprites;
-         map_RefreshDoodadsCells;
-         map_DoodadsSetDrawData;
-         map_RedrawMenuMinimap;
-         ui_Camera_Bounds;
-
-         G_Started:=true;
-
-         MenuBack(true,false);
-
-         GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
+         svld_str_info1:=str_FileError_Open;
+         svld_str_info2:='';
+         exit;
       end;
-      close(f);
+
+      map_BaseVars;
+      case g_type of
+      gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
+      gt_scirmish: map_seed2theme;
+      end;
+
+      KeyPoints_UpdateVisData;
+      map_MakeThemeSprites;
+      map_RefreshDoodadsCells;
+      map_DoodadsSetDrawData;
+      map_RedrawMenuMinimap;
+      ui_Camera_Bounds;
+
+      G_Started:=true;
+
+      MenuBack(true,false);
+
+      GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
    end;
+   close(f);
 end;
 
 procedure saveload_DeleteFile(fn:shortstring);
@@ -345,6 +350,7 @@ begin
 end;
 
 function saveload_DeleteInit(check:boolean):boolean;
+var fn:shortstring;
 begin
    saveload_DeleteInit:=false;
 
@@ -355,6 +361,13 @@ begin
    saveload_DeleteInit:=true;
 
    if(check)then exit;
+
+   fn:=folder_replay+svld_str_fname+fileExt_Replay;
+   if(not FileExists(fn))then
+   begin
+      menu_msgBox_Set(str_FileError_NExists,svld_str_fname,mmbt_nothing);
+      exit;
+   end;
 
    menu_msgBox_Set(str_FileDelete,svld_str_fname,mmbt_DeleteSave);
 end;

@@ -1,7 +1,7 @@
 
 procedure draw_AddAllSprites(noanim:boolean);
 begin
-  doodads_AddSprites(noanim);
+  obstacles_AddSprites(noanim);
      unit_AddSpritesAndMarks(noanim);
   effects_AddSprites(noanim);
  missiles_AddSprites;
@@ -77,16 +77,19 @@ begin
 
 
 
-     draw_text(vid_screen,ui_cam_w,ui_cam_h-10,
+     draw_text(vid_screen,ui_cam_w,ui_cam_h,
      i2s(m_brush),
-     ta_RU,255, c_white);
-  {
+     ta_RB,255, c_white);
+
+     n:=50;
+
    draw_text(vid_screen,ui_cam_w,ui_cam_h-10,
-       c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
-   ' '+b2c[ui_uibtn_sabilityu=nil]+
-   ' '+b2c[ui_uibtn_pabilityu=nil]+
+  //     c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
+  // ' '+b2c[ui_uibtn_sabilityu=nil]+
+   //' '+b2c[ui_uibtn_pabilityu=nil]+
    //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   ui_CheckMapPointFogVision(mouse_map_x,mouse_map_y,true)
-   ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y))
+   ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y))+
+   ' '+tc_aqua+i2s(min2i(min2i(mouse_map_x-n,map_size1-(mouse_map_x+n)),min2i(mouse_map_y-n,map_size1-(mouse_map_y+n))))
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+
@@ -94,12 +97,12 @@ begin
    ' '+tc_orange+i2s(g_gplayers[UIPlayer].ai_attack_timer)+
    ' '+tc_green+b2c[g_gplayers[UIPlayer].ai_ReadyForAttack]}
    ,
-   ta_RU,255, c_white);
+   ta_RB,255, c_white);
 
-   draw_text(vid_screen,ui_cam_w,ui_cam_h-20,
+   {draw_text(vid_screen,ui_cam_w,ui_cam_h-20,
        i2s(mouse_map_x)+
    ' '+i2s(mouse_map_y),
-   ta_RU,255, c_white);    }
+   ta_RU,255, c_white);   }
 
   { draw_text(vid_screen,ui_cam_w,ui_cam_h-30,
        i2s(rpls_pstate)+

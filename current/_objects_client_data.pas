@@ -748,7 +748,7 @@ begin
    setMWSModel(1,@spr_UWeaponFactory2);
    setMWSModel(2,@spr_UWeaponFactory3);
    setMWSModel(3,@spr_UWeaponFactory4);
-   setBuildingSND(snd_uac_smith);
+   setBuildingSND(snd_uac_forge);
 end;
 UID_UTechCenter:
 begin

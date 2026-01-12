@@ -6,6 +6,7 @@ begin
    gfx_MapMakeCrater;
    gfx_MapMakeLiquidFront;
    gfx_MapMakeLiquidBack;
+   gfx_MapMakeRBattleFront;
 end;
 
 procedure map_seed2theme;
@@ -104,6 +105,7 @@ begin
                 end;
 
                 if(o_rO>=orm)then continue;
+                orm:=o_rO;
                 map_GetZone:=o_zone;
              end;
 end;
@@ -208,8 +210,9 @@ begin
 
    for p:=0 to LastKeyPoint do
      with map_KeyPointsL[p] do
-       if(kpCaptureR>0)then
-         if(point_dist_int(x,y,kpx,kpy)<(gap+kpCaptureR))then
+     with kp_TeamData[MaxPlayers] do
+       if(kptd_Active)then
+         if(point_dist_int(x,y,kp_x,kp_y)<(gap+kp_RCapture))then
          begin
             map_IfKeyPointHere:=true;
             break;
@@ -281,11 +284,34 @@ end;
 //
 
 procedure map_KeyPoints_UpdateZone;
-var pn:integer;
+var kpi:byte;
 begin
-   for pn:=0 to LastKeyPoint do
-     with map_KeyPointsL[pn] do
-       if(kpCaptureR>0)then kpzone:=map_GetZone(kpx,kpy,kpCaptureR);
+   for kpi:=0 to LastKeyPoint do
+     with map_KeyPointsL[kpi] do
+       kp_Zone:=map_GetZone(kp_x,kp_y,kp_RCapture);
+end;
+
+procedure map_KeyPoints_UpdateTeamData;
+var
+kpi,t:byte;
+pkptv:PTKeyPointTeamData;
+begin
+   for kpi:=0 to LastKeyPoint do
+     with map_KeyPointsL[kpi] do
+     begin
+        pkptv:=@kp_TeamData[MaxPlayers];
+        for t:=0 to LastPlayer do
+          with kp_TeamData[t] do
+          begin
+             kptd_Active          :=pkptv^.kptd_Active;
+             kptd_TimerOwnerTeam  :=pkptv^.kptd_TimerOwnerTeam;
+             kptd_TimerOwnerPlayer:=pkptv^.kptd_TimerOwnerPlayer;
+             kptd_OwnerPlayer     :=pkptv^.kptd_OwnerPlayer;
+             kptd_OwnerTeam       :=pkptv^.kptd_OwnerTeam;
+             kptd_Timer           :=pkptv^.kptd_Timer;
+             kptd_lifeTime        :=pkptv^.kptd_lifeTime;
+          end;
+     end;
 end;
 
 function map_KeyPoints_Add(akpx,akpy,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal):boolean;
@@ -293,21 +319,26 @@ var kp:integer;
 begin
    map_KeyPoints_Add:=false;
    for kp:=0 to LastKeyPoint do
-     with map_KeyPointsL[kp] do
-       if(kpCaptureR<=0)then
+     with map_KeyPointsL  [kp] do
+     {$IFDEF _FULLGAME}
+     with map_KeyPointsVis[kp] do
+     {$ENDIF}
+       with kp_TeamData[MaxPlayers] do
+       if(not kptd_Active)then
        begin
-          kpx          :=akpx;
-          kpy          :=akpy;
-          kpToCenterD  :=point_dist_int(kpx,kpy,map_Sizeh,map_Sizeh);
-          kpNoBuildR   :=aNoBuildR;
-          kpEnergy     :=aEnergy;
-          kpCaptureR   :=aCaptureR;
-          kpCaptureTime:=aCaptureTime;
-          kplifetime   :=aLifeTime;
+          kp_x          :=akpx;
+          kp_y          :=akpy;
+          kp_ToCenterD  :=point_dist_int(kp_x,kp_y,map_Sizeh,map_Sizeh);
+          kp_RNoBuild   :=aNoBuildR;
+          kp_Energy     :=aEnergy;
+          kp_RCapture   :=aCaptureR;
+          kp_CaptureTime:=aCaptureTime;
+          kptd_Active   :=true;
+          kptd_lifeTime :=aLifeTime;
           {$IFDEF _FULLGAME}
-          kpmmx        :=round(kpx*map_MiniMap_cx);
-          kpmmy        :=round(kpy*map_MiniMap_cx);
-          kpmmr        :=round(kpCaptureR*map_MiniMap_cx);
+          kpmmx         :=round(map_MiniMap_cx*kp_x);
+          kpmmy         :=round(map_MiniMap_cx*kp_y);
+          kpmmr         :=round(map_MiniMap_cx*kp_RCapture);
           {$ENDIF}
           map_KeyPoints_Add:=true;
           map_KeyPointsN+=1;
@@ -383,6 +414,9 @@ mc_KeyPoints: map_KeyPoints_Random(4,keyPoint_r,base_1r,0,keyPoint_CaptTime_Def,
       map_KeyPoints_AddAtStarts(keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
       map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
    end;
+
+   map_KeyPoints_UpdateZone;
+   map_KeyPoints_UpdateTeamData;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -581,58 +615,14 @@ end;
 //    GENERATOR
 //
 
-{function map_FillSea:integer;
-var
-odd:boolean;
-cellw,
-cellhw,
-ix,iy,cx
-     :integer;
-begin
-   map_FillSea:=0;
-   cellhw:=round(did_r[1]/1.27);
-   cellw :=cellhw*2;
-
-   cx:=(map_hSize mod cellw);
-   if(cx>=cellhw)then cx-=cellw;
-   cx:=map_Size-cx;
-   odd:=false;
-
-   iy:=map_hSize;
-
-   while(iy>-cellhw)do
-   begin
-      if(odd)
-      then ix:=cx
-      else ix:=cx-cellhw;
-      odd:=not odd;
-      while(ix>-cellhw)do
-      begin
-         if(not map_IfPlayerStartHere(ix,iy,base_1r+cellw,map_Symmetry))then
-         begin
-            map_addObstacle(ix,iy,1);
-            map_FillSea+=1;
-         end;
-         if(iy<>0)then
-           if(not map_IfPlayerStartHere(map_Size-ix,map_Size-iy,base_1r+cellw,map_Symmetry))then
-           begin
-              map_addObstacle(map_Size-ix,map_Size-iy,1);
-              map_FillSea+=1;
-           end;
-         ix-=cellw;
-      end;
-
-      iy-=cellw;
-   end;
-end; }
-
 procedure map_Obstacles_Create;
-const attempts_max = 2;
+const attempts_max = 3;
 var
 n_obstacles,
 obs_f,
 irO,
 ix,iy,
+edgeDist,
 attempts:integer;
 function TryAddObstacle:boolean;
 var irI:integer;
@@ -644,10 +634,12 @@ begin
       attempts-=1;
       ix:=g_randomx(ix,map_Size1);
       iy:=g_randomx(iy,map_Size1);
+      edgeDist:=min2i(min2i(ix-irO,map_size1-(ix+irO)),min2i(iy-irO,map_size1-(iy+irO)));
+      if(0<=edgeDist)and(edgeDist<=map_ObstaclesGap)then continue;
       irI:=0;
       if((map_ObstaclesN mod 2)=0)then
         if(not map_PointInObsN(ix,iy))then
-          if(irO>=base_2r)then irI:=irO-(irO div 5);
+          if(irO>=base_2r)then irI:=irO-min2i(base_2r,irO div 4);
       if(map_IfObsObsStartHere(ix,iy,irO+map_ObstaclesGap,irI,map_PStartsGap))then continue;
       map_Obstacle_Add(ix,iy,irO,irI);
       if(map_symmetry)then
@@ -697,7 +689,6 @@ begin
    map_Seed2RandomBase;
    map_Obstacles_Create;
    map_KeyPoints_Create;
-   map_KeyPoints_UpdateZone;
    {$IFDEF _FULLGAME}
    map_DoodadsSetDrawData;
    map_Decals_Create;
@@ -718,7 +709,25 @@ begin
 
    map_Size1     :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
    map_ObstaclesS:=random(map_MaxObstacles+1);
-   map_Symmetry :=random(2)>0;
+   map_Symmetry  :=random(2)>0;
+end;
+
+procedure Map_SetScenarioMaxPlayers;
+begin
+   case map_scenario of
+   mc_ffa3   : map_MaxPlayers:=3;
+   mc_ffa4   : map_MaxPlayers:=4;
+   mc_ffa5   : map_MaxPlayers:=5;
+   mc_ffa6   : map_MaxPlayers:=6;
+   mc_ffa7   : map_MaxPlayers:=7;
+   mc_1x1    : map_MaxPlayers:=2;
+   mc_2x2    : map_MaxPlayers:=4;
+   mc_3x3    : map_MaxPlayers:=6;
+   mc_4x4    : map_MaxPlayers:=8;
+   mc_2x2x2  : map_MaxPlayers:=6;
+   mc_2x2x2x2: map_MaxPlayers:=8;
+   else        map_MaxPlayers:=MaxPlayers;
+   end;
 end;
 
 procedure Map_Make;
@@ -732,20 +741,7 @@ gt_scirmish: begin
 
              map_ObstaclesGap:=50;
              map_PStartsGap  := base_1r;
-             case map_scenario of
-             mc_ffa3   : map_MaxPlayers:=3;
-             mc_ffa4   : map_MaxPlayers:=4;
-             mc_ffa5   : map_MaxPlayers:=5;
-             mc_ffa6   : map_MaxPlayers:=6;
-             mc_ffa7   : map_MaxPlayers:=7;
-             mc_1x1    : map_MaxPlayers:=2;
-             mc_2x2    : map_MaxPlayers:=4;
-             mc_3x3    : map_MaxPlayers:=6;
-             mc_4x4    : map_MaxPlayers:=8;
-             mc_2x2x2  : map_MaxPlayers:=6;
-             mc_2x2x2x2: map_MaxPlayers:=8;
-             else        map_MaxPlayers:=MaxPlayers;
-             end;
+             Map_SetScenarioMaxPlayers;
              GameRemoveAIObservers;
 
              map_PlayersStarts;

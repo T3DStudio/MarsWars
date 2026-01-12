@@ -412,7 +412,7 @@ begin
      if(speed<=0)
      or(isfly<>uf_ground)
      or(uid^.uid_isfly)
-     or(not solid)
+     or(not issolid)
      or(zfall<>0)
      or(not iscomplete)then exit;
 
@@ -799,17 +799,30 @@ UID_HKeep     : if(udist<srange)
 end;
 
 procedure unit_CaptureKeyPoint(pu:PTUnit);
-var kpi:byte;
+var
+kpi:byte;
+d  :integer;
 begin
    with pu^ do
      for kpi:=0 to LastKeyPoint do
        with map_KeyPointsL[kpi] do
-         if(kpCaptureR>0)then
-           if(point_dist_int(x,y,kpx,kpy)<=(kpCaptureR+uid^.uid_r))then
-           begin
-              kpUnitsPlayer[playeri     ]+=uid^.uid_LimitUse;
-              kpUnitsTeam  [player^.team]+=uid^.uid_LimitUse;
-           end;
+       begin
+          d:=point_dist_int(x,y,kp_x,kp_y);
+          // capturing
+          if(ServerSide)then
+            if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
+              if(d<=(kp_RCapture+uid^.uid_r))then
+              begin
+                 kp_LimitPlayerC[playeri     ]+=uid^.uid_LimitUse;
+                 kp_LimitTeamC  [player^.team]+=uid^.uid_LimitUse;
+              end;
+          // update team data
+          with kp_TeamData[pu^.player^.team] do
+            if(d<=(kp_RCapture+srange))
+            or((map_scenario=mc_koth)and(kpi=0))then
+            // or(no fog)
+              kptd_VisTimer:=MinVisionTime;
+       end;
 end;
 
 procedure unit_AllCycleServer(pu:PTUnit);
@@ -843,7 +856,7 @@ begin
       if(StayWaitForNewTarget>0)
       then StayWaitForNewTarget-=1;
 
-      pushout        := solid and unit_canMove(pu) and (a_rld<=0);
+      pushout        := issolid and unit_canMove(pu) and (a_rld<=0);
       attack_target  := unit_canAttack(pu,false);//and(playeri=UIPlayer);
       aicode         := (state=ps_AI);//and(isselected);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
@@ -856,13 +869,13 @@ begin
           if(NearTeleport_tu^.rld>0)
           or(not NearTeleport_tu^.iscomplete)then NearTeleport:=true;
 
-      {ai_Local_InitVars(pu);
+      ai_Local_InitVars(pu);
       if(aicode){or(isselected)}then
       begin
          ai_Global_InitVars(pu);
-         ai_Global_CollectData(pu,pu,0,nil);
+         //ai_Global_CollectData(pu,pu,0,nil);
       end;
-      ai_Local_CollectData(pu,pu,0,nil); }
+      //ai_Local_CollectData(pu,pu,0,nil);
 
       if(attack_target)then unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac);
 
@@ -892,7 +905,7 @@ begin
 
                  if(pushout)then
                    if(uid_r<=tu^.uid^.uid_r)or(tu^.speed<=0)or(not tu^.iscomplete)then
-                     if(tu^.solid)and(isfly=tu^.isfly)then unit_push(pu,tu,uds);
+                     if(tu^.issolid)and(isfly=tu^.isfly)then unit_push(pu,tu,uds);
 
                  if(NearTeleport)then
                    if(udi<srange)and(tu^.playeri=playeri)and(tu^.uidi=NearTeleport_tu^.uidi)and(tu^.rld<NearTeleport_tu^.rld)and(tu^.iscomplete)then
@@ -1026,7 +1039,7 @@ begin
          end;
 
          td :=point_dist_int(x,y,pTar^.x,pTar^.y);
-         if(pTar^.solid)
+         if(pTar^.issolid)
          then tdm:=td-      (uid_r+pTar^.uid^.uid_r)
          else tdm:=td- min2i(uid_r,pTar^.uid^.uid_r);
 
@@ -2140,6 +2153,8 @@ begin
           // attack
           if(iscomplete)then
             unit_attack(pu);
+
+          unit_CaptureKeyPoint(pu);
 
           if(cycle_order=g_cycle_order)then
           begin

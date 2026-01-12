@@ -284,6 +284,45 @@ begin
    if(itb)then filledcircleColor(pTarget,r,r,r-(r div 6)-10,c_purple);
 end;
 
+procedure gfx_MapMakeRBattleFront;
+var
+ts : psdl_surface;
+a,
+wsp,
+hsp: integer;
+begin
+   if(theme_map_pRBattleFront=theme_map_RBattleFront)and(theme_map_RBattleFront>=0)then exit;
+   theme_map_pRBattleFront:=theme_map_RBattleFront;
+
+   if(theme_map_RBattleFront<0)or(theme_map_RBattleFront>=theme_spr_terrainN)
+   then ts:=theme_DefSprite
+   else ts:=theme_spr_terrainL[theme_map_RBattleFront].surf;
+
+   wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
+   hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
+   if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
+
+   for a:=1 to LiquidAnimCount do
+     with spr_fireblueFront[a] do
+     begin
+        w:=map_ObstacleR(2)*2;
+        h:=w;
+        gfx_FreeSDLSurface(surf);
+        surf:=gfx_CreateSDLSurface(w,w);
+        hw:=w div 2;
+        hh:=hw;
+
+        gfx_MakeLiquidTemplate(surf,ts,-ts^.w-(a*wsp),-ts^.h-(a*hsp),w,hh,tas_magma,tcs_default,false);
+
+        case a of
+        1,3 : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,30));
+        2   : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,60));
+        end;
+
+        gfx_SetTransparent(surf);
+     end;
+end;
+
 procedure gfx_MapMakeLiquidFront;
 var
 ts : psdl_surface;
@@ -364,6 +403,19 @@ begin
       boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,50));
       gfx_SetTransparent(surf);
    end;
+
+   with spr_fireblueBack do
+   begin
+      w:=map_ObstacleR(2)*2+20;
+      h:=w;
+      gfx_FreeSDLSurface(surf);
+      surf:=gfx_CreateSDLSurface(w,w);
+      hw:=w div 2;
+      hh:=hw;
+      gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,tas_liquid,theme_liquid_style,true);
+      boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,50));
+      gfx_SetTransparent(surf);
+   end;
 end;
 
 procedure gfx_MapMakeCrater;
@@ -399,7 +451,7 @@ x,y,
 w,h:integer;
 ts :pSDL_Surface;
 begin
-   if(theme_map_pTerrain=theme_map_Terrain)and(theme_map_pTerrain>0)then exit;
+   if(theme_map_pTerrain=theme_map_Terrain)and(theme_map_pTerrain>=0)then exit;
    theme_map_pTerrain:=theme_map_Terrain;
 
    if(map_terrain<>nil) then
@@ -1087,10 +1139,10 @@ begin
    ui_log_ListSize:=((ui_UIPortY1-ui_UIPortY0)-ui_CtrlPanelW-ui_ReplayBarH-txt_line_h1) div txt_line_h2;
 
    // FPS  APM REC-status
-   ui_FPSX       := ui_UIPortX1-(font_w1*font_w1h);
+   ui_FPSX      := ui_UIPortX1-(font_w1*font_w1h);
    if(ui_ControlPanelPos=cpp_top)
-   then ui_FPSY  := font_wh
-   else ui_FPSY  := ui_timerY;
+   then ui_FPSY := font_wh
+   else ui_FPSY := ui_timerY;
 
    ui_APMx      := ui_FPSX;
    ui_APMy      := ui_FPSY+txt_line_h2;
@@ -1137,11 +1189,11 @@ begin
 
    // OTHER
 
-   ui_EnergyX   := ui_UIPortXC-font_w2;
+   ui_EnergyX   := ui_UIPortXC-font_w2*2;
    ui_EnergyY   := ui_timerY;
    ui_HellPowerY:= ui_EnergyY+txt_line_h2;
    ui_UACLootY  := ui_HellPowerY+txt_line_h2; ;
-   ui_ArmyX     := ui_UIPortXC;
+   ui_ArmyX     := ui_EnergyX+font_w2;
    ui_ArmyY0    := ui_timerY;
    ui_ArmyY1    := ui_ArmyY0+txt_line_h2;
    ui_ArmyY2    := ui_ArmyY1+txt_line_h2;
