@@ -137,8 +137,11 @@ begin
       and(uo_id<>ua_ability2)
       and(uo_id<>ua_ability3)then ui_CommanderGetWeight+=4;
       if(uid_ability3<>0)then
-      if(unit_AbilityCheck(pu,uid_ability3,false)=0)
+      if (unit_AbilityCheck(pu,uid_ability3,false)=0)
                              then ui_CommanderGetWeight+=2;
+      if (transportM>0)
+      and(transportC>0)      then ui_CommanderGetWeight+=1;
+
    end;
 end;
 
@@ -644,7 +647,7 @@ begin
              for t:=0 to LastUnitLevel do
              begin
                 if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
-                if(uid_isforge  )and(pprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upids[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
+                if(uid_isforge  )and(pprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
              end;
 
          if(a_rld<=0)and(not noanim)then

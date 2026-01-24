@@ -11,13 +11,7 @@ begin
    then it2s:=(r+fr_ifps) div fr_fps1
    else it2s:=0;
 end;
-// card ticks to secs
-function ct2s(r:cardinal):cardinal;
-begin
-   if(r>0)
-   then ct2s:=(r+fr_ifps) div fr_fps1
-   else ct2s:=0;
-end;
+
 // int ticks to secs str
 function ir2s(r:integer):shortstring;
 begin
@@ -461,7 +455,7 @@ end;
 
 procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
 begin
-   with g_upids[upid] do
+   with g_upgrs[upid] do
    begin
       upgr_str_Name    :=NAME;
       upgr_str_Descript:=DESCR;
@@ -480,12 +474,12 @@ end;
 
 function str_UpgradeNameForReq(upid:byte):shortstring;
 begin
-   str_UpgradeNameForReq:=str_hint_upgrade+' "'+g_upids[upid].upgr_str_Name+'"';
+   str_UpgradeNameForReq:=str_hint_upgrade+' "'+g_upgrs[upid].upgr_str_Name+'"';
 end;
 
 function str_UpgradeNameBonus(upid:byte;bonus:integer):shortstring;
 begin
-   with g_upids[upid] do
+   with g_upgrs[upid] do
      str_UpgradeNameBonus:='"'+upgr_str_Name+'"('+i2sSign(bonus)+')';
 end;
 
@@ -856,13 +850,13 @@ var ENRG,
     INFO:shortstring;
     i   :byte;
 begin
-  with g_upids[upid] do
+  with g_upgrs[upid] do
   begin
      ENRG:='';
      TIME:='';
      INFO:='';
 
-     if(upgr_max<=1)or(upgr_mfrg)
+     if(upgr_max<=1)
      then curlvl:=1
      else
        if(curlvl>upgr_max)and(curlvl<255)then curlvl:=upgr_max;
@@ -888,7 +882,6 @@ begin
      if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
      if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
      STRADD(@INFO,tc_orange+'x'+i2s(upgr_max)+tc_default,sep_comma);
-     if(upgr_max>1)and(upgr_mfrg)then STRADD(@INFO,tc_red+'*'+tc_default,sep_comma);
 
      if(length(INFO)>0)
      then str_UpgradeCost:='('+INFO+')'
@@ -1127,7 +1120,7 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  UPPGRADES
    for uid:=0 to 255 do
-     with g_upids[uid] do
+     with g_upgrs[uid] do
      begin
         ITEMP:=str_ProductionHotKey(upgr_btni);
         if(length(ITEMP)>0)
@@ -1136,7 +1129,7 @@ begin
 
         ITEMP:='';
         if(upgr_ruid  >0)then STRADD(@ITEMP,g_uids [upgr_ruid ].uid_str_name ,sep_comma);
-        if(upgr_rupgr >0)then STRADD(@ITEMP,g_upids[upgr_rupgr].upgr_str_Name,sep_comma);
+        if(upgr_rupgr >0)then STRADD(@ITEMP,g_upgrs[upgr_rupgr].upgr_str_Name,sep_comma);
         if(length(ITEMP)>0)
         then upgr_str_Reqs:=tc_yellow+str_hint_requirements+tc_default+ITEMP
         else upgr_str_Reqs:='';
@@ -1177,7 +1170,7 @@ begin
           begin
              STRADD(@ua_str_Common,str_ability_reload+tc_aqua+ir2s(ua_reload)+tc_default+' '+str_hint_sec,sep_sdot);
              if(ua_rldDec_upgr>0)then
-               STRADD(@ua_str_ReloadFactors,str_hint_upgrade+' "'+g_upids[ua_rldDec_upgr].upgr_str_Name+'"(-'+ir2s(ua_rldDec_upgrS)+')',sep_scomma);
+               STRADD(@ua_str_ReloadFactors,str_hint_upgrade+' "'+g_upgrs[ua_rldDec_upgr].upgr_str_Name+'"(-'+ir2s(ua_rldDec_upgrS)+')',sep_scomma);
              if(ua_rldDec_level>0)then
                STRADD(@ua_str_ReloadFactors,str_ability_rldDecByLevel+'(-'+ir2s(ua_rldDec_level)+')',sep_scomma);
              if(length(ua_str_ReloadFactors)>0)then ua_str_ReloadFactors:=str_ability_ReloadFactors+ua_str_ReloadFactors;

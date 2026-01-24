@@ -96,7 +96,7 @@ begin
               map_seed      :=666;
               map_Size1     :=4000;
               map_ObstaclesS:=4;
-              map_Symmetry  :=false;
+              map_Symmetry  :=maps_none;
               map_BaseVars;
 
               LocalPlayer:=0;
@@ -114,7 +114,7 @@ begin
               camp_CreateUnit(4,map_PlayerStartX[4]-150,map_PlayerStartY[4]-150,UID_UCommandCenter);
               camp_CreateUnit(4,map_PlayerStartX[4]+150,map_PlayerStartY[4]+150,UID_UPortal);
 
-              PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HTower,
+              PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HFTower,
                                                   UID_Imp,UID_Demon], MaxUnits,true);
            end;
        end;

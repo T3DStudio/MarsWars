@@ -53,7 +53,8 @@ uses SysUtils, SDL, SDL_Net,crt
 {$Include _missiles.pas}
 {$include _units_common.pas}
 {$include _units.pas}
-{$include _ai_base.pas}
+{$include _ai_common.pas}
+{$include _ai_collect.pas}
 {$include _ai_main.pas}
 {$include _keypoints.pas}
 {$include _unit_client.pas}

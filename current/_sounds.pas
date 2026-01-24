@@ -527,7 +527,7 @@ lmt_unit_attacked       : with g_uids[lm_data_u] do
                           snd_SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
 // Key Point Events
 lmt_Req_Energy          : snd_SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
-lmt_koth_control,
+lmt_koth_control        : snd_SoundPlayAnoncer(snd_KeyPointControl,true,false);
 lmt_ngen_captured,
 lmt_kpoint_captured     : snd_SoundPlayAnoncer(snd_KeyPointCapture,true,false);
 lmt_ngen_exh,
@@ -649,6 +649,7 @@ begin
    snd_Gibs                 :=snd_SoundSetLoad('Gibs'            );
    snd_Healing              :=snd_SoundSetLoad('healing'         );
    snd_IconOfSinCube        :=snd_SoundSetLoad('IconOfSinCube'   );
+   snd_KeyPointControl      :=snd_SoundSetLoad('KeyPointControl' );
    snd_KeyPointCapture      :=snd_SoundSetLoad('KeyPointCapture' );
    snd_KeyPointLost         :=snd_SoundSetLoad('KeyPointLost'    );
    snd_mapmark              :=snd_SoundSetLoad('MapMark'         );

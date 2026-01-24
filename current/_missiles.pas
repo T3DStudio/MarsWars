@@ -185,8 +185,10 @@ begin
            tu:=nil;
            IsUnitRange(m_tar,@tu);
 
+           {$IFDEF _FULLGAME}
            if(not ServerSide)then
-             if(d>base_1rh)and(tu<>nil)then exit;
+             if(d>base_r1h)and(tu<>nil)then exit;
+           {$ENDIF}
 
            m_damage:=adddmg;
            if(m_playeri<=LastPlayer)and(tu<>nil)then

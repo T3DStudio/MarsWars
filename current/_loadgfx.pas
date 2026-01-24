@@ -671,7 +671,7 @@ begin
 
    with spr_kp_out do
    begin
-      hw:=keyPoint_r-6;
+      hw:=keyPoint_DefR-6;
       hh:=hw;
       w :=hw*2;
       h :=w;
@@ -734,6 +734,7 @@ begin
    spr_uibtn_mmark             := gfx_ButtonLoad(folder_ui+'b_mmark'           ,ui_ButtonW1);
    spr_uibtn_AbilityPretEquip  := gfx_ButtonLoad(folder_ui+'b_PretorianEquip'  ,ui_ButtonW1);
    spr_uibtn_AbilityBribe      := gfx_ButtonLoad(folder_ui+'b_Bribe'           ,ui_ButtonW1);
+   spr_uibtn_AbilityHack       := gfx_ButtonLoad(folder_ui+'b_Hack'            ,ui_ButtonW1);
    spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'         ,ui_ButtonW1);
    spr_uibtn_AbilityUACScan    := gfx_ButtonLoad(folder_ui+'b_scan'            ,ui_ButtonW1);
    spr_uibtn_AbilityBlink      := gfx_ButtonLoad(folder_ui+'b_blink'           ,ui_ButtonW1);
@@ -873,7 +874,8 @@ begin
    gfx_LoadMWSModel(@spr_HPools2            ,folder_RaceBuildings[r_hell]+'h_b3a'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HPools3            ,folder_RaceBuildings[r_hell]+'h_b3b'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HPools4            ,folder_RaceBuildings[r_hell]+'h_b3c'      ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HTower             ,folder_RaceBuildings[r_hell]+'h_b4_'      ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HFTower            ,folder_RaceBuildings[r_hell]+'h_b4_'      ,smt_buiding  );
+   gfx_LoadMWSModel(@spr_HSTower            ,folder_RaceBuildings[r_hell]+'h_b11_'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HTeleport          ,folder_RaceBuildings[r_hell]+'h_b5_'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HMonastery         ,folder_RaceBuildings[r_hell]+'h_b6_'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HTotem             ,folder_RaceBuildings[r_hell]+'h_b7_'      ,smt_buiding  );

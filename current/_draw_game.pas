@@ -639,6 +639,10 @@ sty    : integer;
 function GV(fx,fy:integer):boolean;
 begin
    GV:=true;
+   if((ui_fog_sx+fx)<0)
+   or((ui_fog_sy+fy)<0)
+   or((ui_fog_sx+fx)>map_fog_ex)
+   or((ui_fog_sy+fy)>map_fog_ey)then exit;
    if (0<=fx)and(fx<ui_fog_gridw)
    and(0<=fy)and(fy<ui_fog_gridh)then GV:=not ui_fog_pgrid[fx,fy];
 end;
@@ -683,8 +687,6 @@ begin
    end; }
 end;
 
-function map_IfObstacleHere(ix,iy,irO,irI:integer):boolean; forward;
-
 procedure draw_debug;
 var u,ix,iy:integer;
     c:cardinal;
@@ -708,6 +710,9 @@ begin
    then circleColor(vid_screen,mouse_x,mouse_y,5,c_red )
    else circleColor(vid_screen,mouse_x,mouse_y,5,c_lime); }
 
+  { map_SymmetryPoints(mouse_map_x,mouse_map_y,@ix,@iy);
+   UnitsInfo_AddLine(mouse_map_x,mouse_map_y,ix,iy,c_white);
+                                                              }
    if(InputAction(iact_Shift))then
      for u:=0 to LastPlayer do
       with g_gplayers[u] do

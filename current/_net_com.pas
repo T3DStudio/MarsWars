@@ -27,7 +27,7 @@ begin
 
    net_dispose;
 
-   net_period:=0;
+   net_TimerBase:=0;
 
    net_buffer:=SDLNet_AllocPacket(MaxNetBuffer);
    if(net_buffer=nil)then

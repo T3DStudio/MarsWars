@@ -62,7 +62,7 @@ begin
         end;
 
         map_MiniMap_KeyPoint(tar,round(map_PlayerStartX[p]*map_MiniMap_cx),
-                                 round(map_PlayerStartY[p]*map_MiniMap_cx),trunc(base_1r*map_MiniMap_cx),pc,color);
+                                 round(map_PlayerStartY[p]*map_MiniMap_cx),trunc(base_r1*map_MiniMap_cx),pc,color);
      end;
 end;
 
@@ -188,18 +188,15 @@ begin
                SpriteList_AddDoodad(nx,ny,bdepth ,-32000,sTemplateB,255,0,0);
 
                animN:=(abs(animStep+animX+byte(y div cellw1)) mod LiquidAnimCount)+1;
-               //animStep:=(abs(x+x+y) mod LiquidAnimCount)+1;
-               //animStep+=1;
-                //if(animStep>LiquidAnimCount)then animStep:=1;
 
-               if(not InputAction(iact_Alt))then
+               //if(not InputAction(iact_Alt))then
                SpriteList_AddDoodad(nx,ny,depth,-32000,@sTemplateAF^[animN],255,0,0);
 
-               if(InputAction(iact_Control))then
+               {if(InputAction(iact_Control))then
                begin
                UnitsInfo_AddCircle(nx,ny,sTemplateAF^[1].hw,ui_blink2_color_BY);
                UnitsInfo_AddText(nx,ny,i2s(animN),c_white);
-               end;
+               end; }
             end;
          end;
 

@@ -19,30 +19,75 @@ begin
    if(sdl_saveBMP(sdlsurf,@fname[1])<=0)then writeln(sdl_getError);
 end;
 
+function htmldoc_color2hex(color:cardinal):shortstring;
+begin
+   htmldoc_color2hex:=HexStr((color and $FF000000)shr 24,2)+
+                      HexStr((color and $00FF0000)shr 16,2)+
+                      HexStr((color and $0000FF00)shr 8 ,2);
+end;
+
 procedure htmldoc_WriteCaption(line:shortstring);
 begin
    writeln(html_f,'<br><center><h2><b>',line,'</b></h2></center><br>');
 end;
 
 procedure htmldoc_WriteLine(line:shortstring);
-var i,l:byte;
+var
+i,l  :byte;
+c    :char;
+tag_b,
+tag_c:boolean;
+procedure TagColor(c:cardinal);
+begin
+   if(tag_c)then write(html_f,'</font>');
+   write(html_f,'<font color="'+htmldoc_color2hex(c)+'">');
+   tag_c:=true;
+end;
+
 begin
    l:=length(line);
    if(l=0)then exit;
+   //tstr :='';
+   tag_b:=false;
+   tag_c:=false;
+   if(pos(tc_doccpt,line)>0)then
+   begin
+      tag_b:=true;
+      write(html_f,'<b>');
+   end;
    for i:=1 to l do
-     if(line[i]<>tc_docbr)
-     then break
-     else
-     begin
-        writeln(html_f,'<br>');
-        if(i=l)then exit;
-     end;
-   if(pos(tc_doccpt,line)>0)then line:='<b>'+line+'</b>';
-   writeln(html_f,str_RemoveSpecChars(line,false),' ');
-   for i:=l downto 1 do
-     if(line[i]<>tc_docbr)
-     then break
-     else writeln(html_f,'<br>');
+   begin
+      c:=line[i];
+      case c of
+      tc_docbr    : write(html_f,'<br>');
+      tc_doccpt   : ;
+      tc_player0..
+      tc_player7  : TagColor(PlayerColorsDefault[ord(c)]);
+      tc_nl1,
+      tc_nl2,
+      tc_nl3      :;
+      tc_default  : begin
+                    if(tag_c)then write(html_f,'</font>');
+                    tag_c:=false;
+                    end;
+
+      tc_purple   : TagColor(c_purple);
+      tc_red      : TagColor(c_red   );
+      tc_orange   : TagColor(c_orange);
+      tc_yellow   : TagColor(c_yellow);
+      tc_lime     : TagColor(c_lime  );
+      tc_aqua     : TagColor(c_aqua  );
+      tc_blue     : TagColor(c_blue  );
+      tc_gray     : TagColor(c_gray  );
+      tc_white    : TagColor(c_white );
+      tc_green    : TagColor(c_green );
+      tc_dgray    : TagColor(c_dgray );
+      else write(html_f,c);
+      end;
+   end;
+   if(tag_c)then write(html_f,'</font>');
+   if(tag_b)then write(html_f,'</b>');
+   writeln(html_f);
 end;
 
 procedure htmldoc_WriteStringArray(plist:PTStringArray;listSize:integer);
@@ -134,15 +179,15 @@ begin
           writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(uid)+str_htmldoc_img_ext+'">');
           writeln(html_f,'</td><td>');
 
-          writeln(html_f,str_doc_BalanceGood   ,'<br>');
+          htmldoc_WriteLine(str_doc_BalanceGood);   writeln(html_f,'<br>');
           for i in uid_balance_Good do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');
           writeln(html_f,'<br><br>');
 
-          writeln(html_f,str_doc_BalanceBad    ,'<br>');
+          htmldoc_WriteLine(str_doc_BalanceBad);    writeln(html_f,'<br>');
           for i in uid_balance_Bad do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');
           writeln(html_f,'<br><br>');
 
-          writeln(html_f,str_doc_BalanceUseless,'<br>');
+          htmldoc_WriteLine(str_doc_BalanceUseless);writeln(html_f,'<br>');
           for i in uid_balance_Useless do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');
           writeln(html_f,'<br><br>');
 

@@ -19,6 +19,7 @@ NOTSET                 = smallint.MaxValue;
 fr_fps1                = 60;
 fr_RateTicks           = 1000/fr_fps1;
 fr_FrameMS             = round(fr_RateTicks);
+fr_ifps                = fr_fps1-1;
 
 fr_fpsh                = fr_fps1 div 2; // half
 fr_fpst                = fr_fps1 div 3; // thrid
@@ -33,6 +34,7 @@ fr_fps6                = fr_fps1*6;
 fr_fps10               = fr_fps1*10;
 fr_fpst2               = fr_fpst*2; //2/3
 fr_fps60               = fr_fps1*60;
+fr_fpsd15              = fr_fps1 div 15;
 
 APM_UPDPeriod          = fr_fps1*5;
 APM_1Period            = fr_fps60;
@@ -77,7 +79,7 @@ mc_fixed_teams         : set of byte = [mc_1x1,mc_2x2,mc_3x3,mc_4x4,mc_2x2x2,mc_
 allmapscenarios        : set of byte = [mc_ffa3..mc_royale];
 mc_Last                = 14;
 
-// map scenario
+// map neutrall generators
 mapg_no                = 0;
 mapg_5                 = 1;
 mapg_10                = 2;
@@ -85,7 +87,17 @@ mapg_15                = 3;
 mapg_20                = 4;
 mapg_inf               = 5;
 
-map_MaxGenerators      = 5;  // 0-5  max neutrall generators options
+mapg_Last              = 5;  // 0-5  max neutrall generators options
+
+// map symmetry types
+maps_none              = 0;
+maps_point             = 1;
+maps_lineV             = 2;
+maps_lineH             = 3;
+maps_lineL             = 4;
+maps_lineR             = 5;
+
+maps_Last              = 5; // 0-5
 
 // game type
 gt_none                = 0;
@@ -114,7 +126,7 @@ gs_win_team4           = 24;
 gs_win_team5           = 25;
 gs_win_team6           = 26;
 gs_win_team7           = 27;
-gs_running             = 63;
+gs_running             = 63; // last status can't be more thatn 63 (%00111111)
 
 r_random               = 0;
 r_hell                 = 1;
@@ -273,10 +285,9 @@ TTLServer                 = fr_fps1;
 
 net_MaxPing               = word.MaxValue-fr_FrameMS;
 
-net_PingReqTime           = fr_fps2;
-net_PeriodTime            = fr_fpsq;
-
-NetTickN                  = 2;
+net_SendTimePing          = fr_fps2;
+net_SendTimeClient        = fr_fpsq;
+net_SendTimeServer        = fr_fps1 div 30;
 MaxNetBuffer              = 4096;
 
 net_svLanAdv_port         = 63666; // local servers advertisement port
@@ -540,7 +551,7 @@ upgr_hell_Phantoms     = 13; // phantoms
 upgr_hell_DistDamage2  = 14; // t2 distance attacks damage
 upgr_hell_Resurrect    = 15; // archvile ability
 upgr_hell_TeleportCD   = 16; // Teleport reload
-upgr_hell_Recall       = 17; // revers teleport
+upgr_hell_T2TNoCD      = 17; // Teleport-t-toteleport no cd teleportation
 upgr_hell_EvilEyeR     = 18; // hell Eye time
 upgr_hell_TotemInvis   = 19; // totem and eye invisible
 upgr_hell_BuildRestore = 20; // build restoration
@@ -729,39 +740,40 @@ UID_HPools             = 8;
 UID_HPentagram         = 9;
 UID_HMonastery         = 10;
 UID_HFortress          = 11;
-UID_HTower             = 12;
-UID_HTotem             = 13;
-UID_HTeleport          = 14;
-UID_HEye               = 15;
-UID_HAltar             = 16;
-UID_HCommandCenter     = 17;
-UID_HACommandCenter    = 18;
-UID_HBarracks          = 19;
+UID_HFTower            = 12;
+UID_HSTower            = 13;
+UID_HTotem             = 14;
+UID_HTeleport          = 15;
+UID_HEye               = 16;
+UID_HAltar             = 17;
+UID_HCommandCenter     = 18;
+UID_HACommandCenter    = 19;
+UID_HBarracks          = 20;
 
-UID_LostSoul           = 20;
-UID_Phantom            = 21;
-UID_Imp                = 22;
-UID_Demon              = 23;
-UID_Cacodemon          = 24;
-UID_Knight             = 25;
-UID_Baron              = 26;
-UID_Revenant           = 27;
-UID_Pain               = 28;
-UID_Mancubus           = 29;
-UID_Arachnotron        = 30;
-UID_Archvile           = 31;
-UID_Cyberdemon         = 32;
-UID_Mastermind         = 33;
+UID_LostSoul           = 23;
+UID_Phantom            = 24;
+UID_Imp                = 25;
+UID_Demon              = 26;
+UID_Cacodemon          = 27;
+UID_Knight             = 28;
+UID_Baron              = 29;
+UID_Revenant           = 30;
+UID_Pain               = 31;
+UID_Mancubus           = 32;
+UID_Arachnotron        = 33;
+UID_Archvile           = 34;
+UID_Cyberdemon         = 35;
+UID_Mastermind         = 36;
 
-UID_ZMedic             = 34;
-UID_ZEngineer          = 35;
-UID_ZSergant           = 36;
-UID_ZSSergant          = 37;
-UID_ZCommando          = 38;
-UID_ZAntiaircrafter    = 39;
-UID_ZSiegeMarine       = 40;
-UID_ZFPlasmagunner     = 41;
-UID_ZBFGMarine         = 42;
+UID_ZMedic             = 37;
+UID_ZEngineer          = 38;
+UID_ZSergant           = 39;
+UID_ZSSergant          = 40;
+UID_ZCommando          = 41;
+UID_ZAntiaircrafter    = 42;
+UID_ZSiegeMarine       = 43;
+UID_ZFPlasmagunner     = 44;
+UID_ZBFGMarine         = 45;
 
 // UAC
 
@@ -872,6 +884,7 @@ uab_SphereTurbo        = 25;
 
 uab_PretorEquip        = 26;
 uab_Bribe              = 27;
+uab_Hack               = 28;
 
 uab_ToHAKeep           = 30;
 uab_ToHGate            = 31;
@@ -881,23 +894,24 @@ uab_ToHSymbol4         = 34;
 uab_ToHPool            = 35;
 uab_ToHACommandCenter  = 36;
 uab_ToHBarracks        = 37;
-uab_ToHTower           = 38;
-uab_ToHTotem           = 39;
+uab_ToHFTower          = 38;
+uab_ToHSTower          = 39;
+uab_ToHTotem           = 40;
 
-uab_ToUACommandCenter  = 40;
-uab_ToUBarracks        = 41;
-uab_ToUFactory         = 42;
-uab_ToUWeaponFactory   = 43;
-uab_ToUGenerator2      = 44;
-uab_ToUGenerator3      = 45;
-uab_ToUGenerator4      = 46;
-uab_ToUAGTurret        = 47;
-uab_ToUAATurret        = 48;
-uab_ToUACDron          = 49;
-uab_ToUGTurretTo       = 50;
-uab_ToUATurretTo       = 51;
-uab_URadarLvlUp           = 52;
-uab_URMStationLvlUp       = 53;
+uab_ToUACommandCenter  = 41;
+uab_ToUBarracks        = 42;
+uab_ToUFactory         = 43;
+uab_ToUWeaponFactory   = 44;
+uab_ToUGenerator2      = 45;
+uab_ToUGenerator3      = 46;
+uab_ToUGenerator4      = 47;
+uab_ToUAGTurret        = 48;
+uab_ToUAATurret        = 49;
+uab_ToUACDron          = 50;
+uab_ToUGTurretTo       = 51;
+uab_ToUATurretTo       = 52;
+uab_URadarLvlUp        = 53;
+uab_URMStationLvlUp    = 54;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -905,13 +919,13 @@ uab_URMStationLvlUp       = 53;
 //  Key Points
 //
 
-map_generators_LifeTime: array[0..map_MaxGenerators] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
-map_generators_Energy  = 900;
+map_generators_LifeTime: array[0..mapg_Last] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+map_generators_Energy  = 1000;
 
-keyPoint_CaptTime_Gen  = fr_fps1*ptimeq;
 keyPoint_CaptTime_Def  = fr_fps1*ptimeh;
+keyPoint_CaptTime_Gen  = fr_fps1*ptime1;
 keyPoint_CaptTime_KotH = fr_fps1*ptime3;
-keyPoint_r             = 100;
+keyPoint_DefR          = 100;
 keyPoint_GenR          = 75;
 
 keyPoint_KotH_pause     = fr_fps1*180;
@@ -940,14 +954,14 @@ hits_resurrected       = -fr_fps1h;
 
 hits_fdead_border      = -BaseDamage1*3;
 
-base_1r                = 350;
-base_hr                = base_1r div 2;
-base_1rh               = base_1r+(base_1r div 2);
-base_2r                = base_1r*2;
-base_3r                = base_1r*3;
-base_4r                = base_1r*4;
-base_5r                = base_1r*5;
-base_6r                = base_1r*6;
+base_r1                = 350;
+base_rh                = base_r1 div 2;
+base_r1h               = base_r1+(base_r1 div 2);
+base_r2                = base_r1*2;
+base_r3                = base_r1*3;
+base_r4                = base_r1*4;
+base_r5                = base_r1*5;
+base_r6                = base_r1*6;
 
 transport_exp_damage   = BaseDamage4;
 regen_period           = fr_fps1;
@@ -1005,6 +1019,13 @@ fly_height             : array[false..true] of integer = (1,fly_z);
 pain_time              = fr_fps1;
 
 {$IFDEF _FULLGAME}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  REPLAYS
+//
+
+rpls_WriteTimeServer   = fr_fps1 div 30;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1350,8 +1371,6 @@ txt_line_h3            = font_w1+font_w2+1;
 //  VIDEO & UI
 //
 
-fr_ifps                = fr_fps1-1;
-
 vid_sdlvflags          = SDL_HWSURFACE+SDL_RESIZABLE;   //SDL_SWSURFACE
 vid_bpp                = 32;
 vid_minw               = 800;
@@ -1651,12 +1670,16 @@ mi_MP_Connect          = 204;
 mi_MP_Disconnect       = 205;
 mi_MP_ClientAddress    = 206;
 mi_MP_ClientQuality    = 207;
-mi_MP_ClientLANSearch  = 208;
+mi_MP_ClientServerList = 208;
 mi_MP_ChatList         = 209;
 mi_MP_ChatLine         = 210;
 
-mi_NetSearch_List      = 211;
-mi_NetSearch_Connect   = 212;
+mi_NetServers_List     = 211;
+mi_NetServers_Line     = 212;
+mi_NetServers_Connect  = 213;
+mi_NetServers_Add      = 214;
+mi_NetServers_Remove   = 215;
+
 
 //// SCIRMISH INFO
 mi_SubCaptionInfoLine  = 220;
@@ -1699,13 +1722,11 @@ menu_logoh             = 64;
 
 menu_BaseW1            = 28;
 menu_BaseWh            = menu_BaseW1 div 2;
-menu_BaseWq            = menu_BaseWh div 2;
 menu_BaseW1h           = 28+menu_BaseWh;
 menu_BaseW2            = menu_BaseW1*2;
 menu_BasehW            = menu_BaseW1 div 2;
 menu_SmallW            =(menu_BaseW1 div 4)*3;
 menu_ListLineH         =(menu_BaseW1 div 3)*2;
-menu_ListLineH2        = menu_ListLineH*2;
 menu_PListLineH        = menu_ListLineH-2;
 menu_ListLinehH        = menu_ListLineH div 2;
 
@@ -1722,19 +1743,16 @@ menu_underLogoY        = menu_logoh+menu_BaseW1;
 menu_CaptionH          = menu_BaseW1;
 menu_underCaptionY     = menu_underLogoY+menu_CaptionH+menu_BaseW1;
 
-menu_border0           = 100;
 menu_border1           = 125;
-menu_border2           = 150;
 menu_BarStepX          = font_w1h;
 
 menu_BaseList1H        = 16;
-menu_SvSearchListH     = 10;
+menu_ServerListH       = 13;
+menu_ServerLineH       = menu_ListLineH+(menu_ListLineH div 2);
 menu_ListLineWChars1   = 60;
 menu_ListLineWCharsh   = menu_ListLineWChars1 div 2;
-menu_ListLineWChars2   = menu_ListLineWChars1*2;
 menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
 menu_ListWh            = menu_ListW1 div 2;
-menu_ListWq            = menu_ListWh div 2;
 
 menu_CampListW         = menu_ListWh;
 menu_CampLineH         = menu_BaseList1H;
@@ -1767,9 +1785,7 @@ menu_msg_btn1x1        =(menu_msg_x0+menu_msg_x1)div 2;
 menu_msg_btn1y1        = menu_msg_y1;
 menu_msg_btn1tx        =(menu_msg_btn1x0+menu_msg_btn1x1)div 2;
 menu_msg_btn2x0        = menu_msg_btn1x1;
-menu_msg_btn2y0        = menu_msg_btn1y0;
 menu_msg_btn2x1        = menu_msg_x1;
-menu_msg_btn2y1        = menu_msg_y1;
 menu_msg_btn2tx        =(menu_msg_btn2x0+menu_msg_btn2x1)div 2;
 
 menu_HelpUnitsBTNsL    = 6;
@@ -1900,6 +1916,13 @@ str_map_ScenarioL        : array[0..mc_Last ] of shortstring = ('FFA(3)',
                                                                 'key points',
                                                                 'KotH',
                                                                 'Royal Battle');
+str_map_SymmetryL        : array[0..maps_Last] of shortstring = ('no',
+                                                                 'point',
+                                                                 'line |',
+                                                                 'line -',
+                                                                 'line \',
+                                                                 'line /');
+
 str_map_Scenario         : shortstring = 'Scenario';
 str_map_Generators       : shortstring = 'Generators';
 str_map_Seed             : shortstring = 'Seed';

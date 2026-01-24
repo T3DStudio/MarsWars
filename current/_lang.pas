@@ -87,7 +87,7 @@ begin
    str_Caption_Server            := 'SERVER';
    str_Caption_Client            := 'CLIENT';
    str_Caption_Objectives        := 'OBJECTIVES';
-   str_Caption_NetSVSearch       := 'Searching for LAN servers...';
+   str_Caption_NetSvList         := 'SERVER LIST';
 
    str_menu_Campaings            := 'TUTORIALS&CAMPAIGNS';
    str_menu_Scirmish             := 'SKIRMISH';
@@ -211,6 +211,13 @@ begin
    str_map_GeneratorsL[mapg_15 ] := '15 min';
    str_map_GeneratorsL[mapg_20 ] := '20 min';
    str_map_GeneratorsL[mapg_inf] := 'infinity';
+
+   str_map_SymmertyL[maps_none ] := 'no';
+   str_map_SymmertyL[maps_point] := 'point';
+   str_map_SymmertyL[maps_lineV] := 'line |';
+   str_map_SymmertyL[maps_lineh] := 'line -';
+   str_map_SymmertyL[maps_lineL] := 'line \';
+   str_map_SymmertyL[maps_lineR] := 'line /';
 
    str_objective_Scirmish        := '-Destroy all enemy players';
    str_objective_RoyalBattle     := '-Stay alive';
@@ -449,7 +456,7 @@ begin
    str_net_Connect               := 'Connect';
    str_net_Quality               := 'Units update rate';
    str_net_Address               := 'Address';
-   str_net_LANSearch             := 'Search for LAN servers';
+   str_net_ServerList            := 'Server list';
    str_net_ServerLANVis          := 'LAN Advertise';
    str_net_ConnectedToDed        := '- connected to dedicated server -';
 
@@ -493,9 +500,9 @@ begin
    str_doc_UpgrPainS             := 'Painstate threshold: ';
    str_doc_UpgrSightR            := 'Sight range: ';
    str_doc_UpgrTransport         := 'Transport capacity: ';
-   str_doc_BalanceGood           := 'Good against:';
-   str_doc_BalanceBad            := 'Bad against:';
-   str_doc_BalanceUseless        := 'Useless against:';
+   str_doc_BalanceGood           := tc_lime+'Good against'   +tc_default+':';
+   str_doc_BalanceBad            := tc_red +'Bad against'    +tc_default+':';
+   str_doc_BalanceUseless        := tc_gray+'Useless against'+tc_default+':';
    str_doc_LMB                   := tc_lime+'LMB'+tc_white;
    str_doc_RMB                   := tc_red +'RMB'+tc_white;
    str_doc_MWH                   := tc_yellow+'MWheel'+tc_white;
@@ -525,6 +532,7 @@ begin
    str_SetAbilityBaseHint(uab_SphereTurbo        ,'Turbo Sphere'             ,'Increases target`s speed for '+i2s(ddamage_time_sec)+' seconds.');
    str_SetAbilityBaseHint(uab_PretorEquip        ,'Pretorian Equipment'      ,'Valid targets: non-heroic allied UAC units. Makes the target "heroic", that doubles its damage and armor');
    str_SetAbilityBaseHint(uab_Bribe              ,'Bribe'                    ,'Valid targets: non-heroic enemy UAC units. Turns the target to your side. There must be at least one UAC unit allied with you around the target');
+   str_SetAbilityBaseHint(uab_Hack               ,'System Hack'              ,'Valid targets: completed enemy UAC buildings. Turns the target to your side. There must be at least one UAC unit allied with you around the target');
    str_SetAbilityBaseHint(uab_UACCCLand          ,'Land/Take-off'            ,'');
    str_SetAbilityBaseHint(uab_UACCCLandTo        ,'Land/Take-off to point'   ,'');
    str_SetAbilityBaseHint(uab_HellCCLand         ,'Land/Take-off'            ,'');
@@ -537,7 +545,8 @@ begin
    str_SetAbilityBaseHint(uab_ToHSymbol3         ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHSymbol4         ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHACommandCenter  ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHTower           ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHFTower          ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHSTower          ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHTotem           ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUACommandCenter  ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUGenerator2      ,t1                         ,'');
@@ -573,7 +582,8 @@ begin
    str_SetUnitBaseHint(UID_HPentagram        ,'Pentagram of Death'               ,'');
    str_SetUnitBaseHint(UID_HMonastery        ,'Monastery of Despair'             ,'');
    str_SetUnitBaseHint(UID_HFortress         ,'Castle of Damned'                 ,'');
-   str_SetUnitBaseHint(UID_HTower            ,'Guard Tower'                      ,'Basic defensive structure'        );
+   str_SetUnitBaseHint(UID_HFTower           ,'Fire Tower'                       ,'Basic defensive structure'        );
+   str_SetUnitBaseHint(UID_HSTower           ,'Slime Tower'                      ,'Basic defensive structure'        );
    str_SetUnitBaseHint(UID_HTotem            ,'Totem of Horror'                  ,'Advanced defensive structure'     );
    str_SetUnitBaseHint(UID_HEye              ,'Evil Eye'                         ,'Detection structure.');
    str_SetUnitBaseHint(UID_HTeleport         ,'Teleport'                         ,'');
@@ -659,11 +669,11 @@ begin
    str_SetUpgrBaseHint(upgr_hell_Phantoms    ,'Phantoms'                         ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
    str_SetUpgrBaseHint(upgr_hell_DistDamage2 ,'Demon`s Weapons'                  ,'Increases the damage of ranged attacks for '+str_UnitsNamesList(UIDsArmsImpactUpgr(upgr_hell_DistDamage2)));
    str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Teleport Upgrade'                 ,'Reduces the cooldown of the Teleport ability'                   );
-   str_SetUpgrBaseHint(upgr_hell_Recall      ,'Recall'                           ,'The Teleport`s ability'                                         );
+   str_SetUpgrBaseHint(upgr_hell_T2TNoCD     ,'Portal link'                      ,'If the destination is another Teleport, the teleportation occurs without cooldown.'  );
    str_SetUpgrBaseHint(upgr_hell_EvilEyeR    ,'Evil Eye Upgrade'                 ,'Increases the sight range of Evil Eye'                           );
    str_SetUpgrBaseHint(upgr_hell_TotemInvis  ,'Totem of Horror Invisibility'     ,'Totem of Horror becomes invisible'                              );
    str_SetUpgrBaseHint(upgr_hell_BuildRestore,'Building Restoration'             ,'Health regeneration for all Hell buildings'                     );
-   t1:=str_UnitsNamesList([UID_HTower,UID_HTotem]);
+   t1:=str_UnitsNamesList([UID_HFTower,UID_HTotem]);
    str_SetUpgrBaseHint(upgr_hell_TowerR      ,'Demonic Spirits'                  ,'Increases the range for '+t1                             );
    str_SetUpgrBaseHint(upgr_hell_TowerBlink  ,g_aids[uab_HTowerBlink].ua_str_name,'Unlocks "'+g_aids[uab_HTowerBlink].ua_str_name+'" ability for '+t1);
    str_SetUpgrBaseHint(upgr_hell_Resurrect   ,'Resurrection'                     ,'Unlocks ArchVile`s resurrection weapon'                    );
@@ -1089,9 +1099,9 @@ begin
    setlength(camp_mis_size,camp_size);
 
    str_camp_Add('Ascension');
-   str_camp_Add('Hell March');
-   str_camp_Add('Payback time');
-   str_camp_Add('Corporate wars');
+   //str_camp_Add('Hell March');
+   //str_camp_Add('Payback time');
+   //str_camp_Add('Corporate wars');
 
    str_camp_MisAdd(0,'Tutorial');
 
@@ -1472,7 +1482,7 @@ begin
   str_net_Disconnect        := 'Отключится';
   str_net_Quality           := 'Обновление юнитов';
   str_net_Address           := 'Адрес';
-  str_net_LANSearch         := 'Поиск серверов в LAN';
+  str_net_ServerList         := 'Поиск серверов в LAN';
 
   str_gmsg_PortBlocked       := 'Порт занят!';
   str_gmsg_WrongVersion              := 'Другая версия!';
@@ -1513,7 +1523,7 @@ begin
   str_SetUnitBaseHint(UID_HPentagram      ,'Пентаграмма Смерти'         ,'');
   str_SetUnitBaseHint(UID_HMonastery      ,'Монастырь Отчаяния'         ,'');
   str_SetUnitBaseHint(UID_HFortress       ,'Замок Проклятых'            ,'');
-  str_SetUnitBaseHint(UID_HTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
+  str_SetUnitBaseHint(UID_HFTower          ,'Сторожевая Башня'           ,'Базовое защитное сооружение'          );
   str_SetUnitBaseHint(UID_HTotem          ,'Тотем Ужаса'                ,'Продвинутое защитное сооружение'      );
   str_SetUnitBaseHint(UID_HAltar          ,'Алтарь Боли'                ,'');
   str_SetUnitBaseHint(UID_HCommandCenter  ,'Проклятый Командный Центр'  ,''          );
@@ -1547,7 +1557,7 @@ begin
   str_SetUpgrBaseHint(upgr_hell_Phantoms  ,'Фантомы'                       ,'Pain Elemental создает Фантомов вместо Lost Soul'                          );
   str_SetUpgrBaseHint(upgr_hell_DistDamage2  ,'Демоническое Оружие'           ,'Увеличение урона от дальних атак всех Т2 юнитов и защитных сооружений'     );
   str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Улучшение Телепорта'           ,'Уменьшение времени перезарядки Телепорта'                              );
-  str_SetUpgrBaseHint(upgr_hell_Recall ,'Призыв'                        ,'Юнитов можно перемещать обратно в Телепорт'                            );
+  str_SetUpgrBaseHint(upgr_hell_T2TNoCD ,'Призыв'                        ,'Юнитов можно перемещать обратно в Телепорт'                            );
   str_SetUpgrBaseHint(upgr_hell_EvilEyeR      ,'Улучшение Ока Зла'             ,'Увеличение области обзора Ока Зла'                           );
   str_SetUpgrBaseHint(upgr_hell_TotemInvis   ,'Невидимость Тотема Ужаса'      ,''                               );
   str_SetUpgrBaseHint(upgr_hell_BuildRestore    ,'Восстановление Зданий'         ,'Восстановление здоровья всех адских зданий'                   );

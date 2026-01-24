@@ -199,9 +199,11 @@ function unit_canMove(pu:PTUnit):boolean;
 begin
    with pu^ do
    with uid^ do
+     {$IFDEF _FULLGAME}
      if(not ServerSide)and(speed>0)
      then unit_canMove:=(x<>move_x)or(y<>move_y)
      else
+     {$ENDIF}
      begin
         unit_canMove:=false;
 
@@ -218,7 +220,7 @@ begin
 
         if(not uid_isbuilding)then
           if(buffs[ub_PainState]>0)
-          or(buffs[ub_Cast]>0)then exit;
+          or(buffs[ub_Cast     ]>0)then exit;
 
         unit_canMove:=true;
      end;
@@ -412,11 +414,19 @@ end;
 
 procedure unit_MoveVis(pu:PTUnit);
 begin
-   if(ServerSide)then unit_zfall(pu);
+   {$IFDEF _FULLGAME}
+   if(ServerSide)then
+   {$ENDIF}
+   unit_zfall(pu);
+
    with pu^ do
      if(vx<>x)or(vy<>y)then
      begin
-        if(vstp>UnitStepTicks)and(ServerSide)then vstp:=UnitStepTicks;
+        if(vstp>UnitStepTicks)
+        {$IFDEF _FULLGAME}
+        and(ServerSide)
+        {$ENDIF}
+        then vstp:=UnitStepTicks;
         if(vstp<=0)then vstp:=UnitStepTicks;
         vx  +=(x-vx) div vstp;
         vy  +=(y-vy) div vstp;
@@ -532,7 +542,7 @@ begin
    begin
       if(tard=NOTSET)
       or(tard<0     )then tard:=point_dist_int(x,y,pTarget^.x,pTarget^.y);
-      if(tard>base_1r)then
+      if(tard>base_r1)then
       begin
          unit_ability_Recall:=0;
          unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
@@ -569,13 +579,15 @@ begin
             pTeleporter^.rpoint_y:=pTBeacon^.y;
 
             if(point_dist_int(pTeleporter^.x,
-                              pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_1r)then exit;
+                              pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_r1)then exit;
 
             unit_Teleport2Point(pTarget,
             pTeleporter^.rpoint_x+g_random(uid_missileR),
             pTeleporter^.rpoint_y+g_random(uid_missileR)
             {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
-            teleport_CalcReload(pTeleporter,uid_LimitUse);
+            if(pTeleporter^.player^.upgrs_cur[upgr_hell_T2TNoCD]>0)and(pTBeacon^.uidi=pTeleporter^.uidi)
+            then
+            else teleport_CalcReload(pTeleporter,uid_LimitUse);
             unit_ability_teleport:=true;
          end;
 end;
@@ -889,7 +901,7 @@ begin
    {$ENDIF}
 end;
 
-function unit_ability_Bribe(pCaster:PTUnit;target:integer;check:boolean):cardinal;
+function unit_ability_Bribe(pCaster:PTUnit;target:integer;target_building,check:boolean):cardinal;
 var
 pTarget: PTUnit;
 u      : integer;
@@ -919,8 +931,9 @@ begin
       or(player^.team=pCaster^.player^.team)
       or(IsUnitRange(TransportU,nil))
       or(uid_race<>r_uac)
-      or(uid_isbuilding)
       or(buffs[ub_Heroic]>0)then exit;
+
+      if(uid_isbuilding<>target_building)then exit;
    end;
 
    for u:=1 to MaxUnits do
@@ -976,13 +989,20 @@ begin
       if(not player_UIDLimitCheck(player,auid))
       then LastCreatedUnit:=0
       else
+        {$IFDEF _FULLGAME}
         if(not ServerSide)
         then LastCreatedUnit:=1
-        else unit_add(tx,ty,-1,auid,playeri,true,true,0);
+        else
+        {$ENDIF}
+          unit_add(tx,ty,-1,auid,playeri,true,true,0);
 
       if(LastCreatedUnit>0)then
       begin
-         if(ServerSide)then
+         {$IFDEF _FULLGAME}
+         if(not ServerSide)
+         then LastCreatedUnit:=0
+         else
+         {$ENDIF}
          begin
             LastCreatedUnitP^.dir   :=dir;
             LastCreatedUnitP^.a_tar :=a_tar;
@@ -990,8 +1010,7 @@ begin
             LastCreatedUnitP^.uo_tar:=uo_tar;
             LastCreatedUnitP^.uo_x  :=uo_x;
             LastCreatedUnitP^.uo_y  :=uo_y;
-         end
-         else LastCreatedUnit:=0;
+         end;
       end
       {$IFDEF _FULLGAME}
       else
@@ -1578,11 +1597,12 @@ begin
       a_tar_cl := 0;
       a_exp    := 0;
 
+      aiu_BuildTries  :=0;
       aiu_alarm_timer :=0;
       aiu_alarm_d     :=NOTSET;
       aiu_alarm_x     :=-1;
       aiu_alarm_y     :=0;
-      aiu_need_detect :=NOTSET;
+      aiu_NeedDetect :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
 
@@ -1926,7 +1946,7 @@ begin
           if(uprod_r[pn]>0)
           then unit_ProdStartUnitLine:=ureq_busy
           else
-            with g_upids[puid] do
+            with g_upgrs[puid] do
             begin
                if(check)then exit;
 
@@ -2038,7 +2058,7 @@ begin
           then unit_ProdStartUpgradeLine:=ureq_busy
           else
 
-            with g_upids[upid] do
+            with g_upgrs[upid] do
             begin
                if(check)then exit;
 
@@ -2269,7 +2289,7 @@ begin
          begin
             tuid:=pprod_u[i];
             if(res_energyl_cur<0)
-            or(upgrs_cur[tuid]>=g_upids[tuid].upgr_max)
+            or(upgrs_cur[tuid]>=g_upgrs[tuid].upgr_max)
             or(upgrs_cur[tuid]>=upgrs_max[tuid])
             then
             else

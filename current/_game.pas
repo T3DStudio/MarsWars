@@ -190,8 +190,6 @@ begin
    g_tick         :=0;
    G_Status       :=gs_running;
 
-   ServerSide     :=true;
-
    KeyPoints_Clear;
    FillChar(g_missiles ,SizeOf(g_missiles ),0);
    FillChar(g_units    ,SizeOf(g_units    ),0);
@@ -209,7 +207,7 @@ begin
 
    UnitStepTicks := 8;
 
-   g_royal_r     := 0;
+   g_royal_r     := g_royal_r.MaxValue;
 
    g_cycle_order := 0;
    g_cycle_regen := 0;
@@ -223,6 +221,8 @@ begin
    menu_update:=true;
 
    {$IFDEF _FULLGAME}
+   ServerSide     :=true;
+
    sys_uncappedFPS:=false;
 
    vid_ScreenSpritesS:=0;
@@ -723,7 +723,7 @@ begin
    end;
 
    if(random(3)=0)
-   then map_generators:=random(map_MaxGenerators)+1
+   then map_generators:=random(mapg_Last)+1
    else map_generators:=0;
 
    Map_SetScenarioMaxPlayers;
@@ -882,10 +882,10 @@ begin
                        continue;
                     end;
              end;
-             if(net_logsend_pause>0)then net_logsend_pause-=1;
+             if(net_TimerLogsend>0)then net_TimerLogsend-=1;
           end;
 
-          if(ServerSide)and(G_Started)and(G_Status=gs_running)and(not isobserver)and(not isdefeated)then
+          if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(G_Started)and(G_Status=gs_running)and(not isobserver)and(not isdefeated)then
           begin
              if(build_cd>0)then build_cd-=1;
              if(race=r_hell)and(res_HellPower<HellPower_Max)then
@@ -1257,7 +1257,7 @@ begin
 
    case param_type of
    nmid_lobby_MScenario      : begin ScrollByteSet(@map_scenario,forward,@allmapscenarios);PlayersValidateTeam;Map_Make;end;
-   nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,map_MaxGenerators);Map_Make;end;
+   nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,mapg_Last);Map_Make;end;
    nmid_lobby_MSize          : begin
                                   case forward of
                                   true : ScrollInt(@map_Size1, map_SizeMenuStep,map_MinSize,map_MaxSize);
@@ -1266,7 +1266,7 @@ begin
                                   Map_Make;
                                end;
    nmid_lobby_MObstacles     : begin ScrollByte(@map_ObstaclesS,forward,0,map_MaxObstacles); Map_Make; end;
-   nmid_lobby_MSymmetry      : begin map_Symmetry:=not map_Symmetry; Map_Make; end;
+   nmid_lobby_MSymmetry      : begin ScrollByte(@map_Symmetry  ,forward,0,maps_Last); Map_Make; end;
    nmid_lobby_MRandom        : begin Map_randommap; Map_Make;end;
    nmid_lobby_GFixedPositions: begin
                                   g_FixedPositions:=not g_FixedPositions;
@@ -1314,13 +1314,17 @@ begin
       g_cycle_order+=1;g_cycle_order:=g_cycle_order mod order_period;
       g_cycle_regen+=1;g_cycle_regen:=g_cycle_regen mod regen_period;
 
+      {$IFDEF _FULLGAME}
       if(ServerSide)then
+      {$ENDIF}
       begin
          g_tick+=1;
 
          Scenario_KeyPointsCodeServer;
+         {$IFDEF _FULLGAME}
          case g_type of
          gt_scirmish: begin
+         {$ENDIF}
                          Scenario_KeyPointsEndConditions;
                          case map_scenario of
                          mc_royale    : begin
@@ -1332,13 +1336,15 @@ begin
                          mc_KotH      : Scenario_DefaultDefeatConditions;
                          else           Scenario_DefaultEndConditions;
                          end;
-                      end;
          {$IFDEF _FULLGAME}
+                      end;
          gt_campaing: cmp_MissionCode;
-         {$ENDIF}
          end;
+         {$ENDIF}
       end
-      else Scenario_KeyPointsTeam;
+      {$IFDEF _FULLGAME}
+      else Scenario_KeyPointsTeam
+      {$ENDIF};
       GameObjectsCode;
    end;
 

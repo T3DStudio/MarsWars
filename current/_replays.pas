@@ -295,7 +295,8 @@ begin
       rpls_u      :=0;
       rpls_player :=LocalPlayer;
       rpls_log_c  :=0;
-      rpls_ticks  :=0;
+      rpls_Ticks  :=0;
+      rpls_GameStatus := 255;
       rpls_POVRecorder:=false;
 
       if(rpls_head_itemn>0)then
@@ -329,7 +330,9 @@ begin
    or(rpls_vidy<>camy)then
      if(gs=gs_running)then i:=i or %01000000;
 
-   if((i and %11000000)>0)or(gs=gs_running)then
+   if((i and %11000000)>0)
+   or(gs=gs_running)
+   or(rpls_GameStatus<>gs)then
    begin
       wudata_byte(i,true);
       if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_c,true);
@@ -340,8 +343,9 @@ begin
          wudata_byte(rpls_vidx,true);
          wudata_byte(rpls_vidy,true);
       end;
+      rpls_GameStatus:=gs;
 
-      if(gs=gs_running)then wclinet_gframe(rpls_player,true);
+      if(gs=gs_running)then wclinet_gframe(rpls_player,rpls_WriteTimeServer,true);
    end;
 
    if(rpls_file_LastErr<>0)then
@@ -440,7 +444,7 @@ begin
 
          if(map_Size1<map_MinSize)or(map_Size1>map_MaxSize)
          or(map_ObstaclesS>map_MaxObstacles)
-         or(map_Generators>map_MaxGenerators)
+         or(map_Generators>mapg_Last)
          or not(map_scenario in allmapscenarios)
          or(rpls_player>LastPlayer)then
          begin
@@ -470,14 +474,14 @@ begin
                 exit;
              end;
 
-         if(rpls_pnu=0)then rpls_pnu:=NetTickN;
-         UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*NetTickN;
+         if(rpls_pnu=0)then rpls_pnu:=net_SendTimeServer;
+         UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*net_SendTimeServer;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
 
          rpls_fstate:=rpls_read;
          rpls_pstate:=rpls_read;
          rpls_pnu   :=0;
-         rpls_ticks :=0;
+         rpls_Ticks :=0;
          LocalPlayer:=rpls_player;
          UIPlayer   :=LocalPlayer;
 
@@ -533,7 +537,7 @@ begin
          rpls_vidy:=rudata_byte(true,0);
       end;
 
-      if(G_Status=gs_running)then rclinet_gframe(rpls_player,true,rpls_FastSkip);
+      if(G_Status=gs_running)then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip);
 
       if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;
@@ -568,18 +572,18 @@ begin
    else
      if(G_Started)then
      begin
-        rpls_ticks+=1;
+        rpls_Ticks+=1;
         case rpls_pstate of
-rpls_write : if(rpls_fstate<>rpls_write)
-             then replay_WriteHead
-             else
-               if((rpls_ticks mod 2)<>0)then
-                 replay_WriteGameFrame;
-rpls_read  : if(rpls_fstate<>rpls_read)
-             then replay_Readhead
-             else
-               if((rpls_ticks mod 2)<>0)then
-                 replay_ReadGameFrame;
+        rpls_write : if(rpls_fstate<>rpls_write)
+                     then replay_WriteHead
+                     else
+                       if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
+                         replay_WriteGameFrame;
+        rpls_read  : if(rpls_fstate<>rpls_read)
+                     then replay_Readhead
+                     else
+                       if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
+                         replay_ReadGameFrame;
         else replay_Abort;
         end;
      end;

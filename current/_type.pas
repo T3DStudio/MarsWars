@@ -378,7 +378,9 @@ TUnitArms = record
   aw_snd_target,
   aw_snd_shot,
   aw_snd_start: PTSoundSet;
-  aw_eid_target_onlyshot:boolean;
+  aw_eid_target_onfire,
+  aw_eid_target_onstart,
+  aw_eid_target_onshot:boolean;
   aw_eid_target,
   aw_eid_shot,
   aw_eid_start: byte;
@@ -391,7 +393,7 @@ TUID = record
    uid_square,
    uid_MaxHits1,
    uid_MaxHitsh,
-   uid_MaxHitsq     : longint;
+   uid_MaxHitsq          : longint;
    uid_r,
    uid_missileR,
    uid_req_HellPower,
@@ -408,11 +410,13 @@ TUID = record
    uid_LevelBonusDamage,
    uid_LevelBonusArmor,
    uid_LevelBonusPainC
-                    : integer;
-   uid_zfall        : shortint;
+                         : integer;
+   uid_zfall             : shortint;
 
-   uid_ZombieHits   : integer;
-   uid_ZombieUID    : byte;
+   uid_ZombieHits        : integer;
+   uid_ZombieUID         : byte;
+
+   uid_AI_NextFormUID       : byte;
 
    uid_DeathUID,
    uid_DeathUIDn,
@@ -424,7 +428,7 @@ TUID = record
    uid_req_uid2n,
    uid_req_uid3,
    uid_req_uid3n,
-   uid_req_upgr     : byte;
+   uid_req_upgr          : byte;
 
    uid_TransportMax_Base,
    uid_TransportMax_upgrV: integer;
@@ -450,26 +454,26 @@ TUID = record
    uid_SightR_upgr       : byte;
 
 
-   uid_CanAttack    : boolean;
+   uid_CanAttack         : boolean;
    uid_arms_BonusAntiFlyRange,
    uid_arms_BonusAntiGroundRange,
    uid_arms_BonusAntiBuildingRange,
    uid_arms_BonusAntiUnitRange
-                    : integer;
-   uid_arms         : array[0..LastUnitArms] of TUnitArms;
+                         : integer;
+   uid_arms              : array[0..LastUnitArms] of TUnitArms;
 
-   uid_hits_li2si   : single;
+   uid_hits_li2si        : single;
 
    uid_ability1,
    uid_ability2,
    uid_ability3
-                    : byte;
+                         : byte;
    uid_ability_HKeepShift,
    uid_ability_isradar,
    uid_ability_RldReducByLvl,
    uid_ability_isteleport,
    uid_ability_isCanLiftUp
-                    : boolean;
+                         : boolean;
 
    uid_client_WReload,
    uid_client_WCastTarget,
@@ -487,8 +491,8 @@ TUID = record
    uid_isbarrack,
    uid_issolid,
    uid_isfly
-                    : boolean;
-   uid_FastDeathHits: integer;
+                         : boolean;
+   uid_FastDeathHits     : integer;
 
    uid_balance_Good,
    uid_balance_Bad,
@@ -497,17 +501,17 @@ TUID = record
    uid_prod_Buildings,
    uid_prod_Units,
    uid_prod_Upgrades,
-   ups_TransportUIDs: TSoB;
+   ups_TransportUIDs     : TSoB;
    {$IFDEF _FULLGAME}
    uid_MiniMapR,
    uid_AnimStepFoot,
    uid_AnimStepDeath,
    uid_AnimStepWalk,
-   uid_FogcR        : integer;
+   uid_FogcR             : integer;
    uid_BTNBig,
    uid_BTNDoc,
-   uid_BTNSmall     : TMWTexture;
-   uid_SpriteModel  : array[0..LastUnitLevel] of pTMWSModel;
+   uid_BTNSmall          : TMWTexture;
+   uid_SpriteModel       : array[0..LastUnitLevel] of pTMWSModel;
 
    uid_str_name,
    uid_str_BaseDescript,
@@ -519,22 +523,22 @@ TUID = record
    uid_str_RebuildHint,
    uid_str_ArmsCommon,
    uid_str_Reqs,
-   uid_str_Prod     : shortstring;
+   uid_str_Prod          : shortstring;
    uid_HintInGame,
-   uid_HintDoc      : TUIStringList;
+   uid_HintDoc           : TUIStringList;
 
    uid_eid_BuildHellType
-                    : boolean;
+                         : boolean;
    uid_eid_bcrater
-                    : byte;
-   uid_eid_bcrater_y: integer;
+                         : byte;
+   uid_eid_bcrater_y     : integer;
 
-   uid_eid_SummonSpr: array[0..LastUnitLevel] of PTMWTexture;
+   uid_eid_SummonSpr     : array[0..LastUnitLevel] of PTMWTexture;
    uid_eid_Summon,
    uid_eid_DeathSlow,
    uid_eid_DeathFast,
    uid_eid_Pain
-                    : array[0..LastUnitLevel] of byte;
+                         : array[0..LastUnitLevel] of byte;
 
    uid_snd_Foot,
    uid_snd_Summon,
@@ -546,11 +550,11 @@ TUID = record
    uid_snd_move,
    uid_snd_attack,
    uid_snd_annoy,
-   uid_snd_select   : PTSoundSet;
+   uid_snd_select        : PTSoundSet;
    {$ENDIF}
 end;
 PTUID = ^TUID;
-TUPID = record  // upgrade
+TUpgrade = record  // upgrade
    upgr_ruid,
    upgr_rupgr,
    upgr_btni,
@@ -560,9 +564,8 @@ TUPID = record  // upgrade
    upgr_renerg_apl, // energy + per level
    upgr_time,
    upgr_time_xpl,
-   upgr_time_apl,
-   upgr_max      : integer;
-   upgr_mfrg     : boolean;
+   upgr_time_apl : integer;
+   upgr_max      : byte;
 
    {$IFDEF _FULLGAME}
    upgr_btn      : TMWTexture;
@@ -644,20 +647,20 @@ TPlayerGameData = record
    units_all_e,
    units_all_s,
    units_builders_e,
-   units_builders_ec,
+   units_builders_ec, // builders
    units_builders_s,
-   units_unitProds_ec,// 'barracks'
+   units_unitProds_ec,// barracks
    units_unitProds_s,
-   units_upgrProds_ec,// 'forges'
+   units_upgrProds_ec,// forges
    units_upgrProds_s
                    : integer;
 
    upgrs_cur,
-   upgrs_max        : array[byte] of byte;
+   upgrs_max       : array[byte] of byte;
 
    prod_unit_Limit : longint;                           // current limit in production
    prod_unit_Max,                                       // current max unit productions
-   prod_unit_Now   : integer;                           // current productions
+   prod_unit_Now   : integer;                           // current now in proggress
    prod_unit_ucl,
    prod_unit_uid   : array[byte] of integer;
 
@@ -723,53 +726,55 @@ TPlayerGameData = record
    aip_MaxTowers,
    aip_MaxArmyLimit
                        : integer;
-
+   aip_MaxUpgradeLevel
+                       : byte;
 
 end;
 PTPlayerGameData = ^TPlayerGameData;
 TPList = array[0..LastPlayer] of TPlayerGameData;
 
 TPlayerNetData = record
-   PNU     : byte;
+   PNU
+           : byte;
    n_u,
    net_ping,
    net_ttl : word;
    net_ip  : cardinal;
    net_port: word;
-   net_logsend_pause
+   net_TimerLogsend
            : integer;
 end;
 
 TUnitVisionData = array[0..LastPlayer] of integer;
 
 TUnit = record
-   hits     : longint;
+   hits         : longint;
    vx,vy,
    x,y,
    srange,
    speed,dir,
    rld,vstp,
-   unum     : integer;
-   mapZone  : word;
-   zfall    : shortint;
+   unum         : integer;
+   mapZone      : word;
+   zfall        : shortint;
 
    level,
    cycle_order,
    group,
    playeri,
-   uidi     : byte;
+   uidi         : byte;
 
    uprod_r,
    pprod_r,
-   pprod_e  : array[0..LastUnitLevel] of integer;
+   pprod_e      : array[0..LastUnitLevel] of integer;
    uprod_u,
-   pprod_u  : array[0..LastUnitLevel] of byte;
+   pprod_u      : array[0..LastUnitLevel] of byte;
 
    a_exp,
-   a_shots  : cardinal;
+   a_shots      : cardinal;
    a_rld,
    a_weap_cl,
-   a_weap   : byte;
+   a_weap       : byte;
    a_tar,
    a_tar_cl,
 
@@ -781,34 +786,34 @@ TUnit = record
    uo_bx,
    uo_by,
    uo_tar
-            : integer;
-   uo_id    : byte;
+                : integer;
+   uo_id        : byte;
 
    rpoint_tar,
    rpoint_x,
-   rpoint_y : integer;
+   rpoint_y     : integer;
 
    pains,
    transportU,
    transportM,
    transportC
-            : integer;
+                : integer;
 
-   buffs    : array[0..LastUnitBuff] of integer;
+   buffs        : array[0..LastUnitBuff] of integer;
 
    TeamDetection,
-   TeamVision: TUnitVisionData;
+   TeamVision   : TUnitVisionData;
 
    StayWaitForNewTarget:byte;
    isfly,
-   issolid,
    iscomplete,
-   isselected: boolean;
+   isselected   : boolean;
 
+   aiu_BuildTries:byte;
    aiu_limitaround_ally,
    aiu_limitaround_enemy
             : longint;
-   aiu_need_detect,
+   aiu_NeedDetect,
    aiu_alarm_timer,
    aiu_alarm_d,
    aiu_alarm_x,

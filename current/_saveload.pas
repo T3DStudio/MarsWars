@@ -362,7 +362,7 @@ begin
 
    if(check)then exit;
 
-   fn:=folder_replay+svld_str_fname+fileExt_Replay;
+   fn:=folder_save+svld_str_fname+fileExt_save;
    if(not FileExists(fn))then
    begin
       menu_msgBox_Set(str_FileError_NExists,svld_str_fname,mmbt_nothing);

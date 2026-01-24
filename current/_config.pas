@@ -120,7 +120,7 @@ begin
       vid_vh:=max2i(vid_minh,vid_vh);
 
       if(g_AISlots      >g_MaxAISlots     )then g_AISlots     :=g_MaxAISlots;
-      if(map_generators >map_MaxGenerators)then map_generators:=map_MaxGenerators;
+      if(map_generators >mapg_Last)then map_generators:=mapg_Last;
 
       if(rpls_Quality   >rpls_MaxQuality  )then rpls_Quality  :=rpls_MaxQuality;
       if(net_cl_Quality >net_MaxQuality   )then net_cl_Quality:=net_MaxQuality;

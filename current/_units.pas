@@ -7,53 +7,58 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-    if(hits>hits_dead)then
-    begin
-       if(cycle_order=g_cycle_order)then
-       begin
-          for uc:=1 to MaxUnits do
-           if(uc<>unum)then
-           begin
-              tu:=@g_units[uc];
-              if(tu^.hits>hits_dead)then unit_detect(pu,tu,point_dist_rint(x,y,tu^.x,tu^.y));
-           end;
-       end;
-
-       if(buffs[ub_Resurected]<=0)then
-       begin
-          if(ServerSide)or(hits>hits_fdead)then hits-=1;
-          {$IFDEF _FULLGAME}
-          if(cycle_order=g_cycle_order)and(fsr>1)then fsr-=1;
-          {$ENDIF}
-
-          if(ServerSide)then
-            if(hits<=hits_dead)then unit_remove(pu);
-       end
-       else
-        if(ServerSide)then
+     if(hits>hits_dead)then
+     begin
+        if(cycle_order=g_cycle_order)then
         begin
-           if(hits<hits_resurrected)then hits:=hits_resurrected;
-           hits+=1;
-           if(hits>=0)then
-           begin
-              zfall     :=0;
-              uo_id     :=ua_amove;
-              uo_x      :=x;
-              uo_y      :=y;
-              uo_tar    :=0;
-              rpoint_x  :=x;
-              rpoint_y  :=y;
-              rpoint_tar:=0;
-              dir       :=270;
-              hits      :=uid_MaxHits1;
-              buffs[ub_Resurected]:=0;
-              {$IFDEF _FULLGAME}
-              unit_CalcFogR(pu);
-              {$ENDIF}
-              GameLog_UnitResurrected(pu);
-           end;
+           for uc:=1 to MaxUnits do
+            if(uc<>unum)then
+            begin
+               tu:=@g_units[uc];
+               if(tu^.hits>hits_dead)then unit_detect(pu,tu,point_dist_rint(x,y,tu^.x,tu^.y));
+            end;
         end;
-    end;
+
+        if(buffs[ub_Resurected]<=0)then
+        begin
+           {$IFDEF _FULLGAME}
+           if(ServerSide)or(hits>hits_fdead)then
+           {$ENDIF}
+           hits-=1;
+
+           {$IFDEF _FULLGAME}
+           if(cycle_order=g_cycle_order)and(fsr>1)then fsr-=1;
+           if(ServerSide)then
+           {$ENDIF}
+             if(hits<=hits_dead)then unit_remove(pu);
+        end
+        else
+          {$IFDEF _FULLGAME}
+          if(ServerSide)then
+          {$ENDIF}
+          begin
+             if(hits<hits_resurrected)then hits:=hits_resurrected;
+             hits+=1;
+             if(hits>=0)then
+             begin
+                zfall     :=0;
+                uo_id     :=ua_amove;
+                uo_x      :=x;
+                uo_y      :=y;
+                uo_tar    :=0;
+                rpoint_x  :=x;
+                rpoint_y  :=y;
+                rpoint_tar:=0;
+                dir       :=270;
+                hits      :=uid_MaxHits1;
+                buffs[ub_Resurected]:=0;
+                {$IFDEF _FULLGAME}
+                unit_CalcFogR(pu);
+                {$ENDIF}
+                GameLog_UnitResurrected(pu);
+             end;
+          end;
+     end;
 end;
 
 procedure unit_damage(pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);
@@ -88,7 +93,9 @@ begin
 
       if(hits<=damage)then
       begin
+         {$IFDEF _FULLGAME}
          if(ServerSide)then
+         {$ENDIF}
          begin
             unit_kill(pTarget,false,(hits-damage)<=uid_FastDeathHits,true,false,false);
             if(damagePlayer<=LastPlayer)then
@@ -103,19 +110,22 @@ begin
       else
       begin
          buffs[ub_Damaged]:=fr_fps2;
-
-         if(ServerSide)
-         then hits-=damage
+         {$IFDEF _FULLGAME}
+         if(not ServerSide)then
+         begin
+            if(buffs[ub_PainState]<=0)then exit;
+         end
          else
-           if(buffs[ub_PainState]<=0)then exit;
+         {$ENDIF}
+         hits-=damage;
 
          if(not uid_isbuilding)and(not uid_ismech)then
-           if(uid_Pain>0)then
+           if(uid_PainState_Base>0)then
            begin
               if(pains>0)then pains-=1;
-              if(pains=0)then
+              if(pains<=0)then
               begin
-                 pains:=uid_Pain;
+                 pains:=uid_PainState_Base;
 
                  buffs[ub_PainState]:=max2i(pain_time,a_rld);
 
@@ -411,8 +421,8 @@ begin
    with pu^ do
      if(speed<=0)
      or(isfly<>uf_ground)
-     or(uid^.uid_isfly)
-     or(not issolid)
+     or(uid^.uid_isfly) //and uid_FlyLevelLikeTarget ???
+     or(not uid^.uid_issolid)
      or(zfall<>0)
      or(not iscomplete)then exit;
 
@@ -803,26 +813,34 @@ var
 kpi:byte;
 d  :integer;
 begin
-   with pu^ do
-     for kpi:=0 to LastKeyPoint do
-       with map_KeyPointsL[kpi] do
-       begin
-          d:=point_dist_int(x,y,kp_x,kp_y);
-          // capturing
-          if(ServerSide)then
-            if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
-              if(d<=(kp_RCapture+uid^.uid_r))then
-              begin
-                 kp_LimitPlayerC[playeri     ]+=uid^.uid_LimitUse;
-                 kp_LimitTeamC  [player^.team]+=uid^.uid_LimitUse;
-              end;
-          // update team data
-          with kp_TeamData[pu^.player^.team] do
-            if(d<=(kp_RCapture+srange))
-            or((map_scenario=mc_koth)and(kpi=0))then
-            // or(no fog)
-              kptd_VisTimer:=MinVisionTime;
-       end;
+   if(map_KeyPointsN>0)then
+     with pu^ do
+       for kpi:=0 to map_KeyPointsN-1 do
+         with map_KeyPointsL[kpi] do
+         begin
+            d:=point_dist_int(x,y,kp_x,kp_y);
+            // capturing
+            {$IFDEF _FULLGAME}
+            if(ServerSide)then
+            {$ENDIF}
+              if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
+                if(d<=(kp_RCapture+uid^.uid_r))then
+                begin
+                   kp_LimitPlayerC[playeri     ]+=uid^.uid_LimitUse;
+                   kp_LimitTeamC  [player^.team]+=uid^.uid_LimitUse;
+                end;
+
+            // update team data
+            with uid^ do
+              if(uid_ability_isradar)then
+                if(buffs[ub_Cast]>0)then
+                  d:=min2i(d,point_dist_int(uo_x,uo_y,kp_x,kp_y));
+            with kp_TeamData[pu^.player^.team] do
+              if(d<=(kp_RCapture+srange))
+              or((map_scenario=mc_koth)and(kpi=0))then
+              // or(no fog)
+                kptd_VisTimer:=MinVisionTime;
+         end;
 end;
 
 procedure unit_AllCycleServer(pu:PTUnit);
@@ -856,7 +874,7 @@ begin
       if(StayWaitForNewTarget>0)
       then StayWaitForNewTarget-=1;
 
-      pushout        := issolid and unit_canMove(pu) and (a_rld<=0);
+      pushout        := uid_issolid and unit_canMove(pu) and (a_rld<=0);
       attack_target  := unit_canAttack(pu,false);//and(playeri=UIPlayer);
       aicode         := (state=ps_AI);//and(isselected);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
@@ -873,9 +891,9 @@ begin
       if(aicode){or(isselected)}then
       begin
          ai_Global_InitVars(pu);
-         //ai_Global_CollectData(pu,pu,0,nil);
+         ai_Global_CollectData(pu,pu,0,nil);
       end;
-      //ai_Local_CollectData(pu,pu,0,nil);
+      ai_Local_CollectData(pu,pu,0,nil);
 
       if(attack_target)then unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac);
 
@@ -896,8 +914,9 @@ begin
 
               if(attack_target)then unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac);
 
-              //ai_Local_CollectData(pu,tu,udi,tu_transport);
-              //if(aicode)then ai_Global_CollectData(pu,tu,udi,tu_transport);
+              ai_Local_CollectData(pu,tu,udi,tu_transport);
+              if(aicode)then
+              ai_Global_CollectData(pu,tu,udi,tu_transport);
 
               if(tu^.hits>0)and(tu_transport=nil)then
               begin
@@ -905,7 +924,7 @@ begin
 
                  if(pushout)then
                    if(uid_r<=tu^.uid^.uid_r)or(tu^.speed<=0)or(not tu^.iscomplete)then
-                     if(tu^.issolid)and(isfly=tu^.isfly)then unit_push(pu,tu,uds);
+                     if(tu^.uid^.uid_issolid)and(isfly=tu^.isfly)then unit_push(pu,tu,uds);
 
                  if(NearTeleport)then
                    if(udi<srange)and(tu^.playeri=playeri)and(tu^.uidi=NearTeleport_tu^.uidi)and(tu^.rld<NearTeleport_tu^.rld)and(tu^.iscomplete)then
@@ -934,8 +953,8 @@ begin
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNewTarget:=0;
 
       {$IFNDEF DEBUG1}
-      {ai_Local_Code(pu);
-      if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);}
+      ai_Local_Code(pu);
+      if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
       {$ENDIF}
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
@@ -1039,7 +1058,7 @@ begin
          end;
 
          td :=point_dist_int(x,y,pTar^.x,pTar^.y);
-         if(pTar^.issolid)
+         if(pTar^.uid^.uid_issolid)
          then tdm:=td-      (uid_r+pTar^.uid^.uid_r)
          else tdm:=td- min2i(uid_r,pTar^.uid^.uid_r);
 
@@ -1114,7 +1133,9 @@ begin
    or(pTarget^.uid^.uid_ZombieHits<pTarget^.hits)
    or(pTarget^.hits<=hits_fdead)then exit;
 
+   {$IFDEF _FULLGAME}
    if(ServerSide)then
+   {$ENDIF}
    begin
       _h:=pTarget^.hits/pTarget^.uid^.uid_MaxHits1;
       _d:=pTarget^.dir;
@@ -1162,9 +1183,26 @@ attackinmove: boolean;
 {$IFDEF _FULLGAME}
 vis_Attacker,
 vis_Target  : boolean;
+procedure targetEffects(now:boolean);
+begin
+   with pAttacker^ do
+   with uid^ do
+   with uid_arms[a_weap] do
+   begin
+      if(not IsUnitRange(pTarget^.transportU,nil))then
+        if((g_tick mod fr_fpst)=0)
+        or(now)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^.uid_missileR),
+                               pTarget^.vy-g_randomr(pTarget^.uid^.uid_missileR),
+                               draw_DefaultSpriteDepth(pTarget^.vy+1,pTarget^.isfly),aw_eid_target);
+
+      if(aw_snd_target<>nil)then
+        if((g_tick mod fr_fps1)=0)
+        or(now)then snd_SoundPlayUnit(aw_snd_target,pTarget,@vis_Target);
+   end;
+end;
 {$ENDIF}
-procedure visEffects;
-var i:byte;
+procedure teamVisionProc;
+var t:byte;
 begin
    with pAttacker^ do
    with uid^ do
@@ -1172,12 +1210,12 @@ begin
    begin
       AddToInt(@TeamVision[pTarget^.player^.team],a_rld+1);
       AddToInt(@TeamVision[pTarget^.player^.team],MinVisionTime);
-      for i:=0 to LastPlayer do
-        if(pTarget^.TeamVision[i]>0)
-        or(         TeamVision[i]>0)then
+      for t:=0 to LastPlayer do
+        if(pTarget^.TeamVision[t]>0)
+        or(         TeamVision[t]>0)then
         begin
-                     TeamVision[i]:=max2i(TeamVision[i],pTarget^.TeamVision[i]);
-            pTarget^.TeamVision[i]:=TeamVision[i];
+                     TeamVision[t]:=max2i(TeamVision[t],pTarget^.TeamVision[t]);
+            pTarget^.TeamVision[t]:=TeamVision[t];
         end;
    end;
 end;
@@ -1197,7 +1235,9 @@ begin
    begin
       if(not IsUnitRange(a_tar,@pTarget))then exit;
 
+      {$IFDEF _FULLGAME}
       if(ServerSide)then
+      {$ENDIF}
       begin
          if(a_rld<=0)then
          begin
@@ -1205,11 +1245,8 @@ begin
 
             if(arm>LastUnitArms)or(a=0)then
             begin
-               if(ServerSide)then
-               begin
-                  a_tar:=0;
-                  StayWaitForNewTarget:=1;
-               end;
+               a_tar:=0;
+               StayWaitForNewTarget:=1;
                exit;
             end;
 
@@ -1221,11 +1258,8 @@ begin
 
             if(a=0)then
             begin
-               if(ServerSide)then
-               begin
-                  a_tar:=0;
-                  StayWaitForNewTarget:=1;
-               end;
+               a_tar:=0;
+               StayWaitForNewTarget:=1;
                exit;
             end;
          end;
@@ -1272,6 +1306,7 @@ begin
              exit;
          end;
       end
+      {$IFDEF _FULLGAME}
       else
       begin
          unit_attack:=true;
@@ -1282,7 +1317,8 @@ begin
          with uid^ do
            with uid_arms[a_weap] do
              attackinmove:=(aw_req_flags and wpr_move)>0;
-      end;
+      end
+      {$ENDIF};
 
       if(not unit_canAttack(pAttacker,true))then
       begin
@@ -1307,7 +1343,7 @@ begin
             a_tar_cl :=a_tar;
             a_weap_cl:=a_weap;
 
-            if(ServerSide)and(not uid_isbuilding)then
+            if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(not uid_isbuilding)then
               if(aw_max_range<0)and(aw_type=wpt_directdmg)
               then unit_AddExp(pAttacker,aw_reload*2,false,false)
               else unit_AddExp(pAttacker,aw_reload  ,false,false);
@@ -1315,27 +1351,22 @@ begin
             begin
                if(x<>pTarget^.x)
                or(y<>pTarget^.y)then dir:=point_dir(x,y,pTarget^.x,pTarget^.y);
-               if(ServerSide)then StayWaitForNewTarget:=(a_rld div order_period)+1;
+               {$IFDEF _FULLGAME}
+               if(ServerSide)then
+               {$ENDIF}
+               StayWaitForNewTarget:=(a_rld div order_period)+1;
             end;
             {$IFDEF _FULLGAME}
             effect_UnitAttack(pAttacker,true,@vis_Attacker);
+            if(vis_Target)and(aw_eid_target>0)and(aw_eid_target_onstart)then targetEffects(true);
             {$ENDIF}
-            visEffects;
+            teamVisionProc;
          end;
 
-         if(cycle_order=g_cycle_order)then visEffects;
+         if(cycle_order=g_cycle_order)then teamVisionProc;
 
          {$IFDEF _FULLGAME}
-         if(vis_Target)then
-           if(aw_eid_target>0)and(not aw_eid_target_onlyshot)then
-           begin
-              if(not IsUnitRange(pTarget^.transportU,nil))then
-                if((g_tick mod fr_fpst)=0)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^.uid_missileR),
-                                                          pTarget^.vy-g_randomr(pTarget^.uid^.uid_missileR),
-                                                          draw_DefaultSpriteDepth(pTarget^.vy+1,pTarget^.isfly),aw_eid_target);
-              if(aw_snd_target<>nil)then
-                if((g_tick mod fr_fps1)=0)then snd_SoundPlayUnit(aw_snd_target,pTarget,@vis_Target);
-           end;
+         if(vis_Target)and(aw_eid_target>0)and(aw_eid_target_onfire)then targetEffects(false);
          {$ENDIF}
 
          if(CheckShotPoint)then
@@ -1345,15 +1376,9 @@ begin
             else fakemissile:=(a_shots mod aw_FakeShotsN)>0;
             {$IFDEF _FULLGAME}
             effect_UnitAttack(pAttacker,false,@vis_Attacker);
-            if(vis_Target)then
-              if(aw_eid_target>0)and(aw_eid_target_onlyshot)then
-              begin
-                 if(not IsUnitRange(pTarget^.transportU,nil))then
-                 effect_add(pTarget^.vx-g_randomr(pTarget^.uid^.uid_missileR),pTarget^.vy-g_randomr(pTarget^.uid^.uid_missileR),draw_DefaultSpriteDepth(pTarget^.vy+1,pTarget^.isfly),aw_eid_target);
-
-                 snd_SoundPlayUnit(aw_snd_target,pTarget,@vis_Target);
-              end;
+            if(vis_Target)and(aw_eid_target>0)and(aw_eid_target_onshot)then targetEffects(true);
             {$ENDIF}
+
             // Impact bonuses
             if(aw_impact_upgr>0)and(aw_impact_upgrStep>0)then upgradd:=player^.upgrs_cur[aw_impact_upgr]*aw_impact_upgrStep;
             if(level>0)and(not uid_isbuilding)then upgradd+=level*uid_LevelBonusDamage;
@@ -1393,7 +1418,7 @@ wpt_directdmgZ : if(not fakemissile)and(aw_object_count>0)then
                    end;
 wpt_unit       : if(not fakemissile)then unit_ArmSpawnUnit(pAttacker,aw_object_id);
             else
-              if(ServerSide)and(not fakemissile)then
+              if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(not fakemissile)then
                 case aw_type of
 wpt_resurect    : begin
                      unit_StartResurrection(pAttacker,pTarget,false);
@@ -1470,7 +1495,9 @@ begin
       a_tar:=0;
       TeamVision:=pTransport^.TeamVision;
 
+      {$IFDEF _FULLGAME}
       if(ServerSide)then
+      {$ENDIF}
         if(unit_GetCastingAbility(pTransport)=uab_unload)
         or(pTransport^.transportC>pTransport^.transportM)then
           if(not pTransport^.isfly)
@@ -1733,7 +1760,8 @@ begin
       uab_SphereTurbo      : unit_AbilityCheck:=unit_ability_SphereTurbo  (pCaster,0  ,true );
 
       uab_PretorEquip      : unit_AbilityCheck:=unit_ability_UACHeroic    (pCaster,0  ,true );
-      uab_Bribe            : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,true );
+      uab_Bribe            : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,true ,true );
+      uab_Hack             : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,false,true );
 
       uab_HEyeBlink,
       uab_HTowerBlink      : unit_AbilityCheck:=unit_ability_HTowerBlink  (pCaster,x,y,true );
@@ -1755,7 +1783,8 @@ begin
       uab_ToHSymbol2       : unit_AbilityCheck:=unit_morph(pCaster,uid_HSymbol2       ,false, 1,0      ,true);
       uab_ToHSymbol3       : unit_AbilityCheck:=unit_morph(pCaster,uid_HSymbol3       ,false, 1,0      ,true);
       uab_ToHSymbol4       : unit_AbilityCheck:=unit_morph(pCaster,uid_HSymbol4       ,false, 1,0      ,true);
-      uab_ToHTower         : unit_AbilityCheck:=unit_morph(pCaster,uid_HTower         ,false,-2,0      ,true);
+      uab_ToHFTower        : unit_AbilityCheck:=unit_morph(pCaster,UID_HFTower        ,false,-2,0      ,true);
+      uab_ToHSTower        : unit_AbilityCheck:=unit_morph(pCaster,UID_HSTower        ,false,-2,0      ,true);
       uab_ToHTotem         : unit_AbilityCheck:=unit_morph(pCaster,uid_HTotem         ,false,-2,0      ,true);
 
       uab_ToUACommandCenter: unit_AbilityCheck:=unit_morph(pCaster,uid_UACommandCenter,false, 1,0      ,true);
@@ -1830,6 +1859,7 @@ begin
       uab_SphereTurbo,
       uab_PretorEquip,
       uab_Bribe,
+      uab_Hack,
       uab_HEyeVision,
       uab_HEyeBlink,
       uab_HTowerBlink    : begin
@@ -1843,7 +1873,8 @@ begin
                               uab_SphereDDamage   : unit_AbilityExec:=unit_ability_SphereDDamage(pCaster,uo_tar   ,false);
                               uab_SphereTurbo     : unit_AbilityExec:=unit_ability_SphereTurbo  (pCaster,uo_tar   ,false);
                               uab_PretorEquip     : unit_AbilityExec:=unit_ability_UACHeroic    (pCaster,uo_tar   ,false);
-                              uab_Bribe           : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,false);
+                              uab_Bribe           : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,false,false);
+                              uab_Hack            : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,true ,false);
                               uab_HEyeVision      : unit_AbilityExec:=unit_ability_HellVision   (pCaster,uo_tar   ,false);
                               uab_HEyeBlink,
                               uab_HTowerBlink     : unit_AbilityExec:=unit_ability_HTowerBlink  (pCaster,uo_x,uo_y,false);
@@ -1943,7 +1974,8 @@ begin
       uab_ToHSymbol2,
       uab_ToHSymbol3,
       uab_ToHSymbol4,
-      uab_ToHTower,
+      uab_ToHFTower,
+      uab_ToHSTower,
       uab_ToHTotem,
 
       uab_ToUACommandCenter,
@@ -1967,7 +1999,8 @@ begin
                               uab_ToHSymbol2       : unit_AbilityExec:=unit_morph(pCaster,uid_HSymbol2       ,false, 1,0      ,false);
                               uab_ToHSymbol3       : unit_AbilityExec:=unit_morph(pCaster,uid_HSymbol3       ,false, 1,0      ,false);
                               uab_ToHSymbol4       : unit_AbilityExec:=unit_morph(pCaster,uid_HSymbol4       ,false, 1,0      ,false);
-                              uab_ToHTower         : unit_AbilityExec:=unit_morph(pCaster,uid_HTower         ,false,-2,0      ,false);
+                              uab_ToHFTower        : unit_AbilityExec:=unit_morph(pCaster,UID_HFTower        ,false,-2,0      ,false);
+                              uab_ToHSTower        : unit_AbilityExec:=unit_morph(pCaster,UID_HSTower        ,false,-2,0      ,false);
                               uab_ToHTotem         : unit_AbilityExec:=unit_morph(pCaster,uid_HTotem         ,false,-2,0      ,false);
 
                               uab_ToUACommandCenter: unit_AbilityExec:=unit_morph(pCaster,uid_UACommandCenter,false, 1,0      ,false);
@@ -2086,9 +2119,11 @@ begin
                                      begin
                                         {$IFDEF _FULLGAME}
                                         snd_SoundPlayUnit(snd_CCenterLiftUp ,pu,nil);
+                                        if(ServerSide)then
                                         {$ENDIF}
+                                        zfall:=zfall-fly_hz;
+
                                         isfly:=uf_fly;
-                                        if(ServerSide)then zfall:=zfall-fly_hz;
                                      end;
                                      speed:=uid_MSpeed_Base;
                                   end
@@ -2098,17 +2133,17 @@ begin
                                      begin
                                         {$IFDEF _FULLGAME}
                                         snd_SoundPlayUnit(snd_Transport,pu,nil);
-                                        {$ENDIF}
-                                        isfly:=uf_ground;
                                         if(ServerSide)then
+                                        {$ENDIF}
                                         begin
                                            zfall:=fly_hz;
                                            unit_OrderClear(pu,255);
                                         end;
+                                        isfly:=uf_ground;
                                      end;
                                      speed:=0;
 
-                                     if(ServerSide)and(zfall<>0)then
+                                     if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(zfall<>0)then
                                        if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,255,pu)<>cbr_no)then
                                        begin
                                           buffs[ub_AltMode]:=ub_infinity;
@@ -2142,6 +2177,7 @@ begin
      if(IsUnitRange(pu^.transportU,@pTransport))
      then unit_InTransportCode(pu,pTransport)
      else
+       {$IFDEF _FULLGAME}
        if(not ServerSide)then // CLIENT-SIDE
        begin
           // rallly point
@@ -2166,8 +2202,9 @@ begin
              unit_AllCycleClient(pu);
           end;
        end
-       else                   // SERVER-SIDE
-       begin
+       else
+       {$ENDIF}
+       begin                   // SERVER-SIDE
           // rallly point
           unit_UpdateRPointTar(pu);
 

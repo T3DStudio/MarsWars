@@ -15,18 +15,19 @@ function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
 function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):cardinal;forward;
 
 procedure ai_Local_InitVars(pu:PTUnit);forward;
-//procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
-//procedure ai_Local_Code(pu:PTUnit);forward;
+procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
+procedure ai_Local_Code(pu:PTUnit);forward;
 
 procedure ai_Global_InitVars(pu:PTUnit);forward;
-{procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
+procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
 procedure ai_Global_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
-procedure ai_Global_ScoutPick(pu:PTUnit);forward;
-procedure ai_Global_Code(pu:PTUnit);forward;}
-function ai_HighPriorityTarget(player:PTPlayerGameData;tu:PTUnit):boolean;forward;
+procedure ai_Global_Code(pu:PTUnit);forward;
+//procedure ai_Global_ScoutPick(pu:PTUnit);forward;
+//function ai_HighPriorityTarget(player:PTPlayerGameData;tu:PTUnit):boolean;forward;
 
 function map_IfObstacleZone(zone:word):boolean;       forward;
 function map_GetZone(mx,my:integer;mr:integer=0):word;forward;
+procedure map_SymmetryPoints(startx,starty:integer;resultx,resulty:pinteger);forward;
 
 function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
@@ -167,6 +168,13 @@ function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i ,t);end;
 function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c ,t);end;
 function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
 
+// card ticks to secs
+function ct2s(r:cardinal):cardinal;
+begin
+   if(r>0)
+   then ct2s:=(r+fr_ifps) div fr_fps1
+   else ct2s:=0;
+end;
 
 function strMX(x:byte):shortstring;
 begin
@@ -459,7 +467,7 @@ begin
       if(g<>[])then
         for i:=0 to 255 do
           if(i in g)then
-            with g_upids[i] do upgrs_max[i]:=min2i(upgr_max,lvl);
+            with g_upgrs[i] do upgrs_max[i]:=min2i(upgr_max,lvl);
    end;
 end;
 procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new,NoCheck:boolean);  // current upgrades
@@ -471,10 +479,10 @@ begin
       if(g<>[])then
        for i:=0 to 255 do
         if(i in g)then
-         with g_upids[i] do
-          if(NoCheck)
+         with g_upgrs[i] do
+          {if(NoCheck)
           then upgrs_cur[i]:=min2i(upgr_max ,lvl)
-          else upgrs_cur[i]:=min3i(upgrs_max[i],upgr_max,lvl);
+          else} upgrs_cur[i]:=min3i(upgrs_max[i],upgr_max,lvl);
    end;
 end;
 
@@ -552,7 +560,7 @@ begin
                  and(lm_y=y)
                  then exit
                  else
-                   if(point_dist_rint(lm_x,lm_y,x,y)<base_2r)then exit;
+                   if(point_dist_rint(lm_x,lm_y,x,y)<base_r2)then exit;
       end;
    end;
    PlayerLogCheckNearEvent:=false;
@@ -583,6 +591,12 @@ lmt_player_nready,
 lmt_replay_RecStart,
 lmt_replay_RecStop,
 lmt_replay_RecError,
+lmt_kpoint_captured,
+lmt_kpoint_lost,
+lmt_ngen_exh,
+lmt_ngen_captured,
+lmt_ngen_lost,
+lmt_koth_control,
 lmt_game_end,
 lmt_game_message,
 lmt_game_ReadyToStart,
@@ -1067,6 +1081,13 @@ begin
      end;
 end;
 
+function KeyPoint_GetPlayerTeam(playerN:byte):byte;
+begin
+   KeyPoint_GetPlayerTeam:=MaxPlayers;
+   if(playerN<MaxPlayers)then
+     KeyPoint_GetPlayerTeam:=g_gplayers[playerN].team;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
@@ -1207,9 +1228,9 @@ end;
 function GetUpgradeEnergy(upgr,lvl:byte):integer;
 begin
    GetUpgradeEnergy:=0;
-   with g_upids[upgr] do
+   with g_upgrs[upgr] do
      if(0<lvl)and(lvl<=upgr_max)then
-       if(upgr_mfrg)or((upgr_renerg_xpl<=0)and(upgr_renerg_apl<=0))
+       if(upgr_renerg_xpl<=0)and(upgr_renerg_apl<=0)
        then GetUpgradeEnergy:=upgr_renerg
        else
        begin
@@ -1221,9 +1242,9 @@ function GetUpgradeTime(upgr,lvl:byte):integer;
 const upgr_max_time = fr_fps1*255;
 begin
    GetUpgradeTime:=0;
-   with g_upids[upgr] do
+   with g_upgrs[upgr] do
      if(0<lvl)and(lvl<=upgr_max)then
-       if(upgr_mfrg)or((upgr_time_xpl<=0)and(upgr_time_apl<=0))
+       if(upgr_time_xpl<=0)and(upgr_time_apl<=0)
        then GetUpgradeTime:=upgr_time
        else
        begin
@@ -1232,21 +1253,21 @@ begin
        end;
 end;
 
-function CheckUpgradeReqs(player:PTPlayerGameData;up:byte):cardinal;
+function CheckUpgradeReqs(player:PTPlayerGameData;upgr:byte):cardinal;
 procedure AddBits(ni:cardinal;b:boolean);
 begin if(b)then CheckUpgradeReqs:=CheckUpgradeReqs or ni;end;
 begin
    CheckUpgradeReqs:=0;
    with player^ do
-   with g_upids[up] do
+   with g_upgrs[upgr] do
    begin
       AddBits(ureq_uid       ,(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)  );
       AddBits(ureq_upgr      ,(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)  );
-      AddBits(ureq_energy    , res_energyl_cur<GetUpgradeEnergy(up,upgrs_cur[up]+1) );
+      AddBits(ureq_energy    , res_energyl_cur<GetUpgradeEnergy(upgr,upgrs_cur[upgr]+1) );
       AddBits(ureq_BadProd   , upgr_time<=0                            );
-      AddBits(ureq_max       ,(integer(upgrs_cur[up]+prod_upgr_upid[up])>=min2i(upgr_max,upgrs_max[up])));
-      AddBits(ureq_InProgress,(not upgr_mfrg)and(prod_upgr_upid[up]>0) );
-      AddBits(ureq_forges    , units_upgrProds_ec<=0                             );
+      AddBits(ureq_max       ,(integer(upgrs_cur[upgr]+prod_upgr_upid[upgr])>=min2i(upgr_max,upgrs_max[upgr]) )); //
+      AddBits(ureq_InProgress, prod_upgr_upid[upgr]>0                    );
+      AddBits(ureq_forges    , units_upgrProds_ec<=0                   );
    end;
 end;
 
@@ -1688,13 +1709,6 @@ begin
      end;
 end;
 
-function KeyPoint_GetPlayerTeam(playerN:byte):byte;
-begin
-   KeyPoint_GetPlayerTeam:=MaxPlayers;
-   if(playerN<MaxPlayers)then
-     KeyPoint_GetPlayerTeam:=g_gplayers[playerN].team;
-end;
-
 function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):cardinal;
 begin
    case shadow of
@@ -1999,7 +2013,7 @@ begin
      if(lm_data_u>0)then
        case lm_data_t of
        lmt_argt_unit   : with g_uids [lm_data_u] do ParseLogMessage+=' ('+uid_str_name +')';
-       lmt_argt_upgrade: with g_upids[lm_data_u] do ParseLogMessage+=' ('+upgr_str_Name+')';
+       lmt_argt_upgrade: with g_upgrs[lm_data_u] do ParseLogMessage+=' ('+upgr_str_Name+')';
        lmt_argt_ability: ParseLogMessage+=' ('+str_AbilityHintName(lm_data_u,255)+')';
        end;
 end;
@@ -2061,7 +2075,7 @@ lmt_game_ResetIn      : ParseLogMessage:=str_lobby_GameResetIn+b2s(lm_data_u);
 
 lmt_upgrade_InProgress: ParseLogMessage:=str_warn_upgrade_InProgress;
 lmt_upgrade_complete  : begin
-                        with g_upids[lm_data_u] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
+                        with g_upgrs[lm_data_u] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
                         mcolor^:=c_yellow;
                         end;
 lmt_unit_ready        : begin
@@ -2111,7 +2125,7 @@ lmt_kpoint_lost       : begin
                         mcolor^:=c_dred;
                         end;
 lmt_koth_control      : begin
-                        ParseLogMessage:=b2s(lm_data_u)+str_warn_koth_control;
+                        ParseLogMessage:=b2s(lm_data_u+1)+str_warn_koth_control;
                         mcolor^:=c_dred;
                         end;
 lmt_ngen_exh          : begin
@@ -2304,16 +2318,21 @@ begin
 end;
 
 
-function unit_CalcShadowZ(pu:PTUnit):integer;
+function unit_CalcShadowZ(pu:PTUnit;uidApply:boolean=false):integer;
 begin
    with pu^  do
    with uid^ do
-     if(not uid_isbuilding)
-     then unit_CalcShadowZ:=fly_height[isfly]
-     else
-       if(speed<=0)or(not iscomplete)
-       then unit_CalcShadowZ:=-fly_hz   // no shadowz
-       else unit_CalcShadowZ:=0;
+     case uidApply of
+     true : if(uid_isbuilding)
+            then unit_CalcShadowZ:=-fly_hz
+            else unit_CalcShadowZ:=fly_height[false];
+     false: if(not uid_isbuilding)
+            then unit_CalcShadowZ:=fly_height[isfly]
+            else
+              if(speed<=0)or(not iscomplete)
+              then unit_CalcShadowZ:=-fly_hz   // no shadowz
+              else unit_CalcShadowZ:=0;
+     end;
 end;
 
 procedure unit_CalcFogR(pu:PTUnit);
@@ -2412,7 +2431,7 @@ begin
                                             else strInfoVar1^+=' '+str_map_Scenario  +': '+str_map_ScenarioL  [vbyte1]+tc_default+tc_nl2;
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_generators));
-   if(vbyte1>map_MaxGenerators             )then exit
+   if(vbyte1>mapg_Last                     )then exit
                                             else strInfoVar1^+=' '+str_map_Generators+': '+str_map_GeneratorsL[vbyte1]+tc_nl2;
    vcard:=0;
    BlockRead(f,vcard ,sizeof(map_seed      ));   strInfoVar1^+=' '+str_map_Seed      +': '+c2s(vcard)+tc_nl2;
@@ -2427,7 +2446,9 @@ begin
                                             else strInfoVar1^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
 
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));   strInfoVar1^+=' '+str_map_Symmetry  +': '+str_YesNoC[vbyte1>0]+tc_nl2;
+   BlockRead(f,vbyte1,sizeof(map_Symmetry  ));
+   if(vbyte1>maps_Last                     )then exit
+                                            else strInfoVar1^+=' '+str_map_Symmetry  +': '+str_map_SymmertyL[vbyte1]+tc_nl2;
 
    vint:=-1;
    BlockRead(f,vint  ,sizeof(theme_i       ));

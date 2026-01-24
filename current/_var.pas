@@ -30,7 +30,7 @@ g_cycle_order     : integer = 0;
 g_cycle_regen     : integer = 0;
 
 g_uids            : array[byte] of TUID;
-g_upids           : array[byte] of TUPID;
+g_upgrs           : array[byte] of TUpgrade;
 g_mids            : array[byte] of TMID;
 g_DamageMods      : array[byte] of TDamageMod;
 g_aids            : array[byte] of TUnitAbility;
@@ -52,8 +52,10 @@ map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
 map_ObstaclesS    : byte     = 1;
 map_ObstaclesGap  : integer  = 40;
-map_PStartsGap    : integer  = base_1r;
-map_Symmetry      : boolean  = true;
+map_PStartsGap    : integer  = base_r1;
+map_Symmetry      : byte     = 0;
+
+map_SymmetryDir   : integer  = 0;
 map_MaxPlayers    : byte     = MaxPlayers;
 map_PlayerStartX,
 map_PlayerStartY  : array[0..LastPlayer] of integer;
@@ -68,8 +70,6 @@ map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
 //  OTHER BASE
 //
 
-ServerSide        : boolean = true; // only server side code
-
 UnitStepTicks     : byte = 10;
 
 LastCreatedUnit   : integer = 0;
@@ -77,10 +77,10 @@ LastCreatedUnitP  : PTUnit;
 
 net_status        : byte = 0;
 net_ServerPort    : word = 10666;
-net_period        : byte = 0;
+net_TimerBase     : byte = 0;
 net_svLanAdv      : boolean = true;
 net_svLanAdv_timer: integer = 0;
-net_ping_timer    : integer = 0;
+net_TimerPing    : integer = 0;
 net_wudata_t      : TWUDataTime;
 net_kpoints_kpi   : byte = 0;
 net_socket        : PUDPSocket;
@@ -142,6 +142,8 @@ test_InstaProd    : boolean = true;
 //
 
 {$IFDEF _FULLGAME}
+
+ServerSide        : boolean = true; // only server side code
 
 g_type            : byte     = 0; // 0 = none, 1 = scirmish, 2 - campaing
 
@@ -420,6 +422,9 @@ map_MiniMap_cx    : single;
 map_MiniMap_CamW,
 map_MiniMap_CamH  : integer;
 
+map_fog_ex,
+map_fog_ey        : integer;
+
 map_terrain       : pSDL_SURFACE;
 
 map_ter_w,
@@ -510,9 +515,10 @@ rpls_FastSkip     : boolean = false;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
+rpls_GameStatus   : byte = 0;
 rpls_showlog      : boolean = false;
 rpls_POVRecorder  : boolean = false;
-rpls_ticks        : byte = 0;
+rpls_Ticks        : cardinal = 0;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_head_itemn   : integer = 0;
 rpls_file_head_size
@@ -732,7 +738,8 @@ spr_HPools1,
 spr_HPools2,
 spr_HPools3,
 spr_HPools4,
-spr_HTower,
+spr_HFTower,
+spr_HSTower,
 spr_HTeleport,
 spr_HMonastery,
 spr_HTotem,
@@ -863,6 +870,7 @@ spr_uibtn_AbilitySRDamage,
 spr_uibtn_AbilitySTurbo,
 spr_uibtn_AbilityPretEquip,
 spr_uibtn_AbilityBribe,
+spr_uibtn_AbilityHack,
 spr_uibtn_AbilityUACStrike,
 spr_uibtn_AbilityUACScan,
 spr_uibtn_AbilityBlink,
@@ -1065,7 +1073,7 @@ str_net_ServerStart,
 str_net_ServerStop,
 str_net_Connect,
 str_net_Disconnect,
-str_net_LANSearch,
+str_net_ServerList,
 
 str_hint_upgrade,
 str_hint_sec,
@@ -1267,7 +1275,7 @@ str_Caption_Client,
 str_Caption_GOptions,
 str_Caption_Objectives,
 str_Caption_Multiplayer,
-str_Caption_NetSVSearch,
+str_Caption_NetSvList,
 str_Caption_Map,
 str_Caption_Players      : shortstring;
 
@@ -1276,7 +1284,8 @@ str_ReplayQualityL       : array[0..net_MaxQuality] of shortstring;
 str_Camp_DifficultyL     : array[0..camp_Maxdiff  ] of shortstring;
 str_ui_Tab               : array[0..3] of shortstring;
 
-str_map_GeneratorsL      : array[0..map_MaxGenerators ] of shortstring;
+str_map_GeneratorsL      : array[0..mapg_Last ] of shortstring;
+str_map_SymmertyL        : array[0..maps_Last ] of shortstring;
 str_SG_PlayersColorL     : array[0..ui_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL       : array[0..2] of shortstring;
 str_SG_ControlPanelPosL  : array[0..3] of shortstring;
@@ -1538,6 +1547,7 @@ snd_Teleport,
 snd_explode_plasma,
 snd_explode,
 snd_mapmark,
+snd_KeyPointControl,
 snd_KeyPointCapture,
 snd_KeyPointLost,
 snd_SwitchOn,

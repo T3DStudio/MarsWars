@@ -17,6 +17,18 @@ begin
      end;
 end;
 
+procedure cl_calcWTicks(dataPeriod:byte;pwtickb0,pwtickb1,pwtickb2:pboolean;rpl:boolean);
+var wtick:cardinal;
+begin
+   wtick:=g_tick div dataPeriod;
+
+   pwtickb0^:=(wtick mod cardinal(fr_fps1 div dataPeriod))=0;
+   if(rpl)
+   then pwtickb1^:=(wtick mod cardinal(fr_fps2 div dataPeriod))=0  // every 2 second
+   else pwtickb1^:= pwtickb0^;                                     // every second
+   pwtickb2^:=(wtick mod cardinal(fr_fpsd15 div dataPeriod))=0;    // every second time
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   WRITE GAME DATA
@@ -394,7 +406,7 @@ begin
           bp:=0;
 
           for n:=0 to 255 do
-            if(race=g_upids[n].upgr_race)then
+            if(race=g_upgrs[n].upgr_race)then
               case bp of
                 0: begin
                       bv:=upgrs_cur[n];
@@ -446,7 +458,7 @@ begin
    then wdkpi:=@rpls_kpoints_kpi
    else wdkpi:= @net_kpoints_kpi;
 
-   wdkpi^:=(wdkpi^+1) mod MaxKeyPoints;
+   wdkpi^:=(wdkpi^+1) mod map_KeyPointsN;
 
    if(g_gplayers[POVPlayer].isobserver)
    then kpteam:=MaxPlayers
@@ -455,11 +467,6 @@ begin
    with map_KeyPointsL[wdkpi^] do
      with kp_TeamData[kpteam] do
      begin
-        {a:=wdkpi^ and %00001111;
-        if(kptd_Active)then
-        a:=a or %00010000;
-        wudata_byte(a,rpl); }
-
         w:=(wdkpi^) and %0000000000001111;
         if(kptd_Active)then w:=w or %0000000000010000;
         if(kptd_Active)then
@@ -467,32 +474,29 @@ begin
            w:=w or ((word(ct2s(kptd_lifeTime)) and %0000011111111111) shl 5);
            wudata_word(w,rpl);
 
-           if(kptd_OwnerPlayer>=MaxPlayers)
-           then a:=%00001111
-           else a:=kptd_OwnerPlayer;
+           if(kptd_OwnerPlayer<MaxPlayers)
+           then a:=kptd_OwnerPlayer
+           else a:=%00001111;
 
-           if(kptd_TimerOwnerPlayer>=MaxPlayers)
-           then b:=%1111
-           else b:=(kptd_TimerOwnerPlayer and %00001111) shl 4;
+           if(kptd_TimerOwnerPlayer<MaxPlayers)and(kptd_Timer>0)
+           then b:=(kptd_TimerOwnerPlayer and %00001111) shl 4
+           else b:=%11110000;
 
            a:=a or b;
            wudata_byte(a,rpl);
+
+           if(kptd_TimerOwnerPlayer<=LastPlayer)and(kptd_Timer>0)then
+           wudata_reload(kptd_Timer,rpl);
         end
         else wudata_byte(w and %0000000000011111,rpl);
      end;
-   {
-   kpi
-   kptd_Active
-   kptd_lifeTime
-   kptd_OwnerPlayer
-   kptd_TimerOwnerPlayer}
 end;
 
-procedure wclinet_gframe(POVPlayer:byte;rpl:boolean);
+procedure wclinet_gframe(POVPlayer,dataPeriod:byte;rpl:boolean);
 var
-wtick       : cardinal;
 wtickb0,
-wtickb1     : boolean;
+wtickb1,
+wtickb2     : boolean;
 lastPUnit   : pinteger;
 bs_alive,
 bs_defeated,
@@ -504,12 +508,7 @@ units_now   : integer;
 begin
    wudata_card(g_tick,rpl);
 
-   wtick:=g_tick shr 1;
-
-   wtickb0:=(wtick mod fr_fpsh)=0;
-   if(rpl)
-   then wtickb1:=(wtick mod fr_fps1)=0  // every 2 second
-   else wtickb1:= wtickb0;              // every second
+   cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
 
    if(wtickb1)then
      case map_scenario of
@@ -559,10 +558,12 @@ begin
 
       units_now:=min2i(units_ingame,units_now*4);
 
-      if(map_scenario=mc_KeyPoints)
-      or(map_scenario=mc_KotH)
-      or(map_generators>0)then
-        wclinet_KeyPoint(rpl,POVPlayer);
+      if(wtickb2)then
+        if(map_KeyPointsN>0)then
+          if(map_scenario=mc_KeyPoints)
+          or(map_scenario=mc_KotH)
+          or(map_generators>0)then
+            wclinet_KeyPoint(rpl,POVPlayer);
 
       if(wtickb0)then
       begin
@@ -1388,7 +1389,7 @@ begin
           bp:=0;
 
           for n:=0 to 255 do
-            with g_upids[n] do
+            with g_upgrs[n] do
               if(race=upgr_race)then
               case bp of
               0: begin
@@ -1414,11 +1415,11 @@ begin
    end;
 end;
 
-procedure rclinet_KeyPoint(POVPlayer:byte;rpl,no_effect:boolean);
+procedure rclinet_KeyPoint(rpl,no_effect:boolean);
 var
 kpi,a,b:byte;
 w      :word;
-//active :boolean;
+pactive:boolean;
 begin
    a     :=rudata_byte(rpl,0);
    kpi   :=a and %00001111;
@@ -1427,61 +1428,32 @@ begin
      with map_KeyPointsL[kpi] do
      with kp_TeamData[MaxPlayers] do
      begin
+        pactive:=kptd_Active;
         kptd_Active:=(a and %00010000)>0;
+        if(not no_effect)and(pactive)and(not kptd_Active)then
+          KeyPoints_Explode(kpi);
+
         if(not kptd_Active)then exit;
+
         b:=rudata_byte(rpl,0);
         w:=word(a) or (b shl 8);
         kptd_lifeTime:=((w shr 5) and %0000011111111111)*fr_fps1;
         if(kptd_lifeTime>0)then kptd_lifeTime-=1;
         b:=rudata_byte(rpl,0);
         KeyPoint_ChangeOwner(kpi,b and %00001111,false);
-        kptd_TimerOwnerPlayer:= b and %1111;
+        kptd_TimerOwnerPlayer:=b shr 4;
 
-        //kp_TeamData[POVPlayer]:=kp_TeamData[MaxPlayers];
+        if(kptd_TimerOwnerPlayer<=LastPlayer)
+        then rudata_reload(@kptd_Timer,rpl)
+        else kptd_Timer:=0;
      end;
-      {
-
-      w:=(wdkpi^) and %0000000000001111;
-      if(kptd_Active)then
-      begin
-         w:=w or %0000000000010000;
-         w:=w or ((ct2s(kptd_lifeTime) and %11111111111) shl 5);
-
-         kptd_OwnerPlayer
-         kptd_TimerOwnerPlayer
-
-         if(kptd_OwnerPlayer>=MaxPlayers)
-         then b:=%00001111
-         else b:=kptd_OwnerPlayer;
-
-         if(kptd_TimerOwnerPlayer>=MaxPlayers)
-         then o:=%1111
-         else o:=(kptd_OwnerPlayer and %00001111) shl 4;
-
-
-         kpdata_owner: begin
-                          p:=b and kpdata_pmask;
-                          if(p>LastPlayer)then p:=255;
-                          KeyPoint_ChangeOwner(kpi,p);
-                       end;
-         kpdata_timer: begin
-                          p:=b and kpdata_pmask;
-                          if(p>LastPlayer)then p:=255;
-                          kpTimerOwnerPlayer:=p;
-                          rudata_reload(@kpTimer,rpl);
-                       end;
-         kpdata_life : begin
-                          rudata_reload(@i,rpl);
-                          kplifetime:=i*5;
-                       end;
- }
 end;
 
-procedure rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
+procedure rclinet_gframe(POVPlayer,dataPeriod:byte;rpl,fast_skip:boolean);
 var
-wtick      : cardinal;
 wtickb0,
-wtickb1    : boolean;
+wtickb1,
+wtickb2    : boolean;
 bs_observer,
 bs_defeated,
 bs_alive,
@@ -1494,16 +1466,11 @@ begin
    rpoint_ChangeAnnoncer:=false;
    g_tick:=rudata_card(rpl,g_tick);
 
-   wtick:=g_tick shr 1;
-
-   wtickb0:=(wtick mod fr_fpsh)=0;
-   if(rpl)
-   then wtickb1:=(wtick mod fr_fps1)=0  // every 2 second
-   else wtickb1:= wtickb0;              // every second
+   cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
 
    if(wtickb1)then
      case map_scenario of
-mc_royale   : g_royal_r:=rudata_int(rpl,0);
+     mc_royale   : g_royal_r:=rudata_int(rpl,0);
      end;
 
    bs_defeated :=rudata_byte(rpl,0);
@@ -1534,14 +1501,16 @@ mc_royale   : g_royal_r:=rudata_int(rpl,0);
       begin
          rpls_pnu:=units_now;
          if(rpls_pnu<=0)then rpls_pnu:=1;
-         UnitStepTicks:=round(units_ingame/rpls_pnu*NetTickN)+1;
+         UnitStepTicks:=round(units_ingame/rpls_pnu*dataPeriod)+1;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 
-      if(map_scenario=mc_KeyPoints)
-      or(map_scenario=mc_KotH)
-      or(map_generators>0)then
-        rclinet_KeyPoint(POVPlayer,rpl,fast_skip);
+      if(wtickb2)then
+        if(map_KeyPointsN>0)then
+          if(map_scenario=mc_KeyPoints)
+          or(map_scenario=mc_KotH)
+          or(map_generators>0)then
+            rclinet_KeyPoint(rpl,fast_skip);
 
       if(wtickb0)then
       begin
@@ -1576,11 +1545,12 @@ mc_royale   : g_royal_r:=rudata_int(rpl,0);
    end;
 
    if(rpoint_ChangeAnnoncer)then
-     with g_gplayers[LocalPlayer] do
-     begin
-        snd_SoundPlayUnitCommand(snd_rally_point[race]);
-        rpoint_ChangeAnnoncer:=false;
-     end;
+   begin
+      if(UIPlayer<=LastPlayer)then
+        with g_gplayers[UIPlayer] do
+          snd_SoundPlayUnitCommand(snd_rally_point[race]);
+      rpoint_ChangeAnnoncer:=false;
+   end;
 end;
 {$ENDIF}
 

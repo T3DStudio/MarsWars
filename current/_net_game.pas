@@ -91,7 +91,7 @@ begin
       PNU     :=net_readbyte;
       log_n_cl:=net_readcard;
 
-      if(log_n_cl=log_n)then net_logsend_pause:=0;
+      if(log_n_cl=log_n)then net_TimerLogsend:=0;
    end;
 end;
 
@@ -164,10 +164,10 @@ begin
 
    net_writebyte(map_scenario  );
    net_writebyte(map_generators);
-   net_writeint (map_Size1      );
+   net_writeint (map_Size1     );
    net_writebyte(map_ObstaclesS);
    net_writecard(map_seed      );
-   net_writebool(map_Symmetry  );
+   net_writebyte(map_Symmetry  );
 
    net_writebool(g_FixedPositions);
    net_writebyte(g_AISlots       );
@@ -236,7 +236,6 @@ tpingw : word;
 tping1,
 tping2 : cardinal;
 pu     : PTUnit;
-every2t: boolean;
 begin
    // REEIVING
    net_clearbuffer;
@@ -323,7 +322,7 @@ begin
                                        begin
                                           PNU     :=net_readbyte;
                                           log_n_cl:=net_readcard;
-                                          if(log_n_cl=log_n)then net_logsend_pause:=0;
+                                          if(log_n_cl=log_n)then net_TimerLogsend:=0;
                                        end;
                  nmid_pause          : begin
                                           if(G_Status<=LastPlayer)then
@@ -402,11 +401,8 @@ begin
      end;
 
    // SENDING
-   net_period+=1;
-   net_period:= net_period mod net_PeriodTime;
-   every2t   :=(net_period mod NetTickN)=0;
-   net_ping_timer+=1;
-   net_ping_timer:=net_ping_timer mod net_PingReqTime;
+   net_TimerBase:=(net_TimerBase+1) mod net_SendTimeServer;
+   net_TimerPing:=(net_TimerPing+1) mod net_SendTimePing;
 
    for pid:=0 to LastPlayer do
      {$IFDEF _FULLGAME}
@@ -416,19 +412,19 @@ begin
        with g_nplayers[pid] do
          if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
-            if(G_Started)and(every2t)then
+            if(G_Started)and(net_TimerBase=0)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_GameData);
                net_writebyte(G_Status);
                case G_Status of
-               gs_running    : wclinet_gframe(pid,false);
+               gs_running    : wclinet_gframe(pid,net_SendTimeServer,false);
                gs_waitplayers: net_WritePlayersDelay;
                end;
                net_send(net_ip,net_port);
             end;
 
-            if(pid=net_ping_timer)then
+            if(pid=net_TimerPing)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_ping_request);
@@ -437,13 +433,13 @@ begin
                net_send(net_ip,net_port);
             end;
 
-            if(net_logsend_pause<=0)and(log_n_cl<>log_n)then
+            if(net_TimerLogsend<=0)and(log_n_cl<>log_n)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_LogUpdate);
                wudata_log(pid,@log_n_cl,false);
                net_send(net_ip,net_port);
-               net_logsend_pause:=fr_fpsh;
+               net_TimerLogsend:=fr_fpsh;
             end;
          end;
 
@@ -520,10 +516,10 @@ begin
 
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_generators  ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrInt (@map_Size1        ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrInt (@map_Size1       ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_ObstaclesS  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrBool(@map_Symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrByte(@map_Symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
 
    if(nrBool(@g_FixedPositions))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@g_AISlots       ))then begin redraw_menu:=true;              end;
@@ -622,7 +618,7 @@ nmid_NotConnected: begin
                    end;
 nmid_LogUpdate   : begin
                       rudata_log(LocalPlayer,false);
-                      net_period:=0;
+                      net_TimerBase:=0;
                    end;
 nmid_ping_Request: begin
                       tping1:=net_readcard;
@@ -679,7 +675,7 @@ nmid_GameData    : if(G_Started)then
                    begin
                       G_Status:=net_readbyte;
                       case G_Status of
-                      gs_running    : rclinet_gframe(LocalPlayer,false,false);
+                      gs_running    : rclinet_gframe(LocalPlayer,net_SendTimeServer,false,false);
                       gs_waitplayers: net_ReadPlayersDelay;
                       end;
                    end;
@@ -687,7 +683,7 @@ nmid_GameData    : if(G_Started)then
      end;
 
    // CLIENT OUTPUT
-   if(net_period=0)then
+   if(net_TimerBase=0)then
    begin
       net_clearbuffer;
       if(G_Started)then
@@ -709,8 +705,8 @@ nmid_GameData    : if(G_Started)then
    end;
 
    // CLIENT TIMERS
-   net_period+=1;
-   net_period:=net_period mod net_PeriodTime;
+   net_TimerBase+=1;
+   net_TimerBase:=net_TimerBase mod net_SendTimeClient;
    net_cl_svttl+=1;
    if(net_cl_svttl>=TTLServer)then
    begin

@@ -126,8 +126,8 @@ begin
       8 : Dedicated_screenLine(b2c[g_FixedPositions]  ,1, ai_name(g_AISlots),25, b2c[g_DefeatedObs ] ,50, '' ,1,'',55,'',70);
       10: writeln;
       12: writeln(str_MapOptions);
-      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Obstacles    ,55, str_map_Symmetry ,70);
-      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_Size1),45, strMX(map_ObstaclesS),55, b2c[map_symmetry],70);
+      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Obstacles    ,55, str_map_Symmetry               ,70);
+      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_Size1),45, strMX(map_ObstaclesS),55, str_map_SymmetryL[map_symmetry],70);
       18: writeln;
       20: Dedicated_screenLine('#',1,str_State                ,3, str_Player,11,str_srace,29,str_team ,39, str_ping,49);   // captions
       22: PlayerDataLine(0);

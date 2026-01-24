@@ -152,7 +152,7 @@ begin
                 setlength(net_svsearch_lists,0);
                 setlength(net_svsearch_listi,0);
              end
-             else menu_msgBox_Set(str_Caption_Multiplayer,str_net_LANSearch+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_net_ServerList+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
    false: begin
              if(not net_svsearch)
@@ -631,23 +631,23 @@ begin
 
    case net_status of
    ns_none    : begin
-                   menu_Item_Set(mi_MP_ServerToggle   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServer      (true ,true));mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ServerPort     ,mtx0,mty0,cx  ,mty0+menu_ListLineH,GameNetServer      (true ,true));
-                   menu_Item_Set(mi_MP_ServerLANVis   ,cx  ,mty0,mtx1,mty0+menu_ListLineH,true                           );mty0+=menu_ListLineH;
-                                                                                                                           mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_Connect        ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ClientAddress  ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ClientLANSearch,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServerSearch(true ,true));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ServerToggle    ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServer      (true ,true));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ServerPort      ,mtx0,mty0,cx  ,mty0+menu_ListLineH,GameNetServer      (true ,true));
+                   menu_Item_Set(mi_MP_ServerLANVis    ,cx  ,mty0,mtx1,mty0+menu_ListLineH,true                           );mty0+=menu_ListLineH;
+                                                                                                                            mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_Connect         ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ClientAddress   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ClientServerList,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServerSearch(true ,true));mty0+=menu_ListLineH;
                 end;
    ns_server  : begin
                    mty0-=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ServerPort     ,mtx0,mty0,cx  ,mty0+menu_ListLineH,false                     );
-                   menu_Item_Set(mi_MP_ServerLANVis   ,cx  ,mty0,mtx1,mty0+menu_ListLineH,true                      );mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ServerToggle   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServer(false,true ));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ServerPort      ,mtx0,mty0,cx  ,mty0+menu_ListLineH,false                     );
+                   menu_Item_Set(mi_MP_ServerLANVis    ,cx  ,mty0,mtx1,mty0+menu_ListLineH,true                      );mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ServerToggle    ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServer(false,true ));mty0+=menu_ListLineH;
                    with menu_items[mi_MP_Panel] do
                    begin
-                   menu_Item_Set(mi_MP_ChatList       ,mi_x0,mty0,mi_x1,mi_y1-txt_line_h1,true);
-                   menu_Item_Set(mi_MP_ChatLine       ,mi_x0,mi_y1-txt_line_h1,mi_x1,mi_y1,true);
+                   menu_Item_Set(mi_MP_ChatList        ,mi_x0,mty0,mi_x1,mi_y1-txt_line_h1,true);
+                   menu_Item_Set(mi_MP_ChatLine        ,mi_x0,mi_y1-txt_line_h1,mi_x1,mi_y1,true);
                    end;
                 end;
    ns_client  : begin
@@ -740,17 +740,17 @@ begin
    else menu_page_BottomButtons(mi_back,0          ,mi_Settings,mi_Help,mi_StartNow,0,0);
 end;
 
-procedure net_LANSearch;
+procedure menu_net_ServerList;
 begin
    menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_SVSearch);
 
-   menu_Item_Set(mi_NetSearch_List,menu_hw-menu_ListW1,menu_underCaptionY,
-                                   menu_hw+menu_ListW1,menu_underCaptionY+menu_ListLineH2*menu_SvSearchListH,true);
+   menu_Item_Set(mi_NetServers_List,menu_BaseW1       ,menu_underCaptionY,
+                                    menu_w-menu_BaseW1,menu_underCaptionY+menu_ServerLineH*menu_ServerListH,true);
 
-   menu_page_BottomButtons(mi_back,mi_NetSearch_Connect,0,0,0,0,0);
+   menu_page_BottomButtons(mi_back,mi_NetServers_Connect,0,0,0,0,0);
 
-   menu_item_setEnabled(mi_NetSearch_Connect,GameNetServerListConnect(true));
+   menu_item_setEnabled(mi_NetServers_Connect,GameNetServerListConnect(true));
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -761,7 +761,7 @@ begin
    FillChar(menu_items,SizeOf(Menu_items),0);
 
    if(net_svsearch)
-   then net_LANSearch
+   then menu_net_ServerList
    else
      case menu_page of
      mi_SaveLoad: menu_page_SaveLoad;
@@ -964,11 +964,11 @@ mi_MP_Connect          : if(not check)then GameNetClient(true ,false);
 mi_MP_Disconnect       : if(not check)then GameNetClient(false,false);
 mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,true,0,net_MaxQuality);
 mi_MP_ClientAddress    : ;
-mi_MP_ClientLANSearch  : if(not check)then GameNetServerSearch(true,false);
+mi_MP_ClientServerList : if(not check)then GameNetServerSearch(true,false);
 
-// Net Search MULTIPLAYER
-mi_NetSearch_List      : if(not check)then menu_ListMouseXY2Line(item,@net_svsearch_sel,net_svsearch_scroll,menu_ListLineH2);
-mi_NetSearch_Connect   : if(not check)then GameNetServerListConnect(false);
+// Net Server List MULTIPLAYER
+mi_NetServers_List      : if(not check)then menu_ListMouseXY2Line(item,@net_svsearch_sel,net_svsearch_scroll,menu_ServerLineH);
+mi_NetServers_Connect   : if(not check)then GameNetServerListConnect(false);
 
 // HELP
 mi_help_GameControls,
@@ -1022,7 +1022,7 @@ mi_SaveLoad_list  : case g_started of
                     false: if(not check)then saveload_Load(false);
                     end;
 mi_Replays_list   : if(not check)then replay_Play  (false);
-mi_NetSearch_List : if(not check)then GameNetServerListConnect(false);
+mi_NetServers_List : if(not check)then GameNetServerListConnect(false);
    else
       menu_Controls_DMLB:=false;
    end;
@@ -1043,11 +1043,12 @@ mi_Players_AIskil7     : if(not check)then PlayerAILevelScroll(item-mi_Players_A
 mi_Players_Team0..
 mi_Players_Team7       : if(not check)then PlayerTeamScroll   (item-mi_Players_Team0  ,LocalPlayer,false,false);
 
-mi_Map_Seed            : if(not check)then GameMapSetSeed(LocalPlayer,random($FFFFFFFF)          ,false);
+mi_Map_Seed            : if(not check)then GameMapSetSeed(LocalPlayer,random(map_seed.MaxValue)  ,false);
 mi_Map_Scenario        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MScenario  ,false,false);
 mi_Map_Generators      : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MGenerators,false,false);
 mi_Map_Size            : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSize      ,false,false);
 mi_Map_Obstacles       : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MObstacles ,false,false);
+mi_Map_Symmetry        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSymmetry  ,false,false);
 
 mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots   ,false,false);
 
@@ -1071,7 +1072,7 @@ function menu_Controls_MWD(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MWD:=true;
    case item of
-mi_NetSearch_List      : if(not check)then ScrollInt(@net_svsearch_scroll, 10,0,net_svsearch_size-menu_SvSearchListH,false);
+mi_NetServers_List     : if(not check)then ScrollInt(@net_svsearch_scroll, 10,0,net_svsearch_size-menu_ServerListH,false);
 mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   , 10,0,svld_list_size   -menu_BaseList1H   ,false);
 mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   , 10,0,rpls_list_size   -menu_BaseList1H   ,false);
 mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    ,-2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
@@ -1106,13 +1107,13 @@ function menu_Controls_MWU(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MWU:=true;
    case item of
-mi_NetSearch_List      : if(not check)then ScrollInt(@net_svsearch_scroll,-10,0,net_svsearch_size-menu_SvSearchListH,false);
-mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   ,-10,0,svld_list_size   -menu_BaseList1H   ,false);
-mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   ,-10,0,rpls_list_size   -menu_BaseList1H   ,false);
-mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    , 2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
+mi_NetServers_List     : if(not check)then ScrollInt(@net_svsearch_scroll,-10,0,net_svsearch_size-menu_ServerListH,false);
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   ,-10,0,svld_list_size   -menu_BaseList1H ,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   ,-10,0,rpls_list_size   -menu_BaseList1H ,false);
+mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    , 2 ,0,menu_ChatSize    -menu_ChatListH  ,false);
 mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
                                            with menu_HelpIList^ do
-                                           ScrollInt(@menu_HelpScroll    ,-2 ,0,slist_n          -ui_DocListH       ,false);
+                                           ScrollInt(@menu_HelpScroll    ,-2 ,0,slist_n          -ui_DocListH     ,false);
 
 mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,true,1,ui_MaxCamSpeed,false);
 mi_SS_SoundVolume      : if(not check)then
@@ -1303,11 +1304,11 @@ begin
 ///////////////////////////////////   mouse wheel down
    case InputActionPressed(iact_MWD) of
    true : begin
-             SetSelectedItem(mi_NetSearch_List);
-             SetSelectedItem(mi_SaveLoad_list );
-             SetSelectedItem(mi_Replays_list  );
-             SetSelectedItem(mi_MP_ChatList   );
-             SetSelectedItem(mi_help_InfoList );
+             SetSelectedItem(mi_NetServers_List);
+             SetSelectedItem(mi_SaveLoad_list  );
+             SetSelectedItem(mi_Replays_list   );
+             SetSelectedItem(mi_MP_ChatList    );
+             SetSelectedItem(mi_help_InfoList  );
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);
@@ -1327,11 +1328,11 @@ begin
 ///////////////////////////////////   mouse wheel up
    case InputActionPressed(iact_MWU) of
    true : begin
-             SetSelectedItem(mi_NetSearch_List);
-             SetSelectedItem(mi_SaveLoad_list );
-             SetSelectedItem(mi_Replays_list  );
-             SetSelectedItem(mi_MP_ChatList   );
-             SetSelectedItem(mi_help_InfoList );
+             SetSelectedItem(mi_NetServers_List);
+             SetSelectedItem(mi_SaveLoad_list  );
+             SetSelectedItem(mi_Replays_list   );
+             SetSelectedItem(mi_MP_ChatList    );
+             SetSelectedItem(mi_help_InfoList  );
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);

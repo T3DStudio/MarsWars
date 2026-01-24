@@ -118,7 +118,9 @@ begin
             aw_eid_shot :=eid_shot;
          end;
 end;
-procedure setWeaponTEID(aa:byte;asnd_target:PTSoundSet;aeid_target:byte;rld_a:TSoB);
+procedure setWeaponTEID(aa:byte;asnd_target:PTSoundSet;aeid_target:byte;rld_a:TSoB;eid_target_onstart:boolean=false;
+                                                                                   eid_target_onfire :boolean=false;
+                                                                                   eid_target_onshot :boolean=false);
 begin
    with g_uids[u] do
      if(aa<=LastUnitArms)then
@@ -128,6 +130,9 @@ begin
             aw_snd_target:=asnd_target;
             aw_eid_target:=aeid_target;
             if(rld_a<>[])then aw_AnimPoints:=rld_a;
+            aw_eid_target_onstart:=eid_target_onstart;
+            aw_eid_target_onfire :=eid_target_onfire;
+            aw_eid_target_onshot :=eid_target_onshot;
          end;
 end;
 procedure setWeaponESND2(aaset:TSoB;asnd_start,asnd_shot:PTSoundSet;aeid_start,aeid_shot:byte);
@@ -310,7 +315,7 @@ begin
    setWeaponESND(0,nil,snd_Gibs,0,0);
    setWeaponTEID(0,nil,0       ,[0..255]);
    setWeaponESND(1,snd_archvile_attack,nil,0,0);
-   setWeaponTEID(1,nil  ,0,[0..65]); //snd_archvile_fire EID_ArchFire
+   setWeaponTEID(1,snd_archvile_fire  ,EID_ArchFire,[0..65],true,true,false); //
 end;
 
 UID_ZMedic:
@@ -323,7 +328,7 @@ begin
    setEffectSND (  nil,snd_zimba_death,snd_Gibs ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_Healing,0,0);
    setWeaponESND(1,nil,snd_shot_pistol,0,0);
-   with uid_arms[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
+   with uid_arms[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onshot:=true;end;
 end;
 UID_ZEngineer:
 begin
@@ -335,7 +340,7 @@ begin
    setEffectSND (  nil,snd_zimba_death,snd_Gibs ,snd_zimba_pain);
    setWeaponESND(0,nil,snd_repairing,0,0);
    setWeaponESND(1,nil,snd_shot_pistol,0,0);
-   with uid_arms[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onlyshot:=true;end;
+   with uid_arms[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onshot:=true;end;
 end;
 UID_ZSergant:
 begin
@@ -457,13 +462,22 @@ begin
    setMWSModel(3,@spr_HPools4);
    setBuildingSND(snd_hell_hpool);
 end;
-UID_HTower:
+UID_HFTower:
 begin
    uid_AnimStepWalk:=5;
 
-   setMWSModel(0,@spr_HTower);
+   setMWSModel(0,@spr_HFTower);
    setBuildingSND(snd_hell_htower);
    setWeaponESND(0,nil,snd_hell_attack    ,0,MID_Imp);
+   uid_eid_bcrater_y:=15;
+end;
+UID_HSTower:
+begin
+   uid_AnimStepWalk:=5;
+
+   setMWSModel(0,@spr_HSTower);
+   setBuildingSND(snd_hell_htower);
+   setWeaponESND(0,nil,snd_hell_attack    ,0,MID_Baron);
    uid_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
@@ -489,7 +503,7 @@ begin
    setBuildingSND(snd_hell_htotem);
    uid_eid_bcrater_y:=12;
    setWeaponESND(0,snd_archvile_attack,nil,0,0);
-   setWeaponTEID(0,nil,0,[0..65]); // snd_archvile_fire                EID_ArchFire
+   setWeaponTEID(0,snd_archvile_fire,EID_ArchFire,[0..65],true,true,false ); //
 end;
 UID_HAltar:
 begin
@@ -551,7 +565,7 @@ begin
    setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
    setWeaponESND(0,nil,snd_repairing,0,0);
    setWeaponESND(1,nil,snd_shot_pistol ,0,0);
-   with uid_arms[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onlyshot:=true;end;
+   with uid_arms[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onshot:=true;end;
 end;
 UID_Medic:
 begin
@@ -563,7 +577,7 @@ begin
    setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
    setWeaponESND(0,nil,snd_Healing,0,0);
    setWeaponESND(1,nil,snd_shot_pistol,0,0);
-   with uid_arms[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onlyshot:=true;end;
+   with uid_arms[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onshot:=true;end;
 end;
 UID_Sergant:
 begin
@@ -924,7 +938,7 @@ end;
    begin
       i:=0;
       for u:=0 to 255 do
-        with g_upids[u] do
+        with g_upgrs[u] do
           if(upgr_race=r)then
           begin
              ui_panel_uids[r,2,upgr_btni]:=u;
@@ -935,11 +949,11 @@ end;
 
    // upgrades
    for u:=0 to 255 do
-   with g_upids[u] do
-   begin
-      upgr_btn:=spr_dummy;
+     with g_upgrs[u] do
+     begin
+        upgr_btn:=spr_dummy;
 
-      case u of
+        case u of
 upgr_hell_DistDamage1   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,0 ]; end;
 upgr_hell_UnitArmor     : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,1 ]; end;
 upgr_hell_BuildArmor    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,2 ]; end;
@@ -956,7 +970,7 @@ upgr_hell_Phantoms      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,15]; end;
 upgr_hell_DistDamage2   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,20]; end;
 upgr_hell_Resurrect     : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,12]; end;
 upgr_hell_TeleportCD    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,8 ]; end;
-upgr_hell_Recall        : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,14]; end;
+upgr_hell_T2TNoCD       : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,14]; end;
 upgr_hell_EvilEyeR      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,6 ]; end;
 upgr_hell_TotemInvis    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,16]; end;
 upgr_hell_BuildRestore  : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,17]; end;
@@ -967,7 +981,7 @@ upgr_uac_BioArmor       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,1 ]; end;
 upgr_uac_BuildArmor     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,2 ]; end;
 upgr_uac_RepairTools    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,3 ]; end;
 upgr_uac_BioSpeed       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,4 ]; end;
-upgr_uac_SSMWeapon          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,14]; end;
+upgr_uac_SSMWeapon      : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,14]; end;
 upgr_uac_BuilderR       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,11]; end;
 upgr_uac_CCFly          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,9 ]; end;
 upgr_uac_CCAttack       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,10]; end;
@@ -985,8 +999,8 @@ upgr_uac_TurretPlasma   : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,5 ]; end;
 upgr_uac_TurretArmor    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,18]; end;
 
 
-      end;
-   end;
+        end;
+     end;
 end;
 
 procedure InitClientDataAbilities;
@@ -1046,6 +1060,7 @@ uab_SphereTurbo      : ua_btn     :=spr_uibtn_AbilitySTurbo;
 
 uab_PretorEquip      : ua_btn     :=spr_uibtn_AbilityPretEquip;
 uab_Bribe            : ua_btn     :=spr_uibtn_AbilityBribe;
+uab_Hack             : ua_btn     :=spr_uibtn_AbilityHack;
 
 uab_SpawnLost        : ua_btn     :=spr_uibtn_AbilitySpawnLost;
 uab_SpawnLostTo      : ua_btn     :=spr_uibtn_AbilitySpawnLostTo;
@@ -1062,7 +1077,8 @@ uab_ToHSymbol2       : ua_mbrush_r:=-UID_HSymbol2;
 uab_ToHSymbol3       : ua_mbrush_r:=-UID_HSymbol3;
 uab_ToHSymbol4       : ua_mbrush_r:=-UID_HSymbol4;
 uab_ToHACommandCenter: ua_mbrush_r:=-UID_HACommandCenter;
-uab_ToHTower         : ua_mbrush_r:=-UID_HTower;
+uab_ToHFTower        : ua_mbrush_r:=-UID_HFTower;
+uab_ToHSTower        : ua_mbrush_r:=-UID_HSTower;
 
 uab_ToHGate          : ua_mbrush_r:=-UID_HGate;
 uab_ToHPool          : ua_mbrush_r:=-UID_HPools;
@@ -1093,7 +1109,8 @@ uab_ToHSymbol2,
 uab_ToHSymbol3,
 uab_ToHSymbol4,
 uab_ToHACommandCenter,
-uab_ToHTower,
+uab_ToHFTower,
+uab_ToHSTower,
 uab_ToHGate,
 uab_ToHPool,
 uab_ToHBarracks,
@@ -1116,7 +1133,8 @@ uab_ToUACDron,
 uab_ToUGTurretTo,
 uab_ToUATurretTo,
 uab_ToHTotem,
-uab_ToHTower : ua_mbrush_hint_HalfProdTime:=true;
+uab_ToHFTower,
+uab_ToHSTower        : ua_mbrush_hint_HalfProdTime:=true;
       end;
 
       if(ua_btn=spr_empty)then

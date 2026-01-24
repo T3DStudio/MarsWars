@@ -462,20 +462,20 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,m_brush=uid,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
                                               i2s(ui_bprod_ucl_time[uid_uibtn]),i2s(ui_bprod_ucl_count[ucl]),i2s(units_ucl_s[true,ucl]),i2s(units_ucl_e[true,ucl])                            ,ir2s(ui_bucl_reload[ucl]),
-                                              ui_cenergy[res_energyl_cur<0]        ,c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
+                                              ui_cenergy[res_energyl_cur<0]    ,c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
                                            end;
                             tab_units    : with g_uids[uid] do
                                            begin
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,false,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_uprod_uid_time[uid]),i2s(prod_unit_uid[uid]),i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
-                                              ui_cenergy[res_energyl_cur<0]   ,c_dyellow              ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
+                                              ir2s(ui_uprod_uid_time[uid]) ,i2s(prod_unit_uid[uid]),i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
+                                              ui_cenergy[res_energyl_cur<0],c_dyellow              ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
                                            end;
                             tab_upgrades : begin
-                                              draw_UIButtonS(tar,ux,uy,g_upids[uid].upgr_btn.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
+                                              draw_UIButtonS(tar,ux,uy,g_upgrs[uid].upgr_btn.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_pprod_upg_time[uid]),i2s(prod_upgr_upid[uid]),'',b2s(upgrs_cur[uid])                                 ,'',
-                                              ui_cenergy[res_energyl_cur<0]   ,c_dyellow               ,0 ,ui_max_color[upgrs_cur[uid]>=g_upids[uid].upgr_max] ,0 ,'');
+                                              ir2s(ui_pprod_upg_time[uid]) ,i2s(prod_upgr_upid[uid]),'',b2s(upgrs_cur[uid])                                 ,'',
+                                              ui_cenergy[res_energyl_cur<0],c_dyellow               ,0 ,ui_max_color[upgrs_cur[uid]>=g_upgrs[uid].upgr_max] ,0 ,'');
                                            end;
                             end;
                        end;
@@ -506,7 +506,7 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                                       then tstr:=ir2s(ui_CommandercPU^.rld)
                                                       else tstr:='';
                                                       draw_UIButtonT(tar,ux,uy,'','','','',tstr  ,
-                                                                            0 ,0 ,0 ,0 ,c_aqua,'');
+                                                                               0 ,0 ,0 ,0 ,c_aqua,'');
                                                    end;
                                                 end;
                        iAct_Control_UAMove    : draw_UIButtonS(tar,ux,uy,spr_uibtn_Attack    ,false,not iActEnabled(uid));
@@ -521,7 +521,7 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Control_USelArmy  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F2        ,false,not iActEnabled(uid));
 
                        iAct_Replay_Fog,
-                       iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog  ,ui_fog,not iActEnabled(uid));
+                       iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog ,ui_fog,not iActEnabled(uid));
 
                        iAct_Replay_PlayerAll,
                        iAct_Observer_PlayerAll: draw_UIButtonSText(tar,ux,uy,ta_MM,@str_all,c_white,UIPlayer>LastPlayer,not iActEnabled(uid));
@@ -656,7 +656,7 @@ begin
                                          case ui_tab of
                                          tab_Buildings,
                                          tab_Units    : with g_uids[tuid] do str_StringListCopy(@uid_HintInGame,@ui_MouseHintL);
-                                         tab_Upgrades : with g_upids[tuid] do
+                                         tab_Upgrades : with g_upgrs[tuid] do
                                                         begin
                                                            AddLine(@upgr_str_NameHK);
                                                            s1:=str_UpgradeCost(tuid,upgrs_cur[tuid]+1);

@@ -369,11 +369,11 @@ end;
 procedure drawmenu_BlockHelpUnitsBalance(tar:pSDL_Surface);
 var
 tx,ty:integer;
-procedure DrawTSoBUnits(caption:shortstring;ccolor:cardinal;psob:PTSoB);
+procedure DrawTSoBUnits(caption:shortstring;psob:PTSoB);
 var u:byte;
 begin
    tx:=menu_items[mi_help_InfoList].mi_x0+font_wh;
-   draw_text(tar,tx,ty,caption,ta_LU,255,ccolor);
+   draw_text(tar,tx,ty,caption,ta_LU,255,c_white);
    ty+=txt_line_h2;
    for u in psob^ do
    begin
@@ -398,9 +398,9 @@ begin
    begin
       ty:=mi_y0+font_wh;
 
-      DrawTSoBUnits(str_doc_BalanceGood   ,c_lime,@g_uids[menu_HelpUID].uid_balance_Good   );
-      DrawTSoBUnits(str_doc_BalanceBad    ,c_red ,@g_uids[menu_HelpUID].uid_balance_Bad    );
-      DrawTSoBUnits(str_doc_BalanceUseless,c_gray,@g_uids[menu_HelpUID].uid_balance_Useless);
+      DrawTSoBUnits(str_doc_BalanceGood   ,@g_uids[menu_HelpUID].uid_balance_Good   );
+      DrawTSoBUnits(str_doc_BalanceBad    ,@g_uids[menu_HelpUID].uid_balance_Bad    );
+      DrawTSoBUnits(str_doc_BalanceUseless,@g_uids[menu_HelpUID].uid_balance_Useless);
 
       drawmenu_ItemTextC(tar,mi_help_InfoList,ta_LB,str_doc_unitBalanceNote,c_ltgray);
    end;
@@ -529,9 +529,9 @@ begin
    drawmenu_ItemText2(tar,mi_Map_Scenario  ,str_map_Scenario  ,str_map_ScenarioL[map_scenario]    ,0);
    drawmenu_ItemText2(tar,mi_Map_Generators,str_map_Generators,str_map_GeneratorsL[map_generators],0);
    drawmenu_ItemText2(tar,mi_Map_Seed      ,str_map_Seed      ,menu_mseed+vc(mi_Map_Seed)         ,menu_ItemSelected);
-   drawmenu_ItemText2(tar,mi_Map_Size      ,str_map_Size      ,i2s(map_Size1)                      ,0);
+   drawmenu_ItemText2(tar,mi_Map_Size      ,str_map_Size      ,i2s(map_Size1)                     ,0);
    drawmenu_ItemText2(tar,mi_Map_Obstacles ,str_map_Obstacles ,strMX(map_ObstaclesS)              ,0);
-   drawmenu_ItemText2(tar,mi_Map_Symmetry  ,str_map_Symmetry  ,str_YesNoC[map_Symmetry]           ,0);
+   drawmenu_ItemText2(tar,mi_Map_Symmetry  ,str_map_Symmetry  ,str_map_SymmertyL[map_Symmetry]    ,0);
 
    drawmenu_ItemText1(tar,mi_Map_Theme     ,str_themes[theme_i],0);
    drawmenu_ItemText1(tar,mi_Map_Random    ,str_map_Random     ,0);
@@ -551,20 +551,20 @@ begin
    //
    case net_status of
    ns_none  : begin
-              drawmenu_ItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer  );
-              drawmenu_ItemText1  (tar,mi_MP_ServerToggle   ,str_net_ServerStart    ,0);
-              drawmenu_ItemText1  (tar,mi_MP_Connect        ,str_net_Connect        ,0);
-              drawmenu_ItemText1  (tar,mi_MP_ClientLANSearch,str_net_LANSearch      ,0);
+              drawmenu_ItemCaption(tar,mi_MP_Panel           ,str_Caption_Multiplayer  );
+              drawmenu_ItemText1  (tar,mi_MP_ServerToggle    ,str_net_ServerStart    ,0);
+              drawmenu_ItemText1  (tar,mi_MP_Connect         ,str_net_Connect        ,0);
+              drawmenu_ItemText1  (tar,mi_MP_ClientServerList,str_net_ServerList     ,0);
               end;
    ns_server: begin
-              drawmenu_ItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer+': '+str_Caption_Server);
-              drawmenu_ItemText1  (tar,mi_MP_ServerToggle   ,str_net_ServerStop     ,0);
+              drawmenu_ItemCaption(tar,mi_MP_Panel           ,str_Caption_Multiplayer+': '+str_Caption_Server);
+              drawmenu_ItemText1  (tar,mi_MP_ServerToggle    ,str_net_ServerStop     ,0);
 
               end;
    ns_client: begin
-              drawmenu_ItemCaption(tar,mi_MP_Panel          ,str_Caption_Multiplayer+': '+str_Caption_Client);
+              drawmenu_ItemCaption(tar,mi_MP_Panel           ,str_Caption_Multiplayer+': '+str_Caption_Client);
 
-              drawmenu_ItemText2  (tar,mi_MP_ClientQuality  ,str_net_Quality        ,str_NetQualityL[net_cl_Quality],0);
+              drawmenu_ItemText2  (tar,mi_MP_ClientQuality   ,str_net_Quality        ,str_NetQualityL[net_cl_Quality],0);
 
               if(net_cl_Hoster=255)and(net_cl_svttl<TTLServer)then
               drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedToDed,0);
@@ -684,11 +684,11 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
    // MAIN BLOCKs
    if(net_svsearch)then
    begin
-      drawmenu_ItemText1(tar,mi_caption_SVSearch   ,str_Caption_NetSVSearch,255);
+      drawmenu_ItemText1(tar,mi_caption_SVSearch   ,str_Caption_NetSvList,255);
       // Net search
-      with menu_items[mi_NetSearch_List] do
-      drawmenu_StringArray(tar,mi_NetSearch_List ,@net_svsearch_lists,net_svsearch_size,net_svsearch_scroll,net_svsearch_sel,menu_ListLineH2,mi_charw*3,menu_SvSearchListH,true);
-      drawmenu_ItemText1(tar,mi_NetSearch_Connect,str_net_Connect,0);
+      with menu_items[mi_NetServers_List] do
+      drawmenu_StringArray(tar,mi_NetServers_List ,@net_svsearch_lists,net_svsearch_size,net_svsearch_scroll,net_svsearch_sel,menu_ServerLineH,mi_charw*2,menu_ServerListH,true);
+      drawmenu_ItemText1(tar,mi_NetServers_Connect,str_net_Connect,0);
    end
    else
      case menu_page of

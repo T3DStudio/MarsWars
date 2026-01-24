@@ -13,6 +13,14 @@ begin
      end;
 end;
 
+procedure KeyPoints_Explode(kpi:byte);
+begin
+   with map_KeyPointsL[kpi] do
+     with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
+       if(kptd_Active)and(kptd_VisTimer>0)then
+         effect_KPointExplode(kp_x,kp_y);
+end;
+
 {$ENDIF}
 
 procedure KeyPoints_Clear;
@@ -93,9 +101,9 @@ end;
 procedure Scenario_KeyPointsCodeServer;
 var
 i,p,
-iOwnerPlayer,
-iPlayers,
-iTeams  : integer;
+tCapturingPlayer,
+tPlayers,
+tTeams  : integer;
 
 begin
    Scenario_KeyPointsTeam;
@@ -105,86 +113,90 @@ begin
      with kp_TeamData[MaxPlayers] do
        if(kptd_Active)then
        begin
-          p:=0;
-          if(map_scenario=mc_royale)and(g_royal_r<kp_ToCenterD)then p:=1;
+          if(map_scenario=mc_royale)and(g_royal_r<kp_ToCenterD)then kptd_Active:=false;
           if(kptd_lifeTime>0)and(kptd_OwnerPlayer<=LastPlayer)then
           begin
              kptd_lifeTime-=1;
-             if(kptd_lifeTime=0)then p:=1;
+             if(kptd_lifeTime=0)then kptd_Active:=false
           end;
 
-          if(p>0)then // life expired
+          if(not kptd_Active)then
           begin
              GameLog_NgenExh(kptd_OwnerPlayer,i);
              KeyPoint_ChangeOwner(i,255,false);
-             kptd_Active:=false;
              {$IFDEF _FULLGAME}
-             with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
-               if(kptd_Active)then
-                 effect_KPointExplode(kp_x,kp_y);
+             KeyPoints_Explode(i);
              {$ENDIF}
              continue;
           end;
 
-          iPlayers:=0;
-          iOwnerPlayer:=kptd_OwnerPlayer;
-          kp_LimitPlayerP:=kp_LimitPlayerC;
-          kp_LimitTeamP:=kp_LimitTeamC;
+          tPlayers:=0;
+          tCapturingPlayer:=kptd_OwnerPlayer;
+          kp_LimitPlayerP :=kp_LimitPlayerC;
+          kp_LimitTeamP   :=kp_LimitTeamC;
           if(kptd_TimerOwnerPlayer<=LastPlayer)then
             if(kp_LimitPlayerC[kptd_TimerOwnerPlayer]>0)then
             begin
-               iPlayers:=1;
-               iOwnerPlayer:=kptd_TimerOwnerPlayer;
+               tPlayers:=1;
+               tCapturingPlayer:=kptd_TimerOwnerPlayer;
             end;
 
-          iTeams:=0;
+          tTeams:=0;
           for p:=0 to LastPlayer do
           begin
              if(kp_LimitPlayerC[p]>0)and(p<>kptd_TimerOwnerPlayer)then
              begin
-                if(iPlayers=0)then iOwnerPlayer:=p;
-                iPlayers+=1;
+                if(tPlayers=0)then tCapturingPlayer:=p;
+                tPlayers+=1;
              end;
              if(kp_LimitTeamC  [p]>0)then
-               iTeams+=1;
+               tTeams+=1;
 
              kp_LimitPlayerC[p]:=0;
              kp_LimitTeamC  [p]:=0;
           end;
 
-       if((iPlayers=0)and(kp_Energy>0))
-       or((i=0)and(map_scenario=mc_KotH)and(g_tick<keyPoint_KotH_pause))then
-       begin
-          iPlayers:=1;
-          iOwnerPlayer:=255;
-       end;
+          if((tPlayers=0)and(kp_Energy>0))
+          or((i=0)and(map_scenario=mc_KotH)and(g_tick<keyPoint_KotH_pause))then
+          begin
+             tPlayers:=1;
+             tCapturingPlayer:=255;
+          end;
 
-       if(iPlayers=0)
-       then kptd_Timer:=0
-       else
-         if(iPlayers=1)or(iTeams=1)then
-           if(kptd_OwnerPlayer=iOwnerPlayer)
-           then kptd_Timer:=0
-           else
-           begin
-              if(kptd_TimerOwnerPlayer<>iOwnerPlayer)then
+          if(tPlayers=0)then
+          begin
+             kptd_Timer:=0;
+             kptd_TimerOwnerPlayer:=255;
+             kptd_TimerOwnerTeam  :=255;
+          end
+          else
+            if(tPlayers=1)or(tTeams=1)then
+              if(kptd_OwnerPlayer=tCapturingPlayer)then
               begin
-                 kptd_TimerOwnerPlayer:=iOwnerPlayer;
-                 if(kptd_TimerOwnerPlayer<=LastPlayer)
-                 then kptd_TimerOwnerTeam:=g_gplayers[kptd_TimerOwnerPlayer].team
-                 else kptd_TimerOwnerTeam:=255;
-                 if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
                  kptd_Timer:=0;
-              end;
-              if(kptd_Timer<kp_CaptureTime)
-              then kptd_Timer+=1
+                 kptd_TimerOwnerPlayer:=255;
+                 kptd_TimerOwnerTeam  :=255;
+              end
               else
               begin
-                 kptd_Timer:=0;
-                 KeyPoint_ChangeOwner(i,iOwnerPlayer);
+                 if(kptd_TimerOwnerPlayer<>tCapturingPlayer)then
+                 begin
+                    kptd_TimerOwnerPlayer:=tCapturingPlayer;
+                    if(kptd_TimerOwnerPlayer<=LastPlayer)
+                    then kptd_TimerOwnerTeam:=g_gplayers[kptd_TimerOwnerPlayer].team
+                    else kptd_TimerOwnerTeam:=255;
+                    if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
+                    kptd_Timer:=0;
+                 end;
+                 if(kptd_Timer<kp_CaptureTime)
+                 then kptd_Timer+=1
+                 else
+                 begin
+                    kptd_Timer:=0;
+                    KeyPoint_ChangeOwner(i,tCapturingPlayer);
+                 end;
               end;
-           end;
-    end;
+       end;
 end;
 
 procedure Scenario_KeyPointsEndConditions;
