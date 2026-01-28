@@ -573,8 +573,8 @@ begin
 
    drawmenu_ItemText1(tar,mi_MP_Disconnect   ,str_net_DisConnect  ,0);
    drawmenu_ItemText2(tar,mi_MP_ServerPort   ,str_net_UDPPort     ,menu_ServerPort   +vc(mi_MP_ServerPort   ),menu_ItemSelected);
-   drawmenu_ItemText2(tar,mi_MP_ServerLANVis ,str_net_ServerLANVis,str_YesNoC[net_svLanAdv],0);
-   drawmenu_ItemText2(tar,mi_MP_ClientAddress,str_net_Address     ,menu_ClientAddress+vc(mi_MP_ClientAddress),menu_ItemSelected);
+   drawmenu_ItemText2(tar,mi_MP_ServerLANVis ,str_net_ServerLANAdv,str_YesNoC[net_svLanAdv],0);
+   drawmenu_ItemText2(tar,mi_MP_ClientAddress,str_net_Address     ,str_CutLast(menu_ClientAddress+vc(mi_MP_ClientAddress),30),menu_ItemSelected); //
    drawmenu_ItemText2(tar,mi_Players_Ready   ,str_net_Ready       ,str_YesNoC[PlayerReady ],0);
 
    drawmenu_MultiplayerChat(tar,mi_MP_ChatList);
@@ -682,13 +682,18 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
    drawmenu_ItemText1(tar,mi_StopTimer          ,str_menu_Cancel       ,0);
 
    // MAIN BLOCKs
-   if(net_svsearch)then
+   if(net_SvList)then
    begin
       drawmenu_ItemText1(tar,mi_caption_SVSearch   ,str_Caption_NetSvList,255);
       // Net search
       with menu_items[mi_NetServers_List] do
-      drawmenu_StringArray(tar,mi_NetServers_List ,@net_svsearch_lists,net_svsearch_size,net_svsearch_scroll,net_svsearch_sel,menu_ServerLineH,mi_charw*2,menu_ServerListH,true);
-      drawmenu_ItemText1(tar,mi_NetServers_Connect,str_net_Connect,0);
+      drawmenu_StringArray(tar,mi_NetServers_List ,@net_SvList_lists,net_SvList_Size,net_SvList_scroll,net_SvList_sel,menu_ServerLineH,mi_charw*2,menu_ServerListH,true);
+
+      drawmenu_ItemText1(tar,mi_NetServers_Connect,str_net_Connect      ,0);
+      drawmenu_ItemText1(tar,mi_NetServers_Add    ,str_net_ServerListAdd,0);
+      drawmenu_ItemText1(tar,mi_NetServers_Delete ,str_FileDelete       ,0);
+
+      drawmenu_ItemText2(tar,mi_MP_ClientAddress,menu_ClientAddress+vc(mi_MP_ClientAddress),'',menu_ItemSelected);
    end
    else
      case menu_page of

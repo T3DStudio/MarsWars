@@ -8,6 +8,7 @@ cfg_key_MusicListSize   = 'music_list_size';
 cfg_key_NetServerAddr   = 'net_server_addr';
 cfg_key_NetServerPort   = 'net_server_port';
 cfg_key_NetQuality      = 'net_quality';
+cfg_key_NetServerList   = 'net_server_list';
 cfg_key_UICamScrollSpeed= 'ui_cam_scroll_speed';
 cfg_key_UICamMouseScroll= 'ui_mouse_scroll';
 cfg_key_UIColoredShadows= 'ui_colored_shadows';
@@ -30,9 +31,6 @@ cfg_key_menuScalse      = 'menu_scale';
 cfg_key_menuScaleSmooth = 'menu_scale_smooth';
 
 
-function b2si1(b:byte  ):single;begin b2si1:=b/255;       end;
-function si12b(b:single):byte  ;begin si12b:=trunc(b*255);end;
-
 procedure cfg_setval(vr,vl:shortstring);
 var vlw:word;
     vli:integer;
@@ -47,9 +45,8 @@ cfg_key_MusicVolume     : snd_MusicVolume    := vlw;
 cfg_key_MusicListSize   : snd_musicListSize  := vlw;
 cfg_key_NetServerAddr   : menu_ClientAddress := vl;
 cfg_key_NetServerPort   : menu_ServerPort    := vl;
-cfg_key_menuScalse      : menu_scale         :=(vl=b2c[true]);
-cfg_key_menuScaleSmooth : menu_ScaleSmooth   :=(vl=b2c[true]);
 cfg_key_NetQuality      : net_cl_Quality     := vlw;
+cfg_key_NetServerList   : net_ServerListAdd(vl,false);
 cfg_key_UICamScrollSpeed: ui_CamSpeed        := vli;
 cfg_key_UICamMouseScroll: ui_MouseScroll     :=(vl=b2c[true]);
 cfg_key_UIColoredShadows: ui_ColoredShadow   :=(vl=b2c[true]);
@@ -68,6 +65,9 @@ cfg_key_GAISlots        : g_AISlots          := vlw;
 cfg_key_MapGenerators   : map_generators     := vlw;
 cfg_key_GRecord         : rpls_Record        :=(vl=b2c[true]);
 cfg_key_GRecordQuality  : rpls_Quality       := vlw;
+cfg_key_menuScalse      : menu_scale         :=(vl=b2c[true]);
+cfg_key_menuScaleSmooth : menu_ScaleSmooth   :=(vl=b2c[true]);
+
    end;
 
 end;
@@ -92,10 +92,17 @@ procedure cfg_read;
 var f:text;
     s:shortstring;
 begin
+   net_SvList_Size:=0;
+   setlength(net_SvList_lists,0);
+   setlength(net_SvList_listi,0);
+
    if(FileExists(str_ConfigFName))then
    begin
       assign(f,str_ConfigFName);
-      {$I-}reset(f);{$I+} if (ioresult<>0) then exit;
+      {$I-}
+      reset(f);
+      {$I+}
+      if(ioresult<>0)then exit;
       while not eof(f) do
       begin
          readln(f,s);
@@ -119,11 +126,11 @@ begin
       vid_vw:=max2i(vid_minw,vid_vw);
       vid_vh:=max2i(vid_minh,vid_vh);
 
-      if(g_AISlots      >g_MaxAISlots     )then g_AISlots     :=g_MaxAISlots;
-      if(map_generators >mapg_Last)then map_generators:=mapg_Last;
+      if(g_AISlots     >g_MaxAISlots   )then g_AISlots     :=g_MaxAISlots;
+      if(map_generators>mapg_Last      )then map_generators:=mapg_Last;
 
-      if(rpls_Quality   >rpls_MaxQuality  )then rpls_Quality  :=rpls_MaxQuality;
-      if(net_cl_Quality >net_MaxQuality   )then net_cl_Quality:=net_MaxQuality;
+      if(rpls_Quality  >rpls_MaxQuality)then rpls_Quality  :=rpls_MaxQuality;
+      if(net_cl_Quality>net_MaxQuality )then net_cl_Quality:=net_MaxQuality;
 
       if(ui_ControlPanelPos>ui_MaxControlPanelPos)then ui_ControlPanelPos:=0;
       if(ui_HealthBars     >ui_MaxHealthBars     )then ui_HealthBars     :=0;
@@ -131,12 +138,13 @@ begin
    end;
    menu_ResolutionWi:=vid_vw;
    menu_ResolutionHi:=vid_vh;
-   menu_GetClientAddress;
+   menu_ClientAddress:=menu_GetClientAddress(menu_ClientAddress,@net_cl_svip,@net_cl_svport);
    menu_GetServerPort;
 end;
 
 procedure cfg_write;
 var f:text;
+    i:integer;
 begin
    assign(f,str_ConfigFName);
 {$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
@@ -145,9 +153,6 @@ begin
    writeln(f,cfg_key_SoundVolume     ,'=',snd_SoundVolume       );
    writeln(f,cfg_key_MusicVolume     ,'=',snd_MusicVolume       );
    writeln(f,cfg_key_MusicListSize   ,'=',snd_musicListSize     );
-   writeln(f,cfg_key_NetServerAddr   ,'=',menu_ClientAddress    );
-   writeln(f,cfg_key_NetServerPort   ,'=',menu_ServerPort       );
-   writeln(f,cfg_key_NetQuality      ,'=',net_cl_Quality        );
    writeln(f,cfg_key_UICamScrollSpeed,'=',ui_CamSpeed           );
    writeln(f,cfg_key_UICamMouseScroll,'=',b2c[ui_MouseScroll]   );
    writeln(f,cfg_key_UIColoredShadows,'=',b2c[ui_ColoredShadow] );
@@ -164,10 +169,18 @@ begin
    writeln(f,cfg_key_MapGenerators   ,'=',map_generators        );
    writeln(f,cfg_key_GRecord         ,'=',b2c[rpls_Record]      );
    writeln(f,cfg_key_GRecordQuality  ,'=',rpls_Quality          );
-   writeln(f,cfg_key_GFixedSpawns    ,'=',b2c[g_FixedPositions]);
-   writeln(f,cfg_key_GAISlots        ,'=',g_AISlots            );
+   writeln(f,cfg_key_GFixedSpawns    ,'=',b2c[g_FixedPositions] );
+   writeln(f,cfg_key_GAISlots        ,'=',g_AISlots             );
    writeln(f,cfg_key_menuScalse      ,'=',b2c[menu_scale]       );
    writeln(f,cfg_key_menuScaleSmooth ,'=',b2c[menu_ScaleSmooth] );
+   writeln(f,cfg_key_NetServerAddr   ,'=',menu_ClientAddress    );
+   writeln(f,cfg_key_NetServerPort   ,'=',menu_ServerPort       );
+   writeln(f,cfg_key_NetQuality      ,'=',net_cl_Quality        );
+   if(net_SvList_Size>0)then
+     for i:=0 to net_SvList_Size-1 do
+       with net_SvList_listi[i] do
+         if(si_manual)then
+           writeln(f,cfg_key_NetServerList,'=',si_line);
 
    close(f);
 end;

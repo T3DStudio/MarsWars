@@ -1,3 +1,8 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   MENU COMMON
+
 function StringApplyInput(s:shortstring;charset:TSoc;maxLength:byte;changedVar:pboolean):shortstring;
 var i:byte;
     c:char;
@@ -23,183 +28,6 @@ begin
      changedVar^:=StringApplyInput<>s;
    StringApplyInput:=s;
 end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//   MENU ACTIONS
-
-procedure menu_ControlPanelPosScroll(forward:boolean);
-begin
-   ScrollByte(@ui_ControlPanelPos,forward,0,ui_MaxControlPanelPos);
-   vid_RemakeScreenSurfaces;
-   theme_map_pTerrain:=255;
-   gfx_MapMakeTerrain;
-   ui_InitControlPanelBTNActions;
-end;
-
-procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);
-begin
-   if(menu_msg_type<>mtype)then
-   begin
-      menu_update     :=true;
-      menu_msg_type   :=mtype;
-      menu_msg_Caption:=str_caption;
-      menu_msg_Body   :=str_body;
-      menu_ItemActs   :=0;
-   end;
-end;
-
-function PlayerNameChangeble:boolean;
-begin
-   PlayerNameChangeble:=(net_status=ns_none)and(not G_Started);
-end;
-
-
-function GameNetServer(start,check:boolean):boolean;
-begin
-   GameNetServer:=false;
-
-   if(net_status=ns_client)
-   or(rpls_pstate<>rpls_none)
-   or(G_Started)
-   or(menu_msg_type<>mmbt_none)then exit;
-
-   case start of
-   true : begin   // start
-             if(net_status<>ns_none)
-             or(g_LobbyTimer>0)then exit;
-             GameNetServer:=true;
-             if(check)then exit;
-
-             menu_GetServerPort;
-             if(net_UpSocket(net_ServerPort))then
-             begin
-                net_status:=ns_server;
-                PlayersSetDefault;
-             end
-             else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Server+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
-          end;
-   false: begin   // stop
-             if(net_status<>ns_server)then exit;
-             GameNetServer:=true;
-             if(check)then exit;
-
-             GameResetNetGame;
-          end;
-   end;
-end;
-function GameNetClient(connect,check:boolean):boolean;
-begin
-   GameNetClient:=false;
-
-   if(menu_msg_type<>mmbt_none)then exit;
-
-   case connect of
-   true : begin   // start connecting
-             if(net_status<>ns_none)
-             or(rpls_pstate=rpls_read)
-             or(g_LobbyTimer>0)
-             or(G_Started)then exit;
-             GameNetClient:=true;
-             if(check)then exit;
-
-             menu_GetClientAddress;
-             if(net_UpSocket(0))then
-             begin
-                net_status   :=ns_client;
-                rpls_pnu     :=0;
-                net_svsearch :=false;
-                net_cl_Hoster:=255;
-                net_cl_svttl :=TTLServer;
-                net_cl_log_n :=net_cl_log_n.MaxValue;
-                PlayerReady  :=false;
-                menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer);
-                PlayersClearLog;
-             end
-             else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Client+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
-          end;
-   false: begin   // disconnect
-             if(net_status<>ns_client)then exit;
-             GameNetClient:=true;
-             if(check)then exit;
-
-             net_disconnect;
-             GameResetNetGame;
-          end;
-   end;
-end;
-function GameNetServerSearch(start,check:boolean):boolean;
-begin
-   GameNetServerSearch:=false;
-
-   if(rpls_pstate<>rpls_none)
-   or(G_Started)
-   or(menu_msg_type<>mmbt_none)then exit;
-
-   case start of
-   true : begin
-             if(net_svsearch)
-             or(g_LobbyTimer>0)
-             or(net_status<>ns_none)then exit;
-             GameNetServerSearch:=true;
-             if(check)then exit;
-
-             if(net_UpSocket(net_svLanAdv_port))then
-             begin
-                net_status  :=ns_client;
-                net_svsearch:=true;
-                net_svsearch_size:=0;
-                setlength(net_svsearch_lists,0);
-                setlength(net_svsearch_listi,0);
-             end
-             else menu_msgBox_Set(str_Caption_Multiplayer,str_net_ServerList+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
-          end;
-   false: begin
-             if(not net_svsearch)
-             or(net_status<>ns_client)then exit;
-             GameNetServerSearch:=true;
-             if(check)then exit;
-
-             net_dispose;
-             net_status  :=ns_none;
-             net_svsearch:=false;
-             net_svsearch_size:=0;
-             setlength(net_svsearch_lists,0);
-             setlength(net_svsearch_listi,0);
-          end;
-   end;
-end;
-function GameNetServerListConnect(check:boolean):boolean;
-begin
-   GameNetServerListConnect:=false;
-
-   if(rpls_pstate<>rpls_none)
-   or(G_Started)
-   or(net_status<>ns_client)
-   or(not net_svsearch)
-   or(net_svsearch_sel<0)
-   or(net_svsearch_size<=net_svsearch_sel)then exit;
-
-   GameNetServerListConnect:=true;
-
-   if(check)then exit;
-
-   net_dispose;
-   net_svsearch:=false;
-   net_status:=ns_none;
-
-   with net_svsearch_listi[net_svsearch_sel] do
-     menu_ClientAddress:=c2ip(ip)+':'+w2s(swap(port));
-
-   GameNetClient(true,false);
-end;
-
-function menu_ReadyButtonEnabled:boolean;
-begin
-   menu_ReadyButtonEnabled:=(net_status=ns_client)and(not g_started);
-end;
-
-////////////////////////////////////////////////////////////////////////////////
 
 procedure menu_GetBarValByte(mi:byte;vvar:pbyte;vmin,vmax:byte);
 var
@@ -276,6 +104,228 @@ begin
           end;
    end;
 end;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   MENU ACTIONS
+
+procedure menu_ControlPanelPosScroll(forward:boolean);
+begin
+   ScrollByte(@ui_ControlPanelPos,forward,0,ui_MaxControlPanelPos);
+   vid_RemakeScreenSurfaces;
+   theme_map_pTerrain:=255;
+   gfx_MapMakeTerrain;
+   ui_InitControlPanelBTNActions;
+end;
+
+function menu_ReadyButtonEnabled:boolean;
+begin
+   menu_ReadyButtonEnabled:=(net_status=ns_client)and(not g_started);
+end;
+
+procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);
+begin
+   if(menu_msg_type<>mtype)then
+   begin
+      menu_update     :=true;
+      menu_msg_type   :=mtype;
+      menu_msg_Caption:=str_caption;
+      menu_msg_Body   :=str_body;
+      menu_ItemActs   :=0;
+   end;
+end;
+
+function PlayerNameChangeble:boolean;
+begin
+   PlayerNameChangeble:=(net_status=ns_none)and(not G_Started);
+end;
+
+
+function GameNetServer(start,check:boolean):boolean;
+begin
+   GameNetServer:=false;
+
+   if(net_status=ns_client)
+   or(rpls_pstate<>rpls_none)
+   or(G_Started)
+   or(menu_msg_type<>mmbt_none)then exit;
+
+   case start of
+   true : begin   // start
+             if(net_status<>ns_none)
+             or(g_LobbyTimer>0)then exit;
+             GameNetServer:=true;
+             if(check)then exit;
+
+             menu_GetServerPort;
+             if(net_UpSocket(net_ServerPort))then
+             begin
+                net_status:=ns_server;
+                PlayersSetDefault;
+             end
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Server+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
+          end;
+   false: begin   // stop
+             if(net_status<>ns_server)then exit;
+             GameNetServer:=true;
+             if(check)then exit;
+
+             GameResetNetGame;
+          end;
+   end;
+end;
+function GameNetClient(connect,check:boolean):boolean;
+begin
+   GameNetClient:=false;
+
+   if(menu_msg_type<>mmbt_none)then exit;
+
+   case connect of
+   true : begin   // start connecting
+             if(net_status<>ns_none)
+             or(rpls_pstate=rpls_read)
+             or(g_LobbyTimer>0)
+             or(G_Started)then exit;
+             GameNetClient:=true;
+             if(check)then exit;
+
+             menu_ClientAddress:=menu_GetClientAddress(menu_ClientAddress,@net_cl_svip,@net_cl_svport);
+             if(net_UpSocket(0))then
+             begin
+                net_status   :=ns_client;
+                rpls_pnu     :=0;
+                net_SvList :=false;
+                net_cl_Hoster:=255;
+                net_cl_svttl :=TTLServer;
+                net_cl_log_n :=net_cl_log_n.MaxValue;
+                PlayerReady  :=false;
+                menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer);
+                PlayersClearLog;
+             end
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Client+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
+          end;
+   false: begin   // disconnect
+             if(net_status<>ns_client)then exit;
+             GameNetClient:=true;
+             if(check)then exit;
+
+             net_disconnect;
+             GameResetNetGame;
+          end;
+   end;
+end;
+function GameNetServerList(start,check:boolean):boolean;
+begin
+   GameNetServerList:=false;
+
+   if(rpls_pstate<>rpls_none)
+   or(G_Started)
+   or(menu_msg_type<>mmbt_none)then exit;
+
+   case start of
+   true : begin
+             if(net_SvList)
+             or(g_LobbyTimer>0)
+             or(net_status<>ns_none)then exit;
+             GameNetServerList:=true;
+             if(check)then exit;
+
+             if(net_UpSocket(net_svLanAdv_port))then
+             begin
+                net_status:=ns_client;
+                net_SvList:=true;
+             end
+             else menu_msgBox_Set(str_Caption_Multiplayer,str_net_ServerList+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
+          end;
+   false: begin
+             if(not net_SvList)
+             or(net_status<>ns_client)then exit;
+             GameNetServerList:=true;
+             if(check)then exit;
+
+             net_dispose;
+             net_status:=ns_none;
+             net_SvList:=false;
+          end;
+   end;
+end;
+
+procedure GameNetServerListSelect(mi:byte);
+begin
+   menu_ListMouseXY2Line(mi,@net_SvList_sel,net_SvList_scroll,menu_ServerLineH);
+   if(net_SvList_sel<0)or(net_SvList_Size<=net_SvList_sel)
+   then menu_ClientAddress:=''
+   else
+     with net_SvList_listi[net_SvList_sel] do
+       menu_ClientAddress:=si_line;
+end;
+
+function GameNetServerListConnect(check:boolean):boolean;
+begin
+   GameNetServerListConnect:=false;
+
+   if(rpls_pstate<>rpls_none)
+   or(G_Started)
+   or(net_status<>ns_client)
+   or(not net_SvList)
+   or(length(menu_ClientAddress)=0)
+   then exit;
+
+   GameNetServerListConnect:=true;
+
+   if(check)then exit;
+
+   net_dispose;
+   net_SvList:=false;
+   net_status:=ns_none;
+
+   GameNetClient(true,false);
+end;
+
+function GameNetServerListAdd(check:boolean):boolean;
+begin
+   GameNetServerListAdd:=false;
+
+   if(not net_SvList)
+   or(length(menu_ClientAddress)=0)
+   or(not net_ServerListAdd(menu_ClientAddress,true))
+   then exit;
+
+   GameNetServerListAdd:=true;
+
+   if(check)then exit;
+
+   if(net_ServerListAdd(menu_ClientAddress,false))then
+   begin
+      net_SvList_sel:=net_SvList_Size-1;
+      net_SvList_scroll:=net_SvList_Size-menu_ServerListH;
+   end;
+end;
+
+function GameNetServerListDelete(check:boolean):boolean;
+begin
+   GameNetServerListDelete:=false;
+
+   if(not net_SvList)
+   or(net_SvList_sel<0)
+   or(net_SvList_Size<=net_SvList_sel)
+   then exit;
+
+   GameNetServerListDelete:=true;
+
+   if(check)then exit;
+
+   delete(net_SvList_listi,net_SvList_sel,1);
+   delete(net_SvList_lists,net_SvList_sel,1);
+   net_SvList_Size-=1;
+   if(net_SvList_Scroll>0)then
+   net_SvList_Scroll-=1;
+
+   if(net_SvList_Size>0)then
+     if(net_SvList_sel=net_SvList_Size)then net_SvList_sel-=1;
+end;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -637,7 +687,7 @@ begin
                                                                                                                             mty0+=menu_ListLineH;
                    menu_Item_Set(mi_MP_Connect         ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
                    menu_Item_Set(mi_MP_ClientAddress   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ClientServerList,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServerSearch(true ,true));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ClientServerList,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServerList(true ,true));mty0+=menu_ListLineH;
                 end;
    ns_server  : begin
                    mty0-=menu_ListLineH;
@@ -748,9 +798,15 @@ begin
    menu_Item_Set(mi_NetServers_List,menu_BaseW1       ,menu_underCaptionY,
                                     menu_w-menu_BaseW1,menu_underCaptionY+menu_ServerLineH*menu_ServerListH,true);
 
-   menu_page_BottomButtons(mi_back,mi_NetServers_Connect,0,0,0,0,0);
+   with menu_items[mi_NetServers_List] do
+   menu_Item_Set(mi_MP_ClientAddress,mi_xc-menu_ServerListAddrWh,mi_y1+font_w1,
+                                     mi_xc+menu_ServerListAddrWh,mi_y1+font_w1+menu_ListLineH,true);
+
+   menu_page_BottomButtons(mi_back,mi_NetServers_Connect,mi_NetServers_Add,mi_NetServers_Delete,0,0,0);
 
    menu_item_setEnabled(mi_NetServers_Connect,GameNetServerListConnect(true));
+   menu_item_setEnabled(mi_NetServers_Add    ,GameNetServerListAdd    (true));
+   menu_item_setEnabled(mi_NetServers_Delete ,GameNetServerListDelete (true));
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -760,7 +816,7 @@ begin
    menu_DarkBack:=false;
    FillChar(menu_items,SizeOf(Menu_items),0);
 
-   if(net_svsearch)
+   if(net_SvList)
    then menu_net_ServerList
    else
      case menu_page of
@@ -799,7 +855,7 @@ mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
                      then menu_mseed:=c2s(map_seed)
                      else GameMapSetSeed(LocalPlayer,s2c(menu_mseed),false);
 mi_MP_ServerPort   : menu_GetServerPort;
-mi_MP_ClientAddress: menu_GetClientAddress;
+mi_MP_ClientAddress: menu_ClientAddress:=menu_GetClientAddress(menu_ClientAddress,@net_cl_svip,@net_cl_svport);
 mi_MP_ChatLine,
 mi_MP_ChatList     : if(EnterKey)then
                      begin
@@ -964,11 +1020,13 @@ mi_MP_Connect          : if(not check)then GameNetClient(true ,false);
 mi_MP_Disconnect       : if(not check)then GameNetClient(false,false);
 mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,true,0,net_MaxQuality);
 mi_MP_ClientAddress    : ;
-mi_MP_ClientServerList : if(not check)then GameNetServerSearch(true,false);
+mi_MP_ClientServerList : if(not check)then GameNetServerList(true,false);
 
 // Net Server List MULTIPLAYER
-mi_NetServers_List      : if(not check)then menu_ListMouseXY2Line(item,@net_svsearch_sel,net_svsearch_scroll,menu_ServerLineH);
+mi_NetServers_List      : if(not check)then GameNetServerListSelect(item);
 mi_NetServers_Connect   : if(not check)then GameNetServerListConnect(false);
+mi_NetServers_Add       : if(not check)then GameNetServerListAdd    (false);
+mi_NetServers_Delete    : if(not check)then GameNetServerListDelete (false);
 
 // HELP
 mi_help_GameControls,
@@ -1072,13 +1130,13 @@ function menu_Controls_MWD(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MWD:=true;
    case item of
-mi_NetServers_List     : if(not check)then ScrollInt(@net_svsearch_scroll, 10,0,net_svsearch_size-menu_ServerListH,false);
-mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   , 10,0,svld_list_size   -menu_BaseList1H   ,false);
-mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   , 10,0,rpls_list_size   -menu_BaseList1H   ,false);
-mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    ,-2 ,0,menu_ChatSize    -menu_ChatListH    ,false);
+mi_NetServers_List     : if(not check)then ScrollInt(@net_SvList_scroll, 10,0,net_SvList_Size-menu_ServerListH,false);
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll , 10,0,svld_list_size -menu_BaseList1H ,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll , 10,0,rpls_list_size -menu_BaseList1H ,false);
+mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll  ,-2 ,0,menu_ChatSize  -menu_ChatListH  ,false);
 mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
                                            with menu_HelpIList^ do
-                                           ScrollInt(@menu_HelpScroll    , 2 ,0,slist_n          -ui_DocListH       ,false);
+                                           ScrollInt(@menu_HelpScroll  , 2 ,0,slist_n        -ui_DocListH     ,false);
 
 mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,false,1,ui_MaxCamSpeed,false);
 mi_SS_SoundVolume      : if(not check)then
@@ -1107,13 +1165,13 @@ function menu_Controls_MWU(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MWU:=true;
    case item of
-mi_NetServers_List     : if(not check)then ScrollInt(@net_svsearch_scroll,-10,0,net_svsearch_size-menu_ServerListH,false);
-mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll   ,-10,0,svld_list_size   -menu_BaseList1H ,false);
-mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll   ,-10,0,rpls_list_size   -menu_BaseList1H ,false);
-mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll    , 2 ,0,menu_ChatSize    -menu_ChatListH  ,false);
+mi_NetServers_List     : if(not check)then ScrollInt(@net_SvList_scroll,-10,0,net_SvList_Size-menu_ServerListH,false);
+mi_SaveLoad_list       : if(not check)then ScrollInt(@svld_list_scroll ,-10,0,svld_list_size -menu_BaseList1H ,false);
+mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll ,-10,0,rpls_list_size -menu_BaseList1H ,false);
+mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll  , 2 ,0,menu_ChatSize  -menu_ChatListH  ,false);
 mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
                                            with menu_HelpIList^ do
-                                           ScrollInt(@menu_HelpScroll    ,-2 ,0,slist_n          -ui_DocListH     ,false);
+                                           ScrollInt(@menu_HelpScroll  ,-2 ,0,slist_n        -ui_DocListH     ,false);
 
 mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,true,1,ui_MaxCamSpeed,false);
 mi_SS_SoundVolume      : if(not check)then
@@ -1152,7 +1210,7 @@ mi_SaveLoad_fname      : if(not check)then svld_str_fname    :=    StringApplyIn
 mi_Map_Seed            : if(not check)then menu_mseed        :=    StringApplyInput(menu_mseed            ,CharSetDigits,10                  ,changed);
 
 mi_MP_ServerPort       : if(not check)then menu_ServerPort   :=    StringApplyInput(menu_ServerPort       ,CharSetDigits,5                   ,changed);
-mi_MP_ClientAddress    : if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,21                  ,changed);
+mi_MP_ClientAddress    : if(not check)then menu_ClientAddress:=    StringApplyInput(menu_ClientAddress    ,CharSetCommon,menu_AddressLen     ,changed);
 mi_MP_ChatLine,
 mi_MP_ChatList         : if(not check)then net_chat_str      :=    StringApplyInput(net_chat_str          ,CharSetCommon,254                 ,changed);
    else
@@ -1226,7 +1284,7 @@ begin
    changed:=false;
 
    // force menu msg box error awaiting for server
-   if(net_status=ns_client)and(not net_svsearch)and(not g_started)then
+   if(net_status=ns_client)and(not net_SvList)and(not g_started)then
      if(net_cl_svttl>=TTLServer)
      then menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer)
      else

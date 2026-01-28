@@ -1302,7 +1302,7 @@ begin
    newy^:=ty;
 end;
 
-{$IFDEF _FULLGAME}
+
 procedure BuildingFindNewPlace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger;UnitObsTeamVis:byte=255);
 var
 aukfly  :boolean;
@@ -1354,7 +1354,6 @@ begin
    newx^:=tx;
    newy^:=ty;
 end;
-{$ENDIF}
 
 function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean;checkTeamVis:byte;reveal_u:PTUnit=nil):TCheckCollisionR;
 var u,
@@ -1597,12 +1596,12 @@ begin
       a_tar_cl := 0;
       a_exp    := 0;
 
-      aiu_BuildTries  :=0;
-      aiu_alarm_timer :=0;
-      aiu_alarm_d     :=NOTSET;
-      aiu_alarm_x     :=-1;
-      aiu_alarm_y     :=0;
-      aiu_NeedDetect :=NOTSET;
+      aiu_BuildAttempts:=0;
+      aiu_alarm_timer  :=0;
+      aiu_alarm_d      :=NOTSET;
+      aiu_alarm_x      :=-1;
+      aiu_alarm_y      :=0;
+      aiu_NeedDetect   :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
 
@@ -1850,13 +1849,17 @@ begin
    end;
 end;
 
-function unit_start_build(bx,by:integer;buid,bp:byte):cardinal;
+function unit_start_build(bx,by:integer;buid,bplayer:byte;skipReqCheck:boolean=false):cardinal;
 begin
-   unit_start_build:=CheckUnitReqs(@g_gplayers[bp],buid);
+   if(skipReqCheck)
+   then unit_start_build:=0
+   else unit_start_build:=CheckUnitReqs(@g_gplayers[bplayer],buid);
    if(unit_start_build=0)then
-     with g_gplayers[bp] do
-       if(CheckBuildPlace(bx,by,0,0,bp,buid)=cbp_good)
-       then unit_add(bx,by,-1,buid,bp,false,false,0)
+     with g_gplayers[bplayer] do
+       if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=cbp_good)then
+       begin
+          if(not unit_add(bx,by,-1,buid,bplayer,false,false,0))then unit_start_build:=ureq_other;
+       end
        else unit_start_build:=ureq_place;
 end;
 

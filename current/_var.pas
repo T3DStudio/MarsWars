@@ -467,12 +467,12 @@ net_cl_Quality    : byte = 4;
 net_cl_log_n      : cardinal = 0;
 net_chat_str      : shortstring = '';
 
-net_svsearch      : boolean = false;
-net_svsearch_listi: array of TServerInfo;
-net_svsearch_lists: TStringArray;
-net_svsearch_scroll: integer = 0;
-net_svsearch_size : integer = 0;
-net_svsearch_sel  : integer = 0;
+net_SvList        : boolean = false;
+net_SvList_listi  : array of TServerInfo;
+net_SvList_lists  : TStringArray;
+net_SvList_scroll : integer = 0;
+net_SvList_Size   : integer = 0;
+net_SvList_sel    : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1074,6 +1074,7 @@ str_net_ServerStop,
 str_net_Connect,
 str_net_Disconnect,
 str_net_ServerList,
+str_net_ServerListAdd,
 
 str_hint_upgrade,
 str_hint_sec,
@@ -1257,7 +1258,7 @@ str_observer,
 
 str_net_Ready,
 str_net_UDPPort,
-str_net_ServerLANVis,
+str_net_ServerLANAdv,
 str_net_ConnectedToDed,
 str_net_Quality,
 str_net_Address,

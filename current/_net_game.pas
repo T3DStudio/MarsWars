@@ -131,7 +131,7 @@ begin
    net_writebyte(g_status );
    for p:=0 to LastPlayer do
      with g_gplayers[p] do
-       net_writestring(name );
+       net_writestring(name);
 end;
 
 
@@ -242,6 +242,17 @@ begin
    while(net_Receive>0)do
    begin
       mid:=net_readbyte;
+
+      if(mid=nmid_ServerInfoReq)then
+      begin
+         tping1:=net_readcard;
+         net_clearbuffer;
+         net_writebyte(nmid_ServerInfo);
+         net_writecard(tping1);
+         net_WriteGameInfo;
+         net_send(net_LastinIP,net_LastinPort);
+         continue;
+      end;
 
       if(mid=nmid_connect)
       then net_InputConnection
@@ -720,88 +731,136 @@ end;
 //    NET LAN SEARCH
 //
 
-procedure net_DiscoweringUpdate(aip:cardinal;aport:word;ainfo:shortstring);
-var i,e:word;
+procedure net_ServerList_ItemUpdate(aip:cardinal;aport:word;ainfo:shortstring;aping:cardinal);
+var i,e:integer;
 begin
    e:=0;
 
-   if(net_svsearch_size>0)then
-     for i:=0 to net_svsearch_size-1 do
-       with net_svsearch_listi[i] do
-         if(aip=ip)and(aport=port)then
+   if(net_SvList_Size>0)then
+     for i:=0 to net_SvList_Size-1 do
+       with net_SvList_listi[i] do
+         if(aip=si_ip)and(aport=si_port)then
          begin
             e:=i+1;
             break;
          end;
 
    if(e=0)then
-     if(net_svsearch_size<net_svsearch_size.MaxValue)then
+     if(net_SvList_Size<net_SvList_Size.MaxValue)then
      begin
-        net_svsearch_size+=1;
-        setlength(net_svsearch_listi,net_svsearch_size);
-        setlength(net_svsearch_lists,net_svsearch_size);
-        with net_svsearch_listi[net_svsearch_size-1] do
+        net_SvList_Size+=1;
+        setlength(net_SvList_listi,net_SvList_Size);
+        setlength(net_SvList_lists,net_SvList_Size);
+        with net_SvList_listi[net_SvList_Size-1] do
         begin
-           ip  :=aip;
-           port:=aport;
+           si_ping:=0;
+           si_ip  :=aip;
+           si_port:=aport;
+           si_line:=c2ip(si_ip)+':'+w2s(swap(si_port));
         end;
-        e:=net_svsearch_size;
+        e:=net_SvList_Size;
         menu_update:=true;
      end;
 
    if(e>0)then
    begin
       e-=1;
-      if(net_svsearch_lists[e]<>ainfo)then menu_update:=true;
-      net_svsearch_lists[e]:=ainfo;
+      with net_SvList_listi[e] do
+      begin
+         if(aping<aping.MaxValue)then
+           si_ping:=aping;
+         ainfo:=c2s(si_ping)+' '+si_line+' '+ainfo;
+      end;
+      if(net_SvList_lists[e]<>ainfo)then menu_update:=true;
+      net_SvList_lists[e]:=ainfo;
    end;
 end;
 
-procedure net_Discowering;
-var p,v:byte;
-    s,t:shortstring;
+function net_ReadGameInfo:shortstring;
+var
+v:byte;
+t:shortstring;
+begin
+   //c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort));
+   net_ReadGameInfo:='';
+   v:=net_readbyte;
+   if(v<>g_version)
+   then STRADD(@net_ReadGameInfo,str_gmsg_WrongVersion,sep_space)
+   else
+   begin
+      v:=net_readbyte;
+      if(v>mc_last)
+      then STRADD(@net_ReadGameInfo,str_gmsg_WrongVersion,sep_space)
+      else
+      begin
+         STRADD(@net_ReadGameInfo,str_map_scenariol[v],sep_space);
+         v:=net_readbyte;
+         if(v=0)
+         then STRADD(@net_ReadGameInfo,str_gstat_lobby,sep_space)
+         else
+         begin
+            v:=net_readbyte;
+            if(v=gs_running)
+            then STRADD(@net_ReadGameInfo,str_gstat_Started,sep_space)
+            else
+            begin
+               GameGetStatus(@t,nil,255);
+               STRADD(@net_ReadGameInfo,t,sep_space);
+            end;
+         end;
+         net_ReadGameInfo+=tc_nl1;
+         t:='';
+         for v:=0 to LastPlayer do
+           STRADD(@t,net_readstring,sep_scomma);
+         net_ReadGameInfo+=t;
+         exit;
+      end;
+   end;
+   net_ReadGameInfo:='';
+end;
+
+procedure net_ServerListProc;
+var
+mid   :byte;
+i     :integer;
+tping1,
+tping2:cardinal;
+s     :shortstring;
 begin
    net_clearbuffer;
    while(net_Receive>0)do
    begin
-      v:=net_readbyte;
-      if(v<>nmid_LAN_Adv)then continue;
-
-      s:=c2ip(net_LastinIP)+':'+w2s(swap(net_LastinPort));
-      v:=net_readbyte;
-      if(v<>g_version)
-      then STRADD(@s,str_gmsg_WrongVersion,sep_space)
-      else
-      begin
-         v:=net_readbyte;
-         if(v>mc_last)
-         then STRADD(@s,str_gmsg_WrongVersion,sep_space)
-         else
-         begin
-            STRADD(@s,str_map_scenariol[v],sep_space);
-            v:=net_readbyte;
-            if(v=0)
-            then STRADD(@s,str_gstat_lobby,sep_space)
-            else
-            begin
-               v:=net_readbyte;
-               if(v=gs_running)
-               then STRADD(@s,str_gstat_Started,sep_space)
-               else
-               begin
-                  GameGetStatus(@t,nil,255);
-                  STRADD(@s,t,sep_space);
-               end;
-            end;
-            s+=': ';
-            t:='';
-            for p:=0 to LastPlayer do
-              STRADD(@t,net_readstring,sep_scomma);
-            s+=t;
-         end;
+      mid:=net_readbyte;
+      case mid of
+      nmid_LAN_Adv   : begin
+                          s:=net_ReadGameInfo;
+                          if(length(s)>0)then
+                            net_ServerList_ItemUpdate(net_LastinIP,net_LastinPort,s,tping1.MaxValue);
+                       end;
+      nmid_ServerInfo: begin
+                          tping1:=net_readcard;
+                          tping2:=SDL_GetTicks;
+                          if(tping2>=tping1)then
+                          begin
+                             s:=net_ReadGameInfo;
+                             if(length(s)>0)then
+                               net_ServerList_ItemUpdate(net_LastinIP,net_LastinPort,s,tping2-tping1);
+                          end;
+                       end;
       end;
-      net_DiscoweringUpdate(net_LastinIP,net_LastinPort,s);
    end;
+
+   net_TimerBase+=1;
+   net_TimerBase:=net_TimerBase mod fr_fps2;
+   if(net_SvList_Size>0)and(net_TimerBase=0)then
+     for i:=0 to net_SvList_Size-1 do
+       with net_SvList_listi[i] do
+       begin
+          net_clearbuffer;
+          net_writebyte(nmid_ServerInfoReq);
+          net_writecard(SDL_GetTicks);
+          net_send(si_ip,si_port);
+       end;
 end;
 
 

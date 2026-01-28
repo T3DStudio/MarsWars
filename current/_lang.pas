@@ -258,7 +258,7 @@ begin
    str_PT_Race                   := 'RACE';
    str_PT_Team                   := 'TEAM';
    str_PT_Color                  := 'COLOR';
-   str_PT_Ping                   := 'PING&';
+   str_PT_Ping                   := 'PING';
    str_PT_Obs                    := 'OBS.';
 
    str_race[r_random]            := tc_default+'RANDOM'+tc_default;
@@ -457,7 +457,8 @@ begin
    str_net_Quality               := 'Units update rate';
    str_net_Address               := 'Address';
    str_net_ServerList            := 'Server list';
-   str_net_ServerLANVis          := 'LAN Advertise';
+   str_net_ServerListAdd         := 'Add';
+   str_net_ServerLANAdv          := 'LAN Advertise';
    str_net_ConnectedToDed        := '- connected to dedicated server -';
 
    str_help_Credits              := 'Credits';

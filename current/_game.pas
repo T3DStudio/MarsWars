@@ -1293,8 +1293,8 @@ begin
    snd_SoundControl;
 
    case net_status of
-   ns_client: if(net_svsearch)
-              then net_Discowering
+   ns_client: if(net_SvList)
+              then net_ServerListProc
               else net_Client;
    ns_none  : if(g_Started)and(MainMenu)then exit;
    end;

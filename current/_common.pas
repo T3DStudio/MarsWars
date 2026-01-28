@@ -49,7 +49,7 @@ function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function gfx_ShadowColor(c:cardinal):cardinal;forward;
 
 function GamePauseToggle(check:boolean):boolean;forward;
-function GameNetServerSearch(start,check:boolean):boolean;forward;
+function GameNetServerList(start,check:boolean):boolean;forward;
 
 procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);forward;
 function menu_MouseXY2Item:byte; forward;
@@ -1592,7 +1592,7 @@ begin
       if(not offMenu)then exit;
    end;
 
-   if(GameNetServerSearch(false,check))then
+   if(GameNetServerList(false,check))then
    begin
       MenuBack:=true;
       if(check)then exit;

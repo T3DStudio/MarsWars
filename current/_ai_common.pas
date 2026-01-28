@@ -1,4 +1,12 @@
 
+const
+
+aic_GeneratorsLimit        = ul1*35;
+aic_GeneratorsEnergy       = 8000;
+aic_GeneratorsDestroyEnergy= 9300;
+aic_GeneratorsDestoryLimit = ul1*60;
+
+aic_TowerLifeTime          = fr_fps1*60;
 
 var
 
@@ -12,6 +20,9 @@ ai_generator_kp,
 ai_keypoint_kp    : pTKeyPoint;
 
 ai_keypoint_koth  : boolean;
+
+ai_generators_limit
+                  : longint;
 
 ai_curr_UnitMinLvl,
 ai_curr_UpgrMinLvl: byte;
@@ -348,11 +359,12 @@ begin
    ai_generator_d    := NOTSET;
 
    // energy
-   ai_energy_future     := 0;
-   ai_energy_current     := 0;
+   ai_energy_future  := 0;
+   ai_energy_current := 0;
 
-  { ai_gen_limit      := 0;
+   ai_generators_limit:=0;
 
+  {
    // nearest builder
    ai_nearest_builder_u:=nil;
    ai_nearest_builder_d:= NOTSET;

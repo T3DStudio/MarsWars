@@ -320,10 +320,12 @@ begin
       if(ud<=srange)then
        if(tu^.buffs[ub_Detect]>0)
        or(tu^.uid^.uid_ability=uab_HEyeVision)
-       or(tu^.uid^.uid_ability=uab_UACScan   )then ai_detect_near+=1;
+       or(tu^.uid^.uid_ability=uab_UACScan   )then ai_detect_near+=1;   }
 
       // generators limit
-      if(tu^.uidi=aiucl_generator[race])then ai_gen_limit+=tu^.uid^.uid_LimitUse;  }
+     // if(tu^.uidi=aiucl_generator[race])then ai_gen_limit+=tu^.uid^.uid_LimitUse;
+      if (not tu^.uid^.uid_isbuilder)
+      and(tu^.uid^.uid_gen_EnergyLevel>0)then ai_generators_limit+=tu^.uid^.uid_LimitUse;
 
       // towers
       if(tu^.uid^.uid_isbuilding)and(tu^.uid^.uid_CanAttack)then

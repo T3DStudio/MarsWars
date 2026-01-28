@@ -225,7 +225,10 @@ begin
     +'.'+b2s((c and $FF000000) shr 24);
 end;
 
-procedure menu_GetClientAddress;
+// menu_ClientAddress,@net_cl_svip,@net_cl_svport
+//
+//
+function menu_GetClientAddress(addr_line:shortstring;pip:pcardinal;pport:pword):shortstring;
 var
 addr_str,
 port_str: shortstring;
@@ -237,36 +240,75 @@ ipstruct: TIPaddress;
 begin
    addr_str:='';
    port_str:='';
-   p    :=pos(':',menu_ClientAddress);
+   p:=pos(':',addr_line);
    if(p>0)then
    begin
-      addr_str:=copy(menu_ClientAddress,1,p-1);
-      delete(menu_ClientAddress,1,p);
-      port_str:=menu_ClientAddress;
+      addr_str:=copy(addr_line,1,p-1);
+      delete(addr_line,1,p);
+      port_str:=addr_line;
    end
    else
    begin
-      addr_str:=menu_ClientAddress;
+      addr_str:=addr_line;
       port_str:='10666';
    end;
 
-   net_cl_svport:=swap(s2w(port_str));
-   port_str:=w2s(swap(net_cl_svport));
+   pport^:=swap(s2w(port_str));
+   port_str:=w2s(swap(pport^));
 
    ipc:=ip2c(addr_str,@isIP);
    if(isIP)then
    begin
-      net_cl_svip  :=ipc;
-      menu_ClientAddress:=c2ip(net_cl_svip)+':'+port_str;
+      pip^:=ipc;
+      menu_GetClientAddress:=c2ip(pip^)+':'+port_str;
    end
    else
    begin
-      menu_ClientAddress:=addr_str+':'+port_str;
+      menu_GetClientAddress:=addr_str+':'+port_str;
       addr_str+=#0;
       pstr:=@addr_str[1];
-      if(SDLNet_ResolveHost(ipstruct,pstr,net_cl_svport)=0)
-      then net_cl_svip:=ipstruct.host
-      else net_cl_svip:=0;
+      if(SDLNet_ResolveHost(ipstruct,pstr,pport^)=0)
+      then pip^:=ipstruct.host
+      else pip^:=0;
+   end;
+end;
+
+procedure net_ServerListParseAddr;
+var i:integer;
+begin
+   if(net_SvList_Size>0)then
+     for i:=0 to net_SvList_Size-1 do
+       with net_SvList_listi[i] do
+         menu_GetClientAddress(si_line,@si_ip,@si_port);
+end;
+
+function net_ServerListAdd(addr:shortstring;check:boolean):boolean;
+var i:integer;
+begin
+   net_ServerListAdd:=false;
+
+   if(net_SvList_Size=net_SvList_Size.MaxValue)
+   or(length(addr)=0)then exit;
+
+   if(net_SvList_Size>0)then
+     for i:=0 to net_SvList_Size-1 do
+       with net_SvList_listi[i] do
+         if(si_line=addr)then exit;
+
+   net_ServerListAdd:=true;
+
+   if(check)then exit;
+
+   net_SvList_Size+=1;
+   setlength(net_SvList_lists,net_SvList_Size);
+   setlength(net_SvList_listi,net_SvList_Size);
+
+   with net_SvList_listi[net_SvList_Size-1] do
+   begin
+      si_ping  :=9999;
+      si_line  :=addr;
+      si_manual:=true;
+      net_SvList_lists[net_SvList_Size-1]:=si_line;
    end;
 end;
 

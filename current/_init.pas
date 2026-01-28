@@ -97,8 +97,6 @@ begin
 
    menu_HelpIList:=@str_doc_Credits;
 
-   //gfx_SaveUnitIcons;
-
    {$ENDIF}
 
    if not(InitNET)then exit;
@@ -110,7 +108,9 @@ begin
 
    GameCycle:=true;
 
-   {$IFNDEF _FULLGAME}
+   {$IFDEF _FULLGAME}
+   net_ServerListParseAddr;
+   {$ELSE}
    Dedicated_Init;
    {$ENDIF}
 end;

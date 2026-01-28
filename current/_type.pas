@@ -247,9 +247,11 @@ end;
 pTUnitGroup = ^TUnitGroup;
 
 TServerInfo = record
-   ip       : cardinal;
-   port     : word;
-   info     : shortstring;
+   si_manual  : boolean;
+   si_ping,
+   si_ip      : cardinal;
+   si_port    : word;
+   si_line    : shortstring;
 end;
 
 TCampaignData = record
@@ -809,7 +811,7 @@ TUnit = record
    iscomplete,
    isselected   : boolean;
 
-   aiu_BuildTries:byte;
+   aiu_BuildAttempts:byte;
    aiu_limitaround_ally,
    aiu_limitaround_enemy
             : longint;

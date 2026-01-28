@@ -296,6 +296,7 @@ begin
         if((g_tick-wudtick^)>=wudelay)
         then wb:=true;
 
+      if(rpl)then
       b:=group and %00001111;
 
       if(iscomplete)
@@ -1240,7 +1241,9 @@ begin
    begin
       b:=rudata_byte(rpl,0);
 
+      if(rpl)then
       group:= b and %00001111;
+
       uo   :=(b and %01110000)shr 4;
 
       if(not rpl)and(iscomplete)then rudata_UnitOrderTar(uu,uo,rpl);

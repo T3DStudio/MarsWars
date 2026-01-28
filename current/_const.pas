@@ -334,6 +334,8 @@ nmid_lobby_GDefeatedObs   = 33;
 nmid_lobby_GRandomScirmish= 34;
 nmid_ping_Request         = 40;
 nmid_ping_Answer          = 41;
+nmid_ServerInfo           = 42;
+nmid_ServerInfoReq        = 43;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1678,7 +1680,7 @@ mi_NetServers_List     = 211;
 mi_NetServers_Line     = 212;
 mi_NetServers_Connect  = 213;
 mi_NetServers_Add      = 214;
-mi_NetServers_Remove   = 215;
+mi_NetServers_Delete   = 215;
 
 
 //// SCIRMISH INFO
@@ -1746,9 +1748,13 @@ menu_underCaptionY     = menu_underLogoY+menu_CaptionH+menu_BaseW1;
 menu_border1           = 125;
 menu_BarStepX          = font_w1h;
 
+menu_AddressLen        = 30;
+
 menu_BaseList1H        = 16;
-menu_ServerListH       = 13;
-menu_ServerLineH       = menu_ListLineH+(menu_ListLineH div 2);
+menu_ServerListH       = 9;
+menu_ServerLineH       = menu_ListLineH*2;
+menu_ServerListAddrW1  = font_w2+font_w1*menu_AddressLen;
+menu_ServerListAddrWh  = menu_ServerListAddrW1 div 2;
 menu_ListLineWChars1   = 60;
 menu_ListLineWCharsh   = menu_ListLineWChars1 div 2;
 menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
