@@ -1,9 +1,4 @@
 
-const
-
-kpdata_owner  = %10000000;
-kpdata_timer  = %11000000;
-kpdata_life   = %01000000;
 
 function unit_UO2Ability(pu:PTUnit;uo:byte):byte;
 begin
@@ -196,6 +191,7 @@ begin
       SetBBit(@byte3,4, buffs[ub_SphereTurbo  ]>0);
       SetBBit(@byte3,5, buffs[ub_Heroic       ]>0);
       SetBBit(@byte3,6, buffs[ub_HellVision   ]>0);
+      SetBBit(@byte3,7, transformTimer         >0);
 
       SetBBit(@byte1,0, iscomplete               );
       SetBBit(@byte1,1, IsUnitRange(transportU,nil));
@@ -297,9 +293,9 @@ begin
         then wb:=true;
 
       if(rpl)then
-      b:=group and %00001111;
+        b:=group and %00001111;
 
-      if(iscomplete)
+      if(iscomplete)and(transformTimer<=0)
       then uo:=uo_id
       else uo:=0;
       if(uo_bx>0)then
@@ -314,13 +310,13 @@ begin
 
       wudata_byte(b,rpl);
 
-      if(not rpl)and(iscomplete)then wudata_UnitOrderTar(pu,uo,rpl);
+      if(not rpl)and(iscomplete)and(transformTimer<=0)then wudata_UnitOrderTar(pu,uo,rpl);
 
       if(not wb)then exit;
 
       wudtick^:=g_tick;
 
-      if(iscomplete)then
+      if(iscomplete)and(transformTimer<=0)then
       begin
          if(rpl)then wudata_UnitOrderTar(pu,uo,rpl);
          if(uid_client_WReload)then wudata_reload(rld,rpl);
@@ -373,22 +369,28 @@ begin
          if(hits_si>0)then
          begin
             if(iscomplete)then
-            begin
-               if(a_tar_cl>0)and(a_rld>0)then
-               begin
-                  wt:=0;
-                  if(IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
-                  wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
-                  wudata_word(wt,rpl);
-               end;
-
-               if(uid_client_WCastTarget)then
-                 if(buffs[ub_Cast]>0)then
+              if(transformTimer>0)then
+              begin
+                 wudata_byte(transformUID,rpl);
+                 wudata_reload(transformTimer,rpl);
+              end
+              else
+              begin
+                 if(a_tar_cl>0)and(a_rld>0)then
                  begin
-                    wudata_byte(byte(uo_x shr 5),rpl);
-                    wudata_byte(byte(uo_y shr 5),rpl);
+                    wt:=0;
+                    if(IsUnitRange(a_tar_cl,nil))then wt:=word(a_tar_cl) and %0000001111111111;
+                    wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
+                    wudata_word(wt,rpl);
                  end;
-            end;
+
+                 if(uid_client_WCastTarget)then
+                   if(buffs[ub_Cast]>0)then
+                   begin
+                      wudata_byte(byte(uo_x shr 5),rpl);
+                      wudata_byte(byte(uo_y shr 5),rpl);
+                   end;
+              end;
 
             if(playeri=POVPlayer)
             or(g_gplayers[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
@@ -629,6 +631,9 @@ begin
          then res_energyl_cur-=uid_req_EnergyLevel
          else
          begin
+            if(transformTimer>0)then
+              res_energyl_cur-=g_uids[transformUID].uid_req_EnergyLevel;
+
             unit_IncCounters_Complete(pu);
 
             p:=@units_ucl_u[uid_isbuilding,uid_uibtn];
@@ -697,6 +702,9 @@ begin
          then res_energyl_cur+=uid_req_EnergyLevel
          else
          begin
+            if(transformTimer>0)then
+              res_energyl_cur+=g_uids[transformUID].uid_req_EnergyLevel;
+
             res_energyl_cur-=uid_gen_EnergyLevel;
             res_energyl_max-=uid_gen_EnergyLevel;
             units_uid_c[uidi]-=1;
@@ -713,7 +721,7 @@ begin
                    _puid:=uprod_u[i];
 
                    prod_unit_Limit-=g_uids[_puid].uid_LimitUse;
-                   prod_unit_Now-=1;
+                   prod_unit_Now  -=1;
                    prod_unit_ucl[g_uids[_puid].uid_uibtn]-=1;
                    prod_unit_uid[       _puid           ]-=1;
                    res_energyl_cur+=g_uids[_puid].uid_req_EnergyLevel;
@@ -893,8 +901,10 @@ begin
 
                if(playeri=UIPlayer)then
                begin
-                  if(pu^.iscomplete)and(not iscomplete)then // start transforming to
+                  if((pu^.iscomplete)and(not iscomplete))
+                  or((pu^.transformTimer<=0)and(transformTimer>0))then // start rebuilding/transforming to
                     with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
+
                   if(not pu^.isselected)and(isselected)then ui_UnitSelSound:=true;
                end;
 
@@ -910,7 +920,8 @@ begin
                                      then unit_ArmSpawnUnit(pu,UID_Phantom )
                                      else unit_ArmSpawnUnit(pu,UID_LostSoul);
                     end;
-                  if(pu^.level<level)then effect_Common(cu,0,@vis);
+                  if (pu^.transformTimer<=0)
+                  and(pu^.level<level)then effect_Common(cu,0,@vis);
                end;
             end;
 
@@ -1023,7 +1034,7 @@ begin
    end;
 end;
 
-function byte2s(b:byte):shortstring;
+{function byte2s(b:byte):shortstring;
 begin
    byte2s:='00000000';
    if(b and %00000001)>0 then byte2s[8]:='1';
@@ -1034,7 +1045,7 @@ begin
    if(b and %00100000)>0 then byte2s[3]:='1';
    if(b and %01000000)>0 then byte2s[2]:='1';
    if(b and %10000000)>0 then byte2s[1]:='1';
-end;
+end;   }
 
 procedure  rudata_log(p:byte;rpl:boolean);
 var
@@ -1137,6 +1148,7 @@ begin
          buffs[ub_SphereTurbo  ]:=buff_Bool2InfTime[GetBBit(@byte3,4)];
          buffs[ub_Heroic       ]:=buff_Bool2InfTime[GetBBit(@byte3,5)];
          buffs[ub_HellVision   ]:=buff_Bool2InfTime[GetBBit(@byte3,6)];
+         if(GetBBit(@byte3,7))then transformTimer:=1 else transformTimer:=0;
       end
       else
       begin
@@ -1147,6 +1159,7 @@ begin
          buffs[ub_SphereTurbo  ]:=0;
          buffs[ub_Heroic       ]:=0;
          buffs[ub_HellVision   ]:=0;
+         transformTimer         :=0;
       end;
 
       if(not rpl)and(not g_gplayers[POVPlayer].isobserver)then
@@ -1242,15 +1255,15 @@ begin
       b:=rudata_byte(rpl,0);
 
       if(rpl)then
-      group:= b and %00001111;
+        group:=b and %00001111;
 
-      uo   :=(b and %01110000)shr 4;
+      uo:=(b and %01110000)shr 4;
 
-      if(not rpl)and(iscomplete)then rudata_UnitOrderTar(uu,uo,rpl);
+      if(not rpl)and(iscomplete)and(transformTimer<=0)then rudata_UnitOrderTar(uu,uo,rpl);
 
       if((b and %10000000)=0)then exit;
 
-      if(iscomplete)then
+      if(iscomplete)and(transformTimer<=0)then
       begin
          if(rpl)then rudata_UnitOrderTar(uu,uo,rpl);
          if(uid_client_WReload)then rudata_reload(@rld,rpl);
@@ -1311,8 +1324,8 @@ begin
          uidi:=rudata_byte(rpl,0);
          if(i<>uidi)then
          begin
-            unit_ApplyUID(uu);
             unit_SetDefaults(uu,false);
+            unit_ApplyUID(uu);
             FillChar(buffs,SizeOf(buffs),0);
          end;
          hits:=hits_si2li(sh,uid^.uid_MaxHits1,uid^.uid_hits_li2si);
@@ -1338,21 +1351,27 @@ begin
          if(sh>0)then
          begin
             if(iscomplete)then
-            begin
-               if(a_tar=-1)then
-               begin
-                  wt    :=rudata_word(rpl,0);
-                  a_tar :=integer(wt and %0000001111111111);
-                  a_weap:=(wt and %1111110000000000) shr 10;
-               end;
-
-               if(uid^.uid_client_WCastTarget)then
-                 if(buffs[ub_Cast]>0)then
+              if(transformTimer>0)then
+              begin
+                 transformUID:=rudata_byte(rpl,0);
+                 rudata_reload(@transformTimer,rpl);
+              end
+              else
+              begin
+                 if(a_tar=-1)then
                  begin
-                    uo_x:=integer(rudata_byte(rpl,0) shl 5);
-                    uo_y:=integer(rudata_byte(rpl,0) shl 5);
+                    wt    :=rudata_word(rpl,0);
+                    a_tar :=integer(wt and %0000001111111111);
+                    a_weap:=(wt and %1111110000000000) shr 10;
                  end;
-            end;
+
+                 if(uid^.uid_client_WCastTarget)then
+                   if(buffs[ub_Cast]>0)then
+                   begin
+                      uo_x:=integer(rudata_byte(rpl,0) shl 5);
+                      uo_y:=integer(rudata_byte(rpl,0) shl 5);
+                   end;
+              end;
 
             if(playeri=POVPlayer)
             or(g_gplayers[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
@@ -1377,6 +1396,7 @@ begin
       ou^.vx:=uu^.x;
       ou^.vy:=uu^.y;
       unit_UpdateXY(ou);
+      unit_CalcFogR(ou);
    end
    else client_ChangeUnitState(uu,rpl);
 end;

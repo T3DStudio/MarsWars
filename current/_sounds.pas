@@ -475,15 +475,26 @@ begin
                ui_UnitSelSoundA+=1;
                if(ui_UnitSelSoundA=0)then ui_UnitSelSoundA:=uid_snd_select^.snd_sset_n
             end;
-
-        if(uid_isbuilding)and(not iscomplete)
-        then snd_SoundPlayUnitCommand(snd_building[uid_race])
-        else
-          if(ui_UnitSelSoundA>=0)
-          then snd_SoundPlayUnitCommand(uid_snd_select)
-          else snd_SoundPlayUnitCommand(uid_snd_annoy );
-
         ui_CommanderpPU:=ui_CommandercPU;
+
+        case iscomplete of
+        false: if(uid_isbuilding)then
+               begin
+                  snd_SoundPlayUnitCommand(snd_building[uid_race]);
+                  exit;
+               end;
+        true : if(transformTimer>0)then
+               begin
+                  if(g_uids[transformUID].uid_isbuilding)
+                  then snd_SoundPlayUnitCommand(snd_building[uid_race])
+                  else snd_SoundPlayUnitCommand(uid_snd_select);
+                  exit;
+               end;
+        end;
+
+        if(ui_UnitSelSoundA>=0)
+        then snd_SoundPlayUnitCommand(uid_snd_select)
+        else snd_SoundPlayUnitCommand(uid_snd_annoy );
      end;
 end;
 

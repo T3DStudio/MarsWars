@@ -515,13 +515,21 @@ begin
    setMWSModel(0,@spr_HFortress);
    setBuildingSND(snd_hell_hfort);
 end;
+UID_HEyeNest:
+begin
+   setMWSModel(0,@spr_HEyeNest);
+   setBuildingSND(snd_hell_eye);
+   setEffectEID(0,EID_Teleport  ,0,0,0  );
+   setEffectSND(  snd_Teleport,nil,nil,nil);
+end;
 UID_HEye:
 begin
    setMWSModel(0,@spr_HEye);
    setBuildingSND(snd_hell_eye);
    uid_eid_bcrater:=255;
-   setEffectEID(0,0  ,UID_HEye,UID_HEye,0  );
-   setEffectSND(  nil,snd_explode_plasma,snd_explode_plasma,nil);
+   setEffectEID(0,MID_Baron,UID_HEye,UID_HEye,0  );
+   setEffectSND(  nil      ,snd_explode_plasma,snd_explode_plasma,nil);
+   uid_snd_ready:=snd_hell_eye;
 end;
 UID_HCommandCenter:
 begin
@@ -764,7 +772,7 @@ begin
    setMWSModel(3,@spr_UWeaponFactory4);
    setBuildingSND(snd_uac_forge);
 end;
-UID_UTechCenter:
+UID_UScienceCenter:
 begin
    setMWSModel(0,@spr_UTechCenter);
    setBuildingSND(snd_uac_tech);
@@ -1036,10 +1044,8 @@ uab_UACCCLandTo      : begin
                        ua_mbrush_r:=uambt_Self;
                        end;
 uab_HEyeVision       : ua_btn     :=spr_uibtn_AbilityHVision;
-uab_HEyeBlink        : begin
-                       ua_btn     :=spr_uibtn_AbilityBlink;
-                       ua_mbrush_r:=uambt_Self;
-                       end;
+uab_HEyeSpawn        : ua_mbrush_r:=-UID_HEye;
+
 uab_HTowerBlink      : begin
                        ua_btn     :=spr_uibtn_Upgrades[r_hell,18].surf;
                        ua_mbrush_r:=uambt_Self;
@@ -1068,7 +1074,6 @@ uab_SpawnLostTo      : ua_btn     :=spr_uibtn_AbilitySpawnLostTo;
 uab_Unload           : ua_btn     :=spr_uibtn_AbilityUnload;
 uab_UnloadTo         : ua_btn     :=spr_uibtn_AbilityUnloadTo;
 
-uab_ToUACDron        : ua_mbrush_r:=-UID_UACDron;
 uab_ToUGTurretTo     : ua_mbrush_r:=-UID_UGTurret;
 uab_ToUATurretTo     : ua_mbrush_r:=-UID_UATurret;
 
@@ -1077,13 +1082,10 @@ uab_ToHSymbol2       : ua_mbrush_r:=-UID_HSymbol2;
 uab_ToHSymbol3       : ua_mbrush_r:=-UID_HSymbol3;
 uab_ToHSymbol4       : ua_mbrush_r:=-UID_HSymbol4;
 uab_ToHACommandCenter: ua_mbrush_r:=-UID_HACommandCenter;
-uab_ToHFTower        : ua_mbrush_r:=-UID_HFTower;
-uab_ToHSTower        : ua_mbrush_r:=-UID_HSTower;
 
 uab_ToHGate          : ua_mbrush_r:=-UID_HGate;
 uab_ToHPool          : ua_mbrush_r:=-UID_HPools;
 uab_ToHBarracks      : ua_mbrush_r:=-UID_HBarracks;
-uab_ToHTotem         : ua_mbrush_r:=-UID_HTotem;
 
 uab_ToUACommandCenter: ua_mbrush_r:=-UID_UACommandCenter;
 uab_ToUGenerator2    : ua_mbrush_r:=-UID_UGenerator2;
@@ -1101,7 +1103,6 @@ uab_URMStationLvlUp  : ua_mbrush_r:=-UID_URMStation;
       end;
 
       case a of
-uab_ToUACDron,
 uab_ToUGTurretTo,
 uab_ToUATurretTo,
 uab_ToHAKeep,
@@ -1109,12 +1110,9 @@ uab_ToHSymbol2,
 uab_ToHSymbol3,
 uab_ToHSymbol4,
 uab_ToHACommandCenter,
-uab_ToHFTower,
-uab_ToHSTower,
 uab_ToHGate,
 uab_ToHPool,
 uab_ToHBarracks,
-uab_ToHTotem,
 uab_ToUACommandCenter,
 uab_ToUGenerator2,
 uab_ToUGenerator3,
@@ -1129,12 +1127,8 @@ uab_ToUWeaponFactory : ua_mbrush_hint:=byte(-ua_mbrush_r);
       case a of
 uab_ToUAGTurret,
 uab_ToUAATurret,
-uab_ToUACDron,
 uab_ToUGTurretTo,
-uab_ToUATurretTo,
-uab_ToHTotem,
-uab_ToHFTower,
-uab_ToHSTower        : ua_mbrush_hint_HalfProdTime:=true;
+uab_ToUATurretTo     : ua_mbrush_hint_HalfProdTime:=true;
       end;
 
       if(ua_btn=spr_empty)then

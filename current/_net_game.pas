@@ -852,7 +852,7 @@ begin
 
    net_TimerBase+=1;
    net_TimerBase:=net_TimerBase mod fr_fps2;
-   if(net_SvList_Size>0)and(net_TimerBase=0)then
+   if(net_SvList_Size>0)and(net_TimerBase=1)then
      for i:=0 to net_SvList_Size-1 do
        with net_SvList_listi[i] do
        begin

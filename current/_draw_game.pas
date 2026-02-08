@@ -364,13 +364,15 @@ begin
 end;
 
 procedure UnitsInfo_AddFromUnit(pu:PTUnit;usmodel:PTMWSModel);
-const buff_sprite_w = 18;
+const
+buff_sprite_w = 18;
 var
 srect,
 choosen,
 pain,
 hbar   : boolean;
- acolor: cardinal;
+acolor : cardinal;
+t,
 buffx,
 buffy  : integer;
 begin
@@ -396,21 +398,71 @@ begin
         end;
 
       if(srect)then
-      begin
-         if(playeri=UIPlayer)
-         then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-         else UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
-         UnitsInfo_AddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
-      end;
+        with g_unitsVis[unum] do
+        begin
+           if(playeri=UIPlayer)
+           then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
+           else UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
+           UnitsInfo_AddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
+        end;
       if(hbar )then UnitsInfo_Progressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/uid_MaxHits1,acolor);
 
-      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then UnitsInfo_AddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
+      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then
+        with g_unitsVis[unum] do UnitsInfo_AddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
 
-      if(speed<=0)or(not iscomplete)then
-        if(ui_DrawEdges)then
+      if(ui_DrawEdges)then
+        if(speed<=0)or(not iscomplete)or(transformTimer>0)then
           UnitsInfo_AddCircle(x,y,uid_r,ui_blink2_color_BY);
 
       if(srect)and(uid_isbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfo_AddCircle(x,y,srange,ui_blink2_color_BG);
+
+      if(playeri=UIPlayer)then
+        case iscomplete of
+        true : if(transformTimer>0)
+               then UnitsInfo_AddText(vx,vy,i2s(it2s(transformTimer)),c_white)
+               else
+               begin
+                  if(uid_isbarrack)and(uid_isforge)
+                  then buffy:=ui_ButtonW1
+                  else buffy:=0;
+
+                  buffx:=0;
+                  if(uid_isbarrack)then
+                  begin
+                     for t:=0 to LastUnitLevel do
+                       if(uprod_r[t]>0)then buffx+=1;
+                     if(buffx>0)then
+                     begin
+                        buffx:=-(buffx-1)*ui_ButtonWh;
+                        for t:=0 to LastUnitLevel do
+                          if(uprod_r[t]>0)then
+                          begin
+                             UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
+                             buffx+=ui_ButtonW1;
+                          end;
+                     end;
+                     buffy+=ui_ButtonW1;
+                  end;
+                  buffx:=0;
+                  if(uid_isforge)then
+                  begin
+                     for t:=0 to LastUnitLevel do
+                       if(pprod_r[t]>0)then buffx+=1;
+                     if(buffx>0)then
+                     begin
+                        buffx:=-(buffx-1)*ui_ButtonWh;
+                        for t:=0 to LastUnitLevel do
+                          if(pprod_r[t]>0)then
+                          begin
+                             UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
+                             buffx+=ui_ButtonW1;
+                          end;
+                     end;
+                     buffy+=ui_ButtonW1;
+                  end;
+               end;
+        false: UnitsInfo_AddText(vx,vy,i2s(it2s((((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2)*fr_fps1)),c_white);
+        end;
 
       //ub_Scaned
       case ui_blink3 of
@@ -749,7 +801,7 @@ begin
         //if(k_shift>1)then
         begin
            circleColor(vid_screen,ix,iy,uid_r  ,c_gray);
-          // circleColor(vid_screen,ix,iy,srange,c_white);
+           circleColor(vid_screen,ix,iy,srange,c_white);
            if(isselected)then
            begin
               //lineColor(vid_screen,ix,iy,ui_mapx+pf_mv_nx-ui_cam_x  ,ui_mapy+pf_mv_ny-ui_cam_y  ,c_red );

@@ -149,6 +149,7 @@ g_type            : byte     = 0; // 0 = none, 1 = scirmish, 2 - campaing
 
 g_eids            : array[byte] of TEID;
 g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
+g_unitsVis        : array[0..MaxUnits] of TUnitVis;
 
 missiles_UIDsBioEff         // units that trigger "bio" effect of missiles
                   : TSoB;
@@ -298,13 +299,14 @@ ui_bprod_uid_count,
 ui_bprod_ucl_count,
 ui_bprod_ucl_time : array[byte] of integer;
 ui_bprod_first,
-ui_bprod_all      : integer;
+ui_bprod_cur      : integer;
 ui_uid_reload     : array[byte] of integer;
 ui_bucl_reload    : array[byte] of integer;
 ui_uibtn_rpoint   : integer = 0;   // ui rally point
 ui_uibtn_move     : integer = 0;   // ui move buttons
 ui_uibtn_attack   : integer = 0;   // ui attack buttons
 ui_uibtn_apatrol  : integer = 0;   // ui apatrol button
+ui_uibtn_ProdCncl : integer = 0;   // ui prod cancel button
 
 ui_DrawEdges      : boolean = false;
 ui_umark_u        : integer = 0;
@@ -753,6 +755,7 @@ spr_HBarracks2,
 spr_HBarracks3,
 spr_HBarracks4,
 spr_HEye,
+spr_HEyeNest,
 
 spr_UCommandCenter,
 spr_UACommandCenter,

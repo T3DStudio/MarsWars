@@ -21,7 +21,16 @@ ai_keypoint_kp    : pTKeyPoint;
 
 ai_keypoint_koth  : boolean;
 
-ai_generators_limit
+ai_generators_limit,
+ai_limitaround_enemy_grd,
+ai_limitaround_enemy_fly,
+
+ai_armylimit_alive_u,
+ai_armylimit_alive_b,
+
+ai_curr_detect,
+ai_need_detect
+
                   : longint;
 
 ai_curr_UnitMinLvl,
@@ -34,6 +43,12 @@ ai_keypoint_d,
 ai_keypoint_n,
 ai_keypoint_r,
 
+ai_enemy_d,
+ai_enemy_air_d,
+ai_enemy_grd_d,
+ai_enemy_inv_d,
+ai_enemy_build_d,
+
 ai_energy_future,
 ai_energy_current,
 
@@ -41,6 +56,8 @@ ai_curr_Builders,
 ai_curr_UnitProds,
 ai_curr_UpgrProds,
 ai_curr_Towers,
+
+ai_near_detect,
 
 ai_need_Energy,
 ai_need_Builders,
@@ -50,6 +67,11 @@ ai_need_Towers
 
                   : integer;
 
+ai_enemy_u,
+ai_enemy_air_u,
+ai_enemy_grd_u,
+ai_enemy_inv_u,
+ai_enemy_build_u,
 ai_invuln_tar_u
                   : PTUnit;
 
@@ -300,17 +322,17 @@ begin
       ai_UpgradesLeft :=ai_CalcUpgradesLeft(player);
    end;
 
- {  ai_limitaround_own      := 0;
+   //ai_limitaround_own      := 0;
    ai_limitaround_enemy_fly:= 0;
    ai_limitaround_enemy_grd:= 0;
-   ai_limitaround_fly      := 0;
-   ai_limitaround_grd      := 0;
-   ai_armylimit_siedge     := 0;
+   //ai_limitaround_fly      := 0;
+   //ai_limitaround_grd      := 0;
 
+   //ai_armylimit_siedge     := 0;
    ai_armylimit_alive_u    := 0;
    ai_armylimit_alive_b    := 0;
 
-   // transport
+ {  // transport
    ai_transport_cur        := 0;
    ai_transport_need       := 0;
    with pu^ do
@@ -517,31 +539,42 @@ begin
    ai_curr_Towers     := 0;  // towers
    ai_need_Towers     := 0;
 
+   with pu^.player^ do
+   ai_curr_detect     :=(units_uid_e[UID_URadar  ]*g_uids[UID_URadar  ].uid_LimitUse)+
+                        (units_uid_e[UID_HEyeNest]*g_uids[UID_HEyeNest].uid_LimitUse);
+   ai_near_detect     := 0;
+   ai_need_detect     := 0;
+
   { ai_tech0_cur       :=0;  // tech 0
    ai_tech1_cur       :=0;  // tech 1
    ai_tech2_cur       :=0;  // tech 1
-
-   ai_detect_cur      :=0;  // radar/heye
-   ai_detect_near     :=0;
-   ai_detect_need     :=0;
 
    ai_spec1_cur       :=0;  // rocket station/altar
    ai_spec2_cur       :=0;
 
    ai_towers_cur_active
                       :=0;
-   ai_towers_cur      :=0;
+
    ai_towers_near     :=0;
    ai_towers_near_air :=0;
    ai_towers_near_grd :=0;
    ai_towers_needx    :=-1;
    ai_towers_needy    :=-1;
    ai_towers_needl    :=-1;
-   ai_towers_need     :=0;
+
    ai_towers_need_type:=0;
 
    ai_inprogress_uid  :=0;
    ai_inprogress_auid :=0;  }
 end;
+
+function ai_UnitAbility(pCaster:PTUnit;aid:byte;atar,ax,ay:integer):boolean;
+begin
+   unit_SetAbilityOrder(pCaster,aid,atar,ax,ay,false);
+   ai_UnitAbility:=unit_AbilityExec(pCaster,aid)=0;
+   unit_OrderClear(pCaster,ua_amove);
+end;
+
+
 
 

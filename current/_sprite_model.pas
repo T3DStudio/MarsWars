@@ -39,12 +39,14 @@ smt_missile : if(animk=sms_death)
               else i:=dd;
 
 smt_buiding : case animk of
+        sms_transform,
         sms_build: i:=mm3i(0,anim,2);
         sms_death: exit;
               else i:=aa3(3,3+anim,sm_spritesLast);
               end;
 
 smt_turret  : case animk of
+        sms_transform,
         sms_build: i:=mm3i(0,anim,2);
         sms_dattack,
         sms_mattack,
@@ -54,6 +56,7 @@ smt_turret  : case animk of
               end;
 
 smt_turret2 : case animk of
+        sms_transform,
         sms_build: i:=mm3i(0,anim,2);
         sms_death: exit;
               else i:=3 +dd;
@@ -224,6 +227,7 @@ smt_fapc     :case animk of
               end;
 
 smt_marine0  :case animk of
+        sms_transform,
         sms_build: i:=dd;
         sms_dready,
         sms_stand,
@@ -238,6 +242,7 @@ smt_marine0  :case animk of
               end;
 
 smt_medic    :case animk of
+        sms_transform,
         sms_build: i:=dd;
         sms_dready,
         sms_stand,
@@ -253,6 +258,7 @@ smt_medic    :case animk of
               end;
 
 smt_commando :case animk of
+        sms_transform,
         sms_build: i:=dd;
         sms_stand,
         sms_pain,
@@ -268,6 +274,7 @@ smt_commando :case animk of
               end;
 
 smt_tank     :case animk of
+        sms_transform,
         sms_build: i:=dd;
         sms_dready,
         sms_stand,
@@ -283,6 +290,7 @@ smt_tank     :case animk of
               end;
 
 smt_terminat :case animk of
+        sms_transform,
         sms_build: i:=dd;
         sms_dready,
         sms_stand,
@@ -318,8 +326,9 @@ begin
       then unit_GetAnimState:=sms_walk
       else unit_GetAnimState:=sms_stand;
 
-      if(hits              <=0)then begin unit_GetAnimState:=sms_death;exit;end;
-      if(not iscomplete       )then begin unit_GetAnimState:=sms_build;exit;end;
+      if(hits              <=0)then begin unit_GetAnimState:=sms_death;    exit;end;
+      if(not iscomplete       )then begin unit_GetAnimState:=sms_build;    exit;end;
+      if(transformTimer     >0)then begin unit_GetAnimState:=sms_transform;exit;end;
 
       if(not uid_isbuilding)then
       begin
@@ -343,47 +352,57 @@ begin
    end
 end;
 
-function unit_GetSprite(u:PTUnit):PTMWTexture;
+function unit_GetSprite(u:PTUnit;pmodel:PPTMWSModel=nil):PTMWTexture;
 var ak:byte;
 smodel:PTMWSModel;
 begin
    unit_GetSprite:=@spr_dummy;
 
    with u^   do
+   with g_unitsVis[unum] do
    with uid^ do
    begin
       smodel:=uid_SpriteModel[level];
+      if(transformTimer>0)and(iscomplete)then
+        if(transformUID<>uidi)
+        then smodel:=g_uids[transformUID].uid_SpriteModel[0]
+        else
+          if(level<LastUnitLevel)
+          then smodel:=uid_SpriteModel[level+1];
+      if(pmodel<>nil)then pmodel^:=smodel;
 
       if(smodel<>spr_pdmodel)then
       begin
          ak:=unit_GetAnimState(u,wanim);
 
          case ak of
-sms_walk:    if(animw>0)then
-             begin
-                if(wanim)or(uid_isbuilding)then
+sms_walk      : if(animw>0)then
                 begin
-                   anim+=animw;
-                   if(buffs[ub_SphereTurbo]>0)then
-                     anim+=animw;
-                   if(anim<0)then anim:=0;
-                end;
-                unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,anim div 100,nil)
-             end
-             else unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0,nil);
+                   if(wanim)or(uid_isbuilding)then
+                   begin
+                      anim+=animw;
+                      if(buffs[ub_SphereTurbo]>0)then
+                        anim+=animw;
+                      if(anim<0)then anim:=0;
+                   end;
+                   unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,anim div 100,nil)
+                end
+                else unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0,nil);
 sms_dattack,
-sms_mattack: if(a_weap<=LastUnitArms)
-             then unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,byte(a_rld in uid_arms[a_weap].aw_AnimPoints),nil)
-             else unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0                                            ,nil);
-sms_death:   begin
-                anim:=abs(hits);
-                if(uid_AnimStepDeath>0)
-                then unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,anim div uid_AnimStepDeath,nil)
-                else unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0                         ,nil);
-             end;
-sms_build:   unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,(hits*3) div uid_MaxHits1,nil);
+sms_mattack   : if(a_weap<=LastUnitArms)
+                then unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,byte(a_rld in uid_arms[a_weap].aw_AnimPoints),nil)
+                else unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0                                            ,nil);
+sms_death     : begin
+                   anim:=abs(hits);
+                   if(uid_AnimStepDeath>0)
+                   then unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,anim div uid_AnimStepDeath,nil)
+                   else unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0                         ,nil);
+                end;
+sms_build     : unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,(hits*3) div uid_MaxHits1,nil);
+sms_transform : with g_uids[transformUID] do
+                unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,((uid_ProdTimeTick-transformTimer)*3) div uid_ProdTimeTick,nil);
          else
-             unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0,nil); //stand,pain,cast
+                unit_GetSprite:=SpriteModel2Sprite(smodel,ak,dir,0,nil); //stand,pain,cast
          end;
       end;
    end;

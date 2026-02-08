@@ -54,7 +54,8 @@ TMWSModel = record
    sm_spritesNum : integer;
    sm_kind       : byte;
 end;
-PTMWSModel = ^TMWSModel;
+ PTMWSModel =  ^TMWSModel;
+PPTMWSModel = ^PTMWSModel;
 
 TDecal = record
    decal_x,
@@ -123,7 +124,6 @@ TThemeAnimStyle   = (tas_liquid =0,tas_magma ,tas_noanim);
 TLiquidTextureArray = array[1..LiquidAnimCount] of TMWTexture;
 PTLiquidTextureArray = ^TLiquidTextureArray;
 
-
 TAlarm = record
    al_x,
    al_y,
@@ -150,11 +150,28 @@ TObstacleVis = record
    ov_SpriteFront: PTMWTexture;
 end;
 
-
 TKeyPointVis = record
    kpmmx,
    kpmmy,
    kpmmr        : integer;
+end;
+
+TUnitVis = record
+   wanim    : boolean;
+
+   animw,
+   mmx,mmy,
+   fx,fy,fsr,
+   anim,animf,
+   shadowz
+            : integer;
+   lvlstr_w,  // weapon upgrades
+   lvlstr_r,  // reload
+   lvlstr_b,  // buffs
+   lvlstr_l,  // level
+   lvlstr_a,  // armor
+   lvlstr_s   // other upgrs
+            : string6;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -750,33 +767,37 @@ end;
 TUnitVisionData = array[0..LastPlayer] of integer;
 
 TUnit = record
-   hits         : longint;
+   hits          : longint;
    vx,vy,
    x,y,
    srange,
    speed,dir,
    rld,vstp,
-   unum         : integer;
-   mapZone      : word;
-   zfall        : shortint;
+   pains,
+   unum          : integer;
+   mapZone       : word;
+   zfall         : shortint;
 
    level,
    cycle_order,
    group,
    playeri,
-   uidi         : byte;
+   uidi          : byte;
 
    uprod_r,
    pprod_r,
-   pprod_e      : array[0..LastUnitLevel] of integer;
+   pprod_e       : array[0..LastUnitLevel] of integer;
    uprod_u,
-   pprod_u      : array[0..LastUnitLevel] of byte;
+   pprod_u       : array[0..LastUnitLevel] of byte;
+
+   transformUID  : byte;
+   transformTimer: integer;
 
    a_exp,
-   a_shots      : cardinal;
+   a_shots       : cardinal;
    a_rld,
    a_weap_cl,
-   a_weap       : byte;
+   a_weap        : byte;
    a_tar,
    a_tar_cl,
 
@@ -787,61 +808,42 @@ TUnit = record
    uo_y,
    uo_bx,
    uo_by,
-   uo_tar
-                : integer;
-   uo_id        : byte;
+   uo_tar        : integer;
+   uo_id         : byte;
 
    rpoint_tar,
    rpoint_x,
-   rpoint_y     : integer;
+   rpoint_y      : integer;
 
-   pains,
+
    transportU,
    transportM,
    transportC
-                : integer;
+                 : integer;
 
-   buffs        : array[0..LastUnitBuff] of integer;
+   buffs         : array[0..LastUnitBuff] of integer;
 
    TeamDetection,
-   TeamVision   : TUnitVisionData;
+   TeamVision    : TUnitVisionData;
 
    StayWaitForNewTarget:byte;
    isfly,
    iscomplete,
-   isselected   : boolean;
+   isselected    : boolean;
 
    aiu_BuildAttempts:byte;
    aiu_limitaround_ally,
    aiu_limitaround_enemy
-            : longint;
+                 : longint;
    aiu_NeedDetect,
    aiu_alarm_timer,
    aiu_alarm_d,
    aiu_alarm_x,
    aiu_alarm_y
-            : integer;
+                 : integer;
 
-   {$IFDEF _FULLGAME}
-   wanim    : boolean;
-
-   animw,
-   mmx,mmy,
-   fx,fy,fsr,
-   anim,animf,
-   shadowz
-            : integer;
-   lvlstr_w,  // weapon upgrades
-   lvlstr_r,  // reload
-   lvlstr_b,  // buffs
-   lvlstr_l,  // level
-   lvlstr_a,  // armor
-   lvlstr_s   // other upgrs
-            : string6;
-   {$ENDIF}
-
-   player   : PTPlayerGameData;
-   uid      : PTUID;
+   player        : PTPlayerGameData;
+   uid           : PTUID;
 end;
 PTUnit  = ^TUnit;
 PPTUnit = ^PTUnit;

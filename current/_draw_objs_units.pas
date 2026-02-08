@@ -10,10 +10,11 @@ begin
      with pu^  do
      with uid^ do
      begin
-        if(uid^.uid_isbuilding)and(uid_MiniMapR>0)
-        then rectangleColor(ui_minimap,mmx-uid_MiniMapR,mmy-uid_MiniMapR,
-                                       mmx+uid_MiniMapR,mmy+uid_MiniMapR,PlayerGetColor(player^.pnum,false))
-        else pixelColor    (ui_minimap,mmx,mmy,                          PlayerGetColor(player^.pnum,false));
+        with g_unitsVis[unum] do
+          if(uid^.uid_isbuilding)and(uid_MiniMapR>0)
+          then rectangleColor(ui_minimap,mmx-uid_MiniMapR,mmy-uid_MiniMapR,
+                                         mmx+uid_MiniMapR,mmy+uid_MiniMapR,PlayerGetColor(player^.pnum,false))
+          else pixelColor    (ui_minimap,mmx,mmy,                          PlayerGetColor(player^.pnum,false));
 
         with player^ do
         begin
@@ -53,7 +54,7 @@ begin
      UID_HSymbol4,
      UID_HAltar    : unit_GetSpriteDepth:=sd_decals+vy;
      else
-       if(uid^.uid_isbuilding)and(not iscomplete)
+       if(uid^.uid_isbuilding)and((not iscomplete)or(transformTimer>0))
        then unit_GetSpriteDepth:=sd_build+vy
        else
          if(hits>0)or(buffs[ub_Resurected]>0)
@@ -104,10 +105,13 @@ begin
      with player^ do
        if(ui_CheckUnitFullFogReveal(pu))then
        begin
-          if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
-          if(uid_ability_isradar)then
-            if(buffs[ub_Cast]>0)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,
-                                                            (uo_y div fog_cw)-ui_fog_sy,fsr);
+          with g_unitsVis[unum] do
+          begin
+             if(fog_IfInScreen(fx,fy,fsr))then fog_RevealScreenCircle(fx-ui_fog_sx,fy-ui_fog_sy,fsr);
+             if(uid_ability_isradar)then
+               if(buffs[ub_Cast]>0)then fog_RevealScreenCircle((uo_x div fog_cw)-ui_fog_sx,
+                                                               (uo_y div fog_cw)-ui_fog_sy,fsr);
+          end;
           unit_FogReveal:=true
        end
        else
@@ -128,7 +132,8 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if (iscomplete        )then ui_CommanderGetWeight+=128;
+      if (iscomplete        )
+      and(transformTimer<=0 )then ui_CommanderGetWeight+=128;
       if (not uid_isbuilding)then ui_CommanderGetWeight+=64;
       if (uid_HaveAbility   )then ui_CommanderGetWeight+=32;
       if (uid_MSpeed_Base>0 )then ui_CommanderGetWeight+=16;
@@ -187,6 +192,36 @@ end;
 //    UI COUNTERS
 //
 
+procedure ui_UICountersProductionUID(uidi:byte;time:integer;buffAccelerate:boolean);
+var ftime:integer;
+begin
+   if(time<=0)then exit;
+
+   if(buffAccelerate)
+   then ftime:=time div 2
+   else ftime:=time;
+
+   with g_uids[uidi] do
+     case uid_isbuilding of
+     true : begin
+               if(ui_bprod_ucl_time[uid_uibtn]<=0)
+               or(ui_bprod_ucl_time[uid_uibtn]> ftime)then ui_bprod_ucl_time[uid_uibtn]:=time;
+               if(ui_bprod_first<=0    )
+               or(ui_bprod_first> ftime)then ui_bprod_first:=time;
+
+               ui_bprod_uid_count[uidi     ]+=1;
+               ui_bprod_ucl_count[uid_uibtn]+=1;
+               ui_bprod_cur                 +=1;
+            end;
+     false: begin
+               if(ui_uprod_first         <=0)or(ftime<ui_uprod_first         )then ui_uprod_first         :=time;
+               if(ui_uprod_uid_time[uidi]<=0)or(ftime<ui_uprod_uid_time[uidi])then ui_uprod_uid_time[uidi]:=time;
+
+               ui_uprod_cur+=1;
+            end;
+     end;
+end;
+
 procedure ui_UICountersProduction(pu:PTUnit;pline:integer);
 var
 i,t:byte;
@@ -201,17 +236,8 @@ begin
         begin
            ui_uprod_max+=1;
 
-           if(uprod_r[pline]>0)then
-           begin
-              ui_uprod_cur+=1;
-              if(buffs[ub_SphereTurbo]>0)
-              or(buffs[ub_Heroic     ]>0)
-              then r:=uprod_r[pline] div 2
-              else r:=uprod_r[pline];
-              i:=uprod_u[pline];
-              if(ui_uprod_first      <=0)or(r<ui_uprod_first      )then ui_uprod_first      :=uprod_r[pline];
-              if(ui_uprod_uid_time[i]<=0)or(r<ui_uprod_uid_time[i])then ui_uprod_uid_time[i]:=uprod_r[pline];
-           end
+           if(uprod_r[pline]>0)
+           then ui_UICountersProductionUID(uprod_u[pline],uprod_r[pline],buffs[ub_SphereTurbo]>0)
            else
              for t:=1 to 255 do
                if(t in uid_prod_Units)then ui_uprod_uid_max[t]+=1;
@@ -226,7 +252,6 @@ begin
            begin
               ui_pprod_cur+=1;
               if(buffs[ub_SphereTurbo]>0)
-              or(buffs[ub_Heroic     ]>0)
               then r:=pprod_r[pline] div 2
               else r:=pprod_r[pline];
               i:=pprod_u[pline];
@@ -269,7 +294,6 @@ end;
 
 procedure unit_UICounters(pu:PTUnit);
 var i:byte;
-    t:integer;
 HaveAttack:boolean;
 begin
    with pu^ do
@@ -289,28 +313,26 @@ begin
         else      ui_CommanderSet(pu);
         end;
 
-      if(uid_isbuilding)then
-      begin
-         if(iscomplete)then
-         begin
-            // building area and possible buildings for UI
-            if(uid_isbuilder)and(not isfly)then
-              if(units_builders_s=0)or(isselected)then
-                ui_bprod_possible+=uid_prod_Buildings;
-
-            // production counters
-            for i:=0 to LastUnitLevel do
-              if(i>level)
-              then break
-              else ui_UICountersProduction(pu,i);
-         end;
-         // have rally point
-         if(isselected)and(uid_HaveRallyPoint)then
-           ui_uibtn_rpoint+=1;
-      end;
+      // have rally point
+      if(isselected)and(uid_HaveRallyPoint)then
+        ui_uibtn_rpoint+=1;
 
       if(iscomplete)then
       begin
+         // building area and possible buildings for UI
+         if(uid_isbuilder)and(not isfly)then
+           if(units_builders_s=0)or(isselected)then
+             ui_bprod_possible+=uid_prod_Buildings;
+
+         // production counters
+         if(transformTimer>0)
+         then ui_UICountersProductionUID(transformUID,transformTimer,buffs[ub_SphereTurbo]>0)
+         else
+           for i:=0 to LastUnitLevel do
+             if(i>level)
+             then break
+             else ui_UICountersProduction(pu,i);
+
          // reload by uid
          if(rld<ui_uid_reload [uidi])or(ui_uid_reload [uidi]<0)then ui_uid_reload [uidi]:=rld;
          // reload by ucl, only buildings
@@ -318,40 +340,24 @@ begin
            if(rld<ui_bucl_reload[uid_uibtn])
            or(ui_bucl_reload[uid_uibtn]<0)then ui_bucl_reload[uid_uibtn]:=rld;
 
-         // maon orders
+         // main orders
          if(isselected)then
-         begin
-            HaveAttack:=ui_HaveAttack(pu);
-            if (speed   >0)then ui_uibtn_move   +=1;
-            if (HaveAttack)then ui_uibtn_attack +=1;
-            if (speed   >0)
-            and(HaveAttack)then ui_uibtn_apatrol+=1;
-         end;
+           if(transformTimer>0)
+           then ui_uibtn_ProdCncl+=1
+           else
+           begin
+              HaveAttack:=ui_HaveAttack(pu);
+              if (speed>0   )then ui_uibtn_move   +=1;
+              if (HaveAttack)then ui_uibtn_attack +=1;
+              if (speed>0   )
+              and(HaveAttack)then ui_uibtn_apatrol+=1;
+           end;
       end
       else
       begin
+         if(isselected)then ui_uibtn_ProdCncl+=1;
          // building time
-         t:=min2i(uid_ProdTimeSec,((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2);
-         if(uid_isbuilding)then
-         begin
-            if(t>0)then
-            begin
-               if(ui_bprod_ucl_time[uid_uibtn]<=0)
-               or(ui_bprod_ucl_time[uid_uibtn]> t)then ui_bprod_ucl_time[uid_uibtn]:=t;
-               if(ui_bprod_first<=0)
-               or(ui_bprod_first> t)then ui_bprod_first:=t;
-            end;
-            ui_bprod_uid_count[uidi     ]+=1;
-            ui_bprod_ucl_count[uid_uibtn]+=1;
-            ui_bprod_all                 +=1;
-         end
-         else
-         begin
-            t*=fr_fps1;
-            ui_uprod_cur+=1;
-            if(ui_uprod_first         <=0)or(t<ui_uprod_first         )then ui_uprod_first         :=t;
-            if(ui_uprod_uid_time[uidi]<=0)or(t<ui_uprod_uid_time[uidi])then ui_uprod_uid_time[uidi]:=t;
-         end;
+         ui_UICountersProductionUID(uidi,min2i(uid_ProdTimeSec,((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2)*fr_fps1,buffs[ub_SphereTurbo]>0);
       end;
    end;
 end;
@@ -384,16 +390,21 @@ begin
    ui_pprod_max      :=0;
    ui_pprod_cur      :=0;
    ui_pprod_first    :=0;
-
-   ui_CommanderClear;
+   ui_bprod_possible :=[];
+   ui_bprod_first    :=0;
+   ui_bprod_cur      :=0;
 
    ui_uibtn_rpoint   :=0;
    ui_uibtn_move     :=0;
    ui_uibtn_attack   :=0;
    ui_uibtn_apatrol  :=0;
-   ui_bprod_possible :=[];
-   ui_bprod_first    :=0;
-   ui_bprod_all      :=0;
+   ui_uibtn_ProdCncl :=0;
+   if(UIPlayer=LocalPlayer)then
+     with g_gplayers[UIPlayer] do
+       ui_uibtn_ProdCncl:=units_upgrProds_s+
+                          units_unitProds_s;
+
+   ui_CommanderClear;
 
    for u:=1 to MaxUnits do
    begin
@@ -487,16 +498,17 @@ begin
    with pu^ do
    with uid^ do
      if(uid_AnimStepWalk>0)then
-     begin
-        if(buffs[ub_SphereTurbo]>0)
-        then animf-=2
-        else animf-=1;
-        if(animf<=0)then
-        begin
-           snd_SoundPlayUnit(uid_snd_Foot,nil,nil);
-           animf:=uid_AnimStepFoot;
-        end;
-     end;
+       with g_unitsVis[unum] do
+       begin
+          if(buffs[ub_SphereTurbo]>0)
+          then animf-=2
+          else animf-=1;
+          if(animf<=0)then
+          begin
+             snd_SoundPlayUnit(uid_snd_Foot,nil,nil);
+             animf:=uid_AnimStepFoot;
+          end;
+       end;
 end;
 
 function EID2Spr(eid:byte):PTMWTexture;
@@ -523,6 +535,7 @@ begin
 end;
 begin
    with pu^     do
+   with g_unitsVis[unum] do
    with uid^    do
    with player^ do
    begin
@@ -580,9 +593,9 @@ begin
 end;
 
 procedure unit_AddSpriteAlive(pu:PTUnit;noanim:boolean);
-const _btnas: array[0..LastUnitLevel] of integer = (0,ui_ButtonWh,ui_ButtonW1,ui_ButtonW1+ui_ButtonWh);
 var
 spr        : PTMWTexture;
+spr_model  : PTMWSModel;
 spr_depth,
 spr_alphab,
 spr_alpha,t: integer;
@@ -592,6 +605,7 @@ begin
    with pu^     do
    with uid^    do
    with player^ do
+   with g_unitsVis[unum] do
    if(unit_FogReveal(pu))then
    begin
 /////////      Visible in fog of war
@@ -605,7 +619,7 @@ begin
         if(unit_canMove(pu))then
           wanim:=(x<>move_x)or(y<>move_y)or(x<>vx)or(y<>vy);
 
-      spr:=unit_GetSprite(pu);
+      spr:=unit_GetSprite(pu,@spr_model);
 
       if(spr=pspr_dummy)then exit;
 
@@ -621,7 +635,7 @@ begin
       if((unum mod ui_blink_period2)=ui_blink_timer2)then
         unit_UpdateStatusStrings(pu);
 
-      UnitsInfo_AddFromUnit(pu,uid_SpriteModel[level]);
+      UnitsInfo_AddFromUnit(pu,spr_model); //uid_SpriteModel[level]
 
       spr_depth:=unit_GetSpriteDepth(pu);
       spr_alpha:=255;
@@ -640,16 +654,8 @@ begin
         if(buffs[ub_Summoned]>0)then
           SpriteList_AddUnit(vx,vy,spr_depth+1,0,0,ColorAura,uid_eid_SummonSpr[level],mm3i(0,buffs[ub_Summoned]*4,255));
 
-      if(iscomplete)then
+      if(iscomplete)and(transformTimer<=0)then
       begin
-         if(playeri=UIPlayer)then
-           if(uid_isbarrack)or(uid_isforge)then
-             for t:=0 to LastUnitLevel do
-             begin
-                if(uid_isbarrack)and(uprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
-                if(uid_isforge  )and(pprod_r[t]>0)then UnitsInfo_AddUSprite(vx-_btnas[level]+ui_ButtonW1*t,vy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
-             end;
-
          if(a_rld<=0)and(not noanim)then
            case uidi of
            UID_UGTurret,
@@ -733,6 +739,4 @@ begin
                  UnitsInfo_AddLine(x,y,m_brushx,m_brushy,ui_blink_color1[ui_blink2_colorb]);
      end;
 end;
-
-
 

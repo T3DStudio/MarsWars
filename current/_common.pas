@@ -2279,6 +2279,7 @@ begin
    with uid^ do
      if(hits<=0)
      or(not iscomplete)
+     or(transformTimer>0)
      or(IsUnitRange(transportU,nil))
      or(not uid_isbuilder)then exit;
    unit_F1SelectFilter:=true;
@@ -2329,7 +2330,7 @@ begin
      false: if(not uid_isbuilding)
             then unit_CalcShadowZ:=fly_height[isfly]
             else
-              if(speed<=0)or(not iscomplete)
+              if(speed<=0)or(not iscomplete)or(transformTimer>0)
               then unit_CalcShadowZ:=-fly_hz   // no shadowz
               else unit_CalcShadowZ:=0;
      end;
@@ -2337,7 +2338,8 @@ end;
 
 procedure unit_CalcFogR(pu:PTUnit);
 begin
-   with pu^ do fsr:=mm3i(1,srange div fog_cw,fog_MaxR);
+   with pu^ do
+   with g_unitsVis[unum] do fsr:=mm3i(1,srange div fog_cw,fog_MaxR);
 end;
 
 procedure units_UpdateMiniMapR;

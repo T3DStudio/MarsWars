@@ -59,15 +59,15 @@ begin
 
    pv^:=tu;
    pd^:=d;
-end;
-procedure _setNearestTarget(ppu:PPTunit;pd:pinteger;newvalue:integer);
+end; }
+procedure setNearestTarget(ppu:PPTunit;pd:pinteger;newvalue:integer);
 begin
    if(newvalue<pd^)then
    begin
       pd^ :=newvalue;
       ppu^:=tu;
    end;
-end;  }
+end;
 procedure for_AliveOTransportAllies;
 begin
    with pu^     do
@@ -167,23 +167,21 @@ begin
       begin
          if(tu^.buffs[ub_SphereInvuln]<=0)then
          begin
-            {// enemy
-            _setNearestTarget(@ai_enemy_u,@ai_enemy_d,ud);
-            if(tu^.ukfly)
-            and(tu^.uidi<>UID_LostSoul)
-            and(tu^.uidi<>UID_Phantom )then
+            // enemy
+            setNearestTarget(@ai_enemy_u,@ai_enemy_d,ud);
+            if(not tu^.isfly)or(tu^.uid^.uid_FlyLevelLikeTarget)then
             begin
-               _setNearestTarget(@ai_enemy_air_u,@ai_enemy_air_d,ud);
-               if(ud<base_r1h)and(tu^.uid^.uid_CanAttack)then ai_limitaround_enemy_fly+=tu^.uid^.uid_LimitUse;
+               setNearestTarget(@ai_enemy_grd_u,@ai_enemy_grd_d,ud);
+               if(ud<base_r1h)and(tu^.uid^.uid_CanAttack)then ai_limitaround_enemy_grd+=tu^.uid^.uid_LimitUse;
             end
             else
             begin
-               _setNearestTarget(@ai_enemy_grd_u,@ai_enemy_grd_d,ud);
-               if(ud<base_r1h)and(tu^.uid^.uid_CanAttack)then ai_limitaround_enemy_grd+=tu^.uid^.uid_LimitUse;
+               setNearestTarget(@ai_enemy_air_u,@ai_enemy_air_d,ud);
+               if(ud<base_r1h)and(tu^.uid^.uid_CanAttack)then ai_limitaround_enemy_fly+=tu^.uid^.uid_LimitUse;
             end;
-            if(tu^.uid^.uid_isbuilding)and(not tu^.ukfly)and(pfcheck)then _setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
+            if(tu^.uid^.uid_isbuilding)and(not tu^.isfly)and(pfcheck)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
 
-            // uac strike target
+           { // uac strike target
             if(tu^.speed<11)then
              if(ai_strike_tar_u=nil)
              then ai_strike_tar_u:=tu
@@ -192,7 +190,7 @@ begin
                then ai_strike_tar_u:=tu
                else
                  if(tu^.hits>ai_strike_tar_u^.hits)
-                 then ai_strike_tar_u:=tu; }
+                 then ai_strike_tar_u:=tu;   }
          end;
 
          {// nearest phantom
@@ -202,14 +200,9 @@ begin
       end
       else
         if(CheckUnitTeamVision(team,tu,true))then    // invis enemy in vision
-       // or(((aip_flags and aif_cheat_VisBuildings)>0)and(    tu^.uid^.uid_isbuilding))
-       // or(((aip_flags and aif_cheat_VisUnits    )>0)and(not tu^.uid^.uid_isbuilding))
-        begin
-           // invisible enemy unit
-          { if(tu^.a_rld>0)or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)then
-             if(tu^.buffs[ub_Invis]>0)and(tu^.TeamDetection[team]<=0)and(tu^.buffs[ub_Scaned]<=0)then
-               _setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);      }
-        end;
+          if(tu^.a_rld>0)or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)then
+            if(tu^.buffs[ub_Invisibility]>0)and(tu^.TeamDetection[team]<=0)and(tu^.buffs[ub_Scaned]<=0)then
+              setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
    end;
 end;
 
@@ -311,21 +304,19 @@ begin
         // if(uid_rebuild_uid>0)and(tu^.uidi=uid_rebuild_uid)then ai_inprogress_auid+=1;
       end;
 
-     { // armylimit
+      // armylimit
       if(tu^.uid^.uid_isbuilding)
       then ai_armylimit_alive_b+=tu^.uid^.uid_LimitUse
       else ai_armylimit_alive_u+=tu^.uid^.uid_LimitUse;
 
       // detection near
       if(ud<=srange)then
-       if(tu^.buffs[ub_Detect]>0)
-       or(tu^.uid^.uid_ability=uab_HEyeVision)
-       or(tu^.uid^.uid_ability=uab_UACScan   )then ai_detect_near+=1;   }
+        if(tu^.buffs[ub_Detector]>0)then ai_near_detect+=1;
 
       // generators limit
-     // if(tu^.uidi=aiucl_generator[race])then ai_gen_limit+=tu^.uid^.uid_LimitUse;
       if (not tu^.uid^.uid_isbuilder)
-      and(tu^.uid^.uid_gen_EnergyLevel>0)then ai_generators_limit+=tu^.uid^.uid_LimitUse;
+      and(tu^.uid^.uid_gen_EnergyLevel>0)then
+        ai_generators_limit+=tu^.uid^.uid_LimitUse;
 
       // towers
       if(tu^.uid^.uid_isbuilding)and(tu^.uid^.uid_CanAttack)then
@@ -349,17 +340,6 @@ begin
       end;
    end;
 end;
-
-procedure for_Alive;
-begin
-   with pu^     do
-   with uid^    do
-   with player^ do
-   begin
-
-   end;
-end;
-
 begin
    with pu^     do
    with uid^    do

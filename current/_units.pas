@@ -27,7 +27,8 @@ begin
            hits-=1;
 
            {$IFDEF _FULLGAME}
-           if(cycle_order=g_cycle_order)and(fsr>1)then fsr-=1;
+            with g_unitsVis[unum] do
+             if(cycle_order=g_cycle_order)and(fsr>1)then fsr-=1;
            if(ServerSide)then
            {$ENDIF}
              if(hits<=hits_dead)then unit_remove(pu);
@@ -144,7 +145,7 @@ begin
    end;
 end;
 
-function unit_morph(pu:PTUnit;ouid:byte;ocomplete:boolean;bhits:integer;ulevel:byte;check:boolean):cardinal;
+function unit_morph(pu:PTUnit;ouid:byte;ocomplete:boolean;bhits:integer;ulevel:byte;check:boolean;summoned:boolean=true):cardinal;
 var
 pOldU  :PTUnit;
 pNewUID:PTUID;
@@ -228,7 +229,7 @@ begin
       units_all_e+=1;   // ??? костыль что бы игрок не проигрывал если трансформируется единственное здание/юнит
       unit_kill(pu,true,true,false,false,true);
       units_all_e-=1;
-      unit_add(x,y,unum,ouid,playeri,ocomplete,true,ulevel);
+      unit_add(x,y,unum,ouid,playeri,ocomplete,summoned,ulevel);
 
       res_HellPower-=pNewUID^.uid_req_HellPower;
       res_UACLoot  -=pNewUID^.uid_req_UACLoot;
@@ -266,7 +267,9 @@ begin
    with uid^ do
    begin
       t :=uds;
-      shortCollision:=(pUnit^.playeri=pUObstacle^.playeri)and((pUObstacle^.speed<=0)or(not pUObstacle^.iscomplete));
+      shortCollision:=(pUnit^.playeri=pUObstacle^.playeri)and((pUObstacle^.speed<=0)
+                                                            or(not pUObstacle^.iscomplete)
+                                                            or(pUObstacle^.transformTimer>0));
       if(shortCollision)
       then uds-=pUObstacle^.uid^.uid_r
       else uds-=pUObstacle^.uid^.uid_r+uid_r;
@@ -274,6 +277,7 @@ begin
 
       dirTurn:=(a_rld<=0)and( (pUObstacle^.speed<=0)
                             or(not pUObstacle^.iscomplete)
+                            or(pUObstacle^.transformTimer>0)
                             or(pUObstacle^.uid^.uid_isbuilding)
                             or((pUObstacle^.x=pUObstacle^.uo_x)and(pUObstacle^.y=pUObstacle^.uo_y)) );
 
@@ -424,6 +428,7 @@ begin
      or(uid^.uid_isfly) //and uid_FlyLevelLikeTarget ???
      or(not uid^.uid_issolid)
      or(zfall<>0)
+     or(transformTimer>0)
      or(not iscomplete)then exit;
 
    dx0:=(pu^.x-pu^.uid^.uid_r) div MapObstaclesGridW;
@@ -832,7 +837,7 @@ begin
 
             // update team data
             with uid^ do
-              if(uid_ability_isradar)then
+              if(uid_ability_isradar)and(iscomplete)and(transformTimer<=0)then
                 if(buffs[ub_Cast]>0)then
                   d:=min2i(d,point_dist_int(uo_x,uo_y,kp_x,kp_y));
             with kp_TeamData[pu^.player^.team] do
@@ -885,7 +890,8 @@ begin
         and(NearTeleport_tu^.hits>0)
         and(NearTeleport_tu^.uid^.uid_ability_isteleport)then
           if(NearTeleport_tu^.rld>0)
-          or(not NearTeleport_tu^.iscomplete)then NearTeleport:=true;
+          or(not NearTeleport_tu^.iscomplete)
+          or(NearTeleport_tu^.transformTimer>0)then NearTeleport:=true;
 
       ai_Local_InitVars(pu);
       if(aicode){or(isselected)}then
@@ -923,11 +929,19 @@ begin
                  unit_AuraEffects(pu,tu,udi);
 
                  if(pushout)then
-                   if(uid_r<=tu^.uid^.uid_r)or(tu^.speed<=0)or(not tu^.iscomplete)then
+                   if(uid_r<=tu^.uid^.uid_r)
+                   or(tu^.speed<=0)
+                   or(not tu^.iscomplete)
+                   or(tu^.transformTimer>0)then
                      if(tu^.uid^.uid_issolid)and(isfly=tu^.isfly)then unit_push(pu,tu,uds);
 
                  if(NearTeleport)then
-                   if(udi<srange)and(tu^.playeri=playeri)and(tu^.uidi=NearTeleport_tu^.uidi)and(tu^.rld<NearTeleport_tu^.rld)and(tu^.iscomplete)then
+                   if (udi<srange)
+                   and(tu^.playeri=playeri)
+                   and(tu^.uidi=NearTeleport_tu^.uidi)
+                   and(tu^.rld<NearTeleport_tu^.rld)
+                   and(tu^.iscomplete)
+                   and(tu^.transformTimer<=0)then
                      if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=NearTeleport_tu^.uo_tar))
                      or((tu^.rpoint_x=NearTeleport_tu^.rpoint_x)and(tu^.rpoint_y=NearTeleport_tu^.rpoint_y))
                      then uo_tar:=tu^.unum;
@@ -1022,10 +1036,13 @@ begin
         uo_tar:=0;
         uo_id :=ua_amove;
         {$IFDEF _FULLGAME}
-        fx    :=pTransport^.fx;
-        fy    :=pTransport^.fy;
-        mmx   :=pTransport^.mmx;
-        mmy   :=pTransport^.mmy;
+        with g_unitsVis[unum] do
+        begin
+           fx :=g_unitsVis[pTransport^.unum].fx;
+           fy :=g_unitsVis[pTransport^.unum].fy;
+           mmx:=g_unitsVis[pTransport^.unum].mmx;
+           mmy:=g_unitsVis[pTransport^.unum].mmy;
+        end;
         snd_SoundPlayUnit(snd_Transport,pTransport,nil);
         {$ENDIF}
         unit_UnLoad:=true;
@@ -1144,7 +1161,7 @@ begin
       _z:=pTarget^.zfall;
       _l:=pTarget^.level;
       {$IFDEF _FULLGAME}
-      _s:=pTarget^.shadowz;
+      _s:=g_unitsVis[pTarget^.unum].shadowz;
       {$ENDIF}
 
       unit_kill(pPhantom,true,true,false,false,true);
@@ -1160,7 +1177,8 @@ begin
          hits := trunc(uid^.uid_MaxHits1*_h);
          zfall:=_z;
          {$IFDEF _FULLGAME}
-         shadowz:=_s;
+         with g_unitsVis[unum] do
+           shadowz:=_s;
          {$ENDIF}
          if(hits<=0)then
          begin
@@ -1707,6 +1725,7 @@ begin
       // HAVE ABILITY
       if(hits<=0)
       or(not iscomplete)
+      or(transformTimer>0)
       or(aid=0)then exit;
 
       with g_aids[aid] do
@@ -1749,54 +1768,49 @@ begin
                                 if(rld   >0)then unit_AbilityCheck:=ureq_reloading;
                              end;
 
-      uab_HEyeVision       : unit_AbilityCheck:=unit_ability_HellVision   (pCaster,0  ,true );
+      uab_HEyeVision       : unit_AbilityCheck:=unit_ability_HellVision   (pCaster,0        ,true );
+      uab_HEyeSpawn        : unit_AbilityCheck:=unit_ability_SpawnEvilEye (pCaster,0,0      ,true );
 
-      uab_SphereSoul       : unit_AbilityCheck:=unit_ability_SphereSoul   (pCaster,0  ,true );
-      uab_SphereInvis      : unit_AbilityCheck:=unit_ability_SphereInvis  (pCaster,0  ,true );
-      uab_SphereInvuln     : unit_AbilityCheck:=unit_ability_SphereInvuln (pCaster,0  ,true );
+      uab_SphereSoul       : unit_AbilityCheck:=unit_ability_SphereSoul   (pCaster,0        ,true );
+      uab_SphereInvis      : unit_AbilityCheck:=unit_ability_SphereInvis  (pCaster,0        ,true );
+      uab_SphereInvuln     : unit_AbilityCheck:=unit_ability_SphereInvuln (pCaster,0        ,true );
 
-      uab_SphereRDamage    : unit_AbilityCheck:=unit_ability_SphereRDamage(pCaster,0  ,true );
-      uab_SphereDDamage    : unit_AbilityCheck:=unit_ability_SphereDDamage(pCaster,0  ,true );
-      uab_SphereTurbo      : unit_AbilityCheck:=unit_ability_SphereTurbo  (pCaster,0  ,true );
+      uab_SphereRDamage    : unit_AbilityCheck:=unit_ability_SphereRDamage(pCaster,0        ,true );
+      uab_SphereDDamage    : unit_AbilityCheck:=unit_ability_SphereDDamage(pCaster,0        ,true );
+      uab_SphereTurbo      : unit_AbilityCheck:=unit_ability_SphereTurbo  (pCaster,0        ,true );
 
-      uab_PretorEquip      : unit_AbilityCheck:=unit_ability_UACHeroic    (pCaster,0  ,true );
+      uab_PretorEquip      : unit_AbilityCheck:=unit_ability_UACHeroic    (pCaster,0        ,true );
       uab_Bribe            : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,true ,true );
       uab_Hack             : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,false,true );
 
-      uab_HEyeBlink,
-      uab_HTowerBlink      : unit_AbilityCheck:=unit_ability_HTowerBlink  (pCaster,x,y,true );
+      uab_HTowerBlink      : unit_AbilityCheck:=unit_ability_HTowerBlink  (pCaster,x,y      ,true );
+      uab_HKeepShift       : unit_AbilityCheck:=unit_ability_HKeepBlink   (pCaster,x,y      ,true );
 
-      uab_HKeepShift       : unit_AbilityCheck:=unit_ability_HKeepBlink   (pCaster,x,y,true );
-
-      uab_UACStrike        : unit_AbilityCheck:=unit_ability_UACStrike    (pCaster,x,y,true );
-      uab_UACScan          : unit_AbilityCheck:=unit_ability_UACScan      (pCaster,x,y,true );
+      uab_UACStrike        : unit_AbilityCheck:=unit_ability_UACStrike    (pCaster,x,y      ,true );
+      uab_UACScan          : unit_AbilityCheck:=unit_ability_UACScan      (pCaster,x,y      ,true );
 
       uab_Unload,
       uab_UnloadTo         : if(transportC=0)
                              or(transportM=0)then unit_AbilityCheck:=ureq_other;
 
-      uab_ToHAKeep         : unit_AbilityCheck:=unit_morph(pCaster,uid_HAKeep         ,false, 1,0      ,true);
-      uab_ToHACommandCenter: unit_AbilityCheck:=unit_morph(pCaster,uid_HACommandCenter,false, 1,0      ,true);
-      uab_ToHGate          : unit_AbilityCheck:=unit_morph(pCaster,uid_HGate          ,false, 1,level+1,true);
-      uab_ToHPool          : unit_AbilityCheck:=unit_morph(pCaster,uid_HPools         ,false, 1,level+1,true);
-      uab_ToHBarracks      : unit_AbilityCheck:=unit_morph(pCaster,uid_HBarracks      ,false, 1,level+1,true);
-      uab_ToHSymbol2       : unit_AbilityCheck:=unit_morph(pCaster,uid_HSymbol2       ,false, 1,0      ,true);
-      uab_ToHSymbol3       : unit_AbilityCheck:=unit_morph(pCaster,uid_HSymbol3       ,false, 1,0      ,true);
-      uab_ToHSymbol4       : unit_AbilityCheck:=unit_morph(pCaster,uid_HSymbol4       ,false, 1,0      ,true);
-      uab_ToHFTower        : unit_AbilityCheck:=unit_morph(pCaster,UID_HFTower        ,false,-2,0      ,true);
-      uab_ToHSTower        : unit_AbilityCheck:=unit_morph(pCaster,UID_HSTower        ,false,-2,0      ,true);
-      uab_ToHTotem         : unit_AbilityCheck:=unit_morph(pCaster,uid_HTotem         ,false,-2,0      ,true);
+      uab_ToHAKeep         : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HAKeep         ,true);
+      uab_ToHACommandCenter: unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HACommandCenter,true);
+      uab_ToHGate          : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HGate          ,true);
+      uab_ToHPool          : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HPools         ,true);
+      uab_ToHBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HBarracks      ,true);
+      uab_ToHSymbol2       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol2       ,true);
+      uab_ToHSymbol3       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol3       ,true);
+      uab_ToHSymbol4       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol4       ,true);
 
-      uab_ToUACommandCenter: unit_AbilityCheck:=unit_morph(pCaster,uid_UACommandCenter,false, 1,0      ,true);
-      uab_ToUBarracks      : unit_AbilityCheck:=unit_morph(pCaster,uid_UBarracks      ,false, 1,level+1,true);
-      uab_ToUFactory       : unit_AbilityCheck:=unit_morph(pCaster,uid_UFactory       ,false, 1,level+1,true);
-      uab_ToUWeaponFactory : unit_AbilityCheck:=unit_morph(pCaster,uid_UWeaponFactory ,false, 1,level+1,true);
-      uab_ToUGenerator2    : unit_AbilityCheck:=unit_morph(pCaster,uid_UGenerator2    ,false, 1,0      ,true);
-      uab_ToUGenerator3    : unit_AbilityCheck:=unit_morph(pCaster,uid_UGenerator3    ,false, 1,0      ,true);
-      uab_ToUGenerator4    : unit_AbilityCheck:=unit_morph(pCaster,uid_UGenerator4    ,false, 1,0      ,true);
-      uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret       ,false,-2,0      ,true);
-      uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret       ,false,-2,0      ,true);
-      uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron        ,false,-2,0      ,true);
+      uab_ToUACommandCenter: unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UACommandCenter,true);
+      uab_ToUBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UBarracks      ,true);
+      uab_ToUFactory       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UFactory       ,true);
+      uab_ToUWeaponFactory : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UWeaponFactory ,true);
+      uab_ToUGenerator2    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator2    ,true);
+      uab_ToUGenerator3    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator3    ,true);
+      uab_ToUGenerator4    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator4    ,true);
+      uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
+      uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
 
       uab_URadarLvlUp      : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
       uab_URMStationLvlUp  : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
@@ -1861,23 +1875,23 @@ begin
       uab_Bribe,
       uab_Hack,
       uab_HEyeVision,
-      uab_HEyeBlink,
+      uab_HEyeSpawn,
       uab_HTowerBlink    : begin
                               case aid of
-                              uab_UACScan         : unit_AbilityExec:=unit_ability_UACScan      (pCaster,uo_x,uo_y,false);
-                              uab_UACStrike       : unit_AbilityExec:=unit_ability_UACStrike    (pCaster,uo_x,uo_y,false);
-                              uab_SphereSoul      : unit_AbilityExec:=unit_ability_SphereSoul   (pCaster,uo_tar   ,false);
-                              uab_SphereInvis     : unit_AbilityExec:=unit_ability_SphereInvis  (pCaster,uo_tar   ,false);
-                              uab_SphereInvuln    : unit_AbilityExec:=unit_ability_SphereInvuln (pCaster,uo_tar   ,false);
-                              uab_SphereRDamage   : unit_AbilityExec:=unit_ability_SphereRDamage(pCaster,uo_tar   ,false);
-                              uab_SphereDDamage   : unit_AbilityExec:=unit_ability_SphereDDamage(pCaster,uo_tar   ,false);
-                              uab_SphereTurbo     : unit_AbilityExec:=unit_ability_SphereTurbo  (pCaster,uo_tar   ,false);
-                              uab_PretorEquip     : unit_AbilityExec:=unit_ability_UACHeroic    (pCaster,uo_tar   ,false);
+                              uab_UACScan         : unit_AbilityExec:=unit_ability_UACScan      (pCaster,uo_x,uo_y      ,false);
+                              uab_UACStrike       : unit_AbilityExec:=unit_ability_UACStrike    (pCaster,uo_x,uo_y      ,false);
+                              uab_SphereSoul      : unit_AbilityExec:=unit_ability_SphereSoul   (pCaster,uo_tar         ,false);
+                              uab_SphereInvis     : unit_AbilityExec:=unit_ability_SphereInvis  (pCaster,uo_tar         ,false);
+                              uab_SphereInvuln    : unit_AbilityExec:=unit_ability_SphereInvuln (pCaster,uo_tar         ,false);
+                              uab_SphereRDamage   : unit_AbilityExec:=unit_ability_SphereRDamage(pCaster,uo_tar         ,false);
+                              uab_SphereDDamage   : unit_AbilityExec:=unit_ability_SphereDDamage(pCaster,uo_tar         ,false);
+                              uab_SphereTurbo     : unit_AbilityExec:=unit_ability_SphereTurbo  (pCaster,uo_tar         ,false);
+                              uab_PretorEquip     : unit_AbilityExec:=unit_ability_UACHeroic    (pCaster,uo_tar         ,false);
                               uab_Bribe           : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,false,false);
                               uab_Hack            : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,true ,false);
-                              uab_HEyeVision      : unit_AbilityExec:=unit_ability_HellVision   (pCaster,uo_tar   ,false);
-                              uab_HEyeBlink,
-                              uab_HTowerBlink     : unit_AbilityExec:=unit_ability_HTowerBlink  (pCaster,uo_x,uo_y,false);
+                              uab_HEyeVision      : unit_AbilityExec:=unit_ability_HellVision   (pCaster,uo_tar         ,false);
+                              uab_HEyeSpawn       : unit_AbilityExec:=unit_ability_SpawnEvilEye (pCaster,uo_x,uo_y      ,false);
+                              uab_HTowerBlink     : unit_AbilityExec:=unit_ability_HTowerBlink  (pCaster,uo_x,uo_y      ,false);
                               end;
                               uo_id:=ua_amove;
                               if(unit_AbilityExec>0)
@@ -1974,9 +1988,6 @@ begin
       uab_ToHSymbol2,
       uab_ToHSymbol3,
       uab_ToHSymbol4,
-      uab_ToHFTower,
-      uab_ToHSTower,
-      uab_ToHTotem,
 
       uab_ToUACommandCenter,
       uab_ToUBarracks,
@@ -1988,31 +1999,26 @@ begin
       uab_ToUAGTurret,
       uab_ToUAATurret,
       uab_URadarLvlUp,
-      uab_URMStationLvlUp,
-      uab_ToUACDron      : begin
+      uab_URMStationLvlUp: begin
                               case aid of
-                              uab_ToHAKeep         : unit_AbilityExec:=unit_morph(pCaster,uid_HAKeep         ,false, 1,0      ,false);
-                              uab_ToHACommandCenter: unit_AbilityExec:=unit_morph(pCaster,uid_HACommandCenter,false, 1,0      ,false);
-                              uab_ToHGate          : unit_AbilityExec:=unit_morph(pCaster,uid_HGate          ,false, 1,level+1,false);
-                              uab_ToHPool          : unit_AbilityExec:=unit_morph(pCaster,uid_HPools         ,false, 1,level+1,false);
-                              uab_ToHBarracks      : unit_AbilityExec:=unit_morph(pCaster,uid_HBarracks      ,false, 1,level+1,false);
-                              uab_ToHSymbol2       : unit_AbilityExec:=unit_morph(pCaster,uid_HSymbol2       ,false, 1,0      ,false);
-                              uab_ToHSymbol3       : unit_AbilityExec:=unit_morph(pCaster,uid_HSymbol3       ,false, 1,0      ,false);
-                              uab_ToHSymbol4       : unit_AbilityExec:=unit_morph(pCaster,uid_HSymbol4       ,false, 1,0      ,false);
-                              uab_ToHFTower        : unit_AbilityExec:=unit_morph(pCaster,UID_HFTower        ,false,-2,0      ,false);
-                              uab_ToHSTower        : unit_AbilityExec:=unit_morph(pCaster,UID_HSTower        ,false,-2,0      ,false);
-                              uab_ToHTotem         : unit_AbilityExec:=unit_morph(pCaster,uid_HTotem         ,false,-2,0      ,false);
+                              uab_ToHAKeep         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HAKeep         ,false);
+                              uab_ToHACommandCenter: unit_AbilityExec:=unit_TransformStart(pCaster,uid_HACommandCenter,false);
+                              uab_ToHGate          : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HGate          ,false);
+                              uab_ToHPool          : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HPools         ,false);
+                              uab_ToHBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HBarracks      ,false);
+                              uab_ToHSymbol2       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol2       ,false);
+                              uab_ToHSymbol3       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol3       ,false);
+                              uab_ToHSymbol4       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol4       ,false);
 
-                              uab_ToUACommandCenter: unit_AbilityExec:=unit_morph(pCaster,uid_UACommandCenter,false, 1,0      ,false);
-                              uab_ToUBarracks      : unit_AbilityExec:=unit_morph(pCaster,uid_UBarracks      ,false, 1,level+1,false);
-                              uab_ToUFactory       : unit_AbilityExec:=unit_morph(pCaster,uid_UFactory       ,false, 1,level+1,false);
-                              uab_ToUWeaponFactory : unit_AbilityExec:=unit_morph(pCaster,uid_UWeaponFactory ,false, 1,level+1,false);
-                              uab_ToUGenerator2    : unit_AbilityExec:=unit_morph(pCaster,uid_UGenerator2    ,false, 1,0      ,false);
-                              uab_ToUGenerator3    : unit_AbilityExec:=unit_morph(pCaster,uid_UGenerator3    ,false, 1,0      ,false);
-                              uab_ToUGenerator4    : unit_AbilityExec:=unit_morph(pCaster,uid_UGenerator4    ,false, 1,0      ,false);
-                              uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret       ,false,-2,0      ,false);
-                              uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret       ,false,-2,0      ,false);
-                              uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron        ,false,-2,0      ,false);
+                              uab_ToUACommandCenter: unit_AbilityExec:=unit_TransformStart(pCaster,uid_UACommandCenter,false);
+                              uab_ToUBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UBarracks      ,false);
+                              uab_ToUFactory       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UFactory       ,false);
+                              uab_ToUWeaponFactory : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UWeaponFactory ,false);
+                              uab_ToUGenerator2    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator2    ,false);
+                              uab_ToUGenerator3    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator3    ,false);
+                              uab_ToUGenerator4    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator4    ,false);
+                              uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
+                              uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
 
                               uab_URadarLvlUp      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
                               uab_URMStationLvlUp  : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
@@ -2106,7 +2112,7 @@ begin
       UID_HCommandCenter,
       UID_HACommandCenter,
       UID_UCommandCenter,
-      UID_UACommandCenter   : if(not iscomplete)then
+      UID_UACommandCenter   : if(not iscomplete)or(transformTimer>0)then
                               begin
                                  speed:=0;
                                  isfly:=uf_ground;
@@ -2153,7 +2159,7 @@ begin
                                   end;
       end;
       if(uid_FlyLevelLikeTarget)then
-        if(not iscomplete)
+        if(not iscomplete)or(transformTimer>0)
         then isfly:=uid_isfly
         else
         begin
@@ -2187,7 +2193,7 @@ begin
           unit_BehaviorSpecial(pu);
 
           // attack
-          if(iscomplete)then
+          if(iscomplete)and(transformTimer<=0)then
             unit_attack(pu);
 
           unit_CaptureKeyPoint(pu);
@@ -2215,34 +2221,66 @@ begin
           if(not iscomplete)
           then unit_Completing(pu)
           else
-          begin
-             //if(state=ps_AI)then ai_Global_ScoutPick(pu);
+            if(transformTimer>0)then
+            begin
+               if(buffs[ub_SphereTurbo]>0)
+               then transformTimer-=2
+               else transformTimer-=1;
 
-             // unit&upgrades production
-             unit_Production(pu);
-
-             // order exec
-             unit_Order(pu);
-
-             // move
-             unit_move(pu);
-
-             // REGENERATION
-             if(cycle_order=g_cycle_regen)then
-               if(hits<uid_MaxHits1)then
+               if(transformTimer<1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF} then transformTimer:=1;
+               if(transformTimer=1)then
                begin
-                  i:=uid_Regen_Base;
-                  if(uid_Regen_upgr>0)then
-                    i+=integer(upgrs_cur[uid_Regen_upgr])*BaseRegen1;
-                  if(buffs[ub_SphereTurbo]>0)then i*=2;
-
-                  if(i>0)then
-                  begin
-                     hits+=i;
-                     if(hits>uid_MaxHits1)then hits:=uid_MaxHits1;
-                  end;
+                  res_energyl_cur+=g_uids[transformUID].uid_req_EnergyLevel;
+                  transformTimer:=0;
+                  if(transformUID<>uidi)
+                  then unit_morph(pu,transformUID,true,integer.MaxValue,0,false,false)
+                  else
+                    if(level<LastUnitLevel)then
+                      unit_morph(pu,transformUID,true,integer.MaxValue,level+1,false,false);
+                  GameLog_UnitReady(pu);
                end;
-          end;
+            end
+            else
+            begin
+               //if(state=ps_AI)then ai_Global_ScoutPick(pu);
+
+               // unit&upgrades production
+               unit_Production(pu);
+
+               // order exec
+               unit_Order(pu);
+
+               // move
+               unit_move(pu);
+
+               // REGENERATION
+               if(cycle_order=g_cycle_regen)then
+                 case(uid_Regen_Base>=0)of
+                 true : if(hits<uid_MaxHits1)then
+                        begin
+                           i:=uid_Regen_Base;
+                           if(uid_Regen_upgr>0)then
+                             i+=integer(upgrs_cur[uid_Regen_upgr])*BaseRegen1;
+                           if(buffs[ub_SphereTurbo]>0)then i*=2;
+
+                           if(i>0)then
+                           begin
+                              hits+=i;
+                              if(hits>uid_MaxHits1)then hits:=uid_MaxHits1;
+                           end;
+                        end;
+                 false: if(hits>0)then
+                        begin
+                           hits+=uid_Regen_Base;
+                           if(hits<=0)then
+                           begin
+                              hits:=1;
+                              unit_kill(pu,false,true,false,true,true);
+                              exit;
+                           end;
+                        end;
+                 end;
+            end;
 
           unit_CaptureKeyPoint(pu);
 

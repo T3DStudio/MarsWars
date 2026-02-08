@@ -447,6 +447,7 @@ begin
    {$ELSE}
    Game_StartSkirmish;
    {$ENDIF}
+   map_Seed2RandomBase;
 
    {$IFDEF _FULLGAME}
    unit_UICountersAll;
@@ -794,10 +795,10 @@ begin
                               co_sunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0           ,true)=0,true ,true );
                               co_cunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
                               co_pcancle  : if(isselected)then
-                                            begin
-                                            if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
-                                            if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
-                                            end;
+                                              UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,(not iscomplete)
+                                                                                                         or(unit_TransformStop  (pu,true)=0)
+                                                                                                         or(unit_ProdStopUnit   (pu,o_a0,false,true,true)=0)
+                                                                                                         or(unit_ProdStopUpgrade(pu,o_a0,false     ,true)=0),true ,false);
                               end;
 
                               if(isselected)then
@@ -828,6 +829,8 @@ begin
                           co_cunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
 
                           co_pcancle :
+                                    if(not iscomplete)then unit_kill(tar_u,false,false,true,false,true) else
+                                    if(GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_TransformStop   (tar_u,false                ),x,y))then
                                     if(GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y))then
                                        GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
                           co_ability :

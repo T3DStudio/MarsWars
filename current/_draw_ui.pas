@@ -430,7 +430,7 @@ begin
      with PVisPlayer^ do
        for ucl:=0 to 3 do
          case ucl of
-         0: draw_UITabButtonT(tar,ucl,ui_bprod_first      ,ui_bprod_all ,units_bld_s[true ],units_bld_e[true ],c_white,c_yellow,c_lime,c_orange);
+         0: draw_UITabButtonT(tar,ucl,it2s(ui_bprod_first),ui_bprod_cur ,units_bld_s[true ],units_bld_e[true ],c_white,c_yellow,c_lime,c_orange);
          1: draw_UITabButtonT(tar,ucl,it2s(ui_uprod_first),prod_unit_Now,units_bld_s[false],units_bld_e[false],c_white,c_yellow,c_lime,c_orange);
          2: draw_UITabButtonT(tar,ucl,it2s(ui_pprod_first),prod_upgr_Now,0                 ,0                 ,c_white,c_yellow,0     ,0       );
          3: draw_UITabButtonT(tar,ucl,0                   ,0            ,0                 ,0                 ,0      ,0       ,0     ,0       );
@@ -461,8 +461,8 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                            begin
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,m_brush=uid,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              i2s(ui_bprod_ucl_time[uid_uibtn]),i2s(ui_bprod_ucl_count[ucl]),i2s(units_ucl_s[true,ucl]),i2s(units_ucl_e[true,ucl])                            ,ir2s(ui_bucl_reload[ucl]),
-                                              ui_cenergy[res_energyl_cur<0]    ,c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
+                                              ir2s(ui_bprod_ucl_time[uid_uibtn]),i2s(ui_bprod_ucl_count[ucl]),i2s(units_ucl_s[true,ucl]),i2s(units_ucl_e[true,ucl])                            ,ir2s(ui_bucl_reload[ucl]),
+                                              ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
                                            end;
                             tab_units    : with g_uids[uid] do
                                            begin
@@ -599,6 +599,7 @@ begin
      with m_UnitTargetP^ do
      if(hits>0)then
        with uid^ do
+       with g_unitsVis[unum] do
        with player^ do
        begin
           AddLine(@uid_str_name);
@@ -715,7 +716,7 @@ begin
    w :=round(cx*ui_ReplayBarW);
 
    boxColor (tar,ui_ReplayBarX,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+w,ui_ReplayBarY,c_yellow);
-   draw_text(tar,ui_ReplayBarX,ui_ReplayBarY,i2s(round(cx*100))+'%',ta_LB,255,c_white);
+   draw_text(tar,ui_ReplayBarX,ui_ReplayBarY-font_wh,i2s(round(cx*100))+'%',ta_LB,255,c_white);
 end;
 
 procedure draw_UILog(tar:pSDL_Surface;x,y:integer;logAlign,POVPlayer,LogLineLen,LogListH:byte;LogSet:TSob);
@@ -844,6 +845,8 @@ begin
         if(ui_ControlPanelPos=cpp_right)
         then x:=ui_MouseHintX+(ui_HintLineLenUnit-slist_w)*font_w1
         else x:=ui_MouseHintX;
+        boxColor      (tar,x-font_wh,y-font_wh,x+font_w1*slist_w+font_w1,y+txt_line_h2*slist_n+font_wh,c_black);
+        rectangleColor(tar,x-font_wh,y-font_wh,x+font_w1*slist_w+font_w1,y+txt_line_h2*slist_n+font_wh,c_gray );
         for i:=0 to slist_n-1 do
           draw_text(tar,x,y+txt_line_h2*i,slist_l[i],ta_LU,255,c_white);
      end;

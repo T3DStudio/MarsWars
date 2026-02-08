@@ -518,7 +518,7 @@ begin
    str_SetAbilityBaseHint(uab_UACScan            ,'Scan'                     ,'Reveals units (including invisible ones) in the target area for '+i2s(detection_time_sec)+' seconds');
    with g_mids[MID_Blizzard] do
    str_SetAbilityBaseHint(uab_UACStrike          ,'Missile strike'           ,'Strikes a taktical rocket missile that deal '+tc_red+i2s(mid_base_damage)+tc_default+' damage('+str_uarm_SplashDamageR+i2s(mid_base_SplashR)+')'+str_uarm_Factor+str_DamageMod(dm_RSMShot));
-   str_SetAbilityBaseHint(uab_HEyeBlink          ,'Blink of the Eye'         ,'Short-range teleportation');
+   str_SetAbilityBaseHint(uab_HEyeSpawn          ,'Spawn Evil Eye'           ,'Spawns the Evil Eye at target point. There must be at least one Hell unit allied with you around the point target');
    str_SetAbilityBaseHint(uab_HEyeVision         ,'Hell Vision'              ,'The Evil Eye sacrifices itself to give allied target ability to detect invisible units for '+i2s(detection_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_HTowerBlink        ,'Planar Jump'              ,'Short-range teleportation');
    str_SetAbilityBaseHint(uab_HKeepShift         ,'Dimension Shift'          ,'The building teleport itself to target location. Required upgrade canceled after teleportation.');
@@ -546,16 +546,12 @@ begin
    str_SetAbilityBaseHint(uab_ToHSymbol3         ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHSymbol4         ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHACommandCenter  ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHFTower          ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHSTower          ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHTotem           ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUACommandCenter  ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUGenerator2      ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUGenerator3      ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUGenerator4      ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUAGTurret        ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUAATurret        ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToUACDron          ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUGTurretTo       ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUATurretTo       ,t1                         ,'');
    t1:='Advanced ';
@@ -586,7 +582,8 @@ begin
    str_SetUnitBaseHint(UID_HFTower           ,'Fire Tower'                       ,'Basic defensive structure'        );
    str_SetUnitBaseHint(UID_HSTower           ,'Slime Tower'                      ,'Basic defensive structure'        );
    str_SetUnitBaseHint(UID_HTotem            ,'Totem of Horror'                  ,'Advanced defensive structure'     );
-   str_SetUnitBaseHint(UID_HEye              ,'Evil Eye'                         ,'Detection structure.');
+   str_SetUnitBaseHint(UID_HEyeNest          ,'Evil Eye Nest'                    ,'Detection and scouting structure.');
+   str_SetUnitBaseHint(UID_HEye              ,'Evil Eye'                         ,'Detection and scouting structure.');
    str_SetUnitBaseHint(UID_HTeleport         ,'Teleport'                         ,'');
    str_SetUnitBaseHint(UID_HAltar            ,'Altar of Pain'                    ,'Uses "'+str_ui_HellPower+'" to perform special abilities. Generates "'+str_ui_HellPower+'"');
    str_SetUnitBaseHint(UID_HCommandCenter    ,'Hell Command Center'              ,'Corrupted Command Center'         );
@@ -629,7 +626,7 @@ begin
    str_SetUnitBaseHint(UID_UWeaponFactory    ,'Weapon Factory'                   ,''      );
    str_SetUnitBaseHint(UID_UGTurret          ,'Anti-ground Turret'               ,'Anti-ground defensive structure');
    str_SetUnitBaseHint(UID_UATurret          ,'Anti-air Turret'                  ,'Anti-air defensive structure'   );
-   str_SetUnitBaseHint(UID_UTechCenter       ,'Science Facility'                 ,'');
+   str_SetUnitBaseHint(UID_UScienceCenter    ,'Science Facility'                 ,'');
    str_SetUnitBaseHint(UID_UComputerStation  ,'Computer Station'                 ,'');
    str_SetUnitBaseHint(UID_URadar            ,'Radar'                            ,'Reveals the map and detects invisible enemy units');
    str_SetUnitBaseHint(UID_UAcademy          ,'UAC Academy'                      ,'Uses "'+str_ui_UACLoot+'" to perform special abilities');
@@ -1577,7 +1574,7 @@ begin
   str_SetUnitBaseHint(UID_UWeaponFactory  ,'Завод Вооружений'           ,'');
   str_SetUnitBaseHint(UID_UGTurret        ,'Анти-наземная Турель'       ,'Анти-наземное защитное сооружение' );
   str_SetUnitBaseHint(UID_UATurret        ,'Анти-воздушная Турель'      ,'Анти-воздушное защитное сооружение');
-  str_SetUnitBaseHint(UID_UTechCenter     ,'Научный Центр'              ,'');
+  str_SetUnitBaseHint(UID_UScienceCenter     ,'Научный Центр'              ,'');
   str_SetUnitBaseHint(UID_UComputerStation,'Компьютерная Станция'       ,'');
   str_SetUnitBaseHint(UID_URadar          ,'Радар'                      ,'');
   str_SetUnitBaseHint(UID_URMStation      ,'Станция Ракетного Залпа'    ,'');

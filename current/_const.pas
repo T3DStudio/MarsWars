@@ -746,11 +746,12 @@ UID_HFTower            = 12;
 UID_HSTower            = 13;
 UID_HTotem             = 14;
 UID_HTeleport          = 15;
-UID_HEye               = 16;
-UID_HAltar             = 17;
-UID_HCommandCenter     = 18;
-UID_HACommandCenter    = 19;
-UID_HBarracks          = 20;
+UID_HEyeNest           = 16;
+UID_HEye               = 17;
+UID_HAltar             = 18;
+UID_HCommandCenter     = 19;
+UID_HACommandCenter    = 20;
+UID_HBarracks          = 21;
 
 UID_LostSoul           = 23;
 UID_Phantom            = 24;
@@ -788,7 +789,7 @@ UID_UGenerator4        = 55;
 UID_UBarracks          = 56;
 UID_UFactory           = 57;
 UID_UWeaponFactory     = 58;
-UID_UTechCenter        = 59;
+UID_UScienceCenter     = 59;
 UID_UComputerStation   = 60;
 UID_UGTurret           = 61;
 UID_UATurret           = 62;
@@ -862,7 +863,7 @@ uab_Teleport           = 1;
 uab_Recall             = 2;
 uab_UACScan            = 3;
 uab_UACStrike          = 4;
-uab_HEyeBlink          = 5;
+uab_HEyeSpawn          = 5;
 uab_HTowerBlink        = 6;
 uab_HKeepShift         = 7;
 uab_HKeepAura          = 8;
@@ -896,24 +897,20 @@ uab_ToHSymbol4         = 34;
 uab_ToHPool            = 35;
 uab_ToHACommandCenter  = 36;
 uab_ToHBarracks        = 37;
-uab_ToHFTower          = 38;
-uab_ToHSTower          = 39;
-uab_ToHTotem           = 40;
 
-uab_ToUACommandCenter  = 41;
-uab_ToUBarracks        = 42;
-uab_ToUFactory         = 43;
-uab_ToUWeaponFactory   = 44;
-uab_ToUGenerator2      = 45;
-uab_ToUGenerator3      = 46;
-uab_ToUGenerator4      = 47;
-uab_ToUAGTurret        = 48;
-uab_ToUAATurret        = 49;
-uab_ToUACDron          = 50;
-uab_ToUGTurretTo       = 51;
-uab_ToUATurretTo       = 52;
-uab_URadarLvlUp        = 53;
-uab_URMStationLvlUp    = 54;
+uab_ToUACommandCenter  = 40;
+uab_ToUBarracks        = 41;
+uab_ToUFactory         = 42;
+uab_ToUWeaponFactory   = 43;
+uab_ToUGenerator2      = 44;
+uab_ToUGenerator3      = 45;
+uab_ToUGenerator4      = 46;
+uab_ToUAGTurret        = 47;
+uab_ToUAATurret        = 48;
+uab_ToUGTurretTo       = 49;
+uab_ToUATurretTo       = 50;
+uab_URadarLvlUp        = 51;
+uab_URMStationLvlUp    = 52;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1295,6 +1292,7 @@ sms_dattack            = 5;
 sms_mattack            = 6;
 sms_death              = 7;
 sms_build              = 8;
+sms_transform          = 9;
 
 
 ////////////////////////////////////////////////////////////////////////////////

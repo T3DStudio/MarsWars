@@ -322,6 +322,7 @@ begin
       end;
 
       KeyPoints_UpdateVisData;
+      units_DefaultVisData;
       map_MakeThemeSprites;
       map_RefreshDoodadsCells;
       map_DoodadsSetDrawData;

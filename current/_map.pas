@@ -289,14 +289,6 @@ begin
          end;
 end;
 
-function map_IfObsStartHere(x,y,rO,rI,pStartR:integer):boolean;
-begin
-   map_IfObsStartHere:=false{(map_IfObstacleHere   (x,y,rO,rI,map_symmetry))
-                     or(map_IfPlayerStartHere(x,y,rO,rI,pStartR))};
-   {if(map_symmetry)and(not map_IfObsStartHere)then
-   map_IfObsStartHere:=(map_IfPlayerStartHere(map_size1-x,map_size1-y,rO,rI,pStartR)); }
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   KEY POINTS
@@ -788,7 +780,7 @@ begin
    {$ENDIF}
 end;
 
-procedure Map_RandomSeed;
+procedure map_RandomSeed;
 begin
    map_seed:=random($FFFFFFFF)+(SDL_GetTicks shl 5);
    {$IFDEF _FULLGAME}
@@ -798,7 +790,7 @@ end;
 
 procedure Map_randommap;
 begin
-   Map_RandomSeed;
+   map_RandomSeed;
 
    map_Size1     :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
    map_ObstaclesS:=random(map_MaxObstacles+1);

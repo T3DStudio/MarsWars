@@ -235,6 +235,7 @@ begin
              begin
                 net_status:=ns_client;
                 net_SvList:=true;
+                net_TimerBase:=0;
              end
              else menu_msgBox_Set(str_Caption_Multiplayer,str_net_ServerList+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;

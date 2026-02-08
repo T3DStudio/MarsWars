@@ -444,9 +444,10 @@ begin
    iActSetOnEnabled(iAct_Control_UStop   ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
    iActSetOnEnabled(iAct_Control_UPatrol ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
 
-   if(iActIfOn(iAct_Control_UProdCncl,(ctabType=tcc_Controls)and(POVPlayer<>nil)))then
+   {if(iActIfOn(iAct_Control_UProdCncl,POVPlayer<>nil))then //(ctabType=tcc_Controls)and
      with POVPlayer^ do
-       iActSetDisabled(iAct_Control_UProdCncl,(prod_unit_Now=0)and(prod_upgr_Now=0));
+       iActSetDisabled(iAct_Control_UProdCncl,); }
+   iActSetOnEnabled(iAct_Control_UProdCncl ,POVPlayer<>nil,ui_uibtn_ProdCncl>0);
 
    if(POVPlayer<>nil)then
      iActSetOnEnabled(iAct_Control_UDestroy ,(ctabType=tcc_Controls)and(POVPlayer^.units_all_s>0),true);
@@ -476,6 +477,33 @@ begin
    ui_umark_u:=otar;
    ui_umark_t:=fr_fpsh;
 end;
+procedure local_CommandSound(default:PTSoundSet);
+begin
+   with ui_CommandercPU^ do
+   with uid^ do
+   if(uid_HaveRallypoint)then
+   begin
+      snd_SoundPlayUnitCommand(snd_rally_point[ui_CommandercPU^.player^.race]);
+      exit;
+   end
+   else
+     case iscomplete of
+     false: if(uid_isbuilding)then
+            begin
+               snd_SoundPlayUnitCommand(snd_building[uid_race]);
+               exit;
+            end;
+     true : if(transformTimer>0)then
+            begin
+               if(g_uids[transformUID].uid_isbuilding)
+               then snd_SoundPlayUnitCommand(snd_building[uid_race])
+               else snd_SoundPlayUnitCommand(uid_snd_select);
+               exit;
+            end;
+     end;
+   snd_SoundPlayUnitCommand(default);
+end;
+
 begin
    if(ui_CommandercPU<>nil)then
      with ui_CommandercPU^.uid^ do
@@ -483,18 +511,18 @@ begin
         case cmd of
         //co_ability,
         co_move,
-        co_patrol : snd_SoundPlayUnitCommand(uid_snd_move);
+        co_patrol : local_CommandSound(uid_snd_move);
         co_amove,
-        co_apatrol,
+        co_apatrol: local_CommandSound(uid_snd_attack);
         co_rcamove: if(uid_HaveRallypoint)
-                    then snd_SoundPlayUnitCommand(snd_rally_point[ui_CommandercPU^.player^.race])
-                    else snd_SoundPlayUnitCommand(uid_snd_attack);
+                    then local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race])
+                    else local_CommandSound(uid_snd_attack);
         co_rcmove : if(uid_HaveRallypoint)
-                    then snd_SoundPlayUnitCommand(snd_rally_point[ui_CommandercPU^.player^.race])
+                    then local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race])
                     else
                       if(local_TarIsEnemy)
-                      then snd_SoundPlayUnitCommand(uid_snd_attack)
-                      else snd_SoundPlayUnitCommand(uid_snd_move  );
+                      then local_CommandSound(uid_snd_attack)
+                      else local_CommandSound(uid_snd_move  );
         end;
 
         case cmd of
@@ -698,7 +726,14 @@ begin
                                                   if(tuid>0)then
                                                     with g_uids[tuid] do
                                                     begin
-                                                       math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team);
+                                                       if(not InputAction(iact_Control))
+                                                       then math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,false,true,g_gplayers[LocalPlayer].team)
+                                                       else
+                                                       begin
+                                                          m_brushx:=mouse_map_x;
+                                                          m_brushy:=mouse_map_y;
+                                                       end;
+
                                                        if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,g_gplayers[LocalPlayer].team)<>cbr_no)
                                                        then m_brushc:=c_red;
                                                     end;
@@ -875,14 +910,8 @@ begin
    iAct_Control_UStop     : if(SoundEnabledLeft)then PlayerSendOrder(co_stand ,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UProdCncl : if(SoundEnabledLeft)then
                               with g_gplayers[LocalPlayer] do
-                                if(units_unitProds_s>0)
-                                or(units_upgrProds_s>0)
-                                then PlayerSendOrder(co_pcancle,0,ui_cam_cx,ui_cam_cy,255,uo_corder,LocalPlayer)
-                                else
-                                  case ui_tab of
-                                  tab_units    : PlayerSendOrder(co_cunit   ,0,ui_cam_cx,ui_cam_cy,255,uo_corder,LocalPlayer);
-                                  tab_upgrades : PlayerSendOrder(co_cupgrade,0,ui_cam_cx,ui_cam_cy,255,uo_corder,LocalPlayer);
-                                  end;
+                                if(ui_uibtn_ProdCncl>0)then
+                                   PlayerSendOrder(co_pcancle,0,ui_cam_cx,ui_cam_cy,255,uo_corder,LocalPlayer);
    iAct_Control_UDestroy  : if(SoundEnabledLeft)then PlayerSendOrder(co_destroy,0,0,0,0,uo_corder,LocalPlayer);
    end;
 
