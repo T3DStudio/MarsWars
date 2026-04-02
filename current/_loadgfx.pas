@@ -20,7 +20,7 @@ begin
    sdl_saveBMP(vid_screen,@s[1]);
 end;
 
-function gfx_ShadowColor(c:cardinal):cardinal;
+function gfx_ShadowColor(c:TMWColor):TMWColor;
 begin
    gfx_ShadowColor:=128 +
    (((c and $FF000000) shr 25) shl 24) +
@@ -28,40 +28,40 @@ begin
    (((c and $0000FF00) shr  9) shl 8 );
 end;
 
-function gfx_rgba2c(r,g,b,a:byte):cardinal;
+function gfx_TMWColor(r,g,b,a:byte):TMWColor;
 begin
-   gfx_rgba2c:=a+(b shl 8)+(g shl 16)+(r shl 24);
+   gfx_TMWColor:=a+(b shl 8)+(g shl 16)+(r shl 24);
 end;
 
 procedure gfx_InitColors;
 begin
-   c_dred    :=gfx_rgba2c(190,  0,  0,255);
-   c_red     :=gfx_rgba2c(255,  0,  0,255);
-   c_ared    :=gfx_rgba2c(255,  0,  0,82 );
-   c_orange  :=gfx_rgba2c(255,140,  0,255);
-   c_dorange :=gfx_rgba2c(230, 96,  0,255);
-   c_aorange :=gfx_rgba2c(255,140,  0,82 );
-   c_brown   :=gfx_rgba2c(140,90 , 10,255);
-   c_yellow  :=gfx_rgba2c(255,255,  0,255);
-   c_dyellow :=gfx_rgba2c(220,220,  0,255);
-   c_lime    :=gfx_rgba2c(0  ,255,  0,255);
-   c_alime   :=gfx_rgba2c(0  ,255,  0,42 );
-   c_aaqua   :=gfx_rgba2c(0  ,255,255,42 );
-   c_aqua    :=gfx_rgba2c(0  ,255,255,255);
-   c_purple  :=gfx_rgba2c(255,0  ,255,255);
-   c_violet  :=gfx_rgba2c(147,100,255,255);
-   c_green   :=gfx_rgba2c(0  ,150,0  ,255);
-   c_ablue   :=gfx_rgba2c(0  ,0  ,255,82);
-   c_blue    :=gfx_rgba2c(50 ,50 ,255,255);
-   c_white   :=gfx_rgba2c(255,255,255,255);
-   c_awhite  :=gfx_rgba2c(255,255,255,40 );
-   c_gray    :=gfx_rgba2c(120,120,120,255);
-   c_ltgray  :=gfx_rgba2c(200,200,200,255);
-   c_dgray   :=gfx_rgba2c(70 ,70 ,70 ,255);
-   c_agray   :=gfx_rgba2c(80 ,80 ,80 ,128);
-   c_black   :=gfx_rgba2c(0  ,0  ,0  ,255);
-   c_ablack  :=gfx_rgba2c(0  ,0  ,0  ,128);
-   c_mablack :=gfx_rgba2c(0  ,0  ,0  ,96 );
+   c_dred    :=gfx_TMWColor(190,  0,  0,255);
+   c_red     :=gfx_TMWColor(255,  0,  0,255);
+   c_ared    :=gfx_TMWColor(255,  0,  0,82 );
+   c_orange  :=gfx_TMWColor(255,140,  0,255);
+   c_dorange :=gfx_TMWColor(230, 96,  0,255);
+   c_aorange :=gfx_TMWColor(255,140,  0,82 );
+   c_brown   :=gfx_TMWColor(140,90 , 10,255);
+   c_yellow  :=gfx_TMWColor(255,255,  0,255);
+   c_dyellow :=gfx_TMWColor(220,220,  0,255);
+   c_lime    :=gfx_TMWColor(0  ,255,  0,255);
+   c_alime   :=gfx_TMWColor(0  ,255,  0,42 );
+   c_aaqua   :=gfx_TMWColor(0  ,255,255,42 );
+   c_aqua    :=gfx_TMWColor(0  ,255,255,255);
+   c_purple  :=gfx_TMWColor(255,0  ,255,255);
+   c_violet  :=gfx_TMWColor(147,100,255,255);
+   c_green   :=gfx_TMWColor(0  ,150,0  ,255);
+   c_ablue   :=gfx_TMWColor(0  ,0  ,255,82);
+   c_blue    :=gfx_TMWColor(50 ,50 ,255,255);
+   c_white   :=gfx_TMWColor(255,255,255,255);
+   c_awhite  :=gfx_TMWColor(255,255,255,40 );
+   c_gray    :=gfx_TMWColor(120,120,120,255);
+   c_ltgray  :=gfx_TMWColor(200,200,200,255);
+   c_dgray   :=gfx_TMWColor(70 ,70 ,70 ,255);
+   c_agray   :=gfx_TMWColor(80 ,80 ,80 ,128);
+   c_black   :=gfx_TMWColor(0  ,0  ,0  ,255);
+   c_ablack  :=gfx_TMWColor(0  ,0  ,0  ,128);
+   c_mablack :=gfx_TMWColor(0  ,0  ,0  ,96 );
 
    ui_max_color[false]:=c_dorange;
    ui_max_color[true ]:=c_gray;
@@ -100,7 +100,7 @@ begin
    end;
 end;
 
-procedure SDL_SETpixel(srf:PSDL_SURFACE;x,y:integer;color:cardinal);
+procedure SDL_SETpixel(srf:PSDL_SURFACE;x,y:integer;color:TMWColor);
 var bpp:byte;
 begin
    if(x<0)or(srf^.w<=x)
@@ -111,7 +111,7 @@ begin
    move( (@(color))^, (srf^.pixels+(y*srf^.pitch)+x*bpp)^, bpp);
 end;
 
-function SDL_GETpixel(srf:PSDL_SURFACE;x,y:integer):cardinal;
+function SDL_GETpixel(srf:PSDL_SURFACE;x,y:integer):TMWColor;
 var bpp:byte;
 begin
    SDL_GETpixel:=0;
@@ -315,8 +315,8 @@ begin
         gfx_MakeLiquidTemplate(surf,ts,-ts^.w-(a*wsp),-ts^.h-(a*hsp),w,hh,tas_magma,tcs_default,false);
 
         case a of
-        1,3 : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,30));
-        2   : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,60));
+        1,3 : boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,30));
+        2   : boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,60));
         end;
 
         gfx_SetTransparent(surf);
@@ -373,8 +373,8 @@ begin
 
         if(theme_liquid_animStyle=tas_magma)then
          case a of
-         1,3 : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,30));
-         2   : boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,60));
+         1,3 : boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,30));
+         2   : boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,60));
          end;
 
         gfx_SetTransparent(surf);
@@ -400,7 +400,7 @@ begin
       hw:=w div 2;
       hh:=hw;
       gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,tas_liquid,theme_liquid_style,true);
-      boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,50));
+      boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,50));
       gfx_SetTransparent(surf);
    end;
 
@@ -413,7 +413,7 @@ begin
       hw:=w div 2;
       hh:=hw;
       gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,tas_liquid,theme_liquid_style,true);
-      boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,50));
+      boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,50));
       gfx_SetTransparent(surf);
    end;
 end;
@@ -439,7 +439,7 @@ begin
         hw:=crater_r[i];
         hh:=hw;
         gfx_MakeLiquidTemplate(surf,ts,0,0,w,hw,tas_liquid,theme_crater_style,false);
-        boxColor(surf,0,0,w,w,gfx_rgba2c(0,0,0,70));
+        boxColor(surf,0,0,w,w,gfx_TMWColor(0,0,0,70));
         if(theme_crater_style<>tcs_square)then
           gfx_SetTransparent(surf);
      end;
@@ -540,7 +540,7 @@ begin
      gfx_SetTransparent(gfx_ButtonMakeFromSurface);
 end;
 
-function gfx_ResizeSurfaceCMask(src:pSDL_Surface;newSize:integer;applyMask:cardinal):pSDL_Surface;
+function gfx_ResizeSurfaceCMask(src:pSDL_Surface;newSize:integer;applyMask:TMWColor):pSDL_Surface;
 begin
    if(src=spr_empty)
    then gfx_ResizeSurfaceCMask:=src
@@ -599,7 +599,7 @@ end;
 procedure gfx_LoadFont(fname:shortstring);
 var i:byte;
     c:char;
-  ccc:cardinal;
+  ccc:TMWColor;
  fspr:pSDL_Surface;
 begin
    ccc:=(1 shl 24)-1;
@@ -760,7 +760,7 @@ begin
    for r:=1 to r_count do
    begin
       spr_RaceRank[r]:=gfx_LoadSDLSurface(folder_RaceUI[r]+'rank',true,true);
-      spr_uipanel_EmptyBTN[r]:=gfx_ResizeSurfaceCMask(gfx_LoadSDLSurface(folder_RaceUI[r]+'EmptyBTN',false,true),ui_ButtonW1-2,gfx_rgba2c(0,0,0,160));
+      spr_uipanel_EmptyBTN[r]:=gfx_ResizeSurfaceCMask(gfx_LoadSDLSurface(folder_RaceUI[r]+'EmptyBTN',false,true),ui_ButtonW1-2,gfx_TMWColor(0,0,0,160));
    end;
 
    spr_cursor               := gfx_LoadSDLSurface('cursor'   ,true ,true);
@@ -795,17 +795,17 @@ begin
    tst                      := gfx_LoadSDLSurface('cursor_sub',true ,true);
    spr_cursorSubR           := gfx_CreateSDLSurface(tst^.w,tst^.h);
    draw_sdlsurface(spr_cursorSubR,0,0,tst);
-   boxColor(spr_cursorSubR,0,0,tst^.w,tst^.h,gfx_rgba2c(255,0  ,0  ,200));
+   boxColor(spr_cursorSubR,0,0,tst^.w,tst^.h,gfx_TMWColor(255,0  ,0  ,200));
    gfx_SetTransparent(spr_cursorSubR);
 
    spr_cursorSubG           := gfx_CreateSDLSurface(tst^.w,tst^.h);
    draw_sdlsurface(spr_cursorSubG,0,0,tst);
-   boxColor(spr_cursorSubG,0,0,tst^.w,tst^.h,gfx_rgba2c(0  ,255,0  ,200));
+   boxColor(spr_cursorSubG,0,0,tst^.w,tst^.h,gfx_TMWColor(0  ,255,0  ,200));
    gfx_SetTransparent(spr_cursorSubG);
 
    spr_cursorSubA           := gfx_CreateSDLSurface(tst^.w,tst^.h);
    draw_sdlsurface(spr_cursorSubA,0,0,tst);
-   boxColor(spr_cursorSubA,0,0,tst^.w,tst^.h,gfx_rgba2c(0  ,255,255,200));
+   boxColor(spr_cursorSubA,0,0,tst^.w,tst^.h,gfx_TMWColor(0  ,255,255,200));
    gfx_SetTransparent(spr_cursorSubA);
    gfx_FreeSDLSurface(tst);
 
@@ -1216,13 +1216,13 @@ end;
 procedure vid_RemakeScreenSurfaces;
 var i,y,
 ui_UIPanelWh:integer;
-procedure pline(x0,y0,x1,y1:integer;color:cardinal);
+procedure pline(x0,y0,x1,y1:integer;color:TMWColor);
 begin
    if(ui_ControlPanelPos<2)
    then lineColor(ui_UIPanelTemplate,x0,y0,x1,y1,color)
    else lineColor(ui_UIPanelTemplate,y0,x0,y1,x1,color);
 end;
-procedure prect(x0,y0,x1,y1:integer;color:cardinal);
+procedure prect(x0,y0,x1,y1:integer;color:TMWColor);
 begin
    if(ui_ControlPanelPos<2)
    then rectangleColor(ui_UIPanelTemplate,x0,y0,x1,y1,color)

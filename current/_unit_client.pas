@@ -1417,7 +1417,7 @@ begin
               case bp of
               0: begin
                     bv:=rudata_byte(rpl,0);
-                    upgrs_cur[n]:=min2i(upgr_max,bv and %00001111);
+                    upgrs_cur[n]:=min2i(upgr_max,bv and %00001111);         //???????
                     bp:=1;
                  end;
               1: begin

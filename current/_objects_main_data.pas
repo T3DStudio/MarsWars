@@ -174,7 +174,7 @@ begin
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isforge         := true;
-   uid_ability3        := uab_ToHPool;
+   uid_ability3        := uab_ToHPools;
    uid_AI_NextFormUID  := i;
 end;
 
@@ -380,7 +380,7 @@ begin
    uid_ismech          := true;
    uid_islight         := true;
 
-   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_Baron,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Baron,UID_Knight],[],0,-20,0,dm_AntiUnitLight2);
+   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_Baron,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Baron,UID_Knight],[],0,-20,0,dm_AntiUnitLight2);
 end;
 UID_HTotem:
 begin
@@ -664,7 +664,7 @@ begin
    uid_LimitUse        := ul10;
    uid_ismech          := true;
    uid_arms_BonusAntiBuildingRange:=50;
-   SetWeapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps1   ,MID_HRocket,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,dm_Siege4);
+   SetWeapon(0,wpt_missle   ,aw_srange,0,0 ,fr_fps1   ,MID_CyberRocket,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all-[UID_Cyberdemon],[],0,0,0,dm_Siege4);
 end;
 
 UID_Phantom,
@@ -696,7 +696,7 @@ UID_Phantom : begin
               SetWeapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamaget,fr_fps1,0,0,upgr_hell_Phantoms,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_all,wpr_any,uids_all,[],0,0,0,dm_Lost);
               end;
    end;
-   SetWeapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamaget,fr_fps1,0,0,0                 ,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0   ,0,dm_Lost);
+   SetWeapon(1,wpt_directdmg ,aw_dmelee,0,BaseDamaget,fr_fps1,0,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0   ,0,dm_Lost);
 end;
 
 // ZOMBIE/UAC INFANTRY
@@ -1290,9 +1290,9 @@ begin
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_req_uid1        := UID_UWeaponFactory;
-   uid_ability1        := uab_PretorEquip;
-   uid_ability2        := uab_Bribe;
-   uid_ability3        := uab_Hack;
+   uid_ability1        := uab_Bribe;
+   uid_ability2        := uab_Hack;
+   uid_ability3        := uab_PretorEquip;
 end;
 UID_UHPowerConductor:
 begin
@@ -1607,6 +1607,8 @@ end;
              uid_CanAttack:=true;
                for p:=1 to aw_reload do
                  if(p in aw_ShotPoints)then aw_ShotPoints+=[p-1];
+
+               if(aw_impact_dmod=dm_Siege4)then uid_AI_Siedge:=true;
           end;
 
       if(uid_LimitUse>=MinUnitLimit)and(not uid_isbuilding)then
@@ -1676,7 +1678,7 @@ MID_Baron,
 MID_Mancubus,
 MID_YPlasma,
 MID_BPlasma,
-MID_HRocket        : mid_speed       :=15;
+MID_CyberRocket    : mid_speed       :=15;
 MID_Revenant,
 MID_URocketS,
 MID_URocket,
@@ -1704,7 +1706,7 @@ MID_SChaingun,
 MID_YPlasma,
 MID_Flyer          : mid_base_damage :=BaseDamage2;
 MID_SSShot         : mid_base_damage :=BaseDamage3;
-MID_HRocket        : mid_base_damage :=BaseDamage5;
+MID_CyberRocket    : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage6;
 MID_Blizzard       : mid_base_damage :=BaseDamage10*4;
@@ -1713,7 +1715,7 @@ end;
 // splash R
 case m of
 MID_Blizzard       : mid_base_SplashR:=blizzard_sr;
-MID_HRocket        : mid_base_SplashR:=rocket_sr;
+MID_CyberRocket    : mid_base_SplashR:=rocket_sr;
 MID_URocketS,
 MID_ArchFire,
 MID_Tank           : mid_base_SplashR:=tank_sr;
@@ -1737,6 +1739,7 @@ MID_Baron          : mid_ImmuneUnits:=[UID_Knight,
 MID_Revenant       : mid_ImmuneUnits:=[UID_Revenant   ];
 MID_Mancubus       : mid_ImmuneUnits:=[UID_Mancubus   ];
 MID_YPlasma        : mid_ImmuneUnits:=[UID_Arachnotron];
+MID_CyberRocket    : mid_ImmuneUnits:=[UID_Cyberdemon ];
 end;
 
 // other
@@ -1757,7 +1760,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//   DAMAGE MODS  CONSTANT DATA
+//   DAMAGE MODS CONSTANT DATA
 //
 
 procedure InitDMODs;
@@ -1806,7 +1809,7 @@ end;
 
 procedure InitUpgrades;
 var u:byte;
-procedure setUPGR(rc,upgr,stime,stimeX,stimeA,max,enrg,enrgX,enrgA:integer;rupgr,ruid:byte);
+procedure setUPGR(rc,upgr,stime,stimeX,stimeA:integer;max:byte;enrg,enrgX,enrgA:integer;rupgr,ruid:byte);
 begin
    with g_upgrs[upgr] do
    begin
@@ -1866,13 +1869,13 @@ begin
    setUPGR(r_uac ,upgr_uac_TowerR       ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UACommandCenter );
 
    setUPGR(r_uac ,upgr_uac_DronTurret   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter );
-   setUPGR(r_uac ,upgr_uac_UnitSightR   ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_UScienceCenter     );
-   setUPGR(r_uac ,upgr_uac_CommandoInvis,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter     );
-   setUPGR(r_uac ,upgr_uac_AASplash     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter     );
-   setUPGR(r_uac ,upgr_uac_MechSpeed    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UScienceCenter     );
-   setUPGR(r_uac ,upgr_uac_MechArmor    ,60 ,0,35,5   ,600 ,0,700 ,0            ,UID_UScienceCenter     );
-   setUPGR(r_uac ,upgr_uac_TerAAWeapon  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter     );
-   setUPGR(r_uac ,upgr_uac_Transport    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter     );
+   setUPGR(r_uac ,upgr_uac_UnitSightR   ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_CommandoInvis,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_AASplash     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_MechSpeed    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_MechArmor    ,60 ,0,35,5   ,600 ,0,700 ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_TerAAWeapon  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_Transport    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_RadarR       ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_UComputerStation);
    setUPGR(r_uac ,upgr_uac_TurretPlasma ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation);
    setUPGR(r_uac ,upgr_uac_TurretArmor  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation);
@@ -1928,6 +1931,7 @@ uab_HEyeVision      : begin
 uab_HEyeSpawn       : begin
                          ua_type        := uat_Point;
                          ua_reload      := 60*fr_fps1;
+                         ua_req_uid     := UID_HAKeep;
                       end;
 uab_HTowerBlink     : begin
                          ua_type        := uat_Point;
@@ -1968,10 +1972,6 @@ uab_SphereTurbo     : begin
                          ua_req_HellPower:= 12000;
                       end;
 
-uab_PretorEquip     : begin
-                         ua_type        := uat_UnitAlly;
-                         ua_req_UACLoot := 6000;
-                      end;
 uab_Bribe           : begin
                          ua_type        := uat_UnitEnemy;
                          ua_req_UACLoot := 6000;
@@ -1979,6 +1979,10 @@ uab_Bribe           : begin
 uab_Hack            : begin
                          ua_type        := uat_UnitEnemy;
                          ua_req_UACLoot := 10000;
+                      end;
+uab_PretorEquip     : begin
+                         ua_type        := uat_UnitAlly;
+                         ua_req_UACLoot := 15000;
                       end;
 
 uab_SpawnLost       : begin
@@ -2028,7 +2032,7 @@ uab_ToHSymbol4,
 uab_ToHACommandCenter: ua_type        := uat_NoTarget;
 
 uab_ToHGate,
-uab_ToHPool,
+uab_ToHPools,
 uab_ToHBarracks     : begin
                          ua_type     := uat_NoTarget;
                          ua_req_uid  := UID_HFortress;

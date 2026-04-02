@@ -42,7 +42,7 @@ begin
 
         EID_BFG           : setEID(@spr_eff_bfg       ,sms_death);
 
-        MID_HRocket,
+        MID_CyberRocket,
         MID_Granade,
         MID_Tank,
         MID_Mancubus,
@@ -93,7 +93,7 @@ begin
    end;
 end;
 
-procedure ui_click_eff(cx,cy,ca:integer;cc:cardinal);
+procedure ui_click_eff(cx,cy,ca:integer;cc:TMWColor);
 begin
    ui_mc_x:=cx;
    ui_mc_y:=cy;
@@ -185,7 +185,7 @@ MID_YPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
 EID_BFG           : setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
-MID_HRocket,
+MID_CyberRocket,
 MID_Granade,
 MID_Tank,
 MID_Mancubus,
@@ -280,7 +280,9 @@ procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte
 begin
    if(ui_CheckUnitUIPlayerVision(pUnitVis,false))then
    begin
-      snd_SoundPlayUnit(snd,nil,nil);
+      if(PointInCam(vx,vy))
+      or(PointInCam(tx,ty))then
+        snd_SoundPlayUnit(snd,nil,nil);
       effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart,true);
       effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  ,true);
    end;

@@ -34,7 +34,7 @@ begin
    end;
 end;
 
-procedure map_MiniMap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:cardinal);
+procedure map_MiniMap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:TMWColor);
 begin
    circleColor   (tar,x  ,y  ,r  ,color);
    if(sym<>#0)then
@@ -43,7 +43,7 @@ end;
 
 procedure map_MiniMap_PlayerStarts(tar:pSDL_Surface);
 var p    :byte;
-    color:cardinal;
+    color:TMWColor;
     pc   :char;
 begin
    if(map_MaxPlayers>0)then
@@ -68,7 +68,7 @@ end;
 
 procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);
 var i:byte;
-    c:cardinal;
+    c:TMWColor;
    ch:char;
 begin
    for i:=0 to LastKeyPoint do
@@ -276,9 +276,9 @@ begin
 
             if(ui_DrawEdges)then
             begin
-               UnitsInfo_AddCircle(o_x,o_y,o_rO-BuildObstacleStepR,ui_blink2_color_BY);
+               UnitsInfo_AddCircle(o_x,o_y,o_rO,ui_blink2_color_BY);
                if(o_rI>0)then
-               UnitsInfo_AddCircle(o_x,o_y,o_rI+BuildObstacleStepR,ui_blink2_color_BY);
+               UnitsInfo_AddCircle(o_x,o_y,o_rI,ui_blink2_color_BY);
             end;
          end;
 

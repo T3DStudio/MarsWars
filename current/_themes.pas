@@ -1,7 +1,7 @@
 
 function gfx_FlipSurface(s:PSDL_Surface;xa,ya,trans:boolean):PSDL_Surface;
 var x,y,sx,sy:integer;
-    c:cardinal;
+    c:TMWColor;
 begin
    gfx_FlipSurface:=gfx_CreateSDLSurface(s^.w,s^.h);
    for x:=1 to s^.w do
@@ -221,7 +221,7 @@ end;
 procedure theme_SetLiquidAnims(i:integer;r,g,b:byte;animStyle:TThemeAnimStyle;animTime:byte);
 procedure liqAnim(i:integer);
 begin
-   theme_liquids_MMColor  [i]:=gfx_rgba2c(r,g,b,255);
+   theme_liquids_MMColor  [i]:=gfx_TMWColor(r,g,b,255);
    theme_liquids_AnimStyle[i]:=animStyle;
    theme_liquids_AnimTime[i]:=animTime;
 end;

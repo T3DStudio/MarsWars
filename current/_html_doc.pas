@@ -19,7 +19,7 @@ begin
    if(sdl_saveBMP(sdlsurf,@fname[1])<=0)then writeln(sdl_getError);
 end;
 
-function htmldoc_color2hex(color:cardinal):shortstring;
+function htmldoc_color2hex(color:TMWColor):shortstring;
 begin
    htmldoc_color2hex:=HexStr((color and $FF000000)shr 24,2)+
                       HexStr((color and $00FF0000)shr 16,2)+
@@ -37,7 +37,7 @@ i,l  :byte;
 c    :char;
 tag_b,
 tag_c:boolean;
-procedure TagColor(c:cardinal);
+procedure TagColor(c:TMWColor);
 begin
    if(tag_c)then write(html_f,'</font>');
    write(html_f,'<font color="'+htmldoc_color2hex(c)+'">');

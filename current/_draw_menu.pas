@@ -4,7 +4,7 @@
 //   MENU COMMON
 //
 
-function mic(enabled,selected:boolean):cardinal;
+function mic(enabled,selected:boolean):TMWColor;
 begin
    mic:=c_white;
    if(not enabled)
@@ -55,7 +55,7 @@ begin
 end;
 
 procedure drawmenu_ItemCaption(tar:pSDL_Surface;mi:byte;text:shortstring);
-var color:cardinal;
+var color:TMWColor;
 begin
    with menu_items[mi] do
      if(mi_state>as_off)then
@@ -154,7 +154,7 @@ end;
 
 procedure drawmenu_ItemInfo(tar:pSDL_Surface;mi:byte;text1,text2:shortstring);
 var
-color:cardinal;
+color:TMWColor;
 y    :integer;
 begin
    with menu_items[mi] do
@@ -170,7 +170,7 @@ begin
         draw_text(tar,mi_x0+font_wh,y                    ,text2,ta_LU,mi_charw,color);
      end;
 end;
-procedure drawmenu_ItemTextC(tar:pSDL_Surface;mi,pos:byte;text:shortstring;color:cardinal);
+procedure drawmenu_ItemTextC(tar:pSDL_Surface;mi,pos:byte;text:shortstring;color:TMWColor);
 begin
    with menu_items[mi] do
      if(mi_state>as_off)then
@@ -193,7 +193,7 @@ begin
 end;
 
 procedure drawmenu_ItemText(tar:pSDL_Surface;mi,pos:byte;text:shortstring;selectedVal:byte);
-var color:cardinal;
+var color:TMWColor;
 begin
    with menu_items[mi] do
      if(mi_state>as_off)then
@@ -253,48 +253,49 @@ begin
    drawmenu_ItemText1(tar,mi_caption_Settings   ,str_menu_Settings      ,255);
 
    // SETTINGS LIST
-   drawmenu_ItemText1(tar,mi_settings_Game      ,str_S_Game            ,menu_SettingsPage);
-   drawmenu_ItemText1(tar,mi_settings_Record    ,str_S_Replay          ,menu_SettingsPage);
-   drawmenu_ItemText1(tar,mi_settings_Video     ,str_S_Video           ,menu_SettingsPage);
-   drawmenu_ItemText1(tar,mi_settings_Sound     ,str_S_Sound           ,menu_SettingsPage);
+   drawmenu_ItemText1(tar,mi_settings_Game      ,str_S_Game             ,menu_SettingsPage);
+   drawmenu_ItemText1(tar,mi_settings_Record    ,str_S_Replay           ,menu_SettingsPage);
+   drawmenu_ItemText1(tar,mi_settings_Video     ,str_S_Video            ,menu_SettingsPage);
+   drawmenu_ItemText1(tar,mi_settings_Sound     ,str_S_Sound            ,menu_SettingsPage);
 
    // SETTINGS  GAME
 
-   drawmenu_ItemText2(tar,mi_SG_ColoredShadows  ,str_SG_ColoredShadow  ,str_YesNoC[ui_ColoredShadow]               ,0);
-   drawmenu_ItemText2(tar,mi_SG_ShowAPM         ,str_SG_ShowAPM        ,str_YesNoC[ui_ShowAPM]                     ,0);
-   drawmenu_ItemText2(tar,mi_SG_HealthBars      ,str_SG_HealthBars     ,str_SG_HealthBarsL[ui_HealthBars]          ,0);
-   drawmenu_ItemText2(tar,mi_SG_RightClickAction,str_SG_RightClickAct  ,str_SG_RightClickActL[m_RightClickAct]     ,0);
-   drawmenu_ItemText2(tar,mi_SG_MouseScroll     ,str_SG_MouseScroll    ,str_YesNoC[ui_MouseScroll]                 ,0);
-   drawmenu_ItemText2(tar,mi_SG_PlayerName      ,str_SG_PlayerName     ,PlayerName+vc(mi_SG_PlayerName)            ,menu_ItemSelected);
-   drawmenu_ItemText2(tar,mi_SG_Language        ,str_SG_Language       ,str_SG_LanguageL[ui_language]              ,0);
-   drawmenu_ItemText2(tar,mi_SG_ControlPanelPos ,str_SG_ControlPanelPos,str_SG_ControlPanelPosL[ui_ControlPanelPos],0);
-   drawmenu_ItemText2(tar,mi_SG_PlayersColor    ,str_SG_PlayersColor   ,str_SG_PlayersColorL[ui_PlayersColor]      ,0);
+   drawmenu_ItemText2(tar,mi_SG_PlayerName      ,str_SG_PlayerName      ,PlayerName+vc(mi_SG_PlayerName)            ,menu_ItemSelected);
+   drawmenu_ItemText2(tar,mi_SG_Language        ,str_SG_Language        ,str_SG_LanguageL[ui_language]              ,0);
+   drawmenu_ItemText2(tar,mi_SG_ColoredShadows  ,str_SG_ColoredShadow   ,str_YesNoC[ui_ColoredShadow]               ,0);
+   drawmenu_ItemText2(tar,mi_SG_PlayersColor    ,str_SG_PlayersColor    ,str_SG_PlayersColorL[ui_PlayersColor]      ,0);
+   drawmenu_ItemText2(tar,mi_SG_ShowAPM         ,str_SG_ShowAPM         ,str_YesNoC[ui_ShowAPM]                     ,0);
+   drawmenu_ItemText2(tar,mi_SG_HealthBars      ,str_SG_HealthBars      ,str_SG_HealthBarsL[ui_HealthBars]          ,0);
+   drawmenu_ItemText2(tar,mi_SG_RightClickAction,str_SG_RightClickAct   ,str_SG_RightClickActL[m_RightClickAct]     ,0);
+   drawmenu_ItemText2(tar,mi_SG_MouseScroll     ,str_SG_MouseScroll     ,str_YesNoC[ui_MouseScroll]                 ,0);
+   drawmenu_ItemText2(tar,mi_SG_ControlPanelPos ,str_SG_ControlPanelPos ,str_SG_ControlPanelPosL[ui_ControlPanelPos],0);
+   drawmenu_ItemText2(tar,mi_SG_ControlPanelAuto,str_SG_ControlPanelAuto,str_YesNoC[ui_tab_Auto]                    ,0);
 
-   drawmenu_ItemTextBar(tar,mi_SG_ScrollSpeed   ,str_SG_ScrollSpeed    ,ui_CamSpeed,1,ui_MaxCamSpeed,0);
+   drawmenu_ItemTextBar(tar,mi_SG_ScrollSpeed   ,str_SG_ScrollSpeed     ,ui_CamSpeed,1,ui_MaxCamSpeed,0);
 
    // SETTINGS  GAME RECORDING
-   drawmenu_ItemText2(tar,mi_SR_RecordGames     ,str_SR_RecordGames    ,str_YesNoC[rpls_Record]                    ,0);
-   drawmenu_ItemText2(tar,mi_SR_RecordPrefix    ,str_SR_ReplayPrefix   ,rpls_NamePrefix+vc(mi_SR_RecordPrefix)     ,menu_ItemSelected);
-   drawmenu_ItemText2(tar,mi_SR_RecordQuality   ,str_SR_Quality        ,str_ReplayQualityL[rpls_Quality]           ,0);
+   drawmenu_ItemText2(tar,mi_SR_RecordGames     ,str_SR_RecordGames     ,str_YesNoC[rpls_Record]                    ,0);
+   drawmenu_ItemText2(tar,mi_SR_RecordPrefix    ,str_SR_ReplayPrefix    ,rpls_NamePrefix+vc(mi_SR_RecordPrefix)     ,menu_ItemSelected);
+   drawmenu_ItemText2(tar,mi_SR_RecordQuality   ,str_SR_Quality         ,str_ReplayQualityL[rpls_Quality]           ,0);
 
    // SETTINGS  VIDEO
-   drawmenu_ItemText2(tar,mi_SV_ResolutionW     ,str_SV_ResolutionW    ,i2s(menu_ResolutionWi)+vc(mi_SV_ResolutionW),menu_ItemSelected);
-   drawmenu_ItemText2(tar,mi_SV_ResolutionH     ,str_SV_ResolutionH    ,i2s(menu_ResolutionHi)+vc(mi_SV_ResolutionH),menu_ItemSelected);
-   drawmenu_ItemText1(tar,mi_SV_ResolutionApply ,str_SV_ResolutionApply,0);
+   drawmenu_ItemText2(tar,mi_SV_ResolutionW     ,str_SV_ResolutionW     ,i2s(menu_ResolutionWi)+vc(mi_SV_ResolutionW),menu_ItemSelected);
+   drawmenu_ItemText2(tar,mi_SV_ResolutionH     ,str_SV_ResolutionH     ,i2s(menu_ResolutionHi)+vc(mi_SV_ResolutionH),menu_ItemSelected);
+   drawmenu_ItemText1(tar,mi_SV_ResolutionApply ,str_SV_ResolutionApply ,0);
 
-   drawmenu_ItemText2(tar,mi_SV_Windowed        ,str_SV_Windowed       ,str_YesNoC[vid_windowed]    ,0);
-   drawmenu_ItemText2(tar,mi_SV_ShowFPS         ,str_SV_ShowFPS        ,str_YesNoC[vid_ShowFPS ]    ,0);
-   drawmenu_ItemText2(tar,mi_SV_MenuScaling     ,str_SV_MenuScale      ,str_YesNoC[menu_scale  ]    ,0);
-   drawmenu_ItemText2(tar,mi_SV_SmoothScaled    ,str_SV_MenuScaleSmooth,str_YesNoC[menu_ScaleSmooth],0);
+   drawmenu_ItemText2(tar,mi_SV_Windowed        ,str_SV_Windowed        ,str_YesNoC[vid_windowed]    ,0);
+   drawmenu_ItemText2(tar,mi_SV_ShowFPS         ,str_SV_ShowFPS         ,str_YesNoC[vid_ShowFPS ]    ,0);
+   drawmenu_ItemText2(tar,mi_SV_MenuScaling     ,str_SV_MenuScale       ,str_YesNoC[menu_scale  ]    ,0);
+   drawmenu_ItemText2(tar,mi_SV_SmoothScaled    ,str_SV_MenuScaleSmooth ,str_YesNoC[menu_ScaleSmooth],0);
 
    // SETTINGS  SOUNDS
-   drawmenu_ItemTextBar(tar,mi_SS_SoundVolume   ,str_SS_SoundVolume,snd_SoundVolume,0,snd_MaxSoundVolume,0);
-   drawmenu_ItemTextBar(tar,mi_SS_MusicVolume   ,str_SS_MusicVolume,snd_MusicVolume,0,snd_MaxSoundVolume,0);
+   drawmenu_ItemTextBar(tar,mi_SS_SoundVolume   ,str_SS_SoundVolume     ,snd_SoundVolume,0,snd_MaxSoundVolume,0);
+   drawmenu_ItemTextBar(tar,mi_SS_MusicVolume   ,str_SS_MusicVolume     ,snd_MusicVolume,0,snd_MaxSoundVolume,0);
 
-   drawmenu_ItemText1(tar,mi_SS_PlayerNext      ,str_SS_NextTrack      ,0);
-   drawmenu_ItemText1(tar,mi_SS_ReloadPlaylist  ,str_SS_ReloadMusic    ,0);
+   drawmenu_ItemText1(tar,mi_SS_PlayerNext      ,str_SS_NextTrack       ,0);
+   drawmenu_ItemText1(tar,mi_SS_ReloadPlaylist  ,str_SS_ReloadMusic     ,0);
 
-   drawmenu_ItemText2(tar,mi_SS_PlaylistSize    ,str_SS_MusicListSize  ,b2s(snd_musicListSize),0);
+   drawmenu_ItemText2(tar,mi_SS_PlaylistSize    ,str_SS_MusicListSize   ,b2s(snd_musicListSize),0);
 end;
 
 procedure drawmenu_BlockSaveLoad(tar:pSDL_Surface); // SAVE LOAD
@@ -409,7 +410,7 @@ end;
 procedure drawmenu_BlockScirmish(tar:pSDL_Surface);
 var
 p    :byte;
-color:cardinal;
+color:TMWColor;
 function TeamChar(p:byte):char;
 begin
    if(map_scenario in mc_fixed_teams)
@@ -763,7 +764,8 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
       mmbt_DeleteReplay : begin
                              hlineColor(tar,menu_msg_x0,menu_msg_x1,menu_msg_btn1y0,c_white);
                              vlineColor(tar,menu_msg_btn1x1,menu_msg_btn1y0,menu_msg_btn1y1,c_white);
-                             draw_text(tar,menu_msg_btn1tx,menu_msg_btny,str_YesNoC[true ],ta_MM,menu_ListLineWCharsh,c_gray);
+                             draw_text(tar,menu_msg_btn1tx,menu_msg_btny,str_YesNoC[true ]+'('+str_ActionHotKey(iAct_Return)+')'
+                                                                                          ,ta_MM,menu_ListLineWCharsh,c_gray);
                              draw_text(tar,menu_msg_btn2tx,menu_msg_btny,str_YesNoC[false],ta_MM,menu_ListLineWCharsh,c_gray);
                           end;
       end;

@@ -10,44 +10,44 @@ begin
 
       // sprite model
       case m of
-MID_Imp      : mid_SpriteModel:=@spr_h_p0;
-MID_Cacodemon: mid_SpriteModel:=@spr_h_p1;
-MID_Baron    : mid_SpriteModel:=@spr_h_p2;
+MID_Imp        : mid_SpriteModel:=@spr_h_p0;
+MID_Cacodemon  : mid_SpriteModel:=@spr_h_p1;
+MID_Baron      : mid_SpriteModel:=@spr_h_p2;
 MID_Blizzard,
-MID_HRocket  : mid_SpriteModel:=@spr_h_p3;
-MID_Revenant : mid_SpriteModel:=@spr_h_p4;
-MID_Mancubus : mid_SpriteModel:=@spr_h_p5;
-MID_YPlasma  : mid_SpriteModel:=@spr_h_p7;
-MID_BPlasma  : mid_SpriteModel:=@spr_u_p0;
+MID_CyberRocket: mid_SpriteModel:=@spr_h_p3;
+MID_Revenant   : mid_SpriteModel:=@spr_h_p4;
+MID_Mancubus   : mid_SpriteModel:=@spr_h_p5;
+MID_YPlasma    : mid_SpriteModel:=@spr_h_p7;
+MID_BPlasma    : mid_SpriteModel:=@spr_u_p0;
 MID_Bullet,
 MID_SChaingun,
-MID_Chaingun : mid_SpriteModel:=@spr_u_p9;
+MID_Chaingun   : mid_SpriteModel:=@spr_u_p9;
 MID_SShot,
-MID_SSShot   : mid_SpriteModel:=@spr_u_p1s;
-MID_BFG      : mid_SpriteModel:=@spr_u_p2;
-MID_ArchFire : ;
-MID_Flyer    : mid_SpriteModel:=@spr_u_p3;
+MID_SSShot     : mid_SpriteModel:=@spr_u_p1s;
+MID_BFG        : mid_SpriteModel:=@spr_u_p2;
+MID_ArchFire   : ;
+MID_Flyer      : mid_SpriteModel:=@spr_u_p3;
 MID_Tank,
 MID_Granade,
 MID_URocketS,
-MID_URocket  : mid_SpriteModel:=@spr_u_p8;
+MID_URocket    : mid_SpriteModel:=@spr_u_p8;
       end;
 
       // tracer
       case m of
 MID_Granade,
-MID_HRocket,
+MID_CyberRocket,
 MID_URocketS,
 MID_URocket,
-MID_Revenant : begin
-               mid_eid_FlyTrace:=MID_Bullet;
-               mid_eid_FlyStep :=4;
-               end;
-MID_Blizzard : begin
-               mid_eid_FlyTrace:=MID_Granade;
-               mid_eid_FlyStep :=1;
-               mid_eid_Decal   :=EID_db_h1;
-               end;
+MID_Revenant   : begin
+                 mid_eid_FlyTrace:=MID_Bullet;
+                 mid_eid_FlyStep :=4;
+                 end;
+MID_Blizzard  : begin
+                  mid_eid_FlyTrace:=MID_Granade;
+                 mid_eid_FlyStep :=1;
+                 mid_eid_Decal   :=EID_db_h1;
+                 end;
       end;
 
       // death sound and effect (common)
@@ -57,27 +57,27 @@ MID_YPlasma,
 MID_BPlasma,
 MID_Imp,
 MID_Cacodemon,
-MID_Baron    : mid_snd_death[false]:=snd_explode_plasma;
+MID_Baron     : mid_snd_death[false]:=snd_explode_plasma;
 MID_ArchFire,
 MID_Blizzard,
 MID_Tank,
 MID_Granade,
-MID_HRocket,
+MID_CyberRocket,
 MID_URocket,
-MID_Revenant : mid_snd_death[false]:=snd_explode;
+MID_Revenant  : mid_snd_death[false]:=snd_explode;
 MID_Bullet,
 MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
-MID_SSShot   : begin
-               mid_snd_death    [false]:=snd_rico;
-               mid_snd_DeathSkip[false]:=5;
-               end;
-MID_BFG      : begin
-               mid_snd_death[false]:=snd_explode_bfg;
-               mid_eid_target_eff  :=EID_BFG;
-               end;
-MID_Flyer    : mid_snd_death[false]:=snd_explode_flyer;
+MID_SSShot    : begin
+                mid_snd_death    [false]:=snd_rico;
+                mid_snd_DeathSkip[false]:=5;
+                end;
+MID_BFG       : begin
+                mid_snd_death[false]:=snd_explode_bfg;
+                mid_eid_target_eff  :=EID_BFG;
+                end;
+MID_Flyer     : mid_snd_death[false]:=snd_explode_flyer;
       end;
       mid_snd_death [true ]:=mid_snd_death[false];
       mid_eid_death [false]:=m;
@@ -89,38 +89,38 @@ MID_Flyer    : mid_snd_death[false]:=snd_explode_flyer;
 
       // death sound and effect
       case m of
-MID_URocketS : begin
-                  mid_snd_death [true ]:=snd_explode;
-                  mid_eid_DeathN[true ]:=4;
-                  mid_eid_DeathR[true ]:=20;
-                  mid_snd_death [false]:=snd_explode;
-                  mid_eid_DeathN[false]:=4;
-                  mid_eid_DeathR[false]:=20;
-               end;
+MID_URocketS  : begin
+                   mid_snd_death [true ]:=snd_explode;
+                   mid_eid_DeathN[true ]:=4;
+                   mid_eid_DeathR[true ]:=20;
+                   mid_snd_death [false]:=snd_explode;
+                   mid_eid_DeathN[false]:=4;
+                   mid_eid_DeathR[false]:=20;
+                end;
 MID_Bullet,
 MID_SChaingun,
 MID_Chaingun,
 MID_SShot,
-MID_SSShot   : begin
-                  mid_snd_death    [true]:=nil;
-                  mid_snd_DeathSkip[true]:=0;
-                  mid_eid_death    [true]:=eid_blood;
-                  mid_eid_DeathN   [true]:=0;
-               end;
+MID_SSShot    : begin
+                   mid_snd_death    [true]:=nil;
+                   mid_snd_DeathSkip[true]:=0;
+                   mid_eid_death    [true]:=eid_blood;
+                   mid_eid_DeathN   [true]:=0;
+                end;
       end;
       case m of
-MID_SShot    : begin
-                  mid_eid_DeathN[false]:=2;
-                  mid_eid_DeathN[true ]:=2;
-                  mid_eid_DeathR[false]:=5;
-                  mid_eid_DeathR[true ]:=5;
-               end;
-MID_SSShot   : begin
-                  mid_eid_DeathN[false]:=4;
-                  mid_eid_DeathN[true ]:=4;
-                  mid_eid_DeathR[false]:=12;
-                  mid_eid_DeathR[true ]:=12;
-               end;
+MID_SShot     : begin
+                   mid_eid_DeathN[false]:=2;
+                   mid_eid_DeathN[true ]:=2;
+                   mid_eid_DeathR[false]:=5;
+                   mid_eid_DeathR[true ]:=5;
+                end;
+MID_SSShot    : begin
+                   mid_eid_DeathN[false]:=4;
+                   mid_eid_DeathN[true ]:=4;
+                   mid_eid_DeathR[false]:=12;
+                   mid_eid_DeathR[true ]:=12;
+                end;
       end;
    end;
 

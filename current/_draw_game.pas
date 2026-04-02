@@ -24,7 +24,7 @@ begin
    end;
 end;
 
-procedure SpriteList_AddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteList_AddUnit(ax,ay,adepth,ashadowz:integer;ashadowc,aaura:TMWColor;aspr:PTMWTexture;aalpha:byte);
 begin
    slatemp:=SpriteList_Add;
    if(slatemp<>nil)then
@@ -72,7 +72,7 @@ begin
         yo     := -aspr^.hh;
      end;
 end;
-procedure SpriteList_AddEffect(ax,ay,adepth:integer;aaura:cardinal;aspr:PTMWTexture;aalpha:byte);
+procedure SpriteList_AddEffect(ax,ay,adepth:integer;aaura:TMWColor;aspr:PTMWTexture;aalpha:byte);
 begin
    if(aspr=nil)
    or(aspr=pspr_dummy)then exit;
@@ -163,7 +163,7 @@ begin
    UnitsInfo_New:=true;
 end;
 
-procedure UnitsInfo_AddLine(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfo_AddLine(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -176,7 +176,7 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfo_AddRect(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfo_AddRect(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -189,7 +189,7 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfo_AddRectText(ax0,ay0,ax1,ay1:integer;acolor:cardinal;slt,slt2,srt,srd,sld:string6);
+procedure UnitsInfo_AddRectText(ax0,ay0,ax1,ay1:integer;acolor:TMWColor;slt,slt2,srt,srd,sld:string6);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -207,7 +207,7 @@ begin
         text_ld :=sld;
      end;
 end;
-procedure UnitsInfo_AddBox(ax0,ay0,ax1,ay1:integer;acolor:cardinal);
+procedure UnitsInfo_AddBox(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -220,7 +220,7 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfo_AddCircle(ax0,ay0,ar:integer;acolor:cardinal);
+procedure UnitsInfo_AddCircle(ax0,ay0,ar:integer;acolor:TMWColor);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -232,7 +232,7 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfo_AddText(ax0,ay0:integer;text:string6;acolor:cardinal);
+procedure UnitsInfo_AddText(ax0,ay0:integer;text:string6;acolor:TMWColor);
 var tw:integer;
 begin
    if(UnitsInfo_New)then
@@ -249,7 +249,7 @@ begin
         y0:=mm3i(ui_cam_y+font_wh,y0,ui_cam_y+ui_cam_h-font_w1);
      end;
 end;
-procedure UnitsInfo_AddUSprite(ax0,ay0:integer;acolor:cardinal;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6;abcolor:cardinal=0);
+procedure UnitsInfo_AddUSprite(ax0,ay0:integer;acolor:TMWColor;aspr:PTMWTexture;slt,slt2,srt,srd,sld:string6;abcolor:TMWColor=0);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -303,7 +303,7 @@ begin
      end;
 end;
 
-procedure UnitsInfo_Progressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:cardinal);
+procedure UnitsInfo_Progressbar(ax0,ay0,ax1,ay1:integer;per:single;acolor:TMWColor);
 var v:integer;
 begin
    if(per<0)then per:=0;
@@ -371,7 +371,7 @@ srect,
 choosen,
 pain,
 hbar   : boolean;
-acolor : cardinal;
+acolor : TMWColor;
 t,
 buffx,
 buffy  : integer;
@@ -407,9 +407,6 @@ begin
         end;
       if(hbar )then UnitsInfo_Progressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/uid_MaxHits1,acolor);
 
-      if(rld>0)and(playeri=UIPlayer)and(iscomplete)then
-        with g_unitsVis[unum] do UnitsInfo_AddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
-
       if(ui_DrawEdges)then
         if(speed<=0)or(not iscomplete)or(transformTimer>0)then
           UnitsInfo_AddCircle(x,y,uid_r,ui_blink2_color_BY);
@@ -418,47 +415,54 @@ begin
 
       if(playeri=UIPlayer)then
         case iscomplete of
-        true : if(transformTimer>0)
-               then UnitsInfo_AddText(vx,vy,i2s(it2s(transformTimer)),c_white)
-               else
-               begin
-                  if(uid_isbarrack)and(uid_isforge)
-                  then buffy:=ui_ButtonW1
-                  else buffy:=0;
+        true : begin
+                  if(rld>0)then
+                    with g_unitsVis[unum] do UnitsInfo_AddText(vx,vy-sm_SelectionHH+font_w1,lvlstr_r,c_aqua);
+                  if(transformTimer>0)then
+                  begin
+                     UnitsInfo_AddText   (vx+ui_ButtonWq,vy,i2s(it2s(transformTimer)),c_white);
+                     UnitsInfo_AddUSprite(vx-ui_ButtonWq,vy,c_gray,@g_uids[transformUID].uid_BTNDoc,'','','','','',c_black);
+                  end
+                  else
+                  begin
+                     if(uid_isbarrack)and(uid_isforge)
+                     then buffy:=ui_ButtonW1
+                     else buffy:=0;
 
-                  buffx:=0;
-                  if(uid_isbarrack)then
-                  begin
-                     for t:=0 to LastUnitLevel do
-                       if(uprod_r[t]>0)then buffx+=1;
-                     if(buffx>0)then
+                     buffx:=0;
+                     if(uid_isbarrack)then
                      begin
-                        buffx:=-(buffx-1)*ui_ButtonWh;
                         for t:=0 to LastUnitLevel do
-                          if(uprod_r[t]>0)then
-                          begin
-                             UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
-                             buffx+=ui_ButtonW1;
-                          end;
+                          if(uprod_r[t]>0)then buffx+=1;
+                        if(buffx>0)then
+                        begin
+                           buffx:=-(buffx-1)*ui_ButtonWh;
+                           for t:=0 to LastUnitLevel do
+                             if(uprod_r[t]>0)then
+                             begin
+                                UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_lime  ,@g_uids [uprod_u[t]].uid_BTNBig,i2s(it2s(uprod_r[t])),'','','','',c_black);
+                                buffx+=ui_ButtonW1;
+                             end;
+                        end;
+                        buffy+=ui_ButtonW1;
                      end;
-                     buffy+=ui_ButtonW1;
-                  end;
-                  buffx:=0;
-                  if(uid_isforge)then
-                  begin
-                     for t:=0 to LastUnitLevel do
-                       if(pprod_r[t]>0)then buffx+=1;
-                     if(buffx>0)then
+                     buffx:=0;
+                     if(uid_isforge)then
                      begin
-                        buffx:=-(buffx-1)*ui_ButtonWh;
                         for t:=0 to LastUnitLevel do
-                          if(pprod_r[t]>0)then
-                          begin
-                             UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
-                             buffx+=ui_ButtonW1;
-                          end;
+                          if(pprod_r[t]>0)then buffx+=1;
+                        if(buffx>0)then
+                        begin
+                           buffx:=-(buffx-1)*ui_ButtonWh;
+                           for t:=0 to LastUnitLevel do
+                             if(pprod_r[t]>0)then
+                             begin
+                                UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
+                                buffx+=ui_ButtonW1;
+                             end;
+                        end;
+                        buffy+=ui_ButtonW1;
                      end;
-                     buffy+=ui_ButtonW1;
                   end;
                end;
         false: UnitsInfo_AddText(vx,vy,i2s(it2s((((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2)*fr_fps1)),c_white);
@@ -619,7 +623,7 @@ procedure keyPoints_AddSprites;
 var t,i:integer;
    ddir:single;
 colorN,
-colorS :cardinal;
+colorS :TMWColor;
 begin
    for t:=0 to LastKeyPoint do
      with map_KeyPointsL[t] do
@@ -741,7 +745,7 @@ end;
 
 procedure draw_debug;
 var u,ix,iy:integer;
-    c:cardinal;
+    c:TMWColor;
 begin
    //draw_text(vid_screen,750,0,i2s(mouse_map_x)+' '+i2s(mouse_map_y) , ta_RU,255, c_white);
    //draw_text(vid_screen,750,0,i2s(spr_tdecsi), ta_RU,255, c_white);
@@ -823,7 +827,7 @@ begin
            draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
            draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColor(playeri,false));
-          // draw_text(vid_screen,ix,iy+30,b2c[isfly], ta_LU,255, PlayerGetColor(playeri,false));
+           draw_text(vid_screen,ix,iy+30,b2c[buffs[ub_AltMode]>0], ta_LU,255, PlayerGetColor(playeri,false));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));

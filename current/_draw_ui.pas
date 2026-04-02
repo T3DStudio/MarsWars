@@ -172,11 +172,11 @@ begin
 
    // debug
    if(TestMode>1)and(UIPlayer<=LastPlayer)then
-    with g_gplayers[UIPlayer] do
-     for i:=0 to LastPlayer do
-      with aip_alarms[i] do
-       if(aia_limit>0)then
-        circleColor(ui_minimap,round(aia_x*map_MiniMap_cx),round(aia_y*map_MiniMap_cx),5,c_orange);
+     with g_gplayers[UIPlayer] do
+       for i:=0 to ai_LastAlarm do
+         with ai_TeamAlarms[team,i] do
+           if(aia_limit>0)then
+             circleColor(ui_minimap,round(aia_x*map_MiniMap_cx),round(aia_y*map_MiniMap_cx),5,c_white);
 
    draw_sdlsurface(tar       ,1,1,ui_minimap );
    draw_sdlsurface(ui_minimap,0,0,ui_bminimap);
@@ -347,7 +347,7 @@ end;
 
 procedure draw_UIButtonT(tar:pSDL_Surface;bx,by:integer;
 lu1 ,lu2 ,ru ,rd ,ld :shortstring;
-clu1,clu2,cru,crd,cld:cardinal;ms:shortstring);
+clu1,clu2,cru,crd,cld:TMWColor;ms:shortstring);
 var ux,uy:integer;
 function cs(ps:pshortstring):boolean;begin cs:=(length(ps^)<>0)and(ps^[1]<>'0'); end;
 begin
@@ -363,7 +363,7 @@ begin
 end;
 
 
-procedure draw_UIButtonSText(tar:pSDL_Surface;bx,by:integer;align:byte;txt:pshortstring;color:cardinal;selected,disabled:boolean);
+procedure draw_UIButtonSText(tar:pSDL_Surface;bx,by:integer;align:byte;txt:pshortstring;color:TMWColor;selected,disabled:boolean);
 var ux,uy:integer;
 begin
    ui_Panel_ButtonXY(@ux,@uy,nil,nil,bx,by,ui_ButtonW1,ui_ButtonW1);
@@ -391,7 +391,7 @@ end;
 
 procedure draw_UITabButtonT(tar:pSDL_Surface;bi,
                             i1,i2,i3,i4:integer;
-                            c1,c2,c3,c4:cardinal);
+                            c1,c2,c3,c4:TMWColor);
 var
 bx0,by0,
 bx1,by1:integer;
@@ -468,14 +468,14 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                            begin
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,false,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_uprod_uid_time[uid]) ,i2s(prod_unit_uid[uid]),i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
-                                              ui_cenergy[res_energyl_cur<0],c_dyellow              ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
+                                              ir2s(ui_uprod_uid_time[uid])      ,i2s(prod_unit_uid[uid])     ,i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
+                                              ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
                                            end;
                             tab_upgrades : begin
                                               draw_UIButtonS(tar,ux,uy,g_upgrs[uid].upgr_btn.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_pprod_upg_time[uid]) ,i2s(prod_upgr_upid[uid]),'',b2s(upgrs_cur[uid])                                 ,'',
-                                              ui_cenergy[res_energyl_cur<0],c_dyellow               ,0 ,ui_max_color[upgrs_cur[uid]>=g_upgrs[uid].upgr_max] ,0 ,'');
+                                              ir2s(ui_pprod_upg_time[uid])      ,i2s(prod_upgr_upid[uid])    ,'',b2s(upgrs_cur[uid])                                 ,'',
+                                              ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,0 ,ui_max_color[upgrs_cur[uid]>=upgrs_max[uid]] ,0 ,'');
                                            end;
                             end;
                        end;
@@ -734,7 +734,7 @@ var i,x,y,
 limit :integer;
 logPov:byte;
   str :shortstring;
-  col :cardinal;
+  col :TMWColor;
 function ChatString:shortstring;
 begin
    case ui_InGameChat of
@@ -779,12 +779,12 @@ begin
        begin
           limit:=armylimit+prod_unit_Limit;
           draw_text(tar,ui_EnergyX,ui_EnergyY   ,str_ui_EnergyLevel   +': '+tc_default+i2s(res_energyl_cur           )+tc_white+' / '+tc_aqua  +i2s(res_energyl_max)
-                                                                                                                               ,ta_RU,255,ui_cenergy[res_energyl_cur<=0] );
+                                                                                                                                    ,ta_RU,255,ui_cenergy[res_energyl_cur<=0] );
           draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,c_white);
           draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,c_white);
 
           draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr
-                                                                                                                               ,ta_LU,255,ui_limit[limit>=MaxPlayerLimit]);
+                                                                                                                                    ,ta_LU,255,ui_limit[limit>=MaxPlayerLimit]);
           draw_text(tar,ui_ArmyX  ,ui_ArmyY1    ,str_ui_LimitUnits    +': '+limit2s(units_bld_l[true ]                ,MinUnitLimit),ta_LU,255,c_white);
           draw_text(tar,ui_ArmyX  ,ui_ArmyY2    ,str_ui_LimitBuildings+': '+limit2s(units_bld_l[false]+prod_unit_Limit,MinUnitLimit),ta_LU,255,c_white);
 
@@ -845,7 +845,7 @@ begin
         if(ui_ControlPanelPos=cpp_right)
         then x:=ui_MouseHintX+(ui_HintLineLenUnit-slist_w)*font_w1
         else x:=ui_MouseHintX;
-        boxColor      (tar,x-font_wh,y-font_wh,x+font_w1*slist_w+font_w1,y+txt_line_h2*slist_n+font_wh,c_black);
+        boxColor      (tar,x-font_wh,y-font_wh,x+font_w1*slist_w+font_w1,y+txt_line_h2*slist_n+font_wh,c_ablack);
         rectangleColor(tar,x-font_wh,y-font_wh,x+font_w1*slist_w+font_w1,y+txt_line_h2*slist_n+font_wh,c_gray );
         for i:=0 to slist_n-1 do
           draw_text(tar,x,y+txt_line_h2*i,slist_l[i],ta_LU,255,c_white);

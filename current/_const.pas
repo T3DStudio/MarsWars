@@ -44,7 +44,7 @@ APM_1Period            = fr_fps60;
 //  Game settings borders
 //
 
-g_MaxAISlots           = 11; // 0-11 max skirmish AI skills
+g_MaxAISlots           = 9; // 0-9 max skirmish AI skills
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,69 +179,70 @@ MaxPlayerLog           = 255;
 log_to_all             = %11111111;
 
 
-lmt_chat_player0       = 0;
-{lmt_chat_player1       = 1;
-lmt_chat_player2       = 2;
-lmt_chat_player3       = 3;
-lmt_chat_player4       = 4;
-lmt_chat_player5       = 5;
-lmt_chat_player6       = 6;}
-lmt_chat_player7       = 7; // LaastPlayer
-lmt_chat_common        = 8;
-lmt_game_message       = 9;
-lmt_game_end           = 10;
-lmt_game_ReadyToStart  = 11;
-lmt_game_BreakStarting = 12;
-lmt_game_StartsIn      = 13;
-lmt_game_ResetIn       = 14;
-lmt_game_Paused        = 15;
-lmt_game_Resumed       = 16;
-lmt_player_connected   = 17;
-lmt_player_leave       = 18;
-lmt_player_timeout     = 19;
-lmt_player_defeated    = 20;
-lmt_player_revealed    = 21;
-lmt_player_surrender   = 22;
-lmt_player_ready       = 23;
-lmt_player_nready      = 24;
-lmt_prod_BadPlace      = 25;
-lmt_prod_BadOrder      = 26;
-lmt_prod_AllBusy       = 27;
-lmt_unit_ready         = 28;
-lmt_unit_captured      = 29;
-lmt_unit_lost          = 30;
-lmt_unit_LevelUp       = 31;
-lmt_unit_attacked      = 32;
-lmt_unit_NeedBuilder   = 33;
-lmt_unit_resurrected   = 34;
-lmt_unit_MaxLevel      = 35;
-lmt_upgrade_InProgress = 36;
-lmt_upgrade_complete   = 37;
-lmt_Req_Energy         = 38;
-lmt_Req_HellPower      = 39;
-lmt_Req_UACLoot        = 40;
-lmt_Req_Common         = 41;
-lmt_Req_Limit          = 42;
-lmt_Req_MaxCount       = 43;
-lmt_map_mark           = 44;
-lmt_allies_attacked    = 45;
-lmt_NeedProdUnit       = 46;
-lmt_ability_reload     = 47;
-lmt_ability_BadPlace   = 48;
-lmt_kpoint_captured    = 49;
-lmt_kpoint_lost        = 50;
-lmt_ngen_exh           = 51;
-lmt_ngen_captured      = 52;
-lmt_ngen_lost          = 53;
-lmt_koth_control       = 54;
-lmt_invalid_Target     = 55;
-lmt_Invalid_Order      = 56;
-lmt_replay_RecStart    = 57;
-lmt_replay_RecStop     = 58;
-lmt_replay_RecError    = 59;
+lmt_chat_player0       = 1;
+{lmt_chat_player1       = 2;
+lmt_chat_player2       = 3;
+lmt_chat_player3       = 4;
+lmt_chat_player4       = 5;
+lmt_chat_player5       = 6;
+lmt_chat_player6       = 7;}
+lmt_chat_player7       = 8; // LastPlayer
+lmt_chat_common        = 9;
+lmt_game_message       = 10;
+lmt_game_end           = 11;
+lmt_game_ReadyToStart  = 12;
+lmt_game_BreakStarting = 13;
+lmt_game_StartsIn      = 14;
+lmt_game_ResetIn       = 15;
+lmt_game_Paused        = 16;
+lmt_game_Resumed       = 17;
+lmt_player_connected   = 18;
+lmt_player_leave       = 19;
+lmt_player_timeout     = 20;
+lmt_player_defeated    = 21;
+lmt_player_revealed    = 22;
+lmt_player_surrender   = 23;
+lmt_player_ready       = 24;
+lmt_player_nready      = 25;
+lmt_prod_BadPlace      = 26;
+lmt_prod_BadOrder      = 27;
+lmt_prod_AllBusy       = 28;
+lmt_unit_ready         = 29;
+lmt_unit_captured      = 30;
+lmt_unit_lost          = 31;
+lmt_unit_LevelUp       = 32;
+lmt_unit_attacked      = 33;
+lmt_unit_NeedBuilder   = 34;
+lmt_unit_resurrected   = 35;
+lmt_unit_MaxLevel      = 36;
+lmt_upgrade_InProgress = 37;
+lmt_upgrade_complete   = 38;
+lmt_Req_Energy         = 39;
+lmt_Req_HellPower      = 40;
+lmt_Req_UACLoot        = 41;
+lmt_Req_Common         = 42;
+lmt_Req_Limit          = 43;
+lmt_Req_MaxCount       = 44;
+lmt_map_mark           = 45;
+lmt_allies_attacked    = 46;
+lmt_NeedProdUnit       = 47;
+lmt_ability_reload     = 48;
+lmt_ability_BadPlace   = 49;
+lmt_kpoint_captured    = 50;
+lmt_kpoint_lost        = 51;
+lmt_ngen_exh           = 52;
+lmt_ngen_captured      = 53;
+lmt_ngen_lost          = 54;
+lmt_koth_control       = 55;
+lmt_invalid_Target     = 56;
+lmt_Invalid_Order      = 57;
+lmt_replay_RecStart    = 58;
+lmt_replay_RecStop     = 59;
+lmt_replay_RecError    = 60;
 
 lmts_menu_chat         = [
-                          0..LastPlayer,
+                          lmt_chat_player0..
+                          lmt_chat_player7,
                           lmt_chat_common,
                           lmt_game_message,
                           lmt_game_end,
@@ -263,7 +264,7 @@ lmts_menu_chat         = [
                           lmt_replay_RecStop,
                           lmt_replay_RecError
                          ];
-lmts_last_events       = [0..255];
+lmts_last_events       = [1..255];
 
 lmt_argt_unit          = 0;
 lmt_argt_upgrade       = 1;
@@ -342,7 +343,7 @@ nmid_ServerInfoReq        = 43;
 //
 //  REQUIREMENTS BITS
 //
-
+{
 ureq_limit             : cardinal = 1;
 ureq_uid               : cardinal = 1 shl 1;
 ureq_upgr              : cardinal = 1 shl 2;
@@ -364,7 +365,7 @@ ureq_reloading         : cardinal = 1 shl 17;
 ureq_landplace         : cardinal = 1 shl 18;
 ureq_InvalidTarget     : cardinal = 1 shl 19;
 ureq_MaxLevel          : cardinal = 1 shl 20;
-
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -468,12 +469,13 @@ TargetCheckSRangeBonus = 50;
 //  AI bits
 //
 
-//ai_limit_border        = MaxPlayerLimit-(7*MinUnitLimit);
+ai_MaxAlarms           = 8;
+ai_LastAlarm           = ai_MaxAlarms-1;
 
 aif_base_smart_order   : cardinal = 1;
 aif_base_suicide       : cardinal = 1 shl 1;
 aif_base_advance       : cardinal = 1 shl 2;
-aif_base_SaveBuilder   : cardinal = 1 shl 3;
+aif_base_BuilderMove   : cardinal = 1 shl 3;
 aif_army_scout         : cardinal = 1 shl 4;
 aif_army_smart_order   : cardinal = 1 shl 5;
 aif_army_smart_micro   : cardinal = 1 shl 6;
@@ -481,9 +483,10 @@ aif_army_smart_Target  : cardinal = 1 shl 7;
 aif_upgr_smart_order   : cardinal = 1 shl 8;
 aif_ability_detection  : cardinal = 1 shl 9;
 aif_ability_other      : cardinal = 1 shl 10;
-aif_allies_help        : cardinal = 1 shl 11;
-aif_cheat_VisBuildings : cardinal = 1 shl 12;
-aif_cheat_VisUnits     : cardinal = 1 shl 13;
+aif_ability_TowerRush  : cardinal = 1 shl 11;
+aif_allies_help        : cardinal = 1 shl 12;
+aif_cheat_VisBuildings : cardinal = 1 shl 13;
+aif_cheat_VisUnits     : cardinal = 1 shl 14;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -565,7 +568,7 @@ upgr_uac_BioArmor      = 32; // infantry armor
 upgr_uac_BuildArmor    = 33; // base b armor
 upgr_uac_RepairTools   = 34; // repair/health upgr
 upgr_uac_BioSpeed      = 35; // infantry speed
-upgr_uac_SSMWeapon         = 36; // expansive bullets ????????
+upgr_uac_SSMWeapon     = 36; // antiaircrafter surface-to-surface attack
 upgr_uac_BuilderR      = 37; // main sr
 upgr_uac_CCFly         = 38; // CC fly ability
 upgr_uac_CCAttack      = 39; // CC turret
@@ -599,7 +602,7 @@ upgr_invuln            = 254;
 MID_Imp                = 101;
 MID_Cacodemon          = 102;
 MID_Baron              = 103;
-MID_HRocket            = 104;
+MID_CyberRocket        = 104;
 MID_Revenant           = 105;
 MID_Mancubus           = 106;
 MID_YPlasma            = 107;
@@ -632,7 +635,7 @@ MaxUnits               = LastPlayer*MaxPlayerUnits+MaxPlayerUnits;
 MaxMissiles            = MaxUnits;
 
 MaxUnitWeapons         = 4;
-LastUnitArms         = MaxUnitWeapons-1;  //0-3
+LastUnitArms           = MaxUnitWeapons-1;  //0-3
 
 MaxUnitLevel           = 4;
 LastUnitLevel          = MaxUnitLevel-1;  //0-3
@@ -894,7 +897,7 @@ uab_ToHGate            = 31;
 uab_ToHSymbol2         = 32;
 uab_ToHSymbol3         = 33;
 uab_ToHSymbol4         = 34;
-uab_ToHPool            = 35;
+uab_ToHPools           = 35;
 uab_ToHACommandCenter  = 36;
 uab_ToHBarracks        = 37;
 
@@ -926,6 +929,11 @@ keyPoint_CaptTime_Gen  = fr_fps1*ptime1;
 keyPoint_CaptTime_KotH = fr_fps1*ptime3;
 keyPoint_DefR          = 100;
 keyPoint_GenR          = 75;
+keyPoint_KotR          = 350;
+keyPoint_KotRW         = round(keyPoint_KotR/1.44);
+
+keyPoint_mcN           = 4;
+keyPoint_mcDirStep     = 360 div keyPoint_mcN;
 
 keyPoint_KotH_pause     = fr_fps1*180;
 
@@ -1006,8 +1014,7 @@ rocket_sr              = tank_sr*2;
 bfg_sr                 = rocket_sr*4;
 blizzard_sr            = rocket_sr*3;
 
-BuildObstacleStepR     = 0;
-player_default_ai_level= 7;
+player_default_ai_level= 5;
 sintMaxHits            = 126;
 _d2shi                 = abs(hits_dead div 125)+1;   // 5
 
@@ -1405,6 +1412,7 @@ ui_MaxCamSpeed         = 127;
 ui_ButtonW1            = 48;
 ui_ButtonW2            = ui_ButtonW1*2;
 ui_ButtonWh            = ui_ButtonW1 div 2;
+ui_ButtonWq            = ui_ButtonWh div 2;
 ui_CtrlPanelBW         = 3;
 ui_CtrlPanelBlock      = ui_CtrlPanelBW*ui_CtrlPanelBW;
 ui_CtrlPanelBH         = ui_CtrlPanelBW+10;
@@ -1525,16 +1533,17 @@ mi_settings_Record     = 31;
 mi_settings_Video      = 32;
 mi_settings_Sound      = 33;
 
-mi_SG_ColoredShadows   = 40;
-mi_SG_ShowAPM          = 41;
-mi_SG_HealthBars       = 42;
-mi_SG_RightClickAction = 43;
-mi_SG_ScrollSpeed      = 44;
-mi_SG_MouseScroll      = 45;
-mi_SG_PlayerName       = 46;
-mi_SG_Language         = 47;
+mi_SG_PlayerName       = 39;
+mi_SG_Language         = 40;
+mi_SG_ColoredShadows   = 41;
+mi_SG_PlayersColor     = 42;
+mi_SG_ShowAPM          = 43;
+mi_SG_HealthBars       = 44;
+mi_SG_RightClickAction = 45;
+mi_SG_ScrollSpeed      = 46;
+mi_SG_MouseScroll      = 47;
 mi_SG_ControlPanelPos  = 48;
-mi_SG_PlayersColor     = 49;
+mi_SG_ControlPanelAuto = 49;
 
 mi_SR_RecordGames      = 50;
 mi_SR_RecordPrefix     = 51;

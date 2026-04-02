@@ -150,6 +150,7 @@ begin
    str_SG_ControlPanelPosL[cpp_right ]:= tc_orange+'right' +tc_default;
    str_SG_ControlPanelPosL[cpp_top   ]:= tc_yellow+'top'   +tc_default;
    str_SG_ControlPanelPosL[cpp_bottom]:= tc_aqua  +'bottom'+tc_default;
+   str_SG_ControlPanelAuto       := 'Control panel auto-switching';
    str_SG_HealthBars             := 'Health bars';
    str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
    str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
@@ -519,7 +520,7 @@ begin
    with g_mids[MID_Blizzard] do
    str_SetAbilityBaseHint(uab_UACStrike          ,'Missile strike'           ,'Strikes a taktical rocket missile that deal '+tc_red+i2s(mid_base_damage)+tc_default+' damage('+str_uarm_SplashDamageR+i2s(mid_base_SplashR)+')'+str_uarm_Factor+str_DamageMod(dm_RSMShot));
    str_SetAbilityBaseHint(uab_HEyeSpawn          ,'Spawn Evil Eye'           ,'Spawns the Evil Eye at target point. There must be at least one Hell unit allied with you around the point target');
-   str_SetAbilityBaseHint(uab_HEyeVision         ,'Hell Vision'              ,'The Evil Eye sacrifices itself to give allied target ability to detect invisible units for '+i2s(detection_time_sec)+' seconds');
+   str_SetAbilityBaseHint(uab_HEyeVision         ,'Hell Vision'              ,'Gives allied target ability to detect invisible units for '+i2s(detection_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_HTowerBlink        ,'Planar Jump'              ,'Short-range teleportation');
    str_SetAbilityBaseHint(uab_HKeepShift         ,'Dimension Shift'          ,'The building teleport itself to target location. Required upgrade canceled after teleportation.');
    str_SetAbilityBaseHint(uab_HKeepAura          ,'Decay Aura'               ,'Deals damage('+tc_red+i2s(DecayAuraDamage)+tc_default+', hits 2 times per sec.) to all non-building units around. Damage ignores units armor.');
@@ -556,7 +557,7 @@ begin
    str_SetAbilityBaseHint(uab_ToUATurretTo       ,t1                         ,'');
    t1:='Advanced ';
    str_SetAbilityBaseHint(uab_ToHGate            ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHPool            ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToHPools           ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHBarracks        ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUBarracks        ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUFactory         ,t1                         ,'');
@@ -765,15 +766,15 @@ begin
 
    menu_set_hint(mi_SaveLoad_fname,mi_SaveLoad_list,'');
 
-   for i in [mi_Players_Panel    ..mi_Players_Obs7     ] do menu_set_hint(i,mi_Players_Panel    ,'');
-   for i in [mi_Map_Panel        ..mi_Map_Random       ] do menu_set_hint(i,mi_Map_Panel        ,'');
-   for i in [mi_Game_Panel       ..mi_Game_Random      ] do menu_set_hint(i,mi_Game_Panel       ,'');
-   for i in [mi_MP_Panel         ..mi_MP_ChatLine      ] do menu_set_hint(i,mi_MP_Panel         ,'');
+   for i in [mi_Players_Panel ..mi_Players_Obs7       ] do menu_set_hint(i,mi_Players_Panel ,'');
+   for i in [mi_Map_Panel     ..mi_Map_Random         ] do menu_set_hint(i,mi_Map_Panel     ,'');
+   for i in [mi_Game_Panel    ..mi_Game_Random        ] do menu_set_hint(i,mi_Game_Panel    ,'');
+   for i in [mi_MP_Panel      ..mi_MP_ChatLine        ] do menu_set_hint(i,mi_MP_Panel      ,'');
 
-   for i in [mi_SG_ColoredShadows..mi_SG_PlayersColor  ] do menu_set_hint(i,mi_SG_ColoredShadows,'');
-   for i in [mi_SR_RecordGames   ..mi_SR_RecordQuality ] do menu_set_hint(i,mi_SR_RecordGames   ,'');
-   for i in [mi_SV_ResolutionW   ..mi_SV_SmoothScaled  ] do menu_set_hint(i,mi_SV_ResolutionW   ,'');
-   for i in [mi_SS_SoundVolume   ..mi_SS_ReloadPlaylist] do menu_set_hint(i,mi_SS_SoundVolume   ,'');
+   for i in [mi_SG_PlayerName ..mi_SG_ControlPanelAuto] do menu_set_hint(i,mi_SG_PlayerName ,'');
+   for i in [mi_SR_RecordGames..mi_SR_RecordQuality   ] do menu_set_hint(i,mi_SR_RecordGames,'');
+   for i in [mi_SV_ResolutionW..mi_SV_SmoothScaled    ] do menu_set_hint(i,mi_SV_ResolutionW,'');
+   for i in [mi_SS_SoundVolume..mi_SS_ReloadPlaylist  ] do menu_set_hint(i,mi_SS_SoundVolume,'');
 
    // PLAYERS
    for i:=mi_Players_AIskil0 to mi_Players_AIskil7 do menu_set_hint(i,mi_Players_Panel,': change AI skill'     );

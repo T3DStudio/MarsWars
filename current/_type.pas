@@ -34,6 +34,9 @@ PTUIStringList = ^TUIStringList;
 //   GRAPHIC
 //
 
+TMWColor = cardinal;
+PTMWColor = ^TMWColor;
+
 TMWTexture = record
    surf :pSDL_Surface;
    w,h,
@@ -65,7 +68,7 @@ end;
 TEID = record
    anim_smstate: byte;
    smodel      : PTMWSModel;
-   smask       : cardinal;
+   smask       : TMWColor;
 end;
 
 TEffect = record
@@ -85,7 +88,7 @@ TVisPrim = record
    x0,y0,
    x1,y1    : integer;
    bcolor,
-   color    : cardinal;
+   color    : TMWColor;
    text_lt,
    text_lt2,
    text_rt,
@@ -99,7 +102,7 @@ TVisSpr = record
    depth,
    shadowz  : integer;
    shadowc,
-   aura     : cardinal;
+   aura     : TMWColor;
    alpha    : byte;
 end;
 PTVisSpr = ^TVisSpr;
@@ -132,7 +135,7 @@ TAlarm = record
    al_r,
    al_t      : integer;
    al_v      : byte;
-   al_c      : cardinal;
+   al_c      : TMWColor;
 end;
 
 TObstacleVis = record
@@ -146,7 +149,7 @@ TObstacleVis = record
    ov_mmy,
    ov_mmrO,
    ov_mmrI    : integer;
-   ov_mmc     : cardinal;
+   ov_mmc     : TMWColor;
    ov_SpriteFront: PTMWTexture;
 end;
 
@@ -435,7 +438,8 @@ TUID = record
    uid_ZombieHits        : integer;
    uid_ZombieUID         : byte;
 
-   uid_AI_NextFormUID       : byte;
+   uid_AI_Siedge         : boolean;
+   uid_AI_NextFormUID    : byte;
 
    uid_DeathUID,
    uid_DeathUIDn,
@@ -730,7 +734,11 @@ TPlayerGameData = record
 
 
    // operative data
-   aip_alarms          : array[0..LastPlayer] of TAIAlarm;
+
+   aip_timer_detection,
+   aip_timer_magic,
+   aip_timer_superweapon
+                       : integer;
 
    // settings
    aip_skill           : byte;
@@ -742,12 +750,16 @@ TPlayerGameData = record
    aip_MaxForges,
    aip_MaxDetectors,
    aip_MinTowers,
-   aip_MaxTowers,
+   aip_MaxTowers       : integer;
    aip_MaxArmyLimit
-                       : integer;
+                       : longint;
    aip_MaxUpgradeLevel
                        : byte;
 
+   aip_pause_detection,
+   aip_pause_magic,
+   aip_pause_superweapon
+                       : integer;
 end;
 PTPlayerGameData = ^TPlayerGameData;
 TPList = array[0..LastPlayer] of TPlayerGameData;

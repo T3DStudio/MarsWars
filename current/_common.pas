@@ -7,19 +7,19 @@
 procedure unit_damage (pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);forward;
 procedure unit_Bonuses(pu:PTUnit);forward;
 procedure unit_kill   (pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);forward;
-function unit_TryChangeOwner(pTarget:PTUnit;newOwner:PTPlayerGameData;log,check:boolean):cardinal;forward;
+function unit_TryChangeOwner(pTarget:PTUnit;newOwner:PTPlayerGameData;log,check:boolean):byte;forward;
 function unit_add      (Ux,Uy,Uunum:integer;Uuid,UplayerN:byte;Ucomplete,Usummoned:boolean;Ulevel:byte;altMode:boolean=false):boolean;forward;
 function unit_canMove  (pu:PTUnit):boolean; forward;
 function unit_canAttack(pu:PTUnit;check_buffs:boolean):boolean; forward;
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;forward;
-function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):cardinal;forward;
+function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):byte;forward;
 
 procedure ai_Local_InitVars(pu:PTUnit);forward;
 procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_Local_Code(pu:PTUnit);forward;
 
 procedure ai_Global_InitVars(pu:PTUnit);forward;
-procedure ai_Global_SetCurrentAlarm(tu:PTUnit;x,y,ud:integer;zone:word);forward;
+//procedure ai_Global_SetCurrentAlarm(tar_u:PTUnit;tar_x,tar_y,tar_dist:integer;tar_zone:word);forward;
 procedure ai_Global_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);forward;
 procedure ai_Global_Code(pu:PTUnit);forward;
 //procedure ai_Global_ScoutPick(pu:PTUnit);forward;
@@ -36,7 +36,7 @@ procedure KeyPoints_Clear;   forward;
 procedure GameRemoveAIObservers; forward;
 
 {$IFDEF _FULLGAME}
-procedure draw_LoadingScreen(load_str:pshortstring;color:cardinal);forward;
+procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 procedure ui_EnableControlActs;forward;
 procedure ui_InitControlPanelBTNActions;forward;
@@ -46,7 +46,7 @@ procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
 procedure unit_UICountersAll; forward;
 
 function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
-function gfx_ShadowColor(c:cardinal):cardinal;forward;
+function gfx_ShadowColor(c:TMWColor):TMWColor;forward;
 
 function GamePauseToggle(check:boolean):boolean;forward;
 function GameNetServerList(start,check:boolean):boolean;forward;
@@ -58,7 +58,7 @@ function menu_ChatSize:integer;  forward;
 
 function PlayerNameChangeble  :boolean;forward;
 
-function PlayerGetColor  (player:byte;shadow:boolean):cardinal;  forward;
+function PlayerGetColor  (player:byte;shadow:boolean):TMWColor;  forward;
 function PlayerAIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
 function PlayerRaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
 function PlayerTeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;forward;
@@ -218,6 +218,9 @@ begin
 end;
 function max3i(x1,x2,x3:longint):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
 function min3i(x1,x2,x3:longint):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
+
+function min2b(x1,x2   :byte):byte;begin if(x1<x2)then min2b:=x1 else min2b:=x2;end;
+function max2b(x1,x2   :byte):byte;begin if(x1>x2)then max2b:=x1 else max2b:=x2;end;
 
 function min2c(x1,x2   :cardinal):cardinal;begin if(x1<x2)then min2c:=x1 else min2c:=x2;end;
 function min3c(x1,x2,x3:cardinal):cardinal;begin min3c:=min2c(min2c(x1,x2),x3);end;
@@ -454,20 +457,19 @@ begin
    begin
       if(new)then FillChar(units_uid_m,SizeOf(units_uid_m),0);
       if(g<>[])then
-        for i:=0 to 255 do
-          if(i in g)then units_uid_m[i]:=max;
+        for i in g do
+          units_uid_m[i]:=max;
    end;
 end;
-procedure PlayerSetAllowedUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // allowed upgrades
+procedure PlayerSetAllowedUpgrades(p:byte;g:TSob;lvl:byte;new:boolean);  // allowed upgrades
 var i:byte;
 begin
    with g_gplayers[p] do
    begin
       if(new)then FillChar(upgrs_max,SizeOf(upgrs_max),0);
       if(g<>[])then
-        for i:=0 to 255 do
-          if(i in g)then
-            with g_upgrs[i] do upgrs_max[i]:=min2i(upgr_max,lvl);
+        for i in g do
+          with g_upgrs[i] do upgrs_max[i]:=min2b(upgr_max,lvl);
    end;
 end;
 procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new,NoCheck:boolean);  // current upgrades
@@ -665,6 +667,8 @@ lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]
                end;   }
         end;
 
+        //if(amtype=lmt_player_connected)then g_gplayers[adatau].name:=astr;
+
         if(net_status=ns_client)or(not g_started)
         then POVPlayer:=LocalPlayer
         else POVPlayer:=UIPlayer;
@@ -804,45 +808,44 @@ begin
    PlayersAddToLog(0,log_to_all,lmt_game_Resumed,0,0,name,0,0);
 end;
 
-function GameLog_ReqBits(playerN,auid,atype:byte;bits:cardinal;x,y:integer;check:boolean=false):boolean;
-var bt:byte;
+function GameLog_ReqMsg(playerN,auid,atype,amsgid:byte;x,y:integer;check:boolean=false):boolean;
 begin
-   GameLog_ReqBits:=false;
-   if(playerN>LastPlayer)or(bits=0)then exit;
+   GameLog_ReqMsg:=false;
+   if(playerN>LastPlayer)or(amsgid=0)then exit;
 
    with g_gplayers[playerN] do
    begin
-      if(state=ps_AI)then exit;
-
       if(auid>0)and(atype=lmt_argt_unit)then
         if(units_uid_e[auid]<=0)and(units_uid_m[auid]<=0)then exit;
+
+      GameLog_ReqMsg:=true;
+
+      if(check)
+      or(state=ps_AI)then exit;
    end;
-   GameLog_ReqBits:=true;
 
-   if(check)then exit;
+   {if((msgid and ureq_place        )>0)then bt:=lmt_prod_BadPlace      else
+   if((msgid and ureq_landplace    )>0)then bt:=lmt_ability_BadPlace   else
+   if((msgid and ureq_uid          )>0)
+   or((msgid and ureq_upgr         )>0)then bt:=lmt_Req_Common         else
+   if((msgid and ureq_HellPower    )>0)then bt:=lmt_Req_HellPower      else
+   if((msgid and ureq_UACLoot      )>0)then bt:=lmt_Req_UACLoot        else
+   if((msgid and ureq_reloading    )>0)then bt:=lmt_ability_reload     else
+   if((msgid and ureq_InProgress   )>0)then bt:=lmt_upgrade_InProgress else
+   if((msgid and ureq_max          )>0)then bt:=lmt_Req_MaxCount       else
+   if((msgid and ureq_armylimit    )>0)
+   or((msgid and ureq_limit        )>0)then bt:=lmt_Req_Limit          else
+   if((msgid and ureq_energy       )>0)then bt:=lmt_Req_Energy         else
+   if((msgid and ureq_forges       )>0)
+   or((msgid and ureq_barracks     )>0)then bt:=lmt_NeedProdUnit       else
+   if((msgid and ureq_builders     )>0)then bt:=lmt_unit_NeedBuilder   else
+   if((msgid and ureq_busy         )>0)then bt:=lmt_prod_AllBusy       else
+   if((msgid and ureq_MaxLevel     )>0)then bt:=lmt_unit_MaxLevel      else
+   if((msgid and ureq_InvalidTarget)>0)then bt:=lmt_invalid_Target     else
+   if((msgid and ureq_other        )>0)then bt:=lmt_Invalid_Order      else
+                                            bt:=lmt_prod_BadOrder;      }
 
-   if((bits and ureq_place        )>0)then bt:=lmt_prod_BadPlace      else
-   if((bits and ureq_landplace    )>0)then bt:=lmt_ability_BadPlace   else
-   if((bits and ureq_uid          )>0)
-   or((bits and ureq_upgr         )>0)then bt:=lmt_Req_Common         else
-   if((bits and ureq_HellPower    )>0)then bt:=lmt_Req_HellPower      else
-   if((bits and ureq_UACLoot      )>0)then bt:=lmt_Req_UACLoot        else
-   if((bits and ureq_reloading    )>0)then bt:=lmt_ability_reload     else
-   if((bits and ureq_InProgress   )>0)then bt:=lmt_upgrade_InProgress else
-   if((bits and ureq_max          )>0)then bt:=lmt_Req_MaxCount       else
-   if((bits and ureq_armylimit    )>0)
-   or((bits and ureq_limit        )>0)then bt:=lmt_Req_Limit          else
-   if((bits and ureq_energy       )>0)then bt:=lmt_Req_Energy         else
-   if((bits and ureq_forges       )>0)
-   or((bits and ureq_barracks     )>0)then bt:=lmt_NeedProdUnit       else
-   if((bits and ureq_builders     )>0)then bt:=lmt_unit_NeedBuilder   else
-   if((bits and ureq_busy         )>0)then bt:=lmt_prod_AllBusy       else
-   if((bits and ureq_MaxLevel     )>0)then bt:=lmt_unit_MaxLevel      else
-   if((bits and ureq_InvalidTarget)>0)then bt:=lmt_invalid_Target     else
-   if((bits and ureq_other        )>0)then bt:=lmt_Invalid_Order      else
-                                           bt:=lmt_prod_BadOrder;
-
-   PlayersAddToLog(playerN,0,bt,atype,auid,'',x,y);
+   PlayersAddToLog(playerN,0,amsgid,atype,auid,'',x,y);
 end;
 procedure GameLog_MapMark(playeri:byte;x,y:integer);
 begin
@@ -1100,12 +1103,10 @@ begin
    end;
 end;
 
-{function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
+function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
-   if(map_scenario=mc_royale)
-   then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_Sizeh,map_Sizeh)+d)>=g_royal_r
-   else g_CheckRoyalBattlePoint:=false;
-end;}
+   g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_Sizeh,map_Sizeh)+d)>=g_royal_r
+end;
 
 procedure Game_SetStatusWinnerTeam(team:byte);
 begin
@@ -1188,40 +1189,40 @@ begin
                             and((armylimit+prod_unit_Limit+uid_LimitUse)<=MaxPlayerLimit);
 end;
 
-function CheckUnitReqs(player:PTPlayerGameData;uid:byte;forRebuildCheck:boolean=false):cardinal;
-procedure AddBits(ni:cardinal;b:boolean);
-begin if(b)then CheckUnitReqs:=CheckUnitReqs or ni;end;
+function CheckUnitReqs(player:PTPlayerGameData;uid:byte):byte;
 begin
    CheckUnitReqs:=0;
    with player^ do
    with g_uids[uid] do
    begin
-      if(not forRebuildCheck)then
-      begin
-      AddBits(ureq_limit    ,(units_all_e+prod_unit_Now             )>=MaxPlayerUnits);
-      AddBits(ureq_armylimit,(armylimit+prod_unit_Limit+uid_LimitUse)> MaxPlayerLimit);
-      end;
-      AddBits(ureq_uid      ,(uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n));
-      AddBits(ureq_uid      ,(uid_req_uid2>0)and(units_uid_c[uid_req_uid2]<uid_req_uid2n));
-      AddBits(ureq_uid      ,(uid_req_uid3>0)and(units_uid_c[uid_req_uid3]<uid_req_uid3n));
-      AddBits(ureq_upgr     ,(uid_req_upgr>0)and(upgrs_cur  [uid_req_upgr]=0            ));
-
-      AddBits(ureq_energy   ,(res_energyl_cur<uid_req_EnergyLevel)or(uid_isbuilding and(res_energyl_max<=0)));
-      AddBits(ureq_HellPower,(res_HellPower  <uid_req_HellPower ));
-      AddBits(ureq_UACLoot  ,(res_UACLoot    <uid_req_UACLoot   ));
-      AddBits(ureq_BadProd  , uid_ProdTimeSec<=0   );   //
-
-      if(not forRebuildCheck)then
-      AddBits(ureq_max      ,((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])or
-                             ((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders)));
-
       case uid_isbuilding of
 true  : begin
-           AddBits(ureq_builders,units_builders_ec <=0);
-           AddBits(ureq_BuildCD ,build_cd> 0);
+           if(units_builders_ec<=0)then begin CheckUnitReqs:=lmt_unit_NeedBuilder;exit;end;
+           if(build_cd         > 0)then begin CheckUnitReqs:=lmt_prod_BadOrder;   exit;end;  ////
         end;
-false : AddBits(ureq_barracks   ,units_unitProds_ec<=0);
+false : if(units_unitProds_ec<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;end;
       end;
+
+      if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])
+      or((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders))then
+      begin CheckUnitReqs:=lmt_Req_MaxCount;exit;end;
+
+      if((uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n))
+      or((uid_req_uid2>0)and(units_uid_c[uid_req_uid2]<uid_req_uid2n))
+      or((uid_req_uid3>0)and(units_uid_c[uid_req_uid3]<uid_req_uid3n))
+      or((uid_req_upgr>0)and(upgrs_cur  [uid_req_upgr]=0            ))then
+      begin CheckUnitReqs:=lmt_Req_Common;exit;end;
+
+      if((units_all_e+prod_unit_Now             )>=MaxPlayerUnits)
+      or((armylimit+prod_unit_Limit+uid_LimitUse)> MaxPlayerLimit)then
+      begin CheckUnitReqs:=lmt_Req_Limit;exit;end;
+
+      if(res_HellPower<uid_req_HellPower)then begin CheckUnitReqs:=lmt_Req_HellPower;exit;end;
+      if(res_UACLoot  <uid_req_UACLoot  )then begin CheckUnitReqs:=lmt_Req_UACLoot;exit;end;
+
+      if(res_energyl_cur<uid_req_EnergyLevel)
+      or(uid_isbuilding and(res_energyl_max<=0))then
+      begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
    end;
 end;
 
@@ -1253,21 +1254,30 @@ begin
        end;
 end;
 
-function CheckUpgradeReqs(player:PTPlayerGameData;upgr:byte):cardinal;
-procedure AddBits(ni:cardinal;b:boolean);
-begin if(b)then CheckUpgradeReqs:=CheckUpgradeReqs or ni;end;
+function CheckUpgradeReqs(player:PTPlayerGameData;upgr:byte):byte;
 begin
    CheckUpgradeReqs:=0;
    with player^ do
    with g_upgrs[upgr] do
    begin
-      AddBits(ureq_uid       ,(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)  );
-      AddBits(ureq_upgr      ,(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)  );
-      AddBits(ureq_energy    , res_energyl_cur<GetUpgradeEnergy(upgr,upgrs_cur[upgr]+1) );
-      AddBits(ureq_BadProd   , upgr_time<=0                            );
-      AddBits(ureq_max       ,(integer(upgrs_cur[upgr]+prod_upgr_upid[upgr])>=min2i(upgr_max,upgrs_max[upgr]) )); //
-      AddBits(ureq_InProgress, prod_upgr_upid[upgr]>0                    );
-      AddBits(ureq_forges    , units_upgrProds_ec<=0                   );
+      if(units_upgrProds_ec<=0)then
+      begin CheckUpgradeReqs:=lmt_NeedProdUnit;exit;end;
+
+      if((upgrs_cur[upgr]+prod_upgr_upid[upgr])>=upgrs_max[upgr] )then  //min2i(upgr_max,)
+      begin CheckUpgradeReqs:=lmt_Req_MaxCount;exit;end;
+
+      if(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)
+      or(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)then
+      begin CheckUpgradeReqs:=lmt_Req_Common;exit;end;
+
+      if(prod_upgr_upid[upgr]>0)then
+      begin CheckUpgradeReqs:=lmt_upgrade_InProgress;exit;end;
+
+      if(upgr_time<=0)then
+      begin CheckUpgradeReqs:=lmt_prod_BadOrder;exit;end;
+
+      if(res_energyl_cur<GetUpgradeEnergy(upgr,upgrs_cur[upgr]+1))then
+      begin CheckUpgradeReqs:=lmt_Req_Energy;exit;end;
    end;
 end;
 
@@ -1342,8 +1352,8 @@ begin
      3  : ai_name:=str_ps_AI+' '+tc_lime  +b2s(ain)+tc_default;
      4  : ai_name:=str_ps_AI+' '+tc_green +b2s(ain)+tc_default;
      5  : ai_name:=str_ps_AI+' '+tc_yellow+b2s(ain)+tc_default;
-     6  : ai_name:=str_ps_AI+' '+tc_orange+b2s(ain)+tc_default;
-     7  : ai_name:=str_ps_AI+' '+tc_red   +b2s(ain)+tc_default;
+     6  : ai_name:=str_ps_AI+' '+tc_orange+b2s(ain)+tc_default+' cheater';
+     7  : ai_name:=str_ps_AI+' '+tc_red   +b2s(ain)+tc_default+' cheater';
      8  : ai_name:=str_ps_AI+' '+tc_purple+b2s(ain)+tc_default+' cheater';
      else ai_name:=str_ps_AI+' '+tc_white +b2s(ain)+tc_default+' cheater';
      end;
@@ -1508,7 +1518,7 @@ end;
 //   GAME
 //
 
-function GameGetStatus(pstr:pshortstring;pcol:pcardinal;POVPlayer:byte):boolean;
+function GameGetStatus(pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
 function GetLagPlayers:shortstring;
 var p:byte;
 begin
@@ -1530,7 +1540,8 @@ begin
 
       if(pstr<>nil)and(pcol<>nil)then
         case G_status of
-0..LastPlayer : begin
+gs_paused0..
+gs_paused7    : begin
                    pstr^:=str_gstat_GamePaused+g_gplayers[G_status].name;
                    pcol^:=PlayerGetColor(G_status,false);
                 end;
@@ -1695,7 +1706,7 @@ begin
    end;
 end;
 
-function PlayerGetColor(player:byte;shadow:boolean):cardinal;
+function PlayerGetColor(player:byte;shadow:boolean):TMWColor;
 begin
    if(player>LastPlayer)then
      case shadow of
@@ -1709,7 +1720,7 @@ begin
      end;
 end;
 
-function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):cardinal;
+function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):TMWColor;
 begin
    case shadow of
    false: KeyPoint_GetColor:=PlayerColorDefaultCurrent;
@@ -2006,7 +2017,7 @@ end;
 //   UI LOG
 //
 
-function ParseLogMessage(ptlog:PTLogMes;mcolor:pcardinal):shortstring;
+function ParseLogMessage(ptlog:PTLogMes;mcolor:pTMWColor):shortstring;
 procedure AddDataStr;
 begin
    with ptlog^ do
@@ -2026,7 +2037,6 @@ begin
 lmt_chat_player0..
 lmt_chat_player7      : if(length(lm_string)>0)then
                         begin
-                           //lm_type = sender
                            mcolor^:=PlayerGetColor(lm_type-lmt_chat_player0,false);
                            ParseLogMessage:=lm_string;
                         end;
@@ -2194,8 +2204,8 @@ chunkl,
 chunks:integer;
 aline :shortstring;
 atype :byte;
-acolor:cardinal;
-procedure addLine(line:shortstring;ltype:byte;color:cardinal);
+acolor:TMWColor;
+procedure addLine(line:shortstring;ltype:byte;color:TMWColor);
 begin
    if(ui_log_n>=listHeight)then exit;
    ui_log_n+=1;

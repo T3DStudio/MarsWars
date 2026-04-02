@@ -145,7 +145,7 @@ begin
    end;
 end;
 
-function unit_morph(pu:PTUnit;ouid:byte;ocomplete:boolean;bhits:integer;ulevel:byte;check:boolean;summoned:boolean=true):cardinal;
+function unit_morph(pu:PTUnit;ouid:byte;ocomplete:boolean;bhits:integer;ulevel:byte;check:boolean;summoned:boolean=true):byte;
 var
 pOldU  :PTUnit;
 pNewUID:PTUID;
@@ -157,7 +157,7 @@ begin
    begin
       if(hits<=0)then
       begin
-         unit_morph:=ureq_other;
+         unit_morph:=lmt_Invalid_Order;
          exit;
       end;
       pOldU  :=g_punits[0];
@@ -166,54 +166,54 @@ begin
 
       if(units_uid_m[ouid]<=0)then
       begin
-         unit_morph:=ureq_max;
+         unit_morph:=lmt_Req_MaxCount;
          exit;
       end;
       if((armylimit-uid_LimitUse+pNewUID^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then
       begin
-         unit_morph:=ureq_armylimit;
+         unit_morph:=lmt_Req_Limit;
          exit;
       end;
       if(not ocomplete)or(pNewUID^.uid_isbuilding)then
         if(res_energyl_max<=0)then
         begin
-           unit_morph:=ureq_energy;
+           unit_morph:=lmt_Req_Energy;
            exit;
         end;
       if(not ocomplete)then
       begin
          if(isfly)or(transportC>0)then
          begin
-            unit_morph:=ureq_other;
+            unit_morph:=lmt_Invalid_Order;
             exit;
          end;
          if((res_energyl_cur-uid_gen_EnergyLevel)<pNewUID^.uid_req_EnergyLevel)or(res_energyl_max<=uid_gen_EnergyLevel)then
          begin
-            unit_morph:=ureq_energy;
+            unit_morph:=lmt_Req_Energy;
             exit;
          end;
          if(res_HellPower<pNewUID^.uid_req_HellPower)then
          begin
-            unit_morph:=ureq_HellPower;
+            unit_morph:=lmt_Req_HellPower;
             exit;
          end;
          if(res_UACLoot<pNewUID^.uid_req_UACLoot)then
          begin
-            unit_morph:=ureq_UACLoot;
+            unit_morph:=lmt_Req_UACLoot;
             exit;
          end;
          if(CheckCollisionR(x,y,pNewUID^.uid_r,unum,pNewUID^.uid_isbuilding,pNewUID^.uid_isfly,true,255)<>cbr_no)then
          begin
-            unit_morph:=ureq_place;
+            unit_morph:=lmt_prod_BadPlace;
             exit;
          end;
       end;
 
       if(ulevel>LastUnitLevel)then
       begin
-         if(uidi=ouid)and(level=LastUnitLevel)
-         then unit_morph:=ureq_MaxLevel
-         else unit_morph:=ureq_other;
+         if(uidi=ouid)and(level>=LastUnitLevel)
+         then unit_morph:=lmt_unit_MaxLevel
+         else unit_morph:=lmt_Invalid_Order;
          exit;
       end;
 
@@ -231,8 +231,8 @@ begin
       units_all_e-=1;
       unit_add(x,y,unum,ouid,playeri,ocomplete,summoned,ulevel);
 
-      res_HellPower-=pNewUID^.uid_req_HellPower;
-      res_UACLoot  -=pNewUID^.uid_req_UACLoot;
+      //res_HellPower-=pNewUID^.uid_req_HellPower;
+      //res_UACLoot  -=pNewUID^.uid_req_UACLoot;
    end;
 
    if(LastCreatedUnitP<>nil)then
@@ -573,6 +573,7 @@ wpt_resurect : if(not unit_StartResurrection(pAttacker,pTarget,true))then exit;
 wpt_heal     : if(pTarget^.hits<=0)
                or(pTarget^.hits>=pTarget^.uid^.uid_MaxHits1)
                or(not pTarget^.iscomplete)
+               or(pTarget^.uid^.uid_Regen_Base<0)
                then exit;
       end;
 
@@ -841,9 +842,7 @@ begin
                 if(buffs[ub_Cast]>0)then
                   d:=min2i(d,point_dist_int(uo_x,uo_y,kp_x,kp_y));
             with kp_TeamData[pu^.player^.team] do
-              if(d<=(kp_RCapture+srange))
-              or((map_scenario=mc_koth)and(kpi=0))then
-              // or(no fog)
+              if(d<=(kp_RCapture+srange))then
                 kptd_VisTimer:=MinVisionTime;
          end;
 end;
@@ -966,10 +965,12 @@ begin
 
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNewTarget:=0;
 
-      {$IFNDEF DEBUG1}
       ai_Local_Code(pu);
       if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
-      {$ENDIF}
+      if(isselected)then
+      begin
+         if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
+      end;
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
    end;
@@ -1255,8 +1256,8 @@ begin
 
       {$IFDEF _FULLGAME}
       if(ServerSide)then
-      {$ENDIF}
       begin
+      {$ENDIF}
          if(a_rld<=0)then
          begin
             arm:=unit_target2arm(pAttacker,pTarget,-1,255,@a);
@@ -1323,8 +1324,8 @@ begin
              StayWaitForNewTarget:=1;
              exit;
          end;
-      end
       {$IFDEF _FULLGAME}
+      end
       else
       begin
          unit_attack:=true;
@@ -1335,8 +1336,8 @@ begin
          with uid^ do
            with uid_arms[a_weap] do
              attackinmove:=(aw_req_flags and wpr_move)>0;
-      end
-      {$ENDIF};
+      end;
+      {$ENDIF}
 
       if(not unit_canAttack(pAttacker,true))then
       begin
@@ -1715,9 +1716,9 @@ begin
    end;
 end;
 
-function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):cardinal;
+function unit_AbilityCheck(pCaster:PTUnit;aid:byte;liteCheck:boolean):byte;
 begin
-   unit_AbilityCheck:=ureq_other;
+   unit_AbilityCheck:=lmt_Invalid_Order;
 
    with pCaster^ do
    with uid^ do
@@ -1749,12 +1750,12 @@ begin
       with player^ do
       with g_aids[aid] do
       begin
-         if(ua_reload       >0)and(rld>0)then unit_AbilityCheck:=ureq_reloading;
-         if(ua_req_uid      >0)and(units_uid_c[ua_req_uid ]   <=0)then unit_AbilityCheck:=ureq_uid;
-         if(ua_req_upgr     >0)and(upgrs_cur  [ua_req_upgr]   <=0)then unit_AbilityCheck:=ureq_upgr;
-         if(ua_req_HellPower>0)and(ua_req_HellPower>res_HellPower)then unit_AbilityCheck:=ureq_HellPower;
-         if(ua_req_UACLoot  >0)and(ua_req_UACLoot  >res_UACLoot  )then unit_AbilityCheck:=ureq_UACLoot;
-         if(ua_type=uat_passive)then exit;
+         if( ua_reload       >0)and(rld>0)then unit_AbilityCheck:=lmt_ability_reload;
+         if((ua_req_uid      >0)and(units_uid_c[ua_req_uid ]   <=0))
+         or((ua_req_upgr     >0)and(upgrs_cur  [ua_req_upgr]   <=0))then unit_AbilityCheck:=lmt_Req_Common;
+         if( ua_req_HellPower>0)and(ua_req_HellPower>res_HellPower )then unit_AbilityCheck:=lmt_Req_HellPower;
+         if( ua_req_UACLoot  >0)and(ua_req_UACLoot  >res_UACLoot   )then unit_AbilityCheck:=lmt_Req_UACLoot;
+         if( ua_type=uat_passive)then exit;
       end;
 
       if(unit_AbilityCheck>0)then exit;
@@ -1763,10 +1764,7 @@ begin
       uab_HellCCLand,
       uab_HellCCLandTo,
       uab_UACCCLand,
-      uab_UACCCLandTo      : begin
-                                //if(zfall<>0)then unit_AbilityCheck:=ureq_other;
-                                if(rld   >0)then unit_AbilityCheck:=ureq_reloading;
-                             end;
+      uab_UACCCLandTo      : if(rld>0)then unit_AbilityCheck:=lmt_ability_reload;
 
       uab_HEyeVision       : unit_AbilityCheck:=unit_ability_HellVision   (pCaster,0        ,true );
       uab_HEyeSpawn        : unit_AbilityCheck:=unit_ability_SpawnEvilEye (pCaster,0,0      ,true );
@@ -1791,12 +1789,12 @@ begin
 
       uab_Unload,
       uab_UnloadTo         : if(transportC=0)
-                             or(transportM=0)then unit_AbilityCheck:=ureq_other;
+                             or(transportM=0)then unit_AbilityCheck:=lmt_Invalid_Order;
 
       uab_ToHAKeep         : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HAKeep         ,true);
       uab_ToHACommandCenter: unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HACommandCenter,true);
       uab_ToHGate          : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HGate          ,true);
-      uab_ToHPool          : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HPools         ,true);
+      uab_ToHPools         : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HPools         ,true);
       uab_ToHBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HBarracks      ,true);
       uab_ToHSymbol2       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol2       ,true);
       uab_ToHSymbol3       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol3       ,true);
@@ -1818,7 +1816,7 @@ begin
    end;
 end;
 
-function unit_AbilityExec(pCaster:PTUnit;aid:byte):cardinal; //new
+function unit_AbilityExec(pCaster:PTUnit;aid:byte):byte;
 var pTarget:PTUnit;
 begin
    with pCaster^ do
@@ -1831,7 +1829,6 @@ begin
          if(unit_AbilityExec>0)
          or(ua_type=uat_passive)then
          begin
-            if(uidi=UID_HCommandCenter)then writeln(unit_AbilityExec);
             uo_id:=ua_amove;
             exit;
          end;
@@ -1841,13 +1838,13 @@ begin
          uat_UnitAlly,
          uat_UnitEnemy : begin
                             pTarget:=nil;
-                            unit_AbilityExec:=ureq_InvalidTarget;
+                            unit_AbilityExec:=lmt_invalid_Target;
                             if(IsUnitRange(uo_tar,@pTarget))then
                               if(ability_CheckTarget(aid,pCaster^.player,pTarget^.player))then
                                 unit_AbilityExec:=0;
                             if(unit_AbilityExec>0)then
                             begin
-                               GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
+                               GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
                                unit_OrderClear(pCaster,ua_amove);
                                exit;
                             end;
@@ -1861,7 +1858,7 @@ begin
                               unit_AbilityExec:=unit_ability_Recall(pCaster,uo_tar,NOTSET,false);
                               unit_OrderClear(pCaster,ua_amove);
                               if(unit_AbilityExec>0)
-                              then GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
+                              then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
                            end;
       uab_UACScan,
       uab_UACStrike,
@@ -1895,7 +1892,7 @@ begin
                               end;
                               uo_id:=ua_amove;
                               if(unit_AbilityExec>0)
-                              then GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                              then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
                               else
                               begin
                                  rld:=ua_reload;
@@ -1908,7 +1905,7 @@ begin
                               unit_AbilityExec:=unit_ability_HKeepBlink(pCaster,uo_x,uo_y,false);
                               unit_OrderClear(pCaster,ua_amove);
                               if(unit_AbilityExec>0)
-                              then GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                              then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
                               else
                                 if(ua_req_upgr>0)then player^.upgrs_cur[ua_req_upgr]-=1;
                            end;
@@ -1916,7 +1913,7 @@ begin
                               unit_AbilityExec:=unit_ability_SpawnLost(pCaster,false);
                               uo_id:=ua_amove;
                               if(unit_AbilityExec>0)
-                              then GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
+                              then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
                            end;
       uab_SpawnLostTo    : begin
                               uo_tar:=0;
@@ -1983,7 +1980,7 @@ begin
       uab_ToHAKeep,
       uab_ToHACommandCenter,
       uab_ToHGate,
-      uab_ToHPool,
+      uab_ToHPools,
       uab_ToHBarracks,
       uab_ToHSymbol2,
       uab_ToHSymbol3,
@@ -2004,7 +2001,7 @@ begin
                               uab_ToHAKeep         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HAKeep         ,false);
                               uab_ToHACommandCenter: unit_AbilityExec:=unit_TransformStart(pCaster,uid_HACommandCenter,false);
                               uab_ToHGate          : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HGate          ,false);
-                              uab_ToHPool          : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HPools         ,false);
+                              uab_ToHPools         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HPools         ,false);
                               uab_ToHBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HBarracks      ,false);
                               uab_ToHSymbol2       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol2       ,false);
                               uab_ToHSymbol3       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol3       ,false);
@@ -2026,7 +2023,7 @@ begin
 
                               unit_OrderClear(pCaster,ua_amove);
                               if(unit_AbilityExec>0)
-                              then GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
+                              then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
                               else
                               begin
                                  player^.res_HellPower-=ua_req_HellPower;
@@ -2051,7 +2048,7 @@ begin
                                  end;
                                  unit_OrderClear(pCaster,ua_amove);
                                  if(unit_AbilityExec>0)
-                                 then GameLog_ReqBits(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
+                                 then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
                               end;
                            end;
       else unit_OrderClear(pCaster,ua_amove);
@@ -2118,45 +2115,43 @@ begin
                                  isfly:=uf_ground;
                               end
                               else
-                                if(zfall=0)then
-                                  if(buffs[ub_AltMode]>0)then
-                                  begin
-                                     if(isfly<>uf_fly)then
-                                     begin
-                                        {$IFDEF _FULLGAME}
-                                        snd_SoundPlayUnit(snd_CCenterLiftUp ,pu,nil);
-                                        if(ServerSide)then
-                                        {$ENDIF}
-                                        zfall:=zfall-fly_hz;
+                                if(buffs[ub_AltMode]>0)then
+                                begin
+                                   if(isfly<>uf_fly)then
+                                   begin
+                                      {$IFDEF _FULLGAME}
+                                      snd_SoundPlayUnit(snd_CCenterLiftUp ,pu,nil);
+                                      if(ServerSide)then
+                                      {$ENDIF}
+                                      zfall-=fly_hz;
 
-                                        isfly:=uf_fly;
-                                     end;
-                                     speed:=uid_MSpeed_Base;
-                                  end
-                                  else
-                                  begin
-                                     if(isfly<>uf_ground)then
-                                     begin
-                                        {$IFDEF _FULLGAME}
-                                        snd_SoundPlayUnit(snd_Transport,pu,nil);
-                                        if(ServerSide)then
-                                        {$ENDIF}
-                                        begin
-                                           zfall:=fly_hz;
-                                           unit_OrderClear(pu,255);
-                                        end;
-                                        isfly:=uf_ground;
-                                     end;
-                                     speed:=0;
+                                      isfly:=uf_fly;
+                                   end;
+                                   speed:=uid_MSpeed_Base;
+                                end
+                                else
+                                begin
+                                   if(isfly<>uf_ground)then
+                                   begin
+                                      {$IFDEF _FULLGAME}
+                                      snd_SoundPlayUnit(snd_Transport,pu,nil);
+                                      if(ServerSide)then
+                                      {$ENDIF}
+                                      begin
+                                         zfall+=fly_hz;
+                                         unit_OrderClear(pu,255);
+                                      end;
+                                      isfly:=uf_ground;
+                                   end;
+                                   speed:=0;
 
-                                     if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(zfall<>0)then
-                                       if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,255,pu)<>cbr_no)then
-                                       begin
-                                          buffs[ub_AltMode]:=ub_infinity;
-                                          rld:=fr_fps1;
-                                          GameLog_ReqBits(playeri,uid_ability1,lmt_argt_ability,ureq_landplace,x,y);
-                                       end;
-                                  end;
+                                   if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(zfall<>0)then
+                                     if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,255,pu)<>cbr_no)then
+                                     begin
+                                        buffs[ub_AltMode]:=ub_infinity;
+                                        GameLog_ReqMsg(playeri,uid_ability1,lmt_argt_ability,lmt_ability_BadPlace,x,y);
+                                     end;
+                                end;
       end;
       if(uid_FlyLevelLikeTarget)then
         if(not iscomplete)or(transformTimer>0)

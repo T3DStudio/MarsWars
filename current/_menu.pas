@@ -300,7 +300,8 @@ begin
    if(net_ServerListAdd(menu_ClientAddress,false))then
    begin
       net_SvList_sel:=net_SvList_Size-1;
-      net_SvList_scroll:=net_SvList_Size-menu_ServerListH;
+      if((net_SvList_scroll+menu_ServerListH)<=net_SvList_sel)then
+        net_SvList_scroll:=net_SvList_Size-menu_ServerListH;
    end;
 end;
 
@@ -479,16 +480,17 @@ begin
 
    case menu_SettingsPage of
    mi_settings_Game  : begin
+                          menu_Item_Set(mi_SG_PlayerName      ,mtx0,mty0,mtx1,mty0+menu_SmallW,PlayerNameChangeble);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_Language        ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_ColoredShadows  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_PlayersColor    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_ShowAPM         ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_HealthBars      ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_RightClickAction,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_ScrollSpeed     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_MouseScroll     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_PlayerName      ,mtx0,mty0,mtx1,mty0+menu_SmallW,PlayerNameChangeble);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_Language        ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SG_ControlPanelPos ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_PlayersColor    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);
+                          menu_Item_Set(mi_SG_ControlPanelAuto,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                        end;
    mi_settings_Record: begin
                           menu_Item_Set(mi_SR_RecordGames     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
@@ -883,7 +885,7 @@ mi_back                : if(not check)then MenuBack(false,false);
 mi_exit                : if(not check)then GameCycle:=false;
 mi_StartTimer          : if(not check)then if(TestMode=0)
                                            then g_LobbyTimer:=g_GameStartTime
-                                           else g_LobbyTimer:=fr_fps1;
+                                           else g_LobbyTimer:=2;
 mi_StopTimer           : if(not check)then begin
                                            g_LobbyTimer:=0;
                                            GameLog_BreakStarting;
@@ -910,6 +912,7 @@ mi_settings_Sound      : if(not check)then menu_SettingsPage:=item;
 
 // SETTINGS GAME
 mi_SG_ColoredShadows   : if(not check)then ui_ColoredShadow:=not ui_ColoredShadow;
+mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,ui_MaxPlayersColor);
 mi_SG_ShowAPM          : if(not check)then ui_ShowAPM      :=not ui_ShowAPM;
 mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars,true,0,ui_MaxHealthBars);
 mi_SG_RightClickAction : if(not check)then m_RightClickAct :=not m_RightClickAct;
@@ -918,7 +921,7 @@ mi_SG_MouseScroll      : if(not check)then ui_MouseScroll  :=not ui_MouseScroll;
 mi_SG_PlayerName       : ;
 mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;end;
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(true);
-mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,ui_MaxPlayersColor);
+mi_SG_ControlPanelAuto : if(not check)then ui_tab_Auto:=not ui_tab_Auto;
 
 // SETTINGS GAME RECORDING
 
@@ -1242,9 +1245,10 @@ begin
    mmbt_SaveRewrite,
    mmbt_DeleteSave,
    mmbt_DeleteReplay : begin
-                          if(InputActionPressed(iact_MLB))then
-                            if (menu_msg_btn1x0<=mouse_x)and(mouse_x<=menu_msg_btn1x1)
-                            and(menu_msg_btn1y0<=mouse_y)and(mouse_y<=menu_msg_btn1y1)then
+                            if((InputActionPressed(iact_MLB))
+                            and(menu_msg_btn1x0<=mouse_x)and(mouse_x<=menu_msg_btn1x1)
+                            and(menu_msg_btn1y0<=mouse_y)and(mouse_y<=menu_msg_btn1y1))
+                            or(InputActionPressed(iact_Return))then
                             begin
                                case menu_msg_type of
                                mmbt_SaveRewrite : saveload_SaveWrite (menu_msg_Body);

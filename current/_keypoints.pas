@@ -1,5 +1,15 @@
 
 {$IFDEF _FULLGAME}
+procedure effect_KPointExplode(vx,vy,vr:integer);
+begin
+   effect_add(vx,vy,sd_liquidFront+vy,EID_db_u0,true);
+   if(RectInCam(vx,vy,vr,vr,0))then
+   begin
+      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,false),EID_BBExp,true);
+      snd_SoundPlayUnit(snd_explode,nil,nil);
+   end;
+end;
+
 procedure KeyPoints_UpdateVisData;
 var kpi:byte;
 begin
@@ -13,12 +23,13 @@ begin
      end;
 end;
 
-procedure KeyPoints_Explode(kpi:byte);
+procedure KeyPoints_Explode(kpi:byte;force:boolean=false);
 begin
    with map_KeyPointsL[kpi] do
      with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
-       if(kptd_Active)and(kptd_VisTimer>0)then
-         effect_KPointExplode(kp_x,kp_y);
+       if(kptd_VisTimer>0)then
+         if(kptd_Active or force)then
+           effect_KPointExplode(kp_x,kp_y,kp_RCapture);
 end;
 
 {$ENDIF}
@@ -75,26 +86,33 @@ end;
 
 procedure Scenario_KeyPointsTeam;
 var
-i,p  :byte;
+kpi,p:byte;
 pkptv:PTKeyPointTeamData;
 begin
-   for i:=0 to LastKeyPoint do
-     with map_KeyPointsL[i] do
+   for kpi:=0 to LastKeyPoint do
+     with map_KeyPointsL[kpi] do
      begin
         pkptv:=@kp_TeamData[MaxPlayers];
         for p:=0 to LastPlayer do
           with kp_TeamData[p] do
-            if(kptd_VisTimer>0)then
-            begin
-               kptd_VisTimer-=1;
-               kptd_Active          :=pkptv^.kptd_Active;
-               kptd_TimerOwnerTeam  :=pkptv^.kptd_TimerOwnerTeam;
-               kptd_TimerOwnerPlayer:=pkptv^.kptd_TimerOwnerPlayer;
-               kptd_OwnerPlayer     :=pkptv^.kptd_OwnerPlayer;
-               kptd_OwnerTeam       :=pkptv^.kptd_OwnerTeam;
-               kptd_Timer           :=pkptv^.kptd_Timer;
-               kptd_lifeTime        :=pkptv^.kptd_lifeTime;
-            end;
+          begin
+             if((map_scenario=mc_koth     )and(kpi=0))
+             or((map_scenario=mc_KeyPoints)and(kpi<keyPoint_mcN))
+          // or(no fog)
+             then kptd_VisTimer:=MinVisionTime;
+
+             if(kptd_VisTimer>0)then
+             begin
+                kptd_VisTimer-=1;
+                kptd_Active          :=pkptv^.kptd_Active;
+                kptd_TimerOwnerTeam  :=pkptv^.kptd_TimerOwnerTeam;
+                kptd_TimerOwnerPlayer:=pkptv^.kptd_TimerOwnerPlayer;
+                kptd_OwnerPlayer     :=pkptv^.kptd_OwnerPlayer;
+                kptd_OwnerTeam       :=pkptv^.kptd_OwnerTeam;
+                kptd_Timer           :=pkptv^.kptd_Timer;
+                kptd_lifeTime        :=pkptv^.kptd_lifeTime;
+             end;
+          end;
      end;
 end;
 
@@ -113,7 +131,13 @@ begin
      with kp_TeamData[MaxPlayers] do
        if(kptd_Active)then
        begin
-          if(map_scenario=mc_royale)and(g_royal_r<kp_ToCenterD)then kptd_Active:=false;
+          if(map_scenario=mc_royale)and(g_royal_r<kp_ToCenterD)then
+          begin
+             kptd_Active:=false;
+             for p:=0 to LastPlayer do
+               with kp_TeamData[p] do
+                 kptd_VisTimer:=kptd_VisTimer.MaxValue;
+          end;
           if(kptd_lifeTime>0)and(kptd_OwnerPlayer<=LastPlayer)then
           begin
              kptd_lifeTime-=1;
@@ -125,7 +149,7 @@ begin
              GameLog_NgenExh(kptd_OwnerPlayer,i);
              KeyPoint_ChangeOwner(i,255,false);
              {$IFDEF _FULLGAME}
-             KeyPoints_Explode(i);
+             KeyPoints_Explode(i,true);
              {$ENDIF}
              continue;
           end;
@@ -134,6 +158,12 @@ begin
           tCapturingPlayer:=kptd_OwnerPlayer;
           kp_LimitPlayerP :=kp_LimitPlayerC;
           kp_LimitTeamP   :=kp_LimitTeamC;
+          if(kptd_OwnerPlayer<=LastPlayer)then
+            if(kp_LimitPlayerC[kptd_OwnerPlayer]>0)then
+            begin
+               tPlayers:=1;
+               tCapturingPlayer:=kptd_OwnerPlayer;
+            end;
           if(kptd_TimerOwnerPlayer<=LastPlayer)then
             if(kp_LimitPlayerC[kptd_TimerOwnerPlayer]>0)then
             begin
@@ -144,7 +174,7 @@ begin
           tTeams:=0;
           for p:=0 to LastPlayer do
           begin
-             if(kp_LimitPlayerC[p]>0)and(p<>kptd_TimerOwnerPlayer)then
+             if(kp_LimitPlayerC[p]>0)and(p<>kptd_OwnerPlayer)and(p<>kptd_TimerOwnerPlayer)then
              begin
                 if(tPlayers=0)then tCapturingPlayer:=p;
                 tPlayers+=1;

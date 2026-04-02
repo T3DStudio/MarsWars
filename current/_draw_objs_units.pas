@@ -320,7 +320,7 @@ begin
       if(iscomplete)then
       begin
          // building area and possible buildings for UI
-         if(uid_isbuilder)and(not isfly)then
+         if(uid_isbuilder)and(not isfly)and(zfall=0)then
            if(units_builders_s=0)or(isselected)then
              ui_bprod_possible+=uid_prod_Buildings;
 
@@ -600,7 +600,7 @@ spr_depth,
 spr_alphab,
 spr_alpha,t: integer;
 ColorShadow,
-ColorAura  : cardinal;
+ColorAura  : TMWColor;
 begin
    with pu^     do
    with uid^    do

@@ -4,7 +4,7 @@
 //  COMMON DRAW PROCEDURES
 //
 
-procedure draw_LoadingScreen(load_str:pshortstring;color:cardinal);
+procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);
 begin
    SDL_FillRect(vid_screen,nil,0);
    stringColor(vid_screen,(vid_vw div 2)-(length(load_str^)*font_w1 div 2), vid_vh div 2,@(load_str^[1]),color);
@@ -32,7 +32,7 @@ begin
    end;
 end;
 
-procedure draw_rectw(tar:pSDL_Surface;x0,y0,x1,y1,border,borderSkip:integer;color:cardinal);
+procedure draw_rectw(tar:pSDL_Surface;x0,y0,x1,y1,border,borderSkip:integer;color:TMWColor);
 begin
    while(border<>0)do
    begin
@@ -45,7 +45,7 @@ begin
    end;
 end;
 
-procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:cardinal;lastLineY:pinteger=nil;EdgeY:integer=integer.MaxValue);
+procedure draw_text(sur:pSDL_Surface;x,y:integer;str:shortstring;alignment,MaxLineChars:byte;BaseColor:TMWColor;lastLineY:pinteger=nil;EdgeY:integer=integer.MaxValue);
 var
 strLen,i,
 lines_n,
@@ -53,7 +53,7 @@ line      : byte;
 textH,textW,
 ix        : integer;
 charc     : char;
-color     : cardinal;
+color     : TMWColor;
 lines_spos,
 lines_epos,
 lines_endc,
@@ -157,7 +157,7 @@ begin
    if(lastLineY<>nil)then lastLineY^:=y;
 end;
 
-procedure draw_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;talign,tlength:byte;str:shortstring;color:cardinal;lastLineY:pinteger=nil);
+procedure draw_timer(tar:pSDL_Surface;x,y:integer;time:cardinal;talign,tlength:byte;str:shortstring;color:TMWColor;lastLineY:pinteger=nil);
 var m,s,h:cardinal;
     hs,ms,ss:shortstring;
 begin

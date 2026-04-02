@@ -850,43 +850,43 @@ var ENRG,
     INFO:shortstring;
     i   :byte;
 begin
-  with g_upgrs[upid] do
-  begin
-     ENRG:='';
-     TIME:='';
-     INFO:='';
+   with g_upgrs[upid] do
+   begin
+      ENRG:='';
+      TIME:='';
+      INFO:='';
 
-     if(upgr_max<=1)
-     then curlvl:=1
-     else
-       if(curlvl>upgr_max)and(curlvl<255)then curlvl:=upgr_max;
+      if(upgr_max<=1)
+      then curlvl:=1
+      else
+        if(curlvl>upgr_max)and(curlvl<255)then curlvl:=upgr_max;
 
-     if(upgr_renerg>0)then
-       if(curlvl<255)
-       then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
-       else
-         if(upgr_max>0)then
-         begin
-            for i:=1 to upgr_max do STRADD(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
-            ENRG:=tc_aqua+ENRG+tc_default;
-         end;
-     if(upgr_time  >0)then
-       if(curlvl<255)
-       then TIME:=tc_white+i2s(GetUpgradeTime(upid,curlvl)div fr_fps1)+tc_default
-       else
-         if(upgr_max>0)then
-         begin
-            for i:=1 to upgr_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
-            TIME:=tc_white+TIME+tc_default;
-         end;
-     if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
-     if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
-     STRADD(@INFO,tc_orange+'x'+i2s(upgr_max)+tc_default,sep_comma);
+      if(upgr_renerg>0)then
+        if(curlvl<255)
+        then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
+        else
+          if(upgr_max>0)then
+          begin
+             for i:=1 to upgr_max do STRADD(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
+             ENRG:=tc_aqua+ENRG+tc_default;
+          end;
+      if(upgr_time  >0)then
+        if(curlvl<255)
+        then TIME:=tc_white+i2s(GetUpgradeTime(upid,curlvl)div fr_fps1)+tc_default
+        else
+          if(upgr_max>0)then
+          begin
+             for i:=1 to upgr_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
+             TIME:=tc_white+TIME+tc_default;
+          end;
+      if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
+      if(length(TIME)>0)then STRADD(@INFO,TIME,sep_comma);
+      STRADD(@INFO,tc_orange+'x'+i2s(upgr_max)+tc_default,sep_comma);
 
-     if(length(INFO)>0)
-     then str_UpgradeCost:='('+INFO+')'
-     else str_UpgradeCost:='';
-  end;
+      if(length(INFO)>0)
+      then str_UpgradeCost:='('+INFO+')'
+      else str_UpgradeCost:='';
+   end;
 end;
 
 function str_AbilityHotKey(aid,uipos:byte):shortstring;

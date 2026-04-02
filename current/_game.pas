@@ -139,6 +139,8 @@ end;
 procedure PlayersSetDefault;
 var p:byte;
 begin
+   FillChar(ai_TeamAlarms,SizeOf(ai_TeamAlarms),0);
+
    FillChar(g_gplayers,SizeOf(TPList    ),0);
    FillChar(g_nplayers,SizeOf(g_nplayers),0);
    for p:=0 to LastPlayer do
@@ -149,6 +151,9 @@ begin
         PlayerSetSkirmishTech(p);
         PlayerClearLog(p);
         log_EnergyCheckTimer:=0;
+
+        //res_HellPower:=30000;
+        //res_UACLoot  :=30000;
      end;
 
    {$IFDEF _FULLGAME}
@@ -539,6 +544,22 @@ begin
    ui_GameControlsEnabled:=true;
 end;
 
+procedure ui_Commander2Tab;
+begin
+   if(ui_CommandercPU<>nil)then
+     with ui_CommandercPU^ do
+     with uid^ do
+       if(uid_isbuilder)
+       then ui_tab:=0
+       else
+         if(uid_isbarrack)
+         then ui_tab:=1
+         else
+           if(uid_isforge)
+           then ui_tab:=2
+           else ui_tab:=3;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   UNIT SELECTION
@@ -602,6 +623,8 @@ begin
              ui_CommanderSet(g_punits[u]);
           end;
        end;
+
+   if(ui_tab_Auto)then ui_Commander2Tab;
 end;
 procedure units_SelectGroup(add:boolean;fgroup:byte);
 var u:integer;
@@ -638,6 +661,7 @@ begin
              ui_CommanderSet(g_punits[u]);
           end;
        end;
+   if(ui_tab_Auto)then ui_Commander2Tab;
 end;
 procedure units_Grouping(add:boolean;fgroup:byte);
 var u:integer;
@@ -775,7 +799,7 @@ begin
    if(o_id>0)and(units_all_e>0)then
    begin
       case o_id of
-      uo_build   : if(o_a0>0)then GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit,unit_start_build(o_x0,o_y0,o_a0,tPlayer),-1,-1);
+      uo_build   : if(o_a0>0)then GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit,unit_start_build(o_x0,o_y0,o_a0,tPlayer),-1,-1);
       uo_corder  : begin
                       tar_d :=tar_d.MaxValue;
                       tar_u :=nil;
@@ -823,27 +847,27 @@ begin
                       if(tar_u<>nil)then
                         with tar_u^ do
                           case o_x0 of
-                          co_supgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0           ,false),x,y);
-                          co_cupgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y);
-                          co_sunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0           ,false),x,y);
-                          co_cunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
+                          co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0           ,false),x,y);
+                          co_cupgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y);
+                          co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0           ,false),x,y);
+                          co_cunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
 
                           co_pcancle :
                                     if(not iscomplete)then unit_kill(tar_u,false,false,true,false,true) else
-                                    if(GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_TransformStop   (tar_u,false                ),x,y))then
-                                    if(GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y))then
-                                       GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
+                                    if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_TransformStop   (tar_u,false                ),x,y))then
+                                    if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y))then
+                                       GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
                           co_ability :
-                                if(not GameLog_ReqBits(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false           ),x,y))then
+                                if(not GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false           ),x,y))then
                                   unit_SetAbilityOrder(tar_u,o_a0,o_y0,o_x1,o_y1,false);
                           end
                       else
                         case o_x0 of
                         co_supgrade,
-                        co_cupgrade: GameLog_ReqBits(tPlayer,o_a0,lmt_argt_upgrade,ureq_forges  ,-1,-1);
+                        co_cupgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_NeedProdUnit ,-1,-1);
                         co_sunit,
-                        co_cunit   : GameLog_ReqBits(tPlayer,o_a0,lmt_argt_unit   ,ureq_barracks,-1,-1);
-                        co_pcancle : GameLog_ReqBits(tPlayer,0   ,255             ,ureq_other   ,-1,-1);
+                        co_cunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_NeedProdUnit ,-1,-1);
+                        co_pcancle : GameLog_ReqMsg(tPlayer,0   ,255             ,lmt_Invalid_Order,-1,-1);
                         co_ability : ;
                         end;
                    end;
@@ -910,7 +934,7 @@ begin
              game_PlayerExecuteOrder(p);
 
              if(state=ps_AI)
-             then //ai_player_code(p)
+             then ai_player_code(p)
              else
                if(log_EnergyCheckTimer>0)
                then log_EnergyCheckTimer-=1
@@ -1316,6 +1340,8 @@ begin
    begin
       g_cycle_order+=1;g_cycle_order:=g_cycle_order mod order_period;
       g_cycle_regen+=1;g_cycle_regen:=g_cycle_regen mod regen_period;
+
+      if(map_scenario=mc_KeyPoints)then map_KeyPoints_UpdatePos;
 
       {$IFDEF _FULLGAME}
       if(ServerSide)then

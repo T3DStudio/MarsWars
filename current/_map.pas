@@ -153,6 +153,7 @@ begin
 
    map_Size1       := mm3i(map_MinSize,map_Size1,map_MaxSize);
    map_Sizeh       := map_Size1 div 2;
+   map_SizeKPCR    := map_Sizeh-(map_Sizeh div 3);
    case map_symmetry of
    maps_lineV: if((map_seed mod 2)=0)
                then map_SymmetryDir:=90
@@ -302,6 +303,44 @@ begin
        kp_Zone:=map_GetZone(kp_x,kp_y,kp_RCapture);
 end;
 
+procedure map_KeyPoints_UpdatePos;
+var
+kpi  :byte;
+cx,cy:integer;
+cdir,
+odir :single;
+function circleI(i,m:integer):integer;
+begin
+   if(i<0)
+   then circleI:=-i mod m
+   else
+     if(i>m)
+     then circleI:=m-(i mod m)
+     else circleI:=i;
+end;
+begin
+   cdir:=(g_tick mod 102000)/200+(map_seed mod 360);
+   cx  :=map_sizeH+round(map_SizeKPCR*cos(cdir*DEGTORAD));
+   cy  :=map_sizeH+round(map_SizeKPCR*sin(cdir*DEGTORAD));
+   odir:=(g_tick mod 112000)/300;
+   for kpi:=0 to keyPoint_mcN-1 do
+     with map_KeyPointsL[kpi] do
+     begin
+        odir+=keyPoint_mcDirStep;
+        kp_x   :=circleI(cx+round(map_SizeKPCR*cos(odir*DEGTORAD)),map_size1);
+        kp_y   :=circleI(cy-round(map_SizeKPCR*sin(odir*DEGTORAD)),map_size1);
+        kp_Zone:=map_GetZone(kp_x,kp_y,kp_RCapture);
+        {$IFDEF _FULLGAME}
+        with map_KeyPointsVis[kpi] do
+        begin
+           kpmmx:=round(map_MiniMap_cx*kp_x);
+           kpmmy:=round(map_MiniMap_cx*kp_y);
+           kpmmr:=round(map_MiniMap_cx*kp_RCapture);
+        end;
+        {$ENDIF}
+     end;
+end;
+
 procedure map_KeyPoints_UpdateTeamData;
 var
 kpi,t:byte;
@@ -356,16 +395,18 @@ begin
      end;
 end;
 
-procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal;defaultOnFail:boolean=false);
 const max_attempts = 500;
 var
 ix,iy,
 sx,sy,
 u,b,
+success,
 attempts:integer;
 begin
    u:=map_Size1 div 50;
    b:=map_Size1-(u*2);
+   success:=0;
 
    while(acount>0)do
    begin
@@ -406,9 +447,21 @@ begin
          if(sx<>NOTSET)then
          if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
 
+         if(map_Symmetry>maps_none)
+         then success+=2
+         else success+=1;
          break;
       end;
    end;
+
+   if(defaultOnFail)then
+     if(success<2)then
+     begin
+        map_KeyPoints_Add(map_SizeH,0        ,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+        map_KeyPoints_Add(map_SizeH,map_Size1,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+        map_KeyPoints_Add(0        ,map_SizeH,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+        map_KeyPoints_Add(map_Size1,map_SizeH,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+     end;
 end;
 
 procedure map_KeyPoints_AddAtStarts(aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
@@ -432,12 +485,16 @@ begin
 end;
 
 procedure map_KeyPoints_Create;
+var i:byte;
 begin
    KeyPoints_Clear;
 
    case map_scenario of
-mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,base_r1,0,0,keyPoint_CaptTime_KotH,0);
-mc_KeyPoints: map_KeyPoints_Random(4,keyPoint_DefR,base_r1,0,keyPoint_CaptTime_Def,0);
+mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_KotR,0,0,keyPoint_CaptTime_KotH,0);
+mc_KeyPoints: begin
+                 for i:=1 to keyPoint_mcN do map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_DefR,0,0,keyPoint_CaptTime_Def,0);
+                 map_KeyPoints_UpdatePos;
+              end;
    end;
 
    if(map_generators>0)then

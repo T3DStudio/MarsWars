@@ -39,6 +39,9 @@ g_random_i        : word    = 0;
 g_random_p        : byte    = 0;
 
 g_LobbyTimer      : integer = 0;
+                  // [team,alarmN]
+ai_TeamAlarms     : array[0..LastPlayer,0..ai_LastAlarm] of TAIAlarm;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -50,6 +53,7 @@ map_generators    : byte     = 0;
 map_seed          : cardinal = 1;
 map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
+map_SizeKPCR      : integer  = 100;
 map_ObstaclesS    : byte     = 1;
 map_ObstaclesGap  : integer  = 40;
 map_PStartsGap    : integer  = base_r1;
@@ -80,7 +84,7 @@ net_ServerPort    : word = 10666;
 net_TimerBase     : byte = 0;
 net_svLanAdv      : boolean = true;
 net_svLanAdv_timer: integer = 0;
-net_TimerPing    : integer = 0;
+net_TimerPing     : integer = 0;
 net_wudata_t      : TWUDataTime;
 net_kpoints_kpi   : byte = 0;
 net_socket        : PUDPSocket;
@@ -203,7 +207,7 @@ ui_blink2_colorb  : boolean;
 ui_blink1_color_BG,
 ui_blink1_color_BY,
 ui_blink2_color_BG,
-ui_blink2_color_BY: cardinal;
+ui_blink2_color_BY: TMWColor;
 ui_blink3         : byte;
 ui_mm_ScanBlink   : boolean = false;
 
@@ -265,6 +269,7 @@ ui_fog_ex         : integer = 0;
 ui_fog_ey         : integer = 0;
 
 ui_language       : boolean = false;
+ui_tab_Auto       : boolean = true;
 
 ui_CommandercPU   : PTUnit = nil;
 ui_CommandercD    : integer = 0;
@@ -281,7 +286,7 @@ ui_panel_PTabIActs: array[0..ui_ButtonsNum] of byte;
 ui_mc_x,                                                 //
 ui_mc_y,                                                 // mouse click effect
 ui_mc_a           : integer;                             //
-ui_mc_c           : cardinal;                            //
+ui_mc_c           : TMWColor;                            //
 
 ui_uprod_max,
 ui_uprod_cur,
@@ -315,7 +320,7 @@ ui_max_color,                                       // unit max count color
 ui_cenergy,                                         // energy limit colors
 ui_limit,                                           // unit limit colors
 ui_blink_color2,
-ui_blink_color1   : array[false..true] of cardinal;
+ui_blink_color1   : array[false..true] of TMWColor;
 
 ui_group_d        : array[0..MaxUnitGroups] of TUnitGroup;
 ui_group_f1       : TUnitGroup;
@@ -362,7 +367,7 @@ ui_log_LineLen    : byte = 0;
 ui_log_ListSize   : integer = 0;
 ui_log_lines      : array of shortstring;
 ui_log_type       : array of byte;
-ui_log_color      : array of cardinal;
+ui_log_color      : array of TMWColor;
 ui_log_n          : integer = 0;
 ui_log_LastTimer  : integer = 0;
 
@@ -542,7 +547,7 @@ mouse_map_x,
 mouse_map_y,
 mouse_x,
 mouse_y           : integer;
-m_brushc          : cardinal;
+m_brushc          : TMWColor;
 m_brushx,
 m_brushy,
 m_brush           : integer;
@@ -577,7 +582,6 @@ c_aorange,
 c_brown,
 c_yellow,
 c_dyellow,
-
 c_lime,
 c_alime,
 c_green,
@@ -594,13 +598,13 @@ c_ablack,
 c_mablack,
 c_purple,
 c_violet,
-c_black           : cardinal;
+c_black           : TMWColor;
 
 PlayerColorsDefault,
 PlayerColorsCurrent,
-PlayerColorsShadow : array[0..LastPlayer] of cardinal;
-PlayerColorDefaultCurrent: cardinal = 0;
-PlayerColorDefaultShadow : cardinal = 0;
+PlayerColorsShadow : array[0..LastPlayer] of TMWColor;
+PlayerColorDefaultCurrent: TMWColor = 0;
+PlayerColorDefaultShadow : TMWColor = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -612,7 +616,7 @@ theme_i              : integer = 0;
 
 theme_liquid_animStyle: TThemeAnimStyle;
 theme_liquid_animTime : byte;
-theme_liquid_color    : cardinal = 0;
+theme_liquid_color    : TMWColor = 0;
 
 theme_liquid_style,
 theme_crater_style   : TThemeCircleStyle;
@@ -660,7 +664,7 @@ theme_obstacles_Anims   : TThemeObstacleAnimL;
 
 theme_liquids_AnimStyle : array of TThemeAnimStyle;
 theme_liquids_AnimTime  : array of byte;
-theme_liquids_MMColor   : array of cardinal;
+theme_liquids_MMColor   : array of TMWColor;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1036,6 +1040,7 @@ str_SG_RightClickAct,
 str_SG_ScrollSpeed,
 str_SG_MouseScroll,
 str_SG_ShowAPM,
+str_SG_ControlPanelAuto,
 
 str_SR_RecordGames,
 str_SR_ReplayPrefix,

@@ -1084,7 +1084,7 @@ uab_ToHSymbol4       : ua_mbrush_r:=-UID_HSymbol4;
 uab_ToHACommandCenter: ua_mbrush_r:=-UID_HACommandCenter;
 
 uab_ToHGate          : ua_mbrush_r:=-UID_HGate;
-uab_ToHPool          : ua_mbrush_r:=-UID_HPools;
+uab_ToHPools         : ua_mbrush_r:=-UID_HPools;
 uab_ToHBarracks      : ua_mbrush_r:=-UID_HBarracks;
 
 uab_ToUACommandCenter: ua_mbrush_r:=-UID_UACommandCenter;
@@ -1111,7 +1111,7 @@ uab_ToHSymbol3,
 uab_ToHSymbol4,
 uab_ToHACommandCenter,
 uab_ToHGate,
-uab_ToHPool,
+uab_ToHPools,
 uab_ToHBarracks,
 uab_ToUACommandCenter,
 uab_ToUGenerator2,

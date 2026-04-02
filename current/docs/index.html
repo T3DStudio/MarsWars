@@ -657,8 +657,8 @@ Center,Advanced Hell Command Center
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Hell Knight,Baron of Hell], base impact 
-<font color="FF0000">67</font>*2, upgrade: "Hell Firepower"(+7), factor: x2 
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>] except [Hell Knight,Baron of Hell], base 
+impact <font color="FF0000">67</font>*2, upgrade: "Hell Firepower"(+7), factor: x2 
 [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
 <br><br>
 <br>Upgrades:
@@ -773,9 +773,9 @@ Center,Advanced Hell Command Center
 There must be at least one Hell unit allied with you 
 around the point target.
 <br>Ground-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
-<br>- Hell Vision: The Evil Eye sacrifices itself to give 
-allied target ability to detect invisible units for 8 
-seconds.
+<br><font color="FFFF00">Requirements: </font>Great Hell Keep
+<br>- Hell Vision: Gives allied target ability to detect 
+invisible units for 8 seconds.
 <br>Own&ally-unit-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
 <br><font color="FFFF00">Requirements: </font>Great Hell Keep
 <br> 
@@ -1434,8 +1434,9 @@ Vile], base impact *2, {<font color="FFFF00">Req.: </font>upgrade "Resurrection"
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">225</font>*1, splash damage radius: 40, 
-upgrade: "Demon`s Weapons"(+7), factor: x4 [<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>] except [Cyberdemon], base impact <font color="FF0000">225</font>*1, splash 
+damage radius: 40, upgrade: "Demon`s Weapons"(+7), 
+factor: x4 [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-building range: +50
 <br><br>
 <br>Upgrades:
@@ -2248,10 +2249,6 @@ abilities
 <br>- Armor: "Concrete Walls"(+18)
 <br><br>
 <br>Abilities: 
-<br>- Pretorian Equipment: Valid targets: non-heroic allied 
-UAC units. Makes the target "heroic", that doubles its 
-damage and armor.
-<br>Own&ally-unit-targeted. UAC Loot required: <font color="00FF00">6000</font>.
 <br>- Bribe: Valid targets: non-heroic enemy UAC units. 
 Turns the target to your side. There must be at least 
 one UAC unit allied with you around the target.
@@ -2260,6 +2257,10 @@ one UAC unit allied with you around the target.
 buildings. Turns the target to your side. There must be 
 at least one UAC unit allied with you around the target.
 <br>Enemy-unit-targeted. UAC Loot required: <font color="00FF00">10000</font>.
+<br>- Pretorian Equipment: Valid targets: non-heroic allied 
+UAC units. Makes the target "heroic", that doubles its 
+damage and armor.
+<br>Own&ally-unit-targeted. UAC Loot required: <font color="00FF00">15000</font>.
 <br> 
 </td></tr>
 <tr><td align="center">
@@ -3132,14 +3133,12 @@ Slime Tower<br>
 <img src="imgs\unitBTN23.bmp">
 <img src="imgs\unitBTN24.bmp">
 <img src="imgs\unitBTN25.bmp">
-<img src="imgs\unitBTN31.bmp">
 <img src="imgs\unitBTN36.bmp">
 <img src="imgs\unitBTN37.bmp">
 <img src="imgs\unitBTN38.bmp">
 <img src="imgs\unitBTN39.bmp">
 <img src="imgs\unitBTN40.bmp">
 <img src="imgs\unitBTN42.bmp">
-<img src="imgs\unitBTN44.bmp">
 <img src="imgs\unitBTN45.bmp">
 <img src="imgs\unitBTN80.bmp">
 <img src="imgs\unitBTN81.bmp">
@@ -3147,7 +3146,6 @@ Slime Tower<br>
 <img src="imgs\unitBTN83.bmp">
 <img src="imgs\unitBTN84.bmp">
 <img src="imgs\unitBTN88.bmp">
-<img src="imgs\unitBTN89.bmp">
 <img src="imgs\unitBTN90.bmp">
 <br><br>
 <font color="FF0000">Bad against</font>:
@@ -3158,12 +3156,17 @@ Slime Tower<br>
 <img src="imgs\unitBTN43.bmp">
 <img src="imgs\unitBTN86.bmp">
 <img src="imgs\unitBTN92.bmp">
-<img src="imgs\unitBTN93.bmp">
 <br><br>
 <font color="787878">Useless against</font>:
 <br>
+<img src="imgs\unitBTN27.bmp">
 <img src="imgs\unitBTN28.bmp">
 <img src="imgs\unitBTN29.bmp">
+<img src="imgs\unitBTN31.bmp">
+<img src="imgs\unitBTN44.bmp">
+<img src="imgs\unitBTN87.bmp">
+<img src="imgs\unitBTN89.bmp">
+<img src="imgs\unitBTN93.bmp">
 <br><br>
 </td></tr>
 <tr><td align="center">
@@ -3610,7 +3613,6 @@ Pain Elemental<br>
 <font color="FF0000">Bad against</font>:
 <br>
 <img src="imgs\unitBTN12.bmp">
-<img src="imgs\unitBTN13.bmp">
 <img src="imgs\unitBTN14.bmp">
 <img src="imgs\unitBTN19.bmp">
 <img src="imgs\unitBTN20.bmp">
@@ -3832,6 +3834,7 @@ Cyberdemon<br>
 <br><br>
 <font color="787878">Useless against</font>:
 <br>
+<img src="imgs\unitBTN35.bmp">
 <br><br>
 </td></tr>
 <tr><td align="center">
@@ -4195,7 +4198,6 @@ Zombie Plasmaguner<br>
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
-<img src="imgs\unitBTN13.bmp">
 <img src="imgs\unitBTN30.bmp">
 <img src="imgs\unitBTN41.bmp">
 <img src="imgs\unitBTN42.bmp">

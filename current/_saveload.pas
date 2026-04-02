@@ -184,6 +184,8 @@ begin
    AddItem(@g_status            ,SizeOf(g_status           ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));
    AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen      ));
+   AddItem(@ai_TeamAlarms       ,SizeOf(ai_TeamAlarms      ));
+   AddItem(@map_KeyPointsN      ,SizeOf(map_KeyPointsN     ));
    AddItem(@map_KeyPointsL      ,SizeOf(map_KeyPointsL     ));
    AddItem(@map_ObstaclesL      ,SizeOf(map_ObstaclesL     ));
    AddItem(@map_PlayerStartX    ,SizeOf(map_PlayerStartX   ));
