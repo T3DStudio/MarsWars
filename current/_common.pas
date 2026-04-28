@@ -1189,7 +1189,7 @@ begin
                             and((armylimit+prod_unit_Limit+uid_LimitUse)<=MaxPlayerLimit);
 end;
 
-function CheckUnitReqs(player:PTPlayerGameData;uid:byte):byte;
+function CheckUnitReqs(player:PTPlayerGameData;uid:byte;checkExtraEnergy:integer=0):byte;
 begin
    CheckUnitReqs:=0;
    with player^ do
@@ -1220,7 +1220,7 @@ false : if(units_unitProds_ec<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit
       if(res_HellPower<uid_req_HellPower)then begin CheckUnitReqs:=lmt_Req_HellPower;exit;end;
       if(res_UACLoot  <uid_req_UACLoot  )then begin CheckUnitReqs:=lmt_Req_UACLoot;exit;end;
 
-      if(res_energyl_cur<uid_req_EnergyLevel)
+      if(res_energyl_cur<(uid_req_EnergyLevel+checkExtraEnergy))
       or(uid_isbuilding and(res_energyl_max<=0))then
       begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
    end;

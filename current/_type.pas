@@ -751,7 +751,8 @@ TPlayerGameData = record
    aip_MaxDetectors,
    aip_MinTowers,
    aip_MaxTowers       : integer;
-   aip_MaxArmyLimit
+   aip_MaxArmyLimit,
+   aip_MaxArmyMinPart
                        : longint;
    aip_MaxUpgradeLevel
                        : byte;

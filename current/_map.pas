@@ -151,9 +151,9 @@ procedure map_BaseVars;
 begin
    map_Seed2RandomBase;
 
-   map_Size1       := mm3i(map_MinSize,map_Size1,map_MaxSize);
-   map_Sizeh       := map_Size1 div 2;
-   map_SizeKPCR    := map_Sizeh-(map_Sizeh div 3);
+   map_Size1   := mm3i(map_MinSize,map_Size1,map_MaxSize);
+   map_Sizeh   := map_Size1 div 2;
+   map_SizeKPCR:= map_Sizeh-(map_Sizeh div 3);
    case map_symmetry of
    maps_lineV: if((map_seed mod 2)=0)
                then map_SymmetryDir:=90
@@ -288,6 +288,16 @@ begin
             map_RObstaclePointIn:=o_rO;
             break;
          end;
+end;
+
+function map_IsObstacleTouchEdges(x,y,rO:integer):byte;
+begin
+   map_IsObstacleTouchEdges:=0;
+
+   if((x-rO)<=0)then map_IsObstacleTouchEdges+=1;
+   if((y-rO)<=0)then map_IsObstacleTouchEdges+=1;
+   if((x+rO)>=map_Size1)then map_IsObstacleTouchEdges+=1;
+   if((y+rO)>=map_Size1)then map_IsObstacleTouchEdges+=1;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -732,6 +742,9 @@ end;
 procedure map_Obstacles_Create;
 const attempts_max = 3;
 var
+noSmallObs_x,
+noSmallObs_y,
+noSmallObs_d,
 n_obstacles,
 obs_f,
 irO,
@@ -764,6 +777,16 @@ begin
            sx:=NOTSET;
            sy:=NOTSET;
         end;
+
+      if(map_IsObstacleTouchEdges(ix,iy,irO+map_ObstaclesGap)>1)then continue;
+
+      if(irO<200)then
+      begin
+         if(point_dist_int(noSmallObs_x,noSmallObs_y,ix,iy)<noSmallObs_d)then continue;
+         if(sx<>NOTSET)then
+         if(point_dist_int(noSmallObs_x,noSmallObs_y,sx,sy)<noSmallObs_d)then continue;
+      end;
+
 
       irI:=0;
       dR:=map_RObstaclePointIn(ix,iy);
@@ -802,6 +825,10 @@ begin
         oc_n:=0;
         setlength(oc_l,oc_n);
      end;
+
+   noSmallObs_x:=g_random(map_Size1);
+   noSmallObs_y:=g_random(map_Size1);
+   noSmallObs_d:=g_random(map_Size1 div 4);
 
    n_obstacles:=trunc(MaxObstacles*map_Size1/map_MaxSize);
 

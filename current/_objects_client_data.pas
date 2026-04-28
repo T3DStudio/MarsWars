@@ -1098,8 +1098,8 @@ uab_ToUBarracks      : ua_mbrush_r:=-UID_UBarracks;
 uab_ToUFactory       : ua_mbrush_r:=-UID_UFactory;
 uab_ToUWeaponFactory : ua_mbrush_r:=-UID_UWeaponFactory;
 
-uab_URadarLvlUp      : ua_mbrush_r:=-UID_URadar;
-uab_URMStationLvlUp  : ua_mbrush_r:=-UID_URMStation;
+uab_LvlUpURadar      : ua_mbrush_r:=-UID_URadar;
+uab_LvlUpURMStation  : ua_mbrush_r:=-UID_URMStation;
       end;
 
       case a of

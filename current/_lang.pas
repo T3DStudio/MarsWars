@@ -562,8 +562,8 @@ begin
    str_SetAbilityBaseHint(uab_ToUBarracks        ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUFactory         ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUWeaponFactory   ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_URadarLvlUp        ,t1+'"Radar"'               ,'Upgrades the Radar to lower its ability reload time');
-   str_SetAbilityBaseHint(uab_URMStationLvlUp    ,t1+'"Rocket Launcher Station"','Upgrades the Rocket Launcher Station to lower its ability reload time');
+   str_SetAbilityBaseHint(uab_LvlUpURadar        ,t1+'"Radar"'               ,'Upgrades the Radar to lower its ability reload time');
+   str_SetAbilityBaseHint(uab_LvlUpURMStation    ,t1+'"Rocket Launcher Station"','Upgrades the Rocket Launcher Station to lower its ability reload time');
 
 
    /////////////////////////////////////////////////////////////////////////////
@@ -775,6 +775,7 @@ begin
    for i in [mi_SR_RecordGames..mi_SR_RecordQuality   ] do menu_set_hint(i,mi_SR_RecordGames,'');
    for i in [mi_SV_ResolutionW..mi_SV_SmoothScaled    ] do menu_set_hint(i,mi_SV_ResolutionW,'');
    for i in [mi_SS_SoundVolume..mi_SS_ReloadPlaylist  ] do menu_set_hint(i,mi_SS_SoundVolume,'');
+   for i in [mi_help_Credits  ..mi_help_Other         ] do menu_set_hint(i,mi_help_Credits  ,'');
 
    // PLAYERS
    for i:=mi_Players_AIskil0 to mi_Players_AIskil7 do menu_set_hint(i,mi_Players_Panel,': change AI skill'     );

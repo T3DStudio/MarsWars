@@ -915,7 +915,7 @@ begin
                   if(pu^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
                     case uidi of
                     UID_URadar    : effect_ScanSound(cu);
-                    UID_URMStation: unit_UACStrike_missile(cu);
+                    UID_URMStation: ability_UACStrike_missile(cu);
                     UID_Pain      : if(upgrs_cur[upgr_hell_Phantoms]>0)
                                      then unit_ArmSpawnUnit(pu,UID_Phantom )
                                      else unit_ArmSpawnUnit(pu,UID_LostSoul);

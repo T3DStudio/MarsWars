@@ -717,9 +717,9 @@ UpgradeArmorBonus1     = 7;
 UpgradeUnitArmorBonus  = UpgradeArmorBonus1;
 UpgradeBuildArmorBonus = UpgradeArmorBonus1*2+round(UpgradeArmorBonus1/2);
 
-BaseHeal1              = BaseRegen1*2;
+BaseHeal1              = BaseRegen1*6;
 BaseHealBonus1         = BaseHeal1 div 2;
-BaseRepair1            = BaseRegen1*2;
+BaseRepair1            = BaseRegen1*4;
 BaseRepairBonus1       = BaseHeal1 div 2;
 
 DecayAuraDamage        = UpgradeDamageBonus1;
@@ -912,8 +912,8 @@ uab_ToUAGTurret        = 47;
 uab_ToUAATurret        = 48;
 uab_ToUGTurretTo       = 49;
 uab_ToUATurretTo       = 50;
-uab_URadarLvlUp        = 51;
-uab_URMStationLvlUp    = 52;
+uab_LvlUpURadar        = 51;
+uab_LvlUpURMStation    = 52;
 
 
 ////////////////////////////////////////////////////////////////////////////////

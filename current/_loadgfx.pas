@@ -1099,11 +1099,11 @@ begin
    // mouse hint position
    case ui_ControlPanelPos of
    cpp_left  : begin
-               ui_MouseHintX:=ui_UIPanelW+font_wh;
+               ui_MouseHintX:=ui_UIPanelW+font_w1;
                ui_MouseHintY:=ui_UIPanelW;
                end;
    cpp_right : begin
-               ui_MouseHintX:=vid_vw-ui_UIPanelW-font_wh-ui_HintLineLenUnit*font_w1;
+               ui_MouseHintX:=vid_vw-ui_UIPanelW-font_w1h-ui_HintLineLenUnit*font_w1;
                ui_MouseHintY:=ui_UIPanelW;
                end;
    cpp_top   : begin

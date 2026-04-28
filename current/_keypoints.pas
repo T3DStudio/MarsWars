@@ -99,6 +99,8 @@ begin
              if((map_scenario=mc_koth     )and(kpi=0))
              or((map_scenario=mc_KeyPoints)and(kpi<keyPoint_mcN))
           // or(no fog)
+             or(kptd_TimerOwnerTeam=p)
+             or(kptd_OwnerTeam     =p)
              then kptd_VisTimer:=MinVisionTime;
 
              if(kptd_VisTimer>0)then

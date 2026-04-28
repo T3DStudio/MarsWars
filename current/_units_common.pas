@@ -448,10 +448,10 @@ begin
      end;
 end;
 
-function unit_CheckWeapons(pu:PTUnit):boolean;
+function unit_CheckActiveWeapons(pu:PTUnit):boolean;
 var a:byte;
 begin
-   unit_CheckWeapons:=false;
+   unit_CheckActiveWeapons:=false;
    with pu^ do
    with player^ do
    with uid^ do
@@ -461,9 +461,32 @@ begin
          begin
             if(aw_req_uid >0)and(units_uid_c[aw_req_uid ]<=0)then continue;
             if(aw_req_upgr>0)and(upgrs_cur  [aw_req_upgr] =0)then continue;
-            unit_CheckWeapons:=true;
+            unit_CheckActiveWeapons:=true;
             break;
          end;
+end;
+
+function unit_AddExp(pu:PTUnit;exp:cardinal;forceUp,check:boolean):byte;
+begin
+   unit_AddExp:=lmt_unit_MaxLevel;
+   with pu^ do
+     if(level<LastUnitLevel)then
+       with uid^ do
+       begin
+          unit_AddExp:=0;
+          if(check)then exit;
+
+          a_exp+=exp;
+          if(a_exp>=ExpLevel1)or(forceUp)then
+          begin
+             level+=1;
+             a_exp:=0;
+             GameLog_UnitPromoted(pu);
+             {$IFDEF _FULLGAME}
+             effect_Common(pu,0,nil);
+             {$ENDIF}
+          end;
+       end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -485,395 +508,104 @@ begin
          else unit_Ability2Act:=0;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
 
-function unit_ability_HellVision(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_HellVision(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^     do
-   begin
-      unit_ability_HellVision:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_HellVision:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_HellVision:=0;
-   if(check)then exit;
-
-   unit_ability_HellVision:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
-
+   ability_CheckTarget_HellVision:=false;
    with pTarget^ do
      if(not iscomplete)
      or(IsUnitRange(TransportU,nil))
      or(hits<=0)
-     or(player^.team<>pCaster^.player^.team)
+     or(player^.team<>CasterTeam)
      or(buffs[ub_HellVision]>0)
      or(buffs[ub_Detector  ]>0)then exit;
-
-   unit_ability_HellVision:=0;
-
-   pTarget^.buffs[ub_HellVision]:=hell_vision_time;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_Hvision,nil);
-   {$ENDIF}
+   ability_CheckTarget_HellVision:=true;
 end;
 
-function unit_ability_Recall(pTeleporter:PTUnit;tar,tard:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_SphereSoul(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pTeleporter - teleporter
-   with pTeleporter^ do
-   begin
-      unit_ability_Recall:=lmt_Invalid_Order;
-
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_Recall:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_Recall:=0;
-   if(check)then exit;
-
-   unit_ability_Recall:=lmt_invalid_Target;
-   if(not IsUnitRange(tar,@pTarget))then exit;
+   ability_CheckTarget_SphereSoul:=false;
    with pTarget^ do
    with uid^ do
-     if(uid_isbuilding)
+     if(hits<=0)
+     or(hits>=uid_MaxHits1)
+     or(player^.team<>CasterTeam)
+     or(IsUnitRange(TransportU,nil))
      or(not iscomplete)
-     or(isfly)
-     or(hits<=0)
-     or(buffs[ub_Teleported]>0)
-     or(pTeleporter^.playeri<>playeri)
-     then exit;
-
-   with pTeleporter^  do
-   with uid^ do
-   with player^ do
-   begin
-      if(tard=NOTSET)
-      or(tard<0     )then tard:=point_dist_int(x,y,pTarget^.x,pTarget^.y);
-      if(tard>base_r1)then
-      begin
-         unit_ability_Recall:=0;
-         unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
-         teleport_CalcReload(pTeleporter,pTarget^.uid^.uid_LimitUse);
-
-         pTarget^.uo_x  :=pTarget^.x;
-         pTarget^.uo_y  :=pTarget^.y;
-         pTarget^.uo_tar:=0;
-      end;
-   end;
+     or(uid_isbuilding)then exit;
+   ability_CheckTarget_SphereSoul:=true;
 end;
 
-function unit_ability_teleport(pTarget,pTeleporter:PTUnit;td:integer):boolean;
-var
-pTBeacon:PTUnit;
+function ability_CheckTarget_SphereInvis(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // td = dist2(pTarget,pTeleporter)
-   if(td=NOTSET)then td:=point_dist_int(pTarget^.x,pTarget^.y,pTeleporter^.x,pTeleporter^.y);
-   unit_ability_teleport:=false;
-   with pTarget^  do
-   with uid^ do
-   begin
-      if(uid_isbuilding)
-      or(not iscomplete)
-      or(isfly)
-      or(pTeleporter^.hits<=0)
-      or(not pTeleporter^.iscomplete)
-      or(pTeleporter^.transformTimer>0)
-      or(playeri<>pTeleporter^.playeri)
-      then exit;
-
-      if(buffs[ub_Teleported]>0)
-      or(td>pTeleporter^.uid^.uid_r)
-      or(pTeleporter^.rld>0)then exit;
-
-      if(not IsUnitRange(pTeleporter^.rpoint_tar,@pTBeacon))then exit;
-      if(pTeleporter^.player^.team<>pTBeacon^.player^.team)
-      or(pTBeacon^.hits<=0)then exit;
-
-      if(isfly=uf_ground)then
-        if(map_IfObstacleZone(pTBeacon^.mapZone))then exit;
-
-      pTeleporter^.rpoint_x:=pTBeacon^.x;
-      pTeleporter^.rpoint_y:=pTBeacon^.y;
-
-      if(point_dist_int(pTeleporter^.x,
-                        pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_r1)then exit;
-
-      unit_Teleport2Point(pTarget,
-      pTeleporter^.rpoint_x+g_random(uid_missileR),
-      pTeleporter^.rpoint_y+g_random(uid_missileR)
-      {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
-      if(pTeleporter^.player^.upgrs_cur[upgr_hell_T2TNoCD]>0)and(pTBeacon^.uidi=pTeleporter^.uidi)
-      then
-      else teleport_CalcReload(pTeleporter,uid_LimitUse);
-
-      unit_ability_teleport:=true;
-   end;
-end;
-
-function unit_ability_UACScan(pRadar:PTUnit;x0,y0:integer;check:boolean):byte;
-begin
-   with pRadar^ do
-   begin
-      unit_ability_UACScan:=lmt_Invalid_Order;
-      if(hits<=0)
-      or(not iscomplete)
-      or(not uid^.uid_ability_isradar)
-      or(transformTimer>0)then exit;
-
-      unit_ability_UACScan:=lmt_ability_reload;
-      if(buffs[ub_Cast]>0)
-      or(rld>0)then exit;
-
-      unit_ability_UACScan:=0;
-      if(check)then exit;
-
-      uo_x:=x0;
-      uo_y:=y0;
-      buffs[ub_Cast]:=detection_time;
-
-      {$IFDEF _FULLGAME}
-      effect_ScanSound(pRadar);
-      {$ENDIF}
-   end;
-end;
-
-function unit_ability_SphereSoul(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
-begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_SphereSoul:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_SphereSoul:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_SphereSoul:=0;
-   if(check)then exit;
-
-   unit_ability_SphereSoul:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_SphereInvis:=false;
 
    with pTarget^ do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(hits>=uid_MaxHits1)
-      or(IsUnitRange(TransportU,nil))
-      or(not iscomplete)
-      or(uid_isbuilding)then exit;
+     if(hits<=0)
+     or(IsUnitRange(TransportU,nil))
+     or(player^.team<>CasterTeam)
+     or(not iscomplete)
+     or(uid_isbuilding)
+     or(buffs[ub_SphereInvis ]>0)
+     or(buffs[ub_Invisibility]>0)then exit;
 
-      unit_ability_SphereSoul:=0;
-
-      hits:=mm3i(1,hits+soul_heal,uid_MaxHits1);
-   end;
-
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_ULevelUp,nil);
-   {$ENDIF}
+   ability_CheckTarget_SphereInvis:=true;
 end;
 
-function unit_ability_SphereInvis(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_SphereInvuln(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_SphereInvis:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_SphereInvis:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_SphereInvis:=0;
-   if(check)then exit;
-
-   unit_ability_SphereInvis:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_SphereInvuln:=false;
 
    with pTarget^ do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(IsUnitRange(TransportU,nil))
-      or(not iscomplete)
-      or(uid_isbuilding)
-      or(buffs[ub_SphereInvis ]>0)
-      or(buffs[ub_Invisibility]>0)then exit;
+     if(hits<=0)
+     or(IsUnitRange(TransportU,nil))
+     or(player^.team<>CasterTeam)
+     or(not iscomplete)
+     or(uid_isbuilding)
+     or(buffs[ub_SphereInvuln]>0)then exit;
 
-      unit_ability_SphereInvis:=0;
-
-      buffs[ub_SphereInvis ]:=invis_time;
-      buffs[ub_Invisibility]:=invis_time;
-   end;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_ULevelUp,nil);
-   {$ENDIF}
+   ability_CheckTarget_SphereInvuln:=true;
 end;
 
-function unit_ability_SphereInvuln(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_SphereRDamage(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_SphereInvuln:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_SphereInvuln:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_SphereInvuln:=0;
-   if(check)then exit;
-
-   unit_ability_SphereInvuln:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_SphereRDamage:=false;
 
    with pTarget^ do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(IsUnitRange(TransportU,nil))
-      or(not iscomplete)
-      or(uid_isbuilding)
-      or(buffs[ub_SphereInvuln]>0)then exit;
+     if(hits<=0)
+     or(IsUnitRange(TransportU,nil))
+     or(player^.team<>CasterTeam)
+     or(buffs[ub_SphereRDamage]>0)
+     or(buffs[ub_Heroic       ]>0)then exit;
 
-      unit_ability_SphereInvuln:=0;
-
-      buffs[ub_SphereInvuln]:=invuln_time;
-   end;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_ULevelUp,nil);
-   {$ENDIF}
+   ability_CheckTarget_SphereRDamage:=true;
 end;
 
-
-function unit_ability_SphereRDamage(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_SphereDDamage(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_SphereRDamage:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_SphereRDamage:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_SphereRDamage:=0;
-   if(check)then exit;
-
-   unit_ability_SphereRDamage:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_SphereDDamage:=false;
 
    with pTarget^ do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(IsUnitRange(TransportU,nil))
-      or(buffs[ub_SphereRDamage]>0)
-      or(buffs[ub_Heroic       ]>0)then exit;
+     if(hits<=0)
+     or(IsUnitRange(TransportU,nil))
+     or(player^.team<>CasterTeam)
+     or(not iscomplete)
+     or(transformTimer>0)
+     or(not unit_CheckActiveWeapons(pTarget))
+     or(buffs[ub_SphereDDamage]>0)
+     or(buffs[ub_Heroic       ]>0)then exit;
 
-      unit_ability_SphereRDamage:=0;
-
-      buffs[ub_SphereRDamage]:=rdamage_time;
-   end;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_HLevelUp,nil);
-   {$ENDIF}
+   ability_CheckTarget_SphereDDamage:=true;
 end;
 
-function unit_ability_SphereDDamage(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_SphereTurbo(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_SphereDDamage:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_SphereDDamage:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_SphereDDamage:=0;
-   if(check)then exit;
-
-   unit_ability_SphereDDamage:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
-
-   with pTarget^ do
-   with uid^ do
-   begin
-      if(hits<=0)
-      or(IsUnitRange(TransportU,nil))
-      or(not iscomplete)
-      or(not unit_CheckWeapons(pTarget))
-      or(buffs[ub_SphereDDamage]>0)
-      or(buffs[ub_Heroic       ]>0)then exit;
-
-      unit_ability_SphereDDamage:=0;
-
-      buffs[ub_SphereDDamage]:=ddamage_time;
-   end;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_HLevelUp,nil);
-   {$ENDIF}
-end;
-
-function unit_ability_SphereTurbo(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
-begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_SphereTurbo:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_SphereTurbo:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_SphereTurbo:=0;
-   if(check)then exit;
-
-   unit_ability_SphereTurbo:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_SphereTurbo:=false;
 
    with pTarget^ do
    with uid^ do
@@ -881,10 +613,11 @@ begin
       if(hits<=0)
       or(IsUnitRange(TransportU,nil))
       or(buffs[ub_Heroic     ]>0)
-      or(buffs[ub_SphereTurbo]>0)then exit;
+      or(buffs[ub_SphereTurbo]>0)
+      or(player^.team<>CasterTeam)then exit;
 
       if not(
-      (unit_CheckWeapons(pTarget))or
+      (unit_CheckActiveWeapons(pTarget))or
       (uid_MSpeed_Base>0)or
       ((uid_Regen_Base>0)and(hits<UID_MaxHits1))or
       (not iscomplete   )or
@@ -893,111 +626,63 @@ begin
       (unit_ProdStopUnit   (pTarget,255,true,false,true)=0)or
       (rld>0            )
       )then exit;
-
-      unit_ability_SphereTurbo:=0;
-
-      buffs[ub_SphereTurbo]:=dturbo_time;
    end;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_HLevelUp,nil);
-   {$ENDIF}
+
+   ability_CheckTarget_SphereTurbo:=true;
 end;
 
-function unit_ability_UACHeroic(pCaster:PTUnit;target:integer;check:boolean):byte;
-var pTarget:PTUnit;
+function ability_CheckTarget_UACHeroic(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_UACHeroic:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_UACHeroic:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_UACHeroic:=0;
-   if(check)then exit;
-
-   unit_ability_UACHeroic:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_UACHeroic:=false;
 
    with pTarget^ do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(IsUnitRange(TransportU,nil))
-      or(uid_race<>r_uac)
-      or(uid_isbuilding)
-      or(buffs[ub_Heroic]>0)then exit;
+     if(hits<=0)
+     or(player^.team<>CasterTeam)
+     or(IsUnitRange(TransportU,nil))
+     or(uid_race<>r_uac)
+     or(uid_isbuilding)
+     or(buffs[ub_Heroic]>0)then exit;
 
-      unit_ability_UACHeroic:=0;
-
-      buffs[ub_SphereTurbo  ]:=0;
-      buffs[ub_SphereDDamage]:=0;
-      buffs[ub_SphereRDamage]:=0;
-      buffs[ub_Heroic       ]:=ub_infinity;
-   end;
-   {$IFDEF _FULLGAME}
-   effect_Common(pTarget,EID_PowerUp,nil);
-   {$ENDIF}
+   ability_CheckTarget_UACHeroic:=true;
 end;
 
-function unit_ability_Bribe(pCaster:PTUnit;target:integer;target_building,check:boolean):byte;
-var
-pTarget: PTUnit;
-u      : integer;
+function ability_CheckTarget_Bribe(CasterTeam:byte;pTarget:PTUnit;target_building:boolean):boolean;
 begin
-   // pCaster - caster
-   // pTarget - target
-   with pCaster^ do
-   begin
-      unit_ability_Bribe:=lmt_Invalid_Order;
-      if(not iscomplete)
-      or(transformTimer>0)
-      or(hits<=0)then exit;
-
-      unit_ability_Bribe:=lmt_ability_reload;
-      if(rld>0)then exit;
-   end;
-
-   unit_ability_Bribe:=0;
-   if(check)then exit;
-
-   unit_ability_Bribe:=lmt_invalid_Target;
-   if(not IsUnitRange(target,@pTarget))then exit;
+   ability_CheckTarget_Bribe:=false;
 
    with pTarget^ do
    with uid^ do
-   begin
-      if(hits<=0)
-      or(not iscomplete)
-      or(player^.team=pCaster^.player^.team)
-      or(IsUnitRange(TransportU,nil))
-      or(uid_race<>r_uac)
-      or(buffs[ub_Heroic]>0)then exit;
+     if(hits<=0)
+     or(not iscomplete)
+     or(transformTimer>0)
+     or(player^.team=CasterTeam)
+     or(IsUnitRange(TransportU,nil))
+     or(uid_race<>r_uac)
+     or(buffs[ub_Heroic]>0)
+     or(uid_isbuilding<>target_building)then exit;
 
-      if(uid_isbuilding<>target_building)then exit;
-   end;
-
-   for u:=1 to MaxUnits do
-     with g_units[u] do
-       if(hits>0)and(player^.team=pCaster^.player^.team)and(uid^.uid_race=r_uac)then
-         if(point_dist_int(x,y,pTarget^.x,pTarget^.y)<=(srange+uid^.uid_r+pTarget^.uid^.uid_r))then
-         begin
-            unit_ability_Bribe:=0;
-            break;
-         end;
-
-   if(unit_ability_Bribe>0)then exit;
-
-   unit_ability_Bribe:=unit_TryChangeOwner(pTarget,pCaster^.player,true,false);
+   ability_CheckTarget_Bribe:=true;
 end;
 
-procedure unit_UACStrike_missile(pu:PTUnit);
+function ability_CheckTarget_Recall(TeleporterPlayer:byte;pTarget:PTUnit):boolean;
+begin
+   ability_CheckTarget_Recall:=false;
+
+   with pTarget^ do
+   with uid^ do
+     if(uid_isbuilding)
+     or(not iscomplete)
+     or(isfly)
+     or(hits<=0)
+     or(buffs[ub_Teleported]>0)
+     or(TeleporterPlayer<>playeri)
+     then exit;
+
+   ability_CheckTarget_Recall:=true;
+end;
+
+procedure ability_UACStrike_missile(pu:PTUnit);
 begin
    with pu^ do
    begin
@@ -1008,37 +693,9 @@ begin
    end;
 end;
 
-function unit_ability_UACStrike(pu:PTUnit;x0,y0:integer;check:boolean):byte;
-var p:byte;
+procedure unit_ability_spawn(pSpawner:PTUnit;tx,ty:integer;auid:byte);
 begin
-   with pu^ do
-   with player^ do
-   begin
-      unit_ability_UACStrike:=lmt_Invalid_Order;
-      if(hits<0)
-      or(not iscomplete)
-      or(transformTimer>0)then
-
-      unit_ability_UACStrike:=lmt_ability_reload;
-      if(rld>0)
-      or(buffs[ub_Cast]>0)then exit;
-
-      unit_ability_UACStrike:=0;
-      if(check)then exit;
-
-      unit_OrderClear(pu,ua_amove);
-      uo_x:=x0;
-      uo_y:=y0;
-      buffs[ub_Cast]:=fr_fps2;
-      for p:=0 to LastPlayer do AddToInt(@TeamVision[p],buffs[ub_Cast]);
-      unit_UACStrike_missile(pu);
-   end;
-end;
-
-
-procedure unit_ability_spawn(pu:PTUnit;tx,ty:integer;auid:byte);
-begin
-   with pu^ do
+   with pSpawner^ do
    with player^ do
    begin
       if(not player_UIDLimitCheck(player,auid))
@@ -1075,6 +732,400 @@ begin
    end;
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+
+function unit_ability_HellVision(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_HellVision:=lmt_Invalid_Order;
+   with pCaster^     do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_HellVision:=0;
+   if(check)then exit;
+
+   unit_ability_HellVision:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_HellVision(pCaster^.player^.team,pTarget))then exit;
+
+   unit_ability_HellVision:=0;
+
+   pTarget^.buffs[ub_HellVision]:=hell_vision_time;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_Hvision,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_Recall(pTeleporter:PTUnit;tar,tard:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pTeleporter - teleporter
+   with pTeleporter^ do
+   begin
+      unit_ability_Recall:=lmt_Invalid_Order;
+
+      if(not iscomplete)
+      or(transformTimer>0)
+      or(hits<=0)then exit;
+
+      unit_ability_Recall:=lmt_ability_reload;
+      if(rld>0)then exit;
+   end;
+
+   unit_ability_Recall:=0;
+   if(check)then exit;
+
+   unit_ability_Recall:=lmt_invalid_Target;
+   if(not IsUnitRange(tar,@pTarget))then exit;
+   if(not ability_CheckTarget_Recall(pTeleporter^.playeri,pTarget))then exit;
+
+   with pTeleporter^  do
+   with uid^ do
+   with player^ do
+   begin
+      if(tard=NOTSET)
+      or(tard<0     )then tard:=point_dist_int(x,y,pTarget^.x,pTarget^.y);
+      if(tard>base_r1)then
+      begin
+         unit_ability_Recall:=0;
+         unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
+         teleport_CalcReload(pTeleporter,pTarget^.uid^.uid_LimitUse);
+
+         pTarget^.uo_x  :=pTarget^.x;
+         pTarget^.uo_y  :=pTarget^.y;
+         pTarget^.uo_tar:=0;
+      end;
+   end;
+end;
+
+function unit_ability_teleport(pTarget,pTeleporter:PTUnit;tard:integer):boolean;
+var
+pTBeacon:PTUnit;
+begin
+   // tard = dist2(pTarget,pTeleporter)
+   if(tard=NOTSET)then tard:=point_dist_int(pTarget^.x,pTarget^.y,pTeleporter^.x,pTeleporter^.y);
+   unit_ability_teleport:=false;
+   with pTarget^  do
+   with uid^ do
+   begin
+      if(uid_isbuilding)
+      or(not iscomplete)
+      or(isfly)
+      or(pTeleporter^.hits<=0)
+      or(not pTeleporter^.iscomplete)
+      or(pTeleporter^.transformTimer>0)
+      or(playeri<>pTeleporter^.playeri)
+      then exit;
+
+      if(buffs[ub_Teleported]>0)
+      or(tard>pTeleporter^.uid^.uid_r)
+      or(pTeleporter^.rld>0)then exit;
+
+      if(not IsUnitRange(pTeleporter^.rpoint_tar,@pTBeacon))then exit;
+      if(pTeleporter^.player^.team<>pTBeacon^.player^.team)
+      or(pTBeacon^.hits<=0)then exit;
+
+      if(isfly=uf_ground)then
+        if(map_IfObstacleZone(pTBeacon^.mapZone))then exit;
+
+      pTeleporter^.rpoint_x:=pTBeacon^.x;
+      pTeleporter^.rpoint_y:=pTBeacon^.y;
+
+      if(point_dist_int(pTeleporter^.x,
+                        pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_r1)then exit;
+
+      unit_Teleport2Point(pTarget,
+      pTeleporter^.rpoint_x+g_random(uid_missileR),
+      pTeleporter^.rpoint_y+g_random(uid_missileR)
+      {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
+      if(pTeleporter^.player^.upgrs_cur[upgr_hell_T2TNoCD]>0)and(pTBeacon^.uidi=pTeleporter^.uidi)
+      then
+      else teleport_CalcReload(pTeleporter,uid_LimitUse);
+
+      unit_ability_teleport:=true;
+   end;
+end;
+
+function unit_ability_UACScan(pRadar:PTUnit;x0,y0:integer;check:boolean):byte;
+begin
+   with pRadar^ do
+   begin
+      unit_ability_UACScan:=lmt_Invalid_Order;
+      if(hits<=0)
+      or(not iscomplete)
+      or(not uid^.uid_ability_isradar)
+      or(transformTimer>0)
+      or(buffs[ub_Cast]>0)then exit;
+
+      unit_ability_UACScan:=0;
+      if(check)then exit;
+
+      uo_x:=x0;
+      uo_y:=y0;
+      buffs[ub_Cast]:=detection_time;
+
+      {$IFDEF _FULLGAME}
+      effect_ScanSound(pRadar);
+      {$ENDIF}
+   end;
+end;
+
+function unit_ability_SphereSoul(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_SphereSoul:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_SphereSoul:=0;
+   if(check)then exit;
+
+   unit_ability_SphereSoul:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_SphereSoul(pCaster^.player^.team,pTarget))then exit;
+   unit_ability_SphereSoul:=0;
+
+   with pTarget^ do hits:=mm3i(1,hits+soul_heal,uid^.uid_MaxHits1);
+
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_ULevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereInvis(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_SphereInvis:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_SphereInvis:=0;
+   if(check)then exit;
+
+   unit_ability_SphereInvis:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_SphereInvis(pCaster^.player^.team,pTarget))then exit;
+
+   unit_ability_SphereInvis:=0;
+
+   with pTarget^ do
+   begin
+      buffs[ub_SphereInvis ]:=invis_time;
+      buffs[ub_Invisibility]:=invis_time;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_ULevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereInvuln(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_SphereInvuln:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_SphereInvuln:=0;
+   if(check)then exit;
+
+   unit_ability_SphereInvuln:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_SphereInvuln(pCaster^.player^.team,pTarget))then exit;
+
+   unit_ability_SphereInvuln:=0;
+
+   with pTarget^ do buffs[ub_SphereInvuln]:=invuln_time;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_ULevelUp,nil);
+   {$ENDIF}
+end;
+
+
+function unit_ability_SphereRDamage(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_SphereRDamage:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_SphereRDamage:=0;
+   if(check)then exit;
+
+   unit_ability_SphereRDamage:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_SphereRDamage(pCaster^.player^.team,pTarget))then exit;
+
+   unit_ability_SphereRDamage:=0;
+
+   with pTarget^ do buffs[ub_SphereRDamage]:=rdamage_time;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_HLevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereDDamage(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_SphereDDamage:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_SphereDDamage:=0;
+   if(check)then exit;
+
+   unit_ability_SphereDDamage:=lmt_invalid_Target;
+   pTarget:=nil;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_SphereDDamage(pCaster^.player^.team,pTarget))then exit;
+
+   unit_ability_SphereDDamage:=0;
+
+   with pTarget^ do buffs[ub_SphereDDamage]:=ddamage_time;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_HLevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_SphereTurbo(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_SphereTurbo:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_SphereTurbo:=0;
+   if(check)then exit;
+
+   unit_ability_SphereTurbo:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_SphereTurbo(pCaster^.player^.team,pTarget))then exit;
+   unit_ability_SphereTurbo:=0;
+
+   with pTarget^ do buffs[ub_SphereTurbo]:=dturbo_time;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_HLevelUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_UACHeroic(pCaster:PTUnit;target:integer;check:boolean):byte;
+var pTarget:PTUnit;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_UACHeroic:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_UACHeroic:=0;
+   if(check)then exit;
+
+   unit_ability_UACHeroic:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_UACHeroic(pCaster^.player^.team,pTarget))then exit;
+   unit_ability_UACHeroic:=0;
+
+   with pTarget^ do
+   begin
+      buffs[ub_SphereTurbo  ]:=0;
+      buffs[ub_SphereDDamage]:=0;
+      buffs[ub_SphereRDamage]:=0;
+      buffs[ub_Heroic       ]:=ub_infinity;
+   end;
+   {$IFDEF _FULLGAME}
+   effect_Common(pTarget,EID_PowerUp,nil);
+   {$ENDIF}
+end;
+
+function unit_ability_Bribe(pCaster:PTUnit;target:integer;target_building,check:boolean):byte;
+var
+pTarget: PTUnit;
+u      : integer;
+begin
+   // pCaster - caster
+   // pTarget - target
+   unit_ability_Bribe:=lmt_Invalid_Order;
+   with pCaster^ do
+     if(not iscomplete)
+     or(transformTimer>0)
+     or(hits<=0)then exit;
+
+   unit_ability_Bribe:=0;
+   if(check)then exit;
+
+   unit_ability_Bribe:=lmt_invalid_Target;
+   if(not IsUnitRange(target,@pTarget))then exit;
+   if(not ability_CheckTarget_Bribe(pCaster^.player^.team,pTarget,target_building))then exit;
+
+   for u:=1 to MaxUnits do
+     with g_units[u] do
+       if(hits>0)and(player^.team=pCaster^.player^.team)and(uid^.uid_race=r_uac)then
+         if(point_dist_int(x,y,pTarget^.x,pTarget^.y)<=(srange+uid^.uid_r+pTarget^.uid^.uid_r))then
+         begin
+            unit_ability_Bribe:=0;
+            break;
+         end;
+
+   if(unit_ability_Bribe>0)then exit;
+
+   unit_ability_Bribe:=unit_TryChangeOwner(pTarget,pCaster^.player,true,false);
+end;
+
+function unit_ability_UACStrike(pu:PTUnit;x0,y0:integer;check:boolean):byte;
+var p:byte;
+begin
+   with pu^ do
+   with player^ do
+   begin
+      unit_ability_UACStrike:=lmt_Invalid_Order;
+      if(hits<0)
+      or(not iscomplete)
+      or(transformTimer>0)then
+
+      unit_ability_UACStrike:=lmt_ability_reload;
+      if(buffs[ub_Cast]>0)then exit;
+
+      unit_ability_UACStrike:=0;
+      if(check)then exit;
+
+      unit_OrderClear(pu,ua_amove);
+      uo_x:=x0;
+      uo_y:=y0;
+      buffs[ub_Cast]:=fr_fps2;
+      for p:=0 to LastPlayer do AddToInt(@TeamVision[p],buffs[ub_Cast]);
+      ability_UACStrike_missile(pu);
+   end;
+end;
+
 procedure unit_ArmSpawnUnit(pu:PTUnit;auid:byte);
 var dd:integer;
 begin
@@ -1097,8 +1148,7 @@ begin
       or(not iscomplete)then exit;
 
       unit_ability_SpawnLost:=lmt_ability_reload;
-      if(rld>0)
-      or(buffs[ub_Cast]>0)then exit;
+      if(buffs[ub_Cast]>0)then exit;
 
       unit_ability_SpawnLost:=0;
       if(check)then exit;
@@ -1110,31 +1160,6 @@ begin
       rld:=uid_arms[0].aw_reload;
       buffs[ub_Cast]:=rld div 2;
    end;
-end;
-
-////////////////////////////////////////////////////////////////////////////////
-
-function unit_AddExp(pu:PTUnit;exp:cardinal;forceUp,check:boolean):byte;
-begin
-   unit_AddExp:=lmt_unit_MaxLevel;
-   with pu^ do
-     if(level<LastUnitLevel)then
-       with uid^ do
-       begin
-          unit_AddExp:=0;
-          if(check)then exit;
-
-          a_exp+=exp;
-          if(a_exp>=ExpLevel1)or(forceUp)then
-          begin
-             level+=1;
-             a_exp:=0;
-             GameLog_UnitPromoted(pu);
-             {$IFDEF _FULLGAME}
-             effect_Common(pu,0,nil);
-             {$ENDIF}
-          end;
-       end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1564,10 +1589,8 @@ begin
       unit_ability_HKeepBlink:=lmt_Invalid_Order;
       if(hits<=0)
       or(transformTimer>0)
-      or(not iscomplete)then exit;
-
-      unit_ability_HKeepBlink:=lmt_ability_reload;
-      if(buffs[ub_Cast]>0)then exit;
+      or(not iscomplete)
+      or(buffs[ub_Cast]>0)then exit;
 
       unit_ability_HKeepBlink:=0;
       if(check)then exit;
@@ -1642,9 +1665,6 @@ begin
       with player^ do
         if((armylimit+g_uids[UID_HEye].uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
 
-      unit_ability_SpawnEvilEye:=lmt_ability_reload;
-      if(rld>0)then exit;
-
       unit_ability_SpawnEvilEye:=0;
       if(check)then exit;
 
@@ -1662,7 +1682,6 @@ begin
         end;
    end;
 
-   unit_ability_SpawnEvilEye:=lmt_Invalid_Order;
    for u:=1 to MaxUnits do
      with g_units[u] do
        if(hits>0)and(player^.team=pCaster^.player^.team)and(uid^.uid_race=r_hell)then
@@ -2509,7 +2528,8 @@ end;
 function unit_CheckTransport(pTransport,pPassenger:PTUnit):boolean;
 begin
    unit_CheckTransport:=false;
-   if(pPassenger^.isfly=uf_fly)or(pTransport=pPassenger)then exit;
+   if(pPassenger^.isfly=uf_fly)
+   or(pTransport=pPassenger)then exit;
 
    if(pTransport^.player<>pPassenger^.player)then
      if(pTransport^.player^.team<>pPassenger^.player^.team)then exit;
@@ -2719,6 +2739,7 @@ begin
       speed:=uid_MSpeed_Base;
       if(uid_MSpeed_upgr>0)then
         speed+=integer(upgrs_cur[uid_MSpeed_upgr])*uid_MSpeed_upgrV;
+      if(buffs[ub_SphereTurbo]>0)then speed*=2;
 
       // TRANSPORT CAPASITY
       transportM:=uid_TransportMax_Base;

@@ -447,11 +447,11 @@ begin
 end;
 
 procedure unit_move(pu:PTUnit);
-var mdist,ss:integer;
-    ddir    :single;
+var mdist:integer;
+    ddir :single;
 begin
    with pu^ do
-    if(x=vx)and(y=vy)then
+    if(x=vx)and(y=vy)and(speed>0)then
      if(x<>move_x)or(y<>move_y)then
        if(unit_canMove(pu))then
        begin
@@ -464,8 +464,6 @@ begin
              move_py:=move_y;
           end;
 
-          ss:=speed;
-
           mdist:=point_dist_int(x,y,move_x,move_y);
           if(mdist<=speed)then
           begin
@@ -474,13 +472,6 @@ begin
           end
           else
           begin
-             with uid^ do
-               with player^ do
-                 if(uid_MSpeed_Upgr>0)then
-                   ss+=integer(upgrs_cur[uid_MSpeed_Upgr])*uid_MSpeed_UpgrV;
-
-             if(buffs[ub_SphereTurbo]>0)then ss*=2;
-
              if(mdist>70)
              then mdist:=8+g_random(25)
              else mdist:=50;
@@ -488,8 +479,8 @@ begin
              dir:=dir_turn(dir,point_dir(x,y,move_x,move_y),mdist);
 
              ddir:=dir*degtorad;
-             unit_SetXY(pu,x+round(ss*cos(ddir)),
-                           y-round(ss*sin(ddir)),mvxy_none);
+             unit_SetXY(pu,x+round(speed*cos(ddir)),
+                           y-round(speed*sin(ddir)),mvxy_none);
           end;
           unit_PushFromObstacles(pu);
        end;
@@ -969,7 +960,7 @@ begin
       if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
       if(isselected)then
       begin
-         if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
+         //if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
       end;
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
@@ -1810,8 +1801,8 @@ begin
       uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
       uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
 
-      uab_URadarLvlUp      : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
-      uab_URMStationLvlUp  : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
+      uab_LvlUpURadar      : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
+      uab_LvlUpURMStation  : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
       end;
    end;
 end;
@@ -1995,8 +1986,8 @@ begin
       uab_ToUGenerator4,
       uab_ToUAGTurret,
       uab_ToUAATurret,
-      uab_URadarLvlUp,
-      uab_URMStationLvlUp: begin
+      uab_LvlUpURadar,
+      uab_LvlUpURMStation: begin
                               case aid of
                               uab_ToHAKeep         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HAKeep         ,false);
                               uab_ToHACommandCenter: unit_AbilityExec:=unit_TransformStart(pCaster,uid_HACommandCenter,false);
@@ -2017,8 +2008,8 @@ begin
                               uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
                               uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
 
-                              uab_URadarLvlUp      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
-                              uab_URMStationLvlUp  : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
+                              uab_LvlUpURadar      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
+                              uab_LvlUpURMStation  : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
                               end;
 
                               unit_OrderClear(pCaster,ua_amove);

@@ -533,14 +533,14 @@ begin
 
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
-   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseWh;
+   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
 
    case menu_HelpPage of
    mi_help_GameControls,

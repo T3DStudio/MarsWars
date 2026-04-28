@@ -1273,7 +1273,7 @@ begin
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_LimitUse        := ul2;
    uid_ability1        := uab_UACScan;
-   uid_ability3        := uab_URadarLvlUp;
+   uid_ability3        := uab_LvlUpURadar;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isdetector      := true;
@@ -1320,7 +1320,7 @@ begin
    uid_LimitUse        := ul10;
    uid_req_uid1        := UID_UComputerStation;
    uid_ability1        := uab_UACStrike;
-   uid_ability3        := uab_URMStationLvlUp;
+   uid_ability3        := uab_LvlUpURMStation;
    uid_isbuilding      := true;
    uid_ismech          := true;
 end;
@@ -2051,12 +2051,12 @@ uab_ToUWeaponFactory: begin
                          ua_type     := uat_NoTarget;
                          ua_req_uid  := UID_UComputerStation;
                       end;
-uab_URadarLvlUp     : begin
+uab_LvlUpURadar     : begin
                          ua_type     := uat_NoTarget;
                          ua_req_uid  := UID_UACommandCenter;
                          ua_req_UACLoot:=1000;
                       end;
-uab_URMStationLvlUp : begin
+uab_LvlUpURMStation : begin
                          ua_type     := uat_NoTarget;
                          ua_req_uid  := UID_UComputerStation;
                          ua_req_UACLoot:=2000;

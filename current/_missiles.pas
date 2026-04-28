@@ -253,7 +253,7 @@ begin
 
         rdamage:=ApplyDamageMod(tu,m_dmod,m_damage);
 
-        if(ud<=0)and(m_dtars=0)then // direct target
+        if(ud<=0)and((m_dtars=0)or(mid_size>0))then // direct target
         begin
            {$IFDEF _FULLGAME}
            m_eid_DeathType:=tu^.uidi in missiles_UIDsBioEff;
