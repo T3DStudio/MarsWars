@@ -141,6 +141,12 @@ begin
          end;
       end;
 
+      // teleport target
+      if(tu^.aiu_alarm_d<NOTSET)
+      and(mapZone<>tu^.mapZone)
+      and(not map_IfObstacleZone(tu^.mapZone))then
+        setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d);
+
       // Alarmed base
       if (not tu^.uid^.uid_CanAttack)
       and(tu^.uid^.uid_isbuilding   )
@@ -152,7 +158,7 @@ begin
       if(tu^.uidi=UID_HEye)then
         if(ud<srange)then ai_near_HEye+=1;
 
-      // heroic target
+      // magic targets
       if(ability_CheckTarget_UACHeroic    (team,tu))then ai_SetTarget_Heroic       (tu);
       if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
       if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
@@ -327,7 +333,7 @@ begin
 
       // nearest teleport
       if(pfcheck)and(not isfly)and(tu^.uid^.uid_ability_isteleport)and(ud<=base_r2)then
-        if(setNearestTarget(@ai_HTeleportNearest_u,@ai_HTeleportNearest_rld,rld))then
+        if(setNearestTarget(@ai_HTeleportNearest_u,@ai_HTeleportNearest_rld,tu^.rld))then
           ai_HTeleportNearest_d:=ud;
 
       // nearest base
@@ -419,11 +425,12 @@ begin
       if(tu^.uid^.uid_isforge  )then ai_curr_UpgrProds+=tu^.level+1;
 
       // units in groups
-      if(tu^.group<=MaxUnitGroups)then
-      begin
-         ai_group_ucount[tu^.group]+=1;
-         ai_group_ulimit[tu^.group]+=tu^.uid^.uid_LimitUse;
-      end;
+      if(not tu^.uid^.uid_isbuilding)then
+        if(tu^.group<=MaxUnitGroups)then
+        begin
+           ai_group_ucount[tu^.group]+=1;
+           ai_group_ulimit[tu^.group]+=tu^.uid^.uid_LimitUse;
+        end;
    end;
 end;
 begin
@@ -445,7 +452,10 @@ begin
          end;
 
          if(player=tu^.player)then for_AliveOwn;
-      end;
+      end
+      else
+        if(player=tu^.player)then
+          ai_ownDead_limit+=tu^.uid^.uid_LimitUse;
 
      {
      if(tu^.uid^.uid_ZombieUID>0)and(pfcheck)then

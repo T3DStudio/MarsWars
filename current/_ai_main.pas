@@ -4,6 +4,11 @@
 //  COMMON
 //
 
+procedure ai_Suicide(pu:PTUnit);
+begin
+   unit_kill(pu,false,false,true,false,true);
+end;
+
 procedure ai_RunTo(pu:PTUnit;odist,ox,oy,ow:integer;otar:PTUnit);
 begin
    with pu^  do
@@ -149,7 +154,7 @@ build_dir,
 build_dirs,
 build_step: integer;
 rad_dir   : single;
-skipEnergyCheck:boolean;
+skipEnergyCheck :boolean;
 ckeckExtraEnergy:integer;
 
 procedure ClearBuildDir;
@@ -306,17 +311,25 @@ procedure SetBuilders(needN:integer);
 begin
    if(build_uid>0)then exit;
 
-   ckeckExtraEnergy:=500;
    with pBuilder^  do
    with player^ do
-     if (ai_curr_Builders<needN)
-     and(ai_curr_Builders<aip_MaxBuilders )
-     and(ai_curr_Builders<PlayerMaxBuilders)then
-       case race of
-       r_hell: SetBuildUID2(UID_HKeep,UID_HCommandCenter);
-       r_uac : SetBuildUID1(UID_UCommandCenter);
-       end;
-   ckeckExtraEnergy:=0;
+   begin
+      if(units_bld_l[false]<aip_MaxArmyMinPart)
+      then ckeckExtraEnergy:=400
+      else ckeckExtraEnergy:=400;
+      if (ai_curr_Builders<needN)
+      and(ai_curr_Builders<aip_MaxBuilders )
+      and(ai_curr_Builders<PlayerMaxBuilders)then
+        case race of
+        r_hell: if(ai_available_HKeep)
+               and(units_builders_e=(aip_MaxBuilders-1))
+               and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
+                then SetBuildUID1(UID_HKeep)
+                else SetBuildUID2(UID_HKeep,UID_HCommandCenter);
+        r_uac : SetBuildUID1(UID_UCommandCenter);
+        end;
+      ckeckExtraEnergy:=0;
+   end;
 end;
 procedure SetDetectors(needL:longint);
 begin
@@ -377,8 +390,8 @@ begin
      case race of
      r_hell: SetBuildUID1(UID_HAltar,1);
      r_uac : begin
-                if(res_UACLoot  >0)then SetBuildUID1(UID_UAcademy        ,1);
-                if(res_HellPower>0)then SetBuildUID1(UID_UHPowerConductor,1);
+                if(res_UACLoot  >1000)then SetBuildUID1(UID_UAcademy        ,1);
+                if(res_HellPower>1000)then SetBuildUID1(UID_UHPowerConductor,1);
                 SetBuildUID1(UID_URMStation,1);
              end;
      end;
@@ -411,6 +424,8 @@ begin
          if(ai_enemy_inv_u<>nil)then
            SetDetectors(aip_MaxDetectors);
          SetGenerators(500);
+         if(aiu_alarm_d=NOTSET)then
+           SetTeleport;
          SetBarracks  (1);
          SetBuilders  (aip_MaxBuilders  );
          SetGenerators(ai_need_Energy   );
@@ -722,7 +737,7 @@ uprod_random     : case race of
       UID_ZMedic,
       UID_Medic,
       UID_ZEngineer,
-      UID_Engineer  : tuid_m:=aic_max_specialist;
+      UID_Engineer  : tuid_m:=aic_max_SpecUID;
       else            tuid_m:=MaxUnits;
       end;
 
@@ -753,18 +768,29 @@ begin
        UID_UGenerator1,
        UID_UGenerator2,
        UID_UGenerator3,
-       UID_UGenerator4: if (res_energyl_cur>uid_req_EnergyLevel)
-                        and(res_energyl_max>aic_GeneratorsDestroyEnergy)
-                        and(armylimit      >aic_GeneratorsDestoryLimit )then ai_NeedSuicide:=true;
+       UID_UGenerator4    : if (res_energyl_cur>uid_req_EnergyLevel)
+                            and(res_energyl_max>aic_GeneratorsDestroyEnergy)
+                            and(armylimit      >aic_GeneratorsDestoryLimit )then ai_NeedSuicide:=true;
+       UID_HCommandCenter,
+       UID_HACommandCenter: if ((units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])>=PlayerMaxBuilders)
+                            and(ai_available_HKeep)then ai_NeedSuicide:=true;
+
+       UID_UBarracks,
+       UID_UFactory,
+       UID_HBarracks,
+       UID_HGate          : if(not ai_IsProducting(pu))then
+                            begin
+                               if(units_uid_c[uidi]>1)and(ai_selfUID_minLevel=level)then
+                               begin
+                                  i:=ai_GetLevel(pu)+1;
+                                  if(uid_isbarrack)and((ai_curr_UnitProds-i)>ai_need_UnitProds)then ai_NeedSuicide:=true;
+                                  if(uid_isforge  )and((ai_curr_UpgrProds-i)>ai_need_UpgrProds)then ai_NeedSuicide:=true;
+                               end;
+                               // destroy redundance barracks
+                            end;
        else
-          if(units_uid_c[uidi]>1)and(ai_selfUID_minLevel=level)then
-            if(uid_isbarrack)or(uid_isforge)then
-              if(not ai_IsProducting(pu))then
-              begin
-                 i:=ai_GetLevel(pu)+1;
-                 if(uid_isbarrack)and((ai_curr_UnitProds-i)>ai_need_UnitProds)then ai_NeedSuicide:=true;
-                 if(uid_isforge  )and((ai_curr_UpgrProds-i)>ai_need_UpgrProds)then ai_NeedSuicide:=true;
-              end;
+          if(not uid_isbuilding)then
+            if((MaxPlayerLimit-armylimit-prod_unit_Limit-ai_ownDead_limit)<ai_NeedFreeLimit)and(ai_enemy_d>base_r2)and(a_rld=0)then ai_NeedSuicide:=true;
        end;
 end;
 
@@ -799,7 +825,7 @@ UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter: if(u_royal_d>base_r3)
                     or(map_scenario<>mc_royale)then
-                      if (units_builders_ec>1)
+                      if (units_builders_c>1)
                       and(ai_curr_UnitProds>0)
                       and(res_energyl_cur>=1500)then
                         case uidi of
@@ -973,7 +999,7 @@ begin
        if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
 end;
 
-// ai_HEyeNest_u
+
 procedure ai_AbilitiesDetection(pCaster:PTunit);
 begin
    with pCaster^ do
@@ -984,7 +1010,7 @@ begin
                       if(ai_need_heye_d<NOTSET)then
                         if(ai_UnitAbility(pCaster,uab_HEyeVision,ai_need_heye_u^.unum,0,0))then
                           aip_timer_detection:=aip_pause_detection;
-
+                      // ai_HEyeNest_u
                    end;
      UID_URadar  : if(ai_enemy_inv_d<NOTSET)then
                      if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
@@ -1164,7 +1190,7 @@ begin
          end
          else
            if(not iscomplete)
-           then unit_kill(pu,false,true,true,false,true);
+           then ai_Suicide(pu);
 end;
 
 procedure ai_Local_Code(pu:PTUnit);
@@ -1188,7 +1214,7 @@ begin
             if(ai_enemy_d<srange)then l+=aiu_limitaround_enemy;
             ai_Alarm_SetForTeam(team,x,y,l,i,uid^.uid_isbuilding,mapZone);
          end;
-         ai_Local_SetCurrentAlarm(pu,ai_enemy_u,0,0,ai_enemy_d);
+         ai_Local_SetCurrentAlarm(pu,ai_enemy_u,0,0,ai_enemy_d,0);
       end;
 
       // base alarm
@@ -1198,7 +1224,7 @@ begin
             if(uid_isfly)
             or(isfly)
             or(aia_zone=mapZone)
-            or(uid_isbarrack)then ai_Local_SetCurrentAlarm(pu,nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y));
+            or(uid_isbarrack)then ai_Local_SetCurrentAlarm(pu,nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y),aia_zone);
 
       //aiu_alarm_timer
    end;
@@ -1234,7 +1260,7 @@ begin
       if((aip_flags and aif_base_suicide)>0)then
         if(ai_NeedSuicide(pu))then
         begin
-           unit_kill(pu,false,true,true,false,true);
+           ai_Suicide(pu);
            exit;
         end;
 
@@ -1332,7 +1358,7 @@ begin
       ai_RunTo(pu,tar_dist,tar_x,tar_y,wrect,nil);
    end;
 end;
-function FollowCommander:boolean;
+function FollowCommander(onlyMyLevel:boolean=false):boolean;
 var
 commander_d:integer;
 commander_u:PTUnit;
@@ -1343,7 +1369,7 @@ begin
    begin
       commander_u:=ai_commander_fly_u;
       commander_d:=ai_commander_fly_d;
-      if(ai_commander_grd_u<>nil)then
+      if(ai_commander_grd_u<>nil)and(not onlyMyLevel)then
         if(ai_commander_grd_u^.group<>aic_group_AttackWait)then
         begin
            commander_u:=ai_commander_grd_u;
@@ -1361,6 +1387,8 @@ begin
    FollowCommander:=(pu<>commander_u);
    if(FollowCommander)then
      ai_RunTo(pu,commander_d,0,0,-pu^.srange,commander_u);
+
+   //with pu^ do if(isselected)then writeln('FollowCommander ',FollowCommander,' ',commander_u=pu,' ',ai_commander_fly_u<>nil,' ',ai_commander_grd_u<>nil,' ',commander_u=ai_commander_fly_u,' ',commander_u=ai_commander_grd_u);
 end;
 function TryTeleporting(toU:PTUnit):boolean;
 begin
@@ -1372,7 +1400,7 @@ begin
       pu^.uo_y:=ai_HTeleportNearest_u^.y;
       if(ai_HTeleportNearest_d<ai_HTeleportNearest_u^.uid^.uid_r)then
       begin
-         ai_HTeleportNearest_u^.uo_tar:=toU^.unum;
+         ai_HTeleportNearest_u^.rpoint_tar:=toU^.unum;
          unit_ability_teleport(pu,ai_HTeleportNearest_u,ai_HTeleportNearest_d);
       end;
    end;
@@ -1400,16 +1428,19 @@ end;
 function TransportLoadForDefend:boolean;
 begin
    TransportLoadForDefend:=false;
-   if(ai_TransportTar_BDefend_d<NOTSET)then
-     if(pu^.mapZone<>ai_BDefend_u^.mapZone)or(ai_BDefend_d>base_r5)then
-     begin
-        TransportLoadForDefend:=true;
-        pu^.uo_x:=ai_TransportTar_BDefend_u^.x;
-        pu^.uo_y:=ai_TransportTar_BDefend_u^.y;
-        if(ai_TransportTar_BDefend_d<50)
-        then pu^.uo_tar:=ai_TransportTar_BDefend_u^.unum
-        else pu^.uo_tar:=0;
-     end;
+   with pu^ do
+     if(ai_TransportTar_BDefend_d<NOTSET)then
+       if(pu^.mapZone<>ai_BDefend_u^.mapZone)or(ai_BDefend_d>base_r5)then
+         if(ai_TransportTar_BDefend_d<ai_BDefend_d)
+         or(transportC<=0)then
+         begin
+            TransportLoadForDefend:=true;
+            uo_x:=ai_TransportTar_BDefend_u^.x;
+            uo_y:=ai_TransportTar_BDefend_u^.y;
+            if(ai_TransportTar_BDefend_d<50)
+            then uo_tar:=ai_TransportTar_BDefend_u^.unum
+            else uo_tar:=0;
+         end;
 end;
 function TransportDefendBase:boolean;
 begin
@@ -1419,9 +1450,70 @@ begin
        if(pu^.transportC>0)then
        begin
           ai_RunTo(pu,ai_BDefend_d,0,0,pu^.srange,ai_BDefend_u);
-          if(ai_BDefend_d<=pu^.srange)then pu^.uo_id:=uab_Unload;
           TransportDefendBase:=true;
        end;
+   //with pu^ do if(isselected)then writeln('TransportDefendBase ',TransportDefendBase);
+end;
+function TransportAttackCommon(load_u:PTUnit;load_d:integer;myGroup:byte):boolean;
+begin
+   TransportAttackCommon:=false;
+   with pu^ do
+     if(tar_dist<NOTSET)then
+       if(myGroup=255)
+       or(myGroup=group)then
+         if(load_d=NOTSET)
+         or((tar_dist<load_d)and(transportC>0))then
+         begin
+            if(transportC>0)then
+              if(tar_dist<base_r1)then
+              begin
+                 uo_id:=unit_Ability2Act(pu,uab_Unload);
+                 if(not FollowCommander(true))then
+                   MainTargetGo(base_r1);
+                 TransportAttackCommon:=true;
+              end
+              else
+              begin
+                 if(not FollowCommander(true))then
+                   MainTargetGo(base_r1);
+                 TransportAttackCommon:=true;
+              end;
+         end
+         else
+         begin
+            uo_x:=load_u^.x;
+            uo_y:=load_u^.y;
+            if(load_d<50)
+            then uo_tar:=load_u^.unum
+            else uo_tar:=0;
+            TransportAttackCommon:=true;
+         end;
+   {with pu^ do
+     if(isselected)then
+     begin
+        writeln('TransportAttackCommon ',load_d,' ',myGroup);
+        if(ai_commander_fly_d<NOTSET)then
+          UnitsInfo_AddLine(x,y,ai_commander_fly_u^.x,ai_commander_fly_u^.y,c_aqua);
+     end; }
+end;
+function TransportDropAndRunOut:boolean;
+begin
+   TransportDropAndRunOut:=false;
+   with pu^ do
+     case(transportC>0)of
+     true : if(tar_dist<base_r1)and(tar_zone=mapZone)then
+            begin
+               MainTargetGo(-base_r1);
+               uo_id:=unit_Ability2Act(pu,uab_Unload);
+               TransportDropAndRunOut:=true;
+            end;
+     false: if(ai_enemy_d<base_r1)then
+            begin
+               ai_RunFrom(pu,ai_enemy_u,0,0);
+               TransportDropAndRunOut:=true;
+            end;
+     end;
+   //with pu^ do if(isselected)then writeln('TransportDropAndRunOut ',TransportDropAndRunOut);
 end;
 ////  SET GROUPS
 procedure SetGroupsForBase;
@@ -1431,7 +1523,11 @@ begin
    with uid^ do
    with player^ do
    begin
-      if((aip_flags and aif_army_scout)>0)and(ai_group_ucount[aic_group_Scout]=0)and(ai_scout_u=pu)then
+      if ((aip_flags and aif_army_scout)>0)
+      and(ai_group_ucount[aic_group_Scout]=0)
+      and(ai_scout_u=pu)
+      and(ai_enemy_d>base_r2)
+      then
       begin
          group:=aic_group_Scout;
          exit;
@@ -1448,16 +1544,7 @@ begin
          end;
       end;
 
-      {tlimit:=ai_group_ulimit[aic_group_base ]+
-              ai_group_ulimit[aic_group_Scout]+
-              ai_group_ulimit[aic_group_AttackNow ]+
-              ai_group_ulimit[aic_group_AttackWait]+
-              ai_group_ulimit[aic_group_KeyPointAssault]+
-              ai_group_ulimit[aic_group_KeyPointGuard  ];
-
-      if(tlimit>=aip_MaxArmyLimit)
-      or(armylimit>=aic_MaxLimitBorder)then
-        group:=aic_group_AttackNow;    }
+      if(units_bld_l[true]<=0)then group:=aic_group_AttackNow;
    end;
 end;
 ////
@@ -1472,6 +1559,14 @@ begin
       if(res_energyl_cur<0)then
       begin
          ai_Cancel_Prod(pu);
+         exit;
+      end;
+
+      //if(isselected)then writeln(ai_NeedLimitForTransport,' ',ai_enemy_d>base_r2,' ',-ai_ownDead_limit,' ',(armylimit+prod_unit_Limit)>(MaxPlayerLimit-g_uids[UID_HTeleport].uid_LimitUse));
+
+      if(ai_NeedSuicide(pu))then
+      begin
+         ai_Suicide(pu);
          exit;
       end;
 
@@ -1510,13 +1605,24 @@ begin
 
       // GROUP ACTIONS
       case group of
-      aic_group_TransportBase  : begin
-                                    if(not TransportDefendBase)then
-                                      if(not FollowCommander)then
-                                        ai_BaseIdle(pu,aic_BaseIdle_r);
-                                 end;
+      aic_group_TransportBase,
       aic_group_TransportAttack: begin
+                                    if(ai_keypoint_d<NOTSET)then
+                                      with ai_keypoint_kp^ do
+                                        MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,1,kp_RCapture);
+                                    MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,1);
 
+                                    if(not TransportDropAndRunOut)then
+                                      if(not TransportDefendBase)then
+                                        if(not TransportAttackCommon(ai_TransportTar_Attack_u,ai_TransportTar_Attack_d,aic_group_TransportAttack))then
+                                          if(not TransportAttackCommon(ai_TransportTar_BDefend_u,ai_TransportTar_BDefend_d,255))then
+                                            if(not FollowCommander)then
+                                            begin
+                                               ai_BaseIdle(pu,aic_BaseIdle_r);
+                                               if(ai_Base_d<srange)
+                                               or(ai_Base_d=NOTSET)
+                                               then uo_id:=unit_Ability2Act(pu,uab_Unload);
+                                            end;
                                  end;
       aic_group_KeyPointGuard,
       aic_group_KeyPointAssault: begin
@@ -1550,23 +1656,41 @@ begin
       aic_group_base           : if(not DefendBase)then
                                    if(not FollowCommander)then
                                    begin
-                                      MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,map_GetZone(aiu_alarm_x,aiu_alarm_y),1);
+                                      MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,1);
                                       if(tar_dist<srange)
                                       then MainTargetGo(0)
                                       else ai_BaseIdle(pu,aic_BaseIdle_r);
                                    end;
       aic_group_AttackNow      : begin
-                                    MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,map_GetZone(aiu_alarm_x,aiu_alarm_y),1);
-                                    MainTargetGo(0);
+                                    if(ai_keypoint_d<NOTSET)then
+                                      with ai_keypoint_kp^ do
+                                        MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,1,round(kp_RCapture*0.6));
+                                    MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,1);
+
+                                    if(tar_dist<=base_r1h)
+                                    then MainTargetGo(0)
+                                    else
+                                      if(not FollowCommander)then
+                                        MainTargetGo(0);
                                  end;
-      aic_group_AttackWait     : if(ai_HTeleportNearest_u<>nil)then
-                                 begin
-                                    // если есть к кому телепортироваться - то сразу идем телепортируемся, иначе гуляем вокруг
-                                    ai_RunTo(pu,ai_HTeleportNearest_d,0,0,aic_BaseIdle_r,ai_HTeleportNearest_u);
-                                 end
-                                 else
-                                   if(not FollowCommander)then
-                                     ai_BaseIdle(pu,aic_BaseIdle_r);
+      aic_group_AttackWait     : if(not DefendBase)then
+                                   if(ai_HTeleportNearest_u<>nil)then
+                                   begin
+                                      if(isselected)then
+                                      begin
+                                         if(ai_HTeleportTarget_u<>nil)then
+                                           UnitsInfo_AddLine(x,y,ai_HTeleportTarget_u^.x,ai_HTeleportTarget_u^.y,c_aqua);
+
+                                         UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_orange);
+
+                                      end;
+                                      if(ai_HTeleportTarget_u<>nil)
+                                      then TryTeleporting(ai_HTeleportTarget_u)
+                                      else ai_RunTo(pu,ai_HTeleportNearest_d,0,0,aic_BaseIdle_r,ai_HTeleportNearest_u);
+                                   end
+                                   else
+                                     if(not FollowCommander)then
+                                       ai_BaseIdle(pu,aic_BaseIdle_r);
       aic_group_Scout          : begin
                                     uo_id:=ua_move;
                                     if(ai_enemy_battle_u<>nil)and(ai_enemy_battle_d<srange)
@@ -1576,16 +1700,6 @@ begin
       end;
 
       if((aip_flags and aif_ability_other    )>0)then ai_AbilitiesCommon(pu);
-
-      {if(tar_dist<=base_r1h)then
-      begin
-         ai_RunTo(pu,tar_dist,tar_x,tar_y,0,nil);
-         {if(isselected)then
-         begin
-            UnitsInfo_AddLine(x+2,y-2,tar_x,tar_y,c_aqua);
-            writeln('if(tar_dist<=base_r2)');
-         end; }
-      end; }
    end;
 end;
 

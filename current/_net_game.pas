@@ -91,7 +91,7 @@ begin
       PNU     :=net_readbyte;
       log_n_cl:=net_readcard;
 
-      if(log_n_cl=log_n)then net_TimerLogsend:=0;
+      if(log_n_cl=log_n)then net_TimerLogSend:=0;
    end;
 end;
 
@@ -333,7 +333,7 @@ begin
                                        begin
                                           PNU     :=net_readbyte;
                                           log_n_cl:=net_readcard;
-                                          if(log_n_cl=log_n)then net_TimerLogsend:=0;
+                                          if(log_n_cl=log_n)then net_TimerLogSend:=0;
                                        end;
                  nmid_pause          : begin
                                           if(G_Status<=LastPlayer)then
@@ -444,13 +444,13 @@ begin
                net_send(net_ip,net_port);
             end;
 
-            if(net_TimerLogsend<=0)and(log_n_cl<>log_n)then
+            if(net_TimerLogSend<=0)and(log_n_cl<>log_n)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_LogUpdate);
                wudata_log(pid,@log_n_cl,false);
                net_send(net_ip,net_port);
-               net_TimerLogsend:=fr_fpsh;
+               net_TimerLogSend:=fr_fpsh;
             end;
          end;
 

@@ -1308,8 +1308,8 @@ begin
          end;
 
          // Groups
-         for k:=iAct_USetGroup0 to iAct_USetGroup9 do if(InputActionPressed(k))then units_Grouping   (false,k-iAct_USetGroup0);
-         for k:=iAct_UAddGroup1 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_Grouping   (true ,k-iAct_UAddGroup1+1);
+         for k:=iAct_USetGroup0 to iAct_USetGroup9 do if(InputActionPressed(k))then units_SetGroup   (false,k-iAct_USetGroup0);
+         for k:=iAct_UAddGroup1 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_SetGroup   (true ,k-iAct_UAddGroup1+1);
          for k:=iAct_UASlGroup1 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup1+1);
          for k:=iAct_USelGroup1 to iAct_USelGroup9 do
            if(InputActionDPressed(k))

@@ -474,7 +474,7 @@ begin
      end;
 end;
 
-procedure map_KeyPoints_AddAtStarts(aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+{procedure map_KeyPoints_AddAtStarts(aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
 var   p:byte;
 r,sx,sy:integer;
 begin
@@ -492,7 +492,7 @@ begin
         map_KeyPoints_Add(map_PlayerStartX[p]+r*sx,
                           map_PlayerStartY[p]+r*sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
      end;
-end;
+end;}
 
 procedure map_KeyPoints_Create;
 var i:byte;
@@ -509,7 +509,7 @@ mc_KeyPoints: begin
 
    if(map_generators>0)then
    begin
-      map_KeyPoints_AddAtStarts(keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+      //map_KeyPoints_AddAtStarts(keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
       map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
    end;
 

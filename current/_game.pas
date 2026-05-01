@@ -331,7 +331,7 @@ begin
        if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
-procedure GameCreateStartBase(x,y:integer;uid,playerN,count:byte);
+{procedure GameCreateStartBase(x,y:integer;uid,playerN,count:byte);
 var
 i     :byte;
 r,d,ds:integer;
@@ -358,6 +358,34 @@ begin
          0,uid,playerN,true,false,0);
 
          d+=ds;
+      end;
+   end;
+end; }
+
+procedure GameCreateStartBase(x,y:integer;uid_Builder,uid_Gen,playerN:byte);
+var
+stepR,
+stepD,
+dir,
+num  :integer;
+begin
+   unit_add(x,y,0,uid_Builder,playerN,true,false,0);
+   if(map_generators>0)then
+   begin
+      stepR:=g_uids[uid_Builder].uid_r+g_uids[uid_Gen].uid_r;
+      if(g_uids[uid_Gen].uid_LimitUse>ul1)
+      then num:=2
+      else num:=4;
+      stepD:=360 div num;
+      dir:=point_dir(x,y,map_Sizeh,map_Sizeh)+(stepD div 2);
+      while(num>0)do
+      begin
+         unit_add(
+         x+round(stepR*cos(dir*DEGTORAD)),
+         y-round(stepR*sin(dir*DEGTORAD)),
+         0,uid_Gen,playerN,true,false,0);
+         num-=1;
+         dir+=stepD;
       end;
    end;
 end;
@@ -403,7 +431,10 @@ begin
           PlayerSetSkirmishTech(p);
           ai_PlayerSetSkirmishSettings(p);
           if(not isobserver)then
-             GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_race_start_fbase[race],p,0)
+            case race of
+            r_hell: GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_HKeep         ,uid_HSymbol4   ,p);
+            r_uac : GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],UID_UCommandCenter,UID_UGenerator4,p);
+            end;
        end;
 
    {$IFDEF _FULLGAME}
@@ -663,7 +694,7 @@ begin
        end;
    if(ui_tab_Auto)then ui_Commander2Tab;
 end;
-procedure units_Grouping(add:boolean;fgroup:byte);
+procedure units_SetGroup(add:boolean;fgroup:byte);
 var u:integer;
 begin
    if(not ui_GameControlsEnabled)
@@ -877,7 +908,7 @@ begin
 end;
 
 procedure game_PlayersCycle;
-var p:byte;
+var p,t:byte;
 trevealed:boolean;
 begin
    for p:=0 to LastPlayer do
@@ -909,7 +940,7 @@ begin
                        continue;
                     end;
              end;
-             if(net_TimerLogsend>0)then net_TimerLogsend-=1;
+             if(net_TimerLogSend>0)then net_TimerLogSend-=1;
           end;
 
           if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(G_Started)and(G_Status=gs_running)and(not isobserver)and(not isdefeated)then
@@ -948,6 +979,13 @@ begin
                  end;
           end;
        end;
+
+   if(g_cycle_order=0)and(map_scenario=mc_royale)then
+     for t:=0 to LastPlayer do
+       for p:=0 to ai_LastAlarm do
+         with ai_TeamAlarms[t,p] do
+           if(aia_limit>0)then
+             if(g_CheckRoyalBattlePoint(aia_x,aia_y,base_r1))then aia_limit:=0;
 end;
 
 procedure game_LobbyTimer;

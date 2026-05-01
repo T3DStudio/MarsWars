@@ -1761,15 +1761,15 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(uid_isbuilder)then units_builders_ec+=1;
+      if(uid_isbuilder)then units_builders_c+=1;
       if(uid_isbarrack)then
       begin
-         units_unitProds_ec+=1;
+         units_unitProds_c+=1;
          prod_unit_Max+=level+1;
       end;
       if(uid_isforge  )then
       begin
-         units_upgrProds_ec+=1;
+         units_upgrProds_c+=1;
          prod_upgr_Max+=level+1;
       end;
    end;
@@ -1780,15 +1780,15 @@ begin
    with uid^ do
    with player^ do
    begin
-      if(uid_isbuilder)then units_builders_ec-=1;
+      if(uid_isbuilder)then units_builders_c-=1;
       if(uid_isbarrack)then
       begin
-         units_unitProds_ec-=1;
+         units_unitProds_c-=1;
          prod_unit_Max-=level+1;
       end;
       if(uid_isforge  )then
       begin
-         units_upgrProds_ec-=1;
+         units_upgrProds_c-=1;
          prod_upgr_Max-=level+1;
       end;
    end;
@@ -1802,8 +1802,9 @@ begin
    begin
       if(units_uid_u[uidi                    ]<=0)then units_uid_u[uidi                    ]:=unum;
       if(units_ucl_u[uid_isbuilding,uid_uibtn]<=0)then units_ucl_u[uid_isbuilding,uid_uibtn]:=unum;
+      //units_all_c+=1;
       units_ucl_c[uid_isbuilding,uid_uibtn]+=1;
-      units_uid_c[uidi            ]+=1;
+      units_uid_c[uidi                    ]+=1;
       res_energyl_max+=uid_gen_EnergyLevel;
       res_energyl_cur+=uid_gen_EnergyLevel;
       unit_IncCounters_Prod(pu);
@@ -2424,6 +2425,7 @@ begin
          unit_ProdStopUpgrade(pu,255,true     ,false);
          unit_TransformStop  (pu,false);
 
+         //units_all_c-=1;
          units_ucl_c[uid_isbuilding,uid_uibtn]-=1;
          units_uid_c[uidi                    ]-=1;
          res_energyl_max-=uid_gen_EnergyLevel;

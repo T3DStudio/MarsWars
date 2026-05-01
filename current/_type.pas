@@ -668,13 +668,14 @@ TPlayerGameData = record
    units_bld_l     : array[false..true] of longint; // limit
 
    units_all_e,
+   //units_all_c,
    units_all_s,
    units_builders_e,
-   units_builders_ec, // builders
+   units_builders_c,  // builders
    units_builders_s,
-   units_unitProds_ec,// barracks
+   units_unitProds_c, // barracks
    units_unitProds_s,
-   units_upgrProds_ec,// forges
+   units_upgrProds_c, // forges
    units_upgrProds_s
                    : integer;
 
@@ -735,6 +736,7 @@ TPlayerGameData = record
 
    // operative data
 
+   aip_timer_attack,
    aip_timer_detection,
    aip_timer_magic,
    aip_timer_superweapon
@@ -757,6 +759,7 @@ TPlayerGameData = record
    aip_MaxUpgradeLevel
                        : byte;
 
+   aip_pause_attack,
    aip_pause_detection,
    aip_pause_magic,
    aip_pause_superweapon
@@ -773,7 +776,7 @@ TPlayerNetData = record
    net_ttl : word;
    net_ip  : cardinal;
    net_port: word;
-   net_TimerLogsend
+   net_TimerLogSend
            : integer;
 end;
 
@@ -854,6 +857,7 @@ TUnit = record
    aiu_alarm_x,
    aiu_alarm_y
                  : integer;
+   aiu_alarm_zone: word;
 
    player        : PTPlayerGameData;
    uid           : PTUID;

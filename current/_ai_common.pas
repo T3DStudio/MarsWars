@@ -10,26 +10,30 @@ aic_GeneratorsDestoryLimit = ul1*35;
 
 aic_TowerLifeTime          = fr_fps1*60;
 
-aic_BaseIdle_r              = 50;
+aic_BaseIdle_r             = 50;
 
-aic_max_specialist          = 5;
+aic_max_SpecUID            = 6;
 
-aic_group_base              = 0;
-aic_group_AttackNow         = 1;
-aic_group_AttackWait        = 2;   // wait for target
-aic_group_Scout             = 3;
-aic_group_TransportBase     = 4;
-aic_group_TransportAttack   = 5;
-aic_group_KeyPointAssault   = 6;
-aic_group_KeyPointGuard     = 7;
+aic_group_base             = 0;
+aic_group_AttackNow        = 1;
+aic_group_AttackWait       = 2;
+aic_group_Scout            = 3;
+aic_group_TransportBase    = 4;
+aic_group_TransportAttack  = 5;
+aic_group_KeyPointAssault  = 6;
+aic_group_KeyPointGuard    = 7;
 
 var
 
 ai_group_ucount   : array[0..MaxUnitGroups] of integer;
 ai_group_ulimit   : array[0..MaxUnitGroups] of longint;
 
+ai_ownDead_limit  : longint = 0;
+ai_NeedFreeLimit  : longint = 0;
+
 ai_choosen,
-ai_flags_BaseAdvance
+ai_flags_BaseAdvance,
+ai_available_HKeep
                   : boolean;
 
 ai_generator_kp,
@@ -104,6 +108,7 @@ ai_near_HEye,
 ai_HTeleportAlarmed_d,
 ai_HTeleportNearest_d,
 ai_HTeleportNearest_rld,
+ai_HTeleportTarget_d,
 
 ai_TransportTar_Attack_d,
 ai_TransportTar_BDefend_d,
@@ -149,6 +154,7 @@ ai_SphereTurbo_u,
 
 ai_HTeleportAlarmed_u,
 ai_HTeleportNearest_u,
+ai_HTeleportTarget_u,
 
 ai_scout_u,
 
@@ -161,6 +167,24 @@ ai_TransportTar_BDefend_u
 
 ai_Strike_w
                   : byte;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   AI OTHER COMMON
+//
+
+function ai_IsAvailableUID(player:PTPlayerGameData;uid:byte):boolean;
+begin
+   case CheckUnitReqs(player,uid) of
+   0,
+   lmt_Req_Limit,
+   lmt_Req_HellPower,
+   lmt_Req_UACLoot,
+   lmt_Req_Energy,
+   lmt_Req_MaxCount : ai_IsAvailableUID:=player^.aip_MaxEnergy>=g_uids[uid].uid_req_EnergyLevel;
+   else               ai_IsAvailableUID:=false;
+   end;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -248,7 +272,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
-procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxArmyLimit,aDetectionPause,aSpecialPause:integer);
+procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
 begin
    with g_gplayers[p] do
    begin
@@ -260,9 +284,10 @@ begin
       aip_MinTowers        :=aMinTowers;
       aip_MaxTowers        :=aMaxTowers;
       aip_MaxArmyLimit     :=aMaxArmyLimit*ul1;
+      aip_pause_attack     :=max2i(fr_fps1,fr_fps1*aAttackPause   );
       aip_pause_detection  :=max2i(fr_fps1,fr_fps1*aDetectionPause);
-      aip_pause_magic      :=max2i(fr_fps1,fr_fps1*aSpecialPause);
-      aip_pause_superweapon:=max2i(fr_fps1,fr_fps1*aSpecialPause);
+      aip_pause_magic      :=max2i(fr_fps1,fr_fps1*aSpecialPause  );
+      aip_pause_superweapon:=max2i(fr_fps1,fr_fps1*aSpecialPause  );
 
       aip_MaxArmyMinPart   :=mm3i(ul2,aip_MaxArmyLimit div 4,ul10);
       {
@@ -280,16 +305,16 @@ begin
    with g_gplayers[p] do
    begin
       case aip_skill of
-      //              energy buil bar   forges dete  min   max       pause
-      //                     ders racks        ctors tower tower     dtct spec
-      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0   ,0   );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,10 ,60  ,180 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
-      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,40 ,20  ,120 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
-      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,65 ,10  ,60  );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,125,0   ,30  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,125,0   ,0   );//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      //              energy buil bar   forges dete  min   max        pause
+      //                     ders racks        ctors tower tower      dtct spec
+      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0  ,0   ,0   );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
+      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,10 ,150,60  ,180 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
+      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,40 ,100,20  ,120 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
+      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,65 ,50 ,10  ,60  );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,125,0  ,0   ,30  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,125,0  ,0   ,0   );//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
       end;
-      //aic_max_specialist:=aip_skill-1;
+      //aic_max_SpecUID:=aip_skill-1;
       if(aip_skill>1)
       then aip_MaxUpgradeLevel:=aip_skill
       else aip_MaxUpgradeLevel:=0;
@@ -376,6 +401,7 @@ begin
       aiu_alarm_d          :=NOTSET;
       aiu_alarm_x          :=-1;
       aiu_alarm_y          :=-1;
+      aiu_alarm_zone       := 0;
       aiu_NeedDetect       :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
@@ -387,19 +413,21 @@ begin
 end;
 
 
-procedure ai_Local_SetCurrentAlarm(pu,tar_u:PTUnit;tar_x,tar_y,tar_dist:integer);
+procedure ai_Local_SetCurrentAlarm(pu,tar_u:PTUnit;tar_x,tar_y,tar_dist:integer;tar_zone:word);
 begin
    with pu^ do
      if(tar_dist<aiu_alarm_d)then
      begin
         if(tar_u<>nil)then
         begin
-           tar_x:=tar_u^.x;
-           tar_y:=tar_u^.y;
+           tar_x   :=tar_u^.x;
+           tar_y   :=tar_u^.y;
+           tar_zone:=tar_u^.mapZone;
         end;
-        aiu_alarm_x:=tar_x;
-        aiu_alarm_y:=tar_y;
-        aiu_alarm_d:=tar_dist;
+        aiu_alarm_x   :=tar_x;
+        aiu_alarm_y   :=tar_y;
+        aiu_alarm_d   :=tar_dist;
+        aiu_alarm_zone:=tar_zone;
      end;
 end;
 
@@ -427,20 +455,48 @@ procedure ai_Global_InitVars(pu:PTUnit);
 var i,d   :integer;
 koth_point:boolean;
 begin
+   ai_NeedFreeLimit        :=0;
+
    with pu^ do
    with uid^ do
    with player^ do
    begin
-      ai_flags_BaseAdvance:=(aip_flags and aif_base_advance )>0;
-      //ai_teleport_use    :=(ai_flags and aif_army_teleport)>0;
-      ai_choosen          :=(units_uid_c[uidi]>1)and(unum=units_uid_u[uidi]);
+      ai_flags_BaseAdvance :=(aip_flags and aif_base_advance )>0;
+      ai_choosen           :=(units_uid_c[uidi]>1)and(unum=units_uid_u[uidi]);
       ai_AvailableDetectors:= units_uid_e[UID_HEye]+units_uid_e[UID_URadar];
+      ai_UpgradesLeft      := ai_CalcUpgradesLeft(player);
+      case race of
+      r_hell: begin
+                 if (units_uid_e[UID_HTeleport]=0)
+                 and(ai_IsAvailableUID(player,UID_HTeleport))
+                 and((units_uid_e[UID_HKeep]>0)or(units_uid_e[UID_HAKeep]>0))
+                 and(ai_group_ucount[aic_group_AttackWait]> 0)
+                 and(ai_group_ucount[aic_group_AttackNow ]<=0)
+                 and((armylimit+prod_unit_Limit)>(MaxPlayerLimit-g_uids[UID_HTeleport].uid_LimitUse))then ai_NeedFreeLimit:=g_uids[UID_HTeleport].uid_LimitUse;
 
-      ai_UpgradesLeft :=ai_CalcUpgradesLeft(player);
+
+              end;
+      r_uac : begin
+              end;
+      end;
+
+
+      {case race of
+      r_hell : ai_NeedLimitForTransport:=
+      r_uac  : ai_NeedLimitForTransport:=((units_uid_e[UID_UTransport]+prod_unit_uid[UID_UTransport])=0)
+                                      and(ai_IsAvailableUID(player,UID_UTransport))
+                                      and(ai_group_ucount[aic_group_AttackWait]> 0)
+                                      and(ai_group_ucount[aic_group_AttackNow ]<=0)
+                                      and((armylimit+prod_unit_Limit)>(MaxPlayerLimit-g_uids[UID_UTransport].uid_LimitUse));
+      end; } //ai_NeedFreeLimit
+
+      ai_available_HKeep:=ai_IsAvailableUID(player,UID_HKeep);
    end;
 
    FillChar(ai_group_ucount,SizeOf(ai_group_ucount),0);
    FillChar(ai_group_ulimit,SizeOf(ai_group_ulimit),0);
+
+   ai_ownDead_limit        :=0;
 
    //ai_limitaround_own      := 0;
    ai_armylimit_ForTeleport:= 0;
@@ -531,7 +587,8 @@ begin
    begin
       // nearest point/generator
       ai_keypoint_koth:=false;
-      for i:=0 to LastKeyPoint do
+      if(map_KeyPointsN>0)then
+      for i:=0 to map_KeyPointsN-1 do
         with map_KeyPointsL[i] do
         with kp_TeamData[MaxPlayers] do
           if(kptd_Active)then
@@ -540,11 +597,14 @@ begin
              begin
                 if(kp_Energy>0)then
                 begin
-                   ai_energy_future+=kp_Energy;
+                   ai_energy_future +=kp_Energy;
                    ai_energy_current+=kp_Energy;
                 end
                 else ai_keypoint_n+=1;
              end;
+
+             if(kptd_OwnerTeam<=LastPlayer)and(kptd_OwnerTeam<>team)then
+               ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,point_dist_int(kp_x,kp_y,x,y),kp_zone);
 
              if(map_scenario=mc_royale)then
                if(g_royal_r<(kp_ToCenterD+kp_RCapture))then continue;
@@ -559,9 +619,6 @@ begin
 
              koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_tick>=keyPoint_KotH_pause);
 
-
-             //if(kptd_OwnerTeam<>team)then
-             //  if(kptd_Timer>0)and(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;    // ??
              if(not koth_point)then
              begin
                 if(kptd_OwnerTeam=team)and(kptd_OwnerPlayer<>playeri)then continue;
@@ -633,6 +690,9 @@ begin
    ai_HTeleportNearest_d:= NOTSET;
    ai_HTeleportNearest_rld:=NOTSET;
    ai_HTeleportNearest_u:= nil;
+   ai_HTeleportTarget_d := NOTSET;
+   ai_HTeleportTarget_u := nil;
+
    //ai_limitaround_teleports:= 0;
 
    {// teleporter beacon
@@ -907,6 +967,7 @@ begin
    with newu^ do
    with uid^ do
      if(aiu_limitaround_enemy<aiu_limitaround_ally)
+     or(not newu^.uid^.uid_CanAttack and (newu^.buffs[ub_damaged]<=0))
      then exit;
 
    // scout or harrasment groups in first
@@ -1040,6 +1101,7 @@ begin
      if(speed<11)
      or(uid_LimitUse>ul2)
      or(transportM>0)
+     or(aiu_alarm_d<base_r2)
      then exit;
 
    if(ai_scout_u=nil)
@@ -1101,78 +1163,63 @@ begin
    ai_BDefend_d:=ud;
 end;
 
-procedure ai_player_code(playeri:byte);
-var tu:PTunit;
-    a :byte;
+procedure ai_player_code(playerN:byte);
+var
+a:byte;
+u:integer;
+limit_Attack,
+limit_Base:longint;
 begin
-   with g_gplayers[playeri] do
+   with g_gplayers[playerN] do
    begin
-      {if(IsUnitRange(ai_scout_u_cur,@tu))
-      then ai_scout_u_cur_w:=GetWeaponPriority(tu,wtp_Scout,false)
-      else
-      begin
-         ai_scout_u_cur_w:=0;
-         ai_scout_u_cur  :=0;
-      end;
-      if(ai_scout_u_new>0)then
-      begin
-         if(ai_scout_u_new_w>ai_scout_u_cur_w)then
-         begin
-            ai_scout_u_cur_w:=ai_scout_u_new_w;
-            ai_scout_u_cur  :=ai_scout_u_new  ;
-         end;
-      end;
-      ai_scout_u_new  :=0;
-      ai_scout_u_new_w:=0; }
-
       if(aip_timer_detection  >0)then aip_timer_detection  -=1;
       if(aip_timer_magic      >0)then aip_timer_magic      -=1;
       if(aip_timer_superweapon>0)then aip_timer_superweapon-=1;
 
-      if(g_cycle_order=pnum)then
+      //if(g_cycle_order=playerN)then
+
+      if(aip_timer_attack<0)then
       begin
-         if(map_scenario=mc_royale)then
-           for a:=0 to ai_LastAlarm do
-             with ai_TeamAlarms[team,a] do
-               if(aia_limit>0)then
-                 if(g_CheckRoyalBattlePoint(aia_x,aia_y,base_r1))then aia_limit:=0;
+         aip_timer_attack+=1;
+         if(aip_timer_attack>=0)then
+         begin
+            limit_Attack:=0;
+            limit_Base  :=0;
+            for u:=1 to MaxUnits do
+              with g_punits[u]^ do
+              with uid^ do
+                if(hits>0)and(playerN=playeri)and(not uid_isbuilding)then
+                  case group of
+                  aic_group_Base      : limit_Base  +=uid_LimitUse;
+                  aic_group_AttackNow,
+                  aic_group_AttackWait: limit_Attack+=uid_LimitUse;
+                  end;
 
-         {if(ai_scout_u_cur=0)
-         then ai_scout_timer:=0
-         else
-           if(ai_scout_timer=0)
-           then ai_scout_timer:=max2i(1,ai_attack_delay)
-           else ai_timer(@ai_scout_timer,0);
-
-         ai_ReadyForAttack:=(armylimit>=ai_limit_border)
-                          or((units_bld_l[false]+prod_unit_Limit)>=ai_maxlimit_blimit)
-                          or(units_bld_l[true]<=0);
-
-         if(not ai_ReadyForAttack)
-         then ai_attack_timer:=0
-         else
-           if(ai_attack_timer=0)
-           then ai_attack_timer:=max2i(1,ai_attack_delay)
-           else ai_timer(@ai_attack_timer,fr_fps60); }
-      end;
-   end;
-end;
-
-{procedure ai_GoTo(pu:PTUnit;ux,uy,ud,ur:integer);
-begin
-   with pu^ do
-   begin
-      if(ud=NOTSET)then ud:=point_dist_int(x,y,ux,uy);
-      if(ud>ur)then
-      begin
-         uo_x:=ux;
-         uo_y:=uy;
+            if(limit_Attack<=aip_MaxArmyMinPart)or(limit_Attack<limit_Base)
+            then aip_timer_attack:=0
+            else aip_timer_attack:=hits_ndead
+         end;
       end
       else
-      begin
-         uo_x:=ux-g_randomr(ur);
-         uo_y:=uy-g_randomr(ur);
-      end;
+        if(aip_timer_attack=0)then
+        begin
+           if(armylimit>=aic_MaxLimitBorder)
+           or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxArmyLimit)then
+             aip_timer_attack:=aip_pause_attack+1;
+        end
+        else
+        begin
+           aip_timer_attack-=1;
+           if(aip_timer_attack<=0)then
+           begin
+              for u:=1 to MaxUnits do
+                with g_punits[u]^ do
+                with uid^ do
+                  if(hits>0)and(playerN=playeri)and(not uid_isbuilding)and(group=aic_group_base)then
+                    group:=aic_group_AttackNow;
+              aip_timer_attack:=hits_ndead;
+           end;
+        end;
    end;
-end;  }
+end;
 

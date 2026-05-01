@@ -706,7 +706,7 @@ BaseDamage6            = BaseDamage1*6;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
-BaseRegen1             = 5;
+BaseRegen1             = 4;
 
 BaseDamageLevel1       = 2.5;
 BaseArmorLevel1        = 2.5;
@@ -839,7 +839,8 @@ uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,U
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-uid_race_start_fbase   : array[1..r_count] of smallint = (UID_HKeep ,UID_UCommandCenter );
+//uid_race_start_fbase   : array[1..r_count] of smallint = (UID_HKeep ,UID_UCommandCenter );
+//uid_race_start_gen     : array[1..r_count] of smallint = (UID_HKeep ,UID_UCommandCenter );
 
 
 ////////////////////////////////////////////////////////////////////////////////

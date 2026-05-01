@@ -457,7 +457,7 @@ begin
        begin
           if(move_px<>move_x)or(move_py<>move_y)then
           begin
-             if(player^.state<>ps_AI)then
+             //if(player^.state<>ps_AI)then
                if(x<>move_x)
                or(y<>move_y)then dir:=point_dir(x,y,move_x,move_y);
              move_px:=move_x;

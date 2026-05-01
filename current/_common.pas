@@ -1197,10 +1197,10 @@ begin
    begin
       case uid_isbuilding of
 true  : begin
-           if(units_builders_ec<=0)then begin CheckUnitReqs:=lmt_unit_NeedBuilder;exit;end;
-           if(build_cd         > 0)then begin CheckUnitReqs:=lmt_prod_BadOrder;   exit;end;  ////
+           if(units_builders_c<=0)then begin CheckUnitReqs:=lmt_unit_NeedBuilder;exit;end;
+           if(build_cd        > 0)then begin CheckUnitReqs:=lmt_prod_BadOrder;   exit;end;  ////
         end;
-false : if(units_unitProds_ec<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;end;
+false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;end;
       end;
 
       if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])
@@ -1260,7 +1260,7 @@ begin
    with player^ do
    with g_upgrs[upgr] do
    begin
-      if(units_upgrProds_ec<=0)then
+      if(units_upgrProds_c<=0)then
       begin CheckUpgradeReqs:=lmt_NeedProdUnit;exit;end;
 
       if((upgrs_cur[upgr]+prod_upgr_upid[upgr])>=upgrs_max[upgr] )then  //min2i(upgr_max,)
