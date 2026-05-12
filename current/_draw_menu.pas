@@ -66,7 +66,7 @@ begin
         end;
 
         rectangleColor(tar,mi_xc-menu_ItemCaptionhW,mi_y0,
-                           mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonhH,c_ltgray);
+                           mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonq,c_ltgray);
         draw_text(tar,mi_xc,mi_y0+font_wh ,text,ta_MU,255,color);
      end;
 end;
@@ -415,7 +415,7 @@ function TeamChar(p:byte):char;
 begin
    if(map_scenario in mc_fixed_teams)
    then TeamChar:=b2s(PlayerGetFixedTeams(map_scenario,p)+1)[1]
-   else TeamChar:=b2s(g_gplayers[p].team+1)[1]
+   else TeamChar:=b2s(g_PlayersMain[p].team+1)[1]
 end;
 function AISlotsSOpt:shortstring;
 begin
@@ -451,7 +451,7 @@ begin
 
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(state<>ps_None)then
        begin
           if(p=LocalPlayer)
@@ -504,14 +504,14 @@ begin
        end;
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
      with menu_items[mi_Players_Ping0+p] do
        if(mi_state>as_off)then
          if(net_status=ns_none)or(state<>ps_Human)
          then boxColor(tar,mi_x0+font_wh,mi_y0+font_wh,
                            mi_x1-font_wh,mi_y1-font_wh,PlayerGetColor(p,false))
          else
-           with g_nplayers[p] do
+           with g_PlayersTemp[p] do
              if((net_status<>ns_client)and(p=LocalPlayer  ))
              or((net_status= ns_client)and(p=net_cl_Hoster))
              then draw_text(tar,mi_xc,mi_yc,str_ps_Host,ta_MM,255,PlayerGetColor(p,false))

@@ -59,7 +59,7 @@ begin
      begin
         if(kptd_OwnerPlayer<=LastPlayer)then
         begin
-           with g_gplayers[kptd_OwnerPlayer] do
+           with g_PlayersMain[kptd_OwnerPlayer] do
            begin
               res_energyl_cur-=kp_Energy;
               res_energyl_max-=kp_Energy;
@@ -69,12 +69,12 @@ begin
 
         kptd_OwnerPlayer:=newOwnerPlayer;
         if(kptd_OwnerPlayer<=LastPlayer)
-        then kptd_OwnerTeam:=g_gplayers[newOwnerPlayer].team
+        then kptd_OwnerTeam:=g_PlayersMain[newOwnerPlayer].team
         else kptd_OwnerTeam:=kptd_OwnerPlayer;
 
         if(kptd_OwnerPlayer<=LastPlayer)then
         begin
-           with g_gplayers[kptd_OwnerPlayer] do
+           with g_PlayersMain[kptd_OwnerPlayer] do
            begin
               res_energyl_cur+=kp_Energy;
               res_energyl_max+=kp_Energy;
@@ -118,13 +118,31 @@ begin
      end;
 end;
 
+{$IFDEF _FULLGAME}
+procedure Scenario_KeyPointsCodeClient;
+var i:byte;
+begin
+   Scenario_KeyPointsTeam;
+   for i:=0 to LastKeyPoint do
+     with map_KeyPointsL[i] do
+     with kp_TeamData[MaxPlayers] do
+       if(kptd_Active)then
+       begin
+          kp_LimitPlayerP :=kp_LimitPlayerC;
+          kp_LimitTeamP   :=kp_LimitTeamC;
+          FillChar(kp_LimitPlayerC,SizeOf(kp_LimitPlayerC),0);
+          FillChar(kp_LimitTeamC  ,SizeOf(kp_LimitTeamC  ),0);
+       end;
+end;
+{$ENDIF}
+
 procedure Scenario_KeyPointsCodeServer;
 var
 i,p,
 tCapturingPlayer,
 tPlayers,
 tTeams  : integer;
-
+cLimit  : longint;
 begin
    Scenario_KeyPointsTeam;
 
@@ -156,18 +174,22 @@ begin
              continue;
           end;
 
+          if(kp_Energy>0)
+          then cLimit:=keyPoint_MinLimit
+          else cLimit:=ul1;
+
           tPlayers:=0;
           tCapturingPlayer:=kptd_OwnerPlayer;
           kp_LimitPlayerP :=kp_LimitPlayerC;
           kp_LimitTeamP   :=kp_LimitTeamC;
           if(kptd_OwnerPlayer<=LastPlayer)then
-            if(kp_LimitPlayerC[kptd_OwnerPlayer]>0)then
+            if(kp_LimitPlayerC[kptd_OwnerPlayer]>=cLimit)then
             begin
                tPlayers:=1;
                tCapturingPlayer:=kptd_OwnerPlayer;
             end;
           if(kptd_TimerOwnerPlayer<=LastPlayer)then
-            if(kp_LimitPlayerC[kptd_TimerOwnerPlayer]>0)then
+            if(kp_LimitPlayerC[kptd_TimerOwnerPlayer]>=cLimit)then
             begin
                tPlayers:=1;
                tCapturingPlayer:=kptd_TimerOwnerPlayer;
@@ -176,12 +198,12 @@ begin
           tTeams:=0;
           for p:=0 to LastPlayer do
           begin
-             if(kp_LimitPlayerC[p]>0)and(p<>kptd_OwnerPlayer)and(p<>kptd_TimerOwnerPlayer)then
+             if(kp_LimitPlayerC[p]>=cLimit)and(p<>kptd_OwnerPlayer)and(p<>kptd_TimerOwnerPlayer)then
              begin
                 if(tPlayers=0)then tCapturingPlayer:=p;
                 tPlayers+=1;
              end;
-             if(kp_LimitTeamC  [p]>0)then
+             if(kp_LimitTeamC  [p]>=cLimit)then
                tTeams+=1;
 
              kp_LimitPlayerC[p]:=0;
@@ -215,7 +237,7 @@ begin
                  begin
                     kptd_TimerOwnerPlayer:=tCapturingPlayer;
                     if(kptd_TimerOwnerPlayer<=LastPlayer)
-                    then kptd_TimerOwnerTeam:=g_gplayers[kptd_TimerOwnerPlayer].team
+                    then kptd_TimerOwnerTeam:=g_PlayersMain[kptd_TimerOwnerPlayer].team
                     else kptd_TimerOwnerTeam:=255;
                     if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
                     kptd_Timer:=0;

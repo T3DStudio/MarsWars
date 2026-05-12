@@ -201,7 +201,7 @@ end;
 procedure effect_ScanSound(pCaster:PTUnit);
 begin
    if(UIPlayer<=LastPlayer)then
-     if(pCaster^.player^.team<>g_gplayers[UIPlayer].team)then exit;
+     if(pCaster^.player^.team<>g_PlayersMain[UIPlayer].team)then exit;
    snd_SoundPlayUnit(snd_RadarScan,nil,nil);
 end;
 
@@ -273,7 +273,7 @@ begin
    end;
 end;
 
-procedure unit_SetXY(pu:PTUnit;ax,ay:integer;movevxy:byte);
+procedure unit_SetXY(pu:PTUnit;ax,ay:integer;movevxy:byte;updateXY:boolean=true);
 var _px,_py:integer;
 begin
    with pu^ do
@@ -284,7 +284,8 @@ begin
       y:=mm3i(1,ay,map_Size1);
       if(x<>_px)or(y<>_py)then
       begin
-         unit_UpdateXY(pu);
+         if(updateXY)then
+           unit_UpdateXY(pu);
          case uo_id of
          ua_move,
          ua_hold,
@@ -686,7 +687,7 @@ procedure ability_UACStrike_missile(pu:PTUnit);
 begin
    with pu^ do
    begin
-      missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot,false);
+      missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
       {$IFDEF _FULLGAME}
       effect_RStationShot(pu);
       {$ENDIF}
@@ -1275,7 +1276,7 @@ begin
 
    VisionTeam:=255;
    if(VisionPlayer<MaxPlayers)then
-     VisionTeam:=g_gplayers[VisionPlayer].team;
+     VisionTeam:=g_PlayersMain[VisionPlayer].team;
 
    if(flyLevel)then check_obstacles:=false;
 
@@ -1516,7 +1517,7 @@ var u:integer;
  zone:word;
 begin
    if(playerN<=LastPlayer)then
-     with g_gplayers[playerN] do
+     with g_PlayersMain[playerN] do
        if(units_builders_e<=0)then
        begin
           CheckInBuildArea:=cba_noBuilders; // no builders
@@ -1802,11 +1803,10 @@ begin
    begin
       if(units_uid_u[uidi                    ]<=0)then units_uid_u[uidi                    ]:=unum;
       if(units_ucl_u[uid_isbuilding,uid_uibtn]<=0)then units_ucl_u[uid_isbuilding,uid_uibtn]:=unum;
-      //units_all_c+=1;
       units_ucl_c[uid_isbuilding,uid_uibtn]+=1;
       units_uid_c[uidi                    ]+=1;
-      res_energyl_max+=uid_gen_EnergyLevel;
-      res_energyl_cur+=uid_gen_EnergyLevel;
+      res_energyl_max +=uid_gen_EnergyLevel;
+      res_energyl_cur +=uid_gen_EnergyLevel;
       unit_IncCounters_Prod(pu);
    end;
 end;
@@ -1832,9 +1832,10 @@ begin
       else
       begin
          hits  := 1;
-         res_energyl_cur-=uid_req_EnergyLevel;
-         res_HellPower  -=uid_req_HellPower;
-         res_UACLoot    -=uid_req_UACLoot;
+         energyCur_builds+=uid_req_EnergyLevel;
+         res_energyl_cur -=uid_req_EnergyLevel;
+         res_HellPower   -=uid_req_HellPower;
+         res_UACLoot     -=uid_req_UACLoot;
          {$IFDEF _FULLGAME}
          if(playeri=UIPlayer)then snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
          {$ENDIF}
@@ -1935,7 +1936,7 @@ begin
    unit_add:=false;
    LastCreatedUnit :=0;
    LastCreatedUnitP:=g_punits[0];
-   with g_gplayers[UplayerN] do
+   with g_PlayersMain[UplayerN] do
    begin
       if(Uuid=0)then exit;
 
@@ -1963,7 +1964,7 @@ begin
             unit_SetXY(LastCreatedUnitP,Ux,Uy,mvxy_strict);
             uidi       := Uuid;
             playeri    := UplayerN;
-            player     :=@g_gplayers[playeri];
+            player     :=@g_PlayersMain[playeri];
             uo_x       := x;
             uo_y       := y;
             uo_bx      := -1;
@@ -1996,9 +1997,9 @@ function unit_start_build(bx,by:integer;buid,bplayer:byte;skipReqCheck:boolean=f
 begin
    if(skipReqCheck)
    then unit_start_build:=0
-   else unit_start_build:=CheckUnitReqs(@g_gplayers[bplayer],buid);
+   else unit_start_build:=CheckUnitReqs(@g_PlayersMain[bplayer],buid);
    if(unit_start_build=0)then
-     with g_gplayers[bplayer] do
+     with g_PlayersMain[bplayer] do
        if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=cbp_good)then
        begin
           if(not unit_add(bx,by,-1,buid,bplayer,false,false,0))then unit_start_build:=lmt_Invalid_Order;
@@ -2100,6 +2101,7 @@ begin
                prod_unit_Limit+=g_uids[puid].uid_LimitUse;
                prod_unit_ucl[g_uids[puid].uid_uibtn]+=1;
                prod_unit_uid[puid                  ]+=1;
+               energyCur_units+=g_uids[puid].uid_req_EnergyLevel;
                res_energyl_cur-=g_uids[puid].uid_req_EnergyLevel;
                res_HellPower  -=g_uids[puid].uid_req_HellPower;
                res_UACLoot    -=g_uids[puid].uid_req_UACLoot;
@@ -2155,6 +2157,7 @@ begin
               prod_unit_Limit-=g_uids[puid].uid_LimitUse;
               prod_unit_ucl[g_uids[puid].uid_uibtn]-=1;
               prod_unit_uid[puid                  ]-=1;
+              energyCur_units-=g_uids[puid].uid_req_EnergyLevel;
               res_energyl_cur+=g_uids[puid].uid_req_EnergyLevel;
               if(canceled)then
               begin
@@ -2213,7 +2216,8 @@ begin
                prod_upgr_Now+=1;
                prod_upgr_upid[upid]+=1;
                pprod_e[pn]:=GetUpgradeEnergy(upid,upgrs_cur[upid]+1);
-               res_energyl_cur-=pprod_e[pn];
+               energyCur_upgrades+=pprod_e[pn];
+               res_energyl_cur   -=pprod_e[pn];
                pprod_r[pn]:=GetUpgradeTime(upid,upgrs_cur[upid]+1);
                pprod_u[pn]:=upid;
             end;
@@ -2263,7 +2267,8 @@ begin
 
               prod_upgr_Now-=1;
               prod_upgr_upid[upid]-=1;
-              res_energyl_cur+=pprod_e[pn];
+              energyCur_upgrades-=pprod_e[pn];
+              res_energyl_cur   +=pprod_e[pn];
               pprod_r[pn]:=0;
            end;
 end;
@@ -2310,7 +2315,15 @@ begin
 
       if(res_HellPower  <ptarUID^.uid_req_HellPower  )then begin unit_TransformStart:=lmt_Req_HellPower;exit;end;
       if(res_UACLoot    <ptarUID^.uid_req_UACLoot    )then begin unit_TransformStart:=lmt_Req_UACLoot;  exit;end;
-      if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;   exit;end;
+
+      if(isselected)and(not check)then writeln((state=ps_AI)and(ptarUID^.uid_isbuilder),' ',energyCur_units+energyCur_upgrades,' ',ptarUID^.uid_req_EnergyLevel);
+
+      case (state=ps_AI)and(ptarUID^.uid_isbuilder) of
+      false: if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
+      true : if(res_energyl_max<ptarUID^.uid_req_EnergyLevel)
+             or((energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
+             then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
+      end;
 
       unit_TransformStart:=0;
       if(check)then exit;
@@ -2318,9 +2331,10 @@ begin
       vx:=x;
       vy:=y;
 
-      res_energyl_cur-=ptarUID^.uid_req_EnergyLevel;
-      res_HellPower  -=ptarUID^.uid_req_HellPower;
-      res_UACLoot    -=ptarUID^.uid_req_UACLoot;
+      energyCur_transforms+=ptarUID^.uid_req_EnergyLevel;
+      res_energyl_cur     -=ptarUID^.uid_req_EnergyLevel;
+      res_HellPower       -=ptarUID^.uid_req_HellPower;
+      res_UACLoot         -=ptarUID^.uid_req_UACLoot;
 
       unit_ProdStopUnit   (pu,255,true,true,false);
       unit_ProdStopUpgrade(pu,255,true     ,false);
@@ -2348,9 +2362,10 @@ begin
       unit_TransformStop:=0;
       if(check)then exit;
 
-      res_energyl_cur+=g_uids[transformUID].uid_req_EnergyLevel;
-      res_HellPower  +=g_uids[transformUID].uid_req_HellPower;
-      res_UACLoot    +=g_uids[transformUID].uid_req_UACLoot;
+      energyCur_transforms-=g_uids[transformUID].uid_req_EnergyLevel;
+      res_energyl_cur     +=g_uids[transformUID].uid_req_EnergyLevel;
+      res_HellPower       +=g_uids[transformUID].uid_req_HellPower;
+      res_UACLoot         +=g_uids[transformUID].uid_req_UACLoot;
       transformTimer:=0;
    end;
 end;
@@ -2415,9 +2430,10 @@ begin
 
       if(not iscomplete)then
       begin
-         res_energyl_cur+=uid_req_EnergyLevel;
-         res_HellPower  +=round(uid_req_HellPower*(uid_MaxHits1-hits)/uid_MaxHits1);
-         res_UACLoot    +=round(uid_req_UACLoot  *(uid_MaxHits1-hits)/uid_MaxHits1);
+         energyCur_builds-=uid_req_EnergyLevel;
+         res_energyl_cur +=uid_req_EnergyLevel;
+         res_HellPower   +=round(uid_req_HellPower*(uid_MaxHits1-hits)/uid_MaxHits1);
+         res_UACLoot     +=round(uid_req_UACLoot  *(uid_MaxHits1-hits)/uid_MaxHits1);
       end
       else
       begin

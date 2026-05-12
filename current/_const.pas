@@ -474,19 +474,20 @@ ai_LastAlarm           = ai_MaxAlarms-1;
 
 aif_base_smart_order   : cardinal = 1;
 aif_base_suicide       : cardinal = 1 shl 1;
-aif_base_advance       : cardinal = 1 shl 2;
-aif_base_BuilderMove   : cardinal = 1 shl 3;
-aif_army_scout         : cardinal = 1 shl 4;
-aif_army_smart_order   : cardinal = 1 shl 5;
-aif_army_smart_micro   : cardinal = 1 shl 6;
-aif_army_smart_Target  : cardinal = 1 shl 7;
-aif_upgr_smart_order   : cardinal = 1 shl 8;
-aif_ability_detection  : cardinal = 1 shl 9;
-aif_ability_other      : cardinal = 1 shl 10;
-aif_ability_TowerRush  : cardinal = 1 shl 11;
-aif_allies_help        : cardinal = 1 shl 12;
-aif_cheat_VisBuildings : cardinal = 1 shl 13;
-aif_cheat_VisUnits     : cardinal = 1 shl 14;
+aif_base_advanceMain   : cardinal = 1 shl 2;
+aif_base_advanceOther  : cardinal = 1 shl 3;
+aif_base_BuilderMove   : cardinal = 1 shl 4;
+aif_army_scout         : cardinal = 1 shl 5;
+aif_army_smart_order   : cardinal = 1 shl 6;
+aif_army_smart_micro   : cardinal = 1 shl 7;
+aif_army_smart_Target  : cardinal = 1 shl 8;
+aif_upgr_smart_order   : cardinal = 1 shl 9;
+aif_ability_detection  : cardinal = 1 shl 10;
+aif_ability_other      : cardinal = 1 shl 11;
+aif_ability_TowerRush  : cardinal = 1 shl 12;
+aif_allies_help        : cardinal = 1 shl 13;
+aif_cheat_VisBuildings : cardinal = 1 shl 14;
+aif_cheat_VisUnits     : cardinal = 1 shl 15;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -932,6 +933,8 @@ keyPoint_DefR          = 100;
 keyPoint_GenR          = 75;
 keyPoint_KotR          = 350;
 keyPoint_KotRW         = round(keyPoint_KotR/1.44);
+keyPoint_MinLimit      = ul5;
+keyPoint_MaxLimitAI    = keyPoint_MinLimit*2;
 
 keyPoint_mcN           = 4;
 keyPoint_mcDirStep     = 360 div keyPoint_mcN;
@@ -1743,7 +1746,7 @@ menu_ListLinehH        = menu_ListLineH div 2;
 menu_CaptionhW         = menu_BaseW1*3;
 menu_BigButtonW        = menu_BaseW1*3+menu_BaseWh;
 menu_BigButtonH        = menu_BaseW1;
-menu_BigButtonhH       = menu_BigButtonH div 2;
+menu_BigButtonq        = menu_BigButtonH div 2;
 menu_StepFromBottom    = menu_BaseW1+menu_BasehW;
 menu_ItemCaptionhW     = menu_BaseW1*3;
 menu_LowerBorderY      = menu_h-menu_StepFromBottom-menu_BigButtonH;

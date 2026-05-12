@@ -73,11 +73,13 @@ begin
       or(damage<=0)
       then exit;
 
+      //damage:=1;
+
       armor:=0;
       if(iscomplete)and(not IgnoreArmor)then
       begin
-         if(buffs[ub_SphereRDamage]>0)
-         or(buffs[ub_Heroic       ]>0)then damage-=damage div 2;
+         if(buffs[ub_SphereRDamage]>0)then damage-=damage div 2;
+         if(buffs[ub_Heroic       ]>0)then damage-=damage div 3;
 
          with player^ do
          begin
@@ -100,7 +102,7 @@ begin
          begin
             unit_kill(pTarget,false,(hits-damage)<=uid_FastDeathHits,true,false,false);
             if(damagePlayer<=LastPlayer)then
-              with g_gplayers[damagePlayer] do
+              with g_PlayersMain[damagePlayer] do
               begin
                  if(race<>r_hell)then
                  res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
@@ -256,7 +258,7 @@ begin
      end;
 end;
 
-procedure unit_push(pUnit,pUObstacle:PTUnit;uds:single);
+procedure unit_PushFromUnit(pUnit,pUObstacle:PTUnit;uds:single);
 var t:single;
    ud:integer;
 shortCollision,
@@ -288,14 +290,14 @@ begin
          if((pUObstacle^.x=x)and(pUObstacle^.y=y))then
          begin
             case g_random(4) of
-            0: unit_SetXY(pUnit,x-ud,y   ,mvxy_none);
-            1: unit_SetXY(pUnit,x+ud,y   ,mvxy_none);
-            2: unit_SetXY(pUnit,x   ,y-ud,mvxy_none);
-            3: unit_SetXY(pUnit,x   ,y+ud,mvxy_none);
+            0: unit_SetXY(pUnit,x-ud,y   ,mvxy_none,isfly);
+            1: unit_SetXY(pUnit,x+ud,y   ,mvxy_none,isfly);
+            2: unit_SetXY(pUnit,x   ,y-ud,mvxy_none,isfly);
+            3: unit_SetXY(pUnit,x   ,y+ud,mvxy_none,isfly);
             end;
          end
          else unit_SetXY(pUnit,x+round(uds*(pUObstacle^.x-x)/t)+g_randomr(2),
-                               y+round(uds*(pUObstacle^.y-y)/t)+g_randomr(2),mvxy_none);
+                               y+round(uds*(pUObstacle^.y-y)/t)+g_randomr(2),mvxy_none,isfly);
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -337,14 +339,14 @@ begin
       if((pObstacle^.o_x=x)and(pObstacle^.o_y=y))then
       begin
          case g_random(4) of
-         0: unit_SetXY(pu,x-udi,y   ,mvxy_none);
-         1: unit_SetXY(pu,x+udi,y   ,mvxy_none);
-         2: unit_SetXY(pu,x   ,y-udi,mvxy_none);
-         3: unit_SetXY(pu,x   ,y+udi,mvxy_none);
+         0: unit_SetXY(pu,x-udi,y   ,mvxy_none,false);
+         1: unit_SetXY(pu,x+udi,y   ,mvxy_none,false);
+         2: unit_SetXY(pu,x   ,y-udi,mvxy_none,false);
+         3: unit_SetXY(pu,x   ,y+udi,mvxy_none,false);
          end;
       end
       else unit_SetXY(pu,x+round(udi*(pObstacle^.o_x-x)/t)+g_randomr(2),
-                         y+round(udi*(pObstacle^.o_y-y)/t)+g_randomr(2),mvxy_none);
+                         y+round(udi*(pObstacle^.o_y-y)/t)+g_randomr(2),mvxy_none,false);
 
       vstp+=round(uds/speed*UnitStepTicks);
 
@@ -380,7 +382,7 @@ begin
       if(t<udi)then exit;
 
       unit_SetXY(pu,pObstacle^.o_x-round(udi*(pObstacle^.o_x-x)/t),
-                    pObstacle^.o_y-round(udi*(pObstacle^.o_y-y)/t),mvxy_none);
+                    pObstacle^.o_y-round(udi*(pObstacle^.o_y-y)/t),mvxy_none,false);
 
 
       vstp+=round(udi/speed*UnitStepTicks);
@@ -402,7 +404,6 @@ begin
       end;
    end;
 end;
-
 begin
    with pu^ do
    with uid^ do
@@ -431,10 +432,14 @@ begin
      or(transformTimer>0)
      or(not iscomplete)then exit;
 
-   dx0:=(pu^.x-pu^.uid^.uid_r) div MapObstaclesGridW;
-   dy0:=(pu^.y-pu^.uid^.uid_r) div MapObstaclesGridW;
-   dx1:=(pu^.x+pu^.uid^.uid_r) div MapObstaclesGridW;
-   dy1:=(pu^.y+pu^.uid^.uid_r) div MapObstaclesGridW;
+   with pu^ do
+   with uid^ do
+   begin
+      dx0:=(x-uid_r) div MapObstaclesGridW;
+      dy0:=(y-uid_r) div MapObstaclesGridW;
+      dx1:=(x+uid_r) div MapObstaclesGridW;
+      dy1:=(y+uid_r) div MapObstaclesGridW;
+   end;
    for dx:=dx0 to dx1 do
    for dy:=dy0 to dy1 do
      if (0<=dx)and(dx<=MapObstaclesGridN)
@@ -444,6 +449,7 @@ begin
            for i:=0 to oc_n-1 do
              with oc_l[i]^ do
                if(o_rO>0)then unit_PushFromObstacle(pu,oc_l[i]);
+   unit_UpdateXY(pu);
 end;
 
 procedure unit_move(pu:PTUnit);
@@ -467,7 +473,7 @@ begin
           mdist:=point_dist_int(x,y,move_x,move_y);
           if(mdist<=speed)then
           begin
-             unit_SetXY(pu,move_x,move_y,mvxy_none);
+             unit_SetXY(pu,move_x,move_y,mvxy_none,isfly);
              dir:=point_dir(vx,vy,x,y);
           end
           else
@@ -480,7 +486,7 @@ begin
 
              ddir:=dir*degtorad;
              unit_SetXY(pu,x+round(speed*cos(ddir)),
-                           y-round(speed*sin(ddir)),mvxy_none);
+                           y-round(speed*sin(ddir)),mvxy_none,isfly);
           end;
           unit_PushFromObstacles(pu);
        end;
@@ -702,7 +708,7 @@ begin
      wpt_directdmg,
      wpt_directdmgZ
                    : if(aw_impact_dmod>0)then
-                       for dmod:=0 to MaxDamageModFactors do
+                       for dmod:=0 to LastDamageModFactor do
                          with g_DamageMods[aw_impact_dmod][dmod] do
                            if(dm_TargetFlags>0)then
                              if(CheckUnitBaseFlags(pTarget,dm_TargetFlags))then
@@ -740,12 +746,12 @@ begin
              wpt_heal      : if(n_tarp^.hits<a_tarp^^.hits)
                              then
                              else
-                               if(n_tarp^.hits>a_tarp^^.hits)
-                               then exit
-                               else
-                                 if(udist<a_tard^)
-                                 then
-                                 else exit;
+                             if(n_tarp^.hits>a_tarp^^.hits)
+                             then exit
+                             else
+                               if(udist<a_tard^)
+                               then
+                               else exit;
              wpt_missle,
              wpt_directdmg,
              wpt_directdmgZ: case(aw_max_range<aw_srange)of
@@ -755,18 +761,18 @@ begin
                              false: if(n_fac>a_fac^)  // ranged weapon
                                     then
                                     else
-                                      if(n_fac<a_fac^)
+                                    if(n_fac<a_fac^)
+                                    then exit
+                                    else
+                                      if(n_tarp^.hits<a_tarp^^.hits)
+                                      then
+                                      else
+                                      if(n_tarp^.hits>a_tarp^^.hits)
                                       then exit
                                       else
-                                        if(n_tarp^.hits<a_tarp^^.hits)
+                                        if(udist<a_tard^)
                                         then
-                                        else
-                                          if(n_tarp^.hits>a_tarp^^.hits)
-                                          then exit
-                                          else
-                                            if(udist<a_tard^)
-                                            then
-                                            else exit;
+                                        else exit;
                              end
              else
                if(udist<=a_tard^) // nearest
@@ -816,16 +822,12 @@ begin
          with map_KeyPointsL[kpi] do
          begin
             d:=point_dist_int(x,y,kp_x,kp_y);
-            // capturing
-            {$IFDEF _FULLGAME}
-            if(ServerSide)then
-            {$ENDIF}
-              if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
-                if(d<=(kp_RCapture+uid^.uid_r))then
-                begin
-                   kp_LimitPlayerC[playeri     ]+=uid^.uid_LimitUse;
-                   kp_LimitTeamC  [player^.team]+=uid^.uid_LimitUse;
-                end;
+            if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
+              if(d<=(kp_RCapture+uid^.uid_r))then
+              begin
+                 kp_LimitPlayerC[playeri     ]+=uid^.uid_LimitUse;
+                 kp_LimitTeamC  [player^.team]+=uid^.uid_LimitUse;
+              end;
 
             // update team data
             with uid^ do
@@ -846,6 +848,7 @@ a_tarp,
 tu_transport,tu : PTUnit;
 aicode,
 attack_target,
+isattackable,
 pushout         : boolean;
 t_weap          : byte;
 NearTeleport    : boolean;
@@ -883,15 +886,17 @@ begin
           or(not NearTeleport_tu^.iscomplete)
           or(NearTeleport_tu^.transformTimer>0)then NearTeleport:=true;
 
+      isattackable:=false;
+      if(attack_target)then
+        isattackable:=unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac);
+
       ai_Local_InitVars(pu);
       if(aicode){or(isselected)}then
       begin
          ai_Global_InitVars(pu);
-         ai_Global_CollectData(pu,pu,0,nil);
+         ai_Global_CollectData(pu,pu,0,nil,isattackable);
       end;
       ai_Local_CollectData(pu,pu,0,nil);
-
-      if(attack_target)then unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac);
 
       for uc:=1 to MaxUnits do
         if(uc<>unum)then
@@ -908,11 +913,13 @@ begin
 
               if(tu_transport=nil)then unit_detect(pu,tu,udi);
 
-              if(attack_target)then unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac);
+              isattackable:=false;
+              if(attack_target)then
+                isattackable:=unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac);
 
               ai_Local_CollectData(pu,tu,udi,tu_transport);
               if(aicode)then
-              ai_Global_CollectData(pu,tu,udi,tu_transport);
+              ai_Global_CollectData(pu,tu,udi,tu_transport,isattackable);
 
               if(tu^.hits>0)and(tu_transport=nil)then
               begin
@@ -923,7 +930,7 @@ begin
                    or(tu^.speed<=0)
                    or(not tu^.iscomplete)
                    or(tu^.transformTimer>0)then
-                     if(tu^.uid^.uid_issolid)and(isfly=tu^.isfly)then unit_push(pu,tu,uds);
+                     if(tu^.uid^.uid_issolid)and(isfly=tu^.isfly)then unit_PushFromUnit(pu,tu,uds);
 
                  if(NearTeleport)then
                    if (udi<srange)
@@ -1001,7 +1008,7 @@ begin
         transportC+=pPassenger^.uid^.uid_TransportSize;
         pPassenger^.transportU:=unum;
         pPassenger^.a_tar:=0;
-        if(uo_tar=pPassenger^.unum)then     uo_tar:=0;
+        if(uo_tar=pPassenger^.unum)then             uo_tar:=0;
         if(pPassenger^.uo_tar=unum)then pPassenger^.uo_tar:=0;
         unit_UnSelect(pPassenger);
         {$IFDEF _FULLGAME}
@@ -1187,9 +1194,9 @@ var arm,a   : byte;
 pTarget     : PTUnit;
 damage,
 upgradd,c   : integer;
-doubleImpact,
 fakemissile,
 attackinmove: boolean;
+impactX     : single;
 {$IFDEF _FULLGAME}
 vis_Attacker,
 vis_Target  : boolean;
@@ -1393,7 +1400,9 @@ begin
             if(aw_impact_upgr>0)and(aw_impact_upgrStep>0)then upgradd:=player^.upgrs_cur[aw_impact_upgr]*aw_impact_upgrStep;
             if(level>0)and(not uid_isbuilding)then upgradd+=level*uid_LevelBonusDamage;
 
-            doubleImpact:=(buffs[ub_Heroic]>0)or(buffs[ub_SphereDDamage]>0);
+            impactX:=1;
+            if(buffs[ub_SphereDDamage]>0)then impactX*=2;
+            if(buffs[ub_Heroic       ]>0)then impactX*=1.5;
 
             if(not attackinmove)then
               if(x<>pTarget^.x)
@@ -1402,29 +1411,27 @@ begin
 wpt_missle     : if(aw_object_id>0)then
                    if(aw_object_count<0)then
                    begin
-                      missile_add(pTarget^.x,pTarget^.y,vx-aw_object_count+aw_offset_x,vy-aw_object_count+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,doubleImpact);
-                      missile_add(pTarget^.x,pTarget^.y,vx+aw_object_count+aw_offset_x,vy+aw_object_count+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,doubleImpact);
+                      missile_add(pTarget^.x,pTarget^.y,vx-aw_object_count+aw_offset_x,vy-aw_object_count+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,impactX);
+                      missile_add(pTarget^.x,pTarget^.y,vx+aw_object_count+aw_offset_x,vy+aw_object_count+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,impactX);
                    end
                    else
                      if(aw_object_count>1)then
                      begin
                         for c:=1 to aw_object_count do
-                        missile_add(pTarget^.x,pTarget^.y,vx+aw_offset_x,vy+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,doubleImpact);
+                        missile_add(pTarget^.x,pTarget^.y,vx+aw_offset_x,vy+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,impactX);
                      end
-                     else missile_add(pTarget^.x,pTarget^.y,vx+aw_offset_x,vy+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,doubleImpact);
+                     else missile_add(pTarget^.x,pTarget^.y,vx+aw_offset_x,vy+aw_offset_y,a_tar,aw_object_id,playeri,isfly,pTarget^.isfly,fakemissile,upgradd,aw_impact_dmod,impactX);
 
 wpt_directdmg  : if(not fakemissile)and(aw_object_count>0)then
                  begin
                     damage:=ApplyDamageMod(pTarget,aw_impact_dmod,aw_object_count+upgradd);
-                    if(doubleImpact)then damage*=2;
-                    unit_damage(pTarget,damage,playeri,false);
+                    unit_damage(pTarget,round(damage*impactX),playeri,false);
                  end;
 wpt_directdmgZ : if(not fakemissile)and(aw_object_count>0)then
                    if(not unit_TryZombification(pAttacker,pTarget))then
                    begin
                       damage:=ApplyDamageMod(pTarget,aw_impact_dmod,aw_object_count+upgradd);
-                      if(doubleImpact)then damage*=2;
-                      unit_damage(pTarget,damage,playeri,false);
+                      unit_damage(pTarget,round(damage*impactX),playeri,false);
                    end;
 wpt_unit       : if(not fakemissile)then unit_ArmSpawnUnit(pAttacker,aw_object_id);
             else
@@ -1435,9 +1442,7 @@ wpt_resurect    : begin
                      if((aw_req_flags and wpr_reload)>0)then rld:=max2i(0,aw_object_count*fr_fps1);
                   end;
 wpt_heal        : begin
-                     damage:=aw_object_count+upgradd;
-                     if(doubleImpact)
-                     or((pTarget^.buffs[ub_Heroic]>0)and(not pTarget^.uid^.uid_isbuilding))then damage*=2;
+                     damage:=round((aw_object_count+upgradd)*impactX);
                      pTarget^.hits:=mm3i(1,pTarget^.hits+damage,pTarget^.uid^.uid_MaxHits1);
                   end;
                 end;
@@ -1487,7 +1492,8 @@ begin
            hits:=uid_MaxHits1;
            iscomplete :=true;
            unit_IncCounters_Complete(pu);
-           res_energyl_cur+=uid_req_EnergyLevel;
+           energyCur_Builds-=uid_req_EnergyLevel;
+           res_energyl_cur +=uid_req_EnergyLevel;
            GameLog_UnitReady(pu);
         end;
      end;
@@ -1555,8 +1561,11 @@ begin
                       uo_tar:=0;
                       uo_bx :=-1;
                       uo_by :=-1;
-                      uo_x  :=ax;
-                      uo_y  :=ay;
+                      if(buffs[ub_Cast]<=0)then
+                      begin
+                         uo_x:=ax;
+                         uo_y:=ay;
+                      end;
                       end;
        uat_UnitAny,
        uat_UnitOwn,
@@ -1568,8 +1577,11 @@ begin
                       uo_tar:=atar;
                       uo_bx :=-1;
                       uo_by :=-1;
-                      uo_x  :=x;
-                      uo_y  :=y;
+                      if(buffs[ub_Cast]<=0)then
+                      begin
+                         uo_x:=x;
+                         uo_y:=y;
+                      end;
                       end;
        end;
 end;
@@ -1722,6 +1734,8 @@ begin
 
       with g_aids[aid] do
         if(ua_type=uat_none)then exit;
+
+      if not(aid in player^.a_ability)then exit;
 
       case aid of
       uab_Unload,
@@ -2216,7 +2230,8 @@ begin
                if(transformTimer<1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF} then transformTimer:=1;
                if(transformTimer=1)then
                begin
-                  res_energyl_cur+=g_uids[transformUID].uid_req_EnergyLevel;
+                  energyCur_transforms-=g_uids[transformUID].uid_req_EnergyLevel;
+                  res_energyl_cur     +=g_uids[transformUID].uid_req_EnergyLevel;
                   transformTimer:=0;
                   if(transformUID<>uidi)
                   then unit_morph(pu,transformUID,true,integer.MaxValue,0,false,false)

@@ -438,6 +438,8 @@ TUID = record
    uid_ZombieHits        : integer;
    uid_ZombieUID         : byte;
 
+   uid_AI_PrimaryTarget,
+   uid_AI_Healer,
    uid_AI_Siedge         : boolean;
    uid_AI_NextFormUID    : byte;
 
@@ -619,6 +621,24 @@ TLogMes = record
 end;
 PTLogMes = ^TLogMes;
 
+TPlayerTempData = record
+   PNU
+            : byte;
+   n_u,
+   net_ping,
+   net_ttl  : word;
+   net_ip   : cardinal;
+   net_port : word;
+   net_TimerLogSend
+            : integer;
+
+   o_id,
+   o_a0     : byte;
+   o_x0,o_y0,
+   o_x1,o_y1: integer;
+end;
+
+
 TPlayerGameData = record
    name            : shortstring;
 
@@ -634,18 +654,29 @@ TPlayerGameData = record
    res_UACLoot
 
                    : integer;
-   armylimit
-                   : longint;
 
    isobserver,
    isrevealed,
    isdefeated,
    isready         : boolean;
 
-   o_id,
-   o_a0            : byte;
-   o_x0,o_y0,
-   o_x1,o_y1       : integer;
+   units_uid_m     : array[byte] of integer;
+   upgrs_cur,
+   upgrs_max       : array[byte] of byte;
+
+   a_ability       : TSoB;
+
+   log_l           : array[0..MaxPlayerLog] of TLogMes;
+   log_i,
+   log_n,
+   log_n_cl
+                   : cardinal;
+
+   log_EnergyCheckTimer
+                   : integer;
+
+   armylimit
+                   : longint;
 
                    // units by class [building,ucl]
    units_ucl_e,    // existed
@@ -658,8 +689,7 @@ TPlayerGameData = record
    units_uid_e,    // existed
    units_uid_c,    // completed
    units_uid_s,    // selected
-   units_uid_u,    // one of
-   units_uid_m     // max
+   units_uid_u     // one of
                    : array[byte] of integer;
 
                    // units by isbuilding [building]
@@ -668,7 +698,6 @@ TPlayerGameData = record
    units_bld_l     : array[false..true] of longint; // limit
 
    units_all_e,
-   //units_all_c,
    units_all_s,
    units_builders_e,
    units_builders_c,  // builders
@@ -678,9 +707,6 @@ TPlayerGameData = record
    units_upgrProds_c, // forges
    units_upgrProds_s
                    : integer;
-
-   upgrs_cur,
-   upgrs_max       : array[byte] of byte;
 
    prod_unit_Limit : longint;                           // current limit in production
    prod_unit_Max,                                       // current max unit productions
@@ -692,49 +718,14 @@ TPlayerGameData = record
    prod_upgr_Now   : integer;
    prod_upgr_upid  : array[byte] of byte;
 
-   a_rebuild,
-   a_ability       : TSoB;
-
-   log_l           : array[0..MaxPlayerLog] of TLogMes;
-   log_i,
-   log_n,
-   log_n_cl
-                   : cardinal;
-
-   log_EnergyCheckTimer
+   energyCur_builds,
+   energyCur_units,
+   energyCur_upgrades,
+   energyCur_transforms
                    : integer;
 
 
-   {ai_max_ulimit,
-   ai_maxcount_energy,
-   ai_maxcount_mains,
-   ai_maxcount_unitps,
-   ai_maxcount_upgrps,
-   ai_maxcount_tech0,
-   ai_maxcount_tech1,
-   ai_maxcount_tech2,
-   ai_maxlimit_detect,
-   ai_maxcount_spec1,
-   ai_maxcount_spec2,
-   ai_maxcount_towers,
-   ai_mincount_towers,
-   ai_maxlimit_blimit,
-   ai_max_specialist,
-   ai_attack_limit,
-   ai_attack_delay,
-   ai_scout_u_cur,
-   ai_scout_u_cur_w,
-   ai_scout_u_new,
-   ai_scout_u_new_w,
-   ai_detection_pause  : integer;
-   ai_maxcount_upgrlvl : byte;
-   ai_hptargets        : TSoB;
-   ai_attack_timer,
-   ai_scout_timer      : integer;
-   ai_ReadyForAttack   : boolean; }
-
-
-   // operative data
+   // operative AI data
 
    aip_timer_attack,
    aip_timer_detection,
@@ -753,8 +744,8 @@ TPlayerGameData = record
    aip_MaxDetectors,
    aip_MinTowers,
    aip_MaxTowers       : integer;
-   aip_MaxArmyLimit,
-   aip_MaxArmyMinPart
+   aip_MaxUnitLimit,
+   aip_MaxUnitMinPart
                        : longint;
    aip_MaxUpgradeLevel
                        : byte;
@@ -767,18 +758,6 @@ TPlayerGameData = record
 end;
 PTPlayerGameData = ^TPlayerGameData;
 TPList = array[0..LastPlayer] of TPlayerGameData;
-
-TPlayerNetData = record
-   PNU
-           : byte;
-   n_u,
-   net_ping,
-   net_ttl : word;
-   net_ip  : cardinal;
-   net_port: word;
-   net_TimerLogSend
-           : integer;
-end;
 
 TUnitVisionData = array[0..LastPlayer] of integer;
 

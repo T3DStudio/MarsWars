@@ -61,6 +61,30 @@ end;
 //   COMMON
 //
 
+procedure project2rect(tarx,tary:pinteger;dir:single;rw:integer);
+var
+sn,cs:single;
+rs   :integer;
+begin
+   cs:= cos(dir*degtorad);
+   sn:=-sin(dir*degtorad);
+   rs:=round(rw*1.3); //1.414
+   if(abs(cs)>=abs(sn))then
+   begin
+      if(cs<0)
+      then tarx^:=-rw
+      else tarx^:= rw;
+      tary^:=round(rs*sn);
+   end
+   else
+   begin
+      tarx^:=round(rs*cs);
+      if(sn<0)
+      then tary^:=-rw
+      else tary^:= rw;
+   end;
+end;
+
 procedure map_SymmetryPoints(startx,starty:integer;resultx,resulty:pinteger);
 begin
    case map_Symmetry of
@@ -88,6 +112,19 @@ begin
                   resultx^:=NOTSET;
                   resulty^:=NOTSET;
    end;
+end;
+
+procedure map_SymmetryPoints2(startx,starty,resultx,resulty:pinteger;gapR:integer);
+begin
+   map_symmetryPoints(startx^,starty^,resultx,resulty);
+   if(resultx^<>NOTSET)then
+     if(point_dist_int(startx^,starty^,resultx^,resulty^)<gapR)then
+     begin
+        startx^ :=(startx^+resultx^)div 2;
+        starty^ :=(starty^+resulty^)div 2;
+        resultx^:=NOTSET;
+        resulty^:=NOTSET;
+     end;
 end;
 
 
@@ -315,10 +352,12 @@ end;
 
 procedure map_KeyPoints_UpdatePos;
 var
-kpi  :byte;
-cx,cy:integer;
+kpi  : byte;
+cd,
+cx,cy: integer;
 cdir,
-odir :single;
+odir : single;
+itick: cardinal;
 function circleI(i,m:integer):integer;
 begin
    if(i<0)
@@ -329,10 +368,14 @@ begin
      else circleI:=i;
 end;
 begin
+   itick:=g_tick div 3;
+   if(longint(itick)<map_SizeKPCR)
+   then cd:=integer(itick)
+   else cd:=map_SizeKPCR;
    cdir:=(g_tick mod 102000)/200+(map_seed mod 360);
-   cx  :=map_sizeH+round(map_SizeKPCR*cos(cdir*DEGTORAD));
-   cy  :=map_sizeH+round(map_SizeKPCR*sin(cdir*DEGTORAD));
-   odir:=(g_tick mod 112000)/300;
+   cx  :=map_sizeH+round(cd*cos(cdir*DEGTORAD));
+   cy  :=map_sizeH+round(cd*sin(cdir*DEGTORAD));
+   odir:=map_SymmetryDir+(g_tick mod 112000)/300;
    for kpi:=0 to keyPoint_mcN-1 do
      with map_KeyPointsL[kpi] do
      begin
@@ -405,7 +448,51 @@ begin
      end;
 end;
 
-procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal;defaultOnFail:boolean=false);
+function map_KeyPoints_CheckPos(ix,iy,aCaptureR:integer):boolean;
+begin
+   map_KeyPoints_CheckPos:=(map_IfPlayerStartHere (ix,iy,base_r1h,0,map_PStartsGap))
+                         or(map_IfKeyPointHere    (ix,iy,base_r1h  ))
+                         or(map_DistToObstacleEdge(ix,iy)<aCaptureR);
+end;
+
+procedure map_KeyPoints_Rect(cx,cy,cr,cdir,acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+var
+adir,
+astep: single;
+ix,iy,
+sx,sy: integer;
+p,ph,
+pn   :byte;
+begin
+   if(acount<=0)then exit;
+   ph:=(acount div 2)+(acount mod 2);
+   pn:=acount+(acount mod 2);
+
+   astep:=360/pn;
+   adir :=dir_MOD360(cdir);
+   adir -=astep/2;
+   for p:=0 to acount-1 do
+   begin
+      if(map_Symmetry>maps_none)and(p>=ph)then break;
+
+      adir+=astep;
+      project2rect(@ix,@iy,adir,cr);
+      ix+=cx;
+      iy+=cy;
+      map_SymmetryPoints2(@ix,@iy,@sx,@sy,base_r1h);
+
+      if(map_IfKeyPointHere(ix,iy,base_r1h))then continue;
+
+      if(sx<>NOTSET)then
+        if(map_IfKeyPointHere(sx,sy,base_r1h))then continue;
+
+      if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
+      if(sx<>NOTSET)then
+        if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
+   end;
+end;
+
+procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
 const max_attempts = 500;
 var
 ix,iy,
@@ -414,7 +501,7 @@ u,b,
 success,
 attempts:integer;
 begin
-   u:=map_Size1 div 50;
+   u:=aCaptureR;
    b:=map_Size1-(u*2);
    success:=0;
 
@@ -431,68 +518,31 @@ begin
          ix:=u+g_random(b);
          iy:=u+g_random(b);
 
-         map_symmetryPoints(ix,iy,@sx,@sy);
+         map_symmetryPoints2(@ix,@iy,@sx,@sy,base_r1h);
 
+         if(map_KeyPoints_CheckPos(ix,iy,aCaptureR))then continue;
          if(sx<>NOTSET)then
-           if(point_dist_int(ix,iy,sx,sy)<(base_r1h))then
-           begin
-              ix:=(ix+sx)div 2;
-              iy:=(iy+sy)div 2;
-              sx:=NOTSET;
-              sy:=NOTSET;
-           end;
+           if(map_KeyPoints_CheckPos(sx,sy,aCaptureR))then continue;
 
-         if(map_IfPlayerStartHere (ix,iy,base_r1h,0,map_PStartsGap))
-         or(map_IfKeyPointHere    (ix,iy,base_r1h  ))
-         or(map_DistToObstacleEdge(ix,iy)<aCaptureR)
-         then continue;
-
-         if(sx<>NOTSET)then
-           if(map_IfPlayerStartHere (sx,sy,base_r1h,0,map_PStartsGap))
-           or(map_IfKeyPointHere    (sx,sy,base_r1h  ))
-           or(map_DistToObstacleEdge(sx,sy)<aCaptureR)
-           then continue;
-
-         if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
-         if(sx<>NOTSET)then
-         if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
-
-         if(map_Symmetry>maps_none)
-         then success+=2
+         if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))
+         then exit
          else success+=1;
+
+         if(sx<>NOTSET)then
+           if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))
+           then exit
+           else success+=1;
+
          break;
       end;
    end;
 
-   if(defaultOnFail)then
-     if(success<2)then
-     begin
-        map_KeyPoints_Add(map_SizeH,0        ,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-        map_KeyPoints_Add(map_SizeH,map_Size1,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-        map_KeyPoints_Add(0        ,map_SizeH,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-        map_KeyPoints_Add(map_Size1,map_SizeH,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-     end;
+   if(success<map_MaxPlayers)and(map_MaxPlayers>0)then
+   begin
+      b:=map_MaxPlayers-success;
+      map_KeyPoints_Rect(map_SizeH,map_SizeH,map_SizeH-u,map_SymmetryDir+((360 div map_MaxPlayers) div 2),b,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
+   end;
 end;
-
-{procedure map_KeyPoints_AddAtStarts(aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
-var   p:byte;
-r,sx,sy:integer;
-begin
-   r:=round((aCaptureR+g_uids[uid_race_start_fbase[r_uac]].uid_r)/1.74);
-   for p:=0 to LastPlayer do
-     if(p<map_MaxPlayers)then
-     begin
-        sx:=sign(map_Sizeh-map_PlayerStartX[p]);
-        sy:=sign(map_Sizeh-map_PlayerStartY[p]);
-        if(sx=0)and(sy=0)then
-        begin
-           sx:=1;
-           sy:=1;
-        end;
-        map_KeyPoints_Add(map_PlayerStartX[p]+r*sx,
-                          map_PlayerStartY[p]+r*sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-     end;
-end;}
 
 procedure map_KeyPoints_Create;
 var i:byte;
@@ -508,10 +558,7 @@ mc_KeyPoints: begin
    end;
 
    if(map_generators>0)then
-   begin
-      //map_KeyPoints_AddAtStarts(keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
-      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
-   end;
+     map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
 
    map_KeyPoints_UpdateZone;
    map_KeyPoints_UpdateTeamData;
@@ -532,7 +579,7 @@ begin
      for y:=0 to map_MaxPlayers-1 do
        if(random(2)=0)and(x<>y)then
        begin
-          if(teamShuffle)and(map_MaxPlayers>2)and(g_gplayers[x].team<>g_gplayers[y].team)then continue;
+          if(teamShuffle)and(map_MaxPlayers>2)and(g_PlayersMain[x].team<>g_PlayersMain[y].team)then continue;
           i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
           i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
        end;
@@ -560,30 +607,6 @@ begin
       if(map_Symmetry>maps_none)then
         map_symmetryPoints(map_PlayerStartX[p   ], map_PlayerStartY[p   ],
                           @map_PlayerStartX[p+ph],@map_PlayerStartY[p+ph]);
-   end;
-end;
-
-procedure project2rect(tarx,tary:pinteger;dir:single;rw:integer);
-var
-sn,cs:single;
-rs   :integer;
-begin
-   cs:= cos(dir*degtorad);
-   sn:=-sin(dir*degtorad);
-   rs:=round(rw*1.3); //1.414
-   if(abs(cs)>=abs(sn))then
-   begin
-      if(cs<0)
-      then tarx^:=-rw
-      else tarx^:= rw;
-      tary^:=round(rs*sn);
-   end
-   else
-   begin
-      tarx^:=round(rs*cs);
-      if(sn<0)
-      then tary^:=-rw
-      else tary^:= rw;
    end;
 end;
 

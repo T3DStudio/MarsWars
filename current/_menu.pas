@@ -533,14 +533,14 @@ begin
 
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
-   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH;
+   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
 
    case menu_HelpPage of
    mi_help_GameControls,
@@ -594,14 +594,14 @@ begin
       if(p<map_MaxPlayers)then
       menu_Item_Set(mi_Players_State0   +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle      (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
 
-      if(g_gplayers[p].state=ps_None)and(not g_started)then
+      if(g_PlayersMain[p].state=ps_None)and(not g_started)then
       menu_Item_Set(mi_Players_Slot0    +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSwap         (p,LocalPlayer,true))
       else
       menu_Item_Set(mi_Players_AIskil0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
 
-      if(p<map_MaxPlayers)and(not g_gplayers[p].isobserver)then
+      if(p<map_MaxPlayers)and(not g_PlayersMain[p].isobserver)then
       menu_Item_Set(mi_Players_Race0    +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll    (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
-      if(p<map_MaxPlayers)and(not g_gplayers[p].isobserver)then
+      if(p<map_MaxPlayers)and(not g_PlayersMain[p].isobserver)then
       menu_Item_Set(mi_Players_Team0    +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll    (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
 
       menu_Item_Set(mi_Players_Obs0     +p,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_PListLineH,PlayerToggleObserver(p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersObsW;
@@ -853,7 +853,7 @@ var changed:boolean;
 begin
    changed:=true;
    case menu_ItemSelected of
-mi_SG_PlayerName   : g_gplayers[LocalPlayer].name:=PlayerName;
+mi_SG_PlayerName   : g_PlayersMain[LocalPlayer].name:=PlayerName;
 mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
                      then menu_mseed:=c2s(map_seed)
                      else GameMapSetSeed(LocalPlayer,s2c(menu_mseed),false);
@@ -1124,7 +1124,7 @@ end;
 
 function menu_ChatSize:integer;
 begin
-   with g_gplayers[LocalPlayer] do
+   with g_PlayersMain[LocalPlayer] do
      if(log_n<MaxPlayerLog)
      then menu_ChatSize:=integer(log_n)
      else menu_ChatSize:=MaxPlayerLog;

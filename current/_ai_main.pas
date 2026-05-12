@@ -9,7 +9,7 @@ begin
    unit_kill(pu,false,false,true,false,true);
 end;
 
-procedure ai_RunTo(pu:PTUnit;odist,ox,oy,ow:integer;otar:PTUnit);
+procedure ai_RunTo(pu,otar:PTUnit;ox,oy,odist,ow:integer);
 begin
    with pu^  do
    begin
@@ -18,7 +18,8 @@ begin
          ox:=otar^.x;
          oy:=otar^.y;
       end;
-      if(odist<0)then odist:=point_dist_int(x,y,ox,oy);
+      if(odist<0)
+      or(odist=NOTSET)then odist:=point_dist_int(x,y,ox,oy);
       if(ow=0)or(odist>base_r1)then
       begin
          uo_x:=ox;
@@ -53,28 +54,41 @@ begin
       or(force)
       or(not isfly and (mapZone<>map_GetZone(uo_x,uo_y)))
       or(g_CheckRoyalBattlePoint(uo_x,uo_y,base_r1))
-      then ai_RunTo(pu,-1,g_random(map_Size1),
-                          g_random(map_Size1),0,nil);
+      then ai_RunTo(pu,nil,g_random(map_Size1),
+                           g_random(map_Size1),NOTSET,0);
    end;
 end;
 
 procedure ai_BaseIdle(pu:PTUnit;idle_r:integer);
+var
+base_u:PTUnit;
+base_d:integer;
 begin
-   if(ai_base_d=NOTSET)
+   if(ai_BaseOwn_d=NOTSET)then
+   begin
+      base_u:=ai_BaseAlly_u;
+      base_d:=ai_BaseAlly_d;
+   end
+   else
+   begin
+      base_u:=ai_BaseOwn_u;
+      base_d:=ai_BaseOwn_d;
+   end;
+
+   if(base_d=NOTSET)
    then ai_DefaultIdle(pu)
    else
-     if(idle_r<ai_base_d)and(ai_base_d<NOTSET)
-     then ai_RunTo(pu,ai_base_d,0,0,base_r1,ai_base_u)
+     if(idle_r<base_d)and(base_d<NOTSET)
+     then ai_RunTo(pu,base_u,0,0,base_d,base_r1)
      else
        with pu^ do
-         if(point_dist_rint(x,y,uo_x,uo_y)<srange)then
-           ai_RunTo(pu,-1,g_random(map_Size1),
-                          g_random(map_Size1),0,nil);
+         if(point_dist_rint(x,y,uo_x,uo_y)<idle_r)then
+           ai_RunTo(pu,nil,g_random(map_Size1),
+                           g_random(map_Size1),NOTSET,0);
 end;
 
-procedure ai_RunFrom(pu,tu:PTUnit;tx,ty:integer);
+procedure ai_RunFrom(pu,tu:PTUnit;tx,ty,td:integer);
 var
-pdir,
 px,py:integer;
 begin
    if(tu<>nil)then
@@ -83,20 +97,32 @@ begin
       ty:=tu^.y;
    end;
    with pu^ do
-   begin
-      pdir:=dir_MOD360(point_dir(tx,ty,x,y)+23) div 45;
-      uo_x:=x+dir_stepX[pdir]*base_r1;
-      uo_y:=y+dir_stepY[pdir]*base_r1;
-   end;
+     if(min2i(x,abs(map_Size1-x))<srange)
+     or(min2i(y,abs(map_Size1-y))<srange)
+     then ai_DefaultIdle(pu)
+     else
+     begin
+        if(td<0)
+        or(td=NOTSET)then td:=point_dist_int(x,y,tx,ty);
+        if(td<1)then td:=1;
+        px:=round(((tx-x)/td)*srange);
+        py:=round(((ty-y)/td)*srange);
+
+        uo_x:=x-px;
+        uo_y:=y-py;
+     end;
 end;
 
-procedure ai_BuildOrder(pu:PTUnit);
+procedure ai_CalcBuildNeed(pu:PTUnit);
 begin
    with pu^  do
    with player^ do
    begin
       // energy
-      ai_need_Energy:=1150+ai_curr_UnitProds*625;
+      case race of
+      r_uac : ai_need_Energy:=1150+ai_curr_UnitProds*625;
+      r_hell: ai_need_Energy:=1250+ai_curr_UnitProds*700;
+      end;
 
       // upgrade prods
       ai_need_UpgrProds:=0;
@@ -106,13 +132,20 @@ begin
 
          if(ai_need_UpgrProds>ai_UpgradesLeft)then ai_need_UpgrProds:=ai_UpgradesLeft;
          if(ai_need_UpgrProds>aip_MaxForges  )then ai_need_UpgrProds:=aip_MaxForges;
+
+         if(ai_need_UpgrProds<1)and(res_energyl_max>=1000)then ai_need_UpgrProds:=1;
       end;
 
       // unit prods
       ai_need_UnitProds:=0;
       if(aip_MaxBarracks>0)then
       begin
-         ai_need_UnitProds:=(res_energyl_max div 425)-ai_need_UpgrProds;
+         case race of
+         r_uac : ai_need_UnitProds:=(res_energyl_max div 425);
+         r_hell: ai_need_UnitProds:=(res_energyl_max div 500);
+         end;
+         ai_need_UnitProds+=ai_curr_Builders;
+         if(ai_UpgradesLeft>0)then ai_need_UnitProds-=ai_need_UpgrProds;
          if(ai_need_UnitProds<1)then ai_need_UnitProds:=1;
          if(ai_need_UnitProds>aip_MaxBarracks)then ai_need_UnitProds:=aip_MaxBarracks;
       end;
@@ -130,13 +163,19 @@ begin
            ai_need_detect:=aip_MaxDetectors;
       end;
 
-      if(isselected)then
-      begin
-         //writeln('ai_need_Energy=',ai_need_Energy,' ai_need_UnitProds=',ai_need_UnitProds,' ai_need_UpgrProds=',ai_need_UpgrProds);
-         //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds);
-        // writeln('ai_need_UpgrProds=',ai_need_UpgrProds,' ai_curr_UpgrProds=',ai_curr_UpgrProds);
+      // ai_TechPriority
+      case race of
+      r_hell: ;
+      r_uac : ;
       end;
 
+      if(isselected)then
+      begin
+         writeln('ai_need_Energy=',ai_need_Energy,' ai_need_UnitProds=',ai_need_UnitProds,' ai_need_UpgrProds=',ai_need_UpgrProds,' ',ai_UpgradesLeft);
+         //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds);
+        // writeln('ai_need_UpgrProds=',ai_need_UpgrProds,' ai_curr_UpgrProds=',ai_curr_UpgrProds);
+         //writeln('ai_need_UpgrProds ',ai_need_UpgrProds);
+      end;
    end;
 end;
 
@@ -154,7 +193,6 @@ build_dir,
 build_dirs,
 build_step: integer;
 rad_dir   : single;
-skipEnergyCheck :boolean;
 ckeckExtraEnergy:integer;
 
 procedure ClearBuildDir;
@@ -165,20 +203,16 @@ begin
 end;
 
 function SetBuildUID1(buid:byte;count:integer=MaxPlayerUnits):boolean;
-var t:byte;
 begin
    SetBuildUID1:=false;
    if(build_uid=0)then
      if(pBuilder^.player^.units_uid_e[buid]<count)then
        if(buid in pBuilder^.uid^.uid_prod_Buildings)then
-       begin
-          t:=CheckUnitReqs(pBuilder^.player,buid,ckeckExtraEnergy);
-          if(t=0)or((t=lmt_Req_Energy)and(skipEnergyCheck))then
-          begin
-             SetBuildUID1:=true;
-             build_uid  :=buid;
-          end;
-       end;
+         if(CheckUnitReqs(pBuilder^.player,buid,ckeckExtraEnergy)=0)then
+         begin
+            SetBuildUID1:=true;
+            build_uid  :=buid;
+         end;
 end;
 function SetBuildUID2(buid1,buid2:byte):boolean;
 begin
@@ -314,9 +348,9 @@ begin
    with pBuilder^  do
    with player^ do
    begin
-      if(units_bld_l[false]<aip_MaxArmyMinPart)
+      if(units_bld_l[false]<aip_MaxUnitMinPart)
       then ckeckExtraEnergy:=400
-      else ckeckExtraEnergy:=400;
+      else ckeckExtraEnergy:=0;
       if (ai_curr_Builders<needN)
       and(ai_curr_Builders<aip_MaxBuilders )
       and(ai_curr_Builders<PlayerMaxBuilders)then
@@ -409,7 +443,6 @@ begin
    build_x  :=0;
    build_y  :=0;
    ClearBuildDir;
-   skipEnergyCheck:=false;
    ckeckExtraEnergy:=0;
 
    with pBuilder^  do
@@ -438,7 +471,7 @@ begin
          SetDetectors (ai_need_Detect   );
       end
       else
-        case g_random(8) of
+        case g_random(9) of
         0 : if(NeedMaxTowers)
             then SetTowers(aip_MaxTowers)
             else SetTowers(aip_MinTowers);
@@ -449,6 +482,7 @@ begin
         5 : SetTeleport;
         6 : SetTech;
         7 : SetSpecial;
+        8 : SetDetectors (ai_need_Detect   );
         end;
 
       if(build_uid=0)then exit;
@@ -501,7 +535,7 @@ procedure SetUpgrade(upid,lvl:byte);
 var uip:integer;
 begin
    if(upid>0)then
-     with pFroge^     do
+     with pFroge^ do
      with player^ do
      begin
         uip:=upgrs_cur[upid]+prod_upgr_upid[upid];
@@ -577,152 +611,226 @@ end;
 const
 
 uprod_smart       = -1;
-uprod_random      = -2;
-uprod_AflyMech    = -3;
-uprod_AFly        = -4;
-uprod_AgroundMech = -5;
-uprod_AgroundBio  = -6;
+uprod_base        = -2;
+uprod_random      = -3;
+uprod_randomFly   = -4;
+uprod_AflyMech    = -5;
+uprod_AFly        = -6;
+uprod_AgroundMech = -7;
+uprod_AgroundBio  = -8;
+uprod_Sidge       = -9;
+uprod_Transport   = -10;
+uprod_Special     = -11;
 
 
-function ai_Barrack(pBarrack:PTUnit;utype,ucount:integer):boolean;
+function ai_Barrack(pBarrack:PTUnit;utype:integer;ucount:integer=MaxPlayerUnits):boolean;
 var
-tuid,c:byte;
+tuid  :byte;
 tuid_n,
 tuid_m:integer;
 tlimit:longint;
-function CheckReq(auid:byte):boolean;
-begin
-   c:=CheckUnitReqs(pBarrack^.player,auid);
-   CheckReq:=(c=0)or(c=lmt_Req_Energy);
-end;
-function tryUID(auid:byte;skipEnergyCheck:boolean=false):boolean;
-begin
-   c:=CheckUnitReqs(pBarrack^.player,auid);
-   tryUID:=(c=0)or((c=lmt_Req_Energy)and(not skipEnergyCheck));
-   if(tryUID)then tuid:=auid;
-end;
-
-function tryTransport:boolean;
-begin
-   tryTransport:=false;
-   with pBarrack^ do
-   with player^ do
-     if(unum=units_uid_u[uidi])then
-       if(CheckReq(UID_UTransport)and(ai_transport_cur<ai_transport_need))then
-         tryTransport:=ai_Barrack(pBarrack,UID_UTransport,255);
-end;
 begin
    ai_Barrack:=false;
    tuid:=0;
    with pBarrack^ do
    with uid^    do
    with player^ do
-   if((ai_armylimit_alive_u+prod_unit_Limit)<aip_MaxArmyLimit)then
+   if((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)then
    begin
+      if(aiu_alarm_d<NOTSET)then
+      begin
+         rpoint_x:=aiu_alarm_x;
+         rpoint_y:=aiu_alarm_y;
+      end;
+
       case utype of
 uprod_smart      : begin
                       tlimit:=0;
-                      utype :=0;
+                      utype :=uprod_random;
                       if(ai_enemylimit_flyMech   >tlimit)then begin tlimit:=ai_enemylimit_flyMech;   utype:=uprod_AflyMech;   end;
                       if(ai_enemylimit_fly       >tlimit)then begin tlimit:=ai_enemylimit_fly;       utype:=uprod_Afly;       end;
                       if(ai_enemylimit_groundMech>tlimit)then begin tlimit:=ai_enemylimit_groundMech;utype:=uprod_AgroundMech;end;
                       if(ai_enemylimit_groundBio >tlimit)then begin tlimit:=ai_enemylimit_groundBio; utype:=uprod_AgroundBio; end;
-
-                      case utype of
-                      uprod_AflyMech,
-                      uprod_AFly,
-                      uprod_AgroundMech,
-                      uprod_AgroundBio : if(ai_Barrack(pBarrack,utype       ,255))then exit;
-                      else               if(ai_Barrack(pBarrack,uprod_random,255))then exit;
+                      if(ai_armylimit_siedge<=ul15)then
+                        if(ai_enemylimit_Towers  >tlimit)then begin tlimit:=ai_enemylimit_Towers;    utype:=uprod_Sidge;      end;
+                      if(utype=uprod_random)and(aiu_alarm_d=NOTSET)then
+                      begin
+                         ai_Barrack:=ai_Barrack(pBarrack,uprod_randomFly,5);
+                         if(ai_Barrack)then exit;
                       end;
-
+                      //if(isselected)then writeln('utype=',utype,' ',ul10,' ai_armylimit_siedge=',ai_armylimit_siedge);
+                      ai_Barrack:=ai_Barrack(pBarrack,utype);
                       exit;
                    end;
-uprod_AflyMech   : case race of
-                   r_hell: if(not tryUID(UID_Arachnotron    ))then
-                           if(not tryUID(UID_ZFPlasmagunner ))then
-                           if(not tryUID(UID_Cacodemon      ))then
-                           if(not tryUID(UID_ZAntiaircrafter))then
-                           if(not tryUID(UID_Revenant       ))then exit;
-                   r_uac : if(not tryUID(UID_Arachnotron    ))then exit;
+uprod_base       : begin
+                      if((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitMinPart)then
+                      begin
+                         if(ai_Barrack(pBarrack,uprod_Transport))then exit;
 
+                         if(ai_armylimit_siedge<=ul10)and(ai_BaseDef_d=NOTSET)then
+                           if(ai_Barrack(pBarrack,uprod_Sidge))then exit;
+
+                         if(ai_Barrack(pBarrack,uprod_Special))then exit;
+                      end;
+
+                      ai_Barrack(pBarrack,uprod_smart);
+                      exit;
                    end;
-uprod_AFly       : case race of
-                   r_hell: if(not tryUID(UID_ZAntiaircrafter))then
-                           if(not tryUID(UID_Revenant       ))then exit;
-                   r_uac : if(not tryUID(UID_Antiaircrafter ))then
-                           if(not tryUID(UID_FPlasmagunner  ))then exit;
+uprod_AflyMech   : begin
+                      case race of
+                      r_hell: if(not ai_Barrack(pBarrack,UID_Arachnotron    ))then
+                              if(not ai_Barrack(pBarrack,UID_ZFPlasmagunner ))then
+                              if(not ai_Barrack(pBarrack,UID_Cacodemon      ))then
+                              if(not ai_Barrack(pBarrack,UID_ZAntiaircrafter))then
+                              if(    ai_Barrack(pBarrack,UID_Revenant       ))then exit;
+                      r_uac : if(not ai_Barrack(pBarrack,UID_FPlasmagunner  ))then
+                              if(    ai_Barrack(pBarrack,UID_Antiaircrafter ))then exit;
+                      end;
+                      ai_Barrack(pBarrack,uprod_random);
+                      exit;
                    end;
-uprod_AgroundMech: case race of
-                   r_hell: if(not tryUID(UID_Arachnotron    ))then
-                           if(not tryUID(UID_ZFPlasmagunner ))then
-                           if(not tryUID(UID_Cacodemon      ))then exit;
-                   r_uac : if(not tryUID(UID_FPlasmagunner  ))then
-                           if(not tryUID(UID_UACDron        ))then exit;
+uprod_AFly       : begin
+                      case race of
+                      r_hell: if(not ai_Barrack(pBarrack,UID_ZAntiaircrafter))then
+                              if(    ai_Barrack(pBarrack,UID_Revenant       ))then exit;
+                      r_uac : if(not ai_Barrack(pBarrack,UID_Antiaircrafter ))then
+                              if(    ai_Barrack(pBarrack,UID_FPlasmagunner  ))then exit;
+                      end;
+                      ai_Barrack(pBarrack,uprod_random);
+                      exit;
                    end;
-uprod_AgroundBio : case race of
-                   r_hell: if(not tryUID(UID_Mastermind,true))then
-                             case random(4) of
-                             0: tuid:=UID_Imp;
-                             1: tuid:=UID_Demon;
-                             2: tuid:=UID_Knight;
-                             3: tuid:=UID_Baron;
-                             end;
-                   r_uac : if(not tryUID(UID_Terminator,true))then
-                             case random(5) of
-                             0: tuid:=UID_Sergant;
-                             1: tuid:=UID_SSergant;
-                             2: tuid:=UID_Commando;
-                             3: tuid:=UID_ZAntiaircrafter;
-                             end;
+uprod_AgroundMech: begin
+                      case race of
+                      r_hell: if(not ai_Barrack(pBarrack,UID_Arachnotron    ))then
+                              if(not ai_Barrack(pBarrack,UID_ZFPlasmagunner ))then
+                              if(    ai_Barrack(pBarrack,UID_Cacodemon      ))then exit;
+                      r_uac : if(not ai_Barrack(pBarrack,UID_FPlasmagunner  ))then
+                              if(    ai_Barrack(pBarrack,UID_UACDron        ))then exit;
+                      end;
+                      ai_Barrack(pBarrack,uprod_random);
+                      exit;
                    end;
-uprod_random     : case race of
-                   r_hell: case random(23) of
-                                0 : tuid:=UID_LostSoul;
-                                1 : tuid:=UID_Imp;
-                                2 : tuid:=UID_Demon;
-                                3 : tuid:=UID_Cacodemon;
-                                4 : tuid:=UID_Knight;
-                                5 : tuid:=UID_Baron;
-                                6 : tuid:=UID_Cyberdemon;
-                                7 : tuid:=UID_Mastermind;
-                                8 : tuid:=UID_Pain;
-                                9 : tuid:=UID_Revenant;
-                                10: tuid:=UID_Mancubus;
-                                11: tuid:=UID_Arachnotron;
-                                12: tuid:=UID_Archvile;
-                                13: tuid:=UID_ZMedic;
-                                14: tuid:=UID_ZEngineer;
-                                15: tuid:=UID_ZSergant;
-                                16: tuid:=UID_ZSSergant;
-                                17: tuid:=UID_ZCommando;
-                                18: tuid:=UID_ZAntiaircrafter;
-                                19: tuid:=UID_ZSiegeMarine;
-                                20: tuid:=UID_ZFPlasmagunner;
-                                21: tuid:=UID_ZBFGMarine;
-                                22: tuid:=UID_Phantom;
-                           end;
-                   r_uac : if(tryTransport)
-                           then exit
-                           else
-                             case random(14) of
-                                  0 : tuid:=UID_Medic;
-                                  1 : tuid:=UID_Engineer;
-                                  2 : tuid:=UID_Sergant;
-                                  3 : tuid:=UID_SSergant;
-                                  4 : tuid:=UID_Commando;
-                                  5 : tuid:=UID_Antiaircrafter;
-                                  6 : tuid:=UID_SiegeMarine;
-                                  7 : tuid:=UID_FPlasmagunner;
-                                  8 : tuid:=UID_BFGMarine;
-                                  9 : tuid:=UID_UTransport;
-                                  10: tuid:=UID_UACDron;
-                                  11: tuid:=UID_Terminator;
-                                  12: tuid:=UID_Tank;
-                                  13: tuid:=UID_Flyer;
-                             end;
+uprod_AgroundBio :    case race of
+                      r_hell: if(not ai_Barrack(pBarrack,UID_Mastermind))then
+                                case random(5) of
+                                0: tuid:=UID_Imp;
+                                1: tuid:=UID_Demon;
+                                2: tuid:=UID_Knight;
+                                3: tuid:=UID_Baron;
+                                4: tuid:=UID_ZBFGMarine;
+                                end;
+                      r_uac : if(not ai_Barrack(pBarrack,UID_Terminator))then
+                                case random(5) of
+                                0: tuid:=UID_Sergant;
+                                1: tuid:=UID_SSergant;
+                                2: tuid:=UID_Commando;
+                                3: tuid:=UID_Antiaircrafter;
+                                4: tuid:=UID_BFGMarine;
+                                end;
+                      end;
+
+uprod_Sidge      :    case race of
+                      r_hell:   case random(3) of
+                                0: tuid:=UID_Cyberdemon;
+                                1: tuid:=UID_Mancubus;
+                                2: tuid:=UID_ZSiegeMarine;
+                                end;
+                      r_uac :   case random(3) of
+                                0: tuid:=UID_SiegeMarine;
+                                1: tuid:=UID_Tank;
+                                2: tuid:=UID_Flyer;
+                                end;
+                      end;
+uprod_Transport  :    case race of
+                      r_hell: ;
+                      r_uac : if(ai_transport_cur<ai_transport_need)then tuid:=UID_UTransport;
+                      end;
+uprod_Special    : begin
+                      tuid_n:=(units_bld_l[false]+prod_unit_Limit) div aip_MaxUnitMinPart;
+                      ai_Barrack:=true;
+                      case race of
+                      r_hell: begin
+                                 if(ai_Barrack(pBarrack,UID_Pain          ,tuid_n))then exit;
+                                 if(ai_Barrack(pBarrack,UID_Archvile      ,2     ))then exit;
+                                 if(ai_Barrack(pBarrack,UID_ZMedic        ,tuid_n))then exit;
+                                 if(ai_Barrack(pBarrack,UID_ZEngineer     ,tuid_n))then exit;
+                                 if(ai_Barrack(pBarrack,UID_ZBFGMarine    ,2     ))then exit;
+                                 if(ai_Barrack(pBarrack,UID_ZFPlasmagunner,tuid_n))then exit;
+                                 if(ai_Barrack(pBarrack,UID_Cacodemon     ,tuid_n))then exit;
+                              end;
+                      r_uac : begin
+                                 if(ai_Barrack(pBarrack,UID_Medic         ,tuid_n))then exit;
+                                 if(ai_Barrack(pBarrack,UID_Engineer      ,tuid_n))then exit;
+                                 if(ai_Barrack(pBarrack,UID_BFGMarine     ,2     ))then exit;
+                                 if(ai_Barrack(pBarrack,UID_FPlasmagunner ,tuid_n))then exit;
+                              end;
+                      end;
+                      ai_Barrack:=false;
+                      exit;
                    end;
-1..255           : tuid:=utype;
+uprod_randomFly  :    case race of
+                      r_hell: case random(5) of
+                              0: tuid:=UID_Cacodemon;
+                              1: tuid:=UID_Pain;
+                              2: tuid:=UID_ZAntiaircrafter;
+                              3: tuid:=UID_LostSoul;
+                              4: tuid:=UID_Phantom;
+                              end;
+                      r_uac : case random(2) of
+                              0: tuid:=UID_Antiaircrafter;
+                              1: tuid:=UID_Flyer;
+                              end;
+                      end;
+uprod_random     :    case race of
+                      r_hell: if(ai_Barrack(pBarrack,uprod_randomFly,2))
+                              then exit
+                              else
+                                case random(23) of
+                                     0 : tuid:=UID_Imp;
+                                     1 : tuid:=UID_Demon;
+                                     2 : tuid:=UID_Cacodemon;
+                                     3 : tuid:=UID_Knight;
+                                     4 : tuid:=UID_Baron;
+                                     5 : tuid:=UID_Cyberdemon;
+                                     6 : tuid:=UID_Mastermind;
+                                     7 : tuid:=UID_Pain;
+                                     8 : tuid:=UID_Revenant;
+                                     9 : tuid:=UID_Mancubus;
+                                     10: tuid:=UID_Arachnotron;
+                                     11: tuid:=UID_Archvile;
+                                     12: tuid:=UID_ZMedic;
+                                     13: tuid:=UID_ZEngineer;
+                                     14: tuid:=UID_ZSergant;
+                                     15: tuid:=UID_ZSSergant;
+                                     16: tuid:=UID_ZCommando;
+                                     17: tuid:=UID_ZAntiaircrafter;
+                                     18: tuid:=UID_ZSiegeMarine;
+                                     19: tuid:=UID_ZFPlasmagunner;
+                                     20: tuid:=UID_ZBFGMarine;
+                                     21: tuid:=UID_LostSoul;
+                                     22: tuid:=UID_Phantom;
+                                end;
+                      r_uac : if(ai_Barrack(pBarrack,uprod_Transport))
+                              then exit
+                              else
+                                case random(14) of
+                                     0 : tuid:=UID_Medic;
+                                     1 : tuid:=UID_Engineer;
+                                     2 : tuid:=UID_Sergant;
+                                     3 : tuid:=UID_SSergant;
+                                     4 : tuid:=UID_Commando;
+                                     5 : tuid:=UID_Antiaircrafter;
+                                     6 : tuid:=UID_SiegeMarine;
+                                     7 : tuid:=UID_FPlasmagunner;
+                                     8 : tuid:=UID_BFGMarine;
+                                     9 : tuid:=UID_UTransport;
+                                     10: tuid:=UID_UACDron;
+                                     11: tuid:=UID_Terminator;
+                                     12: tuid:=UID_Tank;
+                                     13: tuid:=UID_Flyer;
+                                end;
+                      end;
+1..255           :    tuid:=utype;
       end;
 
       tuid_n:=units_uid_e[tuid]+prod_unit_uid[tuid];
@@ -775,6 +883,8 @@ begin
        UID_HACommandCenter: if ((units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])>=PlayerMaxBuilders)
                             and(ai_available_HKeep)then ai_NeedSuicide:=true;
 
+       UID_UWeaponFactory,
+       UID_HPools,
        UID_UBarracks,
        UID_UFactory,
        UID_HBarracks,
@@ -789,8 +899,8 @@ begin
                                // destroy redundance barracks
                             end;
        else
-          if(not uid_isbuilding)then
-            if((MaxPlayerLimit-armylimit-prod_unit_Limit-ai_ownDead_limit)<ai_NeedFreeLimit)and(ai_enemy_d>base_r2)and(a_rld=0)then ai_NeedSuicide:=true;
+          //if(not uid_isbuilding)then
+          //  if((MaxPlayerLimit-armylimit-prod_unit_Limit-ai_ownDead_limit)<ai_NeedFreeLimit)and(ai_enemy_d>base_r2)and(a_rld=0)then ai_NeedSuicide:=true;
        end;
 end;
 
@@ -799,20 +909,27 @@ end;
 //    UPGRADE/TRANSFORM ABILITIES
 //
 
-procedure ai_UpgradeAbilities(pu:PTUnit);
+function ai_AbilitiesTransformIf(pu:PTUnit):boolean;
+begin
+   with pu^ do
+     ai_AbilitiesTransformIf:=(aiu_limitaround_ally>=aiu_limitaround_enemy)
+                           and(buffs[ub_damaged]<=0)
+                           and(hits>uid^.uid_MaxHitsh);
+end;
+
+procedure ai_AbilitiesTransform(pu:PTUnit);
 begin
    with pu^     do
    with uid^    do
    with player^ do
-   begin
-      case uidi of
+     case uidi of
 UID_HSymbol1,
 UID_HSymbol2,
 UID_HSymbol3,
 UID_UGenerator1,
 UID_UGenerator2,
-UID_UGenerator3   : if(res_energyl_cur>=400)and(ai_curr_UnitProds>0)then
-                    //or((prod_unit_Max>0)and(prod_unit_Max=prod_unit_Now)and(prod_upgr_Max=prod_upgr_Now))then
+UID_UGenerator3   : if((res_energyl_cur-g_uids[uid_AI_NextFormUID].uid_req_EnergyLevel)>=400)
+                    or((ai_curr_UnitProds>1)and(ai_armylimit_alive_u>aip_MaxUnitMinPart))then
                       case uidi of
                       UID_HSymbol1   : ai_UnitAbility(pu,uab_ToHSymbol2   ,0,0,0);
                       UID_HSymbol2   : ai_UnitAbility(pu,uab_ToHSymbol3   ,0,0,0);
@@ -825,9 +942,7 @@ UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter: if(u_royal_d>base_r3)
                     or(map_scenario<>mc_royale)then
-                      if (units_builders_c>1)
-                      and(ai_curr_UnitProds>0)
-                      and(res_energyl_cur>=1500)then
+                      if(ai_curr_UnitProds>0)then
                         case uidi of
                         UID_HKeep         : ai_UnitAbility(pu,uab_ToHAKeep         ,0,0,0);
                         UID_HCommandCenter: ai_UnitAbility(pu,uab_ToHACommandCenter,0,0,0);
@@ -852,8 +967,7 @@ UID_UWeaponFactory: if(u_royal_d>base_r3)
 
 UID_URadar        : ai_UnitAbility(pu,uab_LvlUpURadar    ,0,0,0);
 UID_URMStation    : ai_UnitAbility(pu,uab_LvlUpURMStation,0,0,0);
-      end;
-   end;
+     end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -955,10 +1069,13 @@ begin
                           if(cd<NOTSET)
                           then ai_ability_TowerBlink2Dir(pCaster,cx,cy,cd,g_randomr(30))  //srange
                           else
-                            if(srange<ai_base_d)and(ai_base_d<NOTSET)then
+                            if(srange<ai_BaseOwn_d)and(ai_BaseOwn_d<NOTSET)then
                               if(aiu_alarm_d=NOTSET)then
-                                ai_ability_TowerBlink2Dir(pCaster,ai_base_u^.x,ai_base_u^.y,min2i(cd,srange),g_randomr(30));
+                                ai_ability_TowerBlink2Dir(pCaster,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,min2i(cd,srange),g_randomr(30));
                        end;
+     UID_HTeleport   : if(ai_enemy_battle_d<base_r1h)and(ai_HTeleportRecall_u<>nil)then
+                         if(ai_HTeleportRecall_u^.aiu_alarm_d>base_r2)then
+                           ai_UnitAbility(pCaster,uab_Recall,ai_HTeleportRecall_u^.unum,0,0);
      UID_HAltar      : if(aip_timer_magic=0)then
                        begin
                           if(ai_AbilityMagic(pCaster,ai_SphereTurbo_u  ,uab_SphereTurbo  ))then aip_timer_magic:=aip_pause_magic;
@@ -980,6 +1097,14 @@ begin
                        begin
                           if(ai_AbilityMagic(pCaster,ai_Strike_u       ,uab_UACStrike    ))then aip_timer_superweapon:=aip_pause_superweapon;
                        end;
+
+     UID_Pain        : if ((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)
+                       and((MaxPlayerLimit-armylimit)>ul1)then
+                         if((upgrs_cur[upgr_hell_Phantoms]=0)and(units_uid_e[UID_LostSoul]<units_uid_m[UID_LostSoul]))
+                         or((upgrs_cur[upgr_hell_Phantoms]>0)and(units_uid_e[UID_Phantom ]<units_uid_m[UID_Phantom ]))then
+                           if((base_r1h<ai_enemy_battle_d)and(ai_enemy_battle_d<base_r2))
+                           or((ai_ZombieTarget_d<base_r1h)and(upgrs_cur[upgr_hell_Phantoms]>0))then
+                             ai_UnitAbility(pCaster,uab_SpawnLost,0,0,0);
      end;
 
    if(ai_Bribe_u<>nil)
@@ -1007,14 +1132,19 @@ begin
    with player^ do
      case uidi of
      UID_HEyeNest: begin
+                      //if(isselected)then writeln('ai_need_heye_d ',ai_need_heye_d,' ai_AvailableDetectors ',ai_AvailableDetectors);
                       if(ai_need_heye_d<NOTSET)then
                         if(ai_UnitAbility(pCaster,uab_HEyeVision,ai_need_heye_u^.unum,0,0))then
                           aip_timer_detection:=aip_pause_detection;
                       // ai_HEyeNest_u
                    end;
-     UID_URadar  : if(ai_enemy_inv_d<NOTSET)then
-                     if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
-                       aip_timer_detection:=aip_pause_detection;
+     UID_URadar  : begin
+                      if(ai_enemy_inv_d<NOTSET)then
+                        if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
+                          aip_timer_detection:=aip_pause_detection;
+                      if(aiu_alarm_d=NOTSET)then
+                        ai_UnitAbility(pCaster,uab_UACScan   ,0,g_random(map_Size1),g_random(map_Size1));
+                   end;
      end;
 end;
 
@@ -1057,7 +1187,8 @@ begin
    with pBuilder^ do
      if(not ai_keypoint_koth)
      or(ai_keypoint_d>keyPoint_KotR)then
-       if(aiu_alarm_d<base_r2)and(ai_curr_Builders<PlayerMaxBuilders)and(hits<uid^.uid_MaxHitsh)then
+       if (ai_enemy_d<base_r2)
+       and(hits<uid^.uid_MaxHitsh)then
        begin
           moveEventType:=met_hits;
           exit;
@@ -1113,7 +1244,7 @@ begin
    alarmType:=moveEventType;
    {if(pBuilder^.isselected)then
    begin
-      writeln('alarmType ',alarmType,' ai_base_d=',ai_base_d,' base_r1=',base_r1);
+      writeln('alarmType ',alarmType,' ai_BaseOwn_d=',ai_BaseOwn_d,' aiu_alarm_d=',pBuilder^.aiu_alarm_d);
       //writeln('ai_choosen ',ai_choosen,' ai_keypoint_koth=',ai_keypoint_koth,' ai_keypoint_d=',ai_keypoint_d);
    end;}
    with pBuilder^ do
@@ -1157,11 +1288,11 @@ begin
                                                   lx:=min2i(g_royal_r div 4,base_r1h);
                                                   setLandingPlace(map_sizeH,map_sizeH,u_royal_d,lx);
                                                end;
-                                   met_hits  : ai_RunFrom(pBuilder,nil,aiu_alarm_x,aiu_alarm_y);
+                                   met_hits  : ai_RunFrom(pBuilder,ai_enemy_u,0,0,ai_enemy_d);
                                    // met_build
                                    else
-                                      if(ai_base_d<NOTSET)
-                                      then setLandingPlace(ai_base_u^.x,ai_base_u^.y,ai_base_d,base_r1)
+                                      if(ai_BaseOwn_d<NOTSET)
+                                      then setLandingPlace(ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,ai_BaseOwn_d,base_r1)
                                       else setLandingPlace(x,y,0,base_r1h);
                                    end;
                             false: if(alarmType>0)then ai_ability_CCLift(pBuilder);
@@ -1193,6 +1324,101 @@ begin
            then ai_Suicide(pu);
 end;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    BUILDINGS AI
+//
+
+procedure ai_Global_Buildings(pu:PTUnit);
+begin
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      ai_CalcBuildNeed(pu);
+
+      if(uid_isbuilder)and(not isfly)and(zfall=0)then ai_Builder(pu);
+
+      //if(isselected)then
+      //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
+      //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
+      {if(isselected)then
+      begin
+         if(ai_generator_d<NOTSET)then
+           with ai_generator_kp^ do UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
+         if(ai_keypoint_d<NOTSET)then
+           with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
+         //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime);
+      end;}
+
+      if((aip_flags and aif_base_suicide)>0)then
+        if(ai_NeedSuicide(pu))then
+        begin
+           ai_Suicide(pu);
+           exit;
+        end;
+
+      if(res_energyl_cur<0)then
+      begin
+         ai_Cancel_Prod(pu);
+         exit;
+      end;
+
+      if(not iscomplete)then exit;
+
+      if(uid_isforge  )and(aip_MaxUpgradeLevel>0)then ai_Forge(pu);
+      if(uid_isbarrack)and(aip_MaxUnitLimit   >0)then
+        if((aip_flags and aif_army_smart_order)>0)
+        then ai_Barrack(pu,uprod_base  )
+        else ai_Barrack(pu,uprod_random);
+
+      // Transformation
+      case ai_AbilitiesTransformIf(pu) of
+      true : case uid_isbuilder of
+             true : if(ai_flags_BaseAMain)then
+                    begin
+                       if(transformTimer<=0)then
+                         ai_AbilitiesTransform(pu);
+                       if(transformTimer>0)then exit;
+                    end;
+             false: if(ai_flags_BaseAOther)then
+                    begin
+                       if(transformTimer<=0)then
+                         ai_AbilitiesTransform(pu);
+                       if(transformTimer>0)then exit;
+                    end;
+             end;
+      false: if(transformTimer>0)then unit_TransformStop(pu,false);
+      end;
+
+      {if(isselected)and(ai_enemy_inv_d<NOTSET)then
+      begin
+         UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y+1,c_blue);
+         UnitsInfo_AddLine(x+2,y,uo_x,uo_y+2,c_yellow);
+      end; }
+
+      if(aip_timer_detection=0)then
+        if((aip_flags and aif_ability_detection)>0)then ai_AbilitiesDetection(pu);
+      if(uid_isbuilder)then
+        if((aip_flags and aif_base_BuilderMove )>0)then ai_AbilitiesBuilderMove(pu);
+      if((aip_flags and aif_ability_other      )>0)then ai_AbilitiesCommon(pu);
+   end;
+end;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    UNITS AI
+//
+
+{$include _ai_main_units.pas}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//    MAIN
+//
+
 procedure ai_Local_Code(pu:PTUnit);
 var i:integer;
     l:longint;
@@ -1201,7 +1427,11 @@ begin
    with uid^    do
    with player^ do
    begin
-      //if(isselected)and(ai_enemy_d<NOTSET)then UnitsInfo_AddLine(x+1,y,ai_enemy_u^.x,ai_enemy_u^.y+1,c_orange);
+      {if(isselected)and(ai_enemy_d<NOTSET)then
+      begin
+         UnitsInfo_AddLine(x+1,y,ai_enemy_u^.x,ai_enemy_u^.y+1,c_orange);
+         writeln('ai_enemy_d ',ai_enemy_d,' srange',srange,' ai_enemy_z ',ai_enemy_u^.mapZone);
+      end;}
 
       // correct alarm in position
       i:=max2i(200,srange);
@@ -1224,489 +1454,13 @@ begin
             if(uid_isfly)
             or(isfly)
             or(aia_zone=mapZone)
-            or(uid_isbarrack)then ai_Local_SetCurrentAlarm(pu,nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y),aia_zone);
+            or(uid_isbarrack)
+            or(uid_ability_isradar)then
+              ai_Local_SetCurrentAlarm(pu,nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y),aia_zone);
 
       //aiu_alarm_timer
    end;
 end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//    BUILDINGS AI
-//
-
-procedure ai_Global_Buildings(pu:PTUnit);
-begin
-   with pu^     do
-   with uid^    do
-   with player^ do
-   begin
-      ai_BuildOrder(pu);
-
-      if(uid_isbuilder)and(not isfly)and(zfall=0)then ai_Builder(pu);
-
-      //if(isselected)then
-      //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
-      //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-      {if(isselected)then
-      begin
-         if(ai_generator_d<NOTSET)then
-           with ai_generator_kp^ do UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
-         if(ai_keypoint_d<NOTSET)then
-           with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
-         //if(ai_base_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_base_u^.x,ai_base_u^.y,c_lime);
-      end;}
-
-      if((aip_flags and aif_base_suicide)>0)then
-        if(ai_NeedSuicide(pu))then
-        begin
-           ai_Suicide(pu);
-           exit;
-        end;
-
-      if(res_energyl_cur<0)then
-      begin
-         ai_Cancel_Prod(pu);
-         exit;
-      end;
-
-      if(not iscomplete)then exit;
-
-      if(uid_isforge  )and(aip_MaxUpgradeLevel>0)then ai_Forge  (pu);
-      if(uid_isbarrack)and(aip_MaxArmyLimit   >0)then
-        if((aip_flags and aif_army_smart_order)>0)
-        then ai_Barrack(pu,uprod_smart,255)
-        else ai_Barrack(pu,uprod_random  ,255);
-
-      // Transformation
-      if(ai_flags_BaseAdvance)then
-      begin
-         if(transformTimer<=0)then
-           ai_UpgradeAbilities(pu);
-         if(transformTimer>0)then exit;
-      end;
-
-      {if(isselected)and(ai_enemy_inv_d<NOTSET)then
-      begin
-         UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y+1,c_blue);
-         UnitsInfo_AddLine(x+2,y,uo_x,uo_y+2,c_yellow);
-      end; }
-
-      if(aip_timer_detection=0)then
-        if((aip_flags and aif_ability_detection)>0)then ai_AbilitiesDetection(pu);
-      if(uid_isbuilder)then
-      if((aip_flags and aif_base_BuilderMove )>0)then ai_AbilitiesBuilderMove(pu);
-      if((aip_flags and aif_ability_other    )>0)then ai_AbilitiesCommon(pu);
-   end;
-end;
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//    UNITS AI
-//
-
-procedure ai_Global_Units(pu:PTUnit);
-var
-tar_dist,
-tar_x,
-tar_y,
-tar_r     :integer;
-tar_weight:byte;
-tar_zone  :word;
-////  GROUP ACTIONS
-procedure MainTargetClear;
-begin
-   tar_weight:=0;
-   tar_dist  :=NOTSET;
-end;
-procedure MainTargetSet(tu:PTUnit;tx,ty,tdist:integer;tz:word;tweight:byte;tr:integer=0);
-begin
-   if(tu<>nil)then
-   begin
-      tx:=tu^.x;
-      ty:=tu^.y;
-      tz:=tu^.mapZone;
-   end;
-   with pu^ do
-     if(mapZone=tz)or(tdist<base_r1)or(isfly)then
-     begin
-        if(tweight>tar_weight)
-        then
-        else
-          if(tweight<tar_weight)
-          then exit
-          else
-            if(tdist<tar_dist)
-            then
-            else exit;
-
-        tar_x     :=tx;
-        tar_y     :=ty;
-        tar_r     :=tr;
-        tar_dist  :=tdist;
-        tar_zone  :=tz;
-        tar_weight:=tweight;
-     end;
-end;
-function MainTargetGo(wrect:integer):boolean;
-begin
-   MainTargetGo:=false;
-   if(tar_dist<NOTSET)then
-   begin
-      MainTargetGo:=true;
-      ai_RunTo(pu,tar_dist,tar_x,tar_y,wrect,nil);
-   end;
-end;
-function FollowCommander(onlyMyLevel:boolean=false):boolean;
-var
-commander_d:integer;
-commander_u:PTUnit;
-begin
-   commander_d:=NOTSET;
-   commander_u:=nil;
-   if(pu^.isfly)then
-   begin
-      commander_u:=ai_commander_fly_u;
-      commander_d:=ai_commander_fly_d;
-      if(ai_commander_grd_u<>nil)and(not onlyMyLevel)then
-        if(ai_commander_grd_u^.group<>aic_group_AttackWait)then
-        begin
-           commander_u:=ai_commander_grd_u;
-           commander_d:=ai_commander_grd_d;
-        end
-   end
-   else
-   begin
-      commander_u:=ai_commander_grd_u;
-      commander_d:=ai_commander_grd_d;
-   end;
-   if(commander_u=nil)
-   then commander_u:=pu;
-
-   FollowCommander:=(pu<>commander_u);
-   if(FollowCommander)then
-     ai_RunTo(pu,commander_d,0,0,-pu^.srange,commander_u);
-
-   //with pu^ do if(isselected)then writeln('FollowCommander ',FollowCommander,' ',commander_u=pu,' ',ai_commander_fly_u<>nil,' ',ai_commander_grd_u<>nil,' ',commander_u=ai_commander_fly_u,' ',commander_u=ai_commander_grd_u);
-end;
-function TryTeleporting(toU:PTUnit):boolean;
-begin
-   TryTeleporting:=false;
-   if(ai_HTeleportNearest_d<base_r2)then
-   begin
-      TryTeleporting:=true;
-      pu^.uo_x:=ai_HTeleportNearest_u^.x;
-      pu^.uo_y:=ai_HTeleportNearest_u^.y;
-      if(ai_HTeleportNearest_d<ai_HTeleportNearest_u^.uid^.uid_r)then
-      begin
-         ai_HTeleportNearest_u^.rpoint_tar:=toU^.unum;
-         unit_ability_teleport(pu,ai_HTeleportNearest_u,ai_HTeleportNearest_d);
-      end;
-   end;
-end;
-function DefendBase:boolean;
-begin
-   DefendBase:=false;
-
-   if(ai_BDefend_d<NOTSET)then
-     with ai_BDefend_u^ do
-     begin
-        DefendBase:=true;
-        if(pu^.isfly)
-        then ai_RunTo(pu,ai_BDefend_d,aiu_alarm_x,aiu_alarm_y,0,nil)
-        else
-          if(pu^.mapZone=mapZone)then
-          begin
-             if(ai_BDefend_d>base_r6)then
-                if(TryTeleporting(ai_BDefend_u))then exit;
-             ai_RunTo(pu,ai_BDefend_d,aiu_alarm_x,aiu_alarm_y,0,nil)
-          end
-          else DefendBase:=TryTeleporting(ai_BDefend_u);
-     end;
-end;
-function TransportLoadForDefend:boolean;
-begin
-   TransportLoadForDefend:=false;
-   with pu^ do
-     if(ai_TransportTar_BDefend_d<NOTSET)then
-       if(pu^.mapZone<>ai_BDefend_u^.mapZone)or(ai_BDefend_d>base_r5)then
-         if(ai_TransportTar_BDefend_d<ai_BDefend_d)
-         or(transportC<=0)then
-         begin
-            TransportLoadForDefend:=true;
-            uo_x:=ai_TransportTar_BDefend_u^.x;
-            uo_y:=ai_TransportTar_BDefend_u^.y;
-            if(ai_TransportTar_BDefend_d<50)
-            then uo_tar:=ai_TransportTar_BDefend_u^.unum
-            else uo_tar:=0;
-         end;
-end;
-function TransportDefendBase:boolean;
-begin
-   TransportDefendBase:=false;
-   if(ai_BDefend_d<NOTSET)then
-     if(not TransportLoadForDefend)then
-       if(pu^.transportC>0)then
-       begin
-          ai_RunTo(pu,ai_BDefend_d,0,0,pu^.srange,ai_BDefend_u);
-          TransportDefendBase:=true;
-       end;
-   //with pu^ do if(isselected)then writeln('TransportDefendBase ',TransportDefendBase);
-end;
-function TransportAttackCommon(load_u:PTUnit;load_d:integer;myGroup:byte):boolean;
-begin
-   TransportAttackCommon:=false;
-   with pu^ do
-     if(tar_dist<NOTSET)then
-       if(myGroup=255)
-       or(myGroup=group)then
-         if(load_d=NOTSET)
-         or((tar_dist<load_d)and(transportC>0))then
-         begin
-            if(transportC>0)then
-              if(tar_dist<base_r1)then
-              begin
-                 uo_id:=unit_Ability2Act(pu,uab_Unload);
-                 if(not FollowCommander(true))then
-                   MainTargetGo(base_r1);
-                 TransportAttackCommon:=true;
-              end
-              else
-              begin
-                 if(not FollowCommander(true))then
-                   MainTargetGo(base_r1);
-                 TransportAttackCommon:=true;
-              end;
-         end
-         else
-         begin
-            uo_x:=load_u^.x;
-            uo_y:=load_u^.y;
-            if(load_d<50)
-            then uo_tar:=load_u^.unum
-            else uo_tar:=0;
-            TransportAttackCommon:=true;
-         end;
-   {with pu^ do
-     if(isselected)then
-     begin
-        writeln('TransportAttackCommon ',load_d,' ',myGroup);
-        if(ai_commander_fly_d<NOTSET)then
-          UnitsInfo_AddLine(x,y,ai_commander_fly_u^.x,ai_commander_fly_u^.y,c_aqua);
-     end; }
-end;
-function TransportDropAndRunOut:boolean;
-begin
-   TransportDropAndRunOut:=false;
-   with pu^ do
-     case(transportC>0)of
-     true : if(tar_dist<base_r1)and(tar_zone=mapZone)then
-            begin
-               MainTargetGo(-base_r1);
-               uo_id:=unit_Ability2Act(pu,uab_Unload);
-               TransportDropAndRunOut:=true;
-            end;
-     false: if(ai_enemy_d<base_r1)then
-            begin
-               ai_RunFrom(pu,ai_enemy_u,0,0);
-               TransportDropAndRunOut:=true;
-            end;
-     end;
-   //with pu^ do if(isselected)then writeln('TransportDropAndRunOut ',TransportDropAndRunOut);
-end;
-////  SET GROUPS
-procedure SetGroupsForBase;
-var tlimit:longint;
-begin
-   with pu^ do
-   with uid^ do
-   with player^ do
-   begin
-      if ((aip_flags and aif_army_scout)>0)
-      and(ai_group_ucount[aic_group_Scout]=0)
-      and(ai_scout_u=pu)
-      and(ai_enemy_d>base_r2)
-      then
-      begin
-         group:=aic_group_Scout;
-         exit;
-      end;
-
-      if(transportM<=0)and(ai_generator_d<NOTSET)and(uid_LimitUse<=ul10)then
-      begin
-         tlimit:=ai_group_ulimit[aic_group_base]+ai_group_ulimit[aic_group_KeyPointAssault];
-         if (tlimit>=aip_MaxArmyMinPart)
-         and(ai_group_ulimit[aic_group_KeyPointAssault]<aip_MaxArmyMinPart)then
-         begin
-            group:=aic_group_KeyPointAssault;
-            exit;
-         end;
-      end;
-
-      if(units_bld_l[true]<=0)then group:=aic_group_AttackNow;
-   end;
-end;
-////
-begin
-   with pu^ do
-   with uid^ do
-   with player^ do
-   begin
-      uo_id :=ua_amove;
-      uo_tar:=0;
-
-      if(res_energyl_cur<0)then
-      begin
-         ai_Cancel_Prod(pu);
-         exit;
-      end;
-
-      //if(isselected)then writeln(ai_NeedLimitForTransport,' ',ai_enemy_d>base_r2,' ',-ai_ownDead_limit,' ',(armylimit+prod_unit_Limit)>(MaxPlayerLimit-g_uids[UID_HTeleport].uid_LimitUse));
-
-      if(ai_NeedSuicide(pu))then
-      begin
-         ai_Suicide(pu);
-         exit;
-      end;
-
-      if(not iscomplete)then exit;
-
-      MainTargetClear;
-
-      // SET GROUP
-      if(transportM>0)then
-        if(ai_group_ucount[aic_group_AttackNow ]>0)
-        or(ai_group_ucount[aic_group_AttackWait]>0)
-        then group:=aic_group_TransportAttack
-        else group:=aic_group_TransportBase;
-      case group of
-      aic_group_base           : SetGroupsForBase;
-      aic_group_AttackNow,
-      aic_group_AttackWait     : if (aiu_alarm_d   =NOTSET)
-                                 and(ai_generator_d=NOTSET)
-                                 and(ai_keypoint_d =NOTSET)
-                                 then group:=aic_group_AttackWait
-                                 else group:=aic_group_AttackNow;
-      aic_group_Scout          : if((aip_flags and aif_army_scout)=0)
-                                 then group:=aic_group_base
-                                 else
-                                   if(ai_scout_u<>pu)and(ai_base_d<base_r1)
-                                   then group:=aic_group_base;
-      aic_group_KeyPointAssault,
-      aic_group_KeyPointGuard  : if((ai_generator_d=NOTSET)
-                                 and(ai_keypoint_d =NOTSET))
-                                 or(uid_LimitUse>ul10)
-                                 then group:=aic_group_base;
-      aic_group_TransportAttack,
-      aic_group_TransportBase  : if(transportM<=0)then group:=aic_group_base;
-      else  group:= aic_group_base;
-      end;
-
-      // GROUP ACTIONS
-      case group of
-      aic_group_TransportBase,
-      aic_group_TransportAttack: begin
-                                    if(ai_keypoint_d<NOTSET)then
-                                      with ai_keypoint_kp^ do
-                                        MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,1,kp_RCapture);
-                                    MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,1);
-
-                                    if(not TransportDropAndRunOut)then
-                                      if(not TransportDefendBase)then
-                                        if(not TransportAttackCommon(ai_TransportTar_Attack_u,ai_TransportTar_Attack_d,aic_group_TransportAttack))then
-                                          if(not TransportAttackCommon(ai_TransportTar_BDefend_u,ai_TransportTar_BDefend_d,255))then
-                                            if(not FollowCommander)then
-                                            begin
-                                               ai_BaseIdle(pu,aic_BaseIdle_r);
-                                               if(ai_Base_d<srange)
-                                               or(ai_Base_d=NOTSET)
-                                               then uo_id:=unit_Ability2Act(pu,uab_Unload);
-                                            end;
-                                 end;
-      aic_group_KeyPointGuard,
-      aic_group_KeyPointAssault: begin
-                                    if(ai_generator_d<NOTSET)then
-                                      with ai_generator_kp^ do
-                                        MainTargetSet(nil,kp_x,kp_y,ai_generator_d,kp_zone,1,round(kp_RCapture*0.6));
-                                    if(ai_keypoint_d<NOTSET)then
-                                      with ai_keypoint_kp^ do
-                                        MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,1,round(kp_RCapture*0.6));
-
-                                    if(tar_dist=NOTSET)
-                                    then group:=aic_group_base
-                                    else
-                                      case group of
-                                      aic_group_KeyPointGuard  : if(tar_dist>srange)then
-                                                                 begin
-                                                                    group:=aic_group_KeyPointAssault;
-                                                                    MainTargetGo(0);
-                                                                 end
-                                                                 else MainTargetGo(tar_r);
-                                      aic_group_KeyPointAssault: if(tar_dist<tar_r)then
-                                                                 begin
-                                                                    group:=aic_group_KeyPointGuard;
-                                                                    MainTargetGo(0);
-                                                                 end
-                                                                 else
-                                                                   if(not FollowCommander)then
-                                                                     MainTargetGo(0);
-                                      end;
-                                 end;
-      aic_group_base           : if(not DefendBase)then
-                                   if(not FollowCommander)then
-                                   begin
-                                      MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,1);
-                                      if(tar_dist<srange)
-                                      then MainTargetGo(0)
-                                      else ai_BaseIdle(pu,aic_BaseIdle_r);
-                                   end;
-      aic_group_AttackNow      : begin
-                                    if(ai_keypoint_d<NOTSET)then
-                                      with ai_keypoint_kp^ do
-                                        MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,1,round(kp_RCapture*0.6));
-                                    MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,1);
-
-                                    if(tar_dist<=base_r1h)
-                                    then MainTargetGo(0)
-                                    else
-                                      if(not FollowCommander)then
-                                        MainTargetGo(0);
-                                 end;
-      aic_group_AttackWait     : if(not DefendBase)then
-                                   if(ai_HTeleportNearest_u<>nil)then
-                                   begin
-                                      if(isselected)then
-                                      begin
-                                         if(ai_HTeleportTarget_u<>nil)then
-                                           UnitsInfo_AddLine(x,y,ai_HTeleportTarget_u^.x,ai_HTeleportTarget_u^.y,c_aqua);
-
-                                         UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_orange);
-
-                                      end;
-                                      if(ai_HTeleportTarget_u<>nil)
-                                      then TryTeleporting(ai_HTeleportTarget_u)
-                                      else ai_RunTo(pu,ai_HTeleportNearest_d,0,0,aic_BaseIdle_r,ai_HTeleportNearest_u);
-                                   end
-                                   else
-                                     if(not FollowCommander)then
-                                       ai_BaseIdle(pu,aic_BaseIdle_r);
-      aic_group_Scout          : begin
-                                    uo_id:=ua_move;
-                                    if(ai_enemy_battle_u<>nil)and(ai_enemy_battle_d<srange)
-                                    then ai_RunFrom(pu,ai_enemy_battle_u,0,0)
-                                    else ai_DefaultIdle(pu);
-                                 end;
-      end;
-
-      if((aip_flags and aif_ability_other    )>0)then ai_AbilitiesCommon(pu);
-   end;
-end;
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//    MAIN
-//
 
 procedure ai_Global_Code(pu:PTUnit);
 begin

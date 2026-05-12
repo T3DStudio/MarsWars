@@ -19,8 +19,8 @@ g_DefeatedObs     : boolean  = true;
 
 g_royal_r         : integer  = 0;
 
-g_gplayers        : TPList;
-g_nplayers        : array[0..LastPlayer ] of TPlayerNetData;
+g_PlayersMain     : TPList;
+g_PlayersTemp     : array[0..LastPlayer ] of TPlayerTempData;
 g_units           : array[0..MaxUnits   ] of TUnit;
 g_punits          : array[0..MaxUnits   ] of PTUnit;
 

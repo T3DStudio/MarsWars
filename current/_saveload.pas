@@ -163,7 +163,7 @@ begin
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
    AddItem(@g_tick              ,SizeOf(g_tick           ));
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
      begin
         AddItem(@state     ,SizeOf(state     ));
         AddItem(@name      ,SizeOf(name      ));
@@ -174,7 +174,7 @@ begin
 
    // other
    AddItem(@g_FixedPositions    ,SizeOf(g_FixedPositions   ));
-   AddItem(@g_gplayers          ,SizeOf(TPList             ));
+   AddItem(@g_PlayersMain       ,SizeOf(TPList             ));
    AddItem(@g_units             ,SizeOf(g_units            ));
    AddItem(@g_missiles          ,SizeOf(g_missiles         ));
    AddItem(@g_effects           ,SizeOf(g_effects          ));
@@ -305,7 +305,7 @@ begin
       for u:=1 to MaxUnits do
         with g_units[u] do
         begin
-           player:=@g_gplayers[playeri];
+           player:=@g_PlayersMain[playeri];
            uid   :=@g_uids[uidi];
         end;
 

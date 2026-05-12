@@ -1,7 +1,7 @@
 
 procedure PlayerSetSkirmishTech(playerN:byte);
 begin
-   with g_gplayers[playerN] do
+   with g_PlayersMain[playerN] do
    begin
       PlayerSetAllowedUnits(playerN,[ UID_HKeep         ..UID_HBarracks,
                                       UID_LostSoul      ..UID_ZBFGMarine,
@@ -20,7 +20,6 @@ begin
 
       PlayerSetAllowedUpgrades(playerN,[0..255],255,true); //
 
-      a_rebuild:=[1..255];
       a_ability:=[1..255];
    end;
 end;
@@ -28,7 +27,7 @@ end;
 function PlayersSwap(pSlot,pTarget:byte;Check:boolean):boolean;
 var
   tgp:TPlayerGameData;
-  tnp:TPlayerNetData;
+  tnp:TPlayerTempData;
 t0,t1:byte;
 begin
    //pSlot - target slot
@@ -46,7 +45,7 @@ begin
    or(pTarget>LastPlayer)
    then exit;
 
-   if(g_gplayers[pSlot].state<>ps_none)
+   if(g_PlayersMain[pSlot].state<>ps_none)
    or(pTarget=pSlot)then exit;
 
    PlayersSwap:=true;
@@ -64,26 +63,26 @@ begin
    end;
    {$ENDIF}
 
-   t0:=g_gplayers[pSlot  ].team;
-   t1:=g_gplayers[pTarget].team;
+   t0:=g_PlayersMain[pSlot  ].team;
+   t1:=g_PlayersMain[pTarget].team;
 
-   tgp:=g_gplayers[pSlot];
-   g_gplayers[pSlot  ]:=g_gplayers[pTarget];
-   g_gplayers[pTarget]:=tgp;
+   tgp:=g_PlayersMain[pSlot];
+   g_PlayersMain[pSlot  ]:=g_PlayersMain[pTarget];
+   g_PlayersMain[pTarget]:=tgp;
 
-   tnp:=g_nplayers[pSlot];
-   g_nplayers[pSlot  ]:=g_nplayers[pTarget];
-   g_nplayers[pTarget]:=tnp;
+   tnp:=g_PlayersTemp[pSlot];
+   g_PlayersTemp[pSlot  ]:=g_PlayersTemp[pTarget];
+   g_PlayersTemp[pTarget]:=tnp;
 
-   g_gplayers[pSlot  ].pnum:=pSlot;
-   g_gplayers[pTarget].pnum:=pTarget;
+   g_PlayersMain[pSlot  ].pnum:=pSlot;
+   g_PlayersMain[pTarget].pnum:=pTarget;
 
    if(pSlot  >=map_MaxPlayers)then
-   g_gplayers[pSlot  ].isobserver:=true;
-   g_gplayers[pTarget].isobserver:=false;
+   g_PlayersMain[pSlot  ].isobserver:=true;
+   g_PlayersMain[pTarget].isobserver:=false;
 
-   g_gplayers[pSlot  ].team:=PlayerValidateTeam(pSlot  ,t1);
-   g_gplayers[pTarget].team:=PlayerValidateTeam(pTarget,t0);
+   g_PlayersMain[pSlot  ].team:=PlayerValidateTeam(pSlot  ,t1);
+   g_PlayersMain[pTarget].team:=PlayerValidateTeam(pTarget,t0);
 
    {$IFDEF _FULLGAME}
    if(LocalPlayer=pTarget)then LocalPlayer:=pSlot
@@ -96,7 +95,7 @@ end;
 
 procedure PlayerSetState(playerN,newState:byte);
 begin
-   with g_gplayers[playerN] do
+   with g_PlayersMain[playerN] do
    begin
       case newState of
 ps_None : begin isready:=false;if(not g_started)then
@@ -120,9 +119,9 @@ end;
 
 procedure PlayerSetDefault(p:byte);
 begin
-   with g_gplayers[p] do
+   with g_PlayersMain[p] do
    begin
-      aip_skill  :=player_default_ai_level;
+      aip_skill :=player_default_ai_level;
       race      :=r_random;
       mrace     :=r_random;
       team      :=p;
@@ -141,10 +140,10 @@ var p:byte;
 begin
    FillChar(ai_TeamAlarms,SizeOf(ai_TeamAlarms),0);
 
-   FillChar(g_gplayers,SizeOf(TPList    ),0);
-   FillChar(g_nplayers,SizeOf(g_nplayers),0);
+   FillChar(g_PlayersMain,SizeOf(g_PlayersMain),0);
+   FillChar(g_PlayersTemp,SizeOf(g_PlayersTemp),0);
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
      begin
         PlayerSetDefault(p);
         PlayerSetState(p,ps_None);
@@ -158,7 +157,7 @@ begin
 
    {$IFDEF _FULLGAME}
    LocalPlayer:=0;
-   with g_gplayers[LocalPlayer] do
+   with g_PlayersMain[LocalPlayer] do
    begin
       state:=ps_human;
       name :=PlayerName;
@@ -202,7 +201,7 @@ begin
      with g_units[u] do
      begin
         hits  :=hits_dead;
-        player:=@g_gplayers[playeri];
+        player:=@g_PlayersMain[playeri];
         uid   :=@g_units  [uidi   ];
      end;
    LastCreatedUnit :=0;
@@ -269,7 +268,7 @@ end;
 procedure GameLocalStart;
 begin
    ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer] , map_PlayerStartY[LocalPlayer]);
-   if(g_gplayers[LocalPlayer].isobserver)then
+   if(g_PlayersMain[LocalPlayer].isobserver)then
    begin
       ui_tab  :=tab_controls;
       UIPlayer:=255;
@@ -294,7 +293,7 @@ begin
    or(not g_DefeatedObs)
    or(g_started and Game_IsEnded)then exit;
 
-   with g_gplayers[pid] do
+   with g_PlayersMain[pid] do
      if(state<>ps_Human)
      or(armylimit<=0)
      or(units_all_e<=0)
@@ -327,7 +326,7 @@ procedure GameRemoveAIObservers;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
@@ -397,11 +396,11 @@ begin
    if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(p>=map_MaxPlayers)then isobserver:=true;
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(isobserver)then
        begin
           team:=0;
@@ -425,7 +424,7 @@ begin
        end;
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(state<>ps_None)then
        begin
           PlayerSetSkirmishTech(p);
@@ -566,7 +565,7 @@ end;
 function ui_GameControlsEnabled:boolean;
 begin
    ui_GameControlsEnabled:=false;
-   with g_gplayers[LocalPlayer] do
+   with g_PlayersMain[LocalPlayer] do
      if(UIPlayer<>LocalPlayer)
      or(isobserver)
      or(isdefeated)
@@ -613,7 +612,7 @@ begin
 
    SelectBuildings:=true;
    if(add)
-   then SelectBuildings:=(g_gplayers[LocalPlayer].units_bld_s[false]=0)
+   then SelectBuildings:=(g_PlayersMain[LocalPlayer].units_bld_s[false]=0)
    else
      if(fuid=255)then
        for u:=1 to MaxUnits do
@@ -732,7 +731,7 @@ begin
    wteams_n  :=0;
    FillChar(teams_army,SizeOf(teams_army),0);
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        teams_army[team]+=units_all_e;
 
    for p:=0 to LastPlayer do
@@ -749,7 +748,7 @@ procedure Scenario_DefaultDefeatConditions;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-     if(g_gplayers[p].units_all_e>0)then exit;
+     if(g_PlayersMain[p].units_all_e>0)then exit;
    Game_SetStatusWinnerTeam(255);
 end;
 
@@ -786,7 +785,7 @@ begin
 
    {$IFDEF _FULLGAME}
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(state=ps_AI)then
          PlayerSetState(p,ps_None);
 
@@ -794,7 +793,7 @@ begin
    {$ENDIF}
 
    for p:=0 to map_MaxPlayers-1 do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(state<>ps_human)then
        begin
           race :=random(r_count+1);
@@ -826,7 +825,8 @@ u,
 tar_d : integer;
 tar_ex: boolean;
 begin
-   with g_gplayers[tPlayer] do
+   with g_PlayersMain[tPlayer] do
+   with g_PlayersTemp[tPlayer] do
    if(o_id>0)and(units_all_e>0)then
    begin
       case o_id of
@@ -912,8 +912,8 @@ var p,t:byte;
 trevealed:boolean;
 begin
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
-     with g_nplayers[p] do
+     with g_PlayersMain[p] do
+     with g_PlayersTemp[p] do
        if(state>ps_None)then
        begin
           if(state=ps_human)and(net_status=ns_server){$IFDEF _FULLGAME}and(p<>LocalPlayer){$ENDIF}then
@@ -1065,7 +1065,7 @@ begin
    {$ENDIF}
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_gplayers[PlayerTarget] do
+     with g_PlayersMain[PlayerTarget] do
        if(state=ps_AI)then
        begin
           PlayerAILevelScroll:=true;
@@ -1099,7 +1099,7 @@ begin
    {$ENDIF}
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_gplayers[PlayerTarget] do
+     with g_PlayersMain[PlayerTarget] do
        if(state<>ps_human)then
        begin
           PlayerAIToggle:=true;
@@ -1133,7 +1133,7 @@ begin
    if(not GameOptionsChangeable)then exit;
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_gplayers[PlayerTarget] do
+     with g_PlayersMain[PlayerTarget] do
       if(not isobserver)and(state<>ps_None)then
       begin
          if(state=ps_None)then exit;
@@ -1181,7 +1181,7 @@ begin
    if(not GameOptionsChangeable)then exit;
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_gplayers[PlayerTarget] do
+     with g_PlayersMain[PlayerTarget] do
      begin
         if(state=ps_None)then exit;
 
@@ -1231,7 +1231,7 @@ begin
    if(not GameOptionsChangeable)then exit;
 
    if(PlayerTarget<=LastPlayer)and(PlayerTarget<map_MaxPlayers)then
-     with g_gplayers[PlayerTarget] do
+     with g_PlayersMain[PlayerTarget] do
      begin
         if(state<>ps_Human)
         or(PlayerTarget<>PlayerRequestor)then exit;
@@ -1410,7 +1410,7 @@ begin
          {$ENDIF}
       end
       {$IFDEF _FULLGAME}
-      else Scenario_KeyPointsTeam
+      else Scenario_KeyPointsCodeClient
       {$ENDIF};
       GameObjectsCode;
    end;

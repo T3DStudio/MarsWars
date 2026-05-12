@@ -536,7 +536,7 @@ begin
       begin
          uidi   :=auid;
          playeri:=0;
-         player :=@g_gplayers[playeri];
+         player :=@g_PlayersMain[playeri];
          unit_ApplyUID(pu);
          hits   :=hits_fdead-1;
       end;
@@ -1076,13 +1076,13 @@ begin
         end;
         if(uid_TransportMax_Base>0)then
         AddLineUnitDocHint(str_doc_TransportCpst  +DocValI(uid_TransportMax_Base));
-        AddLineUnitDocHint(str_hint_SplashResist  +': '+str_YesNoG[uid_isbuilding or uid_ismech]);
+        AddLineUnitDocHint(str_hint_SplashResist  +str_YesNoG[uid_isbuilding or uid_ismech]);
         if(uid_gen_EnergyLevel >0)then
-        AddLineUnitDocHint(str_hint_IncEnergyLevel+': '+DocValI(uid_gen_EnergyLevel ,tc_aqua  ));
+        AddLineUnitDocHint(str_hint_IncEnergyLevel+DocValI(uid_gen_EnergyLevel ,tc_aqua  ));
         if(uid_bounty_HellPower>0)then
-        AddLineUnitDocHint(str_doc_BountyHellPower+': '+DocValI(uid_bounty_HellPower,tc_yellow));
+        AddLineUnitDocHint(str_doc_BountyHellPower+DocValI(uid_bounty_HellPower,tc_yellow));
         if(uid_bounty_UACLoot  >0)then
-        AddLineUnitDocHint(str_doc_BountyUACLoot  +': '+DocValI(uid_bounty_UACLoot  ,tc_lime  ));
+        AddLineUnitDocHint(str_doc_BountyUACLoot  +DocValI(uid_bounty_UACLoot  ,tc_lime  ));
         if(uid_ZombieUID>0)then
         begin
            AddLineUnitDocHint(str_doc_ZombieUID   +'"'+g_uids[uid_ZombieUID].uid_str_name+'"');

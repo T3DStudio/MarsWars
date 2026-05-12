@@ -374,7 +374,7 @@ begin
    ctabType :=ui_ControlTabType;
 
    if(UIPlayer<=LastPlayer)
-   then POVPlayer:=@g_gplayers[UIPlayer]
+   then POVPlayer:=@g_PlayersMain[UIPlayer]
    else POVPlayer:=nil;
 
    for ucl:=0 to ui_ButtonsNum do
@@ -466,7 +466,7 @@ function local_TarIsEnemy:boolean;
 begin
    local_TarIsEnemy:=false;
    if(IsUnitRange(otar,nil))then
-     if(g_units[otar].player^.team<>g_gplayers[LocalPlayer].team)then local_TarIsEnemy:=true;
+     if(g_units[otar].player^.team<>g_PlayersMain[LocalPlayer].team)then local_TarIsEnemy:=true;
 end;
 procedure local_ClickEffect(color:TMWColor);
 begin
@@ -560,7 +560,7 @@ begin
          net_writebyte(oa0);
          net_writebyte(oid);
 
-         with g_gplayers[LocalPlayer] do
+         with g_PlayersMain[LocalPlayer] do
            net_writeint(units_all_s);
          for u:=1 to MaxUnits do
            with g_punits[u]^ do
@@ -570,7 +570,7 @@ begin
          net_send(net_cl_svip,net_cl_svport);
       end
       else
-        with g_gplayers[playerN] do
+        with g_PlayersTemp[playerN] do
         begin
            o_x0:=ox0;
            o_y0:=oy0;
@@ -611,7 +611,7 @@ begin
    if(not PointInCam(tx,ty))then exit;
 
    if(UIPlayer<=LastPlayer)
-   then pUIPlayer:=@g_gplayers[UIPlayer]
+   then pUIPlayer:=@g_PlayersMain[UIPlayer]
    else pUIPlayer:=nil;
 
    if(pUIPlayer<>nil)then
@@ -683,14 +683,14 @@ begin
                           end
                           else
                           begin
-                             ReqBits:=CheckUnitReqs(@g_gplayers[LocalPlayer],m_brush);
+                             ReqBits:=CheckUnitReqs(@g_PlayersMain[LocalPlayer],m_brush);
                              if(ReqBits>0)then
                              begin
                                 if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
                                 m_brush:=co_empty;
                              end
                              else
-                               with g_gplayers[LocalPlayer] do
+                               with g_PlayersMain[LocalPlayer] do
                                begin
                                   if(not InputAction(iact_Control))then
                                   begin
@@ -734,7 +734,7 @@ begin
                                                           m_brushy:=mouse_map_y;
                                                        end;
 
-                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,g_gplayers[LocalPlayer].team)<>cbr_no)
+                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,g_PlayersMain[LocalPlayer].team)<>cbr_no)
                                                        then m_brushc:=c_red;
                                                     end;
                                                end
@@ -764,7 +764,7 @@ begin
                 then PlayerSendOrder(co_ability,target,x,y,byte(-m_brush),
                                                      uo_corder,LocalPlayer)   // ability
                 else GameLog_ReqMsg(LocalPlayer,byte(-m_brush),lmt_argt_ability,lmt_invalid_Target,mouse_map_x,mouse_map_y);
-                if(g_gplayers[LocalPlayer].units_all_s>1)then exit;
+                if(g_PlayersMain[LocalPlayer].units_all_s>1)then exit;
              end;
 co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // move
 co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // attack
@@ -824,7 +824,7 @@ begin
                             begin
                                u:=action-iAct_SProd1;
                                if(0<=u)and(u<=ui_ButtonsNum)then
-                                 with g_gplayers[LocalPlayer] do
+                                 with g_PlayersMain[LocalPlayer] do
                                    case ui_tab of
                                    tab_buildings: case click_type of
                                                   pct_left : if(SoundOn)then m_brush:=ui_panel_uids[race,ui_tab,u];
@@ -909,7 +909,7 @@ begin
    iAct_Control_UAStop    : if(SoundEnabledLeft)then PlayerSendOrder(co_astand,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UStop     : if(SoundEnabledLeft)then PlayerSendOrder(co_stand ,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UProdCncl : if(SoundEnabledLeft)then
-                              with g_gplayers[LocalPlayer] do
+                              with g_PlayersMain[LocalPlayer] do
                                 if(ui_uibtn_ProdCncl>0)then
                                    PlayerSendOrder(co_pcancle,0,ui_cam_cx,ui_cam_cy,255,uo_corder,LocalPlayer);
    iAct_Control_UDestroy  : if(SoundEnabledLeft)then PlayerSendOrder(co_destroy,0,0,0,0,uo_corder,LocalPlayer);
@@ -1192,7 +1192,7 @@ end;
 procedure test_nullupgr(playeri:byte);
 var i:byte;
 begin
-   with g_gplayers[playeri] do
+   with g_PlayersMain[playeri] do
      for i:=1 to 255 do
        upgrs_cur[i]:=0;
 end;
@@ -1280,8 +1280,8 @@ begin
          {$IFDEF DEBUG0}
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
          {$ENDIF}
-         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_gplayers[LocalPlayer] do if(state=ps_human     )then state:=ps_AI         else state:=ps_human;
-         if(InputActionPressed(iAct_test_iddqd       ))then with g_gplayers[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
+         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersMain[LocalPlayer] do if(state=ps_human     )then state:=ps_AI         else state:=ps_human;
+         if(InputActionPressed(iAct_test_iddqd       ))then with g_PlayersMain[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
          if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(LocalPlayer);

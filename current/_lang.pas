@@ -355,7 +355,7 @@ begin
 
    str_ui_time                   := 'Time: ';
    str_ui_menu                   := 'Menu';
-   str_ui_UnitGroups             := 'Unit groups: ';
+   str_ui_UnitGroups             := 'Unit groups:';
    str_ui_KothTime               := 'Center capture time left: ';
    str_ui_KotHTime_act           := 'Time left until center area is active: ';
    str_ui_KotHWinner             := ' is King of the Hill!';

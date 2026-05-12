@@ -8,8 +8,8 @@ begin
      {$IFDEF _FULLGAME}
      if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_gplayers[p] do
-       with g_nplayers[p] do
+       with g_PlayersMain[p] do
+       with g_PlayersTemp[p] do
          if(state=ps_None)then
          begin
             net_NewPlayer:=p;
@@ -38,8 +38,8 @@ begin
      {$IFDEF _FULLGAME}
      if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_gplayers[p] do
-       with g_nplayers[p] do
+       with g_PlayersMain[p] do
+       with g_PlayersTemp[p] do
          if(state=ps_human)and(net_ip=aip)and(net_port=aport)then
          begin
             net_GetPlayer:=p;
@@ -57,8 +57,8 @@ begin
    c_players:=0;
    c_out    :=0;
    for p:=0 to MaxPlayers do
-     with g_gplayers[p] do
-     with g_nplayers[p] do
+     with g_PlayersMain[p] do
+     with g_PlayersTemp[p] do
        if(state=PS_human)and(not isobserver)and(not isdefeated)then
        begin
           c_players+=1;
@@ -72,8 +72,8 @@ var
 tbool:boolean;
 tstr :shortstring;
 begin
-   with g_gplayers[pid] do
-   with g_nplayers[pid] do
+   with g_PlayersMain[pid] do
+   with g_PlayersTemp[pid] do
    begin
       tstr:=name;
       name:=net_readstring;
@@ -108,12 +108,12 @@ var p,s:byte;
 begin
    s:=0;
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        SetBBit(@s,p,state=ps_human);
    net_writebyte(s);
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
-     with g_nplayers[p] do
+     with g_PlayersMain[p] do
+     with g_PlayersTemp[p] do
        if(state=ps_human)then
        begin
           net_writeword(net_ttl );
@@ -130,7 +130,7 @@ begin
    if(g_started)then
    net_writebyte(g_status );
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        net_writestring(name);
 end;
 
@@ -143,8 +143,8 @@ begin
    net_writebool(G_Started);
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
-     with g_nplayers[p] do
+     with g_PlayersMain[p] do
+     with g_PlayersTemp[p] do
      begin
         net_writestring(name );
         if(isobserver)
@@ -180,7 +180,7 @@ begin
         net_writeint(map_PlayerStartY[p]);
      end;
 
-   with g_nplayers[pid] do
+   with g_PlayersTemp[pid] do
      net_send(net_ip,net_port);
 end;
 
@@ -273,14 +273,14 @@ begin
                                       net_clearbuffer;
                                       net_writebyte(nmid_ping_Answer);
                                       net_writecard(tping1);
-                                      with g_nplayers[pid] do
+                                      with g_PlayersTemp[pid] do
                                         net_send(net_ip,net_port);
                                    end;
             nmid_ping_Answer     : begin
                                       tping1:=net_readcard;
                                       tping2:=SDL_GetTicks;
                                       if(tping1<=tping2)then
-                                        with g_nplayers[pid] do
+                                        with g_PlayersTemp[pid] do
                                         begin
                                            tpingw:=net_ping;
                                            net_ping:=tping2-tping1;
@@ -298,14 +298,15 @@ begin
                                                 PlayerKill(pid,true);
                                                 PlayerSetState(pid,ps_None);
                                              end;
-                                      true : g_gplayers[pid].state:=ps_none;
+                                      true : g_PlayersMain[pid].state:=ps_none;
                                       end;
                                       menu_update:=true;
                                    end;
             else
                if(G_Started)then
                  case mid of
-                 nmid_order          : with g_gplayers[pid]do
+                 nmid_order          : with g_PlayersMain[pid]do
+                                       with g_PlayersTemp[pid]do
                                        begin
                                           o_x0:=net_readint;
                                           o_y0:=net_readint;
@@ -328,8 +329,8 @@ begin
                                           end;
                                        end;
                  nmid_map_mark       : net_ReadMapMark(pid);
-                 nmid_ClientData     : with g_gplayers[pid] do
-                                       with g_nplayers[pid] do
+                 nmid_ClientData     : with g_PlayersMain[pid] do
+                                       with g_PlayersTemp[pid] do
                                        begin
                                           PNU     :=net_readbyte;
                                           log_n_cl:=net_readcard;
@@ -419,8 +420,8 @@ begin
      {$IFDEF _FULLGAME}
      if(pid<>LocalPlayer)then
      {$ENDIF}
-       with g_gplayers[pid] do
-       with g_nplayers[pid] do
+       with g_PlayersMain[pid] do
+       with g_PlayersTemp[pid] do
          if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
             if(G_Started)and(net_TimerBase=0)then
@@ -498,8 +499,8 @@ begin
    s:=net_readbyte;
    for p:=0 to LastPlayer do
      if(GetBBit(@s,p))then
-       with g_gplayers[p] do
-       with g_nplayers[p] do
+       with g_PlayersMain[p] do
+       with g_PlayersTemp[p] do
        begin
           if(state=ps_human)then
           begin
@@ -555,8 +556,8 @@ procedure net_ClientReadLobbyPlayerData(pid:byte);
 var i,w:integer;
 oldname:shortstring;
 begin
-   with g_gplayers[pid] do
-   with g_nplayers[pid] do
+   with g_PlayersMain[pid] do
+   with g_PlayersTemp[pid] do
    begin
       oldname:=name;
       name   :=net_readstring;
@@ -644,7 +645,7 @@ nmid_LobbyInfo    : begin
                       svstarted:=net_readbool;
 
                       for i:=0 to LastPlayer do
-                        with g_gplayers[i] do
+                        with g_PlayersMain[i] do
                         begin
                            net_ClientReadLobbyPlayerData(i);
                            if(svstarted)then

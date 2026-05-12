@@ -555,6 +555,7 @@ begin
    uid_LevelBonusDamage:= -1;
    uid_DeathUID        := UID_LostSoul;
    uid_DeathUIDn       := 3;
+   uid_AI_PrimaryTarget:= true;
    SetWeapon(0,wpt_unit,aw_fsr+50,0,0 ,fr_fps2,UID_Phantom ,0,upgr_hell_Phantoms,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
    SetWeapon(1,wpt_unit,aw_fsr+50,0,0 ,fr_fps2,UID_LostSoul,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
 
@@ -601,6 +602,7 @@ begin
    uid_req_uid1        := UID_HMonastery;
    uid_LimitUse        := ul4;
    uid_islight         := true;
+   uid_AI_PrimaryTarget:= true;
    SetWeapon(0,wpt_resurect,aw_dmelee,0,3  ,fr_fpsh,0           ,0,upgr_hell_Resurrect,0,0,wtrset_resurect   ,wpr_any,uids_arch_res,[             ],0,0,0,0);
    SetWeapon(1,wpt_missle  ,aw_fsr   ,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,0,0);
 end;
@@ -683,6 +685,7 @@ begin
    uid_islight         := true;
    uid_FastDeathHits   := 1;
    uid_FlyLevelLikeTarget:=true;
+   uid_bounty_HellPower:= 10;
    case i of
 UID_LostSoul: begin
               uid_uibtn          := 12;
@@ -943,6 +946,7 @@ begin
    uid_islight         := false;
    uid_FastDeathHits   := hits_fdead_border;
    uid_arms_BonusAntiUnitRange:=50;
+   uid_AI_PrimaryTarget:= true;
 
    case i of
 UID_BFGMarine : begin
@@ -983,6 +987,7 @@ begin
    uid_ProdTimeSec     := ptime1q;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
+   uid_AI_PrimaryTarget:= true;
 
    case i of
 UID_Medic : begin
@@ -1023,6 +1028,7 @@ begin
    uid_ProdTimeSec     := ptime1q;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
+   uid_AI_PrimaryTarget:= true;
 
    case i of
 UID_Engineer : begin
@@ -1435,7 +1441,7 @@ begin
 end;
 UID_Tank:
 begin
-   uid_MaxHits1        := 5000;
+   uid_MaxHits1        := 6000;
    uid_req_EnergyLevel := 600;
    uid_r               := 20;
    uid_MSpeed_Base     := 8;
@@ -1451,7 +1457,7 @@ begin
    uid_req_uid1        := UID_UScienceCenter;
    uid_FastDeathHits   :=1;
    uid_arms_BonusAntiBuildingRange:=50;
-   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fpst2,MID_Tank,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_Siege4);
+   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fps1,MID_Tank,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_Siege4);
 end;
 UID_Flyer:
 begin
@@ -1609,6 +1615,8 @@ end;
                  if(p in aw_ShotPoints)then aw_ShotPoints+=[p-1];
 
                if(aw_impact_dmod=dm_Siege4)then uid_AI_Siedge:=true;
+
+               if(aw_type=wpt_heal)then uid_AI_Healer:=true;
           end;
 
       if(uid_LimitUse>=MinUnitLimit)and(not uid_isbuilding)then
@@ -1796,7 +1804,8 @@ begin
    SetDMOD(dm_AntiGroundLight2 ,0,200,                      wtr_light+wtr_ground);
    SetDMOD(dm_RSMShot          ,0,400,wtr_building                              );
    SetDMOD(dm_Siege4           ,0,400,wtr_building                              );
-   SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
+   SetDMOD(dm_Lost             ,0,300,wtr_unit    +wtr_bio +wtr_light+wtr_fly   );
+   SetDMOD(dm_Lost             ,1, 50,             wtr_mech                     );
    SetDMOD(dm_BFG              ,0, 50,wtr_building                              );
    SetDMOD(dm_AntiBio2         ,0,200,             wtr_bio                      );
    SetDMOD(dm_AntiBio2         ,1, 50,wtr_building                              );

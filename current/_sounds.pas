@@ -501,7 +501,7 @@ end;
 procedure snd_SoundLogUIPlayer(PListener:byte);
 begin
    if(PListener<=LastPlayer)then
-     with g_gplayers[PListener] do
+     with g_PlayersMain[PListener] do
        with log_l[log_i] do
          case lm_type of
 lmt_chat_player0..

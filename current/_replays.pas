@@ -112,7 +112,7 @@ begin
    AddItem(@rpls_player         ,SizeOf(rpls_player      ));
    AddItem(@g_tick              ,SizeOf(g_tick           ));
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
      begin
         AddItem(@state     ,SizeOf(state     ));
         AddItem(@name      ,SizeOf(name      ));
@@ -122,7 +122,7 @@ begin
      end;
 
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        AddItem(@race,SizeOf(race));
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
 end;
@@ -458,7 +458,7 @@ begin
          end;
 
          for p:=0 to LastPlayer do
-           with g_gplayers[p] do
+           with g_PlayersMain[p] do
              if(length(name)>MaxPlayerNameLen)
              or not(state in [ps_None,ps_human,ps_AI])
              or(race >r_count)

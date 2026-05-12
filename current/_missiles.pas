@@ -158,7 +158,7 @@ begin
          end;
 end;
 
-procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte;doubleDMG:boolean);
+procedure missile_add(mxt,myt,mvx,mvy,mtar:integer;msid,mpl:byte;mfst,mfet,mfake:boolean;adddmg:integer;mdmod:byte;mdmgX:single=1);
 var m,d:integer;
     tu:PTUnit;
 begin
@@ -192,13 +192,13 @@ begin
 
            m_damage:=adddmg;
            if(m_playeri<=LastPlayer)and(tu<>nil)then
-             with g_gplayers[m_playeri] do
+             with g_PlayersMain[m_playeri] do
                if(m_mid=MID_URocket)and(tu^.isfly)and(upgrs_cur[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
 
            with g_mids[m_mid] do
            begin
               m_damage+=mid_base_damage;
-              if(doubleDMG)then m_damage*=2;
+              m_damage:=round(m_damage*mdmgX);
               m_homing:=mid_homing;
 
               if(mid_speed>0)
@@ -240,7 +240,7 @@ begin
         if(not mid_noFlyCheck)and(m_mfs<>tu^.isfly)then exit;
         if(tu^.uidi in mid_ImmuneUnits)then exit;
 
-        teams  :=g_gplayers[m_playeri].team=tu^.player^.team;
+        teams  :=g_PlayersMain[m_playeri].team=tu^.player^.team;
 
         if(teams)then
           if(mid_base_SplashR<=0)

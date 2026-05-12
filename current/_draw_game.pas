@@ -674,8 +674,11 @@ begin
           //if(ui_CheckMapPointFogVision(kp_x,kp_y,true))then
           if(kptd_VisTimer>0)then
           begin
+             if(UIPlayer<=LastPlayer)and(kp_Energy>0)then
+               if(kp_LimitPlayerC[UIPlayer]>0)then
+                 UnitsInfo_AddText(kp_x,kp_y-txt_line_h1,limit2s(kp_LimitPlayerC[UIPlayer],ul1)+'/'+limit2s(keyPoint_MinLimit,ul1),ui_max_color[kp_LimitPlayerC[UIPlayer]>=keyPoint_MinLimit]);
+             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y            ,cr2s(kptd_lifeTime            ),c_aqua);
              if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y+txt_line_h1,ir2s(kp_CaptureTime-kptd_Timer),colorN );
-             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y            ,cr2s(kptd_lifeTime           ),c_white);
           end;
        end;
 end;
@@ -752,7 +755,7 @@ begin
 
    //draw_text(vid_screen,750,0,b2pm[map_ffly] , ta_RU,255, c_white);
 
-  { with g_gplayers[LocalPlayer] do
+  { with g_PlayersMain[LocalPlayer] do
    begin
       draw_text(vid_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
       draw_text(vid_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
@@ -771,7 +774,7 @@ begin
                                                               }
    if(InputAction(iact_Shift))then
      for u:=0 to LastPlayer do
-      with g_gplayers[u] do
+      with g_PlayersMain[u] do
       begin
          ix:=170+89*u;
 
@@ -867,7 +870,7 @@ begin
         end;
 
          //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);
-         //if(isselected)then            i2s(TeamVision[g_gplayers[player].team])+#13+i2s(TeamDetection[g_gplayers[player].team])
+         //if(isselected)then            i2s(TeamVision[g_PlayersMain[player].team])+#13+i2s(TeamDetection[g_PlayersMain[player].team])
          //if(alrm_r<=0)then
          //
 
