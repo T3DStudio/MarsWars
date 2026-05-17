@@ -1361,9 +1361,7 @@ begin
             a_weap_cl:=a_weap;
 
             if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(not uid_isbuilding)then
-              if(aw_max_range<0)and(aw_type=wpt_directdmg)
-              then unit_AddExp(pAttacker,aw_reload*2,false,false)
-              else unit_AddExp(pAttacker,aw_reload  ,false,false);
+              unit_AddExp(pAttacker,aw_reload,false,false);
             if(not attackinmove)then
             begin
                if(x<>pTarget^.x)

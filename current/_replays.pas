@@ -101,16 +101,16 @@ begin
    setlength(rpls_head_items,0);
    rpls_file_head_size:=0;
 
-   AddItem(@g_version           ,SizeOf(g_version        ));
-   AddItem(@map_scenario        ,SizeOf(map_scenario     ));
-   AddItem(@map_generators      ,SizeOf(map_generators   ));
-   AddItem(@map_seed            ,SizeOf(map_seed         ));
-   AddItem(@map_Size1           ,SizeOf(map_Size1        ));
-   AddItem(@map_ObstaclesS      ,SizeOf(map_ObstaclesS   ));
-   AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
-   AddItem(@theme_i             ,SizeOf(theme_i          ));
-   AddItem(@rpls_player         ,SizeOf(rpls_player      ));
-   AddItem(@g_tick              ,SizeOf(g_tick           ));
+   AddItem(@g_version           ,SizeOf(g_version     ));
+   AddItem(@map_scenario        ,SizeOf(map_scenario  ));
+   AddItem(@map_generators      ,SizeOf(map_generators));
+   AddItem(@map_seed            ,SizeOf(map_seed      ));
+   AddItem(@map_Size1           ,SizeOf(map_Size1     ));
+   AddItem(@map_Template        ,SizeOf(map_Template  ));
+   AddItem(@map_Symmetry        ,sizeof(map_Symmetry  ));
+   AddItem(@theme_i             ,SizeOf(theme_i       ));
+   AddItem(@rpls_player         ,SizeOf(rpls_player   ));
+   AddItem(@g_tick              ,SizeOf(g_tick        ));
    for p:=0 to LastPlayer do
      with g_PlayersMain[p] do
      begin
@@ -443,7 +443,7 @@ begin
          end;
 
          if(map_Size1<map_MinSize)or(map_Size1>map_MaxSize)
-         or(map_ObstaclesS>map_MaxObstacles)
+         or(map_Template  >mapt_Last)
          or(map_Generators>mapg_Last)
          or not(map_scenario in allmapscenarios)
          or(rpls_player>LastPlayer)then

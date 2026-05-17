@@ -185,8 +185,6 @@ begin
    str_map                       := 'Map';
    str_map_Seed                  := 'Seed';
    str_map_Size                  := 'Size';
-   str_map_Obstacles             := 'Obstacles';
-   str_map_Symmetry              := 'Symmetric';
    str_map_Random                := 'Random map';
    str_map_Scenario              := 'Scenario';
    str_map_ScenarioL[mc_ffa3     ]:= tc_lime  +'FFA(3)'      +tc_default;
@@ -213,12 +211,21 @@ begin
    str_map_GeneratorsL[mapg_20 ] := '20 min';
    str_map_GeneratorsL[mapg_inf] := 'infinity';
 
+   str_map_Symmetry              := 'Symmetric';
    str_map_SymmertyL[maps_none ] := 'no';
    str_map_SymmertyL[maps_point] := 'point';
    str_map_SymmertyL[maps_lineV] := 'line |';
    str_map_SymmertyL[maps_lineh] := 'line -';
    str_map_SymmertyL[maps_lineL] := 'line \';
    str_map_SymmertyL[maps_lineR] := 'line /';
+
+   str_map_Template               := 'Template';
+   str_map_TemplateL[mapt_lake   ]:= tc_red   +'central lake';
+   str_map_TemplateL[mapt_ring   ]:= tc_orange+'central ring';
+   str_map_TemplateL[mapt_sea    ]:= tc_aqua  +'sea';
+   str_map_TemplateL[mapt_cave   ]:= tc_blue  +'cave';
+   str_map_TemplateL[mapt_steppe ]:= tc_gray  +'steppe';
+   str_map_TemplateL[mapt_canyon ]:= tc_lime  +'canyon';
 
    str_objective_Scirmish        := '-Destroy all enemy players';
    str_objective_RoyalBattle     := '-Stay alive';
@@ -385,12 +392,12 @@ begin
    str_hint_UpgradesLvl          := 'Upgrades: ';
    str_hint_Demons               := 'demons&zombies';
    str_hint_Except               := 'except';
-   str_hint_SplashResist         := 'Immune to splash damage';
+   str_hint_SplashResist         := 'Immune to splash damage: ';
    str_hint_TargetLimit          := 'target limit';
    str_hint_builder              := 'Builder';
    str_hint_barrack              := 'Unit production';
    str_hint_forge                := 'Upgrades facility';
-   str_hint_IncEnergyLevel       := 'Increase energy level';
+   str_hint_IncEnergyLevel       := 'Increase energy level: ';
    str_hint_CanRebuildTo         := 'Can be rebuilt into ';
    str_hint_UnitArming           := 'Arming: ';
    str_hint_Abilities            := 'Abilities: ';
@@ -488,6 +495,7 @@ begin
    str_doc_PainC                 := 'PainState base threshold: ';
    str_doc_TransportSize         := 'Places in transport: ';
    str_doc_TransportCpst         := 'Base transport capacity: ';
+   str_doc_LevelUpTime           := 'Time in combat to level up: ';
    str_doc_LevelArmorBonus       := 'Bonus to armor per level: ';
    str_doc_LevelDamageBonus      := 'Bonus to impact per level: ';
    str_doc_LevelPainSBonus       := 'Bonus to PainState threshold per level: ';
@@ -785,7 +793,6 @@ begin
    // MAP
    menu_set_hint(mi_Map_Generators,mi_Map_Panel,': generators life time');
    menu_set_hint(mi_Map_Seed      ,mi_Map_Panel,': select for edition/make random value');
-   menu_set_hint(mi_Map_Obstacles ,mi_Map_Panel,': obstacles max size');
 
    /////////////////////////////////////////////////////////////////////////////
    //  Help docs  CREDITS
@@ -923,7 +930,6 @@ begin
    DocHelp_AddBaseMchanics(tc_orange+'VETERAN SYSTEM'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics('All combat units gain combat experience and increase their level. All units spawn at level 1 and can be upgraded to level 4. With each new level, the unit increases its damage, armor, and pain threshold.');
-   DocHelp_AddBaseMchanics('In long-range combat, a unit must be in combat for '+i2s(ExpLevel1sec)+' seconds to get next level. In melee it will take half as long for the unit to reach next level.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt);
@@ -1275,7 +1281,7 @@ begin
   str_map               := 'Карта';
   str_map_Seed          := 'Номер';
   str_map_Size          := 'Размер';
-  str_map_Obstacles     := 'Преграды';
+//  str_map_Template     := 'Преграды';
   str_map_Symmetry      := 'Симметрия';
   str_map_Random        := 'Случайная карта';
 

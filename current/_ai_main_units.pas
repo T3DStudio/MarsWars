@@ -47,7 +47,7 @@ begin
         tar_weight:=tweight;
      end;
 end;
-procedure MainTargetSetDefault;
+procedure MainTargetSetKeyPoint;
 var p:integer;
 begin
    if(ai_keypoint_d<NOTSET)then
@@ -55,15 +55,22 @@ begin
      begin
         p:=ai_keypoint_d;
         case map_scenario of
-        mc_koth     : if(ai_keypoint_koth)then p:=p div 3;
+        mc_koth     : p:=p div 4;
         mc_keypoints: p:=p div 2;
         end;
         MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,p,kp_RCapture);
      end;
+end;
+procedure MainTargetSetDefault;
+begin
+   MainTargetSetKeyPoint;
    with pu^ do
-     MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,aiu_alarm_d,0);  // koth
+     if(map_scenario<>mc_koth)
+     or(aiu_alarm_d<base_r1h)then
+       MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,aiu_alarm_d,0);
    if(ai_BaseDef_d<NOTSET)then
-     MainTargetSet(ai_BaseDef_u,0,0,ai_BaseDef_d,0,ai_BaseDef_d div 2,0);
+     with ai_BaseDef_u^ do
+       MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,ai_BaseDef_d,0,ai_BaseDef_d div 2,0);
 end;
 
 function MainTargetGo(wrect:integer):boolean;
@@ -259,19 +266,32 @@ begin
         end;
 
       if (transportM<=0)
-      and(uid_LimitUse<=keyPoint_MaxLimitAI)
       and(ai_BaseDef_d>base_r2)then
-        if(NeedCaptureGenerators)
-        or(ai_keypoint_d<NOTSET)then
-        begin
-           tlimit:=ai_GroupAll_ulimit[aic_group_Home]+ai_GroupAll_ulimit[aic_group_KeyPointAssault]+ai_GroupAll_ulimit[aic_group_Scout];
-           if (tlimit>=aip_MaxUnitMinPart)
-           and(ai_GroupAll_ulimit[aic_group_KeyPointAssault]<aip_MaxUnitMinPart)then
+      begin
+         if(uid_LimitUse<=keyPoint_MaxLimitAI)
+         and(not uid_AI_PrimaryTarget)then
+           if(NeedCaptureGenerators)
+           or(ai_keypoint_d<NOTSET)then
            begin
-              group:=aic_group_KeyPointAssault;
-              exit;
+              tlimit:=ai_GroupAll_ulimit[aic_group_Home]
+                     +ai_GroupAll_ulimit[aic_group_KeyPointAssault]
+                     +ai_GroupAll_ulimit[aic_group_Scout];
+              if (tlimit>=aip_MaxUnitMinPart)
+              and(ai_GroupAll_ulimit[aic_group_KeyPointAssault]<aip_MaxUnitMinPart)then
+              begin
+                 group:=aic_group_KeyPointAssault;
+                 exit;
+              end;
            end;
-        end;
+
+         if(map_scenario=mc_koth)and(g_tick>=keyPoint_KotH_pause)then
+         begin
+            if(ai_keypoint_d=NOTSET)
+            then group:=aic_group_AttackWait
+            else group:=aic_group_AttackNow;
+            exit;
+         end;
+      end;
 
       if(units_bld_l[true]<=0)
       or((ai_AttackGroupFlyLimit=0)and(ai_GroupAll_ulimit[aic_group_AttackWait]>0)and(uid_CanAttack)and(isfly))then
@@ -282,7 +302,10 @@ begin
 
       case uidi of
       UID_LostSoul,
-      UID_Phantom : group:=aic_group_AttackNow;
+      UID_Phantom : if(NeedCaptureGenerators)
+                    or(ai_keypoint_d<NOTSET)
+                    then group:=aic_group_KeyPointAssault
+                    else group:=aic_group_AttackNow;
       end;
    end;
 end;
@@ -322,22 +345,21 @@ begin
         case group of
         aic_group_Home           : SetGroupsForHome;
         aic_group_AttackNow,
-        aic_group_AttackWait     : if (aiu_alarm_d   =NOTSET)
-                                   and(ai_generator_d=NOTSET)
-                                   and(ai_keypoint_d =NOTSET)
-                                   then group:=aic_group_AttackWait
-                                   else group:=aic_group_AttackNow;
+        aic_group_AttackWait     : begin
+                                      MainTargetSetDefault;
+                                      if(tar_dist =NOTSET)
+                                      then group:=aic_group_AttackWait
+                                      else group:=aic_group_AttackNow;
+                                   end;
         aic_group_Scout          : if(not NeedScouting)
                                    then group:=aic_group_Home
                                    else
                                      if(ai_ScoutCandidate_u<>pu)and(ai_BaseOwn_d<base_r1)
                                      then group:=aic_group_Home;
         aic_group_KeyPointAssault,
-        aic_group_KeyPointGuard  : if((not NeedCaptureGenerators)
-                                   and(ai_keypoint_d =NOTSET))
-                                   or(uid_LimitUse>ul10)then
+        aic_group_KeyPointGuard  : if((not NeedCaptureGenerators)and(ai_keypoint_d =NOTSET))
+                                   or((uid_LimitUse>ul10)and(map_scenario<>mc_koth))then
                                      group:=aic_group_Home;
-
         aic_group_Transport      : if(transportM<=0)then group:=aic_group_Home;
         else group:= aic_group_Home;
         end;
@@ -372,9 +394,7 @@ begin
                                     if(NeedCaptureGenerators)then
                                       with ai_generator_kp^ do
                                         MainTargetSet(nil,kp_x,kp_y,ai_generator_d,kp_zone,ai_generator_d,round(kp_RCapture*0.6));
-                                    if(ai_keypoint_d<NOTSET)then
-                                      with ai_keypoint_kp^ do
-                                        MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,ai_keypoint_d ,round(kp_RCapture*0.6));
+                                    MainTargetSetKeyPoint;
 
                                     if(tar_dist=NOTSET)
                                     then group:=aic_group_Home
@@ -398,8 +418,6 @@ begin
                                  end;
       aic_group_AttackNow      : begin
                                     MainTargetSetDefault;
-                                    //if(isselected)then writeln('tar_dist ',tar_dist,' ',tar_dist<=base_r1h);
-
                                     if(tar_dist<=base_r1h)
                                     then MainTargetGo(tar_r)
                                     else
@@ -418,9 +436,12 @@ begin
                                          end;
                                          UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_orange);
                                       end;  }
-                                      if(ai_HTeleportTarget_u<>nil)
-                                      then TryTeleporting(ai_HTeleportTarget_u)
-                                      else ai_RunTo(pu,ai_HTeleportNearest_u,0,0,ai_HTeleportNearest_d,aic_BaseIdle_r);
+                                      if(map_scenario=mc_koth)and(ai_HTeleportTarKOTH_u<>nil)
+                                      then TryTeleporting(ai_HTeleportTarKOTH_u)
+                                      else
+                                        if(ai_HTeleportTarget_u<>nil)
+                                        then TryTeleporting(ai_HTeleportTarget_u)
+                                        else ai_RunTo(pu,ai_HTeleportNearest_u,0,0,ai_HTeleportNearest_d,aic_BaseIdle_r);
                                    end
                                    else
                                    begin
@@ -439,33 +460,40 @@ begin
                                  end;
       end;
 
-      if((aip_flags and aif_army_smart_micro)>0)then     // add micro about royal battle
-      begin
-         if(uid_AI_Siedge)and(ai_enemy_build_d<base_r1h)and(ai_enemy_build_d<NOTSET)then
-           uo_tar:=ai_enemy_build_u^.unum;
+      if((aip_flags and aif_army_smart_micro)>0)then
+        if(u_royal_d<=aic_BaseIdle_r)then
+        begin
+           uo_id:=ua_move;
+           uo_x :=map_SizeH;
+           uo_y :=map_SizeH;
+           exit;
+        end
+        else
+        begin
+           if(uid_AI_Siedge)and(ai_enemy_build_d<base_r1h)and(ai_enemy_build_d<NOTSET)then
+             uo_tar:=ai_enemy_build_u^.unum;
 
-         case uidi of
-         UID_Pain     : if(ai_enemy_battle_d<base_r1h)then
-                        begin
-                           uo_id:=ua_move;
-                           ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
-                        end;
-         UID_Phantom  : if(ai_ZombieTarget_d<base_r1h)then
-                          ai_RunTo(pu,ai_enemy_battle_u,0,0,ai_ZombieTarget_d,0);
-         UID_Medic,
-         UID_ZMedic   : if(ai_HealTar_d<base_r2)then
-                          ai_RunTo(pu,ai_HealTar_u,0,0,ai_HealTar_d,0);
-         UID_Engineer,
-         UID_ZEngineer: if(ai_RepairTar_d<base_r2)then
-                          ai_RunTo(pu,ai_RepairTar_u,0,0,ai_RepairTar_d,0);
-         end;
-      end;
-      if((aip_flags and aif_army_smart_Target)>0)then
-        if(ai_PrimaryTarget_u<>nil)then
-          uo_tar:=ai_PrimaryTarget_u^.unum;
-
+           case uidi of
+           UID_Pain     : if(ai_enemy_battle_d<base_r1h)then
+                          begin
+                             uo_id:=ua_move;
+                             ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
+                          end;
+           UID_Phantom  : if(ai_ZombieTarget_d<base_r1h)then ai_RunTo(pu,ai_enemy_battle_u,0,0,ai_ZombieTarget_d,0);
+           UID_Medic,
+           UID_ZMedic   : if(ai_HealTar_d     <base_r2 )then ai_RunTo(pu,ai_HealTar_u     ,0,0,ai_HealTar_d     ,0);
+           UID_Engineer,
+           UID_ZEngineer: if(ai_RepairTar_d   <base_r3 )then ai_RunTo(pu,ai_RepairTar_u   ,0,0,ai_RepairTar_d   ,0);
+           end;
+        end;
       if(uo_id=ua_amove)then
-        if((aip_flags and aif_ability_other)>0)then ai_AbilitiesCommon(pu);
+      begin
+         if((aip_flags and aif_army_smart_Target)>0)then
+           if(ai_PrimaryTarget_u<>nil)then
+             uo_tar:=ai_PrimaryTarget_u^.unum;
+
+         if((aip_flags and aif_ability_other)>0)then ai_AbilitiesCommon(pu);
+      end;
 
      { if(isselected)then
       begin

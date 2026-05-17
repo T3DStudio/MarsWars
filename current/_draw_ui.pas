@@ -783,7 +783,7 @@ begin
           draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,c_white);
           draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,c_white);
 
-          draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_orange+ui_limitstr
+          draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_gray+ui_limitstr
                                                                                                                                     ,ta_LU,255,ui_max_color[limit>=MaxPlayerLimit]);
           draw_text(tar,ui_ArmyX  ,ui_ArmyY1    ,str_ui_LimitUnits    +': '+limit2s(units_bld_l[true ]                ,MinUnitLimit),ta_LU,255,c_white);
           draw_text(tar,ui_ArmyX  ,ui_ArmyY2    ,str_ui_LimitBuildings+': '+limit2s(units_bld_l[false]+prod_unit_Limit,MinUnitLimit),ta_LU,255,c_white);

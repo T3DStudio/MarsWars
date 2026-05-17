@@ -632,7 +632,7 @@ begin
    menu_Item_Set(mi_Map_Generators,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Map_Seed      ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Map_Size      ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
-   menu_Item_Set(mi_Map_Obstacles ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
+   menu_Item_Set(mi_Map_Template  ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Map_Symmetry  ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Map_Theme     ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Map_Random    ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
@@ -641,7 +641,7 @@ begin
    menu_items[mi_Map_Generators].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Map_Seed      ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Map_Size      ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
-   menu_items[mi_Map_Obstacles ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
+   menu_items[mi_Map_Template  ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Map_Symmetry  ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Map_Random    ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
 end;
@@ -1007,7 +1007,7 @@ mi_Map_Scenario        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_
 mi_Map_Generators      : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MGenerators    ,true,false);
 mi_Map_Seed            : ;
 mi_Map_Size            : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSize          ,true,false);
-mi_Map_Obstacles       : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MObstacles     ,true,false);
+mi_Map_Template        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MTemplate      ,true,false);
 mi_Map_Symmetry        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSymmetry      ,true,false);
 mi_Map_Random          : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MRandom        ,true,false);
 
@@ -1109,7 +1109,7 @@ mi_Map_Seed            : if(not check)then GameMapSetSeed(LocalPlayer,random(map
 mi_Map_Scenario        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MScenario  ,false,false);
 mi_Map_Generators      : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MGenerators,false,false);
 mi_Map_Size            : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSize      ,false,false);
-mi_Map_Obstacles       : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MObstacles ,false,false);
+mi_Map_Template        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MTemplate  ,false,false);
 mi_Map_Symmetry        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSymmetry  ,false,false);
 
 mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots   ,false,false);

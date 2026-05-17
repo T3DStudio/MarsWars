@@ -431,8 +431,10 @@ TUID = record
    uid_LimitUse,
    uid_LevelBonusDamage,
    uid_LevelBonusArmor,
-   uid_LevelBonusPainC
-                         : integer;
+   uid_LevelBonusPainC   : integer;
+   uid_LevelUpTimeTicks,
+   uid_LevelUpTimeSecs   : cardinal;
+
    uid_zfall             : shortint;
 
    uid_ZombieHits        : integer;

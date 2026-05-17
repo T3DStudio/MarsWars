@@ -531,7 +531,7 @@ begin
    drawmenu_ItemText2(tar,mi_Map_Generators,str_map_Generators,str_map_GeneratorsL[map_generators],0);
    drawmenu_ItemText2(tar,mi_Map_Seed      ,str_map_Seed      ,menu_mseed+vc(mi_Map_Seed)         ,menu_ItemSelected);
    drawmenu_ItemText2(tar,mi_Map_Size      ,str_map_Size      ,i2s(map_Size1)                     ,0);
-   drawmenu_ItemText2(tar,mi_Map_Obstacles ,str_map_Obstacles ,strMX(map_ObstaclesS)              ,0);
+   drawmenu_ItemText2(tar,mi_Map_Template  ,str_map_Template  ,str_map_TemplateL[map_Template]    ,0);
    drawmenu_ItemText2(tar,mi_Map_Symmetry  ,str_map_Symmetry  ,str_map_SymmertyL[map_Symmetry]    ,0);
 
    drawmenu_ItemText1(tar,mi_Map_Theme     ,str_themes[theme_i],0);

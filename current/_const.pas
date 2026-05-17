@@ -52,6 +52,9 @@ g_MaxAISlots           = 9; // 0-9 max skirmish AI skills
 //  BASE
 //
 
+MaxPlayers             = 8;
+LastPlayer             = MaxPlayers-1; //0-7
+
 // player state
 ps_None                = 0;
 ps_human               = 1;
@@ -99,6 +102,22 @@ maps_lineR             = 5;
 
 maps_Last              = 5; // 0-5
 
+// map templates
+mapt_lake              = 0;
+mapt_ring              = 1;
+mapt_sea               = 2;
+mapt_cave              = 3;
+mapt_steppe            = 4;
+mapt_canyon            = 5;
+
+mapt_last              = 5;
+
+mapt_ltemple_dstep     = round(360/MaxPlayers);
+
+// map other
+map_MinSize            = 2500;
+map_SizeMenuStep       = 250;
+
 // game type
 gt_none                = 0;
 gt_scirmish            = 1;
@@ -133,8 +152,7 @@ r_hell                 = 1;
 r_uac                  = 2;
 r_count                = 2;  // race num 0-r_count
 
-MaxPlayers             = 8;
-LastPlayer             = MaxPlayers-1; //0-7
+
 
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
@@ -144,10 +162,6 @@ MaxKeyPoints           = MaxPlayers*2;
 LastKeyPoint           = MaxKeyPoints-1;
 
 map_MaxSize            = 8000;
-map_MinSize            = 2500;
-map_SizeMenuStep       = 250;
-
-map_MaxObstacles       = 10;
 
 zone_solid             : word = word.MaxValue;
 
@@ -326,7 +340,7 @@ nmid_lobby_MSeed          = 24;
 nmid_lobby_MScenario      = 25;
 nmid_lobby_MGenerators    = 26;
 nmid_lobby_MSize          = 27;
-nmid_lobby_MObstacles     = 28;
+nmid_lobby_MTemplate      = 28;
 nmid_lobby_MSymmetry      = 29;
 nmid_lobby_MRandom        = 30;
 nmid_lobby_GFixedPositions= 31;
@@ -724,9 +738,6 @@ BaseRepair1            = BaseRegen1*4;
 BaseRepairBonus1       = BaseHeal1 div 2;
 
 DecayAuraDamage        = UpgradeDamageBonus1;
-
-ExpLevel1sec           = ptime2;
-ExpLevel1              = fr_fps1*ExpLevel1sec;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1662,7 +1673,7 @@ mi_Map_Scenario        = 182;
 mi_Map_Generators      = 183;
 mi_Map_Seed            = 184;
 mi_Map_Size            = 185;
-mi_Map_Obstacles       = 186;
+mi_Map_Template        = 186;
 mi_Map_Symmetry        = 187;
 mi_Map_Theme           = 188;
 mi_Map_Random          = 189;

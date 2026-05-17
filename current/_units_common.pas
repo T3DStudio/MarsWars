@@ -478,7 +478,7 @@ begin
           if(check)then exit;
 
           a_exp+=exp;
-          if(a_exp>=ExpLevel1)or(forceUp)then
+          if(a_exp>=uid_LevelUpTimeTicks)or(forceUp)then
           begin
              level+=1;
              a_exp:=0;

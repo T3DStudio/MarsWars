@@ -147,21 +147,21 @@ begin
    svld_file_size:=0;
 
    // 'CAPTION' part
-   AddItem(@g_version           ,SizeOf(g_version        ));
-   AddItem(@g_type              ,SizeOf(g_type           ));
-   AddItem(@camp_sel            ,SizeOf(camp_sel         ));
-   AddItem(@camp_mis_sel        ,SizeOf(camp_mis_sel     ));
-   AddItem(@camp_diff           ,SizeOf(camp_diff        ));
-   AddItem(@camp_data           ,sizeof(camp_data        ));
-   AddItem(@map_scenario        ,SizeOf(map_scenario     ));
-   AddItem(@map_generators      ,SizeOf(map_generators   ));
-   AddItem(@map_seed            ,SizeOf(map_seed         ));
-   AddItem(@map_Size1           ,SizeOf(map_Size1        ));
-   AddItem(@map_ObstaclesS      ,SizeOf(map_ObstaclesS   ));
-   AddItem(@map_Symmetry        ,sizeof(map_Symmetry     ));
-   AddItem(@theme_i             ,SizeOf(theme_i          ));
-   AddItem(@LocalPlayer         ,SizeOf(LocalPlayer      ));
-   AddItem(@g_tick              ,SizeOf(g_tick           ));
+   AddItem(@g_version           ,SizeOf(g_version     ));
+   AddItem(@g_type              ,SizeOf(g_type        ));
+   AddItem(@camp_sel            ,SizeOf(camp_sel      ));
+   AddItem(@camp_mis_sel        ,SizeOf(camp_mis_sel  ));
+   AddItem(@camp_diff           ,SizeOf(camp_diff     ));
+   AddItem(@camp_data           ,sizeof(camp_data     ));
+   AddItem(@map_scenario        ,SizeOf(map_scenario  ));
+   AddItem(@map_generators      ,SizeOf(map_generators));
+   AddItem(@map_seed            ,SizeOf(map_seed      ));
+   AddItem(@map_Size1           ,SizeOf(map_Size1     ));
+   AddItem(@map_Template        ,SizeOf(map_Template  ));
+   AddItem(@map_Symmetry        ,sizeof(map_Symmetry  ));
+   AddItem(@theme_i             ,SizeOf(theme_i       ));
+   AddItem(@LocalPlayer         ,SizeOf(LocalPlayer   ));
+   AddItem(@g_tick              ,SizeOf(g_tick        ));
    for p:=0 to LastPlayer do
      with g_PlayersMain[p] do
      begin
@@ -326,8 +326,8 @@ begin
       KeyPoints_UpdateVisData;
       units_DefaultVisData;
       map_MakeThemeSprites;
-      map_RefreshDoodadsCells;
-      map_DoodadsSetDrawData;
+      map_RefreshObstaclesGrid;
+      map_Obstacles_SetDrawData;
       map_RedrawMenuMinimap;
       ui_Camera_Bounds;
 

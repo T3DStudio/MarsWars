@@ -1307,7 +1307,7 @@ begin
       nmid_lobby_MScenario,
       nmid_lobby_MGenerators,
       nmid_lobby_MSize,
-      nmid_lobby_MObstacles,
+      nmid_lobby_MTemplate,
       nmid_lobby_MSymmetry,
       nmid_lobby_MRandom,
 
@@ -1330,8 +1330,8 @@ begin
                                   end;
                                   Map_Make;
                                end;
-   nmid_lobby_MObstacles     : begin ScrollByte(@map_ObstaclesS,forward,0,map_MaxObstacles); Map_Make; end;
-   nmid_lobby_MSymmetry      : begin ScrollByte(@map_Symmetry  ,forward,0,maps_Last); Map_Make; end;
+   nmid_lobby_MTemplate      : begin ScrollByte(@map_Template,forward,0,mapt_Last); Map_Make; end;
+   nmid_lobby_MSymmetry      : begin ScrollByte(@map_Symmetry,forward,0,maps_Last); Map_Make; end;
    nmid_lobby_MRandom        : begin Map_randommap; Map_Make;end;
    nmid_lobby_GFixedPositions: begin
                                   g_FixedPositions:=not g_FixedPositions;

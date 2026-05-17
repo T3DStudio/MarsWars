@@ -2455,9 +2455,9 @@ begin
    if(vint<map_MinSize)or(map_MaxSize<vint )then exit
                                             else strInfoVar1^+=' '+str_map_Size      +': '+i2s(vint )+tc_nl2;
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_ObstaclesS ));
-   if(vbyte1>map_MaxObstacles              )then exit
-                                            else strInfoVar1^+=' '+str_map_Obstacles +': '+strMX(vbyte1)+tc_nl2;
+   BlockRead(f,vbyte1,sizeof(map_Template  ));
+   if(vbyte1>mapt_Last                     )then exit
+                                            else strInfoVar1^+=' '+str_map_Template  +': '+str_map_TemplateL[vbyte1]+tc_nl2;
 
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_Symmetry  ));

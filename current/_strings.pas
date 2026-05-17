@@ -1067,6 +1067,7 @@ begin
         begin
            AddLineUnitDocHint(str_doc_PainC           +DocValI(uid_PainState_Base   ));
            AddLineUnitDocHint(str_doc_TransportSize   +DocValI(uid_TransportSize    ));
+           AddLineUnitDocHint(str_doc_LevelUpTime     +DocValI(uid_LevelUpTimeSecs  ));
            if(uid_LevelBonusDamage>0)then
            AddLineUnitDocHint(str_doc_LevelDamageBonus+DocValI(uid_LevelBonusDamage ));
            if(uid_LevelBonusArmor>0)then

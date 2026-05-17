@@ -13,7 +13,7 @@ aic_TowerLifeTime          = fr_fps1*60;
 
 aic_BaseIdle_r             = 50;
 
-aic_max_SpecUID            = 6;
+aic_max_SpecUID            = 5;
 
 aic_group_Home             = 0;
 aic_group_AttackNow        = 1;
@@ -33,12 +33,12 @@ ai_GroupIn_ulimit    : array[0..MaxUnitGroups] of longint;
 ai_choosen,
 ai_flags_BaseAMain,
 ai_flags_BaseAOther,
-ai_available_HKeep
+ai_available_HKeep,
+ai_available_HGate
                      : boolean;
 
 ai_generator_kp,
 ai_keypoint_kp       : pTKeyPoint;
-ai_keypoint_koth     : boolean;
 
 ai_generators_limit,
 ai_enemylimit_baseR2_grd,
@@ -54,7 +54,7 @@ ai_armylimit_ForTeleport,
 ai_armylimit_siedge,
 ai_armylimit_alive_u,
 ai_armylimit_alive_b,
-ai_armylimit_alive_fly,
+ai_armylimit_fly,
 
 ai_AttackGroupFlyLimit,
 
@@ -116,6 +116,7 @@ ai_HTeleportRecall_d,
 ai_HTeleportNearest_d,
 ai_HTeleportRemote_d,
 ai_HTeleportTarget_d,
+ai_HTeleportTarKOTH_d,
 
 ai_TransportTar_Attack_d,
 ai_TransportTar_BDefend_d,
@@ -168,6 +169,7 @@ ai_HTeleportRecall_u,
 ai_HTeleportNearest_u,
 ai_HTeleportRemote_u,
 ai_HTeleportTarget_u,
+ai_HTeleportTarKOTH_u,
 
 ai_ScoutCandidate_u,
 
@@ -196,7 +198,8 @@ begin
    lmt_Req_HellPower,
    lmt_Req_UACLoot,
    lmt_Req_Energy,
-   lmt_Req_MaxCount : ai_IsAvailableUID:=player^.aip_MaxEnergy>=g_uids[uid].uid_req_EnergyLevel;
+   lmt_Req_MaxCount : ai_IsAvailableUID:=(player^.aip_MaxEnergy  >=g_uids[uid].uid_req_EnergyLevel)
+                                       or(player^.res_energyl_max>=g_uids[uid].uid_req_EnergyLevel);
    else               ai_IsAvailableUID:=false;
    end;
 end;
@@ -486,6 +489,7 @@ begin
       ai_UpgradesLeft      := ai_CalcUpgradesLeft(player);
 
       ai_available_HKeep   := ai_IsAvailableUID(player,UID_HKeep);
+      ai_available_HGate   := ai_IsAvailableUID(player,UID_HGate);
    end;
 
    FillChar(ai_GroupAll_ucount,SizeOf(ai_GroupAll_ucount),0);
@@ -504,7 +508,7 @@ begin
    ai_armylimit_siedge     := 0;
    ai_armylimit_alive_u    := 0;
    ai_armylimit_alive_b    := 0;
-   ai_armylimit_alive_fly  := 0;
+   ai_armylimit_fly        := 0;
 
    ai_AttackGroupFlyLimit  := 0;
 
@@ -520,8 +524,12 @@ begin
           begin
              // transportU in production
              if(uid_isfly)
-             and(not uid_isbuilding)
-             and(uid_TransportMax_Base>0)then ai_transport_cur+=uid_TransportMax_Base*prod_unit_uid[i];
+             and(not uid_isbuilding)then
+             begin
+                if(uid_TransportMax_Base>0)then ai_transport_cur+=uid_TransportMax_Base*prod_unit_uid[i];
+                if(uid_CanAttack)then ai_armylimit_fly+=uid_LimitUse*prod_unit_uid[i];
+             end;
+
              if(uid_AI_Siedge)then ai_armylimit_siedge+=uid_LimitUse*prod_unit_uid[i];
           end;
         if(units_uid_c[i]>0)then
@@ -573,7 +581,7 @@ begin
    with player^ do
    begin
       // nearest point/generator
-      ai_keypoint_koth:=false;
+      //ai_keypoint_koth:=false;
       if(map_KeyPointsN>0)then
       for i:=0 to map_KeyPointsN-1 do
         with map_KeyPointsL[i] do
@@ -636,7 +644,7 @@ begin
                begin
                   ai_keypoint_d   :=d;
                   ai_keypoint_kp  :=@map_KeyPointsL[i];
-                  ai_keypoint_koth:=koth_point;
+                  //ai_keypoint_koth:=koth_point;
                end;
 
              if(d<kp_RCapture)then break;
@@ -681,6 +689,8 @@ begin
    ai_HTeleportRemote_u     := nil;
    ai_HTeleportTarget_d     := NOTSET;
    ai_HTeleportTarget_u     := nil;
+   ai_HTeleportTarKOTH_d    := NOTSET;
+   ai_HTeleportTarKOTH_u    := nil;
 
    // 'Magic' targets
    ai_Strike_u              := nil;

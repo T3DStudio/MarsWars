@@ -54,7 +54,7 @@ map_seed          : cardinal = 1;
 map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
 map_SizeKPCR      : integer  = 100;
-map_ObstaclesS    : byte     = 1;
+map_Template      : byte     = mapt_ring;
 map_ObstaclesGap  : integer  = 40;
 map_PStartsGap    : integer  = base_r1;
 map_Symmetry      : byte     = 0;
@@ -981,6 +981,7 @@ str_doc_Description,
 str_doc_PainC,
 str_doc_TransportSize,
 str_doc_TransportCpst,
+str_doc_LevelUpTime,
 str_doc_LevelArmorBonus,
 str_doc_LevelDamageBonus,
 str_doc_LevelPainSBonus,
@@ -1230,7 +1231,7 @@ str_map_Scenario,
 str_map_Generators,
 str_map_Seed,
 str_map_Size,
-str_map_Obstacles,
+str_map_Template,
 str_map_Symmetry,
 str_map_Random,
 
@@ -1295,6 +1296,7 @@ str_ui_Tab               : array[0..3] of shortstring;
 
 str_map_GeneratorsL      : array[0..mapg_Last ] of shortstring;
 str_map_SymmertyL        : array[0..maps_Last ] of shortstring;
+str_map_TemplateL        : array[0..mapt_Last ] of shortstring;
 str_SG_PlayersColorL     : array[0..ui_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL       : array[0..2] of shortstring;
 str_SG_ControlPanelPosL  : array[0..3] of shortstring;

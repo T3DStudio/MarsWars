@@ -152,6 +152,15 @@ begin
       and(tu^.mapZone<>mapZone)
       and(not map_IfObstacleZone(tu^.mapZone))then
         setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d);
+      // добавить условие на больший приоритет на телепорт с апгрейдом Portal Link
+      // добавить поиск "удаленного" телепорта
+
+      if(map_scenario=mc_koth)then
+        with map_KeyPointsL[0] do
+          if (not map_IfObstacleZone(kp_Zone))
+          and(tu^.mapZone=kp_Zone)
+          and(tu^.mapZone<>mapZone)then
+            setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud);
 
       // Alarmed base
       if (not tu^.uid^.uid_CanAttack)
@@ -171,8 +180,10 @@ begin
         then setNearestTarget(@ai_BaseAlly_u,@ai_BaseAlly_d,ud-uid_r-tu^.uid^.uid_r)
         else setNearestTarget(@ai_BaseOwn_u ,@ai_BaseOwn_d ,ud-uid_r-tu^.uid^.uid_r);
 
-      if(tu^.uidi=UID_HEye)then
-        if(ud<tu^.srange)then ai_near_HEye+=1;
+      if(tu^.uidi=UID_HEye)
+      or(tu^.uidi=UID_HEyeNest)then
+        if(ud<tu^.srange)
+        or(ud<    srange)then ai_near_HEye+=1;
 
       // magic targets
       if(ability_CheckTarget_UACHeroic    (team,tu))then ai_SetTarget_Heroic       (tu);
@@ -224,7 +235,9 @@ begin
                   if(ud<base_r2)then ai_enemylimit_baseR2_fly+=tu^.uid^.uid_LimitUse;
                end;
             end;
-            if(tu^.uid^.uid_isbuilding)and(not tu^.isfly)and(pfcheck)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
+            if(tu^.uid^.uid_isbuilding)and(pfcheck)then
+              if(not tu^.isfly)
+              or(isattackable)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
             if(tu^.uid^.uid_CanAttack)then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
 
             // uac strike target
@@ -404,12 +417,7 @@ begin
       // armylimit
       if(tu^.uid^.uid_isbuilding)
       then ai_armylimit_alive_b+=tu^.uid^.uid_LimitUse
-      else
-      begin
-         ai_armylimit_alive_u+=tu^.uid^.uid_LimitUse;
-         if(tu^.isfly)then
-           ai_armylimit_alive_fly+=tu^.uid^.uid_LimitUse;
-      end;
+      else ai_armylimit_alive_u+=tu^.uid^.uid_LimitUse;
 
       // detection near
       if(ud<=srange)then
@@ -468,6 +476,12 @@ begin
 
          if(player=tu^.player)then for_AliveOwn;
       end;
+
+      if (playeri=tu^.playeri)
+      and(tu^.isfly)
+      and(not tu^.uid^.uid_isbuilding)
+      and(tu^.uid^.uid_CanAttack)then
+        ai_armylimit_fly+=tu^.uid^.uid_LimitUse;
 
       if(tu^.uid^.uid_ZombieUID>0)and(pfcheck)then
         if(hits_fdead<tu^.hits)and(tu^.hits<=tu^.uid^.uid_ZombieHits)then

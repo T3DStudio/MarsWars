@@ -42,13 +42,19 @@ begin
                    or(uid_ability3=aid);
 end;
 
+function UIDCalcLevelUp(limit:longint):integer;
+begin
+   UIDCalcLevelUp:=ptime1h+round((limit-MinUnitLimit)/MinUnitLimit*ptimeq);
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   UNITS CONSTANT DATA
 //
 
 procedure InitUIDS;
-var i,u,p:byte;
+var
+i,u,p:byte;
 procedure SetWeapon(wid,wtype:byte;wmax_range,wmin_range,wcount:integer;wreload,woid,wreq_ruid,wreq_rupid,wdupgr:byte;wdupgrs:integer;wtarf,wreq_flags:cardinal;wuids,wShotPoints:TSoB;wax,way:integer;wafakeshots,wadmod:byte);
 begin
    with g_uids[i] do
@@ -439,6 +445,7 @@ begin
    uid_PainState_Base  := 6;
    uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1;
+   uid_LevelUpTimeSecs := ptime1;
    SetWeapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpst2,0,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,0,dm_AntiUnitBioHeavy2);
 end;
 {
@@ -685,7 +692,8 @@ begin
    uid_islight         := true;
    uid_FastDeathHits   := 1;
    uid_FlyLevelLikeTarget:=true;
-   uid_bounty_HellPower:= 10;
+   uid_bounty_HellPower:= 1;
+   uid_LevelUpTimeSecs := ptime1;
    case i of
 UID_LostSoul: begin
               uid_uibtn          := 12;
@@ -947,6 +955,7 @@ begin
    uid_FastDeathHits   := hits_fdead_border;
    uid_arms_BonusAntiUnitRange:=50;
    uid_AI_PrimaryTarget:= true;
+   uid_LevelUpTimeSecs := UIDCalcLevelUp(ul1);
 
    case i of
 UID_BFGMarine : begin
@@ -988,6 +997,7 @@ begin
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
    uid_AI_PrimaryTarget:= true;
+   uid_LevelUpTimeSecs := ptime1;
 
    case i of
 UID_Medic : begin
@@ -1029,6 +1039,7 @@ begin
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
    uid_AI_PrimaryTarget:= true;
+   uid_LevelUpTimeSecs := ptime1;
 
    case i of
 UID_Engineer : begin
@@ -1619,6 +1630,10 @@ end;
                if(aw_type=wpt_heal)then uid_AI_Healer:=true;
           end;
 
+      if(uid_LevelUpTimeSecs=0)then
+        uid_LevelUpTimeSecs :=UIDCalcLevelUp(uid_LimitUse);
+      uid_LevelUpTimeTicks:=uid_LevelUpTimeSecs*fr_fps1;
+
       if(uid_LimitUse>=MinUnitLimit)and(not uid_isbuilding)then
       begin
          if(uid_CanAttack)and(uid_LevelBonusDamage=0)then
@@ -1803,7 +1818,7 @@ begin
    SetDMOD(dm_AntiFly2         ,0,200,                                wtr_fly   );
    SetDMOD(dm_AntiGroundLight2 ,0,200,                      wtr_light+wtr_ground);
    SetDMOD(dm_RSMShot          ,0,400,wtr_building                              );
-   SetDMOD(dm_Siege4           ,0,400,wtr_building                              );
+   SetDMOD(dm_Siege4           ,0,300,wtr_building                              );
    SetDMOD(dm_Lost             ,0,300,wtr_unit    +wtr_bio +wtr_light+wtr_fly   );
    SetDMOD(dm_Lost             ,1, 50,             wtr_mech                     );
    SetDMOD(dm_BFG              ,0, 50,wtr_building                              );

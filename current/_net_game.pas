@@ -165,7 +165,7 @@ begin
    net_writebyte(map_scenario  );
    net_writebyte(map_generators);
    net_writeint (map_Size1     );
-   net_writebyte(map_ObstaclesS);
+   net_writebyte(map_Template  );
    net_writecard(map_seed      );
    net_writebyte(map_Symmetry  );
 
@@ -529,7 +529,7 @@ begin
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_generators  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrInt (@map_Size1       ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrByte(@map_ObstaclesS  ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrByte(@map_Template    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_Symmetry    ))then begin redraw_menu:=true;new_map:=true;end;
 

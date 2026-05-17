@@ -152,6 +152,7 @@ begin
        175 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 4)*3;
        200 : ApplyDamageMod:=ApplyDamageMod* 2;
        300 : ApplyDamageMod:=ApplyDamageMod* 3;
+       350 : ApplyDamageMod:=ApplyDamageMod* 3+(ApplyDamageMod div 2);
        400 : ApplyDamageMod:=ApplyDamageMod* 4;
        500 : ApplyDamageMod:=ApplyDamageMod* 5;
          else ApplyDamageMod:=round(ApplyDamageMod/100*dm_Factor);

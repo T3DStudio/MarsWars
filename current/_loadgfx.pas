@@ -63,7 +63,7 @@ begin
    c_ablack  :=gfx_TMWColor(0  ,0  ,0  ,128);
    c_mablack :=gfx_TMWColor(0  ,0  ,0  ,96 );
 
-   ui_max_color[false]:=c_dorange;
+   ui_max_color[false]:=c_orange;
    ui_max_color[true ]:=c_gray;
    ui_cenergy  [false]:=c_white;
    ui_cenergy  [true ]:=c_red;
