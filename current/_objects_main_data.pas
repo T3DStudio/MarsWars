@@ -1616,18 +1616,23 @@ end;
       if(uid_ProdHitStep<=0)then uid_ProdHitStep:=1;
       uid_ProdTimeTick:=uid_ProdTimeSec*fr_fps1;
 
-      uid_CanAttack:=false;
+      uid_CanAttack      :=false;
+      uid_CanAttackGround:=false;
+      uid_CanAttackAir   :=false;
       for u:=0 to LastUnitArms do
         with uid_arms[u] do
           if(aw_reload>0)and(aw_type>0)then
           begin
              uid_CanAttack:=true;
-               for p:=1 to aw_reload do
-                 if(p in aw_ShotPoints)then aw_ShotPoints+=[p-1];
+             for p:=1 to aw_reload do
+               if(p in aw_ShotPoints)then aw_ShotPoints+=[p-1];
 
-               if(aw_impact_dmod=dm_Siege4)then uid_AI_Siedge:=true;
+             if(aw_impact_dmod=dm_Siege4)then uid_AI_Siedge:=true;
 
-               if(aw_type=wpt_heal)then uid_AI_Healer:=true;
+             if(aw_type=wpt_heal)then uid_AI_Healer:=true;
+
+             if(aw_tar_Flags and wtr_fly   )>0 then uid_CanAttackAir   :=true;
+             if(aw_tar_Flags and wtr_ground)>0 then uid_CanAttackGround:=true;
           end;
 
       if(uid_LevelUpTimeSecs=0)then

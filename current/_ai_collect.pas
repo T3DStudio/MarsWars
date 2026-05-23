@@ -107,6 +107,12 @@ begin
       if(tu^.uid^.uid_CanAttack)then    // can attack
       begin
          // towers
+         if(ud<srange)and(tu^.uid^.uid_isbuilding)and(not tu^.isfly)then
+         begin
+            if(tu^.uid^.uid_CanAttackGround)then ai_towers_near_AG+=1;
+            if(tu^.uid^.uid_CanAttackAir   )then ai_towers_near_AA+=1;
+         end;
+
          {if(tu^.uidi=aiucl_twr_air1[race])
          or(tu^.uidi=aiucl_twr_air2[race])then
          begin
@@ -155,12 +161,25 @@ begin
       // добавить условие на больший приоритет на телепорт с апгрейдом Portal Link
       // добавить поиск "удаленного" телепорта
 
+      // teleport beacon for KOTH
       if(map_scenario=mc_koth)then
         with map_KeyPointsL[0] do
           if (not map_IfObstacleZone(kp_Zone))
           and(tu^.mapZone=kp_Zone)
           and(tu^.mapZone<>mapZone)then
             setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud);
+
+      // teleport beacon for generator capture
+      if(ai_generator_d<NOTSET)then
+        if (ai_generator_kp^.kp_Zone<>    mapZone)
+        and(ai_generator_kp^.kp_Zone= tu^.mapZone)then
+          if(ai_HTeleportTarGen_u=nil)
+          then ai_HTeleportTarGen_u:=tu
+          else
+            if(tu^.aiu_alarm_d>ai_HTeleportTarGen_u^.aiu_alarm_d)
+            then ai_HTeleportTarGen_u:=tu;
+
+      //ai_HTeleportTarGen_d
 
       // Alarmed base
       if (not tu^.uid^.uid_CanAttack)
@@ -337,13 +356,18 @@ begin
          and(not busyHealer)then
            if(unit_CheckTransport(pu,tu))then
            begin
-              if(tu^.group=aic_group_Home)
-              or(tu^.group=aic_group_AttackNow)
-              or(tu^.group=aic_group_AttackWait)then
+              if(tu^.group=aic_group_Home      )
+              or(tu^.group=aic_group_AttackNow )
+              or(tu^.group=aic_group_AttackWait)
+              or(tu^.group=aic_group_GenWait   )
+              or(tu^.group=aic_group_GenAssault)then
                 setNearestTarget(@ai_TransportTar_BDefend_u,@ai_TransportTar_BDefend_d,ud);
 
               if(tu^.group=aic_group_AttackWait)then
                 setNearestTarget(@ai_TransportTar_Attack_u ,@ai_TransportTar_Attack_d ,ud);
+
+              if(tu^.group=aic_group_GenWait   )then
+                setNearestTarget(@ai_TransportTar_GenTeam_u,@ai_TransportTar_GenTeam_d,ud);
            end;
       end;
 
@@ -391,14 +415,6 @@ begin
            if(tu^.aiu_BuildAttempts<ai_MinBuildAttempts)then
              ai_MinBuildAttempts:=tu^.aiu_BuildAttempts;
 
-         if(tu^.speed>0)and(tu^.uid^.uid_CanAttack)then
-         begin
-           { if(tu^.ukfly)
-            then ai_limitaround_fly+=tu^.uid^.uid_LimitUse
-            else ai_limitaround_grd+=tu^.uid^.uid_LimitUse;
-            if(ud<=base_r1)
-            then ai_limitaround_own+=tu^.uid^.uid_LimitUse;  }
-         end;
         { if(tu^.uid^.uid_ability=uab_UACScan)then ai_radars+=1;  }
          // transportU
          if(not tu^.uid^.uid_isbuilding)then
@@ -433,18 +449,25 @@ begin
         if(not tu^.uid^.uid_isbuilder)then
           ai_curr_Towers+=1;
 
-      // unit productions
+      // unit productions available
       if(tu^.uid^.uid_isbarrack)then ai_curr_UnitProds+=tu^.level+1;
-      // upgrade productions
+      // upgrade productions available
       if(tu^.uid^.uid_isforge  )then ai_curr_UpgrProds+=tu^.level+1;
 
-      // units in groups
+
       if(not tu^.uid^.uid_isbuilding)then
-        if(tu^.group<=MaxUnitGroups)then
-        begin
-           ai_GroupAll_ucount[tu^.group]+=1;
-           ai_GroupAll_ulimit[tu^.group]+=tu^.uid^.uid_LimitUse;
-        end;
+      begin
+         // units in groups
+         if(tu^.group<=MaxUnitGroups)then
+         begin
+            ai_GroupAll_ucount[tu^.group]+=1;
+            ai_GroupAll_ulimit[tu^.group]+=tu^.uid^.uid_LimitUse;
+         end;
+
+         // limit of generator guards near
+         if(ud<srange)and(tu^.group=aic_group_GenGuard)then
+           ai_nearGenGuards+=tu^.uid^.uid_LimitUse;
+      end;
    end;
 end;
 begin

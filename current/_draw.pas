@@ -18,6 +18,7 @@ begin
    draw_AddAllSprites(G_Status<>gs_running);
 
    draw_LayerTerrain   (vid_screen);
+   test_w :=vid_ScreenSpritesS;
    draw_LayerSpriteList(vid_screen);
 
    if (ui_fog)
@@ -55,6 +56,7 @@ begin
 
    sdl_FillRect(vid_screen,nil,0);
 
+
    if(MainMenu)
    then draw_Menu
    else draw_Game;
@@ -63,6 +65,15 @@ begin
 
    if(TestMode>1)then
    begin
+
+      if(InputAction(iact_Alt))then
+      begin
+         writeln(LocalPlayer);
+        for i:=0 to LastPlayer do
+          with g_PlayersMain[i] do
+            writeln(i,' ',isobserver,' ',isdefeated);
+      end;
+
       //
      // for i:=0 to fog_TileSetSize do
       //  draw_sdlsurface(vid_screen,20+i*fog_cr*2,20,ui_fog_Tiles[i] );
@@ -77,13 +88,15 @@ begin
 
 
 
+
      draw_text(vid_screen,ui_cam_w,ui_cam_h,
      i2s(m_brush),
      ta_RB,255, c_white);
 
      n:=50;
 
-   draw_text(vid_screen,ui_cam_w,ui_cam_h-10,
+   draw_text(vid_screen,ui_cam_w,ui_cam_h-30,
+    w2s(test_w)+' '+tc_nl1+
   //     c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
   // ' '+b2c[ui_uibtn_sabilityu=nil]+
    //' '+b2c[ui_uibtn_pabilityu=nil]+

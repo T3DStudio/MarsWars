@@ -1106,10 +1106,12 @@ begin
 end;
 
 procedure Game_SetStatusWinnerTeam(team:byte);
+//var
 begin
    if(team>LastPlayer)then exit;
 
    G_status:=gs_win_team0+team;
+   //if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
    GameLog_EndGame(team);
 end;
 
@@ -1855,7 +1857,8 @@ begin
    if(UIplayer>LastPlayer)then
    begin
       if(rpls_pstate=rpls_read)
-      or(g_PlayersMain[LocalPlayer].isobserver)then exit;
+      or(g_PlayersMain[LocalPlayer].isobserver)
+      or(Game_IsEnded)then exit;
    end
    else
       if(tu^.TeamVision[g_PlayersMain[UIplayer].team]>0)then exit;
@@ -1868,8 +1871,9 @@ begin
    ui_CheckUnitFullFogReveal:=false;
    if(tu=nil)then exit;
 
-   if(rpls_pstate>=rpls_read)
-   or(g_PlayersMain[LocalPlayer].isobserver)then
+   if(rpls_pstate=rpls_read)
+   or(g_PlayersMain[LocalPlayer].isobserver)
+   or(Game_IsEnded)then
    begin
       if(UIPlayer>LastPlayer)
       then ui_CheckUnitFullFogReveal:=true
@@ -2457,7 +2461,7 @@ begin
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_Template  ));
    if(vbyte1>mapt_Last                     )then exit
-                                            else strInfoVar1^+=' '+str_map_Template  +': '+str_map_TemplateL[vbyte1]+tc_nl2;
+                                            else strInfoVar1^+=' '+str_map_Template  +': '+str_map_TemplateL[vbyte1]+tc_default+tc_nl2;
 
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_Symmetry  ));

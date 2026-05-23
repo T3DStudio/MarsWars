@@ -227,6 +227,7 @@ begin
    begin
       if(orI<0)then orI+=orO;
       if(orI<0)then orI:=0;
+      if(abs(orO-orI)<ObstacleMinInnerR)then orI:=orO-ObstacleMinInnerR;
       o_rO  :=orO;
       o_rI  :=orI;
       o_rM  :=(orO+orI) div 2;
@@ -249,11 +250,6 @@ begin
             o_rO:=0;
             o_rI:=0;
          end;
-end;
-
-function map_CalcSeaPlayerR:integer;
-begin
-   map_CalcSeaPlayerR:=min2i(map_size1 div 7,base_r2);
 end;
 
 procedure map_CalcLakeR(ro,ri:pinteger);
@@ -804,7 +800,7 @@ begin
                                   map_Starts_Circle(map_Sizeh,map_Sizeh,map_SymmetryDir,io+base_rh);
                     end;
                  end;
-   mapt_sea    : case map_scenario of
+   mapt_temple : case map_scenario of
                  mc_1x1,
                  mc_2x2,
                  mc_3x3,
@@ -813,8 +809,8 @@ begin
                  mc_2x2x2x2: map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_SymmetryDir,4);
                  mc_KotH,
                  mc_royale : map_Starts_Circle(map_Sizeh,map_Sizeh,map_SymmetryDir,map_Sizeh-(map_Size1 div 8));
-                 else        if(not map_Starts_Random(base_r1,map_CalcSeaPlayerR,0,0,0,0))then
-                               map_Starts_Circle(map_Sizeh,map_Sizeh,map_SymmetryDir,map_Sizeh-(map_Size1 div 8));
+                 else        if(not map_Starts_Random(base_r1,base_r1+(map_Size1 div 12),map_Sizeh,map_Sizeh,(map_Size1 div 4)-base_rh,0))then
+                               map_Starts_Rect  (map_Sizeh,map_Sizeh,map_SizeH-(map_SizeH div 5),map_SymmetryDir);
                  end;
    mapt_cave,
    mapt_steppe,
@@ -928,7 +924,7 @@ begin
    end;
 end;
 
-procedure map_Obstacles_FillSea(obR,playerStartGap:integer);
+{procedure map_Obstacles_FillSea(obR,playerStartGap:integer);
 var
 odd:boolean;
 cellw,
@@ -965,10 +961,51 @@ begin
       end;
       iy-=cellw;
    end;
+end; }
+
+procedure map_Obstacles_Temple(irI,irO,playerR:integer);
+var p,i,
+tx,ty,
+rx,ry,
+sx,sy,
+ro,ri,
+dir  :integer;
+begin
+   for i:=0 to LastPlayer do
+   begin
+      dir:=map_SymmetryDir+i*mapt_ltemple_dstep2;
+      for p:=0 to LastPlayer do
+      begin
+         dir+=mapt_ltemple_dstep1;
+         tx:=map_sizeH+round(irI*cos(dir*DEGTORAD));
+         ty:=map_sizeH-round(irI*sin(dir*DEGTORAD));
+         project2rect(@rx,@ry,dir,irO);
+         rx+=map_SizeH;
+         ry+=map_SizeH;
+         ro:=point_dist_int(tx,ty,rx,ry) div 2;
+         ri:=ro-(ro div 6);
+         tx:=(tx+rx) div 2;
+         ty:=(ty+ry) div 2;
+
+         map_SymmetryPoints2(@tx,@ty,@sx,@sy,ro*2+map_ObstaclesGap);
+
+         if(map_IfPlayerStartHere(tx,ty,ro,ri,playerR))then continue;
+         if(sx<>NOTSET)then
+           if(map_IfPlayerStartHere(sx,sy,ro,ri,playerR))then continue;
+
+         if(map_IfObstacleHere(tx,ty,ro+map_ObstaclesGap,ri))then continue;
+         if(sx<>NOTSET)then
+           if(map_IfObstacleHere(sx,sy,ro+map_ObstaclesGap,ri))then continue;
+
+         map_Obstacle_Add(tx,ty,ro,ri);
+         if(sx<>NOTSET)then
+           map_Obstacle_Add(sx,sy,ro,ri);
+      end;
+   end;
 end;
 
 procedure map_Obstacles_Create;
-var p,
+var
 ix,iy,io,ii:integer;
 begin
    // clear
@@ -994,17 +1031,14 @@ begin
                     map_Obstacle_Add(map_SizeH,map_SizeH,io,ii);
                     map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize) div 4,0,3,0);
                  end;
-   mapt_sea    : begin
-                    io:=map_CalcSeaPlayerR;
-                    ii:=map_size1 div 35;
-                    if(map_MaxPlayers>0)then
-                      for ix:=0 to map_MaxPlayers-1 do
-                        map_Obstacle_Add(map_PlayerStartX[ix],map_PlayerStartY[ix],io,io-ii);
-                    if(map_scenario=mc_koth)then
-                      map_Obstacle_Add(map_SizeH,map_SizeH,keyPoint_KotR+ii*2,keyPoint_KotR);
+   mapt_temple : begin
+                    io:=map_Size1 div 4;
+                    if(map_scenario=mc_koth)
+                    then map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR)
+                    else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
 
-                    map_Obstacles_FillSea(map_size1 div 35,io-ii-(ii div 2));
-                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize) div 10,0,1,0);
+                    map_Obstacles_Temple(io+map_obstaclesGap*2,map_sizeh+base_r1,base_r1);
+                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),1,2,0);
                  end;
    mapt_cave   : map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),2,10,0);
    mapt_steppe : map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),0,2 ,0);

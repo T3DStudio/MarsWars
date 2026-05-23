@@ -7,9 +7,8 @@ aic_GeneratorsLimit        = ul1*30;
 aic_GeneratorsEnergy       = 9000;
 aic_GeneratorsDestroyEnergy= 10000;
 aic_GeneratorsDestoryLimit = ul1*35;
-aic_GeneratorsPoints       = 4;
 
-aic_TowerLifeTime          = fr_fps1*60;
+//aic_TowerLifeTime          = fr_fps1*60;/// ???????
 
 aic_BaseIdle_r             = 50;
 
@@ -20,8 +19,9 @@ aic_group_AttackNow        = 1;
 aic_group_AttackWait       = 2;
 aic_group_Scout            = 3;
 aic_group_Transport        = 4;
-aic_group_KeyPointAssault  = 6;
-aic_group_KeyPointGuard    = 7;
+aic_group_GenAssault       = 5;
+aic_group_GenGuard         = 6;
+aic_group_GenWait          = 7;
 
 var
 
@@ -33,8 +33,7 @@ ai_GroupIn_ulimit    : array[0..MaxUnitGroups] of longint;
 ai_choosen,
 ai_flags_BaseAMain,
 ai_flags_BaseAOther,
-ai_available_HKeep,
-ai_available_HGate
+ai_available_HKeep
                      : boolean;
 
 ai_generator_kp,
@@ -62,7 +61,9 @@ ai_curr_detect,
 ai_need_detect,
 
 ai_transport_cur,
-ai_transport_need
+ai_transport_need,
+
+ai_nearGenGuards
 
                      : longint;
 
@@ -103,6 +104,9 @@ ai_curr_UnitProds,
 ai_curr_UpgrProds,
 ai_curr_Towers,
 
+ai_towers_near_AG,
+ai_towers_near_AA,
+
 ai_near_detect,
 
 ai_need_Energy,
@@ -120,6 +124,7 @@ ai_HTeleportTarKOTH_d,
 
 ai_TransportTar_Attack_d,
 ai_TransportTar_BDefend_d,
+ai_TransportTar_GenTeam_d,
 
 ai_selfUID_nocomplete,
 ai_selfUID_minLevel,
@@ -170,11 +175,13 @@ ai_HTeleportNearest_u,
 ai_HTeleportRemote_u,
 ai_HTeleportTarget_u,
 ai_HTeleportTarKOTH_u,
+ai_HTeleportTarGen_u,
 
 ai_ScoutCandidate_u,
 
 ai_TransportTar_Attack_u,
 ai_TransportTar_BDefend_u,
+ai_TransportTar_GenTeam_u,
 
 ai_PrimaryTarget_u
 
@@ -474,6 +481,27 @@ begin
          end;
 end;
 
+procedure ai_SetKeyPoint(pcurkp:ppTKeyPoint;pcurd:pinteger;newkp:pTKeyPoint;newd:integer;tu:PTUnit);
+begin
+   if(pcurkp^=nil)
+   then
+   else
+     if((newkp^.kp_Zone=tu^.mapZone)or tu^.isfly)>((pcurkp^^.kp_Zone=tu^.mapZone)or tu^.isfly)
+     then
+     else
+     if((newkp^.kp_Zone=tu^.mapZone)or tu^.isfly)<((pcurkp^^.kp_Zone=tu^.mapZone)or tu^.isfly)
+     then exit
+     else
+       if(newd<pcurd^)
+       then
+       else
+       if(newd>pcurd^)
+       then exit;
+
+   pcurkp^:=newkp;
+   pcurd^ :=newd;
+end;
+
 procedure ai_Global_InitVars(pu:PTUnit);
 var i,d   :integer;
 koth_point:boolean;
@@ -489,7 +517,6 @@ begin
       ai_UpgradesLeft      := ai_CalcUpgradesLeft(player);
 
       ai_available_HKeep   := ai_IsAvailableUID(player,UID_HKeep);
-      ai_available_HGate   := ai_IsAvailableUID(player,UID_HGate);
    end;
 
    FillChar(ai_GroupAll_ucount,SizeOf(ai_GroupAll_ucount),0);
@@ -509,6 +536,8 @@ begin
    ai_armylimit_alive_u    := 0;
    ai_armylimit_alive_b    := 0;
    ai_armylimit_fly        := 0;
+
+   ai_nearGenGuards        := 0;
 
    ai_AttackGroupFlyLimit  := 0;
 
@@ -576,16 +605,14 @@ begin
 
    ai_generators_limit:=0;
 
+   // nearest point/generator
    with pu^ do
    with uid^ do
    with player^ do
-   begin
-      // nearest point/generator
-      //ai_keypoint_koth:=false;
-      if(map_KeyPointsN>0)then
-      for i:=0 to map_KeyPointsN-1 do
-        with map_KeyPointsL[i] do
-        with kp_TeamData[MaxPlayers] do
+     if(map_KeyPointsN>0)then
+       for i:=0 to map_KeyPointsN-1 do
+         with map_KeyPointsL[i] do
+         with kp_TeamData[team] do
           if(kptd_Active)then
           begin
              if(kptd_OwnerPlayer=playeri)then
@@ -606,10 +633,12 @@ begin
              or(kp_x>=map_Size1)
              or(kp_y>=map_Size1)then continue;
 
-             if(transportM>0)then
+             if(transportM>0)
+             or(not isfly)then
                if(map_IfObstacleZone(kp_zone))then continue;
 
-             if(kptd_OwnerTeam<=LastPlayer)and(kptd_OwnerTeam<>team)then
+             if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
+             or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
                if(isfly)
                or(kp_zone=mapZone)then
                  ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,point_dist_int(kp_x,kp_y,x,y),kp_zone);
@@ -623,33 +652,17 @@ begin
                   if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
              end;
 
-             d:=point_dist_int(kp_x,kp_y,x,y)-uid_r;
-
-             if(d>kp_RCapture)and(mapZone<>kp_zone)and(not isfly)then continue;
+             d:=point_dist_int(kp_x,kp_y,x,y);
 
              if(not koth_point)then
                if((kp_LimitTeamP[team]>=keyPoint_MinLimit  )and(d> kp_RCapture))
                or((kp_LimitTeamP[team]> keyPoint_MaxLimitAI)and(d<=kp_RCapture))then continue;
 
-             if(kp_Energy>0)and(not koth_point)then
-             begin
-                if(d<ai_generator_d)then
-                begin
-                   ai_generator_d :=d;
-                   ai_generator_kp:=@map_KeyPointsL[i];
-                end;
-             end
-             else
-               if(d<ai_keypoint_d)then
-               begin
-                  ai_keypoint_d   :=d;
-                  ai_keypoint_kp  :=@map_KeyPointsL[i];
-                  //ai_keypoint_koth:=koth_point;
-               end;
-
-             if(d<kp_RCapture)then break;
+             case(kp_Energy>0)and(not koth_point)of
+             true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_d,@map_KeyPointsL[i],d,pu);
+             false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@map_KeyPointsL[i],d,pu);
+             end;
           end;
-   end;
 
   { ai_PhantomWantZombieMe:=false; }
 
@@ -679,6 +692,8 @@ begin
    ai_TransportTar_Attack_u :=nil;
    ai_TransportTar_BDefend_d:=NOTSET;
    ai_TransportTar_BDefend_u:=nil;
+   ai_TransportTar_GenTeam_d:=NOTSET;
+   ai_TransportTar_GenTeam_u:=nil;
 
    // teleporter
    ai_HTeleportRecall_d     := NOTSET;
@@ -691,6 +706,7 @@ begin
    ai_HTeleportTarget_u     := nil;
    ai_HTeleportTarKOTH_d    := NOTSET;
    ai_HTeleportTarKOTH_u    := nil;
+   ai_HTeleportTarGen_u     := nil;
 
    // 'Magic' targets
    ai_Strike_u              := nil;
@@ -724,6 +740,9 @@ begin
    ai_need_UpgrProds        := 0;
 
    ai_curr_Towers           := 0;  // towers
+   ai_towers_near_AG        := 0;
+   ai_towers_near_AA        := 0;
+
 
    with pu^.player^ do
    ai_curr_detect           :=(units_uid_e[UID_URadar  ]*g_uids[UID_URadar  ].uid_LimitUse)+

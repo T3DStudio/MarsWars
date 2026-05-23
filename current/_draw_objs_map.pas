@@ -191,14 +191,14 @@ begin
 
                animN:=(abs(animStep+animX+byte(y div cellw1)) mod LiquidAnimCount)+1;
 
-               //if(not InputAction(iact_Alt))then
+               if(not InputAction(iact_Alt))then
                SpriteList_AddDoodad(nx,ny,depth,-32000,@sTemplateAF^[animN],255,0,0);
 
-               {if(InputAction(iact_Control))then
+               if(InputAction(iact_Control))then
                begin
                UnitsInfo_AddCircle(nx,ny,sTemplateAF^[1].hw,ui_blink2_color_BY);
                UnitsInfo_AddText(nx,ny,i2s(animN),c_white);
-               end; }
+               end;
             end;
          end;
 
@@ -309,30 +309,27 @@ begin
             ov_animTime   :=0;
             ov_SpriteFront:=nil;
 
-            if(map_Template=mapt_sea)
-            then ov_mmc:=theme_liquid_color
+            if(o_rO=map_ObstacleR(0))then
+            begin
+               ov_mmc:=c_ltgray;
+               if(theme_obstacle0N>0)then
+                 obstacle_SetAnimData(d,theme_obstacle0L[d mod theme_obstacle0N]);
+            end
             else
-              if(o_rO=map_ObstacleR(0))then
+              if(o_rO=map_ObstacleR(1))then
               begin
-                 ov_mmc:=c_ltgray;
-                 if(theme_obstacle0N>0)then
-                   obstacle_SetAnimData(d,theme_obstacle0L[d mod theme_obstacle0N]);
+                 ov_mmc:=c_gray;
+                 if(theme_obstacle1N>0)then
+                   obstacle_SetAnimData(d,theme_obstacle1L[d mod theme_obstacle1N]);
               end
               else
-                if(o_rO=map_ObstacleR(1))then
+                if(o_rO=map_ObstacleR(2))then
                 begin
                    ov_mmc:=c_gray;
-                   if(theme_obstacle1N>0)then
-                     obstacle_SetAnimData(d,theme_obstacle1L[d mod theme_obstacle1N]);
+                   if(theme_obstacle2N>0)then
+                     obstacle_SetAnimData(d,theme_obstacle2L[d mod theme_obstacle2N]);
                 end
-                else
-                  if(o_rO=map_ObstacleR(2))then
-                  begin
-                     ov_mmc:=c_gray;
-                     if(theme_obstacle2N>0)then
-                       obstacle_SetAnimData(d,theme_obstacle2L[d mod theme_obstacle2N]);
-                  end
-                  else ov_mmc:=theme_liquid_color;
+                else ov_mmc:=theme_liquid_color;
          end;
 end;
 

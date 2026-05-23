@@ -138,6 +138,7 @@ u_royal_d         : integer;
 
 {$IFDEF DEBUG0}
 test_InstaProd    : boolean = true;
+test_w            : word = 0;
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////

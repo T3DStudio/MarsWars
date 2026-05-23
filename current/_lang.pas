@@ -222,7 +222,7 @@ begin
    str_map_Template               := 'Template';
    str_map_TemplateL[mapt_lake   ]:= tc_red   +'central lake';
    str_map_TemplateL[mapt_ring   ]:= tc_orange+'central ring';
-   str_map_TemplateL[mapt_sea    ]:= tc_aqua  +'sea';
+   str_map_TemplateL[mapt_temple ]:= tc_yellow+'temple';
    str_map_TemplateL[mapt_cave   ]:= tc_blue  +'cave';
    str_map_TemplateL[mapt_steppe ]:= tc_gray  +'steppe';
    str_map_TemplateL[mapt_canyon ]:= tc_lime  +'canyon';

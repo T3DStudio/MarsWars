@@ -259,16 +259,17 @@ begin
    begin
       if(needN        <=ai_curr_Towers)
       or(aip_MaxTowers<=ai_curr_Towers)then exit;
+      if(aiu_alarm_d=NOTSET)then exit;
 
       case race of
       r_hell: SetBuildUID3(UID_HFTower,UID_HSTower,UID_HTotem);
       r_uac : begin
-                 if(aiu_alarm_d<base_r2)
-                 and(ai_enemylimit_baseR2_grd>0)
-                 and(ai_enemylimit_baseR2_fly>0)then
-                   if(ai_enemylimit_baseR2_grd>=ai_enemylimit_baseR2_fly)
-                   then SetBuildUID1(UID_UGTurret)
-                   else SetBuildUID1(UID_UATurret);
+                 if(aiu_alarm_d<base_r2)then
+                   if(ai_enemylimit_baseR2_grd>0)
+                   or(ai_enemylimit_baseR2_fly>0)then
+                     if(ai_enemylimit_baseR2_grd>=ai_enemylimit_baseR2_fly)
+                     then SetBuildUID1(UID_UGTurret)
+                     else SetBuildUID1(UID_UATurret);
 
                  if(build_uid=0)then SetBuildUID2(UID_UGTurret,UID_UATurret);
               end;
@@ -637,6 +638,26 @@ tuid  :byte;
 tuid_n,
 tuid_m:integer;
 tlimit:longint;
+procedure SmartSet(alimit:longint;autype:integer);
+begin
+   if(alimit>tlimit)then
+   begin
+      tlimit:=alimit;
+      utype :=autype;
+   end;
+end;
+function remoteKpExists:boolean;
+begin
+   remoteKpExists:=false;
+   with pBarrack^ do
+   begin
+      if(ai_generator_d<NOTSET)then
+        if(ai_generator_kp^.kp_zone<>mapZone)then remoteKpExists:=true;
+      if(ai_keypoint_d<NOTSET)then
+        if(ai_keypoint_kp^.kp_zone<>mapZone)then remoteKpExists:=true;
+   end;
+end;
+
 begin
    ai_Barrack:=false;
    tuid:=0;
@@ -655,27 +676,20 @@ begin
 uprod_smart      : begin
                       tlimit:=0;
                       utype :=uprod_random;
-                      if(ai_enemylimit_flyMech   >tlimit)then begin tlimit:=ai_enemylimit_flyMech;   utype:=uprod_AflyMech;   end;
-                      if(ai_enemylimit_fly       >tlimit)then begin tlimit:=ai_enemylimit_fly;       utype:=uprod_Afly;       end;
-                      if(ai_enemylimit_groundMech>tlimit)then begin tlimit:=ai_enemylimit_groundMech;utype:=uprod_AgroundMech;end;
-                      if(ai_enemylimit_groundBio >tlimit)then begin tlimit:=ai_enemylimit_groundBio; utype:=uprod_AgroundBio; end;
-                      if(ai_enemylimit_Towers    >tlimit)then
-                        if(ai_armylimit_siedge<=ul15)    then begin tlimit:=ai_enemylimit_Towers;    utype:=uprod_Sidge;      end;
+
+                      SmartSet(ai_enemylimit_flyMech   ,uprod_AflyMech   );
+                      SmartSet(ai_enemylimit_fly       ,uprod_Afly       );
+                      SmartSet(ai_enemylimit_groundMech,uprod_AgroundMech);
+                      SmartSet(ai_enemylimit_groundBio ,uprod_AgroundBio );
+                      if(ai_armylimit_siedge<=ul15)then
+                      SmartSet(ai_enemylimit_Towers    ,uprod_Sidge      );
+
                       //if(isselected)then writeln('utype=',utype,' ',ul10,' ai_armylimit_siedge=',ai_armylimit_siedge);
                       ai_Barrack:=ai_Barrack(pBarrack,utype);
                       exit;
                    end;
 uprod_base       : begin
-                       {
-                       if(map_scenario=mc_koth)then
-                         with map_KeyPointsL[0] do
-                           if(kp_Zone<>mapZone)then
-                           begin
-                              tlimit:=tlimit.MaxValue;
-                              utype :=uprod_randomFly;
-                           end;                                ?????????????????????????????????????
-                       }
-                      {if((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitMinPart)then
+                      if((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitMinPart)then
                       begin
                          if(ai_Barrack(pBarrack,uprod_Transport))then exit;
 
@@ -683,7 +697,11 @@ uprod_base       : begin
                            if(ai_Barrack(pBarrack,uprod_Sidge))then exit;
 
                          if(ai_Barrack(pBarrack,uprod_Special))then exit;
-                      end;   }
+
+                         if(ai_armylimit_fly<ul20)then
+                          // if(remoteKpExists)then
+                             if(ai_Barrack(pBarrack,uprod_randomFly))then exit;
+                      end;
 
                       ai_Barrack(pBarrack,uprod_smart);
                       exit;
@@ -1015,6 +1033,7 @@ begin
    ai_ability_CCLift:=false;
    with pCaster^ do
    begin
+      //if(isselected)then writeln('ai_ability_CCLift');
       case uidi of
       UID_HCommandCenter,
       UID_HACommandCenter: ai_ability_CCLift:=ai_UnitAbility(pCaster,uab_HellCCLand,0,0,0);
@@ -1033,6 +1052,20 @@ begin
        ai_AbilityMagic:=ai_UnitAbility(pCaster,aid,unum,x,y);
 end;
 
+function ai_AbilityDronToTower:boolean;
+begin
+   ai_AbilityDronToTower:=false;
+   if(u_royal_d>base_r1)then
+   begin
+      if(ai_generator_d<NOTSET)then
+        if (ai_generator_d<ai_generator_kp^.kp_RCapture)
+        and(ai_generator_d>ai_generator_kp^.kp_RNoBuild)then ai_AbilityDronToTower:=true;
+      if(ai_keypoint_d <NOTSET)and(map_scenario=mc_koth)then
+        if(ai_keypoint_d <ai_keypoint_kp^.kp_RCapture)then ai_AbilityDronToTower:=true;
+   end;
+end;
+
+
 procedure ai_AbilitiesCommon(pCaster:PTunit);
 var
 cx,cy,cd:integer;
@@ -1044,42 +1077,41 @@ begin
      case uidi of
      UID_HFTower,             //ai_generator_d
      UID_HSTower,
-     UID_HTotem      : if(a_rld<=0)then
+     UID_HTotem      : if(a_rld<=0)and(aiu_alarm_d>srange)then
                        begin
-                          if(ai_keypoint_d<NOTSET)and((map_scenario=mc_koth))then
+                          if(ai_keypoint_d<NOTSET)then
                             with ai_keypoint_kp^ do
-                            begin
-                               if(ai_keypoint_d<kp_RCapture)then exit;
-                               if(ai_keypoint_d<cd)then
-                               begin
-                                  cx:=kp_x;
-                                  cy:=kp_y;
-                                  cd:=ai_keypoint_d;
-                               end;
-                            end;
+                              if(kp_zone=mapZone)then
+                              begin
+                                 if(ai_keypoint_d<kp_RCapture)then exit;
+                                 if(ai_keypoint_d<cd)then
+                                 begin
+                                    cx:=kp_x;
+                                    cy:=kp_y;
+                                    cd:=ai_keypoint_d;
+                                 end;
+                              end;
                           if(ai_generator_d<NOTSET)then
                             with ai_generator_kp^ do
+                              if(kp_zone=mapZone)then
+                              begin
+                                 if(ai_generator_d<=kp_RCapture)then exit;
+                                 if(ai_generator_d<cd)then
+                                 begin
+                                    cx:=kp_x;
+                                    cy:=kp_y;
+                                    cd:=ai_generator_d;
+                                 end;
+                              end;
+                          if(aiu_alarm_d<cd)and(aiu_alarm_d<NOTSET)then
+                            if(aiu_alarm_d<base_r2)
+                            or((aip_flags and aif_ability_TowerRush)>0)then
                             begin
-                               if(ai_generator_d<=kp_RCapture)then exit;
-                               if(ai_generator_d<cd)then
-                               begin
-                                  cx:=kp_x;
-                                  cy:=kp_y;
-                                  cd:=ai_generator_d;
-                               end;
+                               cx:=aiu_alarm_x;
+                               cy:=aiu_alarm_y;
+                               cd:=aiu_alarm_d;
                             end;
-                          if(aiu_alarm_d<NOTSET)then
-                          begin
-                             if(aiu_alarm_d<srange)then exit;
-                             if(aiu_alarm_d<cd)then
-                               if(aiu_alarm_d<base_r2)
-                               or((aip_flags and aif_ability_TowerRush)>0)then
-                               begin
-                                  cx:=aiu_alarm_x;
-                                  cy:=aiu_alarm_y;
-                                  cd:=aiu_alarm_d;
-                               end;
-                          end;
+
 
                           if(cd<NOTSET)
                           then ai_ability_TowerBlink2Dir(pCaster,cx,cy,cd,g_randomr(30))  //srange
@@ -1120,8 +1152,17 @@ begin
                            if((base_r1h<ai_enemy_battle_d)and(ai_enemy_battle_d<base_r2))
                            or((ai_ZombieTarget_d<base_r1h)and(upgrs_cur[upgr_hell_Phantoms]>0))then
                              ai_UnitAbility(pCaster,uab_SpawnLost,0,0,0);
-     UID_UACDron     : ;
+     UID_UACDron     : if(ai_enemy_d>base_r1)and(ai_AbilityDronToTower)then
+                         if(ai_towers_near_AG<=ai_towers_near_AA)
+                         then ai_UnitAbility(pCaster,uab_ToUGTurretTo,0,x,y)
+                         else ai_UnitAbility(pCaster,uab_ToUATurretTo,0,x,y);
      end;
+
+   if(ai_HEyeNest_u<>nil)and(ai_near_HEye<=0)then
+     with pCaster^ do
+       if(not map_IfObstacleZone(mapZone))then
+         with player^ do
+           if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
 
    if(ai_Bribe_u<>nil)
    or(ai_Hack_u <>nil)then
@@ -1133,12 +1174,6 @@ begin
           if(ai_Hack_u <>nil)then
             if(ai_UnitAbility(pCaster,uab_Hack ,ai_Hack_u^ .unum,0,0))then aip_timer_magic:=aip_pause_magic;
        end;
-
-   if(ai_HEyeNest_u<>nil)and(ai_near_HEye<=0)then
-     with pCaster^ do
-       if(not map_IfObstacleZone(mapZone))then
-         with player^ do
-           if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
 end;
 
 
@@ -1174,11 +1209,16 @@ met_build  = 4;
 var
 ldir,lx,ly:integer;
 alarmType :byte;
+function RoyalCR:integer;
+begin
+   RoyalCR:=min2i(g_royal_r div 3,base_r1h);
+end;
+
 function moveEventType:byte;
 begin
    moveEventType:=0;
    case map_scenario of
-   mc_koth  : if(ai_choosen)and((map_scenario=mc_koth))and(ai_keypoint_d<NOTSET)then
+   mc_koth  : if(ai_choosen)and(map_scenario=mc_koth)and(ai_keypoint_d<NOTSET)then
                 with ai_keypoint_kp^ do
                   if(kp_RCapture<ai_keypoint_d)or(pBuilder^.isfly)then
                   begin
@@ -1186,19 +1226,18 @@ begin
                      exit;
                   end;
    mc_royale: case pBuilder^.isfly of
-              true : if(ai_choosen)
-                     or(u_royal_d<base_r1h)then
+              true : if(u_royal_d<base_r1h)then
                      begin
                         moveEventType:=met_royale;
                         exit;
                      end;
-              false: if(ai_choosen)
-                     or(u_royal_d<base_r1)then
+              false: if(u_royal_d<base_r1)then
                      begin
                         moveEventType:=met_royale;
                         exit;
                      end;
               end;
+
    end;
 
    with pBuilder^ do
@@ -1226,6 +1265,8 @@ begin
    with uid^ do
    begin
       if(point_dist_int(uo_x,uo_y,lx,ly)>=lr)then exit;
+      if(map_scenario=mc_royale)then
+        if(base_r1h>(g_royal_r-point_dist_int(uo_x,uo_y,map_sizeH,map_sizeH)))then exit;
       if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,false,true,255,pBuilder)<>cbr_no)then exit;
    end;
    checkLandingPlace:=true;
@@ -1240,7 +1281,7 @@ begin
         uo_y:=ly;
      end
      else
-       if(checkLandingPlace(lx,ly,lr))then
+       if(checkLandingPlace(uo_x,uo_y,lr))then
        begin
           if(point_dist_int(x,y,uo_x,uo_y)<uid_r)then
           begin
@@ -1256,14 +1297,13 @@ begin
           math_push_out(uo_x,uo_y,uid_r,unum,@uo_x,@uo_y,false,true,playeri );
        end;
 end;
-
 begin
    alarmType:=moveEventType;
-   {if(pBuilder^.isselected)then
+   if(pBuilder^.isselected)then
    begin
-      writeln('alarmType ',alarmType,' ai_BaseOwn_d=',ai_BaseOwn_d,' aiu_alarm_d=',pBuilder^.aiu_alarm_d);
+      writeln('alarmType ',alarmType,' ',ai_choosen,' ',u_royal_d,' ',base_r1h,' ',(u_royal_d<base_r1h));
       //writeln('ai_choosen ',ai_choosen,' (map_scenario=mc_koth)=',(map_scenario=mc_koth),' ai_keypoint_d=',ai_keypoint_d);
-   end;}
+   end;
    with pBuilder^ do
    with uid^    do
    with player^ do
@@ -1274,7 +1314,7 @@ begin
                                         ai_ability_KeepShift(pBuilder,kp_x+g_randomr(keyPoint_KotRW),
                                                                       kp_y+g_randomr(keyPoint_KotRW));
                           met_royale: begin
-                                         lx:=min2i(g_royal_r div 4,base_r1h);
+                                         lx:=RoyalCR;
                                          ai_ability_KeepShift(pBuilder,map_sizeH+g_randomr(lx),
                                                                        map_sizeH+g_randomr(lx));
                                       end;
@@ -1302,8 +1342,8 @@ begin
                                    met_koth  : with ai_keypoint_kp^ do
                                                  setLandingPlace(kp_x,kp_y,ai_keypoint_d,keyPoint_KotRW);
                                    met_royale: begin
-                                                  lx:=min2i(g_royal_r div 4,base_r1h);
-                                                  setLandingPlace(map_sizeH,map_sizeH,u_royal_d,lx);
+                                                  lx:=min2i(g_royal_r div 3,base_r1h);
+                                                  setLandingPlace(map_sizeH,map_sizeH,u_royal_cd,lx);
                                                end;
                                    met_hits  : ai_RunFrom(pBuilder,ai_enemy_u,0,0,ai_enemy_d);
                                    // met_build
@@ -1357,17 +1397,7 @@ begin
 
       if(uid_isbuilder)and(not isfly)and(zfall=0)and(build_cd<=0)then ai_Builder(pu);
 
-      //if(isselected)then
-      //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
-      //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-      {if(isselected)then
-      begin
-         if(ai_generator_d<NOTSET)then
-           with ai_generator_kp^ do UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
-         if(ai_keypoint_d<NOTSET)then
-           with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
-         //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime);
-      end;}
+
 
       if((aip_flags and aif_base_suicide)>0)then
         if(ai_NeedSuicide(pu))then
@@ -1484,6 +1514,19 @@ begin
    with pu^ do
    with uid^ do
    begin
+      //if(isselected)then
+      //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
+      //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
+      if(isselected)then
+      begin
+         writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
+         if(ai_generator_d<NOTSET)then
+           with ai_generator_kp^ do UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
+         if(ai_keypoint_d<NOTSET)then
+           with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
+         //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime);
+      end;
+
       if(uid_isbuilding)
       then ai_Global_Buildings(pu)
       else ai_Global_Units    (pu);

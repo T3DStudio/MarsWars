@@ -305,7 +305,7 @@ begin
    for a:=1 to LiquidAnimCount do
      with spr_fireblueFront[a] do
      begin
-        w:=map_ObstacleR(2)*2;
+        w:=map_ObstacleR(2)*3;
         h:=w;
         gfx_FreeSDLSurface(surf);
         surf:=gfx_CreateSDLSurface(w,w);
@@ -362,7 +362,7 @@ begin
    for a:=1 to LiquidAnimCount do
      with spr_liquidFront[a] do
      begin
-        w:=map_ObstacleR(1)*2;
+        w:=map_ObstacleR(1)*3;
         h:=w;
         gfx_FreeSDLSurface(surf);
         surf:=gfx_CreateSDLSurface(w,w);
@@ -393,7 +393,7 @@ begin
 
    with spr_liquidBack do
    begin
-      w:=map_ObstacleR(1)*2+20;
+      w:=map_ObstacleR(1)*3+20;
       h:=w;
       gfx_FreeSDLSurface(surf);
       surf:=gfx_CreateSDLSurface(w,w);
@@ -406,7 +406,7 @@ begin
 
    with spr_fireblueBack do
    begin
-      w:=map_ObstacleR(2)*2+20;
+      w:=map_ObstacleR(2)*3+20;
       h:=w;
       gfx_FreeSDLSurface(surf);
       surf:=gfx_CreateSDLSurface(w,w);

@@ -105,14 +105,15 @@ maps_Last              = 5; // 0-5
 // map templates
 mapt_lake              = 0;
 mapt_ring              = 1;
-mapt_sea               = 2;
+mapt_temple            = 2;
 mapt_cave              = 3;
 mapt_steppe            = 4;
 mapt_canyon            = 5;
 
 mapt_last              = 5;
 
-mapt_ltemple_dstep     = round(360/MaxPlayers);
+mapt_ltemple_dstep1    = round(360/MaxPlayers);
+mapt_ltemple_dstep2    = round(mapt_ltemple_dstep1/MaxPlayers);
 
 // map other
 map_MinSize            = 2500;
@@ -548,6 +549,7 @@ MapObstaclesGridN      = map_MaxSize div MapObstaclesGridW;
 
 ObstaclesRMin          = 10;
 ObstaclesRStep         = 45;
+ObstacleMinInnerR      = ObstaclesRStep*3;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -687,6 +689,7 @@ ul6                    = MinUnitLimit*6;
 ul8                    = MinUnitLimit*8;
 ul10                   = MinUnitLimit*10;
 ul15                   = MinUnitLimit*15;
+ul20                   = MinUnitLimit*20;
 
 // production time
 ptime1                 = 20;
@@ -1399,7 +1402,7 @@ vid_minw               = 800;
 vid_minh               = 600;
 
 vid_ab                 = 128;
-vid_MaxScreenSprites   = 1000; // max vis sprites;
+vid_MaxScreenSprites   = 2000; // max vis sprites;
 
 cpp_left               = 0;
 cpp_right              = 1;

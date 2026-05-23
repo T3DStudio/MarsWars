@@ -480,7 +480,8 @@ TUID = record
    uid_SightR_upgrV      : integer;
    uid_SightR_upgr       : byte;
 
-
+   uid_CanAttackGround,
+   uid_CanAttackAir,
    uid_CanAttack         : boolean;
    uid_arms_BonusAntiFlyRange,
    uid_arms_BonusAntiGroundRange,
@@ -875,6 +876,7 @@ TKeyPoint = record
    kp_TeamData   : array[0..MaxPlayers] of TKeyPointTeamData;
 end;
 pTKeyPoint = ^TKeyPoint;
+ppTKeyPoint = ^pTKeyPoint;
 
 TObstacle = record
    o_x,
