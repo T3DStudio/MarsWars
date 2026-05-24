@@ -1957,11 +1957,18 @@ str_map_SymmetryL        : array[0..maps_Last] of shortstring = ('no',
                                                                  'line \',
                                                                  'line /');
 
+str_map_TemplateL        : array[0..mapt_Last] of shortstring = ('central lake',
+                                                                 'central ring',
+                                                                 'temple',
+                                                                 'cave',
+                                                                 'steppe',
+                                                                 'canyon');
+
 str_map_Scenario         : shortstring = 'Scenario';
 str_map_Generators       : shortstring = 'Generators';
 str_map_Seed             : shortstring = 'Seed';
 str_map_Size             : shortstring = 'Size';
-str_map_Obstacles        : shortstring = 'Obstacles';
+str_map_Template         : shortstring = 'Template';
 str_map_Symmetry         : shortstring = 'Symmetry';
 str_game_AISlots         : shortstring = 'Fill empty slots';
 str_game_FixedPositions  : shortstring = 'Fixed player starts';

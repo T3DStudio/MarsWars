@@ -1,9 +1,3 @@
-program T3D_RTS;
-
-
-{$DEFINE _FULLGAME}
-//{$UNDEF _FULLGAME}
-
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
@@ -104,4 +98,5 @@ begin
    cfg_write;
    {$ENDIF}
 end.
+
 

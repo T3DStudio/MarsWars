@@ -2515,7 +2515,7 @@ var p:byte;
 begin
    NoHumanPlayers:=false;
    for p:=0 to LastPlayer do
-     with g_gplayers[p] do
+     with g_PlayersMain[p] do
        if(state=PS_human)then exit;
    NoHumanPlayers:=true;
 end;

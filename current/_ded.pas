@@ -76,13 +76,13 @@ procedure PlayerDataLine(p:byte);
 function PlayerGetPINGStr:shortstring;
 begin
    PlayerGetPINGStr:='';
-   with g_gplayers[p] do
-   with g_nplayers[p] do
+   with g_PlayersMain[p] do
+   with g_PlayersTemp[p] do
      if(state=ps_human)then PlayerGetPINGStr:=w2s(net_ping);
 end;
 
 begin
-   with g_gplayers[p] do
+   with g_PlayersMain[p] do
      if(state=ps_none)
      then   Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,'',29,'',39,'',49)
      else
@@ -99,7 +99,7 @@ begin
      case G_status of
      gs_running    : Dedicated_GameStatusStr:=str_GameStarted;
      gs_paused0..
-     gs_paused7    : Dedicated_GameStatusStr:=str_GamePaused+g_gplayers[G_status-gs_paused0].name;
+     gs_paused7    : Dedicated_GameStatusStr:=str_GamePaused+g_PlayersMain[G_status-gs_paused0].name;
      gs_waitplayers: Dedicated_GameStatusStr:=str_GameWFPlayers;
      gs_win_team0..
      gs_win_team7  : Dedicated_GameStatusStr:=str_GameEnded+b2s(G_Status-gs_win_team0+1);
@@ -126,8 +126,8 @@ begin
       8 : Dedicated_screenLine(b2c[g_FixedPositions]  ,1, ai_name(g_AISlots),25, b2c[g_DefeatedObs ] ,50, '' ,1,'',55,'',70);
       10: writeln;
       12: writeln(str_MapOptions);
-      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Obstacles    ,55, str_map_Symmetry               ,70);
-      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_Size1),45, strMX(map_ObstaclesS),55, str_map_SymmetryL[map_symmetry],70);
+      14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);
+      16: Dedicated_screenLine(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generators],15, c2s(map_seed),30, i2s(map_Size1),45, str_map_TemplateL[map_Template],55, str_map_SymmetryL[map_symmetry],70);
       18: writeln;
       20: Dedicated_screenLine('#',1,str_State                ,3, str_Player,11,str_srace,29,str_team ,39, str_ping,49);   // captions
       22: PlayerDataLine(0);

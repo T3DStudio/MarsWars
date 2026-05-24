@@ -448,7 +448,7 @@ begin
       if(not tu^.uid^.uid_isbuilding)then
       begin
          // units in groups
-         if(tu^.group<=MaxUnitGroups)then
+         if(tu^.group<=MaxAIGroups)then
          begin
             ai_GroupAll_ucount[tu^.group]+=1;
             ai_GroupAll_ulimit[tu^.group]+=tu^.uid^.uid_LimitUse;
@@ -484,7 +484,7 @@ begin
          else
            if (not tu^.uid^.uid_isbuilding)
            and(tu^.transportU=unum)
-           and(tu^.group<=MaxUnitGroups)then
+           and(tu^.group<=MaxAIGroups)then
              ai_GroupIn_ulimit[tu^.group]+=tu^.uid^.uid_LimitUse;
 
          if(player=tu^.player)then for_AliveOwn;

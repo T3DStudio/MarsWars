@@ -380,7 +380,7 @@ begin
                  nmid_lobby_MScenario,
                  nmid_lobby_MGenerators,
                  nmid_lobby_MSize,
-                 nmid_lobby_MObstacles,
+                 nmid_lobby_MTemplate,
                  nmid_lobby_MSymmetry,
                  nmid_lobby_MRandom,
 

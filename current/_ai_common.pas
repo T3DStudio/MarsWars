@@ -23,11 +23,13 @@ aic_group_GenAssault       = 5;
 aic_group_GenGuard         = 6;
 aic_group_GenWait          = 7;
 
+MaxAIGroups                = 7;
+
 var
 
-ai_GroupAll_ucount   : array[0..MaxUnitGroups] of integer;
-ai_GroupAll_ulimit   : array[0..MaxUnitGroups] of longint;
-ai_GroupIn_ulimit    : array[0..MaxUnitGroups] of longint;
+ai_GroupAll_ucount   : array[0..MaxAIGroups] of integer;
+ai_GroupAll_ulimit   : array[0..MaxAIGroups] of longint;
+ai_GroupIn_ulimit    : array[0..MaxAIGroups] of longint;
 
 
 ai_choosen,
