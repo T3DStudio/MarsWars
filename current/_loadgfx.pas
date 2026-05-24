@@ -732,7 +732,7 @@ begin
    spr_uibtn_ReplayPause       := gfx_ButtonLoad(folder_ui+'b_rstop'           ,ui_ButtonW1);
    spr_uibtn_ReplayPOV         := gfx_ButtonLoad(folder_ui+'b_rvis'            ,ui_ButtonW1);
    spr_uibtn_mmark             := gfx_ButtonLoad(folder_ui+'b_mmark'           ,ui_ButtonW1);
-   spr_uibtn_AbilityPretEquip  := gfx_ButtonLoad(folder_ui+'b_PretorianEquip'  ,ui_ButtonW1);
+   spr_uibtn_AbilityUACGeneral := gfx_ButtonLoad(folder_ui+'b_UACGeneral'      ,ui_ButtonW1);
    spr_uibtn_AbilityBribe      := gfx_ButtonLoad(folder_ui+'b_Bribe'           ,ui_ButtonW1);
    spr_uibtn_AbilityHack       := gfx_ButtonLoad(folder_ui+'b_Hack'            ,ui_ButtonW1);
    spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'         ,ui_ButtonW1);

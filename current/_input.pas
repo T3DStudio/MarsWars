@@ -325,15 +325,15 @@ begin
    ui_panel_CTabIActs[tcc_replay  ,MPos(20)]:=iAct_Replay_Player7;
 
    ui_panel_CTabIActs[tcc_observer,MPos(0 )]:=iAct_Observer_Fog;
-   ui_panel_CTabIActs[tcc_observer,MPos(3 )]:=iAct_Observer_PlayerAll;
-   ui_panel_CTabIActs[tcc_observer,MPos(4 )]:=iAct_Observer_Player0;
-   ui_panel_CTabIActs[tcc_observer,MPos(5 )]:=iAct_Observer_Player1;
-   ui_panel_CTabIActs[tcc_observer,MPos(6 )]:=iAct_Observer_Player2;
-   ui_panel_CTabIActs[tcc_observer,MPos(7 )]:=iAct_Observer_Player3;
-   ui_panel_CTabIActs[tcc_observer,MPos(8 )]:=iAct_Observer_Player4;
-   ui_panel_CTabIActs[tcc_observer,MPos(9 )]:=iAct_Observer_Player5;
-   ui_panel_CTabIActs[tcc_observer,MPos(10)]:=iAct_Observer_Player6;
-   ui_panel_CTabIActs[tcc_observer,MPos(11)]:=iAct_Observer_Player7;
+   ui_panel_CTabIActs[tcc_observer,MPos(2 )]:=iAct_Observer_PlayerAll;
+   ui_panel_CTabIActs[tcc_observer,MPos(3 )]:=iAct_Observer_Player0;
+   ui_panel_CTabIActs[tcc_observer,MPos(4 )]:=iAct_Observer_Player1;
+   ui_panel_CTabIActs[tcc_observer,MPos(5 )]:=iAct_Observer_Player2;
+   ui_panel_CTabIActs[tcc_observer,MPos(6 )]:=iAct_Observer_Player3;
+   ui_panel_CTabIActs[tcc_observer,MPos(7 )]:=iAct_Observer_Player4;
+   ui_panel_CTabIActs[tcc_observer,MPos(8 )]:=iAct_Observer_Player5;
+   ui_panel_CTabIActs[tcc_observer,MPos(9 )]:=iAct_Observer_Player6;
+   ui_panel_CTabIActs[tcc_observer,MPos(10)]:=iAct_Observer_Player7;
 end;
 
 procedure iActSetDisabled(iAct:byte;isdisabled:boolean);
@@ -393,14 +393,11 @@ begin
         end;
    end;
 
-   iActSetOnEnabled(iAct_Control_USelBase,g_control,ui_group_f1.ugroup_n>0);
-   iActSetOnEnabled(iAct_Control_USelArmy,g_control,ui_group_f2.ugroup_n>0);
-
    iActSetOnEnabled(iAct_InGamePause,GamePauseToggle(true),true);
    iActSetOnEnabled(iAct_InGameMenu ,true                 ,true);
 
    // replay controls
-   iActSetOnEnabled(iAct_Replay_Fast       ,ctabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Fast       ,ctabType=tcc_Replay,G_Status=gs_running);
    iActSetOnEnabled(iAct_Replay_Pause      ,ctabType=tcc_Replay,replay_Pause(true));
    iActSetOnEnabled(iAct_Replay_Back2      ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
    iActSetOnEnabled(iAct_Replay_Back10     ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
@@ -443,6 +440,9 @@ begin
    iActSetOnEnabled(iAct_Control_UMove   ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
    iActSetOnEnabled(iAct_Control_UStop   ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
    iActSetOnEnabled(iAct_Control_UPatrol ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
+
+   iActSetOnEnabled(iAct_Control_USelBase,g_control,ui_group_f1.ugroup_n>0);
+   iActSetOnEnabled(iAct_Control_USelArmy,g_control,ui_group_f2.ugroup_n>0);
 
    {if(iActIfOn(iAct_Control_UProdCncl,POVPlayer<>nil))then //(ctabType=tcc_Controls)and
      with POVPlayer^ do
@@ -1199,6 +1199,7 @@ end;
 
 procedure GameControlsKeyboard;
 var
+ctab :TTabControlContent;
 act,k:byte;
 clickSound:boolean;
 begin
@@ -1297,9 +1298,20 @@ begin
          if(InputActionPressed(iAct_test_debug1      ))then ;
       end;
 
+      // Controls tab actions
+      ctab:=ui_ControlTabType;
+      if(ctab=tcc_observer)
+      or(ctab=tcc_replay  )
+      or(g_status=gs_running)then
+        for k:=0 to ui_ButtonsNum do
+        begin
+           act:=ui_panel_CTabIActs[ctab,k];
+           if(InputActionPressed(act))then
+             ui_ExecInGameAction(act,pct_left,@clickSound);
+        end;
+
       if(g_status=gs_running)then
       begin
-
          // To last event
          if(InputActionPressed(iAct_LastEvent))then
          begin
@@ -1318,13 +1330,7 @@ begin
              if(InputActionPressed(k))
              then units_SelectGroup(false,k-iAct_USelGroup1+1);
 
-         // Controls tab actions
-         for k:=0 to ui_ButtonsNum do
-         begin
-            act:=ui_panel_CTabIActs[ui_ControlTabType,k];
-            if(InputActionPressed(act))then
-              ui_ExecInGameAction(act,pct_left,@clickSound);
-         end;
+         // unit common controls
          if(InputActionDPressed(iAct_Control_USelBase))then ui_Camera_MoveToGroup(@ui_group_f1);
          if(InputActionDPressed(iAct_Control_USelArmy))then ui_Camera_MoveToGroup(@ui_group_f2);
 

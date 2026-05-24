@@ -1780,7 +1780,7 @@ begin
       uab_SphereDDamage    : unit_AbilityCheck:=unit_ability_SphereDDamage(pCaster,0        ,true );
       uab_SphereTurbo      : unit_AbilityCheck:=unit_ability_SphereTurbo  (pCaster,0        ,true );
 
-      uab_PretorEquip      : unit_AbilityCheck:=unit_ability_UACHeroic    (pCaster,0        ,true );
+      uab_UACGeneral       : unit_AbilityCheck:=unit_ability_UACGeneral   (pCaster,0        ,true );
       uab_Bribe            : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,true ,true );
       uab_Hack             : unit_AbilityCheck:=unit_ability_Bribe        (pCaster,0  ,false,true );
 
@@ -1812,6 +1812,7 @@ begin
       uab_ToUGenerator4    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator4    ,true);
       uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
       uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
+      uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron  ,false,-2,level,true);
 
       uab_LvlUpURadar      : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
       uab_LvlUpURMStation  : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
@@ -1871,7 +1872,7 @@ begin
       uab_SphereRDamage,
       uab_SphereDDamage,
       uab_SphereTurbo,
-      uab_PretorEquip,
+      uab_UACGeneral,
       uab_Bribe,
       uab_Hack,
       uab_HEyeVision,
@@ -1886,7 +1887,7 @@ begin
                               uab_SphereRDamage   : unit_AbilityExec:=unit_ability_SphereRDamage(pCaster,uo_tar         ,false);
                               uab_SphereDDamage   : unit_AbilityExec:=unit_ability_SphereDDamage(pCaster,uo_tar         ,false);
                               uab_SphereTurbo     : unit_AbilityExec:=unit_ability_SphereTurbo  (pCaster,uo_tar         ,false);
-                              uab_PretorEquip     : unit_AbilityExec:=unit_ability_UACHeroic    (pCaster,uo_tar         ,false);
+                              uab_UACGeneral      : unit_AbilityExec:=unit_ability_UACGeneral   (pCaster,uo_tar         ,false);
                               uab_Bribe           : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,false,false);
                               uab_Hack            : unit_AbilityExec:=unit_ability_Bribe        (pCaster,uo_tar   ,true ,false);
                               uab_HEyeVision      : unit_AbilityExec:=unit_ability_HellVision   (pCaster,uo_tar         ,false);
@@ -1998,6 +1999,7 @@ begin
       uab_ToUGenerator4,
       uab_ToUAGTurret,
       uab_ToUAATurret,
+      uab_ToUACDron,
       uab_LvlUpURadar,
       uab_LvlUpURMStation: begin
                               case aid of
@@ -2019,6 +2021,7 @@ begin
                               uab_ToUGenerator4    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator4    ,false);
                               uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
                               uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
+                              uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron  ,false,-2,level,false);
 
                               uab_LvlUpURadar      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
                               uab_LvlUpURMStation  : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);

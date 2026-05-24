@@ -532,11 +532,13 @@ begin
              uo_tar:=ai_enemy_build_u^.unum;
 
            case uidi of
-           UID_Pain     : if(ai_enemy_battle_d<base_r1h)then
-                          begin
-                             uo_id:=ua_move;
-                             ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
-                          end;
+           UID_Pain     : if (min2i(x,abs(map_Size1-x))>srange)
+                          and(min2i(y,abs(map_Size1-y))>srange)then
+                            if(ai_enemy_battle_d<base_r1h)then
+                            begin
+                               uo_id:=ua_move;
+                               ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
+                            end;
            UID_Phantom  : if(ai_ZombieTarget_d<base_r1h)then ai_RunTo(pu,ai_enemy_battle_u,0,0,ai_ZombieTarget_d,0);
            UID_Medic,
            UID_ZMedic   : if(ai_HealTar_d     <base_r2 )then ai_RunTo(pu,ai_HealTar_u     ,0,0,ai_HealTar_d     ,0);

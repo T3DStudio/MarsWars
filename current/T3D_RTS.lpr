@@ -4,9 +4,6 @@ program T3D_RTS;
 {$DEFINE _FULLGAME}
 //{$UNDEF _FULLGAME}
 
-{ $IFOPT ded+   // illegal compiler switch ded ??????????
-// add ifopt
-}
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}

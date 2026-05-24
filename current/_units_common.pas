@@ -632,9 +632,9 @@ begin
    ability_CheckTarget_SphereTurbo:=true;
 end;
 
-function ability_CheckTarget_UACHeroic(CasterTeam:byte;pTarget:PTUnit):boolean;
+function ability_CheckTarget_UACGeneral(CasterTeam:byte;pTarget:PTUnit):boolean;
 begin
-   ability_CheckTarget_UACHeroic:=false;
+   ability_CheckTarget_UACGeneral:=false;
 
    with pTarget^ do
    with uid^ do
@@ -645,7 +645,7 @@ begin
      or(uid_isbuilding)
      or(buffs[ub_Heroic]>0)then exit;
 
-   ability_CheckTarget_UACHeroic:=true;
+   ability_CheckTarget_UACGeneral:=true;
 end;
 
 function ability_CheckTarget_Bribe(CasterTeam:byte;pTarget:PTUnit;target_building:boolean):boolean;
@@ -1036,24 +1036,36 @@ begin
    {$ENDIF}
 end;
 
-function unit_ability_UACHeroic(pCaster:PTUnit;target:integer;check:boolean):byte;
+function unit_ability_UACGeneral(pCaster:PTUnit;target:integer;check:boolean):byte;
 var pTarget:PTUnit;
+u,n:integer;
 begin
    // pCaster - caster
    // pTarget - target
-   unit_ability_UACHeroic:=lmt_Invalid_Order;
+   unit_ability_UACGeneral:=lmt_Invalid_Order;
    with pCaster^ do
      if(not iscomplete)
      or(transformTimer>0)
      or(hits<=0)then exit;
 
-   unit_ability_UACHeroic:=0;
+   unit_ability_UACGeneral:=0;
    if(check)then exit;
 
-   unit_ability_UACHeroic:=lmt_invalid_Target;
+   unit_ability_UACGeneral:=lmt_invalid_Target;
    if(not IsUnitRange(target,@pTarget))then exit;
-   if(not ability_CheckTarget_UACHeroic(pCaster^.player^.team,pTarget))then exit;
-   unit_ability_UACHeroic:=0;
+   if(not ability_CheckTarget_UACGeneral(pCaster^.player^.team,pTarget))then exit;
+
+
+   unit_ability_UACGeneral:=lmt_Req_MaxCount;
+   n:=0;
+   for u:=1 to MaxUnits do
+     with g_units[u] do
+       if(hits>0)and(playeri=pTarget^.playeri)and(buffs[ub_Heroic]>0)then
+       begin
+          n+=1;
+          if(n>=UACGeneralsMax)then exit;
+       end;
+   unit_ability_UACGeneral:=0;
 
    with pTarget^ do
    begin
@@ -1149,7 +1161,8 @@ begin
       or(not iscomplete)then exit;
 
       unit_ability_SpawnLost:=lmt_ability_reload;
-      if(buffs[ub_Cast]>0)then exit;
+      if(buffs[ub_Cast]>0)
+      or(rld>0)then exit;
 
       unit_ability_SpawnLost:=0;
       if(check)then exit;
@@ -2320,9 +2333,11 @@ begin
 
       case (state=ps_AI)and(ptarUID^.uid_isbuilder) of
       false: if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-      true : if(res_energyl_max<ptarUID^.uid_req_EnergyLevel)
-             or((energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
+      true : if((res_energyl_max-energyCur_builds-energyCur_transforms)<ptarUID^.uid_req_EnergyLevel)
              then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
+             {else
+               if((energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
+               then begin unit_TransformStart:=lmt_Req_Energy;exit;end;  }
       end;
 
       unit_TransformStart:=0;

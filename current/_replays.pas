@@ -5,6 +5,7 @@ procedure replay_MenuSelectedInfo;
 var  f: file;
     fn: shortstring;
 vbyte1: byte;
+ioer  : word;
 begin
    rpls_str_info1:='';
    rpls_str_info2:='';
@@ -25,9 +26,10 @@ begin
    {$I-}
    reset (f,1);
    {$I+}
-   if(ioresult<>0)then
+   ioer:=ioresult;
+   if(ioer<>0)then
    begin
-      rpls_str_info1:=str_FileError_Open;
+      rpls_str_info1:=str_FileError_Open+'('+w2s(ioer)+')';
       exit;
    end;
    if(FileSize(f)<rpls_file_head_size)then
@@ -44,9 +46,9 @@ begin
    then rpls_str_info1:=str_FileError_WVer
    else
      if(not FileReadBaseGameInfo(f,@rpls_str_info1,@rpls_str_info2))then rpls_str_info1:=str_FileError_WData;
-
    {$I+}
-   if(IOResult<>0)then rpls_str_info1:=str_FileError_WData;
+   ioer:=IOResult;
+   if(ioer<>0)then rpls_str_info1:=str_FileError_WData+'('+w2s(ioer)+')';
    close(f);
 end;
 
@@ -358,7 +360,9 @@ end;
 
 // REPLAY READ
 procedure replay_ReadHead;
-var p,i:byte;
+var
+p,i  :byte;
+ioerr:word;
 begin
    replay_Abort;
 
@@ -372,7 +376,6 @@ begin
    end;
 
    rpls_str_path:=folder_replay+rpls_list[rpls_list_sel]+fileExt_Replay;
-
    if(not FileExists(rpls_str_path))then
    begin
       rpls_pstate   :=rpls_none;
@@ -387,19 +390,21 @@ begin
    reset (rpls_file,1);
    {$I+}
 
-   if(ioresult<>0)then
+   ioerr:=ioresult;
+   if(ioerr<>0)then
    begin
       replay_Abort;
       g_started     :=false;
       menu_page     :=mi_replays;
-      rpls_str_info1:=str_FileError_Open;
+      rpls_str_info1:=str_FileError_Open+'('+w2s(ioerr)+')';
       rpls_str_info2:='';
    end
    else
    begin
-      rpls_file_LastErr:=0;
+      rpls_fstate   :=rpls_read;
       rpls_file_pos :=0;
       rpls_file_size:=FileSize(rpls_file);
+      rpls_file_LastErr:=0;
 
       if(rpls_file_size<rpls_file_head_size)then
       begin
@@ -459,8 +464,7 @@ begin
 
          for p:=0 to LastPlayer do
            with g_PlayersMain[p] do
-             if(length(name)>MaxPlayerNameLen)
-             or not(state in [ps_None,ps_human,ps_AI])
+             if not(state in [ps_None,ps_human,ps_AI])
              or(race >r_count)
              or(mrace>r_count)
              or(team >LastPlayer)then
@@ -474,11 +478,14 @@ begin
                 exit;
              end;
 
+         for p:=0 to LastPlayer do
+           with g_PlayersMain[p] do
+             if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
+
          if(rpls_pnu=0)then rpls_pnu:=net_SendTimeServer;
          UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*net_SendTimeServer;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
 
-         rpls_fstate:=rpls_read;
          rpls_pstate:=rpls_read;
          rpls_pnu   :=0;
          rpls_Ticks :=0;
@@ -493,7 +500,7 @@ begin
          ui_Camera_Bounds;
          ui_tab    :=tab_controls;
          G_Started :=true;
-         MainMenu  :=false;
+         MenuBack(true,false);
          ServerSide:=false;
       end;
    end;
@@ -579,9 +586,7 @@ begin
                      else
                        if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
                          replay_WriteGameFrame;
-        rpls_read  : if(rpls_fstate<>rpls_read)
-                     then replay_Readhead
-                     else
+        rpls_read  : if(rpls_fstate=rpls_read)then
                        if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
                          replay_ReadGameFrame;
         else replay_Abort;
@@ -646,9 +651,8 @@ begin
 
    g_type     :=gt_scirmish;
    rpls_pstate:=rpls_read;
-   g_started  :=true;
 
-   MenuBack(true,false);
+   replay_ReadHead;
 end;
 
 procedure replay_DeleteFile(fn:shortstring);

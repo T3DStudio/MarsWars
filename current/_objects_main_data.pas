@@ -357,7 +357,7 @@ begin
    uid_SightR_upgr     := upgr_hell_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 6;
-   uid_ProdTimeSec     := ptime2;
+   uid_ProdTimeSec     := ptime1h;
    uid_Regen_Base      := BaseRegen1;
    uid_Regen_Upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
@@ -370,7 +370,7 @@ begin
 end;
 UID_HSTower:
 begin
-   uid_MaxHits1        := 3000;
+   uid_MaxHits1        := 4000;
    uid_req_EnergyLevel := 400;
    uid_r               := 20;
    uid_SightR_Base     := 300;
@@ -1309,7 +1309,7 @@ begin
    uid_req_uid1        := UID_UWeaponFactory;
    uid_ability1        := uab_Bribe;
    uid_ability2        := uab_Hack;
-   uid_ability3        := uab_PretorEquip;
+   uid_ability3        := uab_UACGeneral;
 end;
 UID_UHPowerConductor:
 begin
@@ -1352,14 +1352,15 @@ begin
    uid_SightR_upgr     := upgr_uac_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 6;
-   uid_ProdTimeSec     := ptime2;
+   uid_ProdTimeSec     := ptime1h;
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_Armor_upgr2     := upgr_uac_TurretArmor;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_islight         := true;
-   uid_ability1        := uab_ToUAATurret;
+   uid_ability2        := uab_ToUAATurret;
+   uid_ability3        := uab_ToUACDron;
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_BPlasma ,0,upgr_uac_TurretPlasma,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground_mech,wpr_any,uids_all,[],0,-11,2,dm_AntiUnitMech2  );
    SetWeapon(1,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_Chaingun,0,0                    ,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground     ,wpr_any,uids_all,[],0,-11,2,dm_AntiUnitBioLight2);
 end;
@@ -1372,7 +1373,7 @@ begin
    uid_SightR_upgr     := upgr_uac_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 7;
-   uid_ProdTimeSec     := ptime2;
+   uid_ProdTimeSec     := ptime1h;
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_Armor_upgr2     := upgr_uac_TurretArmor;
    uid_CanAttack       := true;
@@ -1380,6 +1381,7 @@ begin
    uid_ismech          := true;
    uid_islight         := true;
    uid_ability1        := uab_ToUAGTurret;
+   uid_ability3        := uab_ToUACDron;
    SetWeapon(0,wpt_missle,aw_fsr+(uid_r*2),0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,0,dm_AntiFly2);
 end;
 
@@ -2009,7 +2011,7 @@ uab_Hack            : begin
                          ua_type        := uat_UnitEnemy;
                          ua_req_UACLoot := 10000;
                       end;
-uab_PretorEquip     : begin
+uab_UACGeneral         : begin
                          ua_type        := uat_UnitAlly;
                          ua_req_UACLoot := 15000;
                       end;
@@ -2053,7 +2055,10 @@ uab_ToUATurretTo    : begin
                          ua_type        := uat_Point;
                          ua_req_upgr    := upgr_uac_DronTurret;
                       end;
-
+uab_ToUACDron       : begin
+                         ua_type        := uat_NoTarget;
+                         ua_req_upgr    := upgr_uac_DronTurret;
+                      end;
 uab_ToHAKeep,
 uab_ToHSymbol2,
 uab_ToHSymbol3,
@@ -2083,12 +2088,12 @@ uab_ToUWeaponFactory: begin
 uab_LvlUpURadar     : begin
                          ua_type     := uat_NoTarget;
                          ua_req_uid  := UID_UACommandCenter;
-                         ua_req_UACLoot:=1000;
+                         ua_req_UACLoot:=2000;
                       end;
 uab_LvlUpURMStation : begin
                          ua_type     := uat_NoTarget;
                          ua_req_uid  := UID_UComputerStation;
-                         ua_req_UACLoot:=2000;
+                         ua_req_UACLoot:=3000;
                       end;
       end;
    end;

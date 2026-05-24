@@ -923,6 +923,13 @@ begin
       if(ui_umark_t=0)then ui_umark_u:=0;
    end;
 
+   case ui_ControlPanelPos of
+   0 : vlineColor(tar,         -ui_cam_x,         -ui_cam_y,map_Size1-ui_cam_y,c_white);
+   1 : vlineColor(tar,map_Size1-ui_cam_x,         -ui_cam_y,map_Size1-ui_cam_y,c_white);
+   2 : hlineColor(tar,         -ui_cam_x,map_Size1-ui_cam_x,         -ui_cam_y,c_white);
+   3 : hlineColor(tar,         -ui_cam_x,map_Size1-ui_cam_x,map_Size1-ui_cam_y,c_white);
+   end;
+
    if(UIPlayer>LastPlayer)
    then PVisPlayer:=nil
    else PVisPlayer:=@g_PlayersMain[UIPlayer];

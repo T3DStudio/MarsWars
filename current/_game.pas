@@ -6,15 +6,18 @@ begin
       PlayerSetAllowedUnits(playerN,[ UID_HKeep         ..UID_HBarracks,
                                       UID_LostSoul      ..UID_ZBFGMarine,
                                       UID_UCommandCenter..UID_URMStation,
-                                      UID_Engineer      ..UID_Flyer  ],
-                                    MaxUnits,true);
+                                      UID_Engineer      ..UID_Flyer     ],
+                                    MaxUnits,true );
 
       PlayerSetAllowedUnits(playerN,[ UID_LostSoul,
                                       UID_Phantom ],
-                                    20,false);
+                                    20      ,false);
+      PlayerSetAllowedUnits(playerN,[ UID_HAltar  ],
+                                    3       ,false);
+
 
       if(map_generators>0)then
-      PlayerSetAllowedUnits(playerN,[ UID_HSymbol1..UID_HSymbol4,
+      PlayerSetAllowedUnits(playerN,[ UID_HSymbol1   ..UID_HSymbol4,
                                       UID_UGenerator1..UID_UGenerator4],0,false);
 
 
@@ -414,7 +417,7 @@ begin
             if(g_AISlots>0)then
             begin
                aip_skill:=g_AISlots;
-               race    :=r_random;
+               race     :=r_random;
                PlayerSetState(p,ps_AI);
             end;
 

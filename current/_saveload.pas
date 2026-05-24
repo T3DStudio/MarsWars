@@ -327,6 +327,7 @@ begin
       units_DefaultVisData;
       map_MakeThemeSprites;
       map_RefreshObstaclesGrid;
+      map_SetNeedTransportStatus;
       map_Obstacles_SetDrawData;
       map_RedrawMenuMinimap;
       ui_Camera_Bounds;

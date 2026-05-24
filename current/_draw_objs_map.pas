@@ -189,16 +189,16 @@ begin
                or(abs(rOutR-d)<=cellw1)then
                  SpriteList_AddDoodad(nx,ny,bdepth ,-32000,sTemplateB,255,0,0);
 
-               animN:=(abs(animStep+animX+byte(y div cellw1)) mod LiquidAnimCount)+1;
+               animN:=((animStep+animX+byte(abs(y) div cellw1)) mod LiquidAnimCount)+1;
 
-               if(not InputAction(iact_Alt))then
+               //if(not InputAction(iact_Alt))then
                SpriteList_AddDoodad(nx,ny,depth,-32000,@sTemplateAF^[animN],255,0,0);
 
-               if(InputAction(iact_Control))then
+               {if(InputAction(iact_Control))then
                begin
                UnitsInfo_AddCircle(nx,ny,sTemplateAF^[1].hw,ui_blink2_color_BY);
                UnitsInfo_AddText(nx,ny,i2s(animN),c_white);
-               end;
+               end;  }
             end;
          end;
 

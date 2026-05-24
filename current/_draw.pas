@@ -66,13 +66,13 @@ begin
    if(TestMode>1)then
    begin
 
-      if(InputAction(iact_Alt))then
+     { if(InputAction(iact_Alt))then
       begin
          writeln(LocalPlayer);
         for i:=0 to LastPlayer do
           with g_PlayersMain[i] do
             writeln(i,' ',isobserver,' ',isdefeated);
-      end;
+      end;   }
 
       //
      // for i:=0 to fog_TileSetSize do

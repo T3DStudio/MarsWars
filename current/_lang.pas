@@ -392,7 +392,7 @@ begin
    str_hint_UpgradesLvl          := 'Upgrades: ';
    str_hint_Demons               := 'demons&zombies';
    str_hint_Except               := 'except';
-   str_hint_SplashResist         := 'Immune to splash damage: ';
+   str_hint_SplashResist         := 'Immune to splash damage';
    str_hint_TargetLimit          := 'target limit';
    str_hint_builder              := 'Builder';
    str_hint_barrack              := 'Unit production';
@@ -540,7 +540,7 @@ begin
    str_SetAbilityBaseHint(uab_SphereRDamage      ,'Damage Resistance Sphere' ,'Halves damage to the target for '+i2s(rdamage_time_sec)+' seconds.');
    str_SetAbilityBaseHint(uab_SphereDDamage      ,'Double Damage Sphere'     ,'Doubles the target`s damage for '+i2s(ddamage_time_sec)+' seconds.');
    str_SetAbilityBaseHint(uab_SphereTurbo        ,'Turbo Sphere'             ,'Increases target`s speed for '+i2s(ddamage_time_sec)+' seconds.');
-   str_SetAbilityBaseHint(uab_PretorEquip        ,'Pretorian Equipment'      ,'Valid targets: non-heroic allied UAC units. Makes the target "heroic", that doubles its damage and armor');
+   str_SetAbilityBaseHint(uab_UACGeneral         ,'UAC General Rank'         ,'Valid targets: non-heroic allied UAC units. Makes the target a "heroic", which increases the damage they deal by 1.5 times and reduces the damage they take by a third. There can be a maximum of '+b2s(UACGeneralsMax)+' "heroic" units in your army.');
    str_SetAbilityBaseHint(uab_Bribe              ,'Bribe'                    ,'Valid targets: non-heroic enemy UAC units. Turns the target to your side. There must be at least one UAC unit allied with you around the target');
    str_SetAbilityBaseHint(uab_Hack               ,'System Hack'              ,'Valid targets: completed enemy UAC buildings. Turns the target to your side. There must be at least one UAC unit allied with you around the target');
    str_SetAbilityBaseHint(uab_UACCCLand          ,'Land/Take-off'            ,'');
@@ -563,6 +563,8 @@ begin
    str_SetAbilityBaseHint(uab_ToUAATurret        ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUGTurretTo       ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToUATurretTo       ,t1                         ,'');
+   str_SetAbilityBaseHint(uab_ToUACDron          ,t1                         ,'');
+
    t1:='Advanced ';
    str_SetAbilityBaseHint(uab_ToHGate            ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHPools           ,t1                         ,'');
@@ -742,7 +744,7 @@ begin
    str_SetActionBaseHint(iAct_Replay_Forward60   ,'Fast forward 60 seconds');
    str_SetActionBaseHint(iAct_Replay_POV         ,'Player-recorder POV');
    str_SetActionBaseHint(iAct_Replay_Log         ,'List of game messages');
-   str_SetActionBaseHint(iAct_Replay_Fog         ,'Fog of war');
+   str_SetActionBaseHint(iAct_Replay_Fog         ,'Fog of war' );
    str_SetActionBaseHint(iAct_Replay_PlayerAll   ,'All players');
    str_SetActionBaseHint(iAct_Replay_Player0     ,'Player #1');
    str_SetActionBaseHint(iAct_Replay_Player1     ,'Player #2');
@@ -753,16 +755,17 @@ begin
    str_SetActionBaseHint(iAct_Replay_Player6     ,'Player #7');
    str_SetActionBaseHint(iAct_Replay_Player7     ,'Player #8');
 
-   str_action_hint[iAct_Observer_Fog      ]:= str_action_hint[iAct_Replay_Fog      ];
-   str_action_hint[iAct_Observer_PlayerAll]:= str_action_hint[iAct_Replay_PlayerAll];
-   str_action_hint[iAct_Observer_Player0  ]:= str_action_hint[iAct_Replay_Player0  ];
-   str_action_hint[iAct_Observer_Player1  ]:= str_action_hint[iAct_Replay_Player1  ];
-   str_action_hint[iAct_Observer_Player2  ]:= str_action_hint[iAct_Replay_Player2  ];
-   str_action_hint[iAct_Observer_Player3  ]:= str_action_hint[iAct_Replay_Player3  ];
-   str_action_hint[iAct_Observer_Player4  ]:= str_action_hint[iAct_Replay_Player4  ];
-   str_action_hint[iAct_Observer_Player5  ]:= str_action_hint[iAct_Replay_Player5  ];
-   str_action_hint[iAct_Observer_Player6  ]:= str_action_hint[iAct_Replay_Player6  ];
-   str_action_hint[iAct_Observer_Player7  ]:= str_action_hint[iAct_Replay_Player7  ];
+   str_SetActionBaseHint(iAct_Observer_Fog       ,'Fog of war' );
+   str_SetActionBaseHint(iAct_Observer_PlayerAll ,'All players');
+   str_SetActionBaseHint(iAct_Observer_Player0   ,'Player #1');
+   str_SetActionBaseHint(iAct_Observer_Player1   ,'Player #2');
+   str_SetActionBaseHint(iAct_Observer_Player2   ,'Player #3');
+   str_SetActionBaseHint(iAct_Observer_Player3   ,'Player #4');
+   str_SetActionBaseHint(iAct_Observer_Player4   ,'Player #5');
+   str_SetActionBaseHint(iAct_Observer_Player5   ,'Player #6');
+   str_SetActionBaseHint(iAct_Observer_Player6   ,'Player #7');
+   str_SetActionBaseHint(iAct_Observer_Player7   ,'Player #8');
+
 
    /////////////////////////////////////////////////////////////////////////////
    //  MENU HINTS

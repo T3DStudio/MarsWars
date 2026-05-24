@@ -904,7 +904,7 @@ uab_SphereRDamage      = 23;
 uab_SphereDDamage      = 24;
 uab_SphereTurbo        = 25;
 
-uab_PretorEquip        = 26;
+uab_UACGeneral         = 26;
 uab_Bribe              = 27;
 uab_Hack               = 28;
 
@@ -926,10 +926,11 @@ uab_ToUGenerator3      = 45;
 uab_ToUGenerator4      = 46;
 uab_ToUAGTurret        = 47;
 uab_ToUAATurret        = 48;
-uab_ToUGTurretTo       = 49;
-uab_ToUATurretTo       = 50;
-uab_LvlUpURadar        = 51;
-uab_LvlUpURMStation    = 52;
+uab_ToUACDron          = 49;
+uab_ToUGTurretTo       = 50;
+uab_ToUATurretTo       = 51;
+uab_LvlUpURadar        = 52;
+uab_LvlUpURMStation    = 53;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -961,6 +962,8 @@ keyPoint_KotH_pause     = fr_fps1*180;
 //
 
 PlayerMaxBuilders      = 4;
+
+UACGeneralsMax         = 4;
 
 fr_mancubus_rld        = fr_fps2+fr_fpsh;  //2.5
 fr_mancubus_rld_s1     = fr_fps2-fr_fpss;
@@ -998,8 +1001,8 @@ HellPower_PerLimit     = 100;
 HellPower_PerHP        = 10;
 HellPower_AddPeriod    = fr_fps1;
 HellPower_Add1         = HellPower_PerLimit;
-HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 4);
-HellPower_Add3         = HellPower_Add1+(HellPower_Add1 div 2);
+HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 2);
+HellPower_Add3         = HellPower_Add1+(HellPower_Add1 div 4);
 UACLoot_Max            = 30000;
 
 detection_time_sec     = 8;

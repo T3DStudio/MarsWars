@@ -746,7 +746,8 @@ TPlayerGameData = record
    aip_MaxForges,
    aip_MaxDetectors,
    aip_MinTowers,
-   aip_MaxTowers       : integer;
+   aip_MaxTowers,
+   aip_MaxSuper        : integer;
    aip_MaxUnitLimit,
    aip_MaxUnitMinPart
                        : longint;

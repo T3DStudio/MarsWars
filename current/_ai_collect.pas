@@ -205,7 +205,7 @@ begin
         or(ud<    srange)then ai_near_HEye+=1;
 
       // magic targets
-      if(ability_CheckTarget_UACHeroic    (team,tu))then ai_SetTarget_Heroic       (tu);
+      if(ability_CheckTarget_UACGeneral   (team,tu))then ai_SetTarget_UACGeneral   (tu);
       if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
       if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
       if(ability_CheckTarget_SphereInvuln (team,tu))then ai_SetTarget_SphereInvuln (tu);
@@ -299,12 +299,12 @@ begin
          if(not ai_PhantomWantZombieMe)and(uid_ZombieUID>0)then
            if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then
              if((ud-uid_r-tu^.uid^.uid_r)<=melee_r)then ai_PhantomWantZombieMe:=true;  }
-      end
-      else
-        if(CheckUnitTeamVision(team,tu,true))then    // invis enemy in vision
-          if(tu^.a_rld>0){or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)}then   // ????????
-            if(tu^.buffs[ub_Invisibility]>0)and(tu^.TeamDetection[team]<=0){and(tu^.buffs[ub_Scaned]<=0)}then
-              setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
+      end;
+
+      if(CheckUnitTeamVision(team,tu,true))then    // invis enemy in vision
+        if(tu^.a_rld>0){or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)}then   // ????????
+          if(tu^.buffs[ub_Invisibility]>0)and(tu^.TeamDetection[team]<=0){and(tu^.buffs[ub_Scaned]<=0)}then
+            setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
    end;
 end;
 
@@ -423,6 +423,7 @@ begin
             if(tu^.transportM=tu^.transportC)and(not tu^.isfly)and(tu^.uid^.uid_CanAttack)then
             begin
                ai_armylimit_ForTeleport+=tu^.uid^.uid_LimitUse;
+               if(map_NeedTransport)then
                ai_transport_need       +=tu^.uid^.uid_TransportSize;
             end;
          end;
@@ -439,21 +440,10 @@ begin
       if(ud<=srange)then
         if(tu^.buffs[ub_Detector]>0)then ai_near_detect+=1;
 
-      // generators limit
-      if (not tu^.uid^.uid_isbuilder)
-      and(tu^.uid^.uid_gen_EnergyLevel>0)then
-        ai_generators_limit+=tu^.uid^.uid_LimitUse;
-
-      // towers
-      if(tu^.uid^.uid_isbuilding)and(tu^.uid^.uid_CanAttack)then
-        if(not tu^.uid^.uid_isbuilder)then
-          ai_curr_Towers+=1;
-
       // unit productions available
       if(tu^.uid^.uid_isbarrack)then ai_curr_UnitProds+=tu^.level+1;
       // upgrade productions available
       if(tu^.uid^.uid_isforge  )then ai_curr_UpgrProds+=tu^.level+1;
-
 
       if(not tu^.uid^.uid_isbuilding)then
       begin

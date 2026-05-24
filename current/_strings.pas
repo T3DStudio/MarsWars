@@ -1076,8 +1076,8 @@ begin
            AddLineUnitDocHint(str_doc_LevelPainSBonus +DocValI(uid_LevelBonusPainC  ));
         end;
         if(uid_TransportMax_Base>0)then
-        AddLineUnitDocHint(str_doc_TransportCpst  +DocValI(uid_TransportMax_Base));
-        AddLineUnitDocHint(str_hint_SplashResist  +str_YesNoG[uid_isbuilding or uid_ismech]);
+        AddLineUnitDocHint(str_doc_TransportCpst     +DocValI(uid_TransportMax_Base));
+        AddLineUnitDocHint(str_hint_SplashResist+': '+str_YesNoG[uid_isbuilding or uid_ismech]);
         if(uid_gen_EnergyLevel >0)then
         AddLineUnitDocHint(str_hint_IncEnergyLevel+DocValI(uid_gen_EnergyLevel ,tc_aqua  ));
         if(uid_bounty_HellPower>0)then

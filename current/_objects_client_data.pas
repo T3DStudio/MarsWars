@@ -1064,7 +1064,7 @@ uab_SphereRDamage    : ua_btn     :=spr_uibtn_AbilitySRDamage;
 uab_SphereDDamage    : ua_btn     :=spr_uibtn_AbilitySDDamage;
 uab_SphereTurbo      : ua_btn     :=spr_uibtn_AbilitySTurbo;
 
-uab_PretorEquip      : ua_btn     :=spr_uibtn_AbilityPretEquip;
+uab_UACGeneral       : ua_btn     :=spr_uibtn_AbilityUACGeneral;
 uab_Bribe            : ua_btn     :=spr_uibtn_AbilityBribe;
 uab_Hack             : ua_btn     :=spr_uibtn_AbilityHack;
 
@@ -1093,6 +1093,7 @@ uab_ToUGenerator3    : ua_mbrush_r:=-UID_UGenerator3;
 uab_ToUGenerator4    : ua_mbrush_r:=-UID_UGenerator4;
 uab_ToUAGTurret      : ua_mbrush_r:=-UID_UGTurret;
 uab_ToUAATurret      : ua_mbrush_r:=-UID_UATurret;
+uab_ToUACDron        : ua_mbrush_r:=-UID_UACDron;
 
 uab_ToUBarracks      : ua_mbrush_r:=-UID_UBarracks;
 uab_ToUFactory       : ua_mbrush_r:=-UID_UFactory;
@@ -1119,12 +1120,14 @@ uab_ToUGenerator3,
 uab_ToUGenerator4,
 uab_ToUAGTurret,
 uab_ToUAATurret,
+uab_ToUACDron,
 uab_ToUBarracks,
 uab_ToUFactory,
 uab_ToUWeaponFactory : ua_mbrush_hint:=byte(-ua_mbrush_r);
       end;
 
       case a of
+uab_ToUACDron,
 uab_ToUAGTurret,
 uab_ToUAATurret,
 uab_ToUGTurretTo,

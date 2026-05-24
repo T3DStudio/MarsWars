@@ -127,6 +127,18 @@ begin
      end;
 end;
 
+procedure map_SetNeedTransportStatus;
+var d:integer;
+begin
+   map_NeedTransport:=false;
+   for d:=1 to MaxObstacles do
+     with map_ObstaclesL[d] do
+       if(o_rO>0)and(o_rI>0)then
+       begin
+          map_NeedTransport:=true;
+          exit;
+       end;
+end;
 
 function map_ObstacleR(obs_f:byte):integer;
 begin
@@ -804,9 +816,9 @@ begin
                  mc_1x1,
                  mc_2x2,
                  mc_3x3,
-                 mc_4x4    : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_SymmetryDir,2);
-                 mc_2x2x2  : map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_SymmetryDir,3);
-                 mc_2x2x2x2: map_Starts_Teams (map_Sizeh,map_Sizeh,map_Size1 div 3,map_SymmetryDir,4);
+                 mc_4x4    : map_Starts_Teams (map_Sizeh,map_Sizeh,map_SizeH-(map_SizeH div 5),map_SymmetryDir,2);
+                 mc_2x2x2  : map_Starts_Teams (map_Sizeh,map_Sizeh,map_SizeH-(map_SizeH div 5),map_SymmetryDir,3);
+                 mc_2x2x2x2: map_Starts_Teams (map_Sizeh,map_Sizeh,map_SizeH-(map_SizeH div 5),map_SymmetryDir,4);
                  mc_KotH,
                  mc_royale : map_Starts_Circle(map_Sizeh,map_Sizeh,map_SymmetryDir,map_Sizeh-(map_Size1 div 8));
                  else        if(not map_Starts_Random(base_r1,base_r1+(map_Size1 div 12),map_Sizeh,map_Sizeh,(map_Size1 div 4)-base_rh,0))then
@@ -1038,7 +1050,7 @@ begin
                     else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
 
                     map_Obstacles_Temple(io+map_obstaclesGap*2,map_sizeh+base_r1,base_r1);
-                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),1,2,0);
+                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),0,4,0);
                  end;
    mapt_cave   : map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),2,10,0);
    mapt_steppe : map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),0,2 ,0);
@@ -1052,6 +1064,7 @@ begin
       map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotR-1,0);
 
    map_RefreshObstaclesGrid;
+   map_SetNeedTransportStatus;
 end;
 
 procedure map_CreateObjects;

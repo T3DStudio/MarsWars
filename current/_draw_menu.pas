@@ -486,7 +486,7 @@ begin
               drawmenu_ItemTextC(tar,mi_Players_State0+p,ta_MM,'+'+str_ps_AI,c_white);
           if(g_AISlots>0)and(p<map_MaxPlayers)and(not g_started)then
           begin
-             drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,str_ps_AI+' '+b2s(g_AISlots)              ,c_gray);
+             drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,ai_name(g_AISlots)                        ,c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[r_random]                        ,c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Team0+p,ta_MM,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Obs0 +p,ta_MM,str_YesNoG[false]                         ,c_gray);

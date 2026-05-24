@@ -8,7 +8,7 @@ aic_GeneratorsEnergy       = 9000;
 aic_GeneratorsDestroyEnergy= 10000;
 aic_GeneratorsDestoryLimit = ul1*35;
 
-//aic_TowerLifeTime          = fr_fps1*60;/// ???????
+aic_TowerLifeTime          = fr_fps1*60;/// ???????
 
 aic_BaseIdle_r             = 50;
 
@@ -297,7 +297,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
-procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
+procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxSuper,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
 begin
    with g_PlayersMain[p] do
    begin
@@ -308,6 +308,7 @@ begin
       aip_MaxDetectors     :=aMaxDetectors*ul1;
       aip_MinTowers        :=aMinTowers;
       aip_MaxTowers        :=aMaxTowers;
+      aip_MaxSuper         :=random(aMaxSuper+1);
       aip_MaxUnitLimit     :=aMaxArmyLimit*ul1;
       aip_pause_attack     :=max2i(fr_fps1,fr_fps1*aAttackPause   );
       aip_pause_detection  :=max2i(fr_fps1,fr_fps1*aDetectionPause);
@@ -315,29 +316,20 @@ begin
       aip_pause_superweapon:=max2i(fr_fps1,fr_fps1*aSpecialPause  );
 
       aip_MaxUnitMinPart   :=mm3i(keyPoint_MinLimit,aip_MaxUnitLimit div 4,keyPoint_MaxLimitAI);
-      {
-      ai_attack_limit     :=atl*MinUnitLimit;
-      ai_attack_delay     :=att;
-      ai_maxlimit_blimit  :=l*MinUnitLimit;
-      ai_maxcount_upgrlvl :=mupl;
-      ai_hptargets        :=hpt;
-
-      ,t0,t1,t2,dl,s1,s2,mint,maxt,atl,att,l:integer;mupl:byte;hpt:TSoB
-      }
    end;
 end;
 begin
    with g_PlayersMain[p] do
    begin
       case aip_skill of
-      //              energy buil bar   forges dete  min   max        pause
-      //                     ders racks        ctors tower tower army   dtct spec
-      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0   ,0  ,0   ,0   );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,10  ,150,60  ,240 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
-      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,40  ,100,30  ,180 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
-      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,65  ,50 ,20  ,120 );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,125 ,0  ,10  ,80  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,125 ,0  ,0   ,0   );//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      //              energy buil bar   forges dete  min   max            pause
+      //                     ders racks        ctors tower tower     army  atta det  spec
+      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0   ,0   ,0   );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
+      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,0  ,10   ,150 ,60  ,240 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
+      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,40   ,100 ,30  ,180 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
+      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,65   ,50  ,20  ,120 );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,125  ,0   ,10  ,80  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,0   ,0   ,0   );//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
       end;
       //aic_max_SpecUID:=aip_skill-1;
       if(aip_skill>1)
@@ -435,7 +427,6 @@ begin
       aiu_NeedDetect       :=NOTSET;
       aiu_limitaround_ally :=0;
       aiu_limitaround_enemy:=0;
-      // aiu_alarm_timer ?
    end;
 
    ai_enemy_u:= nil;
@@ -604,6 +595,12 @@ begin
    ai_energy_current := 0;
 
    ai_generators_limit:=0;
+   // generators limit
+   with pu^.player^ do
+     for i:=1 to 255 do
+       with g_uids[i] do
+         if(not uid_isbuilder)and(uid_gen_EnergyLevel>0)then
+           ai_generators_limit+=units_uid_e[i]*uid_LimitUse;
 
    // nearest point/generator
    with pu^ do
@@ -740,6 +737,12 @@ begin
    ai_need_UpgrProds        := 0;
 
    ai_curr_Towers           := 0;  // towers
+   with pu^.player^ do
+     for i:=1 to 255 do
+       with g_uids[i] do
+         if(uid_isbuilding)and(uid_CanAttack)and(not uid_isbuilder)then
+           ai_curr_Towers+=units_uid_e[i];
+
    ai_towers_near_AG        := 0;
    ai_towers_near_AA        := 0;
 
@@ -768,9 +771,12 @@ end;
 //
 
 function ai_UnitAbility(pCaster:PTUnit;aid:byte;atar,ax,ay:integer):boolean;
+var t:byte;
 begin
    unit_SetAbilityOrder(pCaster,aid,atar,ax,ay,false);
    ai_UnitAbility:=unit_AbilityExec(pCaster,aid)=0;
+   //with pCaster^ do
+   //  if(isselected)and(aid=uab_ToUACommandCenter)then writeln('uab_ToUACommandCenter ',t);
    if(pCaster^.buffs[ub_Cast]<=0)then
      unit_OrderClear(pCaster,ua_amove);
 end;
@@ -885,22 +891,22 @@ begin
      if(newu^.uid^.uid_isbuilder>ai_Hack_u^.uid^.uid_isbuilder)
      then
      else
-       if(newu^.uid^.uid_isbuilder<ai_Hack_u^.uid^.uid_isbuilder)
+     if(newu^.uid^.uid_isbuilder<ai_Hack_u^.uid^.uid_isbuilder)
+     then exit
+     else
+       if(newu^.uid^.uid_CanAttack>ai_Hack_u^.uid^.uid_CanAttack)
+       then
+       else
+       if(newu^.uid^.uid_CanAttack<ai_Hack_u^.uid^.uid_CanAttack)
        then exit
        else
-         if(newu^.uid^.uid_CanAttack>ai_Hack_u^.uid^.uid_CanAttack)
+         if(newu^.hits>ai_Hack_u^.hits)
          then
-         else
-           if(newu^.uid^.uid_CanAttack<ai_Hack_u^.uid^.uid_CanAttack)
-           then exit
-           else
-             if(newu^.hits>ai_Hack_u^.hits)
-             then
-             else exit;
+         else exit;
 
    ai_Hack_u:=newu;
 end;
-procedure ai_SetTarget_Heroic(newu:PTUnit);
+procedure ai_SetTarget_UACGeneral(newu:PTUnit);
 begin
    if(ai_Heroic_u=nil)
    then
@@ -908,18 +914,18 @@ begin
      if(newu^.uid^.uid_CanAttack>ai_Heroic_u^.uid^.uid_CanAttack)
      then
      else
-       if(newu^.uid^.uid_CanAttack<ai_Heroic_u^.uid^.uid_CanAttack)
+     if(newu^.uid^.uid_CanAttack<ai_Heroic_u^.uid^.uid_CanAttack)
+     then exit
+     else
+       if(newu^.uid^.uid_LimitUse>ai_Heroic_u^.uid^.uid_LimitUse)
+       then
+       else
+       if(newu^.uid^.uid_LimitUse<ai_Heroic_u^.uid^.uid_LimitUse)
        then exit
        else
-         if(newu^.uid^.uid_LimitUse>ai_Heroic_u^.uid^.uid_LimitUse)
+         if(newu^.hits>ai_Heroic_u^.hits)
          then
-         else
-           if(newu^.uid^.uid_LimitUse<ai_Heroic_u^.uid^.uid_LimitUse)
-           then exit
-           else
-             if(newu^.hits>ai_Heroic_u^.hits)
-             then
-             else exit;
+         else exit;
 
    ai_Heroic_u:=newu;
 end;
@@ -960,6 +966,7 @@ begin
      if(aiu_limitaround_enemy<aiu_limitaround_ally)
      or(aiu_alarm_d>srange)
      or(not newu^.uid^.uid_CanAttack and (newu^.buffs[ub_damaged]<=0))
+     or(buffs[ub_SphereInvuln]>0)
      then exit;
 
    // scout or harrasment groups in first

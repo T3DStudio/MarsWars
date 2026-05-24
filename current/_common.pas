@@ -1223,8 +1223,7 @@ false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;
       case(state=ps_AI)and(uid_isbuilder)of
       false: if(res_energyl_cur<(uid_req_EnergyLevel+checkExtraEnergy))then
              begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
-      true : if(res_energyl_max<(uid_req_EnergyLevel+checkExtraEnergy))
-             or((energyCur_units+energyCur_upgrades+energyCur_transforms)<(uid_req_EnergyLevel+checkExtraEnergy))then
+      true : if((res_energyl_max-energyCur_units-energyCur_upgrades-energyCur_transforms)<(uid_req_EnergyLevel+checkExtraEnergy))then
              begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
       end;
    end;
@@ -1348,22 +1347,9 @@ begin
    if(ain=0)
    then ai_name:=''
    else
-     {$IFDEF _FULLGAME}
-     case ain of
-     0  : ai_name:=str_ps_AI+' '+tc_gray  +b2s(ain)+tc_default;
-     1  : ai_name:=str_ps_AI+' '+tc_blue  +b2s(ain)+tc_default;
-     2  : ai_name:=str_ps_AI+' '+tc_aqua  +b2s(ain)+tc_default;
-     3  : ai_name:=str_ps_AI+' '+tc_lime  +b2s(ain)+tc_default;
-     4  : ai_name:=str_ps_AI+' '+tc_green +b2s(ain)+tc_default;
-     5  : ai_name:=str_ps_AI+' '+tc_yellow+b2s(ain)+tc_default;
-     6  : ai_name:=str_ps_AI+' '+tc_orange+b2s(ain)+tc_default+' cheater';
-     7  : ai_name:=str_ps_AI+' '+tc_red   +b2s(ain)+tc_default+' cheater';
-     8  : ai_name:=str_ps_AI+' '+tc_purple+b2s(ain)+tc_default+' cheater';
-     else ai_name:=str_ps_AI+' '+tc_white +b2s(ain)+tc_default+' cheater';
-     end;
-     {$ELSE}
-     ai_name:=str_ps_AI+' '+b2s(ain);
-     {$ENDIF}
+     if(ain<=5)
+     then ai_name:=str_ps_AI+' '+b2s(ain)
+     else ai_name:=str_ps_AI+' '+b2s(ain)+' cheat';
 end;
 
 function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal;skipFlyCheck:boolean=false):boolean;
@@ -1646,9 +1632,10 @@ begin
       menu_ItemSelected:=0;
    end;
 end;
-procedure GameOpenMenu;
+procedure GameOpenMenu(force:boolean=false);
 begin
-   if(MainMenu)then exit;
+   if(MainMenu)
+   and(not force)then exit;
 
    MainMenu   :=true;
    menu_update:=true;
@@ -1749,7 +1736,9 @@ begin
       or(NewPlayerN>LastPlayer)then exit;
 
       with g_PlayersMain[NewPlayerN] do
-        if(isobserver)and(not isdefeated)then exit;
+        if(NewPlayerN<>LocalPlayer)then
+          if((isobserver)and(not isdefeated))
+          or(state=ps_None)then exit;
    end;
    ui_SetUIPlayer:=true;
 

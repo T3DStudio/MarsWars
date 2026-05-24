@@ -68,6 +68,7 @@ map_ObstaclesN    : integer = 0;
 map_ObstaclesGrid : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TObstacleCell;
 map_KeyPointsN    : byte = 0;
 map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
+map_NeedTransport : boolean = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -876,7 +877,7 @@ spr_uibtn_AbilitySSoul,
 spr_uibtn_AbilitySDDamage,
 spr_uibtn_AbilitySRDamage,
 spr_uibtn_AbilitySTurbo,
-spr_uibtn_AbilityPretEquip,
+spr_uibtn_AbilityUACGeneral,
 spr_uibtn_AbilityBribe,
 spr_uibtn_AbilityHack,
 spr_uibtn_AbilityUACStrike,
