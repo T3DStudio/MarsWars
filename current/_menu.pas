@@ -200,7 +200,7 @@ begin
                 net_cl_svttl :=TTLServer;
                 net_cl_log_n :=net_cl_log_n.MaxValue;
                 PlayerReady  :=false;
-                menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer);
+                menu_msgBox_Set(str_Caption_Multiplayer,menu_ClientAddress+' - '+str_gstat_WaitForServer,mmbt_netWaitServer);
                 PlayersClearLog;
              end
              else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Client+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
@@ -1291,7 +1291,7 @@ begin
    // force menu msg box error awaiting for server
    if(net_status=ns_client)and(not net_SvList)and(not g_started)then
      if(net_cl_svttl>=TTLServer)
-     then menu_msgBox_Set(str_Caption_Multiplayer,str_gstat_WaitForServer,mmbt_netWaitServer)
+     then menu_msgBox_Set(str_Caption_Multiplayer,menu_ClientAddress+' - '+str_gstat_WaitForServer,mmbt_netWaitServer)
      else
        if(menu_msg_type=mmbt_netWaitServer)then menu_msg_type:=mmbt_none;
 

@@ -87,8 +87,10 @@ var
 commander_d:integer;
 commander_u:PTUnit;
 begin
+   FollowCommander:=false;
    commander_d:=NOTSET;
    commander_u:=nil;
+   if(pu^.uid^.uid_FlyLevelLikeTarget)then exit;
    if(pu^.isfly)then
    begin
       commander_u:=ai_commander_fly_u;

@@ -604,7 +604,8 @@ wpt_heal     : if(pTarget^.hits<=0)
          and(pTarget^.hits>0)then exit;
 
          if((armylimit-uid_LimitUse+pTarget^.uid^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
-         if((res_energyl_max-uid_gen_EnergyLevel+pTarget^.uid^.uid_gen_EnergyLevel)<=0)then exit;
+         if(uid_gen_EnergyLevel>0)then
+           if((res_energyl_max-uid_gen_EnergyLevel+pTarget^.uid^.uid_gen_EnergyLevel)<=0)then exit;
          if(pTarget^.uid^.uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders)then exit;
       end;
 
@@ -1139,9 +1140,10 @@ begin
    with pPhantom^ do
    with uid^ do
    with player^ do
-   begin
+   begin    // ?????  зомбификация не работает
       if((armylimit-uid_LimitUse+_zuid^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
-      if((res_energyl_max-uid_gen_EnergyLevel+_zuid^.uid_gen_EnergyLevel)<=0)then exit;
+      if(uid_gen_EnergyLevel>0)then
+        if((res_energyl_max-uid_gen_EnergyLevel+_zuid^.uid_gen_EnergyLevel)<=0)then exit;
       if(pTarget^.uid^.uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders)then exit;
    end;
 

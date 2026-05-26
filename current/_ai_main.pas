@@ -82,9 +82,12 @@ begin
      then ai_RunTo(pu,base_u,0,0,base_d,base_r1)
      else
        with pu^ do
-         if(point_dist_rint(x,y,uo_x,uo_y)<idle_r)then
-           ai_RunTo(pu,nil,g_random(map_Size1),
-                           g_random(map_Size1),NOTSET,0);
+         if(aiu_alarm_d<NOTSET)
+         then ai_RunTo(pu,nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,0)
+         else
+           if(point_dist_rint(x,y,uo_x,uo_y)<idle_r)then
+             ai_RunTo(pu,nil,g_random(map_Size1),
+                             g_random(map_Size1),NOTSET,0);
 end;
 
 procedure ai_RunFrom(pu,tu:PTUnit;tx,ty,td:integer);
@@ -134,7 +137,7 @@ begin
          if(ai_need_UpgrProds>aip_MaxForges    )then ai_need_UpgrProds:=aip_MaxForges;
          if(ai_need_UpgrProds>ai_curr_UnitProds)then ai_need_UpgrProds:=ai_curr_UnitProds-1;
 
-         if(ai_need_UpgrProds<1)and(res_energyl_max>=1000)then ai_need_UpgrProds:=1;
+         if(ai_need_UpgrProds<1)and(res_energyl_max>1200)then ai_need_UpgrProds:=1;
       end;
 
       // unit prods

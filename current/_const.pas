@@ -993,6 +993,7 @@ base_r6                = base_r1*6;
 
 transport_exp_damage   = BaseDamage4;
 regen_period           = fr_fps1;
+regen_period1          = regen_period/fr_fps1;
 order_period           = fr_fpsh+1;
 MinVisionTime          = fr_fps2;
 
@@ -1023,9 +1024,9 @@ invis_time_sec         = 60;
 invis_time             = fr_fps1*invis_time_sec;
 invuln_time_sec        = 30;
 invuln_time            = fr_fps1*invuln_time_sec;
-rdamage_time_sec       = 20;
+rdamage_time_sec       = 30;
 rdamage_time           = fr_fps1*rdamage_time_sec;
-ddamage_time_sec       = 10;
+ddamage_time_sec       = 15;
 ddamage_time           = fr_fps1*ddamage_time_sec;
 dturbo_time_sec        = 10;
 dturbo_time            = fr_fps1*dturbo_time_sec;

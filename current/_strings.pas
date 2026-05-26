@@ -645,6 +645,8 @@ begin
     with g_uids[uid] do
     begin
        STRADD(@str_Unit1LineDescript,str_doc_MaxHits+i2s(uid_MaxHits1)      ,sep_sdot);
+       if(uid_Regen_Base<0)then
+       STRADD(@str_Unit1LineDescript,str_doc_LifeTime+i2s(round(uid_MaxHits1/-uid_Regen_Base*regen_period1))+' '+str_hint_sec ,sep_sdot);
        STRADD(@str_Unit1LineDescript,str_doc_BaseSightR+i2s(uid_SightR_Base),sep_sdot);
        STRADD(@str_Unit1LineDescript,str_UnitRole(uid)                      ,sep_sdot);
 
@@ -1049,6 +1051,8 @@ begin
         AddLineUnitDocHint(str_doc_Attributes     );
         AddLineUnitDocHint(uid_str_DefaultAttr    );
         AddLineUnitDocHint(str_doc_MaxHits        +li2s(uid_MaxHits1));
+        if(uid_Regen_Base<0)then
+        AddLineUnitDocHint(str_doc_LifeTime       +i2s(round(uid_MaxHits1/-uid_Regen_Base*regen_period1))+' '+str_hint_sec );
         if(uid_req_EnergyLevel>0)then
         AddLineUnitDocHint(str_doc_ReqEnergy      +DocValI(uid_req_EnergyLevel,tc_aqua  ));
         if(uid_req_HellPower>0)then

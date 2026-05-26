@@ -486,6 +486,7 @@ begin
    str_doc_ProdTime              := 'Build time: ';
    str_doc_Limit                 := 'Limit used: ';
    str_doc_MaxHits               := 'Max hits: ';
+   str_doc_LifeTime              := 'Lifetime: ';
    str_doc_BaseRegen             := 'Base regeneration: ';
    str_doc_BaseSightR            := 'Base '+str_hint_SightR+': ';
    str_doc_Size                  := 'Size: ';

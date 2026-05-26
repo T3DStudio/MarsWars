@@ -105,8 +105,8 @@ begin
    map_MiniMap_UpdateBackground;
    draw_sdlsurface(ui_minimap ,0,0,ui_bminimap);
    draw_sdlsurface(ui_mminimap,0,0,ui_minimap );
-   map_MiniMap_PlayerStarts(ui_mminimap);
    map_MiniMap_KeyPoints   (ui_mminimap,false);
+   map_MiniMap_PlayerStarts(ui_mminimap);
    menu_update:=menu_update or MainMenu;
 end;
 

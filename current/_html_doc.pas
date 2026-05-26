@@ -5,7 +5,8 @@ const
 str_htmldoc_folder   = 'docs';
 str_htmldoc_imgs     = 'imgs\';
 str_htmldoc_img_ext  = '.bmp';
-str_htmldoc_fname    = str_htmldoc_folder+'\index.html';
+str_htmldoc_fname    = str_htmldoc_folder+'\MarsWars_';
+str_htmldoc_ext      = '.html';
 
 var
 
@@ -102,7 +103,7 @@ procedure htmldoc_make;
 var
 uid,i:byte;
 begin
-   assign(html_f,str_htmldoc_fname);
+   assign(html_f,str_htmldoc_fname+str_SG_LanguageL[ui_language]+str_htmldoc_ext);
 {$I-}rewrite(html_f);{$I+}
    if(ioresult<>0)then exit;
 
@@ -154,10 +155,11 @@ begin
        if(uid_r>0)then
        begin
            writeln(html_f,'<tr><td align="center">');
+           writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
            writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitFront'+b2s(uid)+str_htmldoc_img_ext+'">');
            writeln(html_f,'</td><td>');
 
-           writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
+           //writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
            with uid_HintDoc do
            htmldoc_WriteStringArray(@slist_l,slist_n);
 
@@ -175,9 +177,11 @@ begin
        if(IsUIDValidForHelpTable(uid,true))then
        begin
           writeln(html_f,'<tr><td align="center">');
-          writeln(html_f,uid_str_name,'<br>');
+          writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
           writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(uid)+str_htmldoc_img_ext+'">');
           writeln(html_f,'</td><td>');
+
+         // writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
 
           htmldoc_WriteLine(str_doc_BalanceGood);   writeln(html_f,'<br>');
           for i in uid_balance_Good do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');

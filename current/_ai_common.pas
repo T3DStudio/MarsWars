@@ -654,8 +654,8 @@ begin
              d:=point_dist_int(kp_x,kp_y,x,y);
 
              if(not koth_point)then
-               if((kp_LimitTeamP[team]>=keyPoint_MinLimit  )and(d> kp_RCapture))
-               or((kp_LimitTeamP[team]> keyPoint_MaxLimitAI)and(d<=kp_RCapture))then continue;
+               if((kp_LimitTeamP[team]>=(keyPoint_MinLimit  +uid_LimitUse))and(d> kp_RCapture))
+               or((kp_LimitTeamP[team]> (keyPoint_MaxLimitAI+uid_LimitUse))and(d<=kp_RCapture))then continue;
 
              case(kp_Energy>0)and(not koth_point)of
              true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_d,@map_KeyPointsL[i],d,pu);
@@ -773,7 +773,6 @@ end;
 //
 
 function ai_UnitAbility(pCaster:PTUnit;aid:byte;atar,ax,ay:integer):boolean;
-var t:byte;
 begin
    unit_SetAbilityOrder(pCaster,aid,atar,ax,ay,false);
    ai_UnitAbility:=unit_AbilityExec(pCaster,aid)=0;

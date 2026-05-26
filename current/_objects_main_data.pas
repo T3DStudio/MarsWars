@@ -563,8 +563,8 @@ begin
    uid_DeathUID        := UID_LostSoul;
    uid_DeathUIDn       := 3;
    uid_AI_PrimaryTarget:= true;
-   SetWeapon(0,wpt_unit,aw_fsr+50,0,0 ,fr_fps2,UID_Phantom ,0,upgr_hell_Phantoms,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
-   SetWeapon(1,wpt_unit,aw_fsr+50,0,0 ,fr_fps2,UID_LostSoul,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
+   SetWeapon(0,wpt_unit,aw_fsr+50,0,0 ,fr_fps3,UID_Phantom ,0,upgr_hell_Phantoms,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
+   SetWeapon(1,wpt_unit,aw_fsr+50,0,0 ,fr_fps3,UID_LostSoul,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
 
    uid_FastDeathHits:=1;
 end;
