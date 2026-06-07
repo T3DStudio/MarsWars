@@ -4,20 +4,53 @@ const
 
 str_htmldoc_folder   = 'docs';
 str_htmldoc_imgs     = 'imgs\';
+str_htmldoc_unitFront= str_htmldoc_imgs+'unitFront';
+str_htmldoc_unitBTN  = str_htmldoc_imgs+'unitBTN';
 str_htmldoc_img_ext  = '.bmp';
 str_htmldoc_fname    = str_htmldoc_folder+'\MarsWars_';
 str_htmldoc_ext      = '.html';
+
+str_htmldoc_back1    = '../graphic/map/terrains/ter3.png';
+str_htmldoc_back2    = '../graphic/map/terrains/ter11.png';
 
 var
 
 html_f  :text;
 
-procedure save_sdlsurf(fname:shortstring;sdlsurf:pSDL_Surface);
+procedure htmldoc_sdlsurf(fname:shortstring;sdlsurf:pSDL_Surface);
 begin
    if(sdlsurf=nil)then exit;
    if(FileExists(fname))then exit;
    fname:=fname+#0;
    if(sdl_saveBMP(sdlsurf,@fname[1])<=0)then writeln(sdl_getError);
+end;
+
+function htmldoc_UID1Spr(uid:byte):boolean;
+begin
+   with g_uids[uid] do
+     htmldoc_UID1Spr:=uid_SpriteModel[0]=uid_SpriteModel[LastUnitLevel];
+end;
+
+function htmldoc_UIDImg(uid:byte):shortstring;
+var l:byte;
+begin
+   if(htmldoc_UID1Spr(uid))
+   then htmldoc_UIDImg:='<img src="'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext+'">'
+   else
+   begin
+      htmldoc_UIDImg:='';
+      for l:=0 to LastUnitLevel do
+      begin
+         if(length(htmldoc_UIDImg)>0)then htmldoc_UIDImg+=' ';
+         htmldoc_UIDImg+='<img src="'+str_htmldoc_unitFront+b2s(uid)+'_'+b2s(l)+str_htmldoc_img_ext+'">';
+         if(l=1)then
+           htmldoc_UIDImg+='<br>';
+      end;
+   end;
+end;
+function htmldoc_UIDBTN(uid:byte):shortstring;
+begin
+   htmldoc_UIDBTN:='<img src="'+str_htmldoc_unitBTN+b2s(uid)+str_htmldoc_img_ext+'" alt="'+g_uids[uid].uid_str_name+'" title="'+g_uids[uid].uid_str_name+'">';
 end;
 
 function htmldoc_color2hex(color:TMWColor):shortstring;
@@ -29,7 +62,14 @@ end;
 
 procedure htmldoc_WriteCaption(line:shortstring);
 begin
-   writeln(html_f,'<br><center><h2><b>',line,'</b></h2></center><br>');
+   writeln(html_f,'<br><center><h2 id="'+line+'"><b>',line,'</b></h2></center><br>');
+end;
+
+var capt_link : byte = 1;
+procedure htmldoc_WriteLinkToCapt(line:shortstring);
+begin
+   writeln(html_f,'<a href="#'+line+'"><u><b>',capt_link,'. ',line,'</b></u></a><br>');
+   capt_link+=1;
 end;
 
 procedure htmldoc_WriteLine(line:shortstring);
@@ -110,10 +150,21 @@ begin
    writeln(html_f,'<html><head><meta charset="utf-8"><title>');
    writeln(html_f,str_gcaption);
    writeln(html_f,'</title></head>');
-   writeln(html_f,'<body text="#ffffff" bgcolor="#220000" link="#ffffff" alink="#666666" vlink="#AAAAAA" background="../graphic/map/terrains/ter3.png">');
-   writeln(html_f,'<div align="center"><table bgcolor="#000000" width="1000" border="1" bordercolor="#ffffff" background="../graphic/map/terrains/ter11.png">');
+   writeln(html_f,'<body text="#ffffff" bgcolor="#220000" link="#ffffff" alink="#666666" vlink="#AAAAAA" background="'+str_htmldoc_back1+'">');
+   writeln(html_f,'<div align="center"><table bgcolor="#000000" width="1000" border="1" bordercolor="#ffffff" background="'+str_htmldoc_back2+'">');
    writeln(html_f,'<tr><td align="center" ><b><font size="66" color="#D8893A">'+str_gcaption+'</font></b></td></tr>');
    writeln(html_f,'<tr><td align="left">');
+
+   /////////////////////////////////////////////////////////////////////////////
+   //  CONTENTS
+   htmldoc_WriteLinkToCapt(str_help_Credits);
+   htmldoc_WriteLinkToCapt(str_help_GameControls);
+   htmldoc_WriteLinkToCapt(str_help_GameHotKeys);
+   htmldoc_WriteLinkToCapt(str_help_GameUI);
+   htmldoc_WriteLinkToCapt(str_help_GameMechanics);
+   htmldoc_WriteLinkToCapt(str_help_UnitsInfo);
+   htmldoc_WriteLinkToCapt(str_help_BalanceTable);
+   htmldoc_WriteLinkToCapt(str_help_Other);
 
    /////////////////////////////////////////////////////////////////////////////
    //  CREDITS
@@ -155,11 +206,11 @@ begin
        if(uid_r>0)then
        begin
            writeln(html_f,'<tr><td align="center">');
-           writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
-           writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitFront'+b2s(uid)+str_htmldoc_img_ext+'">');
+           //writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
+           writeln(html_f,htmldoc_UIDImg(uid));
            writeln(html_f,'</td><td>');
 
-           //writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
+           writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
            with uid_HintDoc do
            htmldoc_WriteStringArray(@slist_l,slist_n);
 
@@ -176,23 +227,23 @@ begin
      with g_uids[uid] do
        if(IsUIDValidForHelpTable(uid,true))then
        begin
-          writeln(html_f,'<tr><td align="center">');
-          writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
-          writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(uid)+str_htmldoc_img_ext+'">');
+          writeln(html_f,'<tr><td align="center" style="width: 100px;">');
+          //writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
+          writeln(html_f,htmldoc_UIDBTN(uid));
           writeln(html_f,'</td><td>');
 
-         // writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
+          writeln(html_f,'<center><b>',uid_str_name,'</b></center>');
 
           htmldoc_WriteLine(str_doc_BalanceGood);   writeln(html_f,'<br>');
-          for i in uid_balance_Good do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');
+          for i in uid_balance_Good do writeln(html_f,htmldoc_UIDBTN(i));
           writeln(html_f,'<br><br>');
 
           htmldoc_WriteLine(str_doc_BalanceBad);    writeln(html_f,'<br>');
-          for i in uid_balance_Bad do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');
+          for i in uid_balance_Bad do writeln(html_f,htmldoc_UIDBTN(i));
           writeln(html_f,'<br><br>');
 
           htmldoc_WriteLine(str_doc_BalanceUseless);writeln(html_f,'<br>');
-          for i in uid_balance_Useless do writeln(html_f,'<img src="'+str_htmldoc_imgs+'unitBTN'+b2s(i)+str_htmldoc_img_ext+'">');
+          for i in uid_balance_Useless do writeln(html_f,htmldoc_UIDBTN(i));
           writeln(html_f,'<br><br>');
 
           writeln(html_f,'</td></tr>');
@@ -215,8 +266,13 @@ begin
      with g_uids[uid] do
        if(uid_r>0)then
         begin
-           save_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_imgs+'unitFront'+b2s(uid)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,0)^.surf );
-           save_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_imgs+'unitBTN'  +b2s(uid)+str_htmldoc_img_ext,uid_BTNDoc.surf );
+           if(htmldoc_UID1Spr(uid))
+           then htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,0)^.surf )
+           else
+             for i:=0 to LastUnitLevel do
+               htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+'_'+b2s(i)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,i)^.surf );
+
+           htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitBTN  +b2s(uid)+str_htmldoc_img_ext,uid_BTNDoc.surf );
         end;
 end;
 

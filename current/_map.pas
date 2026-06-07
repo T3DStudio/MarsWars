@@ -196,9 +196,10 @@ begin
    g_random_p:= byte(map_seed);
 end;
 
-procedure map_BaseVars;
+procedure map_BaseVars(setRandom:boolean=true);
 begin
-   map_Seed2RandomBase;
+   if(setRandom)then
+     map_Seed2RandomBase;
 
    map_Size1   := mm3i(map_MinSize,map_Size1,map_MaxSize);
    map_Sizeh   := map_Size1 div 2;
@@ -1018,7 +1019,9 @@ end;
 
 procedure map_Obstacles_Create;
 var
-ix,iy,io,ii:integer;
+ix,iy,
+io,ii,
+obs_n:integer;
 begin
    // clear
    map_ObstaclesN:=0;
@@ -1030,18 +1033,19 @@ begin
         oc_n:=0;
         setlength(oc_l,oc_n);
      end;
+   obs_n:=trunc(MaxObstacles*map_Size1/map_MaxSize);
    case map_template of
    mapt_lake   : begin
                     map_CalcLakeR(@io,@ii);
                     if(map_scenario=mc_koth)
                     then map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR)
                     else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
-                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize) div 3,0,2,0);
+                    map_Obstacles_Noise(obs_n div 3,0,2,0);
                  end;
    mapt_ring   : begin
                     map_CalcLakeR(@io,@ii);
                     map_Obstacle_Add(map_SizeH,map_SizeH,io,ii);
-                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize) div 4,0,3,0);
+                    map_Obstacles_Noise(obs_n div 4,0,3,0);
                  end;
    mapt_temple : begin
                     io:=map_Size1 div 4;
@@ -1050,13 +1054,17 @@ begin
                     else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
 
                     map_Obstacles_Temple(io+map_obstaclesGap*2,map_sizeh+base_r1,base_r1);
-                    map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),0,4,0);
+                    map_Obstacles_Noise(obs_n,0,4,0);
                  end;
-   mapt_cave   : map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),2,10,0);
-   mapt_steppe : map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),0,2 ,0);
+   mapt_cave   : begin
+                 map_Obstacles_Noise(obs_n,3,10,0);
+                 map_Obstacles_Noise(obs_n,2,10,0);
+                 end;
+   mapt_steppe : map_Obstacles_Noise(obs_n,0,2 ,0);
    mapt_canyon : begin
-                 map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),3,10,5,true);
-                 map_Obstacles_Noise(trunc(MaxObstacles*map_Size1/map_MaxSize),0,2 ,0);
+                 map_Obstacles_Noise(obs_n,3,10,5,true);
+                 map_Obstacles_Noise(obs_n,3,10,5,true);
+                 map_Obstacles_Noise(obs_n,0,2 ,0);
                  end;
    end;
 

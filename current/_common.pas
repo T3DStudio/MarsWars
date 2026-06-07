@@ -1223,7 +1223,8 @@ false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;
       case(state=ps_AI)and(uid_isbuilder)of
       false: if(res_energyl_cur<(uid_req_EnergyLevel+checkExtraEnergy))then
              begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
-      true : if((res_energyl_max-energyCur_units-energyCur_upgrades-energyCur_transforms)<(uid_req_EnergyLevel+checkExtraEnergy))then
+      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_transforms+energyCur_BldOther)<(uid_req_EnergyLevel+checkExtraEnergy))
+             or(res_energyl_max<uid_req_EnergyLevel)then
              begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
       end;
    end;

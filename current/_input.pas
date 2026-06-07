@@ -588,23 +588,7 @@ function mouse_BrushTarget(tx,ty,mbrush:integer):integer;
 var
 u        : integer;
 btar_pu  : PTUnit;
-w,
-btar_w   : byte;
 pUIPlayer: PTPlayerGameData;
-function local_GetWeight(pu:PTUnit):byte;
-begin
-   local_GetWeight:=0;
-   with pu^  do
-   with uid^ do
-   begin
-      if(isfly)then local_GetWeight+=16;
-      if(btar_pu<>nil)then
-      begin
-         if(uid_r<btar_pu^.uid^.uid_r)then local_GetWeight+=8;
-         if(hits <btar_pu^.hits      )then local_GetWeight+=4;
-      end;
-   end;
-end;
 begin
    mouse_BrushTarget:=0;
 
@@ -631,7 +615,6 @@ begin
      end;
 
    btar_pu:=nil;
-   btar_w :=0;
 
    for u:=1 to MaxUnits do
      with g_punits[u]^ do
@@ -649,17 +632,29 @@ begin
           -255..-1   : if(not ability_CheckTarget(-mbrush,pUIPlayer,player))then continue;
           end;
 
-          w:=local_GetWeight(g_punits[u]);
-
           if(btar_pu=nil)
           then
           else
-            if(w<=btar_w)
-            then continue
-            else ;
+            if(isfly>btar_pu^.isfly)
+            then
+            else
+            if(isfly<btar_pu^.isfly)
+            then exit
+            else
+              with uid^ do
+                if(uid_r<btar_pu^.uid^.uid_r)
+                then
+                else
+                if(uid_r>btar_pu^.uid^.uid_r)
+                then exit
+                else
+                  if(hits<btar_pu^.hits)
+                  then
+                  else
+                  if(hits>btar_pu^.hits)
+                  then exit;
 
           btar_pu:=g_punits[u];
-          btar_w :=w;
           mouse_BrushTarget:=u;
        end;
 end;
@@ -1226,7 +1221,7 @@ begin
               if(ui_InGameChat>0)then
                 if(net_status=ns_client)
                 then net_send_chat(            ui_InGameChat,net_chat_str)
-                else GameLog_Chat  (LocalPlayer,ui_InGameChat,net_chat_str);
+                else GameLog_Chat (LocalPlayer,ui_InGameChat,net_chat_str);
               net_chat_str:='';
            end;
            ui_InGameChat:=0;
@@ -1246,7 +1241,7 @@ begin
           net_chat_str:=StringApplyInput(net_chat_str,CharSetCommon,MaxChatStringLength,nil);
    end;
 
-   // Escape
+   // Escape (cancel chat)
    if(InputActionPressed(iact_Esc))then
      if(ui_InGameChat>0)then
      begin
@@ -1281,7 +1276,7 @@ begin
          {$IFDEF DEBUG0}
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
          {$ENDIF}
-         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersMain[LocalPlayer] do if(state=ps_human     )then state:=ps_AI         else state:=ps_human;
+         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersMain[LocalPlayer] do if(state=ps_human          )then state:=ps_AI              else state:=ps_human;
          if(InputActionPressed(iAct_test_iddqd       ))then with g_PlayersMain[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;

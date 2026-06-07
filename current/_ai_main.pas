@@ -284,7 +284,7 @@ begin
       or((map_scenario=mc_royale)and(u_royal_cd<base_r1h))then
       begin
          // default
-         build_step:=srange-g_random(g_uids[build_uid].uid_r);
+         build_step:=-1;//srange-g_random(g_uids[build_uid].uid_r);
       end
       else
         if(ai_generator_d<srange)then
@@ -296,7 +296,7 @@ begin
            end;
         end
         else
-          if(aiu_alarm_d<base_r2)then  // or KoTH or generator nearest
+          if(aiu_alarm_d<base_r2)then
           begin
              build_dir :=point_dir(x,y,aiu_alarm_x,aiu_alarm_y);
              build_dirs:=22;
@@ -902,6 +902,18 @@ end;
 //    OTHER
 //
 
+function ai_IsTowerUsefull(pTower:PTUnit):boolean;
+begin
+   ai_IsTowerUsefull:=true;
+   with pTower^ do
+   with player^ do
+     if (aiu_alarm_timer<0)
+     and(-aiu_alarm_timer>aic_TowerLifeTime)then
+       if(ai_curr_Towers>aip_MinTowers)
+       or((ai_BaseAlly_d>base_r1)and(ai_BaseOwn_d>base_r1))then
+         ai_IsTowerUsefull:=false;
+end;
+
 function ai_NeedSuicide(pu:PTUnit):boolean;
 var i:integer;
 begin
@@ -944,14 +956,10 @@ begin
                             end;
        UID_HFTower,
        UID_HSTower,
-       UID_HTotem         : if (ai_curr_Towers>aip_MinTowers)
-                            and(aiu_alarm_timer<0)
-                            and(-aiu_alarm_timer>aic_TowerLifeTime)then ai_NeedSuicide:=true;
+       UID_HTotem         : if (not ai_IsTowerUsefull(pu))then ai_NeedSuicide:=true;
        UID_UGTurret,
-       UID_UATurret       : if (ai_curr_Towers>aip_MinTowers)
-                            and(upgrs_cur[upgr_uac_DronTurret]=0)
-                            and(aiu_alarm_timer<0)
-                            and(-aiu_alarm_timer>aic_TowerLifeTime)then ai_NeedSuicide:=true;
+       UID_UATurret       : if (upgrs_cur[upgr_uac_DronTurret]=0)
+                            and(not ai_IsTowerUsefull(pu))then ai_NeedSuicide:=true;
        else
           //if(not uid_isbuilding)then
           //  if((MaxPlayerLimit-armylimit-prod_unit_Limit-ai_ownDead_limit)<ai_NeedFreeLimit)and(ai_enemy_d>base_r2)and(a_rld=0)then ai_NeedSuicide:=true;
@@ -1086,7 +1094,6 @@ begin
    end;
 end;
 
-
 procedure ai_AbilitiesCommon(pCaster:PTunit);
 var
 cx,cy,cd:integer;
@@ -1186,11 +1193,9 @@ begin
                          else ai_UnitAbility(pCaster,uab_ToUATurretTo,0,x,y);
 
      UID_UGTurret,
-     UID_UATurret    : if (ai_curr_Towers>aip_MinTowers)
-                       and(upgrs_cur[upgr_uac_DronTurret]>0)
-                       and(aiu_alarm_timer<0)
-                       and(-aiu_alarm_timer>aic_TowerLifeTime)then
-                           ai_UnitAbility(pCaster,uab_ToUACDron,0,0,0);
+     UID_UATurret    : if (upgrs_cur[upgr_uac_DronTurret]>0)
+                       and(not ai_IsTowerUsefull(pCaster))then
+                         ai_UnitAbility(pCaster,uab_ToUACDron,0,0,0);
 
      end;
 
@@ -1412,8 +1417,10 @@ begin
             if(transformTimer>0)then unit_TransformStop(pu,false);
          end
          else
-           if(not iscomplete)
-           then ai_Suicide(pu);
+           if(not iscomplete)then
+             if((uid_req_EnergyLevel>0)and(energyCur_BldGens >0))
+             or((uid_req_EnergyLevel=0)and(energyCur_BldOther>0))
+             then ai_Suicide(pu);
 end;
 
 
@@ -1580,6 +1587,28 @@ begin
            with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
          //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime); }
       end;}
+      if(isselected)then
+      with player^ do
+      begin
+        { writeln('res_energyl_max=',res_energyl_max,
+                ' units=',energyCur_units,
+                ' upgrades=',energyCur_upgrades,
+                ' transforms=',energyCur_transforms,
+                ' BldOther=',energyCur_BldOther,
+                ' BldGens=',energyCur_BldGens,
+                ' ',res_energyl_max-energyCur_units-energyCur_upgrades-energyCur_transforms-energyCur_BldOther); }
+
+        { writeln({ai_curr_Towers,' ',
+                 aip_MinTowers,' ',
+                 ai_IsTowerUsefull(pu),' ',
+                 ai_BaseAlly_d,' ',ai_BaseOwn_d,' ',
+                 (upgrs_cur[upgr_uac_DronTurret]>0),' ',
+                 aiu_alarm_timer,' ',
+                 aic_TowerLifeTime}
+                 (upgrs_cur[upgr_uac_DronTurret]>0)
+                                        and(not ai_IsTowerUsefull(pu))
+                 );}
+      end;
 
       if(uid_isbuilding)
       then ai_Global_Buildings(pu)

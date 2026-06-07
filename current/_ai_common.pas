@@ -773,13 +773,33 @@ end;
 //
 
 function ai_UnitAbility(pCaster:PTUnit;aid:byte;atar,ax,ay:integer):boolean;
+var
+px,py,
+ptar :integer;
+pid  :byte;
 begin
+   with pCaster^ do
+   begin
+      px  :=uo_x;
+      py  :=uo_y;
+      ptar:=uo_tar;
+      pid :=uo_id;
+   end;
    unit_SetAbilityOrder(pCaster,aid,atar,ax,ay,false);
    ai_UnitAbility:=unit_AbilityExec(pCaster,aid)=0;
    //with pCaster^ do
    //  if(isselected)and(aid=uab_ToUACommandCenter)then writeln('uab_ToUACommandCenter ',t);
    if(pCaster^.buffs[ub_Cast]<=0)then
-     unit_OrderClear(pCaster,ua_amove);
+   begin
+      //unit_OrderClear(pCaster,ua_amove);
+      with pCaster^ do
+      begin
+         uo_x  :=px;
+         uo_y  :=py;
+         uo_tar:=ptar;
+         uo_id :=pid;
+      end;
+   end;
 end;
 
 function ai_IsProducting(pu:PTUnit):boolean;

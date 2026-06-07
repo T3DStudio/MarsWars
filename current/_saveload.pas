@@ -317,7 +317,7 @@ begin
          exit;
       end;
 
-      map_BaseVars;
+      map_BaseVars(false);
       case g_type of
       gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
       gt_scirmish: map_seed2theme;
@@ -335,6 +335,9 @@ begin
       G_Started:=true;
 
       MenuBack(true,false);
+
+      map_ter_decaln:=0;
+      setlength(map_ter_decalL,map_ter_decaln);
 
       GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
    end;

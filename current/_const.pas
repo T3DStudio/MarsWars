@@ -1003,7 +1003,7 @@ HellPower_PerHP        = 10;
 HellPower_AddPeriod    = fr_fps1;
 HellPower_Add1         = HellPower_PerLimit;
 HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 2);
-HellPower_Add3         = HellPower_Add1+(HellPower_Add1 div 4);
+HellPower_Add3         = HellPower_Add1+ HellPower_Add1;
 UACLoot_Max            = 30000;
 
 detection_time_sec     = 8;

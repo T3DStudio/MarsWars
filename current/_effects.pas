@@ -248,8 +248,8 @@ begin
            r:=0;
            o:=1;
         end;
-        for i:=1 to o do effect_add(m_vx-g_randomr(r),
-                                    m_vy-g_randomr(r),draw_DefaultSpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
+        for i:=1 to o do effect_add(m_vx-random(r)+random(r),
+                                    m_vy-random(r)+random(r),draw_DefaultSpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
 
         if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_vx,m_vy,sd_liquidFront+m_vy,mid_eid_Decal);
 

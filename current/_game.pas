@@ -333,36 +333,6 @@ begin
        if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
-{procedure GameCreateStartBase(x,y:integer;uid,playerN,count:byte);
-var
-i     :byte;
-r,d,ds:integer;
-begin
-   if(count>6)then count:=6;
-
-   if(count=0)
-   then unit_add(x,y,0,uid,playerN,true,false,0)
-   else
-   begin
-      if(count>5)then
-      begin
-         unit_add(x,y,0,uid,playerN,true,false,0);
-         count-=1;
-      end;
-      d  :=point_dir(x,y,map_Sizeh,map_Sizeh);
-      ds :=360 div (count+1);
-      r  :=50+count*18;
-      for i:=0 to count do
-      begin
-         unit_add(
-         x+trunc(r*cos(d*degtorad)),
-         y-trunc(r*sin(d*degtorad)),
-         0,uid,playerN,true,false,0);
-
-         d+=ds;
-      end;
-   end;
-end; }
 
 procedure GameCreateStartBase(x,y:integer;uid_Builder,uid_Gen,playerN:byte);
 var
@@ -372,7 +342,7 @@ dir,
 num  :integer;
 begin
    unit_add(x,y,0,uid_Builder,playerN,true,false,0);
-   if(map_generators>0)then
+   if(map_generators>0)and(uid_Gen>0)then
    begin
       stepR:=g_uids[uid_Builder].uid_r+g_uids[uid_Gen].uid_r;
       if(g_uids[uid_Gen].uid_LimitUse>ul1)
@@ -1389,7 +1359,6 @@ begin
       {$ENDIF}
       begin
          g_tick+=1;
-
          Scenario_KeyPointsCodeServer;
          {$IFDEF _FULLGAME}
          case g_type of

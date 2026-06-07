@@ -194,7 +194,8 @@ begin
       and(tu^.uid^.uid_isbuilding)
       and(tu^.speed<=0)
       and(not tu^.isfly)
-      and(pfcheck)then
+      and(pfcheck)
+      and(pu<>tu)then
         if(playeri<>tu^.playeri)
         then setNearestTarget(@ai_BaseAlly_u,@ai_BaseAlly_d,ud-uid_r-tu^.uid^.uid_r)
         else setNearestTarget(@ai_BaseOwn_u ,@ai_BaseOwn_d ,ud-uid_r-tu^.uid^.uid_r);

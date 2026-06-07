@@ -1296,15 +1296,15 @@ procedure rudata_unit(uu:PTUnit;rpl,DEAD:boolean;POVPlayer:byte;fast_skip:boolea
 var sh: shortint;
     i : byte;
     wt: word;
-    ou: PTUnit;
+  tmpu: PTUnit;
 begin
    if(fast_skip)then
    begin
-      ou:=uu;
+      tmpu:=uu;
       g_units[0].unum:=uu^.unum;
       uu:=@g_units[0];
    end
-   else g_units[0]:=uu^;
+   else g_units[0]:=uu^;  // 'previous state' of unit
 
    with uu^ do
    begin
@@ -1325,7 +1325,7 @@ begin
          if(i<>uidi)then
          begin
             unit_SetDefaults(uu,false);
-            unit_ApplyUID(uu);
+            unit_ApplyUID(uu,false);
             FillChar(buffs,SizeOf(buffs),0);
          end;
          hits:=hits_si2li(sh,uid^.uid_MaxHits1,uid^.uid_hits_li2si);
@@ -1384,19 +1384,20 @@ begin
         end;
       if(fast_skip)then
       begin
-         vx:=x;
-         vy:=y;
+         vx  :=x;
+         vy  :=y;
          vstp:=1;
       end;
    end;
    if(fast_skip)then
    begin
-      ou^.x :=uu^.x;
-      ou^.y :=uu^.y;
-      ou^.vx:=uu^.x;
-      ou^.vy:=uu^.y;
-      unit_UpdateXY(ou);
-      unit_CalcFogR(ou);
+      tmpu^.x :=uu^.x;
+      tmpu^.y :=uu^.y;
+      tmpu^.vx:=uu^.x;
+      tmpu^.vy:=uu^.y;
+
+      unit_UpdateXY(tmpu);
+      unit_CalcFogR(tmpu);
    end
    else client_ChangeUnitState(uu,rpl);
 end;
@@ -1556,12 +1557,12 @@ begin
       begin
          while(true)do
          begin
-           lastUnit+=1;
-           if(lastUnit<1)or(lastUnit>MaxUnits)then lastUnit:=1;
-           g_units[lastUnit].unum:=lastUnit;
-           if( bs_alive and (1 shl ((lastUnit-1) div MaxPlayerUnits)) ) > 0
-           then break
-           else rudata_unit(@g_units[lastUnit],rpl,true,POVPlayer,fast_skip);
+            lastUnit+=1;
+            if(lastUnit<1)or(lastUnit>MaxUnits)then lastUnit:=1;
+            g_units[lastUnit].unum:=lastUnit;
+            if( bs_alive and (1 shl ((lastUnit-1) div MaxPlayerUnits)) ) > 0
+            then break
+            else rudata_unit(@g_units[lastUnit],rpl,true,POVPlayer,fast_skip);
          end;
          rudata_unit(@g_units[lastUnit],rpl,false,POVPlayer,fast_skip);
       end;

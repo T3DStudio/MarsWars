@@ -294,11 +294,11 @@ begin
             nmid_PlayerLeave     : begin
                                       GameLog_PlayerLeave(pid);
                                       case G_Started of
-                                      false: begin
+                                      false: PlayerSetState(pid,ps_None);
+                                      true : begin
                                                 PlayerKill(pid,true);
-                                                PlayerSetState(pid,ps_None);
+                                                g_PlayersMain[pid].state:=ps_none;
                                              end;
-                                      true : g_PlayersMain[pid].state:=ps_none;
                                       end;
                                       menu_update:=true;
                                    end;
@@ -729,7 +729,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//    NET LAN SEARCH
+//    SERVER LIST
 //
 
 procedure net_ServerList_ItemUpdate(aip:cardinal;aport:word;ainfo:shortstring;aping:cardinal);

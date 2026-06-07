@@ -675,6 +675,7 @@ begin
      if(uid_isbuilding)
      or(not iscomplete)
      or(isfly)
+     or(uid_isfly)
      or(hits<=0)
      or(buffs[ub_Teleported]>0)
      or(TeleporterPlayer<>playeri)
@@ -816,6 +817,7 @@ begin
       if(uid_isbuilding)
       or(not iscomplete)
       or(isfly)
+      or(uid_isfly)
       or(pTeleporter^.hits<=0)
       or(not pTeleporter^.iscomplete)
       or(pTeleporter^.transformTimer>0)
@@ -1845,7 +1847,9 @@ begin
       else
       begin
          hits  := 1;
-         energyCur_builds+=uid_req_EnergyLevel;
+         if(uid_gen_EnergyLevel>0)
+         then energyCur_BldGens +=uid_req_EnergyLevel
+         else energyCur_BldOther+=uid_req_EnergyLevel;
          res_energyl_cur -=uid_req_EnergyLevel;
          res_HellPower   -=uid_req_HellPower;
          res_UACLoot     -=uid_req_UACLoot;
@@ -2051,7 +2055,7 @@ begin
          LastCreatedUnitP^.uo_y  :=rpoint_y;
          LastCreatedUnitP^.uo_tar:=rpoint_tar;
          LastCreatedUnitP^.uo_id :=ua_amove;
-         LastCreatedUnitP^.dir   :=dir;
+         LastCreatedUnitP^.dir   :=_dir;
 
          if(uid_OutUnitsTeleBuff)then
          begin
@@ -2333,11 +2337,13 @@ begin
 
       case (state=ps_AI)and(ptarUID^.uid_isbuilder) of
       false: if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-      true : if((res_energyl_max-energyCur_builds-energyCur_transforms)<ptarUID^.uid_req_EnergyLevel)
+      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
+             or(res_energyl_max<ptarUID^.uid_req_EnergyLevel)
              then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-             {else
+             {else                                                 energyCur_transforms
                if((energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
-               then begin unit_TransformStart:=lmt_Req_Energy;exit;end;  }
+               then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
+               }
       end;
 
       unit_TransformStart:=0;
@@ -2445,7 +2451,9 @@ begin
 
       if(not iscomplete)then
       begin
-         energyCur_builds-=uid_req_EnergyLevel;
+         if(uid_gen_EnergyLevel>0)
+         then energyCur_BldGens -=uid_req_EnergyLevel
+         else energyCur_BldOther-=uid_req_EnergyLevel;
          res_energyl_cur +=uid_req_EnergyLevel;
          res_HellPower   +=round(uid_req_HellPower*(uid_MaxHits1-hits)/uid_MaxHits1);
          res_UACLoot     +=round(uid_req_UACLoot  *(uid_MaxHits1-hits)/uid_MaxHits1);

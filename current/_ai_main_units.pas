@@ -55,7 +55,9 @@ begin
      begin
         p:=ai_keypoint_d;
         case map_scenario of
-        mc_koth     : p:=p div 4;
+        mc_koth     : if(ai_keypoint_d>kp_RCapture)
+                      then p:=p div 4
+                      else p:=p*3;
         mc_keypoints: p:=p div 2;
         end;
         MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,p,kp_RCapture);
@@ -390,7 +392,9 @@ begin
         aic_group_GenWait        : if(not NeedCaptureGenerators)
                                    then group:=aic_group_Home
                                    else
-                                     if(not isfly)then
+                                     if(isfly)
+                                     then group:=aic_group_GenAssault
+                                     else
                                        if(ai_generator_kp^.kp_Zone<>mapZone)
                                        then group:=aic_group_GenWait
                                        else

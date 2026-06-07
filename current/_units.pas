@@ -34,12 +34,17 @@ begin
              if(hits<=hits_dead)then unit_remove(pu);
         end
         else
-          {$IFDEF _FULLGAME}
-          if(ServerSide)then
-          {$ENDIF}
-          begin
-             if(hits<hits_resurrected)then hits:=hits_resurrected;
-             hits+=1;
+        begin
+           if(hits<hits_resurrected)then hits:=hits_resurrected;
+
+           {$IFDEF _FULLGAME}
+           if(ServerSide)or(hits<-1)then
+           {$ENDIF}
+           hits+=1;
+
+           {$IFDEF _FULLGAME}
+           if(ServerSide)then
+           {$ENDIF}
              if(hits>=0)then
              begin
                 zfall     :=0;
@@ -58,7 +63,7 @@ begin
                 {$ENDIF}
                 GameLog_UnitResurrected(pu);
              end;
-          end;
+        end;
      end;
 end;
 
@@ -968,7 +973,7 @@ begin
       if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
       if(isselected)then
       begin
-         //if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
+         if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
       end;
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
@@ -997,8 +1002,6 @@ begin
           end;
        end;
 end;
-
-
 
 function unit_Load(pTransport,pPassenger:PTUnit):boolean;
 begin
@@ -1125,6 +1128,7 @@ var _h:single;
     _d,
     _z:integer;
  _zuid:PTUID;
+_pvar:pinteger;
     {$IFDEF _FULLGAME}
     _s:integer;
     {$ENDIF}
@@ -1140,7 +1144,7 @@ begin
    with pPhantom^ do
    with uid^ do
    with player^ do
-   begin    // ?????  зомбификация не работает
+   begin
       if((armylimit-uid_LimitUse+_zuid^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
       if(uid_gen_EnergyLevel>0)then
         if((res_energyl_max-uid_gen_EnergyLevel+_zuid^.uid_gen_EnergyLevel)<=0)then exit;
@@ -1164,8 +1168,10 @@ begin
       {$IFDEF _FULLGAME}
       _s:=g_unitsVis[pTarget^.unum].shadowz;
       {$ENDIF}
-
+      _pvar:=@pPhantom^.player^.units_all_e;
+      _pvar^+=1;
       unit_kill(pPhantom,true,true,false,false,true);
+      _pvar^-=1;
       unit_add(pTarget^.x,pTarget^.y,pPhantom^.unum,pTarget^.uid^.uid_ZombieUID,pPhantom^.playeri,true,true,_l);
       unit_kill(pTarget,true,true,false,false,true);
 
@@ -1210,8 +1216,8 @@ begin
    begin
       if(not IsUnitRange(pTarget^.transportU,nil))then
         if((g_tick mod fr_fpst)=0)
-        or(now)then effect_add(pTarget^.vx-g_randomr(pTarget^.uid^.uid_missileR),
-                               pTarget^.vy-g_randomr(pTarget^.uid^.uid_missileR),
+        or(now)then effect_add(pTarget^.vx-random(pTarget^.uid^.uid_missileR)+random(pTarget^.uid^.uid_missileR),
+                               pTarget^.vy-random(pTarget^.uid^.uid_missileR)+random(pTarget^.uid^.uid_missileR),
                                draw_DefaultSpriteDepth(pTarget^.vy+1,pTarget^.isfly),aw_eid_target);
 
       if(aw_snd_target<>nil)then
@@ -1492,7 +1498,9 @@ begin
            hits:=uid_MaxHits1;
            iscomplete :=true;
            unit_IncCounters_Complete(pu);
-           energyCur_Builds-=uid_req_EnergyLevel;
+           if(uid_gen_EnergyLevel>0)
+           then energyCur_BldGens -=uid_req_EnergyLevel
+           else energyCur_BldOther-=uid_req_EnergyLevel;
            res_energyl_cur +=uid_req_EnergyLevel;
            GameLog_UnitReady(pu);
         end;
@@ -1814,7 +1822,7 @@ begin
       uab_ToUGenerator4    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator4    ,true);
       uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
       uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
-      uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron  ,false,-2,level,true);
+      uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,true);
 
       uab_LvlUpURadar      : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
       uab_LvlUpURMStation  : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
@@ -2023,7 +2031,7 @@ begin
                               uab_ToUGenerator4    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator4    ,false);
                               uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
                               uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
-                              uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron  ,false,-2,level,false);
+                              uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,false);
 
                               uab_LvlUpURadar      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
                               uab_LvlUpURMStation  : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);

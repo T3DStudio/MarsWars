@@ -721,7 +721,8 @@ TPlayerGameData = record
    prod_upgr_Now   : integer;
    prod_upgr_upid  : array[byte] of byte;
 
-   energyCur_builds,
+   energyCur_BldOther,
+   energyCur_BldGens,
    energyCur_units,
    energyCur_upgrades,
    energyCur_transforms

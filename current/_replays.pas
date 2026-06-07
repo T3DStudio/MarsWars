@@ -699,6 +699,8 @@ function replay_Pause(check:boolean):boolean;
 begin
    replay_Pause:=false;
 
+   if(rpls_file_pos>=rpls_file_size)then exit;
+
    if(G_Status=gs_running)then
    begin
       replay_Pause:=true;
