@@ -14,7 +14,7 @@ g_started         : boolean  = false;
 g_status          : byte     = 0;
 
 g_FixedPositions  : boolean  = false;
-g_AISlots         : byte     = player_default_ai_level;
+g_AISlots         : byte     = 0;
 g_DefeatedObs     : boolean  = true;
 
 g_royal_r         : integer  = 0;
@@ -54,7 +54,7 @@ map_seed          : cardinal = 1;
 map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
 map_SizeKPCR      : integer  = 100;
-map_Template      : byte     = mapt_ring;
+map_Template      : byte     = mapt_lake;
 map_ObstaclesGap  : integer  = 40;
 map_PStartsGap    : integer  = base_r1;
 map_Symmetry      : byte     = 0;
@@ -118,13 +118,11 @@ wtrset_enemy_alive_fly,
 wtrset_enemy_alive_fly_mech,
 wtrset_enemy_alive_fly_buildings,
 wtrset_enemy_alive_mech,
-wtrset_enemy_alive_mech_nstun,
 wtrset_enemy_alive_buildings,
 wtrset_enemy_alive_units,
 wtrset_enemy_alive_ground_buildings,
 wtrset_enemy_alive_bio,
 wtrset_enemy_alive_bio_light,
-wtrset_enemy_alive_bio_nstun,
 wtrset_enemy_alive_heavy_bio,
 wtrset_enemy_alive_ground_heavy,
 wtrset_enemy_alive_ground_heavy_bio,
@@ -136,6 +134,13 @@ wtrset_resurect   : cardinal;
 
 u_royal_cd,
 u_royal_d         : integer;
+
+ai_name_i         : byte = 0;
+ai_names_l        : array[0..ai_names_max-1] of shortstring = (
+                    ' TGA'   ,' NRM'    ,' BFG'   ,' Dant3'   ,' marat'  ,' Notarget' ,' Am$ek',' Chainie',' BND'  ,' Nico',
+                    ' Mud'   ,' Aurora' ,' Archi' ,' print423',' Boiec'  ,' KolyanRPG',' MWG'  ,' Teran'  ,' ZZYZX',' Neko',
+                    ' Bertie',' VoZj'   ,' Igara' ,' OutCast' ,' ABK'    ,' Jabber'   ,' Jet'  ,' Murphy' ,' Nick' ,' Raymund',
+                    ' Romero',' Carmack',' Sting' ,' Nort'    ,' Dagamon',' Morg'     ,' Astar',' Zetor'  ,' Sergh',' Krik');
 
 {$IFDEF DEBUG0}
 test_InstaProd    : boolean = true;
@@ -248,6 +253,7 @@ ui_ShowAPM        : boolean = false;
 ui_MouseScroll    : boolean = false;
 ui_ColoredShadow  : boolean = true;
 ui_ControlPanelPos: byte = 0;
+ui_PlayersScreens : boolean = true;
 
 ui_UIPanelX         : integer = 0;
 ui_UIPanelY         : integer = 0;
@@ -275,7 +281,7 @@ ui_tab_Auto       : boolean = true;
 
 ui_CommandercPU   : PTUnit = nil;
 ui_CommandercD    : integer = 0;
-ui_CommandercW    : byte = 0;
+ui_CommandercW    : word = 0;
 ui_CommanderpPU   : PTUnit = nil;
 ui_UnitSelSound   : boolean = false;
 ui_UnitSelSoundA  : integer = 0;
@@ -849,6 +855,7 @@ spr_buff_SphereInvis,
 spr_buff_SphereDArmor,
 spr_buff_SphereDDamage,
 spr_buff_SphereTurbo,
+spr_buff_SphereSoul,
 spr_buff_HellVision,
 spr_buff_Stun,
 spr_buff_Heroic      : TMWTexture;
@@ -974,6 +981,7 @@ str_doc_ReqUACLoot,
 str_doc_ProdTime,
 str_doc_Limit,
 str_doc_MaxHits,
+str_doc_Hits,
 str_doc_LifeTime,
 str_doc_BaseRegen,
 str_doc_BaseSightR,
@@ -1045,6 +1053,7 @@ str_SG_ScrollSpeed,
 str_SG_MouseScroll,
 str_SG_ShowAPM,
 str_SG_ControlPanelAuto,
+str_SG_ShowPlayerScrns,
 
 str_SR_RecordGames,
 str_SR_ReplayPrefix,
@@ -1066,6 +1075,7 @@ str_SV_ShowFPS,
 str_SS_NextTrack,
 str_SS_MusicListSize,
 str_SS_ReloadMusic,
+str_SS_RenewMusicList,
 str_SS_SoundVolume,
 str_SS_MusicVolume,
 
@@ -1328,6 +1338,7 @@ snd_MusicVolume    : byte = 50;
 snd_svolume1       : single = 0.5;
 snd_mvolume1       : single = 0.5;
 snd_musicListSize  : byte = 5;
+snd_RenewMusicList : boolean = false;
 
 MainDevice         : TALCdevice;
 MainContext        : TALCcontext;

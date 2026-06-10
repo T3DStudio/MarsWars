@@ -519,8 +519,8 @@ UID_HEyeNest:
 begin
    setMWSModel(0,@spr_HEyeNest);
    setBuildingSND(snd_hell_eye);
-   setEffectEID(0,EID_Teleport  ,0,0,0  );
-   setEffectSND(  snd_Teleport,nil,nil,nil);
+   //setEffectEID(0,EID_Teleport  ,0,0,0  );
+   //setEffectSND(  snd_Teleport,nil,nil,nil);
 end;
 UID_HEye:
 begin
@@ -704,7 +704,7 @@ begin
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
    setEffectSND (  nil,snd_explode ,snd_explode ,nil);
    setWeaponESND(0    ,nil,snd_explode,0,0);
-   setWeaponTEID(0    ,nil,0,[fr_fps1..255]);
+   setWeaponTEID(0    ,nil,0,[fr_fpsh..255]);
 end;
 UID_Flyer:
 begin
@@ -921,7 +921,9 @@ end;
            end
            else
            begin
-              setEffectEID(0,0  ,EID_BExp            ,EID_BExp            ,0  );
+              if(uid_r>14)
+              then setEffectEID(0,0  ,EID_BExp            ,EID_BExp            ,0  )
+              else setEffectEID(0,0  ,EID_Exp2            ,EID_Exp2            ,0  );
               setEffectSND(  nil,snd_explode_building,snd_explode_building,nil);
               if(uid_eid_bcrater_y=0)then uid_eid_bcrater_y:=5;
            end;

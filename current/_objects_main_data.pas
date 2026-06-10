@@ -4,7 +4,7 @@
 //   UNITS CONSTANT DATA FUNCTIONS
 //
 
-procedure unit_ApplyUID(pu:PTUnit;shadowOpt:boolean=true);
+procedure unit_ApplyUID(pu:PTUnit;clientSwitch:boolean=false);
 begin
    with pu^ do
    begin
@@ -25,7 +25,8 @@ begin
            with g_unitsVis[unum] do
            begin
               animw  := uid_AnimStepWalk;
-              shadowz:= unit_CalcShadowZ(pu,shadowOpt);
+              shadowz:= unit_CalcShadowZ(pu,not clientSwitch);   //;shadowOpt:boolean=true
+              //fly_height[false]    unit_BehaviorSpecial      clientSwitch
               unit_CalcFogR(pu);
            end;
          {$ENDIF}
@@ -357,7 +358,7 @@ begin
    uid_SightR_upgr     := upgr_hell_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 6;
-   uid_ProdTimeSec     := ptime1h;
+   uid_ProdTimeSec     := ptime1q;
    uid_Regen_Base      := BaseRegen1;
    uid_Regen_Upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
@@ -377,7 +378,7 @@ begin
    uid_SightR_upgr     := upgr_hell_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 7;
-   uid_ProdTimeSec     := ptime2;
+   uid_ProdTimeSec     := ptime1h;
    uid_Regen_Base      := BaseRegen1;
    uid_Regen_Upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
@@ -386,7 +387,7 @@ begin
    uid_ismech          := true;
    uid_islight         := true;
 
-   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_Baron,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Baron,UID_Knight],[],0,-20,0,dm_AntiUnitLight2);
+   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpst2,MID_Baron,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Baron,UID_Knight],[],0,-20,0,dm_AntiUnitLight2);
 end;
 UID_HTotem:
 begin
@@ -397,7 +398,7 @@ begin
    uid_SightR_upgr     := upgr_hell_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 8;
-   uid_ProdTimeSec     := ptime2;
+   uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HFortress;
    uid_ability1        := uab_HTowerBlink;
    uid_isbuilding      := true;
@@ -405,7 +406,7 @@ begin
    uid_islight         := true;
    uid_Regen_upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
-   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,0);
+   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,dm_AntiHeavy2);
 end;
 
 
@@ -454,7 +455,7 @@ end;
 }
 UID_Knight    :
 begin
-   uid_MaxHits1        := 2500;
+   uid_MaxHits1        := 2000;
    uid_req_EnergyLevel := 300;
    uid_r               := 14;
    uid_MSpeed_Base     := 10;
@@ -469,7 +470,7 @@ begin
    uid_LimitUse        := ul2;
    uid_islight         := true;
    SetWeapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1  ,MID_Baron,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Knight,UID_Baron],[],0,0,0,dm_AntiUnitLight2);
-   SetWeapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1  ,0        ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,0,dm_AntiUnitLight2);
+   SetWeapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage2,fr_fps1  ,0        ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,0,dm_AntiUnitLight2);
 end;
 UID_Baron     :
 begin
@@ -478,7 +479,7 @@ begin
    3 4000 2
    3 4500 1.5
    }
-   uid_MaxHits1        := 4500;
+   uid_MaxHits1        := 4000;
    uid_req_EnergyLevel := 500;
    uid_r               := 14;
    uid_MSpeed_Base     := 10;
@@ -493,7 +494,7 @@ begin
    uid_LimitUse        := ul3;
    uid_islight         := false;
    SetWeapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1   ,MID_Baron,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all-[UID_Knight,UID_Baron],[],0,0,0,dm_AntiUnitLight2);
-   SetWeapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1   ,0        ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,0,dm_AntiUnitLight2);
+   SetWeapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage2,fr_fps1   ,0        ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Knight,UID_Baron],[],0,0,0,dm_AntiUnitLight2);
 end;
 UID_Revenant   :
 begin
@@ -562,7 +563,7 @@ begin
    uid_LevelBonusDamage:= -1;
    uid_DeathUID        := UID_LostSoul;
    uid_DeathUIDn       := 3;
-   uid_AI_PrimaryTarget:= true;
+   uid_AI_TargetWeight := 10;
    SetWeapon(0,wpt_unit,aw_fsr+50,0,0 ,fr_fps3,UID_Phantom ,0,upgr_hell_Phantoms,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
    SetWeapon(1,wpt_unit,aw_fsr+50,0,0 ,fr_fps3,UID_LostSoul,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
 
@@ -609,9 +610,9 @@ begin
    uid_req_uid1        := UID_HMonastery;
    uid_LimitUse        := ul4;
    uid_islight         := true;
-   uid_AI_PrimaryTarget:= true;
+   uid_AI_TargetWeight := 20;
    SetWeapon(0,wpt_resurect,aw_dmelee,0,3  ,fr_fpsh,0           ,0,upgr_hell_Resurrect,0,0,wtrset_resurect   ,wpr_any,uids_arch_res,[             ],0,0,0,0);
-   SetWeapon(1,wpt_missle  ,aw_fsr   ,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,0,0);
+   SetWeapon(1,wpt_missle  ,aw_fsr   ,0,0  ,fr_fps2,MID_ArchFire,0,0                  ,0,0,wtrset_enemy_alive,wpr_any,uids_all     ,[fr_archvile_s],0,0,0,dm_AntiHeavy2);
 end;
 
 // 'T2' mech
@@ -956,7 +957,7 @@ begin
    uid_FastDeathHits   := hits_fdead_border;
    uid_MSpeed_Base     := 10;
    uid_arms_BonusAntiUnitRange:=50;
-   uid_AI_PrimaryTarget:= true;
+   uid_AI_TargetWeight := 15;
    uid_LevelUpTimeSecs := UIDCalcLevelUp(ul1);
 
    case i of
@@ -997,7 +998,7 @@ begin
    uid_ProdTimeSec     := ptime1q;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
-   uid_AI_PrimaryTarget:= true;
+   uid_AI_TargetWeight := 5;
    uid_LevelUpTimeSecs := ptime1;
    uid_MSpeed_Base     := 12;
 
@@ -1039,7 +1040,7 @@ begin
    uid_ProdTimeSec     := ptime1q;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
-   uid_AI_PrimaryTarget:= true;
+   uid_AI_TargetWeight := 5;
    uid_LevelUpTimeSecs := ptime1;
    uid_MSpeed_Base     := 12;
 
@@ -1353,7 +1354,7 @@ begin
    uid_SightR_upgr     := upgr_uac_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 6;
-   uid_ProdTimeSec     := ptime1h;
+   uid_ProdTimeSec     := ptime1q;
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_Armor_upgr2     := upgr_uac_TurretArmor;
    uid_CanAttack       := true;
@@ -1374,7 +1375,7 @@ begin
    uid_SightR_upgr     := upgr_uac_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 7;
-   uid_ProdTimeSec     := ptime1h;
+   uid_ProdTimeSec     := ptime1q;
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_Armor_upgr2     := upgr_uac_TurretArmor;
    uid_CanAttack       := true;
@@ -1455,7 +1456,13 @@ begin
 end;
 UID_Tank:
 begin
-   uid_MaxHits1        := 6000;
+   {
+   1 1000 1
+   4 4000 4
+     6000 2
+     5000 3
+   }
+   uid_MaxHits1        := 5000;
    uid_req_EnergyLevel := 600;
    uid_r               := 20;
    uid_MSpeed_Base     := 8;
@@ -1471,7 +1478,7 @@ begin
    uid_req_uid1        := UID_UScienceCenter;
    uid_FastDeathHits   :=1;
    uid_arms_BonusAntiBuildingRange:=50;
-   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fps1,MID_Tank,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_Siege4);
+   SetWeapon(0,wpt_missle,aw_srange,rocket_sr,2 ,fr_fpsq3,MID_Tank,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_Siege4);
 end;
 UID_Flyer:
 begin
@@ -1731,8 +1738,8 @@ MID_Granade,
 MID_Cacodemon,
 MID_Tank,
 MID_SShot          : mid_base_damage :=BaseDamage1;
-MID_Revenant,
-MID_Baron          : mid_base_damage :=BaseDamage1h;
+MID_Revenant       : mid_base_damage :=BaseDamage1h;
+MID_Baron,
 MID_SChaingun,
 MID_YPlasma,
 MID_Flyer          : mid_base_damage :=BaseDamage2;
@@ -1832,6 +1839,8 @@ begin
    SetDMOD(dm_BFG              ,0, 50,wtr_building                              );
    SetDMOD(dm_AntiBio2         ,0,200,             wtr_bio                      );
    SetDMOD(dm_AntiBio2         ,1, 50,wtr_building                              );
+   SetDMOD(dm_AntiHeavy2       ,0,200,             wtr_heavy                    );
+
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2195,32 +2204,30 @@ begin
    for u:=0 to MaxUnits do g_punits[u]:=@g_units[u];
 
    // weapon target requirements set
-   //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_unit wtr_building wtr_complete wtr_ncomplete wtr_ground wtr_fly wtr_light wtr_heavy wtr_stun wtr_nostun;
-   wtrset_all                            :=wtr_owner_p+wtr_owner_a+wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy                          :=                        wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive                    :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_light              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+          wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground             :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_light       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+          wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_heavy       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_heavy_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio         +wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_mech        :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_fly                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_fly_mech           :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_mech               :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_mech_nstun         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+         wtr_nostun;
-   wtrset_enemy_alive_buildings          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_units              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_buildings   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_bio                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_bio_nstun          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+         wtr_nostun;
-   wtrset_enemy_alive_bio_light          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          +wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_heavy_bio          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          +wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_bio         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_enemy_alive_ground_light_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light          +wtr_stun+wtr_nostun;
-   wtrset_heal                           :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+         wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
-   wtrset_resurect                       :=wtr_owner_p+wtr_owner_a+wtr_owner_e+           wtr_hits_d           +wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy+wtr_stun+wtr_nostun;
+   //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_unit wtr_building wtr_complete wtr_ncomplete wtr_ground wtr_fly wtr_light wtr_heavy;
+   wtrset_all                            :=wtr_owner_p+wtr_owner_a+wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy                          :=                        wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive                    :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_light              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
+   wtrset_enemy_alive_ground             :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
+   wtrset_enemy_alive_ground_light       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light          ;
+   wtrset_enemy_alive_ground_heavy       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy;
+   wtrset_enemy_alive_ground_heavy_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio         +wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy;
+   wtrset_enemy_alive_ground_mech        :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
+   wtrset_enemy_alive_fly                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_fly_mech           :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_mech               :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_buildings          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_units              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_ground_buildings   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
+   wtrset_enemy_alive_bio                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_enemy_alive_bio_light          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
+   wtrset_enemy_alive_heavy_bio          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
+   wtrset_enemy_alive_ground_bio         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light+wtr_heavy;
+   wtrset_enemy_alive_ground_light_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light          ;
+   wtrset_heal                           :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+         wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+   wtrset_resurect                       :=wtr_owner_p+wtr_owner_a+wtr_owner_e+           wtr_hits_d           +wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
 
    InitUpgrades;
    InitAIDs;

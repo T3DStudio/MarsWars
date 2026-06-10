@@ -335,6 +335,10 @@ begin
                                           PNU     :=net_readbyte;
                                           log_n_cl:=net_readcard;
                                           if(log_n_cl=log_n)then net_TimerLogSend:=0;
+                                          cam_x   :=net_readint;
+                                          cam_y   :=net_readint;
+                                          cam_w   :=net_readint;
+                                          cam_h   :=net_readint;
                                        end;
                  nmid_pause          : begin
                                           if(G_Status<=LastPlayer)then
@@ -703,6 +707,10 @@ nmid_GameData    : if(G_Started)then
          net_writebyte(nmid_ClientData);
          net_writebyte(Quality2Units[net_cl_Quality]);
          net_writecard(net_cl_log_n);
+         net_writeint(ui_cam_x);
+         net_writeint(ui_cam_y);
+         net_writeint(ui_cam_w);
+         net_writeint(ui_cam_h);
       end
       else
       begin

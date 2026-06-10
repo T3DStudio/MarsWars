@@ -330,14 +330,12 @@ begin
       map_SetNeedTransportStatus;
       map_Obstacles_SetDrawData;
       map_RedrawMenuMinimap;
+      map_Decals_Create;
       ui_Camera_Bounds;
 
       G_Started:=true;
 
       MenuBack(true,false);
-
-      map_ter_decaln:=0;
-      setlength(map_ter_decalL,map_ter_decaln);
 
       GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
    end;

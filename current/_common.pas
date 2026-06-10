@@ -1220,11 +1220,12 @@ false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;
       if(res_UACLoot  <uid_req_UACLoot  )then begin CheckUnitReqs:=lmt_Req_UACLoot;exit;end;
 
       if(uid_isbuilding and(res_energyl_max<=0))then begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
+
       case(state=ps_AI)and(uid_isbuilder)of
       false: if(res_energyl_cur<(uid_req_EnergyLevel+checkExtraEnergy))then
-             begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
-      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_transforms+energyCur_BldOther)<(uid_req_EnergyLevel+checkExtraEnergy))
-             or(res_energyl_max<uid_req_EnergyLevel)then
+             begin CheckUnitReqs:=lmt_Req_Energy;exit;end;                                                 //energyCur_BldGens
+      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_transforms+energyCur_BldOther-checkExtraEnergy)<uid_req_EnergyLevel)
+             or(res_energyl_max<(uid_req_EnergyLevel+checkExtraEnergy))then
              begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
       end;
    end;
@@ -1343,14 +1344,16 @@ begin
                                           hits_li2si:=mm3i(   1,trunc(h/s)  ,sintMaxHits);
 end;
 
-function ai_name(ain:byte):shortstring;
+function ai_name(ain,playerN:byte):shortstring;
 begin
    if(ain=0)
    then ai_name:=''
    else
-     if(ain<=5)
-     then ai_name:=str_ps_AI+' '+b2s(ain)
-     else ai_name:=str_ps_AI+' '+b2s(ain)+' cheat';
+   begin
+      ai_name:=str_ps_AI+b2s(ain);
+      if(playerN<=LastPlayer)then
+        ai_name+=ai_names_l[(ai_name_i+playerN) mod ai_names_max];
+   end;
 end;
 
 function CheckUnitBaseFlags(tu:PTUnit;flags:cardinal;skipFlyCheck:boolean=false):boolean;
@@ -2285,7 +2288,6 @@ begin
    with uid^ do
      if(hits<=0)
      or(not iscomplete)
-     or(transformTimer>0)
      or(IsUnitRange(transportU,nil))
      or(not uid_isbuilder)then exit;
    unit_F1SelectFilter:=true;

@@ -122,8 +122,8 @@ begin
       0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_ServerPort);
       2 : writeln(str_GameStatus, Dedicated_GameStatusStr);
       4 : writeln(str_GameOptions);
-      6 : Dedicated_screenLine(str_game_FixedPositions,1, str_game_AISlots  ,25, str_game_DefeatedObs,50, '' ,1,'',55,'',70);
-      8 : Dedicated_screenLine(b2c[g_FixedPositions]  ,1, ai_name(g_AISlots),25, b2c[g_DefeatedObs ] ,50, '' ,1,'',55,'',70);
+      6 : Dedicated_screenLine(str_game_FixedPositions,1, str_game_AISlots      ,25, str_game_DefeatedObs,50, '' ,1,'',55,'',70);
+      8 : Dedicated_screenLine(b2c[g_FixedPositions]  ,1, ai_name(g_AISlots,255),25, b2c[g_DefeatedObs ] ,50, '' ,1,'',55,'',70);
       10: writeln;
       12: writeln(str_MapOptions);
       14: Dedicated_screenLine(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);

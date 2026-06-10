@@ -480,17 +480,18 @@ begin
 
    case menu_SettingsPage of
    mi_settings_Game  : begin
-                          menu_Item_Set(mi_SG_PlayerName      ,mtx0,mty0,mtx1,mty0+menu_SmallW,PlayerNameChangeble);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_Language        ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_ColoredShadows  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_PlayersColor    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_ShowAPM         ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_HealthBars      ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_RightClickAction,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_ScrollSpeed     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_MouseScroll     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_ControlPanelPos ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SG_ControlPanelAuto,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_PlayerName       ,mtx0,mty0,mtx1,mty0+menu_SmallW,PlayerNameChangeble);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_Language         ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_ColoredShadows   ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_PlayersColor     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_ShowAPM          ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_HealthBars       ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_RightClickAction ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_ScrollSpeed      ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_MouseScroll      ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_ControlPanelPos  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_ControlPanelAuto ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SG_ShowPlayerScrns  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                        end;
    mi_settings_Record: begin
                           menu_Item_Set(mi_SR_RecordGames     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
@@ -518,6 +519,7 @@ begin
                                                                                                      mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_PlayerNext      ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_PlaylistSize    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SS_RenewPlaylist   ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_ReloadPlaylist  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                        end;
    end;
@@ -922,6 +924,7 @@ mi_SG_PlayerName       : ;
 mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;end;
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(true);
 mi_SG_ControlPanelAuto : if(not check)then ui_tab_Auto:=not ui_tab_Auto;
+mi_SG_ShowPlayerScrns  : if(not check)then ui_PlayersScreens:=not ui_PlayersScreens;
 
 // SETTINGS GAME RECORDING
 
@@ -963,6 +966,7 @@ mi_SS_MusicVolume      : if(not check)then
                          end;
 mi_SS_PlayerNext       : if(not check)then snd_SoundMusicControll(true);
 mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,true,1,snd_MaxMusicListSize);
+mi_SS_RenewPlaylist    : if(not check)then snd_RenewMusicList:=not snd_RenewMusicList;
 mi_SS_ReloadPlaylist   : if(not check)then snd_GameMusicReLoad;
 
 // SAVE LOAD

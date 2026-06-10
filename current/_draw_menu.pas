@@ -270,6 +270,7 @@ begin
    drawmenu_ItemText2(tar,mi_SG_MouseScroll     ,str_SG_MouseScroll     ,str_YesNoC[ui_MouseScroll]                 ,0);
    drawmenu_ItemText2(tar,mi_SG_ControlPanelPos ,str_SG_ControlPanelPos ,str_SG_ControlPanelPosL[ui_ControlPanelPos],0);
    drawmenu_ItemText2(tar,mi_SG_ControlPanelAuto,str_SG_ControlPanelAuto,str_YesNoC[ui_tab_Auto]                    ,0);
+   drawmenu_ItemText2(tar,mi_SG_ShowPlayerScrns ,str_SG_ShowPlayerScrns ,str_YesNoC[ui_PlayersScreens]              ,0);
 
    drawmenu_ItemTextBar(tar,mi_SG_ScrollSpeed   ,str_SG_ScrollSpeed     ,ui_CamSpeed,1,ui_MaxCamSpeed,0);
 
@@ -295,6 +296,7 @@ begin
    drawmenu_ItemText1(tar,mi_SS_PlayerNext      ,str_SS_NextTrack       ,0);
    drawmenu_ItemText1(tar,mi_SS_ReloadPlaylist  ,str_SS_ReloadMusic     ,0);
 
+   drawmenu_ItemText2(tar,mi_SS_RenewPlaylist   ,str_SS_RenewMusicList  ,str_YesNoC[snd_RenewMusicList],0);
    drawmenu_ItemText2(tar,mi_SS_PlaylistSize    ,str_SS_MusicListSize   ,b2s(snd_musicListSize),0);
 end;
 
@@ -421,7 +423,7 @@ function AISlotsSOpt:shortstring;
 begin
    if(g_AISlots=0)
    then AISlotsSOpt:=str_YesNoG[false]
-   else AISlotsSOpt:=ai_name(g_AISlots)
+   else AISlotsSOpt:=ai_name(g_AISlots,255)
 end;
 begin
    if(rpls_pstate=rpls_read)
@@ -486,7 +488,7 @@ begin
               drawmenu_ItemTextC(tar,mi_Players_State0+p,ta_MM,'+'+str_ps_AI,c_white);
           if(g_AISlots>0)and(p<map_MaxPlayers)and(not g_started)then
           begin
-             drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,ai_name(g_AISlots)                        ,c_gray);
+             drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,ai_name(g_AISlots,p)                      ,c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[r_random]                        ,c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Team0+p,ta_MM,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Obs0 +p,ta_MM,str_YesNoG[false]                         ,c_gray);

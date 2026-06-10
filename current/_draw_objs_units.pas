@@ -126,33 +126,32 @@ end;
 //    UI COMMANDER
 //
 
-function ui_CommanderGetWeight(pu:PTUnit):byte;
+function ui_CommanderGetWeight(pu:PTUnit):word;
 begin
    ui_CommanderGetWeight:=0;
    with pu^ do
    with uid^ do
    begin
       if (iscomplete        )
-      and(transformTimer<=0 )then ui_CommanderGetWeight+=128;
-      if (not uid_isbuilding)then ui_CommanderGetWeight+=64;
-      if (uid_HaveAbility   )then ui_CommanderGetWeight+=32;
-      if (uid_MSpeed_Base>0 )then ui_CommanderGetWeight+=16;
-      if (rld<=0            )then ui_CommanderGetWeight+=8;
+      and(transformTimer<=0 )then ui_CommanderGetWeight+=512;
+      if (not uid_isbuilding)then ui_CommanderGetWeight+=256;
+      if (uid_HaveAbility   )then ui_CommanderGetWeight+=128;
+      if (uid_MSpeed_Base>0 )then ui_CommanderGetWeight+=64;
+      if (rld<=0            )then ui_CommanderGetWeight+=32;
       if (uo_id<>ua_ability1)
       and(uo_id<>ua_ability2)
-      and(uo_id<>ua_ability3)then ui_CommanderGetWeight+=4;
-      if(uid_ability3<>0)then
-      if (unit_AbilityCheck(pu,uid_ability3,false)=0)
-                             then ui_CommanderGetWeight+=2;
+      and(uo_id<>ua_ability3)then ui_CommanderGetWeight+=16;
       if (transportM>0)
-      and(transportC>0)      then ui_CommanderGetWeight+=1;
-
+      and(transportC>0)      then ui_CommanderGetWeight+=8;
+      if(unit_AbilityCheck(pu,uid_ability1,false)=0)then ui_CommanderGetWeight+=1;
+      if(unit_AbilityCheck(pu,uid_ability2,false)=0)then ui_CommanderGetWeight+=1;
+      if(unit_AbilityCheck(pu,uid_ability3,false)=0)then ui_CommanderGetWeight+=1;
    end;
 end;
 
 procedure ui_CommanderSet(pu:PTUnit);
 var
-curWeight:byte;
+curWeight:word;
 curDist  :integer;
 begin
    curWeight:=ui_CommanderGetWeight(pu);
@@ -456,7 +455,7 @@ begin
         if(uo_x<>x)or(uo_y<>y)then // unit is moving or casting
           case uo_id of
           ua_move,
-          ua_amove   : if(uo_bx>0)then
+          ua_amove   : if(uo_bx>0)then    // patrol
                          if(isselected)or(m_UnitTargetN=unum)then
                            UnitsInfo_AddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
           ua_ability1,
@@ -563,6 +562,7 @@ begin
       wl:=0;
       al:=0;
       // weapon/attack
+      lvlstr_w:='';
       atset   :=[];
       for i:=0 to LastUnitArms do
         with uid_arms[i] do
@@ -571,24 +571,29 @@ begin
              if(aw_impact_upgr>0)then WeaponUpgrInc(aw_impact_upgr);
              if(aw_req_upgr>0)and(upgrs_cur[aw_req_upgr]>0)then sl+=1;
           end;
-      lvlstr_w:=i2s6(wl,uid_CanAttack);
+      if(wl>0)then
+        lvlstr_w:=i2s6(wl,uid_CanAttack);
       if(length(lvlstr_w)>0)then lvlstr_w:=tc_red+lvlstr_w+tc_default;
 
       // armor
+      lvlstr_a:='';
       if(iscomplete)then
       begin
          if(uid_Armor_upgr1>0)then al+=upgrs_cur[uid_Armor_upgr1];
          if(uid_Armor_upgr2>0)then al+=upgrs_cur[uid_Armor_upgr2];
       end;
-      lvlstr_a:=tc_lime+i2s6(al,true)+tc_default;
+      if(al>0)then
+        lvlstr_a:=tc_lime+i2s6(al,true)+tc_default;
 
       // other
+      lvlstr_s:='';
       if(uid_Regen_upgr       >0)then sl+=upgrs_cur[uid_Regen_upgr       ];
       if(uid_SightR_upgr      >0)then sl+=upgrs_cur[uid_SightR_upgr      ];
       if(uid_PainState_upgr   >0)then sl+=upgrs_cur[uid_PainState_upgr   ];
       if(uid_TransportMax_upgr>0)then sl+=upgrs_cur[uid_TransportMax_upgr];
       if(uid_MSpeed_upgr      >0)then sl+=upgrs_cur[uid_MSpeed_upgr      ];
-      lvlstr_s:=tc_yellow+i2s6(sl,true)+tc_default;
+      if(sl>0)then
+        lvlstr_s:=tc_yellow+i2s6(sl,true)+tc_default;
    end;
 end;
 

@@ -8,8 +8,7 @@
       <Unit>
         <Filename Value="MarsWars_ded.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="69" Y="5"/>
+        <CursorPos X="53" Y="7"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit>
@@ -24,8 +23,8 @@
       <Unit>
         <Filename Value="_var.pas"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="19"/>
-        <CursorPos X="14" Y="23"/>
+        <TopLine Value="1276"/>
+        <CursorPos X="53" Y="1308"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -44,8 +43,8 @@
       <Unit>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1953"/>
-        <CursorPos Y="1957"/>
+        <TopLine Value="1944"/>
+        <CursorPos X="72" Y="1957"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -59,9 +58,10 @@
       </Unit>
       <Unit>
         <Filename Value="_ded.pas"/>
-        <EditorIndex Value="8"/>
-        <TopLine Value="110"/>
-        <CursorPos X="160" Y="129"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="115"/>
+        <CursorPos X="81" Y="125"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -80,8 +80,16 @@
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="_unit_client.pas"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="1600"/>
+        <CursorPos X="90" Y="1616"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="9">
+    <JumpHistory HistoryIndex="12">
       <Position>
         <Filename Value="MarsWars_ded.lpr"/>
         <Caret Line="5"/>
@@ -122,17 +130,27 @@
         <Filename Value="_net_game.pas"/>
         <Caret Line="383" Column="38" TopLine="365"/>
       </Position>
+      <Position>
+        <Filename Value="_var.pas"/>
+        <Caret Line="28" Column="40" TopLine="19"/>
+      </Position>
+      <Position>
+        <Filename Value="_var.pas"/>
+        <Caret Line="1308" Column="53" TopLine="1276"/>
+      </Position>
+      <Position>
+        <Filename Value="_unit_client.pas"/>
+        <Caret Line="1616" Column="90" TopLine="1600"/>
+      </Position>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode=""/>
     </RunParams>
     <HistoryLists>
-      <List Name="WorkingDirectory" Type="File" Count="1"/>
       <List Name="LaunchingApplication" Type="File" Count="1">
         <Item1 Value="C:\Windows\system32\cmd.exe /C ${TargetCmdLine}"/>
       </List>
-      <List Name="CommandLineParameters" Count="1"/>
     </HistoryLists>
   </ProjectSession>
 </CONFIG>

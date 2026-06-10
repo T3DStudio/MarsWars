@@ -138,12 +138,12 @@ procedure draw_UIMinimapAlarms;
 var i,r:byte;
 begin
    for i:=0 to ui_max_alarms do
-    with ui_alarms[i] do
-     if(al_t>0)then
-     begin
-        r:=(g_tick+cardinal(i+al_t)) mod ui_alarm_time;
+     with ui_alarms[i] do
+       if(al_t>0)then
+       begin
+          r:=(g_tick+cardinal(i+al_t)) mod ui_alarm_time;
 
-        case al_v of
+          case al_v of
 aummat_attacked_b,
 aummat_created_b,
 aummat_upgrade    : RectangleColor(ui_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
@@ -151,16 +151,10 @@ aummat_advance,
 aummat_attacked_u,
 aummat_created_u,
 aummat_info       : CircleColor   (ui_minimap,al_mx  ,al_my  ,              r, al_c);
-        end;
+          end;
 
-        al_t-=2;
-     end;
-
-   map_MiniMap_KeyPoints(ui_minimap,true);
-
-   case map_scenario of
-mc_royale   : circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
-   end;
+          al_t-=2;
+       end;
 end;
 
 procedure draw_UIMinimap(tar:pSDL_Surface);
@@ -180,6 +174,23 @@ begin
 
    draw_sdlsurface(tar       ,1,1,ui_minimap );
    draw_sdlsurface(ui_minimap,0,0,ui_bminimap);
+
+   map_MiniMap_KeyPoints(ui_minimap,true);
+   case map_scenario of
+   mc_royale: circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
+   end;
+
+   if(ui_PlayersScreens)then
+     for i:=0 to LastPlayer do
+       with g_PlayersMain[i] do
+       with g_PlayersTemp[i] do
+         if(cam_w>0)then
+           if(g_PlayersMain[LocalPlayer].isobserver)
+           or(g_PlayersMain[LocalPlayer].team=team)then
+             rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
+                                       round( cam_y       *map_MiniMap_cx),
+                                       round((cam_x+cam_w)*map_MiniMap_cx),
+                                       round((cam_y+cam_h)*map_MiniMap_cx), PlayerGetColor(i,true));
 
    ui_mm_ScanBlink:=not ui_mm_ScanBlink;
 end;
@@ -609,14 +620,11 @@ begin
           STRADD(@s1,lvlstr_w,sep_wdash);
           STRADD(@s1,lvlstr_a,sep_wdash);
           STRADD(@s1,lvlstr_s,sep_wdash);
-          if(length(s1)>0)then
-          begin
-          s1:=str_hint_UpgradesLvl+s1+tc_default;
-          STRADD(@s1,str_doc_MaxHits+li2s(hits),sep_scomma);
-          if(playeri=UIPlayer)and(uid_gen_EnergyLevel>0)then
-          STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_scomma);
+          if(length(s1)>0)then s1:=str_hint_UpgradesLvl+s1+tc_default;
+          STRADD(@s1,str_doc_Hits+li2s(hits),sep_scomma);
+          if(uid_gen_EnergyLevel>0)then
+            STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_scomma);
           AddLine(@s1);
-          end;
           s1:=tc_white+'('+tc_default+chr(playeri)+name+tc_white+')';
           AddLine(@s1);
        end;
@@ -780,8 +788,8 @@ begin
           limit:=armylimit+prod_unit_Limit;
           draw_text(tar,ui_EnergyX,ui_EnergyY   ,str_ui_EnergyLevel   +': '+tc_default+i2s(res_energyl_cur           )+tc_white+' / '+tc_aqua  +i2s(res_energyl_max)
                                                                                                                                     ,ta_RU,255,ui_cenergy[res_energyl_cur<=0] );
-          draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,c_white);
-          draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,c_white);
+          draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,ui_cenergy[res_HellPower>=HellPower_Max]);
+          draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,ui_cenergy[res_UACLoot  >=UACLoot_Max  ]);
 
           draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_gray+ui_limitstr
                                                                                                                                     ,ta_LU,255,ui_max_color[limit>=MaxPlayerLimit]);

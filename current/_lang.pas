@@ -151,6 +151,7 @@ begin
    str_SG_ControlPanelPosL[cpp_top   ]:= tc_yellow+'top'   +tc_default;
    str_SG_ControlPanelPosL[cpp_bottom]:= tc_aqua  +'bottom'+tc_default;
    str_SG_ControlPanelAuto       := 'Control panel auto-switching';
+   str_SG_ShowPlayerScrns        := 'Other player screens on the minimap';
    str_SG_HealthBars             := 'Health bars';
    str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
    str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
@@ -175,6 +176,7 @@ begin
    str_SS_SoundVolume            := 'Sound volume';
    str_SS_NextTrack              := 'Play next track';
    str_SS_ReloadMusic            := 'Load new playlist';
+   str_SS_RenewMusicList         := 'Renew playlist on start';
    str_SS_MusicListSize          := 'Music playlist size';
 
    str_GO_AISlots                := 'Fill empty slots';
@@ -211,7 +213,7 @@ begin
    str_map_GeneratorsL[mapg_20 ] := '20 min';
    str_map_GeneratorsL[mapg_inf] := 'infinity';
 
-   str_map_Symmetry              := 'Symmetric';
+   str_map_Symmetry              := 'Symmetry';
    str_map_SymmertyL[maps_none ] := 'no';
    str_map_SymmertyL[maps_point] := 'point';
    str_map_SymmertyL[maps_lineV] := 'line |';
@@ -220,8 +222,8 @@ begin
    str_map_SymmertyL[maps_lineR] := 'line /';
 
    str_map_Template               := 'Template';
-   str_map_TemplateL[mapt_lake   ]:= tc_red   +'central lake';
-   str_map_TemplateL[mapt_ring   ]:= tc_orange+'central ring';
+   str_map_TemplateL[mapt_lake   ]:= tc_red   +'lake';
+   str_map_TemplateL[mapt_island ]:= tc_orange+'island';
    str_map_TemplateL[mapt_temple ]:= tc_yellow+'temple';
    str_map_TemplateL[mapt_cave   ]:= tc_blue  +'cave';
    str_map_TemplateL[mapt_steppe ]:= tc_gray  +'steppe';
@@ -486,6 +488,7 @@ begin
    str_doc_ProdTime              := 'Build time: ';
    str_doc_Limit                 := 'Limit used: ';
    str_doc_MaxHits               := 'Max hits: ';
+   str_doc_Hits                  := 'Hits: ';
    str_doc_LifeTime              := 'Lifetime: ';
    str_doc_BaseRegen             := 'Base regeneration: ';
    str_doc_BaseSightR            := 'Base '+str_hint_SightR+': ';
@@ -535,7 +538,7 @@ begin
    str_SetAbilityBaseHint(uab_HKeepAura          ,'Decay Aura'               ,'Deals damage('+tc_red+i2s(DecayAuraDamage)+tc_default+', hits 2 times per sec.) to all non-building units around. Damage ignores units armor.');
    str_SetAbilityBaseHint(uab_SpawnLost          ,'Spawn Lost Soul'          ,'');
    str_SetAbilityBaseHint(uab_SpawnLostTo        ,'Spawn Lost Soul to point' ,'');
-   str_SetAbilityBaseHint(uab_SphereSoul         ,'Soul Sphere'              ,'Restores '+i2s(soul_heal)+' health to the target');
+   str_SetAbilityBaseHint(uab_SphereSoul         ,'Soul Sphere'              ,'Restores '+i2s(soul_maxHeal)+' health to the target over '+i2s(soul_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_SphereInvis        ,'Invisibility Sphere'      ,'Makes target invisible for '+i2s(invis_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_SphereInvuln       ,'Invulnerability Sphere'   ,'Makes target invulnerable for '+i2s(invuln_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_SphereRDamage      ,'Damage Resistance Sphere' ,'Halves damage to the target for '+i2s(rdamage_time_sec)+' seconds.');
@@ -783,10 +786,10 @@ begin
    for i in [mi_Game_Panel    ..mi_Game_Random        ] do menu_set_hint(i,mi_Game_Panel    ,'');
    for i in [mi_MP_Panel      ..mi_MP_ChatLine        ] do menu_set_hint(i,mi_MP_Panel      ,'');
 
-   for i in [mi_SG_PlayerName ..mi_SG_ControlPanelAuto] do menu_set_hint(i,mi_SG_PlayerName ,'');
+   for i in [mi_SG_PlayerName ..mi_SG_ShowPlayerScrns ] do menu_set_hint(i,mi_SG_PlayerName ,'');
    for i in [mi_SR_RecordGames..mi_SR_RecordQuality   ] do menu_set_hint(i,mi_SR_RecordGames,'');
    for i in [mi_SV_ResolutionW..mi_SV_SmoothScaled    ] do menu_set_hint(i,mi_SV_ResolutionW,'');
-   for i in [mi_SS_SoundVolume..mi_SS_ReloadPlaylist  ] do menu_set_hint(i,mi_SS_SoundVolume,'');
+   for i in [mi_SS_SoundVolume..mi_SS_RenewPlaylist   ] do menu_set_hint(i,mi_SS_SoundVolume,'');
    for i in [mi_help_Credits  ..mi_help_Other         ] do menu_set_hint(i,mi_help_Credits  ,'');
 
    // PLAYERS

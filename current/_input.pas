@@ -722,14 +722,14 @@ begin
                                                     with g_uids[tuid] do
                                                     begin
                                                        if(not InputAction(iact_Control))
-                                                       then math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,false,true,LocalPlayer)
+                                                       then math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,true,LocalPlayer)
                                                        else
                                                        begin
                                                           m_brushx:=mouse_map_x;
                                                           m_brushy:=mouse_map_y;
                                                        end;
 
-                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,false,true,g_PlayersMain[LocalPlayer].team)<>cbr_no)
+                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,true,g_PlayersMain[LocalPlayer].team)<>cbr_no)
                                                        then m_brushc:=c_red;
                                                     end;
                                                end
@@ -1119,7 +1119,9 @@ begin
 
       if(mouse_select_xs0<>NOTSET)then //select
       begin
-         units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,255);
+         if(m_UnitTargetP<>nil)
+         then units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,-m_UnitTargetP^.unum)
+         else units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,0);
 
          mouse_select_xs0:=NOTSET;
       end;
@@ -1289,8 +1291,8 @@ begin
          if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
          if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
          if(InputActionPressed(iAct_test_BePlayer7   ))then LocalPlayer:=7;
-         if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
-         if(InputActionPressed(iAct_test_debug1      ))then ;
+         //if(InputActionPressed(iAct_test_debug0      ))then Game_ShuffleAINames;
+         if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
       end;
 
       // Controls tab actions

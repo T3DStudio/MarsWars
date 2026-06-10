@@ -103,7 +103,7 @@ begin
       case newState of
 ps_None : begin isready:=false;if(not g_started)then
                                name :='';       end;
-ps_AI   : begin isready:=true; name :=ai_name(aip_skill);isobserver:=false;end;
+ps_AI   : begin isready:=true; name :=ai_name(aip_skill,playerN);isobserver:=false;end;
 ps_human: begin isready:=false;name :='';               end;
       end;
       team :=PlayerValidateTeam(playerN,team);
@@ -189,6 +189,22 @@ begin
    {$ENDIF}
 end;
 
+procedure Game_ShuffleAINames;
+var
+u,i:byte;
+ts :shortstring;
+begin
+   for u:=0 to ai_names_max-1 do
+   for i:=0 to ai_names_max-1 do
+     if(u<>i)and(random(3)=0)then
+     begin
+        ts:=ai_names_l[i];
+        ai_names_l[i]:=ai_names_l[u];
+        ai_names_l[u]:=ts;
+     end;
+   ai_name_i:=random(ai_names_max);
+end;
+
 procedure Game_DefaultAll;
 var u:integer;
 begin
@@ -211,6 +227,8 @@ begin
    LastCreatedUnitP:=@g_units[LastCreatedUnit];
 
    PlayersSetDefault;
+
+   Game_ShuffleAINames;
 
    UnitStepTicks := 8;
 
@@ -279,6 +297,8 @@ begin
    else UIPlayer :=LocalPlayer;
    ui_log_LastTimer:=0;
    rpls_RecordTryPause:=0;
+   if(snd_RenewMusicList)then
+     snd_GameMusicReLoad;
 end;
 
 {$include _replays.pas}
@@ -568,10 +588,9 @@ end;
 //   UNIT SELECTION
 //
 
-procedure units_SelectRect(add:boolean;x0,y0,x1,y1:integer;fuid:byte);
+procedure units_SelectRect(add:boolean;x0,y0,x1,y1,sel_opt:integer);
 var
-u,
-usel_max       : integer;
+u              : integer;
 SelectBuildings,
 wassel         : boolean;
 begin
@@ -579,15 +598,13 @@ begin
 
    if(x0>x1)then begin u:=x1;x1:=x0;x0:=u;end;
    if(y0>y1)then begin u:=y1;y1:=y0;y0:=u;end;
-   usel_max:=32000;
-   if(CheckPointClick(x0,y0,x1,y1))then usel_max:=1;
    ui_CommanderClear;
 
    SelectBuildings:=true;
    if(add)
    then SelectBuildings:=(g_PlayersMain[LocalPlayer].units_bld_s[false]=0)
    else
-     if(fuid=255)then
+     if(sel_opt=0)then
        for u:=1 to MaxUnits do
         with g_punits[u]^ do
          if(hits>0)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
@@ -607,21 +624,19 @@ begin
           wassel:=isselected;
 
           if(not add)then isselected:=false;
-          if(usel_max>0)then
-            if(not add)or(not wassel and add)then
-              if(fuid=255)or(fuid=uidi)then
-                with uid^ do
-                  isselected:=((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
-                    and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))
-                    and(SelectBuildings or not uid_isbuilding);
+          if(not add)or(not wassel and add)then
+            if(sel_opt=0)or(sel_opt=uidi)or(-sel_opt=unum)then
+              with uid^ do
+                isselected:=((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
+                         and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))
+                         and(SelectBuildings or not uid_isbuilding);
 
           if(wassel<>isselected)then
             if(isselected)
             then unit_IncCounters_Select(g_punits[u])
             else unit_DecCounters_Select(g_punits[u]);
-          if(isselected)and(usel_max>0)then
+          if(isselected)then
           begin
-             usel_max-=1;
              ui_UnitSelSound:=true;
              ui_CommanderSet(g_punits[u]);
           end;
@@ -733,6 +748,7 @@ end;
 procedure game_MakeRandomSkirmish;
 var p:byte;
 begin
+   Game_ShuffleAINames;
    Map_randommap;
 
    case random(7) of
@@ -1057,7 +1073,7 @@ begin
           end;
           {$ENDIF}
           ScrollByte(@aip_skill,forward,1,g_MaxAISlots);
-          name:=ai_name(aip_skill);
+          name:=ai_name(aip_skill,PlayerTarget);
        end;
 end;
 

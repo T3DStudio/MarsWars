@@ -185,9 +185,10 @@ begin
                     depth:=fdepth;
                  end;
 
-               if((abs(rInR-d)<=cellw1)and(rInR>0))
-               or(abs(rOutR-d)<=cellw1)then
-                 SpriteList_AddDoodad(nx,ny,bdepth ,-32000,sTemplateB,255,0,0);
+              // if(not InputAction(iact_Control))then
+                 if((abs(rInR-d)<=cellw1)and(rInR>0))
+                 or(abs(rOutR-d)<=cellw1)then
+                   SpriteList_AddDoodad(nx,ny,bdepth ,-32000,sTemplateB,255,0,0);
 
                animN:=((animStep+animX+byte(abs(y) div cellw1)) mod LiquidAnimCount)+1;
 

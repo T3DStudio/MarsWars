@@ -440,7 +440,7 @@ TUID = record
    uid_ZombieHits        : integer;
    uid_ZombieUID         : byte;
 
-   uid_AI_PrimaryTarget,
+   uid_AI_TargetWeight  : byte;
    uid_AI_Healer,
    uid_AI_Siedge         : boolean;
    uid_AI_NextFormUID    : byte;
@@ -639,6 +639,11 @@ TPlayerTempData = record
    o_a0     : byte;
    o_x0,o_y0,
    o_x1,o_y1: integer;
+
+   cam_x,
+   cam_y,
+   cam_w,
+   cam_h    : integer;
 end;
 
 

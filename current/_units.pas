@@ -106,7 +106,7 @@ begin
          {$ENDIF}
          begin
             unit_kill(pTarget,false,(hits-damage)<=uid_FastDeathHits,true,false,false);
-            if(damagePlayer<=LastPlayer)then
+            if(damagePlayer<=LastPlayer)and(iscomplete)then
               with g_PlayersMain[damagePlayer] do
               begin
                  if(race<>r_hell)then
@@ -209,7 +209,7 @@ begin
             unit_morph:=lmt_Req_UACLoot;
             exit;
          end;
-         if(CheckCollisionR(x,y,pNewUID^.uid_r,unum,pNewUID^.uid_isbuilding,pNewUID^.uid_isfly,true,255)<>cbr_no)then
+         if(CheckCollisionR(x,y,pNewUID^.uid_r,unum,pNewUID^.uid_isbuilding,true,255)<>cbr_no)then
          begin
             unit_morph:=lmt_prod_BadPlace;
             exit;
@@ -629,12 +629,6 @@ wpt_heal     : if(pTarget^.hits<=0)
       if((aw_tar_Flags and wtr_complete )=0)and(    pTarget^.iscomplete             )then exit;
       if((aw_tar_Flags and wtr_ncomplete)=0)and(not pTarget^.iscomplete             )then exit;
 
-      if(not pTarget^.uid^.uid_isbuilding  )then
-      begin
-      if((aw_tar_Flags and wtr_stun     )=0)and(pTarget^.buffs[ub_PainState]> 0     )then exit;
-      if((aw_tar_Flags and wtr_nostun   )=0)and(pTarget^.buffs[ub_PainState]<=0     )then exit;
-      end;
-
       if(not CheckUnitBaseFlags(pTarget,aw_tar_Flags))then exit;
 
       // Distance requirements
@@ -648,13 +642,15 @@ wpt_heal     : if(pTarget^.hits<=0)
           then awr:=udist-(srange+(aw_max_range-aw_fsr))
           else awr:=udist-aw_max_range; // absolute range
 
-      if(pTarget^.isfly)
-      then awr-=uid_arms_BonusAntiFlyRange
-      else awr-=uid_arms_BonusAntiGroundRange;
-      if(pTarget^.uid^.uid_isbuilding)
-      then awr-=uid_arms_BonusAntiBuildingRange
-      else awr-=uid_arms_BonusAntiUnitRange;
-
+      if(aw_max_range>=aw_srange)then
+      begin
+         if(pTarget^.isfly)
+         then awr-=uid_arms_BonusAntiFlyRange
+         else awr-=uid_arms_BonusAntiGroundRange;
+         if(pTarget^.uid^.uid_isbuilding)
+         then awr-=uid_arms_BonusAntiBuildingRange
+         else awr-=uid_arms_BonusAntiUnitRange;
+      end;
       canmove:=(speed>0)and(uo_id<>ua_hold);
       pfcheck:=(isfly)or(uid_FlyLevelLikeTarget)or(mapZone=pTarget^.mapZone);
 
@@ -733,6 +729,10 @@ begin
    with pAttacker^ do
    with uid^ do
    begin
+      {if (isselected)
+      and(n_tarp^.uidi=UID_Cacodemon)
+      and(unum<>n_tarp^.unum)then writeln(unum,' ',n_tarp^.unum,' ',udist,' ',uid_r+n_tarp^.uid^.uid_r-aw_dmelee);  }
+
       n_arm:=unit_target2arm(pAttacker,n_tarp,udist,a_arm^,nil);
 
       if(n_arm>LastUnitArms)then exit;
@@ -878,7 +878,7 @@ begin
       if(StayWaitForNewTarget>0)
       then StayWaitForNewTarget-=1;
 
-      pushout        := uid_issolid and unit_canMove(pu) and (a_rld<=0);
+      pushout        := uid_issolid and unit_canMove(pu) and ((a_rld<=0)or uid_isbuilding);
       attack_target  := unit_canAttack(pu,false);//and(playeri=UIPlayer);
       aicode         := (state=ps_AI);//and(isselected);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
@@ -971,10 +971,11 @@ begin
 
       ai_Local_Code(pu);
       if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
-      if(isselected)then
-      begin
-         if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
-      end;
+      {if(TestMode>0)then
+        if(isselected)then
+        begin
+           if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
+        end;   }
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
    end;
@@ -1488,7 +1489,7 @@ begin
         if(g_cycle_order=cycle_order)and(buffs[ub_Damaged]<=0)then
         begin
            hits+=uid_ProdHitStep;
-           hits+=uid_ProdHitStep*upgrs_cur[upgr_fast_build];
+           hits+=uid_ProdHitStep*upgrs_cur[upgr_fprod_build];
            if(buffs[ub_SphereTurbo]>0)then
            hits+=uid_ProdHitStep;
         end;
@@ -2162,7 +2163,7 @@ begin
                                    speed:=0;
 
                                    if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(zfall<>0)then
-                                     if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,false,true,255,pu)<>cbr_no)then
+                                     if(CheckCollisionR(x,y+zfall,uid_r,unum,uid_isbuilding,true,255,pu)<>cbr_no)then
                                      begin
                                         buffs[ub_AltMode]:=ub_infinity;
                                         GameLog_ReqMsg(playeri,uid_ability1,lmt_argt_ability,lmt_ability_BadPlace,x,y);
@@ -2292,6 +2293,11 @@ begin
                            end;
                         end;
                  end;
+               if(buffs[ub_SphereSoul]>0)then
+               begin
+                  hits+=soul_regen;
+                  if(hits>uid_MaxHits1)then hits:=uid_MaxHits1;
+               end;
             end;
 
           unit_CaptureKeyPoint(pu);

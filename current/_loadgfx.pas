@@ -976,6 +976,7 @@ begin
    gfx_LoadMWTexture(@spr_buff_SphereDArmor ,folder_effects+'buff_SphereDArmor'        ,true);
    gfx_LoadMWTexture(@spr_buff_SphereDDamage,folder_effects+'buff_SphereDDamage'       ,true);
    gfx_LoadMWTexture(@spr_buff_SphereTurbo  ,folder_effects+'buff_SphereTurbo'         ,true);
+   gfx_LoadMWTexture(@spr_buff_SphereSoul   ,folder_effects+'buff_SphereSoul'          ,true);
    gfx_LoadMWTexture(@spr_buff_HellVision   ,folder_effects+'buff_HellVision'          ,true);
    gfx_LoadMWTexture(@spr_buff_Scan         ,folder_effects+'buff_scan'                ,true);
    gfx_LoadMWTexture(@spr_buff_Decay        ,folder_effects+'buff_decay'               ,true);
@@ -1053,21 +1054,23 @@ end; }
 procedure map_Decals_Create;
 var i,ix,iy,rn:integer;
 begin
-   map_ter_decaln:=(ui_cam_w*ui_cam_h) div 19000;
+   map_ter_decaln:=(ui_cam_w*ui_cam_h) div 25000;
    setlength(map_ter_decalL,map_ter_decaln);
 
    ui_mwa:= ui_cam_w+vid_ab*2;
    ui_mha:= ui_cam_h+vid_ab*2;
 
    ix:=longint(map_seed) mod ui_mwa;
-   iy:=(g_random_i*5+ix) mod ui_mha;
+   iy:=longint(map_seed) mod ui_mha;
    rn:=ix*iy;
    for i:=1 to map_ter_decaln do
     with map_ter_decalL[i-1] do
     begin
        rn+=17;
-       ix:=g_randomx(ix+rn       ,ui_mwa);
-       iy:=g_randomx(iy+sqr(ix*i),ui_mha);
+       ix+=ix+rn;
+       iy+=iy+sqr(ix*i);
+       ix:=abs(ix) mod ui_mwa;
+       iy:=abs(iy) mod ui_mha;
        decal_x :=ix;
        decal_y :=iy;
     end;

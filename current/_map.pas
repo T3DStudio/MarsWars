@@ -400,6 +400,7 @@ cd,
 cx,cy: integer;
 cdir,
 odir : single;
+stick,
 itick: cardinal;
 function circleI(i,m:integer):integer;
 begin
@@ -411,14 +412,15 @@ begin
      else circleI:=i;
 end;
 begin
-   itick:=g_tick div 3;
+   stick:=g_tick;
+   itick:=stick div 3;
    if(longint(itick)<map_SizeKPCR)
    then cd:=integer(itick)
    else cd:=map_SizeKPCR;
-   cdir:=(g_tick mod 102000)/200+(map_seed mod 360);
+   cdir:=(stick mod 109000)/400+(map_seed mod 360);
    cx  :=map_sizeH+round(cd*cos(cdir*DEGTORAD));
    cy  :=map_sizeH+round(cd*sin(cdir*DEGTORAD));
-   odir:=map_SymmetryDir+(g_tick mod 112000)/300;
+   odir:=map_SymmetryDir+(stick mod 119000)/600;
    for kpi:=0 to keyPoint_mcN-1 do
      with map_KeyPointsL[kpi] do
      begin
@@ -798,7 +800,7 @@ begin
 
    case map_template of
    mapt_lake,
-   mapt_ring   : begin
+   mapt_island : begin
                     map_CalcLakeR(@io,@ii);
                     case map_scenario of
                     mc_1x1,
@@ -1042,7 +1044,7 @@ begin
                     else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
                     map_Obstacles_Noise(obs_n div 3,0,2,0);
                  end;
-   mapt_ring   : begin
+   mapt_island   : begin
                     map_CalcLakeR(@io,@ii);
                     map_Obstacle_Add(map_SizeH,map_SizeH,io,ii);
                     map_Obstacles_Noise(obs_n div 4,0,3,0);

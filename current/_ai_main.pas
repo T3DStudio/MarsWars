@@ -197,7 +197,7 @@ build_dir,
 build_dirs,
 build_step: integer;
 rad_dir   : single;
-ckeckExtraEnergy:integer;
+checkExtraEnergy:integer;
 
 procedure ClearBuildDir;
 begin
@@ -212,7 +212,7 @@ begin
    if(build_uid=0)then
      if(pBuilder^.player^.units_uid_e[buid]<count)then
        if(buid in pBuilder^.uid^.uid_prod_Buildings)then
-         if(CheckUnitReqs(pBuilder^.player,buid,ckeckExtraEnergy)=0)then
+         if(CheckUnitReqs(pBuilder^.player,buid,checkExtraEnergy)=0)then
          begin
             if(pBuilder^.player^.res_UACLoot<1000)and(g_uids[buid].uid_req_UACLoot>0)then exit;
 
@@ -359,14 +359,15 @@ begin
    if(build_uid>0)then exit;
 
    with pBuilder^  do
-   with player^ do
+   with player^ do         //((aip_flags and aif_army_early_attack0)=0)
    begin
       if(units_bld_l[false]<aip_MaxUnitMinPart)
-      then ckeckExtraEnergy:=400
-      else ckeckExtraEnergy:=0;
+      then checkExtraEnergy:=500
+      else checkExtraEnergy:=0;
       if (ai_curr_Builders<needN)
       and(ai_curr_Builders<aip_MaxBuilders )
       and(ai_curr_Builders<PlayerMaxBuilders)then
+      begin
         case race of
         r_hell: if(ai_available_HKeep)
                and(units_builders_e=(aip_MaxBuilders-1))
@@ -375,7 +376,18 @@ begin
                 else SetBuildUID2(UID_HKeep,UID_HCommandCenter);
         r_uac : SetBuildUID1(UID_UCommandCenter);
         end;
-      ckeckExtraEnergy:=0;
+         {if(isselected)then
+           writeln(build_uid,' ',uid^.uid_req_EnergyLevel,
+                   ' res_energyl_cur=',res_energyl_cur,
+                   ' units='     ,energyCur_units,
+                   ' upgrades='  ,energyCur_upgrades,
+                   ' transforms=',energyCur_transforms,
+                   ' BldOther='  ,energyCur_BldOther,
+                   ' checkExtraEnergy=',checkExtraEnergy,' ',
+                   res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_transforms+energyCur_BldOther-checkExtraEnergy); }
+
+      end;
+      checkExtraEnergy:=0;
    end;
 end;
 procedure SetDetectors(needL:longint);
@@ -457,7 +469,7 @@ begin
    build_x  :=0;
    build_y  :=0;
    ClearBuildDir;
-   ckeckExtraEnergy:=0;
+   checkExtraEnergy:=0;
 
    with pBuilder^  do
    with player^ do
@@ -1307,7 +1319,7 @@ begin
       if(point_dist_int(uo_x,uo_y,lx,ly)>=lr)then exit;
       if(map_scenario=mc_royale)then
         if(base_r1h>(g_royal_r-point_dist_int(uo_x,uo_y,map_sizeH,map_sizeH)))then exit;
-      if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,false,true,255,pBuilder)<>cbr_no)then exit;
+      if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,true,255,pBuilder)<>cbr_no)then exit;
    end;
    checkLandingPlace:=true;
 end;
@@ -1334,7 +1346,7 @@ begin
        begin
           uo_x:=lx-g_randomr(lr);
           uo_y:=ly-g_randomr(lr);
-          math_push_out(uo_x,uo_y,uid_r,unum,@uo_x,@uo_y,false,true,playeri );
+          math_push_out(uo_x,uo_y,uid_r,unum,@uo_x,@uo_y,true,playeri );
        end;
 end;
 begin
@@ -1451,6 +1463,9 @@ begin
          ai_Cancel_Prod(pu);
          exit;
       end;
+
+      if(uid_isbarrack)and(prod_unit_Now>0)and((armylimit+prod_unit_Limit)>MaxPlayerLimit)then
+        unit_ProdStopUnit(pu,255,false,true,false);
 
       if(not iscomplete)then exit;
 

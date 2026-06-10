@@ -534,7 +534,8 @@ begin
      or(player^.team<>CasterTeam)
      or(IsUnitRange(TransportU,nil))
      or(not iscomplete)
-     or(uid_isbuilding)then exit;
+     or(uid_isbuilding)
+     or(buffs[ub_SphereSoul]>0)then exit;
    ability_CheckTarget_SphereSoul:=true;
 end;
 
@@ -896,7 +897,7 @@ begin
    if(not ability_CheckTarget_SphereSoul(pCaster^.player^.team,pTarget))then exit;
    unit_ability_SphereSoul:=0;
 
-   with pTarget^ do hits:=mm3i(1,hits+soul_heal,uid^.uid_MaxHits1);
+   with pTarget^ do buffs[ub_SphereSoul]:=soul_time;
 
    {$IFDEF _FULLGAME}
    effect_Common(pTarget,EID_ULevelUp,nil);
@@ -1135,7 +1136,7 @@ begin
       unit_OrderClear(pu,ua_amove);
       uo_x:=x0;
       uo_y:=y0;
-      buffs[ub_Cast]:=fr_fps2;
+      buffs[ub_Cast]:=fr_fps4;
       for p:=0 to LastPlayer do AddToInt(@TeamVision[p],buffs[ub_Cast]);
       ability_UACStrike_missile(pu);
    end;
@@ -1224,7 +1225,7 @@ begin
    else math_1c_push(tx,ty,x0,y0,r0);
 end;
 
-procedure math_push_out(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;flyLevel,check_obstacles:boolean;VisionPlayer:byte=255);
+procedure math_push_out(tx,ty,tr,ignore_unum:integer;newx,newy:pinteger;check_obstacles:boolean;VisionPlayer:byte=255);
 const pout_max = 1;
 var
 pout_x,
@@ -1293,8 +1294,6 @@ begin
    if(VisionPlayer<MaxPlayers)then
      VisionTeam:=g_PlayersMain[VisionPlayer].team;
 
-   if(flyLevel)then check_obstacles:=false;
-
    if(check_obstacles)then
    begin
       dx0:=(tx-tr) div MapObstaclesGridW;
@@ -1321,16 +1320,15 @@ begin
                   end;
    end;
 
-   if(not flyLevel)then
-     for u:=0 to LastKeyPoint do
-       with map_KeyPointsL[u] do
-       with kp_TeamData[min2i(VisionTeam,MaxPlayers)] do
-         if(kptd_Active)and(kp_RNoBuild>0)then
-         begin
-            o:=kp_RNoBuild+tr;
-            d:=point_dist_int(kp_x,kp_y,tx,ty)-o;
-            POutAdd(kp_x,kp_y,d,o);
-         end;
+   for u:=0 to LastKeyPoint do
+     with map_KeyPointsL[u] do
+     with kp_TeamData[min2i(VisionTeam,MaxPlayers)] do
+       if(kptd_Active)and(kp_RNoBuild>0)then
+       begin
+          o:=kp_RNoBuild+tr;
+          d:=point_dist_int(kp_x,kp_y,tx,ty)-o;
+          POutAdd(kp_x,kp_y,d,o);
+       end;
 
    for u:=1 to MaxUnits do
      with g_units[u] do
@@ -1396,14 +1394,12 @@ end;
 
 procedure BuildingFindNewPlace(tx,ty:integer;buid,pl:byte;newx,newy:pinteger);
 var
-aukfly  :boolean;
 dx,dy,o,
 u,sr,dr :integer;
 begin
    with g_uids[buid] do
    begin
-      aukfly:=uid_isfly;
-      math_push_out(tx,ty,uid_r,0,@tx,@ty,aukfly,true,pl);
+      math_push_out(tx,ty,uid_r,0,@tx,@ty,true,pl);
    end;
 
    dx:=-2000;
@@ -1415,7 +1411,7 @@ begin
        with uid^ do
          if (hits>0)
          and(speed<=0)
-         and(isfly=aukfly)
+         and(not isfly)
          and(iscomplete)
          and(playeri=pl)
          and(uid_isbuilder)
@@ -1452,7 +1448,7 @@ begin
    newy^:=ty;
 end;
 
-function CheckCollisionR(tx,ty,tr,skipunit:integer;building,flylevel,check_obstacles:boolean;checkTeamVisUI:byte;reveal_u:PTUnit=nil):TCheckCollisionR;
+function CheckCollisionR(tx,ty,tr,skipunit:integer;building,check_obstacles:boolean;checkTeamVisUI:byte;reveal_u:PTUnit=nil):TCheckCollisionR;
 var u,
 dx,dy,
 dx0,dy0,
@@ -1472,11 +1468,11 @@ begin
      if(u<>skipunit)then
        with g_punits[u]^ do
          with uid^ do
-           if(hits>0)and(isfly=flylevel)and(not IsUnitRange(transportU,nil))then
+           if(hits>0)and(not isfly)and(not IsUnitRange(transportU,nil))then
            begin
               if(checkTeamVisUI<=LastPlayer)then
                 if(TeamVision[checkTeamVisUI]<=0)then continue;
-              if(speed<=0)or(not iscomplete)or(transformTimer>0)then
+              if(speed<=0)or(not iscomplete)or(transformTimer>0)or(uid_isbuilding)then
                 if(point_dist_int(x,y,tx,ty)<(tr+uid_r))then
                 begin
                    CheckCollisionR:=cbr_unit;
@@ -1490,8 +1486,6 @@ begin
                    exit;
                 end;
            end;
-
-   if(flylevel)then exit;
 
    if(building)then
      for u:=0 to LastKeyPoint do
@@ -1588,7 +1582,7 @@ begin
    }
    case CheckInBuildArea(tx,ty,0,buid,playern) of
 cba_inBuildArea : with g_uids[buid] do
-                    if(CheckCollisionR(tx,ty,tr+uid_r,skip_unit,uid_isbuilding,uid_isfly,true,255)<>cbr_no)then
+                    if(CheckCollisionR(tx,ty,tr+uid_r,skip_unit,uid_isbuilding,true,255)<>cbr_no)then
                       CheckBuildPlace:=cbp_noplace;
 cba_NoBuildArea : CheckBuildPlace:=cbp_noplace;
 cba_outBuildArea: CheckBuildPlace:=cbp_out;
@@ -1611,11 +1605,11 @@ begin
       unit_ability_HKeepBlink:=0;
       if(check)then exit;
 
-      math_push_out(x0,y0,uid_r,unum,@x0,@y0,isfly, true, playeri );
+      math_push_out(x0,y0,uid_r,unum,@x0,@y0,true,playeri );
       x0:=mm3i(1,x0,map_Size1);
       y0:=mm3i(1,y0,map_Size1);
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,255,pu)<>cbr_no)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,true,255,pu)<>cbr_no)then
       begin
          unit_ability_HKeepBlink:=lmt_ability_BadPlace;
          exit;
@@ -1645,7 +1639,7 @@ begin
       if(rld>0)then exit;
 
       if(srange<point_dist_int(x,y,x0,y0))then math_1c_push(@x0,@y0,x,y,srange-1);
-      math_push_out(x0,y0,uid_r,unum,@x0,@y0,isfly, true ,playeri );
+      math_push_out(x0,y0,uid_r,unum,@x0,@y0,true ,playeri );
       x0:=mm3i(1,x0,map_Size1);
       y0:=mm3i(1,y0,map_Size1);
 
@@ -1655,7 +1649,7 @@ begin
       unit_ability_HTowerBlink:=0;
       if(check)then exit;
 
-      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,isfly,true,255,pCaster )<>cbr_no)then
+      if(CheckCollisionR(x0,y0,uid_r,unum,uid_isbuilding,true,255,pCaster )<>cbr_no)then
       begin
          unit_ability_HTowerBlink:=lmt_ability_BadPlace;
          exit;
@@ -1686,12 +1680,12 @@ begin
 
       unit_ability_SpawnEvilEye:=lmt_Invalid_Order;
 
-      math_push_out(tx,ty,g_uids[UID_HEye].uid_r,0,@tx,@ty,false,true,playeri);
+      math_push_out(tx,ty,g_uids[UID_HEye].uid_r,0,@tx,@ty,true,playeri);
       tx:=mm3i(1,tx,map_Size1);
       ty:=mm3i(1,ty,map_Size1);
 
       with g_uids[UID_HEye] do
-        if(CheckCollisionR(tx,ty,uid_r,0,uid_isbuilding,false,true,255,pCaster)<>cbr_no)then
+        if(CheckCollisionR(tx,ty,uid_r,0,uid_isbuilding,true,255,pCaster)<>cbr_no)then
         begin
            unit_ability_SpawnEvilEye:=lmt_ability_BadPlace;
            exit;
@@ -2038,7 +2032,10 @@ begin
    barrack_out:=false;
    with pu^ do
    with uid^ do
+   with player^ do
    begin
+      //if(armylimit+ _uid)
+
       cd:=_dir*degtorad;
 
       if(_sstep<0)
@@ -2071,9 +2068,9 @@ begin
    end;
 end;
 
-procedure barrack_spawn(pu:PTUnit;_uid,count:byte);
+procedure barrack_spawn(pu:PTUnit;_uid:byte);
 var
-sstep,i  :integer;
+sstep    :integer;
 announcer:boolean;
 begin
    with pu^ do
@@ -2086,7 +2083,7 @@ begin
 
       announcer:=false;
 
-      for i:=0 to count do announcer:=barrack_out(pu,_uid,sstep,dir+i*15) or announcer;
+      announcer:=barrack_out(pu,_uid,sstep,dir) or announcer;
 
       if(announcer)
       then GameLog_UnitReady(LastCreatedUnitP);
@@ -2516,14 +2513,14 @@ begin
             else
               if(uprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
               begin
-                 barrack_spawn(pu,uprod_u[i],upgrs_cur[upgr_mult_product]);
+                 barrack_spawn(pu,uprod_u[i]);
                  unit_ProdStopUnitLine(pu,255,i,false,false);
               end
               else
               begin
                  step:=1;
                  if(buffs[ub_SphereTurbo]>0)then step+=1;
-                 step+=upgrs_cur[upgr_fast_product];
+                 step+=upgrs_cur[upgr_fprod_unit];
 
                  uprod_r[i]:=max2i(1,uprod_r[i]-step);
               end;
@@ -2558,7 +2555,7 @@ begin
               begin
                  step:=1;
                  if(buffs[ub_SphereTurbo]>0)then step+=1;
-                 step+=upgrs_cur[upgr_fast_product];
+                 step+=upgrs_cur[upgr_fprod_upgr];
 
                  pprod_r[i]:=max2i(1,pprod_r[i]-step);
               end;
@@ -2629,7 +2626,7 @@ begin
         else td:=udist;
 
       if(td<=(uDetector^.srange+uid^.uid_r))then
-        if(buffs[ub_Invisibility]<=0)then
+        if(buffs[ub_Invisibility]<=0)or(hits<0)then
         begin
            AddToInt(@TeamVision[uDetector^.player^.team],MinVisionTime);
            if(scan_buff<=LastUnitBuff)and(player^.team<>uDetector^.player^.team)

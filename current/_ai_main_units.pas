@@ -264,8 +264,9 @@ begin
    with uid^ do
    with player^ do
      NeedScouting:=((aip_flags and aif_army_scout)>0)
-                 and(map_scenario<>mc_koth)
-                 and(not uid_AI_PrimaryTarget);
+                and((aip_flags and aif_army_early_attack0)=0)
+                and(map_scenario<>mc_koth)
+                and(uid_AI_TargetWeight=0);
 end;
 function NeedCaptureGenerators:boolean;
 begin
@@ -276,13 +277,13 @@ begin
                          and(map_generators>0)
                          and(ai_energy_future<aip_MaxEnergy)
                          and(uid_LimitUse<=keyPoint_MaxLimitAI)
-                         and(not uid_AI_PrimaryTarget);
+                         and(uid_AI_TargetWeight=0);
 end;
 procedure CheckSetGeneratorGuard;
 begin
    with pu^ do
    with uid^ do
-     if(ai_generator_d<srange)and(ai_nearGenGuards<keyPoint_MinLimit)and(not uid_AI_PrimaryTarget)then
+     if(ai_generator_d<srange)and(ai_nearGenGuards<keyPoint_MinLimit)and(uid_AI_TargetWeight=0)then
        group:=aic_group_GenGuard;
 end;
 procedure SetGroupsForHome;
@@ -374,41 +375,44 @@ begin
       if(transportM>0)
       then group:=aic_group_Transport
       else
-        case group of
-        aic_group_Home           : SetGroupsForHome;
-        aic_group_AttackNow,
-        aic_group_AttackWait     : begin
-                                      MainTargetSetDefault;
-                                      if(tar_dist =NOTSET)
-                                      then group:=aic_group_AttackWait
-                                      else group:=aic_group_AttackNow;
-                                   end;
-        aic_group_Scout          : if(not NeedScouting)
-                                   then group:=aic_group_Home
-                                   else
-                                     if(ai_ScoutCandidate_u<>pu)and(ai_BaseOwn_d<base_r1)
-                                     then group:=aic_group_Home;
-        aic_group_GenAssault,
-        aic_group_GenWait        : if(not NeedCaptureGenerators)
-                                   then group:=aic_group_Home
-                                   else
-                                     if(isfly)
-                                     then group:=aic_group_GenAssault
+        if(units_bld_l[true]=0)
+        then group:=aic_group_AttackNow
+        else
+          case group of
+          aic_group_Home           : SetGroupsForHome;
+          aic_group_AttackNow,
+          aic_group_AttackWait     : begin
+                                        MainTargetSetDefault;
+                                        if(tar_dist =NOTSET)
+                                        then group:=aic_group_AttackWait
+                                        else group:=aic_group_AttackNow;
+                                     end;
+          aic_group_Scout          : if(not NeedScouting)
+                                     then group:=aic_group_Home
                                      else
-                                       if(ai_generator_kp^.kp_Zone<>mapZone)
-                                       then group:=aic_group_GenWait
+                                       if(ai_ScoutCandidate_u<>pu)and(ai_BaseOwn_d<base_r1)
+                                       then group:=aic_group_Home;
+          aic_group_GenAssault,
+          aic_group_GenWait        : if(not NeedCaptureGenerators)
+                                     then group:=aic_group_Home
+                                     else
+                                       if(isfly)
+                                       then group:=aic_group_GenAssault
                                        else
-                                         if(group=aic_group_GenWait)
-                                         then group:=aic_group_GenAssault;
-        aic_group_GenGuard       : if(ai_generator_d=NOTSET)
-                                   then group:=aic_group_Home
-                                   else
-                                     if(ai_generator_d>srange)
-                                     or(ai_generator_kp^.kp_Zone<>mapZone)
-                                     then group:=aic_group_Home;
-        aic_group_Transport      : if(transportM<=0)then group:=aic_group_Home;
-        else group:= aic_group_Home;
-        end;
+                                         if(ai_generator_kp^.kp_Zone<>mapZone)
+                                         then group:=aic_group_GenWait
+                                         else
+                                           if(group=aic_group_GenWait)
+                                           then group:=aic_group_GenAssault;
+          aic_group_GenGuard       : if(ai_generator_d=NOTSET)
+                                     then group:=aic_group_Home
+                                     else
+                                       if(ai_generator_d>srange)
+                                       or(ai_generator_kp^.kp_Zone<>mapZone)
+                                       then group:=aic_group_Home;
+          aic_group_Transport      : if(transportM<=0)then group:=aic_group_Home;
+          else group:= aic_group_Home;
+          end;
 
      { if(isselected)then
       begin
@@ -534,9 +538,6 @@ begin
         end
         else
         begin
-           if(uid_AI_Siedge)and(ai_enemy_build_d<base_r1h)and(ai_enemy_build_d<NOTSET)then
-             uo_tar:=ai_enemy_build_u^.unum;
-
            case uidi of
            UID_Pain     : if (min2i(x,abs(map_Size1-x))>srange)
                           and(min2i(y,abs(map_Size1-y))>srange)then
@@ -545,7 +546,7 @@ begin
                                uo_id:=ua_move;
                                ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
                             end;
-           UID_Phantom  : if(ai_ZombieTarget_d<base_r1h)then ai_RunTo(pu,ai_enemy_battle_u,0,0,ai_ZombieTarget_d,0);
+           UID_Phantom  : if(ai_ZombieTarget_d<base_r2 )then ai_RunTo(pu,ai_ZombieTarget_u,0,0,ai_ZombieTarget_d,0);
            UID_Medic,
            UID_ZMedic   : if(ai_HealTar_d     <base_r2 )then ai_RunTo(pu,ai_HealTar_u     ,0,0,ai_HealTar_d     ,0);
            UID_Engineer,
@@ -555,8 +556,13 @@ begin
       if(uo_id=ua_amove)then
       begin
          if((aip_flags and aif_army_smart_Target)>0)then
-           if(ai_PrimaryTarget_u<>nil)then
-             uo_tar:=ai_PrimaryTarget_u^.unum;
+         begin
+            if(uid_AI_Siedge)and(ai_enemy_build_d<base_r1h)and(ai_enemy_build_d<NOTSET)
+            then uo_tar:=ai_enemy_build_u^.unum
+            else
+              if(ai_PrimaryTarget_u<>nil)and(uid_AI_TargetWeight=0)
+              then uo_tar:=ai_PrimaryTarget_u^.unum;
+         end;
 
          if((aip_flags and aif_ability_other)>0)then ai_AbilitiesCommon(pu);
       end;

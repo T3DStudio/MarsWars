@@ -21,7 +21,7 @@ begin
    if(rpl)
    then pwtickb1^:=(wtick mod cardinal(fr_fps2 div dataPeriod))=0  // every 2 second
    else pwtickb1^:= pwtickb0^;                                     // every second
-   pwtickb2^:=(wtick mod cardinal(fr_fpsd15 div dataPeriod))=0;    // every second time
+   pwtickb2^:=(wtick mod cardinal(fr_fpsd15 div dataPeriod))=0;    // every 8 tick?
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,14 +183,15 @@ begin
       SetBBit(@byte2,4, buffs[ub_Scaned       ]>0);
       SetBBit(@byte2,5, buffs[ub_AltMode      ]>0);
       SetBBit(@byte2,6, buffs[ub_PainState    ]>0);
+      SetBBit(@byte2,7, buffs[ub_HellVision   ]>0);
 
       SetBBit(@byte3,0, buffs[ub_SphereInvuln ]>0);
       SetBBit(@byte3,1, buffs[ub_SphereInvis  ]>0);
       SetBBit(@byte3,2, buffs[ub_SphereRDamage]>0);
       SetBBit(@byte3,3, buffs[ub_SphereDDamage]>0);
       SetBBit(@byte3,4, buffs[ub_SphereTurbo  ]>0);
-      SetBBit(@byte3,5, buffs[ub_Heroic       ]>0);
-      SetBBit(@byte3,6, buffs[ub_HellVision   ]>0);
+      SetBBit(@byte3,5, buffs[ub_SphereSoul   ]>0);
+      SetBBit(@byte3,6, buffs[ub_Heroic       ]>0);
       SetBBit(@byte3,7, transformTimer         >0);
 
       SetBBit(@byte1,0, iscomplete               );
@@ -495,6 +496,35 @@ begin
      end;
 end;
 
+procedure wclinet_PlayerCams(POVPlayer:byte;rpl:boolean);
+var p,
+bs_cam:byte;
+begin
+   bs_cam:=0;
+   for p:=0 to LastPlayer do
+     if(p<>POVPlayer)then
+       with g_PlayersMain[p] do
+       with g_PlayersTemp[p] do
+         if(state=ps_human)
+         and(not isdefeated)
+         and(not isobserver)then
+           if(g_PlayersMain[POVPlayer].isobserver)
+           or(team=g_PlayersMain[POVPlayer].team)then
+             SetBBit(@bs_cam,p,true);
+
+   wudata_byte(bs_cam,rpl);
+   if(bs_cam>0)then
+     for p:=0 to LastPlayer do
+       with g_PlayersTemp[p] do
+         if(GetBBit(@bs_cam,p))then
+         begin
+            wudata_int(cam_x,rpl);
+            wudata_int(cam_y,rpl);
+            wudata_int(cam_w,rpl);
+            wudata_int(cam_h,rpl);
+         end;
+end;
+
 procedure wclinet_gframe(POVPlayer,dataPeriod:byte;rpl:boolean);
 var
 wtickb0,
@@ -562,11 +592,16 @@ begin
       units_now:=min2i(units_ingame,units_now*4);
 
       if(wtickb2)then
-        if(map_KeyPointsN>0)then
-          if(map_scenario=mc_KeyPoints)
-          or(map_scenario=mc_KotH)
-          or(map_generators>0)then
-            wclinet_KeyPoint(rpl,POVPlayer);
+      begin
+         if(map_KeyPointsN>0)then
+           if(map_scenario=mc_KeyPoints)
+           or(map_scenario=mc_KotH)
+           or(map_generators>0)then
+             wclinet_KeyPoint(rpl,POVPlayer);
+
+         if(not rpl)then
+           wclinet_PlayerCams(POVPlayer,rpl);
+      end;
 
       if(wtickb0)then
       begin
@@ -894,7 +929,8 @@ begin
                if (pu^.buffs[ub_HellVision   ]<=0)and(buffs[ub_HellVision   ]>0)then   effect_Common    (cu,EID_HVision ,@vis);
                if (pu^.buffs[ub_Heroic       ]<=0)and(buffs[ub_Heroic       ]>0)then   effect_Common    (cu,EID_PowerUp ,@vis);
                if((pu^.buffs[ub_SphereInvuln ]<=0)and(buffs[ub_SphereInvuln ]>0))
-               or((pu^.buffs[ub_SphereInvis  ]<=0)and(buffs[ub_SphereInvis  ]>0))then  effect_Common    (cu,EID_ULevelUp,@vis);
+               or((pu^.buffs[ub_SphereInvis  ]<=0)and(buffs[ub_SphereInvis  ]>0))
+               or((pu^.buffs[ub_SphereSoul   ]<=0)and(buffs[ub_SphereSoul   ]>0))then  effect_Common    (cu,EID_ULevelUp,@vis);
                if((pu^.buffs[ub_SphereRDamage]<=0)and(buffs[ub_SphereRDamage]>0))
                or((pu^.buffs[ub_SphereDDamage]<=0)and(buffs[ub_SphereDDamage]>0))
                or((pu^.buffs[ub_SphereTurbo  ]<=0)and(buffs[ub_SphereTurbo  ]>0))then  effect_Common    (cu,EID_HLevelUp,@vis);
@@ -1127,6 +1163,7 @@ begin
          buffs[ub_Scaned       ]:=buff_Bool2InfTime[GetBBit(@byte2,4)];
          buffs[ub_AltMode      ]:=buff_Bool2InfTime[GetBBit(@byte2,5)];
          buffs[ub_PainState    ]:=buff_Bool2InfTime[GetBBit(@byte2,6)];
+         buffs[ub_HellVision   ]:=buff_Bool2InfTime[GetBBit(@byte2,7)];
       end
       else
       begin
@@ -1137,6 +1174,7 @@ begin
          buffs[ub_Scaned       ]:=0;
          buffs[ub_AltMode      ]:=0;
          buffs[ub_PainState    ]:=0;
+         buffs[ub_HellVision   ]:=0;
       end;
 
       if(byte3>0)then
@@ -1146,8 +1184,9 @@ begin
          buffs[ub_SphereRDamage]:=buff_Bool2InfTime[GetBBit(@byte3,2)];
          buffs[ub_SphereDDamage]:=buff_Bool2InfTime[GetBBit(@byte3,3)];
          buffs[ub_SphereTurbo  ]:=buff_Bool2InfTime[GetBBit(@byte3,4)];
-         buffs[ub_Heroic       ]:=buff_Bool2InfTime[GetBBit(@byte3,5)];
-         buffs[ub_HellVision   ]:=buff_Bool2InfTime[GetBBit(@byte3,6)];
+         buffs[ub_SphereSoul   ]:=buff_Bool2InfTime[GetBBit(@byte3,5)];
+         buffs[ub_Heroic       ]:=buff_Bool2InfTime[GetBBit(@byte3,6)];
+
          if(GetBBit(@byte3,7))then transformTimer:=1 else transformTimer:=0;
       end
       else
@@ -1157,8 +1196,8 @@ begin
          buffs[ub_SphereRDamage]:=0;
          buffs[ub_SphereDDamage]:=0;
          buffs[ub_SphereTurbo  ]:=0;
+         buffs[ub_SphereSoul   ]:=0;
          buffs[ub_Heroic       ]:=0;
-         buffs[ub_HellVision   ]:=0;
          transformTimer         :=0;
       end;
 
@@ -1325,7 +1364,7 @@ begin
          if(i<>uidi)then
          begin
             unit_SetDefaults(uu,false);
-            unit_ApplyUID(uu,false);
+            unit_ApplyUID(uu,true);        //после промотки у ЦЦ на земле появлются тени, проверить
             FillChar(buffs,SizeOf(buffs),0);
          end;
          hits:=hits_si2li(sh,uid^.uid_MaxHits1,uid^.uid_hits_li2si);
@@ -1530,11 +1569,35 @@ begin
       end;
 
       if(wtickb2)then
-        if(map_KeyPointsN>0)then
-          if(map_scenario=mc_KeyPoints)
-          or(map_scenario=mc_KotH)
-          or(map_generators>0)then
-            rclinet_KeyPoint(rpl,fast_skip);
+      begin
+         if(map_KeyPointsN>0)then
+           if(map_scenario=mc_KeyPoints)
+           or(map_scenario=mc_KotH)
+           or(map_generators>0)then
+             rclinet_KeyPoint(rpl,fast_skip);
+
+         // player's cam
+         if(not rpl)then
+         begin
+            bs:=rudata_byte(rpl,0);
+            for i:=0 to LastPlayer do
+              with g_PlayersTemp[i] do
+                if(GetBBit(@bs,i))then
+                begin
+                   cam_x:=rudata_int(rpl,0);
+                   cam_y:=rudata_int(rpl,0);
+                   cam_w:=rudata_int(rpl,0);
+                   cam_h:=rudata_int(rpl,0);
+                end
+                else
+                begin
+                   cam_x:=0;
+                   cam_y:=0;
+                   cam_w:=0;
+                   cam_h:=0;
+                end;
+         end;
+      end;
 
       if(wtickb0)then
       begin

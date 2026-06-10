@@ -375,6 +375,11 @@ begin
                      +aif_ability_TowerRush
                      +aif_allies_help;
       end;
+      if not(map_scenario in [mc_koth,mc_royale])then
+      begin
+         if(aip_skill>2)and(random(2)=0)then aip_flags+=aif_army_early_attack0;
+         if(aip_skill>3)and(random(2)=0)then aip_flags+=aif_army_early_attack1;
+      end;
       case aip_skill of
       6 : begin
           aip_flags+=aif_cheat_VisBuildings;
@@ -382,34 +387,25 @@ begin
       7 : begin
           aip_flags+=aif_cheat_VisBuildings;
           aip_flags+=aif_cheat_VisUnits;
-          upgrs_cur[upgr_mult_product]:=1;
+          upgrs_cur[upgr_fprod_unit ]:=1;
           end;
       8 : begin
           aip_flags+=aif_cheat_VisBuildings;
           aip_flags+=aif_cheat_VisUnits;
-          upgrs_cur[upgr_mult_product]:=1;
-          upgrs_cur[upgr_fast_product]:=1;
+          upgrs_cur[upgr_fprod_unit ]:=1;
+          upgrs_cur[upgr_fprod_upgr ]:=1;
           end;
       9 : begin
           aip_flags+=aif_cheat_VisBuildings;
           aip_flags+=aif_cheat_VisUnits;
-          upgrs_cur[upgr_mult_product]:=1;
-          upgrs_cur[upgr_fast_product]:=1;
-          upgrs_cur[upgr_fast_build  ]:=1;
+          upgrs_cur[upgr_fprod_unit ]:=1;
+          upgrs_cur[upgr_fprod_upgr ]:=1;
+          upgrs_cur[upgr_fprod_build]:=1;
           end;
       end;
    end;
    ai_SetScirmishStartAlarms(p);
 end;
-
-{function ai_HighPriorityTarget(player:PTPlayerGameData;tu:PTUnit):boolean;
-begin
-   ai_HighPriorityTarget:=false;
-   if(player^.state=ps_AI)then
-     if(player^.aip_flags and aif_army_smart_prio)>0 then
-       ai_HighPriorityTarget:=(tu^.uidi in player^.ai_hptargets)or(tu^.uid^.uid_gen_EnergyLevel>0);
-end;   }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1018,6 +1014,7 @@ begin
    with newu^ do
    with uid^ do
      if(aiu_limitaround_enemy<aiu_limitaround_ally)
+     or(aiu_limitaround_ally>ul2)
      or(aiu_alarm_d>srange)
      or(not uid_CanAttack)
      then exit;
@@ -1116,6 +1113,24 @@ begin
    ai_SphereTurbo_u:=newu;
 end;
 
+procedure ai_SetPrimaryTarget(newu:PTUnit);
+begin
+   if(ai_PrimaryTarget_u=nil)
+   then
+   else
+     if(newu^.uid^.uid_AI_TargetWeight>ai_PrimaryTarget_u^.uid^.uid_AI_TargetWeight)
+     then
+     else
+     if(newu^.uid^.uid_AI_TargetWeight<ai_PrimaryTarget_u^.uid^.uid_AI_TargetWeight)
+     then exit
+     else
+       if(newu^.hits<ai_PrimaryTarget_u^.hits)
+       then
+       else exit;
+
+   ai_PrimaryTarget_u:=newu;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure ai_SetTarget_Scout(newu:PTUnit);
@@ -1208,6 +1223,16 @@ begin
    ai_HTeleportNearest_d  :=ud;
 end;
 
+{procedure card2bits(card:cardinal);
+var i:byte;
+begin
+   for i:=0 to 31 do
+     if(card and (1 shl i))>0
+     then write('1')
+     else write('0');
+   writeln;
+end;  }
+
 procedure ai_player_code(playerN:byte);
 var
 u:integer;
@@ -1222,9 +1247,9 @@ begin
 
       {if(g_cycle_order=playerN)and(playerN=LocalPlayer)then
       begin
-         //writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack);
+         writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack,' - ',armylimit,' ',aic_MaxLimitBorder,' : ',units_bld_l[false]+prod_unit_Limit,' ',aip_MaxUnitLimit);
          //writeln(aip_timer_detection);
-      end; }
+      end;   }
 
       if(aip_timer_attack<0)then
       begin
@@ -1252,8 +1277,22 @@ begin
         if(aip_timer_attack=0)then
         begin
            if(armylimit>=aic_MaxLimitBorder)
-           or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitLimit)then
-             aip_timer_attack:=aip_pause_attack+1;
+           or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitLimit)
+           then aip_timer_attack:=aip_pause_attack+1
+           else
+             if((aip_flags and aif_army_early_attack0)>0)
+             and(units_bld_l[false]>=ul1)then
+             begin
+                aip_timer_attack:=1;
+                aip_flags:=aip_flags xor aif_army_early_attack0;
+             end
+             else
+               if((aip_flags and aif_army_early_attack1)>0)
+               and(units_bld_l[false]>=aip_MaxUnitMinPart)then
+               begin
+                  aip_timer_attack:=1;
+                  aip_flags:=aip_flags xor aif_army_early_attack1;
+               end;
         end
         else
         begin

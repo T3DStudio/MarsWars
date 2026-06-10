@@ -24,6 +24,7 @@ fr_ifps                = fr_fps1-1;
 fr_fpsh                = fr_fps1 div 2; // half
 fr_fpst                = fr_fps1 div 3; // thrid
 fr_fpsq                = fr_fps1 div 4; // quarter
+fr_fpsq3               = fr_fps1-fr_fpsq;
 fr_fpss                = fr_fps1 div 6; // six
 fr_fps1h               = fr_fpsh*3;     // 1,5
 fr_fps2                = fr_fps1*2;
@@ -104,7 +105,7 @@ maps_Last              = 5; // 0-5
 
 // map templates
 mapt_lake              = 0;
-mapt_ring              = 1;
+mapt_island            = 1;
 mapt_temple            = 2;
 mapt_cave              = 3;
 mapt_steppe            = 4;
@@ -452,8 +453,6 @@ wtr_ground             : cardinal = 1 shl 12;
 wtr_fly                : cardinal = 1 shl 13;
 wtr_light              : cardinal = 1 shl 14;
 wtr_heavy              : cardinal = 1 shl 15;
-wtr_stun               : cardinal = 1 shl 16;
-wtr_nostun             : cardinal = 1 shl 17;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -493,24 +492,23 @@ aif_base_advanceMain   : cardinal = 1 shl 2;
 aif_base_advanceOther  : cardinal = 1 shl 3;
 aif_base_BuilderMove   : cardinal = 1 shl 4;
 aif_army_scout         : cardinal = 1 shl 5;
-aif_army_smart_order   : cardinal = 1 shl 6;
-aif_army_smart_micro   : cardinal = 1 shl 7;
-aif_army_smart_Target  : cardinal = 1 shl 8;
-aif_upgr_smart_order   : cardinal = 1 shl 9;
-aif_ability_detection  : cardinal = 1 shl 10;
-aif_ability_other      : cardinal = 1 shl 11;
-aif_ability_TowerRush  : cardinal = 1 shl 12;
-aif_allies_help        : cardinal = 1 shl 13;
-aif_cheat_VisBuildings : cardinal = 1 shl 14;
-aif_cheat_VisUnits     : cardinal = 1 shl 15;
+aif_army_early_attack0 : cardinal = 1 shl 6; // 'scout' attack
+aif_army_early_attack1 : cardinal = 1 shl 7; // 'early minimum group' attack
+aif_army_smart_order   : cardinal = 1 shl 8;
+aif_army_smart_micro   : cardinal = 1 shl 9;
+aif_army_smart_Target  : cardinal = 1 shl 10;
+aif_upgr_smart_order   : cardinal = 1 shl 11;
+aif_ability_detection  : cardinal = 1 shl 12;
+aif_ability_other      : cardinal = 1 shl 13;
+aif_ability_TowerRush  : cardinal = 1 shl 14;
+aif_allies_help        : cardinal = 1 shl 15;
+aif_cheat_VisBuildings : cardinal = 1 shl 16;
+aif_cheat_VisUnits     : cardinal = 1 shl 17;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  UNIT BUFFs
 //
-
-MaxUnitBuffs           = 19;
-LastUnitBuff           = MaxUnitBuffs-1;
 
 ub_PainState           = 0;
 ub_Resurected          = 1;
@@ -528,9 +526,13 @@ ub_SpecPause           = 12;
 ub_Heroic              = 13;
 ub_SphereInvuln        = 14;
 ub_SphereInvis         = 15;
-ub_SphereRDamage        = 16;
+ub_SphereRDamage       = 16;
 ub_SphereDDamage       = 17;
 ub_SphereTurbo         = 18;
+ub_SphereSoul          = 19;
+
+MaxUnitBuffs           = 20;
+LastUnitBuff           = MaxUnitBuffs-1;
 
 ub_infinity            = NOTSET;
 b2ib                   : array[false..true] of smallint = (0,ub_infinity);
@@ -604,9 +606,9 @@ upgr_uac_TurretPlasma  = 50; // plasma weapons fro anti-ground turret
 upgr_uac_TurretArmor   = 51; // turrets armor
 
 
-upgr_fast_build        = 251;
-upgr_fast_product      = 252;
-upgr_mult_product      = 253;
+upgr_fprod_build       = 251;
+upgr_fprod_upgr        = 252;
+upgr_fprod_unit        = 253;
 upgr_invuln            = 254;
 
 
@@ -675,6 +677,7 @@ dm_Siege4              = 10; //   4*[buildings]
 dm_Lost                = 11; //                      0.5*[mech]
 dm_BFG                 = 12; // 0.5*[buildings]
 dm_AntiBio2            = 13; //   2*[unit bio]
+dm_AntiHeavy2          = 14; //   2*[unit heavy]
 
 
 // LIMIT
@@ -1019,7 +1022,10 @@ melee_r                = 8;
 dir_stepX              : array[0..7] of integer = (1, 1, 0,-1,-1,-1,0,1);
 dir_stepY              : array[0..7] of integer = (0,-1,-1,-1, 0, 1,1,1);
 
-soul_heal              = 1000;
+soul_regen             = 3;
+soul_maxHeal           = 1000;
+soul_time              = soul_maxHeal div soul_regen;
+soul_time_sec          = round(soul_time/fr_fps1);
 invis_time_sec         = 60;
 invis_time             = fr_fps1*invis_time_sec;
 invuln_time_sec        = 30;
@@ -1045,6 +1051,9 @@ fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
 
 pain_time              = fr_fps1;
+
+ai_names_max           = 40;
+
 
 {$IFDEF _FULLGAME}
 
@@ -1566,10 +1575,11 @@ mi_SG_ScrollSpeed      = 46;
 mi_SG_MouseScroll      = 47;
 mi_SG_ControlPanelPos  = 48;
 mi_SG_ControlPanelAuto = 49;
+mi_SG_ShowPlayerScrns  = 50;
 
-mi_SR_RecordGames      = 50;
-mi_SR_RecordPrefix     = 51;
-mi_SR_RecordQuality    = 52;
+mi_SR_RecordGames      = 51;
+mi_SR_RecordPrefix     = 52;
+mi_SR_RecordQuality    = 53;
 
 mi_SV_ResolutionW      = 60;
 mi_SV_ResolutionH      = 61;
@@ -1584,6 +1594,7 @@ mi_SS_MusicVolume      = 71;
 mi_SS_PlayerNext       = 72;
 mi_SS_PlaylistSize     = 73;
 mi_SS_ReloadPlaylist   = 74;
+mi_SS_RenewPlaylist    = 75;
 
 ////  REPLAYS
 mi_Replays_list        = 80;
@@ -1958,8 +1969,8 @@ str_map_SymmetryL        : array[0..maps_Last] of shortstring = ('no',
                                                                  'line \',
                                                                  'line /');
 
-str_map_TemplateL        : array[0..mapt_Last] of shortstring = ('central lake',
-                                                                 'central ring',
+str_map_TemplateL        : array[0..mapt_Last] of shortstring = ('lake',
+                                                                 'island',
                                                                  'temple',
                                                                  'cave',
                                                                  'steppe',

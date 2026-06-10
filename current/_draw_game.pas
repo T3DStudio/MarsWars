@@ -483,6 +483,7 @@ begin
       if(buffs[ub_SphereRDamage]>0)then buffx+=1;
       if(buffs[ub_SphereDDamage]>0)then buffx+=1;
       if(buffs[ub_SphereTurbo  ]>0)then buffx+=1;
+      if(buffs[ub_SphereSoul   ]>0)then buffx+=1;
       if(buffs[ub_Heroic       ]>0)then buffx+=1;
       if(pain                     )then buffx+=1;
 
@@ -501,6 +502,7 @@ begin
       if(buffs[ub_SphereRDamage]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereDArmor );buffx+=buff_sprite_w;end;
       if(buffs[ub_SphereDDamage]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereDDamage);buffx+=buff_sprite_w;end;
       if(buffs[ub_SphereTurbo  ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereTurbo  );buffx+=buff_sprite_w;end;
+      if(buffs[ub_SphereSoul   ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereSoul   );buffx+=buff_sprite_w;end;
       if(buffs[ub_Heroic       ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_Heroic       );buffx+=buff_sprite_w;end;
       if(pain                     )then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_Stun         );buffx+=buff_sprite_w;end;
    end;

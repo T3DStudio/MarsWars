@@ -12,8 +12,9 @@ begin
      if(tu^.hits>0)and(tu_transport=nil)then          // alive and not in transportU
        if(team=tu^.player^.team)then    // alies
        begin
-          if(not tu^.uid^.uid_isbuilding)then
-            if (ud<base_r1h)
+          if (not tu^.uid^.uid_isbuilding)
+          and(pu<>tu)then
+            if (ud<base_r1)
             and(tu^.uid^.uid_CanAttack)
             and(tu^.iscomplete)
             and(tu^.speed>0)
@@ -42,7 +43,7 @@ begin
                 if (tu^.buffs[ub_Invisibility]>0)
                 and(tu^.TeamDetection[team]<=0)
                 and(tu^.uid^.uid_CanAttack)
-                then aiu_NeedDetect:=min2i(aiu_NeedDetect,ud-srange);
+                then aiu_NeedDetect:=min2i(aiu_NeedDetect,ud-srange);   // ???????
            end;
 end;
 
@@ -192,10 +193,14 @@ begin
       // nearest base
       if (tu^.uidi<>UID_HEye)
       and(tu^.uid^.uid_isbuilding)
+      and( tu^.uid^.uid_isbuilder
+        or tu^.uid^.uid_isbarrack
+        or tu^.uid^.uid_isforge
+        or (tu^.uid^.uid_gen_EnergyLevel>0))
       and(tu^.speed<=0)
       and(not tu^.isfly)
       and(pfcheck)
-      and(pu<>tu)then
+      and(tu<>pu)then
         if(playeri<>tu^.playeri)
         then setNearestTarget(@ai_BaseAlly_u,@ai_BaseAlly_d,ud-uid_r-tu^.uid^.uid_r)
         else setNearestTarget(@ai_BaseOwn_u ,@ai_BaseOwn_d ,ud-uid_r-tu^.uid^.uid_r);
@@ -216,7 +221,7 @@ begin
 
       // repair/heal target
       if(pfcheck)
-      or(ud<=srange)then
+      or(isattackable)then
         if (tu^.iscomplete)
         and(tu^.hits<tu^.uid^.uid_MaxHits1)
         and(tu^.uid^.uid_Regen_Base>=0)then
@@ -261,15 +266,10 @@ begin
             if(tu^.uid^.uid_CanAttack)then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
 
             // uac strike target
-            if(tu^.speed<11)then ai_SetTarget_Strike(tu);
+            ai_SetTarget_Strike(tu);
 
             // Primary Target
-            if(ud<=srange)and(isattackable)and(tu^.uid^.uid_AI_PrimaryTarget)then
-              if(ai_PrimaryTarget_u=nil)
-              then ai_PrimaryTarget_u:=tu
-              else
-                if(tu^.hits<ai_PrimaryTarget_u^.hits)
-                then ai_PrimaryTarget_u:=tu;
+            if(ud<=srange)and(isattackable)and(tu^.uid^.uid_AI_TargetWeight>0)then ai_SetPrimaryTarget(tu);
          end;
 
          if(tu^.uid^.uid_isbuilding)then
@@ -499,7 +499,8 @@ begin
 
       if(tu^.uid^.uid_ZombieUID>0)and(pfcheck)then
         if(hits_fdead<tu^.hits)and(tu^.hits<=tu^.uid^.uid_ZombieHits)then
-          setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
+          if(CheckUnitTeamVision(team,tu,false))then
+            setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
    end;
 end;
 
