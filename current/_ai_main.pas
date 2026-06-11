@@ -366,26 +366,17 @@ begin
       else checkExtraEnergy:=0;
       if (ai_curr_Builders<needN)
       and(ai_curr_Builders<aip_MaxBuilders )
-      and(ai_curr_Builders<PlayerMaxBuilders)then
+      and(ai_curr_Builders<PlayerMaxBuilders)
+      and((units_builders_e-units_builders_c)=0)then
       begin
-        case race of
-        r_hell: if(ai_available_HKeep)
-               and(units_builders_e=(aip_MaxBuilders-1))
-               and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
-                then SetBuildUID1(UID_HKeep)
-                else SetBuildUID2(UID_HKeep,UID_HCommandCenter);
-        r_uac : SetBuildUID1(UID_UCommandCenter);
-        end;
-         {if(isselected)then
-           writeln(build_uid,' ',uid^.uid_req_EnergyLevel,
-                   ' res_energyl_cur=',res_energyl_cur,
-                   ' units='     ,energyCur_units,
-                   ' upgrades='  ,energyCur_upgrades,
-                   ' transforms=',energyCur_transforms,
-                   ' BldOther='  ,energyCur_BldOther,
-                   ' checkExtraEnergy=',checkExtraEnergy,' ',
-                   res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_transforms+energyCur_BldOther-checkExtraEnergy); }
-
+         case race of
+         r_hell: if(ai_available_HKeep)
+                and(units_builders_e=(aip_MaxBuilders-1))
+                and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
+                 then SetBuildUID1(UID_HKeep)
+                 else SetBuildUID2(UID_HKeep,UID_HCommandCenter);
+         r_uac : SetBuildUID1(UID_UCommandCenter);
+         end;
       end;
       checkExtraEnergy:=0;
    end;
@@ -1350,7 +1341,9 @@ begin
        end;
 end;
 begin
-   alarmType:=moveEventType;
+   if((pBuilder^.player^.aip_flags and aif_base_BuilderMove )>0)
+   then alarmType:=moveEventType
+   else alarmType:=0;
    {if(pBuilder^.isselected)then
    begin
       writeln('alarmType ',alarmType,' ',ai_choosen,' ',u_royal_d,' ',base_r1h,' ',(u_royal_d<base_r1h));
@@ -1511,8 +1504,7 @@ begin
 
       if(aip_timer_detection=0)then
         if((aip_flags and aif_ability_detection)>0)then ai_AbilitiesDetection(pu);
-      if(uid_isbuilder)then
-        if((aip_flags and aif_base_BuilderMove )>0)then ai_AbilitiesBuilderMove(pu);
+      if(uid_isbuilder)then                             ai_AbilitiesBuilderMove(pu);
       if((aip_flags and aif_ability_other      )>0)then ai_AbilitiesCommon(pu);
    end;
 end;

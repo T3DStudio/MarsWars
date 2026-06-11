@@ -645,13 +645,14 @@ begin
                 if(kptd_OwnerTeam=team)and(kptd_OwnerPlayer<>playeri)then continue;
                 if(kptd_Timer>0)then
                   if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
+                if(kp_LimitTeamP[team]>0)and(kp_LimitPlayerP[playeri]=0)then continue;
              end;
 
              d:=point_dist_int(kp_x,kp_y,x,y);
 
              if(not koth_point)then
-               if((kp_LimitTeamP[team]>=(keyPoint_MinLimit  +uid_LimitUse))and(d> kp_RCapture))
-               or((kp_LimitTeamP[team]> (keyPoint_MaxLimitAI+uid_LimitUse))and(d<=kp_RCapture))then continue;
+               if((kp_LimitPlayerP[playeri]>=(keyPoint_MinLimit  +uid_LimitUse))and(d> kp_RCapture))
+               or((kp_LimitPlayerP[playeri]> (keyPoint_MaxLimitAI+uid_LimitUse))and(d<=kp_RCapture))then continue;
 
              case(kp_Energy>0)and(not koth_point)of
              true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_d,@map_KeyPointsL[i],d,pu);

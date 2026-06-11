@@ -196,7 +196,7 @@ ts :shortstring;
 begin
    for u:=0 to ai_names_max-1 do
    for i:=0 to ai_names_max-1 do
-     if(u<>i)and(random(3)=0)then
+     if(u<>i)and(random(2)=0)then
      begin
         ts:=ai_names_l[i];
         ai_names_l[i]:=ai_names_l[u];
@@ -899,6 +899,7 @@ end;
 procedure game_PlayersCycle;
 var p,t:byte;
 trevealed:boolean;
+c,e:integer;
 begin
    for p:=0 to LastPlayer do
      with g_PlayersMain[p] do
@@ -967,7 +968,23 @@ begin
                     PlayersAddToLog(p,0,lmt_Req_Energy,0,0,'',-1,-1);
                  end;
           end;
+
        end;
+
+   c:=0;
+   e:=0;
+   if(InputAction(iact_Control))then
+     with g_PlayersMain[LocalPlayer] do
+     begin
+        for p:=1 to 255 do
+        begin
+           e+=units_uid_e[p];
+           c+=units_uid_c[p];
+        end;
+        writeln(LocalPlayer,' e=',e,' c=',c,' units_all_e=',units_all_e,' units_all_c=',units_all_c);
+     end;
+   //writeln(pnum,' ',units_all_c);
+
 
    if(g_cycle_order=0)and(map_scenario=mc_royale)then
      for t:=0 to LastPlayer do

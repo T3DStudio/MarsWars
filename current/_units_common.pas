@@ -1814,6 +1814,7 @@ begin
       if(units_ucl_u[uid_isbuilding,uid_uibtn]<=0)then units_ucl_u[uid_isbuilding,uid_uibtn]:=unum;
       units_ucl_c[uid_isbuilding,uid_uibtn]+=1;
       units_uid_c[uidi                    ]+=1;
+      units_all_c+=1;
       res_energyl_max +=uid_gen_EnergyLevel;
       res_energyl_cur +=uid_gen_EnergyLevel;
       unit_IncCounters_Prod(pu);
@@ -2330,7 +2331,7 @@ begin
       if(res_HellPower  <ptarUID^.uid_req_HellPower  )then begin unit_TransformStart:=lmt_Req_HellPower;exit;end;
       if(res_UACLoot    <ptarUID^.uid_req_UACLoot    )then begin unit_TransformStart:=lmt_Req_UACLoot;  exit;end;
 
-      if(isselected)and(not check)then writeln((state=ps_AI)and(ptarUID^.uid_isbuilder),' ',energyCur_units+energyCur_upgrades,' ',ptarUID^.uid_req_EnergyLevel);
+      //if(isselected)and(not check)then writeln((state=ps_AI)and(ptarUID^.uid_isbuilder),' ',energyCur_units+energyCur_upgrades,' ',ptarUID^.uid_req_EnergyLevel);
 
       case (state=ps_AI)and(ptarUID^.uid_isbuilder) of
       false: if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
@@ -2461,9 +2462,9 @@ begin
          unit_ProdStopUpgrade(pu,255,true     ,false);
          unit_TransformStop  (pu,false);
 
-         //units_all_c-=1;
          units_ucl_c[uid_isbuilding,uid_uibtn]-=1;
          units_uid_c[uidi                    ]-=1;
+         units_all_c-=1;
          res_energyl_max-=uid_gen_EnergyLevel;
          res_energyl_cur-=uid_gen_EnergyLevel;
 
@@ -2643,6 +2644,17 @@ begin
    end;
 end;
 
+procedure player_SetDefeat(player:PTPlayerGameData);
+begin
+   with player^ do
+     if(not isdefeated)and(not isobserver)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
+     begin
+        writeln('defeated ',pnum,' ',units_all_c,' ',units_all_e);
+        isdefeated:=true;
+        GameLog_PlayerDefeated(pnum);
+        if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
+     end;
+end;
 
 procedure unit_remove(pu:PTUnit);
 begin
@@ -2651,12 +2663,7 @@ begin
    begin
       unit_DecCounters_Remove(pu);
 
-      if(units_all_e<=0)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
-      begin
-         isdefeated:=true;
-         GameLog_PlayerDefeated(playeri);
-         if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
-      end;
+      if(units_all_e<=0)then player_SetDefeat(player);
    end;
 end;
 
@@ -2745,6 +2752,8 @@ begin
                for i:=1 to uid_DeathUIDn do
                  if(player_UIDLimitCheck(player,uid_DeathUID))then
                    unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0);
+
+           if(units_all_c<=0)then player_SetDefeat(player);
         end;
      end
      else

@@ -62,6 +62,7 @@ begin
                 unit_CalcFogR(pu);
                 {$ENDIF}
                 GameLog_UnitResurrected(pu);
+                unit_IncCounters_Complete(pu);
              end;
         end;
      end;
@@ -234,8 +235,12 @@ begin
    with player^ do
    begin
       units_all_e+=1;   // ??? костыль что бы игрок не проигрывал если трансформируется единственное здание/юнит
+      //if(ocomplete)then
+      units_all_c+=1;
       unit_kill(pu,true,true,false,false,true);
       units_all_e-=1;
+      //if(ocomplete)then
+      units_all_c-=1;
       unit_add(x,y,unum,ouid,playeri,ocomplete,summoned,ulevel);
 
       //res_HellPower-=pNewUID^.uid_req_HellPower;
@@ -508,7 +513,9 @@ begin
       if(buffs[ub_Resurected]>0)
       or(buffs[ub_PainState ]>0)
       or(hits<=hits_fdead      )
-      or(hits>0                )then exit;
+      or(hits>0                )
+      or(pTarget^.player^.isdefeated)
+      or(pTarget^.player^.isobserver)then exit;
    end;
 
    if(pResurrector<>nil)then
@@ -879,8 +886,8 @@ begin
       then StayWaitForNewTarget-=1;
 
       pushout        := uid_issolid and unit_canMove(pu) and ((a_rld<=0)or uid_isbuilding);
-      attack_target  := unit_canAttack(pu,false);//and(playeri=UIPlayer);
-      aicode         := (state=ps_AI);//and(isselected);
+      attack_target  := unit_canAttack(pu,false)and(not isdefeated);
+      aicode         := (state=ps_AI)and(not isdefeated);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
       NearTeleport   := false;
       NearTeleport_tu:= nil;
@@ -971,11 +978,12 @@ begin
 
       ai_Local_Code(pu);
       if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
-      {if(TestMode>0)then
+      if(TestMode>0)then
         if(isselected)then
         begin
-           if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
-        end;   }
+           //if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
+           //writeln(pnum,' ',units_all_c);
+        end;
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
    end;

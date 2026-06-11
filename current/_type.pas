@@ -706,6 +706,7 @@ TPlayerGameData = record
    units_bld_l     : array[false..true] of longint; // limit
 
    units_all_e,
+   units_all_c,
    units_all_s,
    units_builders_e,
    units_builders_c,  // builders
