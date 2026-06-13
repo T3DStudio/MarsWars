@@ -105,6 +105,15 @@ begin
    end;
 end;
 
+procedure menu_FixScroll(scrollVar:pinteger;listSel,listSize:integer);
+begin
+   if(listSel<scrollVar^)
+   then scrollVar^:=listSel
+   else
+     if((scrollVar^+listSize)<=listSel)
+     then scrollVar^:=listSel-listSize+1;
+end;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -252,14 +261,19 @@ begin
    end;
 end;
 
-procedure GameNetServerListSelect(mi:byte);
+procedure GameNetServerListSelectedInfo;
 begin
-   menu_ListMouseXY2Line(mi,@net_SvList_sel,net_SvList_scroll,menu_ServerLineH);
    if(net_SvList_sel<0)or(net_SvList_Size<=net_SvList_sel)
    then menu_ClientAddress:=''
    else
      with net_SvList_listi[net_SvList_sel] do
        menu_ClientAddress:=si_line;
+end;
+
+procedure GameNetServerListSelect(mi:byte);
+begin
+   menu_ListMouseXY2Line(mi,@net_SvList_sel,net_SvList_scroll,menu_ServerLineH);
+   GameNetServerListSelectedInfo;
 end;
 
 function GameNetServerListConnect(check:boolean):boolean;
@@ -305,27 +319,50 @@ begin
    end;
 end;
 
-function GameNetServerListDelete(check:boolean):boolean;
+function GameNetServerListDeleteInit(check:boolean):boolean;
 begin
-   GameNetServerListDelete:=false;
+   GameNetServerListDeleteInit:=false;
 
    if(not net_SvList)
    or(net_SvList_sel<0)
    or(net_SvList_Size<=net_SvList_sel)
    then exit;
 
-   GameNetServerListDelete:=true;
+   GameNetServerListDeleteInit:=true;
 
    if(check)then exit;
+
+   with net_SvList_listi[net_SvList_sel] do
+     menu_msgBox_Set(str_FileDelete,si_line,mmbt_DeleteServer);
+end;
+
+function GameNetServerListDelete(svline:shortstring):boolean;
+var delItem:integer;
+begin
+   GameNetServerListDelete:=false;
+
+   if(not net_SvList)then exit;
+
+   delItem:=-1;
+
+   if(net_SvList_Size>0)then
+     for delItem:=0 to net_SvList_Size-1 do
+       with net_SvList_listi[delItem] do
+         if(si_line=svline)then break;
+
+   if(delItem<0)then exit;
+
+   GameNetServerListDelete:=true;
+
+   net_SvList_sel:=delItem;
 
    delete(net_SvList_listi,net_SvList_sel,1);
    delete(net_SvList_lists,net_SvList_sel,1);
    net_SvList_Size-=1;
    if(net_SvList_Scroll>0)then
-   net_SvList_Scroll-=1;
+     net_SvList_Scroll-=1;
 
-   if(net_SvList_Size>0)then
-     if(net_SvList_sel=net_SvList_Size)then net_SvList_sel-=1;
+   //menu_FixScroll(@net_SvList_scroll,net_SvList_sel,menu_ServerListH);
 end;
 
 
@@ -809,9 +846,9 @@ begin
 
    menu_page_BottomButtons(mi_back,mi_NetServers_Connect,mi_NetServers_Add,mi_NetServers_Delete,0,0,0);
 
-   menu_item_setEnabled(mi_NetServers_Connect,GameNetServerListConnect(true));
-   menu_item_setEnabled(mi_NetServers_Add    ,GameNetServerListAdd    (true));
-   menu_item_setEnabled(mi_NetServers_Delete ,GameNetServerListDelete (true));
+   menu_item_setEnabled(mi_NetServers_Connect,GameNetServerListConnect   (true));
+   menu_item_setEnabled(mi_NetServers_Add    ,GameNetServerListAdd       (true));
+   menu_item_setEnabled(mi_NetServers_Delete ,GameNetServerListDeleteInit(true));
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -850,10 +887,32 @@ end;
 //   MENU MAIN CODE
 //
 
-procedure menu_EndEdition(EnterKey:boolean);
-var changed:boolean;
+function menu_KeyEnter:boolean;
 begin
-   changed:=true;
+   menu_KeyEnter:=false;
+
+   if(Menu_items[mi_Replays_list].mi_state=as_enabled)then
+   begin
+      menu_KeyEnter:=true;
+      replay_Play(false);
+   end
+   else
+     if(Menu_items[mi_SaveLoad_list].mi_state=as_enabled)and(not g_started)then
+     begin
+        menu_KeyEnter:=true;
+        saveload_Load(false);
+     end
+     else
+       if(Menu_items[mi_NetServers_List].mi_state=as_enabled)then
+       begin
+          menu_KeyEnter:=true;
+          GameNetServerListConnect(false);
+       end;
+end;
+
+function menu_EndEdition(EnterKey:boolean):boolean;
+begin
+   menu_EndEdition:=true;
    case menu_ItemSelected of
 mi_SG_PlayerName   : g_PlayersMain[LocalPlayer].name:=PlayerName;
 mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
@@ -865,19 +924,111 @@ mi_MP_ChatLine,
 mi_MP_ChatList     : if(EnterKey)then
                      begin
                         if(length(net_chat_str)>0)then
-                        begin
-                           if(net_status=ns_client)
-                           then net_send_chat(            255,net_chat_str)
-                           else GameLog_Chat  (LocalPlayer,255,net_chat_str);
-                        end;
+                          if(net_status=ns_client)
+                          then net_send_chat(            255,net_chat_str)
+                          else GameLog_Chat (LocalPlayer,255,net_chat_str);
                         net_chat_str:='';
                      end;
-   else changed:=false;
+   else
+     if(EnterKey)
+     then menu_EndEdition:=menu_KeyEnter
+     else menu_EndEdition:=false;
    end;
    menu_ItemSelected:=0;
-   menu_update:=changed or menu_update;
+   menu_update:=menu_EndEdition or menu_update;
 end;
 
+function menu_KeyUp:boolean;
+begin
+   menu_KeyUp:=false;
+
+   if(Menu_items[mi_Replays_list].mi_state=as_enabled)then
+   begin
+      if(rpls_list_sel>0)then
+      begin
+         rpls_list_sel-=1;
+         replay_MenuSelectedInfo;
+         menu_FixScroll(@rpls_list_scroll,rpls_list_sel,menu_BaseList1H);
+         menu_KeyUp:=true;
+      end;
+   end
+   else
+     if(Menu_items[mi_SaveLoad_list].mi_state=as_enabled)then
+     begin
+        if(svld_list_sel>0)then
+        begin
+           svld_list_sel-=1;
+           saveload_MenuSelectedInfo;
+           menu_FixScroll(@svld_list_scroll,svld_list_sel,menu_BaseList1H);
+           menu_KeyUp:=true;
+        end;
+     end
+     else
+       if(Menu_items[mi_NetServers_List].mi_state=as_enabled)then
+       begin
+          if(net_SvList_sel>0)then
+          begin
+             net_SvList_sel-=1;
+             GameNetServerListSelectedInfo;
+             menu_FixScroll(@net_SvList_scroll,net_SvList_sel,menu_ServerListH);
+             menu_KeyUp:=true;
+          end;
+       end;
+   menu_update:=menu_KeyUp or menu_update;
+end;
+
+function menu_KeyDown:boolean;
+begin
+   menu_KeyDown:=false;
+   if(Menu_items[mi_Replays_list].mi_state=as_enabled)then
+   begin
+      if(rpls_list_sel<(rpls_list_Size-1))then
+      begin
+         rpls_list_sel+=1;
+         replay_MenuSelectedInfo;
+         menu_FixScroll(@rpls_list_scroll,rpls_list_sel,menu_BaseList1H);
+         menu_KeyDown:=true;
+      end;
+   end
+   else
+     if(Menu_items[mi_SaveLoad_list].mi_state=as_enabled)then
+     begin
+        if(svld_list_sel<(svld_list_Size-1))then
+        begin
+           svld_list_sel+=1;
+           saveload_MenuSelectedInfo;
+           menu_FixScroll(@svld_list_scroll,svld_list_sel,menu_BaseList1H);
+           menu_KeyDown:=true;
+        end;
+     end
+     else
+       if(Menu_items[mi_NetServers_List].mi_state=as_enabled)then
+       begin
+          if(net_SvList_sel<(net_SvList_Size-1))then
+          begin
+             net_SvList_sel+=1;
+             GameNetServerListSelectedInfo;
+             menu_FixScroll(@net_SvList_scroll,net_SvList_sel,menu_ServerListH);
+             menu_KeyDown:=true;
+          end;
+       end;
+   menu_update:=menu_KeyDown or menu_update;
+end;
+
+function menu_KeyDelete:boolean;
+begin
+   menu_KeyDelete:=false;
+   if(Menu_items[mi_Replays_list].mi_state=as_enabled)
+   then menu_KeyDelete:=replay_DeleteInit(false)
+   else
+     if(Menu_items[mi_SaveLoad_list].mi_state=as_enabled)
+     then menu_KeyDelete:=saveload_DeleteInit(false)
+     else
+       if(Menu_items[mi_NetServers_List].mi_state=as_enabled)
+       then menu_KeyDelete:=GameNetServerListDeleteInit(false);
+
+   menu_update:=menu_KeyDelete or menu_update;
+end;
 
 function menu_Controls_MLB(item:byte;check:boolean):boolean;
 begin
@@ -885,9 +1036,10 @@ begin
    case item of
 mi_back                : if(not check)then MenuBack(false,false);
 mi_exit                : if(not check)then GameCycle:=false;
-mi_StartTimer          : if(not check)then if(TestMode=0)
-                                           then g_LobbyTimer:=g_GameStartTime
-                                           else g_LobbyTimer:=2;
+mi_StartTimer          : if(not check)then {$IFDEF TESTMODE}
+                                           if(TestMode>0)
+                                           then g_LobbyTimer:=2
+                                           else {$ENDIF}g_LobbyTimer:=g_GameStartTime;
 mi_StopTimer           : if(not check)then begin
                                            g_LobbyTimer:=0;
                                            GameLog_BreakStarting;
@@ -1031,10 +1183,10 @@ mi_MP_ClientAddress    : ;
 mi_MP_ClientServerList : if(not check)then GameNetServerList(true,false);
 
 // Net Server List MULTIPLAYER
-mi_NetServers_List      : if(not check)then GameNetServerListSelect(item);
-mi_NetServers_Connect   : if(not check)then GameNetServerListConnect(false);
-mi_NetServers_Add       : if(not check)then GameNetServerListAdd    (false);
-mi_NetServers_Delete    : if(not check)then GameNetServerListDelete (false);
+mi_NetServers_List      : if(not check)then GameNetServerListSelect    (item);
+mi_NetServers_Connect   : if(not check)then GameNetServerListConnect   (false);
+mi_NetServers_Add       : if(not check)then GameNetServerListAdd       (false);
+mi_NetServers_Delete    : if(not check)then GameNetServerListDeleteInit(false);
 
 // HELP
 mi_help_GameControls,
@@ -1087,8 +1239,8 @@ mi_SaveLoad_list  : case g_started of
                     true : menu_Controls_DMLB:=false;
                     false: if(not check)then saveload_Load(false);
                     end;
-mi_Replays_list   : if(not check)then replay_Play  (false);
-mi_NetServers_List : if(not check)then GameNetServerListConnect(false);
+mi_Replays_list   : if(not check)then replay_Play(false);
+mi_NetServers_List: if(not check)then GameNetServerListConnect(false);
    else
       menu_Controls_DMLB:=false;
    end;
@@ -1248,16 +1400,18 @@ begin
                        end;
    mmbt_SaveRewrite,
    mmbt_DeleteSave,
-   mmbt_DeleteReplay : begin
+   mmbt_DeleteReplay,
+   mmbt_DeleteServer : begin
                             if((InputActionPressed(iact_MLB))
                             and(menu_msg_btn1x0<=mouse_x)and(mouse_x<=menu_msg_btn1x1)
                             and(menu_msg_btn1y0<=mouse_y)and(mouse_y<=menu_msg_btn1y1))
                             or(InputActionPressed(iact_Return))then
                             begin
                                case menu_msg_type of
-                               mmbt_SaveRewrite : saveload_SaveWrite (menu_msg_Body);
-                               mmbt_DeleteSave  : saveload_DeleteFile(menu_msg_Body);
-                               mmbt_DeleteReplay:   replay_DeleteFile(menu_msg_Body);
+                               mmbt_SaveRewrite :      saveload_SaveWrite(menu_msg_Body);
+                               mmbt_DeleteSave  :     saveload_DeleteFile(menu_msg_Body);
+                               mmbt_DeleteReplay:       replay_DeleteFile(menu_msg_Body);
+                               mmbt_DeleteServer: GameNetServerListDelete(menu_msg_Body);
                                end;
                                snd_SoundPlayUI(snd_click);
                             end;
@@ -1333,17 +1487,6 @@ begin
   false: if(menu_Controls_Text(menu_ItemTarget  ,true ,nil))then SetBBit(@menu_ItemActs,miat_TextEdit,true);
   end;
 
-///////////////////////////////////  double  left button pressed
-  case InputActionDPressed(iact_MLB) of
-  true : if(menu_Controls_DMLB(menu_ItemSelected,false))then
-         begin
-            SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
-            menu_update:=true;
-            clickSound :=true;
-         end;
-  false: if(menu_Controls_DMLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
-  end;
-
 ///////////////////////////////////   left button pressed
    case InputActionPressed(iact_MLB) of
    true : if(menu_Controls_MLB(menu_ItemSelected,false))then
@@ -1351,9 +1494,20 @@ begin
              SetBBit(@menu_ItemActs,miat_BtnLeft,true);
              menu_update:=true;
              clickSound :=true;
-             if(not GetBBit(@menu_ItemActs,miat_TextEdit))then menu_ItemSelected:=0;
+             if(not GetBBit(@menu_ItemActs,miat_TextEdit))
+             and(not InputActionDPressed(iact_MLB))then menu_ItemSelected:=0;
           end;
    false: if(menu_Controls_MLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnLeft,true);
+   end;
+///////////////////////////////////  double  left button pressed
+   case InputActionDPressed(iact_MLB) of
+   true : if(menu_Controls_DMLB(menu_ItemSelected,false))then
+          begin
+             SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
+             menu_update:=true;
+             clickSound :=true;
+          end;
+   false: if(menu_Controls_DMLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
    end;
 
 ///////////////////////////////////   right button pressed
@@ -1420,9 +1574,14 @@ begin
 
    if(InputActionPressed(iact_Esc   ))then MenuBack(false,false);
    if(InputActionPressed(iact_Return))then menu_EndEdition(true);
+   if(InputActionPressed(iact_Up    ))
+   or(InputActionStuck  (iact_Up    ))then menu_KeyUp;
+   if(InputActionPressed(iact_Down  ))
+   or(InputActionStuck  (iact_Down  ))then menu_KeyDown;
+   if(InputActionPressed(iAct_Delete))then menu_KeyDelete;
 
-  // if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
-  // if(InputActionPressed(iAct_test_debug1      ))then ;
+   // if(InputActionPressed(iAct_test_debug0      ))then writeln(MenuBack(false,true));
+   // if(InputActionPressed(iAct_test_debug1      ))then ;
 
    if(menu_ItemTargetP<>menu_ItemTarget)then
      if(menu_hint_pos[menu_ItemTarget ]>0)

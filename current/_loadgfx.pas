@@ -556,7 +556,7 @@ end;
 
 procedure gfx_MakeFogTileSet;
 var
-x,y,i:integer;
+x,y:integer;
 fsurf:pSDL_Surface;
 b10,
 b01,b11,b21,
@@ -875,7 +875,6 @@ begin
    gfx_LoadMWSModel(@spr_HPools3            ,folder_RaceBuildings[r_hell]+'h_b3b'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HPools4            ,folder_RaceBuildings[r_hell]+'h_b3c'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HFTower            ,folder_RaceBuildings[r_hell]+'h_b4_'      ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSTower            ,folder_RaceBuildings[r_hell]+'h_b11_'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HTeleport          ,folder_RaceBuildings[r_hell]+'h_b5_'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HMonastery         ,folder_RaceBuildings[r_hell]+'h_b6_'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HTotem             ,folder_RaceBuildings[r_hell]+'h_b7_'      ,smt_buiding  );

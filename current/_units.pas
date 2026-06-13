@@ -234,12 +234,10 @@ begin
    with pOldU^ do
    with player^ do
    begin
-      units_all_e+=1;   // ??? костыль что бы игрок не проигрывал если трансформируется единственное здание/юнит
-      //if(ocomplete)then
+      units_all_e+=1;
       units_all_c+=1;
       unit_kill(pu,true,true,false,false,true);
       units_all_e-=1;
-      //if(ocomplete)then
       units_all_c-=1;
       unit_add(x,y,unum,ouid,playeri,ocomplete,summoned,ulevel);
 
@@ -513,15 +511,17 @@ begin
       if(buffs[ub_Resurected]>0)
       or(buffs[ub_PainState ]>0)
       or(hits<=hits_fdead      )
-      or(hits>0                )
-      or(pTarget^.player^.isdefeated)
-      or(pTarget^.player^.isobserver)then exit;
+      or(hits>0                )then exit;
    end;
 
    if(pResurrector<>nil)then
-     if(pTarget^.player^.team<>pResurrector^.player^.team)then
+     if(pTarget^.player^.team=pResurrector^.player^.team)then
+     begin
+        if(pTarget^.player^.isdefeated)
+        or(pTarget^.player^.isobserver)then exit;
+     end
+     else
        with pResurrector^ do
-       with uid^ do
        with player^ do
          if((armylimit+pTarget^.uid^.uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
 
@@ -978,12 +978,12 @@ begin
 
       ai_Local_Code(pu);
       if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
-      if(TestMode>0)then
+      {if(TestMode>0)then
         if(isselected)then
         begin
            //if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
            //writeln(pnum,' ',units_all_c);
-        end;
+        end;}
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
    end;
@@ -1137,7 +1137,7 @@ var _h:single;
     _d,
     _z:integer;
  _zuid:PTUID;
-_pvar:pinteger;
+_ppla:PTPlayerGameData;
     {$IFDEF _FULLGAME}
     _s:integer;
     {$ENDIF}
@@ -1177,10 +1177,12 @@ begin
       {$IFDEF _FULLGAME}
       _s:=g_unitsVis[pTarget^.unum].shadowz;
       {$ENDIF}
-      _pvar:=@pPhantom^.player^.units_all_e;
-      _pvar^+=1;
+      _ppla:=pPhantom^.player;
+      _ppla^.units_all_e+=1;
+      _ppla^.units_all_c+=1;
       unit_kill(pPhantom,true,true,false,false,true);
-      _pvar^-=1;
+      _ppla^.units_all_e-=1;
+      _ppla^.units_all_c-=1;
       unit_add(pTarget^.x,pTarget^.y,pPhantom^.unum,pTarget^.uid^.uid_ZombieUID,pPhantom^.playeri,true,true,_l);
       unit_kill(pTarget,true,true,false,false,true);
 
@@ -1502,7 +1504,7 @@ begin
            hits+=uid_ProdHitStep;
         end;
 
-        if(hits>=uid_MaxHits1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
+        if(hits>=uid_MaxHits1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF}then
         begin
            hits:=uid_MaxHits1;
            iscomplete :=true;
@@ -2247,7 +2249,7 @@ begin
                then transformTimer-=2
                else transformTimer-=1;
 
-               if(transformTimer<1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF} then transformTimer:=1;
+               if(transformTimer<1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF} then transformTimer:=1;
                if(transformTimer=1)then
                begin
                   energyCur_transforms-=g_uids[transformUID].uid_req_EnergyLevel;
@@ -2349,6 +2351,14 @@ begin
       with pu^ do
         if(hits>hits_dead)then
         begin
+           with player^ do
+             if(isdefeated)
+             or(isobserver)then
+             begin
+                unit_kill(pu,true,true,false,true,true);
+                continue;
+             end;
+
            if(cycle_order=g_cycle_order)then
              unit_TeamReveal(pu,false);
 

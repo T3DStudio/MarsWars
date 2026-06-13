@@ -89,9 +89,10 @@ begin
    pv^:=tu;
    pd^:=d;
 end;
-function setNearestTarget(ppu:PPTunit;pd:pinteger;newvalue:integer):boolean;
+function setNearestTarget(ppu:PPTunit;pd:pinteger;newvalue:integer;halfValue:boolean=false):boolean;
 begin
    setNearestTarget:=false;
+   if(halfValue)then newvalue:=newvalue div 2;
    if(newvalue<pd^)then
    begin
       pd^ :=newvalue;
@@ -105,50 +106,20 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(tu^.uid^.uid_CanAttack)then    // can attack
+      if(tu^.uid^.uid_CanAttack)then // can attack
       begin
          // towers
-         if(ud<srange)and(tu^.uid^.uid_isbuilding)and(not tu^.isfly)then
+         if(ud<srange)and(tu^.uid^.uid_isbuilding)and(not tu^.isfly)and(tu<>pu)then
          begin
             if(tu^.uid^.uid_CanAttackGround)then ai_towers_near_AG+=1;
             if(tu^.uid^.uid_CanAttackAir   )then ai_towers_near_AA+=1;
          end;
-
-         {if(tu^.uidi=aiucl_twr_air1[race])
-         or(tu^.uidi=aiucl_twr_air2[race])then
-         begin
-            if(ud<srange)then
-            begin
-               ai_towers_near_air+=1;
-               ai_towers_near    +=1;
-            end;
-            ai_towers_cur+=1;
-            if(tu^.iscomplete)then ai_towers_cur_active+=1;
-         end
-         else
-           if(tu^.uidi=aiucl_twr_ground1[race])
-           or(tu^.uidi=aiucl_twr_ground2[race])then
-           begin
-              if(ud<srange)then
-              begin
-                 ai_towers_near_grd+=1;
-                 ai_towers_near    +=1;
-              end;
-              ai_towers_cur+=1;
-              if(tu^.iscomplete)then ai_towers_cur_active+=1;
-           end;}
          if(tu^.iscomplete)then
          begin
-            //// active detection
+            // active detection
             // hell eye target
-
             if(tu^.buffs[ub_Detector]<=0)and(tu^.buffs[ub_HellVision]<=0)then
               setNearestTarget(@ai_need_heye_u,@ai_need_heye_d,tu^.aiu_NeedDetect);
-              {if(tu^.aiu_NeedDetect<ai_need_heye_d)then
-              begin
-                 ai_need_heye_u:=tu;
-                 ai_need_heye_d:=tu^.aiu_NeedDetect;
-              end;  }
          end;
       end;
 
@@ -158,9 +129,7 @@ begin
       and(not map_IfObstacleZone(tu^.aiu_alarm_zone))
       and(tu^.mapZone<>mapZone)
       and(not map_IfObstacleZone(tu^.mapZone))then
-        setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d);
-      // добавить условие на больший приоритет на телепорт с апгрейдом Portal Link
-      // добавить поиск "удаленного" телепорта
+        setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for KOTH
       if(map_scenario=mc_koth)then
@@ -168,7 +137,7 @@ begin
           if (not map_IfObstacleZone(kp_Zone))
           and(tu^.mapZone=kp_Zone)
           and(tu^.mapZone<>mapZone)then
-            setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud);
+            setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for generator capture
       if(ai_generator_d<NOTSET)then
@@ -179,8 +148,6 @@ begin
           else
             if(tu^.aiu_alarm_d>ai_HTeleportTarGen_u^.aiu_alarm_d)
             then ai_HTeleportTarGen_u:=tu;
-
-      //ai_HTeleportTarGen_d
 
       // Alarmed base
       if (not tu^.uid^.uid_CanAttack)
@@ -214,10 +181,13 @@ begin
       if(ability_CheckTarget_UACGeneral   (team,tu))then ai_SetTarget_UACGeneral   (tu);
       if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
       if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
+      if(tu^.group<>aic_group_Scout)or(tu^.player^.state<>ps_AI)then
+      begin
       if(ability_CheckTarget_SphereInvuln (team,tu))then ai_SetTarget_SphereInvuln (tu);
       if(ability_CheckTarget_SphereRDamage(team,tu))then ai_SetTarget_SphereRDamage(tu);
       if(ability_CheckTarget_SphereDDamage(team,tu))then ai_SetTarget_SphereDDamage(tu);
       if(ability_CheckTarget_SphereTurbo  (team,tu))then ai_SetTarget_SphereTurbo  (tu);
+      end;
 
       // repair/heal target
       if(pfcheck)
@@ -225,9 +195,11 @@ begin
         if (tu^.iscomplete)
         and(tu^.hits<tu^.uid^.uid_MaxHits1)
         and(tu^.uid^.uid_Regen_Base>=0)then
-          if(tu^.uid^.uid_ismech)
-          then setNearestTarget(@ai_RepairTar_u,@ai_RepairTar_d,ud)
-          else setNearestTarget(@ai_HealTar_u  ,@ai_HealTar_d  ,ud);
+          if(speed>tu^.speed)
+          or(ud<srange)then
+            if(tu^.uid^.uid_ismech)
+            then setNearestTarget(@ai_RepairTar_u,@ai_RepairTar_d,ud)
+            else setNearestTarget(@ai_HealTar_u  ,@ai_HealTar_d  ,ud);
    end;
 end;
 

@@ -31,6 +31,7 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 procedure KeyPoints_Clear;   forward;
 
 procedure GameRemoveAIObservers; forward;
+procedure game_MakeRandomSkirmish; forward;
 
 {$IFDEF _FULLGAME}
 procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
@@ -469,7 +470,7 @@ begin
           with g_upgrs[i] do upgrs_max[i]:=min2b(upgr_max,lvl);
    end;
 end;
-procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new,NoCheck:boolean);  // current upgrades
+procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
    with g_PlayersMain[p] do
@@ -479,9 +480,7 @@ begin
        for i:=0 to 255 do
         if(i in g)then
          with g_upgrs[i] do
-          {if(NoCheck)
-          then upgrs_cur[i]:=min2i(upgr_max ,lvl)
-          else} upgrs_cur[i]:=min3i(upgrs_max[i],upgr_max,lvl);
+          upgrs_cur[i]:=min3i(upgrs_max[i],upgr_max,lvl);
    end;
 end;
 
@@ -820,27 +819,6 @@ begin
       if(check)
       or(state=ps_AI)then exit;
    end;
-
-   {if((msgid and ureq_place        )>0)then bt:=lmt_prod_BadPlace      else
-   if((msgid and ureq_landplace    )>0)then bt:=lmt_ability_BadPlace   else
-   if((msgid and ureq_uid          )>0)
-   or((msgid and ureq_upgr         )>0)then bt:=lmt_Req_Common         else
-   if((msgid and ureq_HellPower    )>0)then bt:=lmt_Req_HellPower      else
-   if((msgid and ureq_UACLoot      )>0)then bt:=lmt_Req_UACLoot        else
-   if((msgid and ureq_reloading    )>0)then bt:=lmt_ability_reload     else
-   if((msgid and ureq_InProgress   )>0)then bt:=lmt_upgrade_InProgress else
-   if((msgid and ureq_max          )>0)then bt:=lmt_Req_MaxCount       else
-   if((msgid and ureq_armylimit    )>0)
-   or((msgid and ureq_limit        )>0)then bt:=lmt_Req_Limit          else
-   if((msgid and ureq_energy       )>0)then bt:=lmt_Req_Energy         else
-   if((msgid and ureq_forges       )>0)
-   or((msgid and ureq_barracks     )>0)then bt:=lmt_NeedProdUnit       else
-   if((msgid and ureq_builders     )>0)then bt:=lmt_unit_NeedBuilder   else
-   if((msgid and ureq_busy         )>0)then bt:=lmt_prod_AllBusy       else
-   if((msgid and ureq_MaxLevel     )>0)then bt:=lmt_unit_MaxLevel      else
-   if((msgid and ureq_InvalidTarget)>0)then bt:=lmt_invalid_Target     else
-   if((msgid and ureq_other        )>0)then bt:=lmt_Invalid_Order      else
-                                            bt:=lmt_prod_BadOrder;      }
 
    PlayersAddToLog(playerN,0,amsgid,atype,auid,'',x,y);
 end;
@@ -1223,8 +1201,8 @@ false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;
 
       case(state=ps_AI)and(uid_isbuilder)of
       false: if(res_energyl_cur<(uid_req_EnergyLevel+checkExtraEnergy))then
-             begin CheckUnitReqs:=lmt_Req_Energy;exit;end;                                                 //energyCur_BldGens
-      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_transforms+energyCur_BldOther-checkExtraEnergy)<uid_req_EnergyLevel)
+             begin CheckUnitReqs:=lmt_Req_Energy;exit;end;   //energyCur_BldGens    energyCur_transforms
+      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_BldOther-checkExtraEnergy)<uid_req_EnergyLevel)
              or(res_energyl_max<(uid_req_EnergyLevel+checkExtraEnergy))then
              begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
       end;
@@ -2155,6 +2133,22 @@ lmt_ability_BadPlace  : begin
                         end;
 lmt_ability_reload    : begin
                         ParseLogMessage:=str_warn_AbilityReload;
+                        AddDataStr;
+                        end;
+lmt_ability_Casting   : begin
+                        ParseLogMessage:=str_warn_AbilityCasting;
+                        AddDataStr;
+                        end;
+lmt_ability_ReqUACNear: begin
+                        ParseLogMessage:=str_warn_AbilityReqUACNear;
+                        AddDataStr;
+                        end;
+lmt_ability_ReqHelNear: begin
+                        ParseLogMessage:=str_warn_AbilityReqHelNear;
+                        AddDataStr;
+                        end;
+lmt_ability_Tar2Close : begin
+                        ParseLogMessage:=str_warn_AbilityTar2Close;
                         AddDataStr;
                         end;
 lmt_invalid_Target    : ParseLogMessage:=str_warn_Invalid_Target;

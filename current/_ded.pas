@@ -5,6 +5,7 @@ begin
    begin
       net_status:=ns_server;
       PlayersSetDefault;
+      //game_MakeRandomSkirmish;
    end
    else GameCycle :=false;
 

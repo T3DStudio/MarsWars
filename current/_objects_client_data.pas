@@ -471,15 +471,6 @@ begin
    setWeaponESND(0,nil,snd_hell_attack    ,0,MID_Imp);
    uid_eid_bcrater_y:=15;
 end;
-UID_HSTower:
-begin
-   uid_AnimStepWalk:=5;
-
-   setMWSModel(0,@spr_HSTower);
-   setBuildingSND(snd_hell_htower);
-   setWeaponESND(0,nil,snd_hell_attack    ,0,MID_Baron);
-   uid_eid_bcrater_y:=15;
-end;
 UID_HTeleport:
 begin
    uid_AnimStepWalk:=5;

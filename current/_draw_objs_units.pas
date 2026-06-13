@@ -216,6 +216,7 @@ begin
                if(ui_uprod_first         <=0)or(ftime<ui_uprod_first         )then ui_uprod_first         :=time;
                if(ui_uprod_uid_time[uidi]<=0)or(ftime<ui_uprod_uid_time[uidi])then ui_uprod_uid_time[uidi]:=time;
 
+               ui_uprod_uid_cur[uidi]+=1;
                ui_uprod_cur+=1;
             end;
      end;
@@ -254,6 +255,7 @@ begin
               then r:=pprod_r[pline] div 2
               else r:=pprod_r[pline];
               i:=pprod_u[pline];
+              ui_pprod_upg_cur[i]+=1;
               if(ui_pprod_first      <=0)or(r<ui_pprod_first      )then ui_pprod_first      :=pprod_r[pline];
               if(ui_pprod_upg_time[i]<=0)or(r<ui_pprod_upg_time[i])then ui_pprod_upg_time[i]:=pprod_r[pline];
            end
@@ -377,8 +379,10 @@ begin
    FillChar(ui_bprod_ucl_time ,SizeOf(ui_bprod_ucl_time ),0);
    FillChar(ui_uprod_uid_time ,SizeOf(ui_uprod_uid_time ),0);
    FillChar(ui_uprod_uid_max  ,SizeOf(ui_uprod_uid_max  ),0);
+   FillChar(ui_uprod_uid_cur  ,SizeOf(ui_uprod_uid_cur  ),0);
    FillChar(ui_pprod_upg_time ,SizeOf(ui_pprod_upg_time ),0);
    FillChar(ui_pprod_upg_max  ,SizeOf(ui_pprod_upg_max  ),0);
+   FillChar(ui_pprod_upg_cur  ,SizeOf(ui_pprod_upg_cur  ),0);
    FillChar(ui_units_inapc    ,SizeOf(ui_units_inapc    ),0);
    FillChar(ui_group_d        ,SizeOf(ui_group_d        ),0);
    FillChar(ui_group_f1       ,SizeOf(ui_group_f1       ),0);

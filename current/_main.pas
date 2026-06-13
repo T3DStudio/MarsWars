@@ -1,7 +1,7 @@
 
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
-  {$DEFINE DEBUG0}
+  {$DEFINE TESTMODE}
   //{$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
@@ -66,10 +66,12 @@ begin
    GameInit;
 
    {$IFDEF _FULLGAME}
+   {$IFDEF TESTMODE}
    if(TestMode=2)then
    begin
    htmldoc_make;
    end;
+   {$ENDIF}
    {$ENDIF}
 
    while(GameCycle)do

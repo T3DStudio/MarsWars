@@ -165,12 +165,14 @@ begin
    draw_UIMinimapAlarms;
 
    // debug
+   {$IFDEF TESTMODE}
    if(TestMode>1)and(UIPlayer<=LastPlayer)then
      with g_PlayersMain[UIPlayer] do
        for i:=0 to ai_LastAlarm do
          with ai_TeamAlarms[team,i] do
            if(aia_limit>0)then
              circleColor(ui_minimap,round(aia_x*map_MiniMap_cx),round(aia_y*map_MiniMap_cx),5,c_white);
+   {$ENDIF}
 
    draw_sdlsurface(tar       ,1,1,ui_minimap );
    draw_sdlsurface(ui_minimap,0,0,ui_bminimap);
@@ -479,13 +481,13 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                            begin
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,false,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_uprod_uid_time[uid])      ,i2s(prod_unit_uid[uid])     ,i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
+                                              ir2s(ui_uprod_uid_time[uid])      ,i2s(ui_uprod_uid_cur[uid])  ,i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
                                               ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
                                            end;
                             tab_upgrades : begin
                                               draw_UIButtonS(tar,ux,uy,g_upgrs[uid].upgr_btn.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_pprod_upg_time[uid])      ,i2s(prod_upgr_upid[uid])    ,'',b2s(upgrs_cur[uid])                                 ,'',
+                                              ir2s(ui_pprod_upg_time[uid])      ,i2s(ui_pprod_upg_cur[uid])  ,'',b2s(upgrs_cur[uid])                                 ,'',
                                               ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,0 ,ui_max_color[upgrs_cur[uid]>=upgrs_max[uid]] ,0 ,'');
                                            end;
                             end;
@@ -788,8 +790,11 @@ begin
           limit:=armylimit+prod_unit_Limit;
           draw_text(tar,ui_EnergyX,ui_EnergyY   ,str_ui_EnergyLevel   +': '+tc_default+i2s(res_energyl_cur           )+tc_white+' / '+tc_aqua  +i2s(res_energyl_max)
                                                                                                                                     ,ta_RU,255,ui_cenergy[res_energyl_cur<=0] );
-          draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower     +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,ui_cenergy[res_HellPower>=HellPower_Max]);
-          draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot       +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,ui_cenergy[res_UACLoot  >=UACLoot_Max  ]);
+          if(UIPlayer=LocalPlayer)or(rpls_pstate<>rpls_read)then
+          begin
+             draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower  +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,ui_cenergy[res_HellPower>=HellPower_Max]);
+             draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot    +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,ui_cenergy[res_UACLoot  >=UACLoot_Max  ]);
+          end;
 
           draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_gray+ui_limitstr
                                                                                                                                     ,ta_LU,255,ui_max_color[limit>=MaxPlayerLimit]);
@@ -858,8 +863,9 @@ begin
         for i:=0 to slist_n-1 do
           draw_text(tar,x,y+txt_line_h2*i,slist_l[i],ta_LU,255,c_white);
      end;
-
+   {$IFDEF TESTMODE}
    if(TestMode>0)then draw_text(tar,ui_cam_hw,ui_cam_hh,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
+   {$ENDIF}
 
    if(ui_ShowAPM            )then draw_text(tar,ui_APMx,ui_APMy,'APM: '                                              ,ta_LU,255,c_white);
    if(vid_ShowFPS           )then draw_text(tar,ui_FPSx,ui_FPSy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
@@ -932,10 +938,10 @@ begin
    end;
 
    case ui_ControlPanelPos of
-   0 : vlineColor(tar,         -ui_cam_x,         -ui_cam_y,map_Size1-ui_cam_y,c_white);
-   1 : vlineColor(tar,map_Size1-ui_cam_x,         -ui_cam_y,map_Size1-ui_cam_y,c_white);
-   2 : hlineColor(tar,         -ui_cam_x,map_Size1-ui_cam_x,         -ui_cam_y,c_white);
-   3 : hlineColor(tar,         -ui_cam_x,map_Size1-ui_cam_x,map_Size1-ui_cam_y,c_white);
+   0 : vlineColor(tar,         -ui_cam_x,         -ui_cam_y,map_Size1-ui_cam_y,c_gray);
+   1 : vlineColor(tar,map_Size1-ui_cam_x,         -ui_cam_y,map_Size1-ui_cam_y,c_gray);
+   2 : hlineColor(tar,         -ui_cam_x,map_Size1-ui_cam_x,         -ui_cam_y,c_gray);
+   3 : hlineColor(tar,         -ui_cam_x,map_Size1-ui_cam_x,map_Size1-ui_cam_y,c_gray);
    end;
 
    if(UIPlayer>LastPlayer)

@@ -72,7 +72,7 @@ begin
        MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,aiu_alarm_d,0);
    if(ai_BaseDef_d<NOTSET)then
      with ai_BaseDef_u^ do
-       MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,ai_BaseDef_d,0,ai_BaseDef_d div 2,0);
+       MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,ai_BaseDef_d,mapZone,ai_BaseDef_d div 2,0);
 end;
 
 function MainTargetGo(wrect:integer):boolean;
@@ -168,7 +168,7 @@ begin
                TransportDropAndRunOut:=true;
             end;
      end;
-   //with pu^ do if(isselected)then writeln('TransportDropAndRunOut ',TransportDropAndRunOut);
+   with pu^ do if(isselected)then writeln('TransportDropAndRunOut ',TransportDropAndRunOut,' tar_dist=',tar_dist,' tar_zone=',tar_zone,' mapZone=',mapZone);
 end;
 procedure TransportGoForUnit(tu:PTUnit;du:integer);
 begin
@@ -191,14 +191,15 @@ begin
        begin
           TransportBaseDefenders:=true;
           TransportGoForUnit(ai_TransportTar_BDefend_u,ai_TransportTar_BDefend_d);
+          with pu^ do if(isselected)then writeln('TransportDefendBase 1',TransportBaseDefenders);
        end
        else
          if(pu^.transportC>0)then
          begin
-            ai_RunTo(pu,ai_BaseDef_u,0,0,ai_BaseDef_d,pu^.srange);
+            ai_RunTo(pu,ai_BaseDef_u,0,0,ai_BaseDef_d,-pu^.srange);
             TransportBaseDefenders:=true;
+            with pu^ do if(isselected)then writeln('TransportDefendBase 2',TransportBaseDefenders);
          end;
-   //with pu^ do if(isselected)then writeln('TransportDefendBase ',TransportBaseDefenders);
 end;
 function TransportTransferAttackers:boolean;
 begin
@@ -230,6 +231,7 @@ begin
            TransportGoForUnit(ai_TransportTar_Attack_u,ai_TransportTar_Attack_d);
            TransportTransferAttackers:=true;
         end;
+   with pu^ do if(isselected)then writeln('TransportTransferAttackers ',TransportTransferAttackers);
 end;
 function TransportGeneratorTeam:boolean;
 begin
@@ -440,14 +442,15 @@ begin
                                       if(not TransportBaseDefenders)then
                                         if(not TransportTransferAttackers)then
                                           if(not TransportGeneratorTeam)then
-                                            if(not FollowCommander)then
-                                            begin
+                                          begin
+                                             if(not FollowCommander)then
                                                ai_BaseIdle(pu,aic_BaseIdle_r);
-                                               if(transportC>0)then
-                                                 if(ai_BaseOwn_d<srange)
-                                                 or(ai_BaseOwn_d=NOTSET)
-                                                 then uo_id:=unit_Ability2Act(pu,uab_Unload);
-                                            end;
+
+                                             if(transportC>0)then
+                                               if(ai_BaseOwn_d<srange)
+                                               or(ai_BaseOwn_d=NOTSET)
+                                               then uo_id:=unit_Ability2Act(pu,uab_Unload);
+                                          end;
                                  end;
       aic_group_GenAssault,
       aic_group_GenGuard       : begin

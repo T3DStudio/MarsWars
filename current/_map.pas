@@ -849,7 +849,7 @@ end;
 //    GENERATOR
 //
 
-procedure map_Obstacles_Noise(n_obstacles,min_f,max_f:integer;iRPart:integer;allowInInR:boolean=false);
+procedure map_Obstacles_Noise(n_obstacles,min_f,max_f,iRPart:integer;allowInInR:boolean=false);
 const attempts_max = 3;
 var
 obs_f,
@@ -890,12 +890,15 @@ begin
       dR:=map_RObstaclePointIn(ix,iy);
       if(dR=0)or(allowInInR)then
       begin
-         if(irO>=base_r1)then
+         if(irO>=base_r1)and(iRPart<>0)then
          begin
-            if(iRPart>1 )then irI:=irO-min2i(base_r2,irO div iRPart);
+            if(iRPart>1 )then irI:=min2i(base_r2,irO div iRPart);
             if(iRPart<-1)then
               if(map_ObstaclesN mod 2)=0 then
-                irI:=irO-min2i(base_r2,irO div -iRPart);
+                irI:=min2i(base_r2,irO div -iRPart);
+
+            if(irI<ObstacleMinInnerR)then irI:=ObstacleMinInnerR;
+            irI:=irO-ObstacleMinInnerR;
          end;
       end
       else
@@ -998,7 +1001,7 @@ begin
          rx+=map_SizeH;
          ry+=map_SizeH;
          ro:=point_dist_int(tx,ty,rx,ry) div 2;
-         ri:=ro-(ro div 6);
+         ri:=ro-ObstacleMinInnerR;
          tx:=(tx+rx) div 2;
          ty:=(ty+ry) div 2;
 
@@ -1064,8 +1067,8 @@ begin
                  end;
    mapt_steppe : map_Obstacles_Noise(obs_n,0,2 ,0);
    mapt_canyon : begin
-                 map_Obstacles_Noise(obs_n,3,10,5,true);
-                 map_Obstacles_Noise(obs_n,3,10,5,true);
+                 map_Obstacles_Noise(obs_n,3,10,15,true);
+                 map_Obstacles_Noise(obs_n,3,10,15,true);
                  map_Obstacles_Noise(obs_n,0,2 ,0);
                  end;
    end;

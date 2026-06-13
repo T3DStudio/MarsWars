@@ -129,7 +129,8 @@ begin
 
       // upgrade prods
       ai_need_UpgrProds:=0;
-      if(aip_MaxForges>0)then
+      if(aip_MaxForges>0)
+      and(not ai_earlyAttack)then
       begin
          ai_need_UpgrProds:=res_energyl_max div 1500;
 
@@ -144,10 +145,11 @@ begin
       ai_need_UnitProds:=0;
       if(aip_MaxBarracks>0)then
       begin
-         case race of
+         ai_need_UnitProds:=(res_energyl_max div 425);
+         {case race of
          r_uac : ai_need_UnitProds:=(res_energyl_max div 425);
          r_hell: ai_need_UnitProds:=(res_energyl_max div 500);
-         end;
+         end;}
          ai_need_UnitProds+=ai_curr_Builders;
          if(ai_UpgradesLeft>0)then ai_need_UnitProds-=ai_need_UpgrProds;
          if(ai_need_UnitProds<1)then ai_need_UnitProds:=1;
@@ -265,7 +267,7 @@ begin
       if(aiu_alarm_d=NOTSET)then exit;
 
       case race of
-      r_hell: SetBuildUID3(UID_HFTower,UID_HSTower,UID_HTotem);
+      r_hell: SetBuildUID2(UID_HFTower,UID_HTotem);
       r_uac : begin
                  if(aiu_alarm_d<base_r2)then
                    if(ai_enemylimit_baseR2_grd>0)
@@ -367,7 +369,8 @@ begin
       if (ai_curr_Builders<needN)
       and(ai_curr_Builders<aip_MaxBuilders )
       and(ai_curr_Builders<PlayerMaxBuilders)
-      and((units_builders_e-units_builders_c)=0)then
+      and((units_builders_e-units_builders_c)=0)
+      and(not ai_earlyAttack)then
       begin
          case race of
          r_hell: if(ai_available_HKeep)
@@ -577,6 +580,8 @@ begin
 
                    for i:=1 to aip_MaxUpgradeLevel do
                    begin
+                      if(map_NeedTransport)then
+                        SetUpgrade(upgr_hell_TeleportCD,i);
                       SetUpgrade(upgr_hell_PainFactor  ,i);
                       SetUpgrade(upgr_hell_EvilEyeR    ,i);
                       SetUpgrade(upgr_hell_Regeneration,i);
@@ -586,7 +591,7 @@ begin
                       SetUpgrade(upgr_hell_MeleeDamage ,i);
                       SetUpgrade(upgr_hell_UnitArmor   ,i);
                       SetUpgrade(upgr_hell_BuildArmor  ,i);
-                   end;
+                     end;
                 end;
 
                 SetUpgrade(upgr_hell_DistDamage1+g_random(21),aip_MaxUpgradeLevel);
@@ -600,6 +605,8 @@ begin
                    SetUpgrade(upgr_uac_SSMWeapon    ,1);
                    SetUpgrade(upgr_uac_CommandoInvis,1);
                    SetUpgrade(upgr_uac_CCAttack     ,1);
+                   if(map_NeedTransport)then
+                     SetUpgrade(upgr_uac_Transport  ,1);
                    SetUpgrade(upgr_uac_DronTurret   ,1);
                    SetUpgrade(upgr_uac_TerAAWeapon  ,1);
 
@@ -764,7 +771,9 @@ uprod_AgroundBio :    case race of
                                 0: tuid:=UID_Sergant;
                                 1: tuid:=UID_SSergant;
                                 2: tuid:=UID_Commando;
-                                3: tuid:=UID_Antiaircrafter;
+                                3: if(upgrs_cur[upgr_uac_SSMWeapon]>0)
+                                   then tuid:=UID_Antiaircrafter
+                                   else tuid:=UID_Commando;
                                 4: tuid:=UID_BFGMarine;
                                 end;
                       end;
@@ -862,7 +871,9 @@ uprod_random     :    case race of
                                      2 : tuid:=UID_Sergant;
                                      3 : tuid:=UID_SSergant;
                                      4 : tuid:=UID_Commando;
-                                     5 : tuid:=UID_Antiaircrafter;
+                                     5 : if(upgrs_cur[upgr_uac_SSMWeapon]>0)
+                                         then tuid:=UID_Antiaircrafter
+                                         else tuid:=UID_Commando;
                                      6 : tuid:=UID_SiegeMarine;
                                      7 : tuid:=UID_FPlasmagunner;
                                      8 : tuid:=UID_BFGMarine;
@@ -887,7 +898,7 @@ uprod_random     :    case race of
       UID_ZMedic,
       UID_Medic,
       UID_ZEngineer,
-      UID_Engineer  : tuid_m:=aic_max_SpecUID;
+      UID_Engineer  : tuid_m:=min2i(aip_skill,aic_max_SpecUID);
       else            tuid_m:=MaxUnits;
       end;
 
@@ -958,7 +969,6 @@ begin
                                // destroy redundance barracks
                             end;
        UID_HFTower,
-       UID_HSTower,
        UID_HTotem         : if (not ai_IsTowerUsefull(pu))then ai_NeedSuicide:=true;
        UID_UGTurret,
        UID_UATurret       : if (upgrs_cur[upgr_uac_DronTurret]=0)
@@ -977,8 +987,7 @@ end;
 function ai_AbilitiesTransformIf(pu:PTUnit):boolean;
 begin
    with pu^ do
-     ai_AbilitiesTransformIf:=(aiu_limitaround_ally>=aiu_limitaround_enemy)
-                           and(buffs[ub_damaged]<=0)
+     ai_AbilitiesTransformIf:=(buffs[ub_damaged]<=0)
                            and(hits>uid^.uid_MaxHitsh);
 end;
 
@@ -1007,7 +1016,8 @@ UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter: if(u_royal_d>base_r3)
                     or(map_scenario<>mc_royale)then
-                      if(ai_curr_UnitProds>0)then
+                      if(ai_curr_UnitProds>0)
+                      and((aip_flags and aif_army_early_attack0)=0)then
                         case uidi of
                         UID_HKeep         : ai_UnitAbility(pu,uab_ToHAKeep         ,0,0,0);
                         UID_HCommandCenter: ai_UnitAbility(pu,uab_ToHACommandCenter,0,0,0);
@@ -1107,7 +1117,6 @@ begin
    with player^ do
      case uidi of
      UID_HFTower,
-     UID_HSTower,
      UID_HTotem      : if(a_rld<=0)and(aiu_alarm_d>srange)then
                        begin
                           if(ai_keypoint_d<NOTSET)then
@@ -1197,8 +1206,14 @@ begin
 
      UID_UGTurret,
      UID_UATurret    : if (upgrs_cur[upgr_uac_DronTurret]>0)
-                       and(not ai_IsTowerUsefull(pCaster))then
-                         ai_UnitAbility(pCaster,uab_ToUACDron,0,0,0);
+                       and(not ai_IsTowerUsefull(pCaster))
+                       then ai_UnitAbility(pCaster,uab_ToUACDron,0,0,0)
+                       else
+                         if(ai_enemy_d>base_r2)then
+                           case uidi of
+                           UID_UGTurret: if(ai_towers_near_AG>0)and(ai_towers_near_AA=0)then ai_UnitAbility(pCaster,uab_ToUAATurret,0,0,0);
+                           UID_UATurret: if(ai_towers_near_AA>0)and(ai_towers_near_AG=0)then ai_UnitAbility(pCaster,uab_ToUAGTurret,0,0,0);
+                           end;
 
      end;
 

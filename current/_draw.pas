@@ -18,7 +18,9 @@ begin
    draw_AddAllSprites(G_Status<>gs_running);
 
    draw_LayerTerrain   (vid_screen);
+   {$IFDEF TESTMODE}
    test_w :=vid_ScreenSpritesS;
+   {$ENDIF}
    draw_LayerSpriteList(vid_screen);
 
    if (ui_fog)
@@ -28,12 +30,13 @@ begin
 
    draw_LayerUnitsInfo(vid_screen);
    draw_LayerUI       (vid_screen);
-
+   {$IFDEF TESTMODE}
    if(TestMode>1)and(net_status=0)then draw_debug;
+   {$ENDIF}
 end;
 
 procedure GameDraw;
-var i,n:integer;
+var n:integer;
 begin
    ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod ui_blink_period1;
    ui_blink_timer2+=1;ui_blink_timer2:=ui_blink_timer2 mod ui_blink_period2;
@@ -62,7 +65,7 @@ begin
    else draw_Game;
 
    //_drawMWSModel(@spr_HCommandCenter);
-
+   {$IFDEF TESTMODE}
    if(TestMode>1)then
    begin
 
@@ -125,6 +128,7 @@ begin
   { circleColor(vid_screen,ui_UIPortX0,ui_UIPortY0,10,c_lime);
    circleColor(vid_screen,ui_UIPortX1,ui_UIPortY1,10,c_aqua); }
    end;
+   {$ENDIF}
 
    sdl_flip(vid_screen);
 end;

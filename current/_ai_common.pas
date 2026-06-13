@@ -35,6 +35,7 @@ ai_GroupIn_ulimit    : array[0..MaxAIGroups] of longint;
 ai_choosen,
 ai_flags_BaseAMain,
 ai_flags_BaseAOther,
+ai_earlyAttack,
 ai_available_HKeep
                      : boolean;
 
@@ -327,13 +328,13 @@ begin
       //              energy buil bar   forges dete  min   max            pause
       //                     ders racks        ctors tower tower     army  atta det  spec
       0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0   ,0   ,0   );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,0  ,10   ,150 ,60  ,240 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
-      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,40   ,100 ,30  ,180 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
-      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,65   ,50  ,20  ,120 );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,125  ,0   ,10  ,80  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,0  ,10   ,150 ,90  ,240 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
+      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,30   ,100 ,60  ,180 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
+      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,55   ,50  ,30  ,120 );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,0   ,10  ,80  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
       else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,0   ,0   ,0   );//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
       end;
-      //aic_max_SpecUID:=aip_skill-1;
+
       if(aip_skill>1)
       then aip_MaxUpgradeLevel:=aip_skill
       else aip_MaxUpgradeLevel:=0;
@@ -501,6 +502,8 @@ begin
    begin
       ai_flags_BaseAMain   :=(aip_flags and aif_base_advanceMain )>0;
       ai_flags_BaseAOther  :=(aip_flags and aif_base_advanceOther)>0;
+      ai_earlyAttack       :=((aip_flags and aif_army_early_attack0)>0)
+                           or((aip_flags and aif_army_early_attack1)>0);
       ai_choosen           :=(units_uid_c[uidi]>1)and(unum=units_uid_u[uidi]);
       ai_AvailableDetectors:= units_uid_e[UID_HEyeNest]+units_uid_e[UID_URadar];
       ai_UpgradesLeft      := ai_CalcUpgradesLeft(player);
@@ -825,17 +828,6 @@ begin
      else ai_GetLevel:=level;
 end;
 
-
-procedure ai_timer(y:pinteger;RepeatValue:integer);
-begin
-   if(y^>0)then
-   begin
-      y^-=order_period;
-      if(y^=0)then y^:=-1;
-   end
-   else
-     if(y^<0)then y^:=RepeatValue;
-end;
 
 ////  'MAGIC' targets
 
@@ -1237,6 +1229,7 @@ end;  }
 procedure ai_player_code(playerN:byte);
 var
 u:integer;
+limit_AGroup,
 limit_Attack,
 limit_Base:longint;
 begin
@@ -1248,9 +1241,10 @@ begin
 
       {if(g_cycle_order=playerN)and(playerN=LocalPlayer)then
       begin
-         writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack,' - ',armylimit,' ',aic_MaxLimitBorder,' : ',units_bld_l[false]+prod_unit_Limit,' ',aip_MaxUnitLimit);
+         //writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack,' - ',armylimit,' ',aic_MaxLimitBorder,' : ',units_bld_l[false]+prod_unit_Limit,' ',aip_MaxUnitLimit);
          //writeln(aip_timer_detection);
-      end;   }
+         writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
+      end;  }
 
       if(aip_timer_attack<0)then
       begin
@@ -1277,29 +1271,25 @@ begin
       else
         if(aip_timer_attack=0)then
         begin
-           if(armylimit>=aic_MaxLimitBorder)
-           or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitLimit)
-           then aip_timer_attack:=aip_pause_attack+1
+           if(((aip_flags and aif_army_early_attack0)>0)and(units_bld_l[false]>=ul1))
+           or(((aip_flags and aif_army_early_attack1)>0)and(units_bld_l[false]>=aip_MaxUnitMinPart))
+           then aip_timer_attack:=1
            else
-             if((aip_flags and aif_army_early_attack0)>0)
-             and(units_bld_l[false]>=ul1)then
-             begin
-                aip_timer_attack:=1;
-                aip_flags:=aip_flags xor aif_army_early_attack0;
-             end
-             else
-               if((aip_flags and aif_army_early_attack1)>0)
-               and(units_bld_l[false]>=aip_MaxUnitMinPart)then
-               begin
-                  aip_timer_attack:=1;
-                  aip_flags:=aip_flags xor aif_army_early_attack1;
-               end;
+             if(armylimit>=aic_MaxLimitBorder)
+             or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitLimit)
+             then aip_timer_attack:=aip_pause_attack+1;
         end
         else
         begin
            aip_timer_attack-=1;
            if(aip_timer_attack<=0)then
            begin
+              if((aip_flags and aif_army_early_attack0)>0)
+              then limit_AGroup:=ul1
+              else
+                if((aip_flags and aif_army_early_attack1)>0)
+                then limit_AGroup:=aip_MaxUnitMinPart
+                else limit_AGroup:=aip_MaxUnitLimit;
               limit_Attack:=0;
               for u:=1 to MaxUnits do
                 with g_punits[u]^ do
@@ -1308,9 +1298,15 @@ begin
                   begin
                      limit_Attack+=uid_LimitUse;
                      group:=aic_group_AttackNow;
-                     if(limit_Attack>=aip_MaxUnitLimit)then break;
+                     if(limit_Attack>=limit_AGroup)then break;
                   end;
               aip_timer_attack:=hits_ndead;
+              if(limit_Attack>0)then
+                if((aip_flags and aif_army_early_attack0)>0)
+                then aip_flags:=aip_flags xor aif_army_early_attack0
+                else
+                  if((aip_flags and aif_army_early_attack1)>0)
+                  then aip_flags:=aip_flags xor aif_army_early_attack1;
            end;
         end;
    end;

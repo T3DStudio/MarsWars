@@ -778,7 +778,7 @@ begin
       begin
          if(aping<aping.MaxValue)then
            si_ping:=aping;
-         ainfo:=c2s(si_ping)+' '+si_line+' '+ainfo;
+         ainfo:=tc_orange+c2s(si_ping)+tc_default+' '+si_line+' '+ainfo;
       end;
       if(net_SvList_lists[e]<>ainfo)then menu_update:=true;
       net_SvList_lists[e]:=ainfo;

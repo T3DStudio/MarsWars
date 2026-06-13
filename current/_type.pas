@@ -250,7 +250,7 @@ TMenuItem = record
    mi_state: TActAState;
 end;
 
-TMenuMessageBoxType = (mmbt_none,mmbt_nothing,mmbt_netPortBlock,mmbt_netWaitServer,mmbt_DeleteReplay,mmbt_DeleteSave,mmbt_SaveRewrite);
+TMenuMessageBoxType = (mmbt_none,mmbt_nothing,mmbt_netPortBlock,mmbt_netWaitServer,mmbt_DeleteReplay,mmbt_DeleteSave,mmbt_DeleteServer,mmbt_SaveRewrite);
 
 TSaveLoadItem = record
    data_p:pointer;
@@ -412,7 +412,6 @@ end;
 PTUnitArm = ^TUnitArms;
 
 TUID = record
-   uid_square,
    uid_MaxHits1,
    uid_MaxHitsh,
    uid_MaxHitsq          : longint;

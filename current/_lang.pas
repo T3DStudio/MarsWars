@@ -360,7 +360,11 @@ begin
    str_warn_ngen_exh             := 'The Neutral Generator was exhausted';
    str_warn_Invalid_Target       := 'Invalid target';
    str_warn_Invalid_Order        := 'Invalid order';
-   str_warn_AbilityReload        := 'The ability is on cooldown!' ;
+   str_warn_AbilityReload        := 'The ability is on cooldown';
+   str_warn_AbilityCasting       := 'Unit is in ability-casting state';
+   str_warn_AbilityReqUACNear    := 'Need an allied unit of UAC nearby';
+   str_warn_AbilityReqHelNear    := 'Need an allied unit of Hell nearby';
+   str_warn_AbilityTar2Close     := 'Target is too close';
 
    str_ui_time                   := 'Time: ';
    str_ui_menu                   := 'Menu';
@@ -416,6 +420,7 @@ begin
    str_attr_fly                  := tc_aqua  +'FLYING'+tc_default;
    str_attr_ground               := tc_lime  +'GROUND'+tc_default;
    str_attr_level                := tc_white +'LEVEL'+tc_default;
+   str_attr_SSoul                := tc_blue  +'SOUL SPHERE'+tc_default;
    str_attr_SInvuln              := tc_white +'INVULNERABILITY SPHERE'+tc_default;
    str_attr_SInvis               := tc_purple+'INVISIBILITY SPHERE'+tc_default;
    str_attr_SRDamage             := tc_gray  +'DAMAGE RESISTANCE SPHERE'+tc_default;
@@ -595,7 +600,6 @@ begin
    str_SetUnitBaseHint(UID_HMonastery        ,'Monastery of Despair'             ,'');
    str_SetUnitBaseHint(UID_HFortress         ,'Castle of Damned'                 ,'');
    str_SetUnitBaseHint(UID_HFTower           ,'Fire Tower'                       ,'Basic defensive structure'        );
-   str_SetUnitBaseHint(UID_HSTower           ,'Slime Tower'                      ,'Basic defensive structure'        );
    str_SetUnitBaseHint(UID_HTotem            ,'Totem of Horror'                  ,'Advanced defensive structure'     );
    str_SetUnitBaseHint(UID_HEyeNest          ,'Evil Eye Nest'                    ,'Detection and scouting structure.');
    str_SetUnitBaseHint(UID_HEye              ,'Evil Eye'                         ,'Detection and scouting structure.');
@@ -918,10 +922,11 @@ begin
    DocHelp_AddBaseMchanics(' ');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_stuned  +' - unit is stuned and can`t attack or move;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; its takes half damage and deals double damage;');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC radar;');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Decay   +' - unit is under "Decay Aura" effect;');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and receives 1.5 times less damage;');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Decay   +' - unit is under "Decay Aura" effect; it slowly lose health;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_HVision +' - unit is under "Hell Vision" effect; it can see invisible enemy units;');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SSoul   +' - unit is under "Soul Sphere" effect; it`s regaining it health;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SInvuln +' - unit is under "Invulnerability Sphere" effect; it is immune to any damage;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SInvis  +' - unit is under "Invisibility Sphere" effect; it invisibile;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage;');
@@ -1065,6 +1070,7 @@ begin
    DocHelp_AddHotKeyAction([],tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt);
    DocHelp_AddHotKeyAction([],tc_docbr);
 
+   {$IFDEF TESTMODE}
    DocHelp_AddHotKeyAction([iAct_test_FastTime     ],'toggle uncapped FPS(faster game speed)');
    DocHelp_AddHotKeyAction([iAct_test_InstaProd    ],'toggle instant production');
    DocHelp_AddHotKeyAction([iAct_test_ToggleAI     ],'toggle AI control for current player');
@@ -1075,6 +1081,7 @@ begin
    DocHelp_AddHotKeyAction([iAct_test_BePlayer0..
                             iAct_test_BePlayer7    ],'set current player');
    DocHelp_AddHotKeyAction([],tc_docbr);
+   {$ENDIF}
 
    /////////////////////////////////////////////////////////////////////////////
    //  Help docs  OTHER
@@ -1462,7 +1469,7 @@ begin
   str_attr_fly          := tc_white +'летающий'      ;
   str_attr_ground       := tc_lime  +'наземный'      ;
   str_attr_level        := tc_white +'уровень '      ;
-  str_attr_SInvuln       := tc_lime  +'неу€звимый'    ;
+  str_attr_SInvuln      := tc_lime  +'неу€звимый'    ;
   str_attr_stuned       := tc_yellow+'оглушен'       ;
   str_attr_detector     := tc_purple+'детектор'      ;
 

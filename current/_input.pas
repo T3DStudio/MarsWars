@@ -38,6 +38,7 @@ begin
    input_SetAction(iAct_alt               ,ikt_keyboard,0           ,SDLK_LALt        );
    input_SetAction(iAct_shift             ,ikt_keyboard,0           ,SDLK_LShift      );
 
+   input_SetAction(iAct_Delete            ,ikt_keyboard,0           ,SDLK_Delete      );
    input_SetAction(iAct_Tab               ,ikt_keyboard,0           ,SDLK_Tab         );
    input_SetAction(iAct_ScreenShot        ,ikt_keyboard,0           ,SDLK_Print       );
    input_SetAction(iAct_LastEvent         ,ikt_keyboard,0           ,SDLK_Space       );
@@ -127,7 +128,7 @@ begin
    input_SetAction(iAct_InGameChatAllies  ,ikt_keyboard,iAct_Shift  ,sdlk_return      );
    input_SetAction(iAct_InGamePause       ,ikt_keyboard,0           ,SDLK_Pause       );
    input_SetAction(iAct_InGameMenu        ,ikt_keyboard,0           ,SDLK_ESCAPE      );
-
+   {$IFDEF TESTMODE}
    input_SetAction(iAct_test_FastTime     ,ikt_keyboard,0           ,sdlk_end         );
    input_SetAction(iAct_test_InstaProd    ,ikt_keyboard,0           ,sdlk_home        );
    input_SetAction(iAct_test_ToggleAI     ,ikt_keyboard,0           ,sdlk_pageup      );
@@ -145,7 +146,7 @@ begin
    input_SetAction(iAct_test_BePlayer7    ,ikt_keyboard,0           ,SDLK_KP7         );
    input_SetAction(iAct_test_debug0       ,ikt_keyboard,0           ,SDLK_KP8         );
    input_SetAction(iAct_test_debug1       ,ikt_keyboard,0           ,SDLK_KP9         );
-
+   {$ENDIF}
    input_SetAction(iAct_Replay_Fast       ,ikt_keyboard,0           ,SDLK_Q           );
    input_SetAction(iAct_Replay_Pause      ,ikt_keyboard,0           ,SDLK_W           );
    input_SetAction(iAct_Replay_Back60     ,ikt_keyboard,0           ,SDLK_A           );
@@ -433,24 +434,22 @@ begin
        with uid^ do
          iActSetDisabled(iAct_Control_UAbility3,GameLog_ReqMsg(LocalPlayer,uid_ability3,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability3,false),x,y,true) );
 
-   iActSetOnEnabled(iAct_Control_UAMove  ,(ctabType=tcc_Controls)and((ui_uibtn_move>0)or(ui_uibtn_attack>0)),true);
-   iActSetOnEnabled(iAct_Control_UAStop  ,(ctabType=tcc_Controls)and((ui_uibtn_move>0)or(ui_uibtn_attack>0)),true);
-   iActSetOnEnabled(iAct_Control_UAPatrol,(ctabType=tcc_Controls)and(ui_uibtn_apatrol>0),true);  //
+   iActSetOnEnabled(iAct_Control_UAMove  ,(ctabType=tcc_Controls)and g_control and((ui_uibtn_move>0)or(ui_uibtn_attack>0)),true);
+   iActSetOnEnabled(iAct_Control_UAStop  ,(ctabType=tcc_Controls)and g_control and((ui_uibtn_move>0)or(ui_uibtn_attack>0)),true);
+   iActSetOnEnabled(iAct_Control_UAPatrol,(ctabType=tcc_Controls)and g_control and(ui_uibtn_apatrol>0),true);
 
-   iActSetOnEnabled(iAct_Control_UMove   ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
-   iActSetOnEnabled(iAct_Control_UStop   ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
-   iActSetOnEnabled(iAct_Control_UPatrol ,(ctabType=tcc_Controls)and( ui_uibtn_move>0),true);
+   iActSetOnEnabled(iAct_Control_UMove   ,(ctabType=tcc_Controls)and g_control and( ui_uibtn_move>0),true);
+   iActSetOnEnabled(iAct_Control_UStop   ,(ctabType=tcc_Controls)and g_control and( ui_uibtn_move>0),true);
+   iActSetOnEnabled(iAct_Control_UPatrol ,(ctabType=tcc_Controls)and g_control and( ui_uibtn_move>0),true);
 
-   iActSetOnEnabled(iAct_Control_USelBase,g_control,ui_group_f1.ugroup_n>0);
-   iActSetOnEnabled(iAct_Control_USelArmy,g_control,ui_group_f2.ugroup_n>0);
+   iActSetOnEnabled(iAct_Control_USelBase,(ctabType=tcc_Controls)and g_control,ui_group_f1.ugroup_n>0);
+   iActSetOnEnabled(iAct_Control_USelArmy,(ctabType=tcc_Controls)and g_control,ui_group_f2.ugroup_n>0);
 
-   {if(iActIfOn(iAct_Control_UProdCncl,POVPlayer<>nil))then //(ctabType=tcc_Controls)and
-     with POVPlayer^ do
-       iActSetDisabled(iAct_Control_UProdCncl,); }
-   iActSetOnEnabled(iAct_Control_UProdCncl ,POVPlayer<>nil,ui_uibtn_ProdCncl>0);
+   iActSetOnEnabled(iAct_Control_UProdCncl,(ctabType=tcc_Controls)and g_control and(ui_uibtn_ProdCncl>0),true);
 
-   if(POVPlayer<>nil)then
-     iActSetOnEnabled(iAct_Control_UDestroy ,(ctabType=tcc_Controls)and(POVPlayer^.units_all_s>0),true);
+   if(POVPlayer=nil)or(ctabType<>tcc_Controls)
+   then iActSetOnEnabled(iAct_Control_UDestroy ,false,false)
+   else iActSetOnEnabled(iAct_Control_UDestroy ,POVPlayer^.units_all_s>0,true);
 end;
 
 {procedure MapMarker(x,y:integer);
@@ -1264,20 +1263,19 @@ begin
      if(InputActionPressed(iAct_InGameMenu))then
        ui_ExecInGameAction(iAct_InGameMenu,pct_left,@clickSound);
 
-     // pause
+   // pause
    if(InputActionPressed(iAct_InGamePause))then
      ui_ExecInGameAction(iAct_InGamePause,pct_left,@clickSound);
 
    // other ngame actions
    if(ui_InGameChat=0)then
    begin
+      {$IFDEF TESTMODE}
       // Test mode
       if(TestMode>0)and(net_status=ns_none)then
       begin
          if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
-         {$IFDEF DEBUG0}
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
-         {$ENDIF}
          if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersMain[LocalPlayer] do if(state=ps_human          )then state:=ps_AI              else state:=ps_human;
          if(InputActionPressed(iAct_test_iddqd       ))then with g_PlayersMain[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
@@ -1294,7 +1292,7 @@ begin
          //if(InputActionPressed(iAct_test_debug0      ))then Game_ShuffleAINames;
          if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
       end;
-
+      {$ENDIF}
       // Controls tab actions
       ctab:=ui_ControlTabType;
       if(ctab=tcc_observer)

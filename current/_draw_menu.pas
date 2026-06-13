@@ -630,8 +630,10 @@ begin
    then draw_sdlsurface(tar,0,0,spr_MenuBackgroundD)
    else draw_sdlsurface(tar,0,0,spr_MenuBackgroundL);
 
+   {$IFDEF TESTMODE}
    if(TestMode>0)then
    draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
+   {$ENDIF}
 
    // MENU ITEMS
 
@@ -763,7 +765,8 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
       mmbt_netWaitServer: draw_text(tar,menu_msg_textx,menu_msg_btny,str_menuMsg_HintClient ,ta_MB,menu_ListLineWChars1,c_gray  );
       mmbt_SaveRewrite,
       mmbt_DeleteSave,
-      mmbt_DeleteReplay : begin
+      mmbt_DeleteReplay,
+      mmbt_DeleteServer : begin
                              hlineColor(tar,menu_msg_x0,menu_msg_x1,menu_msg_btn1y0,c_white);
                              vlineColor(tar,menu_msg_btn1x1,menu_msg_btn1y0,menu_msg_btn1y1,c_white);
                              draw_text(tar,menu_msg_btn1tx,menu_msg_btny,str_YesNoC[true ]+'('+str_ActionHotKey(iAct_Return)+')'
@@ -800,7 +803,7 @@ begin
 
       drawmenu_MakeBig;
       menu_redraw:=false;
-      menu_redraw_pause:=fr_fpss;
+      menu_redraw_pause:=fr_fpsd10;
    end;
 
    draw_sdlsurface(vid_screen,menu_sc_x,menu_sc_y,menu_SurfaceSC);

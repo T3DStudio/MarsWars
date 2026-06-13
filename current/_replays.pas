@@ -563,16 +563,18 @@ end;
 
 procedure replay_Code;
 begin
-   if(rpls_RecordTryPause>0)
-   then rpls_RecordTryPause-=1
+   if(rpls_Record)then
+   begin
+      if(rpls_RecordTryPause>0)
+      then rpls_RecordTryPause-=1
+      else
+      begin
+         if(g_Started)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
+         rpls_RecordTryPause:=fr_fps2;
+      end;
+   end
    else
-     if(rpls_Record)then
-     begin
-        if(g_Started)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
-        rpls_RecordTryPause:=fr_fps2;
-     end
-     else
-       if(rpls_pstate=rpls_write)then replay_Abort;
+     if(rpls_pstate=rpls_write)then replay_Abort;
 
    if(not G_Started)or(rpls_pstate=rpls_none)or(g_type=gt_campaing)
    then replay_Abort

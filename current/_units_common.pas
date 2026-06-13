@@ -801,7 +801,8 @@ begin
          pTarget^.uo_x  :=pTarget^.x;
          pTarget^.uo_y  :=pTarget^.y;
          pTarget^.uo_tar:=0;
-      end;
+      end
+      else unit_ability_Recall:=lmt_ability_Tar2Close;
    end;
 end;
 
@@ -862,8 +863,10 @@ begin
       if(hits<=0)
       or(not iscomplete)
       or(not uid^.uid_ability_isradar)
-      or(transformTimer>0)
-      or(buffs[ub_Cast]>0)then exit;
+      or(transformTimer>0)then exit;
+
+      unit_ability_UACScan:=lmt_ability_Casting;
+      if(buffs[ub_Cast]>0)then exit;
 
       unit_ability_UACScan:=0;
       if(check)then exit;
@@ -1058,7 +1061,6 @@ begin
    if(not IsUnitRange(target,@pTarget))then exit;
    if(not ability_CheckTarget_UACGeneral(pCaster^.player^.team,pTarget))then exit;
 
-
    unit_ability_UACGeneral:=lmt_Req_MaxCount;
    n:=0;
    for u:=1 to MaxUnits do
@@ -1102,6 +1104,7 @@ begin
    if(not IsUnitRange(target,@pTarget))then exit;
    if(not ability_CheckTarget_Bribe(pCaster^.player^.team,pTarget,target_building))then exit;
 
+   unit_ability_Bribe:=lmt_ability_ReqUACNear;
    for u:=1 to MaxUnits do
      with g_units[u] do
        if(hits>0)and(player^.team=pCaster^.player^.team)and(uid^.uid_race=r_uac)then
@@ -1128,6 +1131,9 @@ begin
       or(transformTimer>0)then
 
       unit_ability_UACStrike:=lmt_ability_reload;
+      if(rld>0)then exit;
+
+      unit_ability_UACStrike:=lmt_ability_Casting;
       if(buffs[ub_Cast]>0)then exit;
 
       unit_ability_UACStrike:=0;
@@ -1136,7 +1142,7 @@ begin
       unit_OrderClear(pu,ua_amove);
       uo_x:=x0;
       uo_y:=y0;
-      buffs[ub_Cast]:=fr_fps4;
+      buffs[ub_Cast]:=UACStrike_Revealing;
       for p:=0 to LastPlayer do AddToInt(@TeamVision[p],buffs[ub_Cast]);
       ability_UACStrike_missile(pu);
    end;
@@ -1164,8 +1170,10 @@ begin
       or(not iscomplete)then exit;
 
       unit_ability_SpawnLost:=lmt_ability_reload;
-      if(buffs[ub_Cast]>0)
-      or(rld>0)then exit;
+      if(rld>0)then exit;
+
+      unit_ability_SpawnLost:=lmt_ability_Casting;
+      if(buffs[ub_Cast]>0)then exit;
 
       unit_ability_SpawnLost:=0;
       if(check)then exit;
@@ -1692,6 +1700,7 @@ begin
         end;
    end;
 
+   unit_ability_SpawnEvilEye:=lmt_ability_ReqHelNear;
    for u:=1 to MaxUnits do
      with g_units[u] do
        if(hits>0)and(player^.team=pCaster^.player^.team)and(uid^.uid_race=r_hell)then
@@ -2512,7 +2521,7 @@ begin
             or(units_uid_e[puid]>=units_uid_m[puid])
             then
             else
-              if(uprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
+              if(uprod_r[i]=1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF}then
               begin
                  barrack_spawn(pu,uprod_u[i]);
                  unit_ProdStopUnitLine(pu,255,i,false,false);
@@ -2546,7 +2555,7 @@ begin
             or(upgrs_cur[tuid]>=upgrs_max[tuid])
             then
             else
-              if(pprod_r[i]=1){$IFDEF DEBUG0}or(test_InstaProd){$ENDIF}then
+              if(pprod_r[i]=1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF}then
               begin
                  upgrs_cur[tuid]+=1;
                  unit_ProdStopUpgradeLine(pu,255,i,false);
@@ -2649,10 +2658,10 @@ begin
    with player^ do
      if(not isdefeated)and(not isobserver)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
      begin
-        writeln('defeated ',pnum,' ',units_all_c,' ',units_all_e);
         isdefeated:=true;
         GameLog_PlayerDefeated(pnum);
         if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
+        build_cd:=0;
      end;
 end;
 

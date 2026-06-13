@@ -563,6 +563,7 @@ begin
       if(buffs[ub_Detector     ]>0)
       or(uid_isdetector           )then STRADD(@str_UnitAttributes,str_attr_detector ,sep_comma);
       if(buffs[ub_PainState    ]>0)then STRADD(@str_UnitAttributes,str_attr_stuned   ,sep_comma);
+      if(buffs[ub_SphereSoul   ]>0)then STRADD(@str_UnitAttributes,str_attr_SSoul    ,sep_comma);
       if(buffs[ub_SphereInvuln ]>0)then STRADD(@str_UnitAttributes,str_attr_SInvuln  ,sep_comma);
       if(buffs[ub_SphereInvis  ]>0)then STRADD(@str_UnitAttributes,str_attr_SInvis   ,sep_comma);
       if(buffs[ub_SphereRDamage]>0)then STRADD(@str_UnitAttributes,str_attr_SRDamage ,sep_comma);

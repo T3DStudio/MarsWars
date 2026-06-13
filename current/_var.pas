@@ -137,14 +137,16 @@ u_royal_d         : integer;
 
 ai_name_i         : byte = 0;
 ai_names_l        : array[0..ai_names_max-1] of shortstring = (
-                    ' TGA'   ,' NRM'    ,' BFG'   ,' Dant3'   ,' marat'  ,' Notarget' ,' Am$ek',' Chainie',' BND'  ,' Nico',
-                    ' Mud'   ,' Aurora' ,' Archi' ,' print423',' Boiec'  ,' KolyanRPG',' MWG'  ,' Teran'  ,' ZZYZX',' Neko',
-                    ' Bertie',' VoZj'   ,' Igara' ,' OutCast' ,' ABK'    ,' Jabber'   ,' Jet'  ,' Murphy' ,' Nick' ,' Raymund',
-                    ' Romero',' Carmack',' Sting' ,' Nort'    ,' Dagamon',' Morg'     ,' Astar',' Zetor'  ,' Sergh',' Krik');
+                    ' TGA'   ,' NRM'    ,' BFG'   ,' Dant3'   ,' marat'  ,' Notarget' ,' Am$ek'   ,' Chainie' ,' BND'     ,' Nico',
+                    ' Mud'   ,' Aurora' ,' Archi' ,' print423',' Rising' ,' KolyanRPG',' MWG'     ,' Teran'   ,' ZZYZX'   ,' Abaddon',
+                    ' Afrit' ,' Agaures',' Archon',' Azazel'  ,' Arah'   ,' Garrin'   ,' Blot'    ,' Bruiser' ,' Sarutti' ,' CacoLich',
+                    ' Romero',' Carmack',' Sting' ,' Catharsi',' Celt'   ,' Crash'    ,' Cryotron',' Zetor'   ,' Daedabus',' Defiler',
+                    ' Zymeth',' Yvaine' ,' Vetkin',' Tao'     ,' Otomo'  ,' Kenji'    ,' Shinja'  ,' Utara'   ,' Deimos'  ,' Phobos');
 
-{$IFDEF DEBUG0}
-test_InstaProd    : boolean = true;
+{$IFDEF TESTMODE}
+test_InstaProd    : boolean = false;
 test_w            : word = 0;
+TestMode          : byte = 0;
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,6 +155,8 @@ test_w            : word = 0;
 //
 
 {$IFDEF _FULLGAME}
+
+sys_uncappedFPS   : boolean = false;
 
 ServerSide        : boolean = true; // only server side code
 
@@ -166,9 +170,6 @@ missiles_UIDsBioEff         // units that trigger "bio" effect of missiles
                   : TSoB;
 
 CircleRX2Y        : array[0..fog_MaxR,0..fog_MaxR] of integer;
-
-TestMode          : byte = 0;
-sys_uncappedFPS   : boolean = false;
 
 LocalPlayer       : byte = 1; // 'this' player
 PlayerName        : shortstring = 'DoomPlayer';
@@ -303,8 +304,10 @@ ui_pprod_max,
 ui_pprod_cur      : integer;
 ui_units_inapc,
 ui_uprod_uid_max,
+ui_uprod_uid_cur,
 ui_uprod_uid_time,
 ui_pprod_upg_max,
+ui_pprod_upg_cur,
 ui_pprod_upg_time     : array[byte] of integer;
 ui_pprod_first    : integer;
 ui_bprod_possible : TSoB;
@@ -753,7 +756,6 @@ spr_HPools2,
 spr_HPools3,
 spr_HPools4,
 spr_HFTower,
-spr_HSTower,
 spr_HTeleport,
 spr_HMonastery,
 spr_HTotem,
@@ -1186,6 +1188,7 @@ str_attr_dead,
 str_attr_detector,
 str_attr_heroic,
 str_attr_stuned,
+str_attr_SSoul,
 str_attr_SInvuln,
 str_attr_SInvis,
 str_attr_SRDamage,
@@ -1224,7 +1227,11 @@ str_warn_allies_attacked,
 str_warn_Invalid_Order,
 str_warn_Invalid_Target,
 str_warn_AbilityReload,
+str_warn_AbilityCasting,
 str_warn_AbilityBadPlace,
+str_warn_AbilityReqUACNear,
+str_warn_AbilityReqHelNear,
+str_warn_AbilityTar2Close,
 str_warn_kpoint_captured,
 str_warn_kpoint_lost,
 str_warn_koth_control,

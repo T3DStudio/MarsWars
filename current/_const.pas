@@ -26,6 +26,7 @@ fr_fpst                = fr_fps1 div 3; // thrid
 fr_fpsq                = fr_fps1 div 4; // quarter
 fr_fpsq3               = fr_fps1-fr_fpsq;
 fr_fpss                = fr_fps1 div 6; // six
+fr_fpsd10              = fr_fps1 div 10;
 fr_fps1h               = fr_fpsh*3;     // 1,5
 fr_fps2                = fr_fps1*2;
 fr_fps3                = fr_fps1*3;
@@ -243,18 +244,22 @@ lmt_map_mark           = 45;
 lmt_allies_attacked    = 46;
 lmt_NeedProdUnit       = 47;
 lmt_ability_reload     = 48;
-lmt_ability_BadPlace   = 49;
-lmt_kpoint_captured    = 50;
-lmt_kpoint_lost        = 51;
-lmt_ngen_exh           = 52;
-lmt_ngen_captured      = 53;
-lmt_ngen_lost          = 54;
-lmt_koth_control       = 55;
-lmt_invalid_Target     = 56;
-lmt_Invalid_Order      = 57;
-lmt_replay_RecStart    = 58;
-lmt_replay_RecStop     = 59;
-lmt_replay_RecError    = 60;
+lmt_ability_Casting    = 49;
+lmt_ability_BadPlace   = 50;
+lmt_ability_ReqUACNear = 51;
+lmt_ability_ReqHelNear = 52;
+lmt_ability_Tar2Close  = 53;
+lmt_kpoint_captured    = 54;
+lmt_kpoint_lost        = 55;
+lmt_ngen_exh           = 56;
+lmt_ngen_captured      = 57;
+lmt_ngen_lost          = 58;
+lmt_koth_control       = 59;
+lmt_invalid_Target     = 60;
+lmt_Invalid_Order      = 61;
+lmt_replay_RecStart    = 62;
+lmt_replay_RecStop     = 63;
+lmt_replay_RecError    = 64;
 
 lmts_menu_chat         = [
                           lmt_chat_player0..
@@ -691,6 +696,7 @@ ul5                    = MinUnitLimit*5;
 ul6                    = MinUnitLimit*6;
 ul8                    = MinUnitLimit*8;
 ul10                   = MinUnitLimit*10;
+ul12                   = MinUnitLimit*12;
 ul15                   = MinUnitLimit*15;
 ul20                   = MinUnitLimit*20;
 
@@ -727,7 +733,8 @@ BaseDamage6            = BaseDamage1*6;
 BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
-BaseRegen1             = 4;
+BaseRegen1             = 5;
+BaseRegenh             = BaseRegen1 div 2;
 
 BaseDamageLevel1       = 2.5;
 BaseArmorLevel1        = 2.5;
@@ -738,10 +745,10 @@ UpgradeArmorBonus1     = 7;
 UpgradeUnitArmorBonus  = UpgradeArmorBonus1;
 UpgradeBuildArmorBonus = UpgradeArmorBonus1*2+round(UpgradeArmorBonus1/2);
 
-BaseHeal1              = BaseRegen1*6;
-BaseHealBonus1         = BaseHeal1 div 2;
+BaseHeal1              = BaseRegen1*4;
+BaseHealBonus1         = BaseHeal1 div 3;
 BaseRepair1            = BaseRegen1*4;
-BaseRepairBonus1       = BaseHeal1 div 2;
+BaseRepairBonus1       = BaseRepair1 div 3;
 
 DecayAuraDamage        = UpgradeDamageBonus1;
 
@@ -764,15 +771,14 @@ UID_HPentagram         = 9;
 UID_HMonastery         = 10;
 UID_HFortress          = 11;
 UID_HFTower            = 12;
-UID_HSTower            = 13;
-UID_HTotem             = 14;
-UID_HTeleport          = 15;
-UID_HEyeNest           = 16;
-UID_HEye               = 17;
-UID_HAltar             = 18;
-UID_HCommandCenter     = 19;
-UID_HACommandCenter    = 20;
-UID_HBarracks          = 21;
+UID_HTotem             = 13;
+UID_HTeleport          = 14;
+UID_HEyeNest           = 15;
+UID_HEye               = 16;
+UID_HAltar             = 17;
+UID_HCommandCenter     = 18;
+UID_HACommandCenter    = 19;
+UID_HBarracks          = 20;
 
 UID_LostSoul           = 23;
 UID_Phantom            = 24;
@@ -1009,6 +1015,9 @@ HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 2);
 HellPower_Add3         = HellPower_Add1+ HellPower_Add1;
 UACLoot_Max            = 30000;
 
+UACStrike_Revealing_sec= 4;
+UACStrike_Revealing    = UACStrike_Revealing_sec*fr_fps1;
+
 detection_time_sec     = 8;
 detection_time         = fr_fps1*detection_time_sec;
 
@@ -1052,7 +1061,7 @@ fly_height             : array[false..true] of integer = (1,fly_z);
 
 pain_time              = fr_fps1;
 
-ai_names_max           = 40;
+ai_names_max           = 50;
 
 
 {$IFDEF _FULLGAME}
@@ -1099,6 +1108,7 @@ iAct_backspace         = 15;
 
 iAct_ScreenShot        = 16;
 iAct_Tab               = 17;
+iAct_Delete            = 18;
 
 iAct_LastEvent         = 19;
 
@@ -1220,6 +1230,7 @@ iAct_InGameChatAllies  = 202;
 iAct_InGamePause       = 203;
 iAct_InGameMenu        = 204;
 
+{$IFDEF TESTMODE}
 iAct_test_FastTime     = 210;
 iAct_test_InstaProd    = 211;
 iAct_test_ToggleAI     = 212;
@@ -1237,6 +1248,7 @@ iAct_test_BePlayer6    = 223;
 iAct_test_BePlayer7    = 224;
 iAct_test_debug0       = 225;
 iAct_test_debug1       = 226;
+{$ENDIF}
 
 k_LastCharStuckDelay   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;
@@ -1717,10 +1729,9 @@ mi_MP_ChatList         = 209;
 mi_MP_ChatLine         = 210;
 
 mi_NetServers_List     = 211;
-mi_NetServers_Line     = 212;
-mi_NetServers_Connect  = 213;
-mi_NetServers_Add      = 214;
-mi_NetServers_Delete   = 215;
+mi_NetServers_Connect  = 212;
+mi_NetServers_Add      = 213;
+mi_NetServers_Delete   = 214;
 
 
 //// SCIRMISH INFO

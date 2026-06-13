@@ -33,9 +33,10 @@ begin
      for i:=1 to t do
      begin
         s:=ParamStr(i);
-
+        {$IFDEF TESTMODE}
         if(s='test' )then TestMode:=1;
         if(s='testD')then TestMode:=2;
+        {$ENDIF}
      end;
 end;
 

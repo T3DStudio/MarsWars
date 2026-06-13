@@ -899,7 +899,7 @@ end;
 procedure game_PlayersCycle;
 var p,t:byte;
 trevealed:boolean;
-c,e:integer;
+//c,e:integer;
 begin
    for p:=0 to LastPlayer do
      with g_PlayersMain[p] do
@@ -971,7 +971,7 @@ begin
 
        end;
 
-   c:=0;
+   {c:=0;
    e:=0;
    if(InputAction(iact_Control))then
      with g_PlayersMain[LocalPlayer] do
@@ -982,7 +982,7 @@ begin
            c+=units_uid_c[p];
         end;
         writeln(LocalPlayer,' e=',e,' c=',c,' units_all_e=',units_all_e,' units_all_c=',units_all_c);
-     end;
+     end; }
    //writeln(pnum,' ',units_all_c);
 
 
