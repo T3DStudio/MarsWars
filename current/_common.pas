@@ -575,6 +575,7 @@ begin
      if(state>ps_None)then
      begin
         case amtype of
+// message types without spam protection
 lmt_chat_player0..
 lmt_chat_player7,
 lmt_chat_common,
@@ -608,6 +609,9 @@ lmt_game_Resumed
 lmt_unit_attacked,
 lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[lmt_unit_attacked,lmt_allies_attacked]))then exit;
 lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]))then exit;
+
+lmt_markLook,
+lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]))then exit;
         else
            with log_l[log_i] do
              if(lm_tick<=g_tick)then
@@ -807,12 +811,13 @@ end;
 function GameLog_ReqMsg(playerN,auid,atype,amsgid:byte;x,y:integer;check:boolean=false):boolean;
 begin
    GameLog_ReqMsg:=false;
-   if(playerN>LastPlayer)or(amsgid=0)then exit;
+   if(playerN>LastPlayer)
+   or(amsgid=0)then exit;
 
    with g_PlayersMain[playerN] do
    begin
-      if(auid>0)and(atype=lmt_argt_unit)then
-        if(units_uid_e[auid]<=0)and(units_uid_m[auid]<=0)then exit;
+      //if(auid>0)and(atype=lmt_argt_unit)then
+      //  if(units_uid_e[auid]<=0)and(units_uid_m[auid]<=0)then exit;
 
       GameLog_ReqMsg:=true;
 
@@ -822,13 +827,15 @@ begin
 
    PlayersAddToLog(playerN,0,amsgid,atype,auid,'',x,y);
 end;
-procedure GameLog_MapMark(playeri:byte;x,y:integer);
+procedure GameLog_MapMark(playeri:byte;x,y,mType:integer);
 begin
    if(playeri>LastPlayer)then exit;
 
-   PlayersAddToLog(playeri,
-   PlayerGetAlliesByte(playeri,true)
-   ,lmt_map_mark,0,playeri,'',x,y);
+   with g_PlayersMain[playeri] do
+     case mType of
+     co_markLook  : PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_markLook  ,0,0,name,x,y);
+     co_markAttack: PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_markAttack,0,0,name,x,y);
+     end;
 end;
 
 // UNITS
@@ -1080,7 +1087,7 @@ end;
 
 function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
 begin
-   g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_Sizeh,map_Sizeh)+d)>=g_royal_r
+   g_CheckRoyalBattlePoint:=(point_dist_int(x,y,map_Sizeh,map_Sizeh)+d)>=g_royal_RCur;
 end;
 
 procedure Game_SetStatusWinnerTeam(team:byte);
@@ -1180,6 +1187,8 @@ true  : begin
 false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;end;
       end;
 
+      if(units_uid_m[uid]<=0)then begin CheckUnitReqs:=lmt_prod_Unavailable;exit;end;
+
       if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])
       or((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders))then
       begin CheckUnitReqs:=lmt_Req_MaxCount;exit;end;
@@ -1245,6 +1254,9 @@ begin
    begin
       if(units_upgrProds_c<=0)then
       begin CheckUpgradeReqs:=lmt_NeedProdUnit;exit;end;
+
+      if(upgrs_max[upgr]<=0)then
+      begin CheckUpgradeReqs:=lmt_prod_Unavailable;exit;end;
 
       if((upgrs_cur[upgr]+prod_upgr_upid[upgr])>=upgrs_max[upgr] )then  //min2i(upgr_max,)
       begin CheckUpgradeReqs:=lmt_Req_MaxCount;exit;end;
@@ -1313,11 +1325,12 @@ end;
 
 function hits_li2si(h,mh:longint;s:single):shortint;
 begin
-   if(h>=mh                         )then hits_li2si:=127  else
-   if(h =0                          )then hits_li2si:=0    else
+   if(h<=hits_ndead                 )
+   or(mh<=0)or(s<=0)                 then hits_li2si:=-128 else
    if(h =hits_dead                  )then hits_li2si:=-127 else
-   if(h<=hits_ndead                 )then hits_li2si:=-128 else
    if(hits_fdead<h)and(h<0          )then hits_li2si:=mm3i(-125,h div _d2shi,-1  ) else
+   if(h =0                          )then hits_li2si:= 0   else
+   if(h>=mh                         )then hits_li2si:= 127 else
    if( hits_dead<h)and(h<=hits_fdead)then hits_li2si:=-126 else
                                           hits_li2si:=mm3i(   1,trunc(h/s)  ,sintMaxHits);
 end;
@@ -2025,16 +2038,18 @@ lmt_Req_Energy,
 lmt_Req_HellPower,
 lmt_Req_UACLoot,
 lmt_unit_MaxLevel,
+lmt_prod_Unavailable,
 lmt_prod_BadOrder,
 lmt_prod_BadPlace     : begin
                            case lm_type of
-                           lmt_Req_Common   : ParseLogMessage:=str_warn_Req_Common;
-                           lmt_Req_Energy   : ParseLogMessage:=str_warn_Req_Energy;
-                           lmt_Req_HellPower: ParseLogMessage:=str_warn_Req_HellPower;
-                           lmt_Req_UACLoot  : ParseLogMessage:=str_warn_Req_UACLoot;
-                           lmt_unit_MaxLevel: ParseLogMessage:=str_warn_unit_MaxLevel;
-                           lmt_prod_BadOrder: ParseLogMessage:=str_warn_prod_BadOrder;
-                           lmt_prod_BadPlace: ParseLogMessage:=str_warn_prod_BadPlace;
+                           lmt_Req_Common      : ParseLogMessage:=str_warn_Req_Common;
+                           lmt_Req_Energy      : ParseLogMessage:=str_warn_Req_Energy;
+                           lmt_Req_HellPower   : ParseLogMessage:=str_warn_Req_HellPower;
+                           lmt_Req_UACLoot     : ParseLogMessage:=str_warn_Req_UACLoot;
+                           lmt_unit_MaxLevel   : ParseLogMessage:=str_warn_unit_MaxLevel;
+                           lmt_prod_Unavailable: ParseLogMessage:=str_warn_prod_Unavailable;
+                           lmt_prod_BadOrder   : ParseLogMessage:=str_warn_prod_BadOrder;
+                           lmt_prod_BadPlace   : ParseLogMessage:=str_warn_prod_BadPlace;
                            end;
                            AddDataStr;
                         end;
@@ -2062,126 +2077,107 @@ lmt_game_ResetIn      : ParseLogMessage:=str_lobby_GameResetIn+b2s(lm_data_u);
 
 lmt_upgrade_InProgress: ParseLogMessage:=str_warn_upgrade_InProgress;
 lmt_upgrade_complete  : begin
-                        with g_upgrs[lm_data_u] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
-                        mcolor^:=c_yellow;
+                           with g_upgrs[lm_data_u] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
+                           mcolor^:=c_yellow;
                         end;
 lmt_unit_ready        : begin
-                        with g_uids[lm_data_u] do
-                          case lm_data_t of
-                          lmt_argt_unit : if(uid_isbuilding)
-                                          then ParseLogMessage:=str_warn_building_complete+' ('+uid_str_name+')'
-                                          else ParseLogMessage:=str_warn_unit_complete    +' ('+uid_str_name+')';
-                          end;
-                        mcolor^:=c_green;
+                           with g_uids[lm_data_u] do
+                             case lm_data_t of
+                             lmt_argt_unit : if(uid_isbuilding)
+                                             then ParseLogMessage:=str_warn_building_complete+' ('+uid_str_name+')'
+                                             else ParseLogMessage:=str_warn_unit_complete    +' ('+uid_str_name+')';
+                             end;
+                           mcolor^:=c_green;
                         end;
 lmt_unit_resurrected  : begin
-                        mcolor^:=c_dorange;
-                        ParseLogMessage:=str_warn_unit_resurrected;
-                        AddDataStr;
+                           mcolor^:=c_dorange;
+                           ParseLogMessage:=str_warn_unit_resurrected;
+                           AddDataStr;
                         end;
 lmt_unit_captured     : begin
-                        ParseLogMessage:=str_warn_unit_captured;
-                        AddDataStr;
+                           ParseLogMessage:=str_warn_unit_captured;
+                           AddDataStr;
                         end;
 lmt_unit_lost         : begin
-                        ParseLogMessage:=str_warn_unit_lost;
-                        AddDataStr;
+                           ParseLogMessage:=str_warn_unit_lost;
+                           AddDataStr;
                         end;
 lmt_unit_LevelUp      : begin
-                        with g_uids[lm_data_u] do ParseLogMessage:=str_warn_unit_Levelup+' ('+uid_str_name+')';
-                        mcolor^:=c_aqua;
+                           with g_uids[lm_data_u] do ParseLogMessage:=str_warn_unit_Levelup+' ('+uid_str_name+')';
+                           mcolor^:=c_aqua;
                         end;
 lmt_allies_attacked   : begin
-                        with g_uids[lm_data_u] do
-                          ParseLogMessage:=str_warn_allies_attacked+' ('+uid_str_name+')';
-                        mcolor^:=c_orange;
+                           with g_uids[lm_data_u] do
+                             ParseLogMessage:=str_warn_allies_attacked+' ('+uid_str_name+')';
+                           mcolor^:=c_orange;
                         end;
 lmt_unit_attacked     : begin
-                        with g_uids[lm_data_u] do
-                          if(uid_isbuilding)
-                          then ParseLogMessage:=str_warn_base_attacked+' ('+uid_str_name+')'
-                          else ParseLogMessage:=str_warn_unit_attacked+' ('+uid_str_name+')';
-                        mcolor^:=c_red;
+                           with g_uids[lm_data_u] do
+                             if(uid_isbuilding)
+                             then ParseLogMessage:=str_warn_base_attacked+' ('+uid_str_name+')'
+                             else ParseLogMessage:=str_warn_unit_attacked+' ('+uid_str_name+')';
+                           mcolor^:=c_red;
                         end;
-lmt_kpoint_captured   : begin
-                        ParseLogMessage:=str_warn_kpoint_captured;
-                        mcolor^:=c_dred;
-                        end;
-lmt_kpoint_lost       : begin
-                        ParseLogMessage:=str_warn_kpoint_lost;
-                        mcolor^:=c_dred;
-                        end;
+lmt_kpoint_captured,
+lmt_kpoint_lost,
 lmt_koth_control      : begin
-                        ParseLogMessage:=b2s(lm_data_u+1)+str_warn_koth_control;
-                        mcolor^:=c_dred;
+                           case lm_type of
+                           lmt_kpoint_captured: ParseLogMessage:=str_warn_kpoint_captured;
+                           lmt_kpoint_lost    : ParseLogMessage:=str_warn_kpoint_lost;
+                           lmt_koth_control   : ParseLogMessage:=b2s(lm_data_u+1)+str_warn_koth_control;
+                           end;
+                           mcolor^:=c_dred;
                         end;
-lmt_ngen_exh          : begin
-                        ParseLogMessage:=str_warn_ngen_exh;
-                        mcolor^:=c_dyellow;
-                        end;
-lmt_ngen_captured     : begin
-                        ParseLogMessage:=str_warn_ngen_captured;
-                        mcolor^:=c_dyellow;
-                        end;
+lmt_ngen_exh,
+lmt_ngen_captured,
 lmt_ngen_lost         : begin
-                        ParseLogMessage:=str_warn_ngen_lost;
-                        mcolor^:=c_dyellow;
+                           case lm_type of
+                           lmt_ngen_exh     : ParseLogMessage:=str_warn_ngen_exh;
+                           lmt_ngen_captured: ParseLogMessage:=str_warn_ngen_captured;
+                           lmt_ngen_lost    : ParseLogMessage:=str_warn_ngen_lost;
+                           end;
+                           mcolor^:=c_dyellow;
                         end;
-lmt_ability_BadPlace  : begin
-                        ParseLogMessage:=str_warn_AbilityBadPlace;
-                        AddDataStr;
-                        end;
-lmt_ability_reload    : begin
-                        ParseLogMessage:=str_warn_AbilityReload;
-                        AddDataStr;
-                        end;
-lmt_ability_Casting   : begin
-                        ParseLogMessage:=str_warn_AbilityCasting;
-                        AddDataStr;
-                        end;
-lmt_ability_ReqUACNear: begin
-                        ParseLogMessage:=str_warn_AbilityReqUACNear;
-                        AddDataStr;
-                        end;
-lmt_ability_ReqHelNear: begin
-                        ParseLogMessage:=str_warn_AbilityReqHelNear;
-                        AddDataStr;
-                        end;
+lmt_Invalid_Order,
+lmt_NeedProdUnit,
+lmt_unit_NeedBuilder,
+lmt_ability_BadPlace,
+lmt_ability_reload,
+lmt_ability_Casting,
+lmt_ability_ReqUACNear,
+lmt_ability_ReqHelNear,
 lmt_ability_Tar2Close : begin
-                        ParseLogMessage:=str_warn_AbilityTar2Close;
-                        AddDataStr;
+                           case lm_type of
+                           lmt_Invalid_Order     : ParseLogMessage:=str_warn_Invalid_Order;
+                           lmt_NeedProdUnit      : ParseLogMessage:=str_warn_NeedProdUnit;
+                           lmt_unit_NeedBuilder  : ParseLogMessage:=str_warn_NeedBuilder;
+                           lmt_ability_BadPlace  : ParseLogMessage:=str_warn_AbilityBadPlace;
+                           lmt_ability_reload    : ParseLogMessage:=str_warn_AbilityReload;
+                           lmt_ability_Casting   : ParseLogMessage:=str_warn_AbilityCasting;
+                           lmt_ability_ReqUACNear: ParseLogMessage:=str_warn_AbilityReqUACNear;
+                           lmt_ability_ReqHelNear: ParseLogMessage:=str_warn_AbilityReqHelNear;
+                           lmt_ability_Tar2Close : ParseLogMessage:=str_warn_AbilityTar2Close;
+                           end;
+                           AddDataStr;
                         end;
 lmt_invalid_Target    : ParseLogMessage:=str_warn_Invalid_Target;
-lmt_Invalid_Order     : begin
-                        ParseLogMessage:=str_warn_Invalid_Order;
-                        AddDataStr;
+lmt_markLook          : begin
+                           mcolor^:=c_ltgray;
+                           ParseLogMessage:=lm_string+str_warn_markLook;
                         end;
-
-lmt_NeedProdUnit      : begin
-                        ParseLogMessage:=str_warn_NeedProdUnit;
-                        AddDataStr;
+lmt_markAttack        : begin
+                           mcolor^:=c_ltred;
+                           ParseLogMessage:=lm_string+str_warn_markAttack;
                         end;
-lmt_unit_NeedBuilder  : begin
-                        ParseLogMessage:=str_warn_NeedBuilder;
-                        AddDataStr;
-                        end;
-
-lmt_map_mark          : begin
-                        mcolor^:=c_gray;
-                        if(lm_data_u<=LastPlayer)then
-                          with g_PlayersMain[lm_data_u] do ParseLogMessage:=name+str_warn_mapMark;
-                        end;
-lmt_replay_RecStart   : begin
-                        mcolor^:=c_brown;
-                        ParseLogMessage:=str_gmsg_RecordStart+tc_white+lm_string;
-                        end;
-lmt_replay_RecStop    : begin
-                        mcolor^:=c_brown;
-                        ParseLogMessage:=str_gmsg_RecordStop +tc_white+lm_string;
-                        end;
+lmt_replay_RecStart,
+lmt_replay_RecStop,
 lmt_replay_RecError   : begin
-                        mcolor^:=c_brown;
-                        ParseLogMessage:=str_gmsg_RecordError+tc_white+lm_string;
+                           case lm_type of
+                           lmt_replay_RecStart: ParseLogMessage:=str_gmsg_RecordStart+tc_white+lm_string;
+                           lmt_replay_RecStop : ParseLogMessage:=str_gmsg_RecordStop +tc_white+lm_string;
+                           lmt_replay_RecError: ParseLogMessage:=str_gmsg_RecordError+tc_white+lm_string;
+                           end;
+                           mcolor^:=c_brown;
                         end;
      else               ParseLogMessage:='UNKNOWN MESSAGE TYPE';
                         mcolor^:=c_purple;

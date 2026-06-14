@@ -204,6 +204,7 @@ begin
    map_Size1   := mm3i(map_MinSize,map_Size1,map_MaxSize);
    map_Sizeh   := map_Size1 div 2;
    map_SizeKPCR:= map_Sizeh-(map_Sizeh div 3);
+   g_royal_Rmax:= round(map_SizeH*1.41);
    case map_symmetry of
    maps_lineV: if((map_seed mod 2)=0)
                then map_SymmetryDir:=90

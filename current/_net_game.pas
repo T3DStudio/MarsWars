@@ -96,11 +96,12 @@ begin
 end;
 
 procedure net_ReadMapMark(pid:byte);
-var x,y:integer;
+var x,y,mType:integer;
 begin
-   x:=net_readint;
-   y:=net_readint;
-   GameLog_MapMark(pid,x,y);
+   x    :=net_readint;
+   y    :=net_readint;
+   mType:=net_readint;
+   GameLog_MapMark(pid,x,y,mType);
 end;
 
 procedure net_WritePlayersDelay;

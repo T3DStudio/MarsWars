@@ -141,6 +141,8 @@ begin
      begin
         drawmenu_ScrollBar(tar,mi,menu_ChatScroll,menu_ChatListH,menu_ChatSize,true);
         MakeLogListForDraw(LocalPlayer,mi_charw,menu_ChatListH,menu_ChatScroll,lmts_menu_chat);
+
+        //ui_log_n
         y:=mi_y1-font_wh-font_wq;
         if(ui_log_n>0)then
           for i:=0 to ui_log_n-1 do

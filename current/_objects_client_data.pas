@@ -1097,6 +1097,7 @@ uab_LvlUpURMStation  : ua_mbrush_r:=-UID_URMStation;
       end;
 
       case a of
+uab_HEyeSpawn,
 uab_ToUGTurretTo,
 uab_ToUATurretTo,
 uab_ToHAKeep,

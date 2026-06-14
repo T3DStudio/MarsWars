@@ -512,7 +512,7 @@ procedure draw_LayerUnitsInfo(tar:pSDL_Surface);
 var t:integer;
 begin
    case map_scenario of
-   mc_royale: circleColor(tar,map_Sizeh-ui_cam_x,map_Sizeh-ui_cam_y,g_royal_r,ui_max_color[ui_blink1_colorb]);
+   mc_royale: circleColor(tar,map_Sizeh-ui_cam_x,map_Sizeh-ui_cam_y,g_royal_RCur,ui_max_color[ui_blink1_colorb]);
    end;
 
    while(vid_PrimitivesS>0)do
@@ -635,6 +635,9 @@ begin
           colorN:=KeyPoint_GetColor(t,false);
           colorS:=KeyPoint_GetColor(t,true );
 
+          //UnitsInfo_AddText(kp_x,kp_y+50,i2s(kptd_TimerOwnerTeam),c_white);
+          //UnitsInfo_AddText(kp_x,kp_y+60,i2s(kptd_OwnerTeam     ),c_aqua);
+
           if(kp_Energy>0)then
           begin
              SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG        ,255);
@@ -673,7 +676,6 @@ begin
                SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y,colorS,@spr_kp_out,255);
             end;
 
-          //if(ui_CheckMapPointFogVision(kp_x,kp_y,true))then
           if(kptd_VisTimer>0)then
           begin
              if(UIPlayer<=LastPlayer)and(kp_Energy>0)then

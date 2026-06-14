@@ -625,7 +625,7 @@ begin
              end;
 
              if(map_scenario=mc_royale)then
-               if(g_royal_r<(kp_ToCenterD+kp_RCapture))then continue;
+               if(g_royal_RCur<(kp_ToCenterD+kp_RCapture))then continue;
              if(kp_x<=0)
              or(kp_y<=0)
              or(kp_x>=map_Size1)

@@ -286,7 +286,7 @@ begin
          end;
 
    if(map_scenario=mc_royale)then
-     draw_FilledRing(map_sizeh,map_sizeh,map_size1,g_royal_r,sd_decals,sd_decals-2,
+     draw_FilledRing(map_sizeh,map_sizeh,map_size1,g_royal_RCur,sd_decals,sd_decals-2,
                      animStep,
                      @spr_fireblueFront,
                      @spr_fireblueBack);

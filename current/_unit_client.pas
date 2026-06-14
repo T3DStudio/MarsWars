@@ -1,5 +1,4 @@
 
-
 function unit_UO2Ability(pu:PTUnit;uo:byte):byte;
 begin
    unit_UO2Ability:=0;
@@ -296,14 +295,18 @@ begin
       if(rpl)then
         b:=group and %00001111;
 
-      if(iscomplete)and(transformTimer<=0)
-      then uo:=uo_id
-      else uo:=0;
-      if(uo_bx>0)then
-        case uo_id of
-        ua_move : uo:=ua_patrol;
-        ua_amove: uo:=ua_apatrol;
-        end;
+      if(not iscomplete)
+      or(transformTimer>0)
+      then uo:=0
+      else
+      begin
+         uo:=uo_id;
+         if(uo_bx>0)then
+           case uo_id of
+           ua_move : uo:=ua_patrol;
+           ua_amove: uo:=ua_apatrol;
+           end;
+      end;
 
       b:=b or ((uo and %00000111) shl 4);
 
@@ -343,7 +346,9 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(g_PlayersMain[POVPlayer].team,pu,true))or(rpl)or(g_PlayersMain[POVPlayer].isobserver)
+      if(CheckUnitTeamVision(g_PlayersMain[POVPlayer].team,pu,true))
+      or(rpl)
+      or(g_PlayersMain[POVPlayer].isobserver)
       then hits_si:=hits_li2si(hits,uid_MaxHits1,uid_hits_li2si)
       else hits_si:=-128;
 
@@ -543,11 +548,6 @@ begin
 
    cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
 
-   if(wtickb1)then
-     case map_scenario of
-     mc_royale   : wudata_int(g_royal_r,rpl);
-     end;
-
    if(rpl)then
    begin
       units_now:=Quality2Units[rpls_Quality];
@@ -623,6 +623,7 @@ begin
             lastPUnit^+=1;
             if (lastPUnit^<1)or(lastPUnit^>MaxUnits)then lastPUnit^:=1;
          until ( bs_alive and (1 shl ((lastPUnit^-1) div MaxPlayerUnits)) ) > 0 ;
+
          wudata_Unit(@g_units[lastPUnit^],rpl,POVPlayer);
       end;
    end;
@@ -1298,7 +1299,7 @@ begin
 
       uo:=(b and %01110000)shr 4;
 
-      if(not rpl)and(iscomplete)and(transformTimer<=0)then rudata_UnitOrderTar(uu,uo,rpl);
+      //if(not rpl)and(iscomplete)and(transformTimer<=0)then rudata_UnitOrderTar(uu,uo,rpl);
 
       if((b and %10000000)=0)then exit;
 
@@ -1484,8 +1485,8 @@ kpi,a,b:byte;
 w      :word;
 pactive:boolean;
 begin
-   a     :=rudata_byte(rpl,0);
-   kpi   :=a and %00001111;
+   a  :=rudata_byte(rpl,0);
+   kpi:=a and %00001111;
 
    if(kpi<=LastKeyPoint)then
      with map_KeyPointsL[kpi] do
@@ -1531,12 +1532,7 @@ begin
 
    cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
 
-   if(wtickb1)then
-     case map_scenario of
-     mc_royale   : g_royal_r:=rudata_int(rpl,0);
-     end;
-
-   bs_defeated :=rudata_byte(rpl,0);
+   bs_defeated :=rudata_byte(rpl,255);
    bs_observer :=rudata_byte(rpl,0);
    bs_alive    :=0;
    units_ingame:=0;
@@ -1616,6 +1612,7 @@ begin
       end;
 
       lastUnit:=rudata_int(rpl,0);
+      //writeln('- ',g_tick,' ',units_now,' ',lastUnit,' ',POVPlayer,' ',g_PlayersMain[POVPlayer].isobserver);
       for i:=1 to units_now do
       begin
          while(true)do
@@ -1629,6 +1626,7 @@ begin
          end;
          rudata_unit(@g_units[lastUnit],rpl,false,POVPlayer,fast_skip);
       end;
+      //writeln;
    end;
 
    if(rpoint_ChangeAnnoncer)then

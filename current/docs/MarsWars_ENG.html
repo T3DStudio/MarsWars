@@ -147,6 +147,9 @@ add to selection units from the numbered control group<br>
 <font color="00FF00">F2</font>: select all not busy battle units; double tap - move camera to nearest 
 unit<br>
 <br>
+<font color="00FF00">F5</font>: set map mark: "look here"<br>
+<font color="00FF00">F6</font>: set map mark: "attack here"<br>
+<br>
 <font color="00FF00">R</font> <font color="00FF00">T</font> <font color="00FF00">Y</font> <font color="00FF00">F</font> <font color="00FF00">G</font> <font color="00FF00">H</font> <font color="00FF00">V</font> <font color="00FF00">B</font> <font color="00FF00">N</font> <font color="00FF00">U</font> <font color="00FF00">I</font> <font color="00FF00">O</font> <font color="00FF00">J</font> <font color="00FF00">K</font> <font color="00FF00">L</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">R</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">T</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">Y</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">F</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">G</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">H</font> 
 <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">B</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">N</font>: production hotkeys<br>
 <br>
@@ -743,9 +746,9 @@ Center,Advanced Hell Command Center
 <br>- Sight range: "Evil Eye Upgrade"(+50)
 <br><br>
 <br>Abilities: 
-<br>- Spawn Evil Eye: Spawns the Evil Eye at target point. 
-There must be at least one Hell unit allied with you 
-around the point target.
+<br>- Spawn Evil Eye"Evil Eye": Spawns the Evil Eye at 
+target point. There must be at least one Hell unit 
+allied with you around the point target.
 <br>Ground-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
 <br><font color="FFFF00">Requirements: </font>Great Hell Keep
 <br>- Hell Vision: Gives allied target ability to detect 
@@ -764,7 +767,7 @@ invisible units for 8 seconds.
 <br>Max hits: 60
 <br>Lifetime: 60 sec.
 <br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">1</font>
+<br>Build time: NO
 <br>Size: 10
 <br>Base sight range: 300
 <br>Immune to splash damage: YES
@@ -3018,7 +3021,8 @@ Upgrade"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="3232FF">
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*4, upgrade: "Weapons 
-Upgrade"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>]
+Upgrade"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>],x0.5 
+[<font color="FF0000">BUILDING</font>]
 <br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
 Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade "Anti-air Weapon"}
@@ -3129,6 +3133,7 @@ Note: this data is calculated for "ideal" conditions with fully upgraded units w
 <img src="imgs\unitBTN87.bmp" alt="Plasmaguner" title="Plasmaguner">
 <img src="imgs\unitBTN88.bmp" alt="BFG Marine" title="BFG Marine">
 <img src="imgs\unitBTN89.bmp" alt="Dropship" title="Dropship">
+<img src="imgs\unitBTN91.bmp" alt="Terminator" title="Terminator">
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
@@ -3248,6 +3253,7 @@ Note: this data is calculated for "ideal" conditions with fully upgraded units w
 <img src="imgs\unitBTN87.bmp" alt="Plasmaguner" title="Plasmaguner">
 <img src="imgs\unitBTN88.bmp" alt="BFG Marine" title="BFG Marine">
 <img src="imgs\unitBTN89.bmp" alt="Dropship" title="Dropship">
+<img src="imgs\unitBTN91.bmp" alt="Terminator" title="Terminator">
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
@@ -3286,6 +3292,7 @@ Note: this data is calculated for "ideal" conditions with fully upgraded units w
 <img src="imgs\unitBTN87.bmp" alt="Plasmaguner" title="Plasmaguner">
 <img src="imgs\unitBTN88.bmp" alt="BFG Marine" title="BFG Marine">
 <img src="imgs\unitBTN89.bmp" alt="Dropship" title="Dropship">
+<img src="imgs\unitBTN91.bmp" alt="Terminator" title="Terminator">
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
@@ -4984,7 +4991,10 @@ Note: this data is calculated for "ideal" conditions with fully upgraded units w
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
+<img src="imgs\unitBTN12.bmp" alt="Fire Tower" title="Fire Tower">
 <img src="imgs\unitBTN13.bmp" alt="Totem of Horror" title="Totem of Horror">
+<img src="imgs\unitBTN18.bmp" alt="Hell Command Center" title="Hell Command Center">
+<img src="imgs\unitBTN19.bmp" alt="Advanced Hell Command Center" title="Advanced Hell Command Center">
 <img src="imgs\unitBTN27.bmp" alt="Cacodemon" title="Cacodemon">
 <img src="imgs\unitBTN33.bmp" alt="Arachnotron" title="Arachnotron">
 <img src="imgs\unitBTN44.bmp" alt="Zombie Plasmaguner" title="Zombie Plasmaguner">

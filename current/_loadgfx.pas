@@ -38,6 +38,7 @@ begin
    c_dred    :=gfx_TMWColor(190,  0,  0,255);
    c_red     :=gfx_TMWColor(255,  0,  0,255);
    c_ared    :=gfx_TMWColor(255,  0,  0,82 );
+   c_ltred   :=gfx_TMWColor(255,100,100,255);
    c_orange  :=gfx_TMWColor(255,140,  0,255);
    c_dorange :=gfx_TMWColor(230, 96,  0,255);
    c_aorange :=gfx_TMWColor(255,140,  0,82 );
@@ -731,7 +732,8 @@ begin
    spr_uibtn_ReplayLog         := gfx_ButtonLoad(folder_ui+'b_log'             ,ui_ButtonW1);
    spr_uibtn_ReplayPause       := gfx_ButtonLoad(folder_ui+'b_rstop'           ,ui_ButtonW1);
    spr_uibtn_ReplayPOV         := gfx_ButtonLoad(folder_ui+'b_rvis'            ,ui_ButtonW1);
-   spr_uibtn_mmark             := gfx_ButtonLoad(folder_ui+'b_mmark'           ,ui_ButtonW1);
+   spr_uibtn_markLook          := gfx_ButtonLoad(folder_ui+'b_markLook'        ,ui_ButtonW1);
+   spr_uibtn_markAttack        := gfx_ButtonLoad(folder_ui+'b_markAttack'      ,ui_ButtonW1);
    spr_uibtn_AbilityUACGeneral := gfx_ButtonLoad(folder_ui+'b_UACGeneral'      ,ui_ButtonW1);
    spr_uibtn_AbilityBribe      := gfx_ButtonLoad(folder_ui+'b_Bribe'           ,ui_ButtonW1);
    spr_uibtn_AbilityHack       := gfx_ButtonLoad(folder_ui+'b_Hack'            ,ui_ButtonW1);

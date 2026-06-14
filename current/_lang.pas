@@ -137,7 +137,7 @@ begin
    str_SG_ShowAPM                := 'Show APM';
    str_SG_ColoredShadow          := 'Colored shadows';
    str_SG_ScrollSpeed            := 'Scroll speed';
-   str_SG_MouseScroll            := 'Mouse scroll';
+   str_SG_MouseScroll            := 'Screen edge scrolling';
    str_SG_PlayerName             := 'Player name';
    str_SG_Language               := 'UI language';
    str_SG_LanguageL[true ]       := 'RUS';
@@ -156,13 +156,13 @@ begin
    str_SG_HealthBarsL[0]         := tc_lime  +'selected'+tc_default+'+'+tc_red+'damaged'+tc_default;
    str_SG_HealthBarsL[1]         := tc_aqua  +'always'  +tc_default;
    str_SG_HealthBarsL[2]         := tc_orange+'only '   +tc_lime+'selected'+tc_default;
-   str_SG_PlayersColor           := 'Players color';
-   str_SG_PlayersColorL[0]       := tc_white +'default'+tc_default;
-   str_SG_PlayersColorL[1]       := tc_lime  +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_SG_PlayersColorL[2]       := tc_white +'own '   +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
-   str_SG_PlayersColorL[3]       := tc_white +'own '   +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
-   str_SG_PlayersColorL[4]       := tc_purple+'teams'  +tc_default;
-   str_SG_PlayersColorL[5]       := tc_white +'own '   +tc_purple+'teams'+tc_default;
+   str_SG_PlayersColor           := 'Override player colors';
+   str_SG_PlayersColorL[0]       := str_YesNoG[false];
+   str_SG_PlayersColorL[1]       := tc_lime  +'own ' +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[2]       := tc_white +'own ' +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[3]       := tc_white +'own ' +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+   str_SG_PlayersColorL[4]       := tc_purple+'teams'+tc_default;
+   str_SG_PlayersColorL[5]       := tc_white +'own ' +tc_purple+'teams'+tc_default;
 
    str_SV_ResolutionW            := 'Resolution (width)';
    str_SV_ResolutionH            := 'Resolution (height)';
@@ -331,6 +331,7 @@ begin
    str_warn_prod_BadPlace        := 'Invalid building location';
    str_warn_prod_BadOrder        := 'Invalid production order';
    str_warn_prod_AllBusy         := 'All production is busy';
+   str_warn_prod_Unavailable     := 'Unavailable for production';
    str_warn_Req_Energy           := 'Need more free energy';
    str_warn_Req_HellPower        := 'Need more "Hell Power"';
    str_warn_Req_UACLoot          := 'Need more "UAC Loot"';
@@ -351,7 +352,8 @@ begin
    str_warn_NeedBuilder          := 'Need builder';
    str_warn_NeedProdUnit         := 'Need production unit';
    str_warn_MaxCountReached      := 'Maximum reached';
-   str_warn_mapMark              := ' set a mark on the map';
+   str_warn_MarkLook             := ': look here!';
+   str_warn_MarkAttack           := ': attack here!';
    str_warn_kpoint_captured      := 'The Key point was captured';
    str_warn_kpoint_lost          := 'The Key point was lost';
    str_warn_koth_control         := ' team starts controlling the center';
@@ -739,6 +741,10 @@ begin
    str_SetActionBaseHint(iAct_Control_UDestroy   ,'Destroy');
    str_SetActionBaseHint(iAct_Control_USelArmy   ,'Select all battle units');
 
+   str_SetActionBaseHint(iAct_Control_MarkLook   ,'Map mark: look here');
+   str_SetActionBaseHint(iAct_Control_MarkAttack ,'Map mark: attack here');
+
+
    str_SetActionBaseHint(iAct_InGamePause        ,'Pause');
    str_SetActionBaseHint(iAct_InGameMenu         ,'Menu' );
 
@@ -1021,41 +1027,44 @@ begin
                             iAct_USelGroup9       ],'select units from the numbered control group; double tap - move camera to nearest unit from the group');
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_UASlGroup1..
-                            iAct_UASlGroup9       ],'add to selection units from the numbered control group');
+                            iAct_UASlGroup9        ],'add to selection units from the numbered control group');
    DocHelp_AddHotKeyAction([],tc_docbr);
 
    DocHelp_AddHotKeyAction([iAct_Control_UAbility1..
-                            iAct_Control_UAbility3],'abilities of selected units');
+                            iAct_Control_UAbility3 ],'abilities of selected units');
 
    DocHelp_AddHotKeyAction([iAct_Control_UMove,iAct_Control_UStop,iAct_Control_UPatrol,
                             iAct_Control_UAMove,iAct_Control_UAStop,iAct_Control_UAPatrol]
                                                    ,'basic orders of selected units');
-   DocHelp_AddHotKeyAction([iAct_Control_UProdCncl],'cancel production in selected buildings');
-   DocHelp_AddHotKeyAction([iAct_Control_UDestroy ],'kill selected units');
+   DocHelp_AddHotKeyAction([iAct_Control_UProdCncl ],'cancel production in selected buildings');
+   DocHelp_AddHotKeyAction([iAct_Control_UDestroy  ],'kill selected units');
    DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Control_USelBase ],'select all builders; double tap - move camera to nearest builder');
-   DocHelp_AddHotKeyAction([iAct_Control_USelArmy ],'select all not busy battle units; double tap - move camera to nearest unit');
+   DocHelp_AddHotKeyAction([iAct_Control_USelBase  ],'select all builders; double tap - move camera to nearest builder');
+   DocHelp_AddHotKeyAction([iAct_Control_USelArmy  ],'select all not busy battle units; double tap - move camera to nearest unit');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark: "look here"');
+   DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark: "attack here"');
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_SProd1..
-                            iAct_SProd24          ],'production hotkeys');
+                            iAct_SProd24           ],'production hotkeys');
 
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([],tc_orange+'REPLAY PLAYBACK HOTKEYS'+tc_default+tc_doccpt);
    DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Replay_Fast      ],'toggle uncapped FPS(faster game speed)' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Pause     ],'pause playback'    );
-   DocHelp_AddHotKeyAction([iAct_Replay_Back60    ],'rewind 60 seconds' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Back10    ],'rewind 10 seconds' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Back2     ],'rewind 2 seconds'  );
-   DocHelp_AddHotKeyAction([iAct_Replay_Forward2  ],'fast forward 2 seconds' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Forward10 ],'fast forward 10 seconds');
-   DocHelp_AddHotKeyAction([iAct_Replay_Forward60 ],'fast forward 60 seconds');
-   DocHelp_AddHotKeyAction([iAct_Replay_POV       ],'toggle player-recorder POV'  );
-   DocHelp_AddHotKeyAction([iAct_Replay_Log       ],'toggle list of game messages');
-   DocHelp_AddHotKeyAction([iAct_Replay_Fog       ],'toggle fog of war' );
-   DocHelp_AddHotKeyAction([iAct_Replay_PlayerAll ],'set all players vision');
+   DocHelp_AddHotKeyAction([iAct_Replay_Fast       ],'toggle uncapped FPS(faster game speed)' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Pause      ],'pause playback'    );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back60     ],'rewind 60 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back10     ],'rewind 10 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back2      ],'rewind 2 seconds'  );
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward2   ],'fast forward 2 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward10  ],'fast forward 10 seconds');
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward60  ],'fast forward 60 seconds');
+   DocHelp_AddHotKeyAction([iAct_Replay_POV        ],'toggle player-recorder POV'  );
+   DocHelp_AddHotKeyAction([iAct_Replay_Log        ],'toggle list of game messages');
+   DocHelp_AddHotKeyAction([iAct_Replay_Fog        ],'toggle fog of war' );
+   DocHelp_AddHotKeyAction([iAct_Replay_PlayerAll  ],'set all players vision');
    DocHelp_AddHotKeyAction([iAct_Replay_Player0..
-                            iAct_Replay_Player7   ],'set player vision');
+                            iAct_Replay_Player7    ],'set player vision');
 
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([],tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt);
@@ -1449,7 +1458,6 @@ begin
   str_warn_prod_AllBusy   := 'Все производства заняты';
   str_warn_NeedProdUnit      := 'Негде производить это';
   str_warn_MaxCountReached    := 'Достигнут максимум';
-  str_warn_mapMark           := ' поставил отметку на карте';
   str_warn_kpoint_captured   := 'Ключевая точка захвачена!';
   str_warn_kpoint_lost       := 'Ключевая точка потеряна!';
   str_warn_koth_control      := ' команда контролирует центр!';

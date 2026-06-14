@@ -6,7 +6,7 @@ begin
       PlayerSetAllowedUnits(playerN,[ UID_HKeep         ..UID_HBarracks,
                                       UID_LostSoul      ..UID_ZBFGMarine,
                                       UID_UCommandCenter..UID_URMStation,
-                                      UID_Engineer      ..UID_Flyer     ],
+                                      UID_Engineer      ..UID_Flyer     ]-[UID_HEye],
                                     MaxUnits,true );
 
       PlayerSetAllowedUnits(playerN,[ UID_LostSoul,
@@ -232,7 +232,7 @@ begin
 
    UnitStepTicks := 8;
 
-   g_royal_r     := g_royal_r.MaxValue;
+   g_royal_RCur  := g_royal_RCur.MaxValue;
 
    g_cycle_order := 0;
    g_cycle_regen := 0;
@@ -385,7 +385,7 @@ end;
 procedure Game_StartSkirmish;
 var p:byte;
 begin
-   g_royal_r:=trunc(sqrt(sqr(map_Sizeh)*2));
+   g_royal_RCur:=g_royal_Rmax;
    if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
 
    for p:=0 to LastPlayer do
@@ -558,12 +558,14 @@ end;
 function ui_GameControlsEnabled:boolean;
 begin
    ui_GameControlsEnabled:=false;
+   if(MainMenu)
+   or(g_status<>gs_running)
+   or(not g_started)
+   or(UIPlayer<>LocalPlayer)
+   or(rpls_pstate=rpls_read)then exit;
    with g_PlayersMain[LocalPlayer] do
-     if(UIPlayer<>LocalPlayer)
-     or(isobserver)
-     or(isdefeated)
-     or(rpls_pstate=rpls_read)then exit;
-   if(g_status<>gs_running)then exit;
+     if(isobserver)
+     or(isdefeated)then exit;
    ui_GameControlsEnabled:=true;
 end;
 
@@ -1358,6 +1360,15 @@ end;
 
 {$include _net_game.pas}
 
+procedure GameRoyalUpdateR;
+var gtick:longint;
+begin
+   gtick:=longint(g_tick) div fr_fpsh;
+   if(gtick>g_royal_RMax)
+   then g_royal_RCur:=0
+   else g_royal_RCur:=g_royal_Rmax-gtick;
+end;
+
 procedure GameMain;
 begin
    {$IFDEF _FULLGAME}
@@ -1385,7 +1396,10 @@ begin
       g_cycle_order+=1;g_cycle_order:=g_cycle_order mod order_period;
       g_cycle_regen+=1;g_cycle_regen:=g_cycle_regen mod regen_period;
 
-      if(map_scenario=mc_KeyPoints)then map_KeyPoints_UpdatePos;
+      case map_scenario of
+      mc_KeyPoints: map_KeyPoints_UpdatePos;
+      mc_royale   : GameRoyalUpdateR;
+      end;
 
       {$IFDEF _FULLGAME}
       if(ServerSide)then
@@ -1399,11 +1413,7 @@ begin
          {$ENDIF}
                          Scenario_KeyPointsEndConditions;
                          case map_scenario of
-                         mc_royale    : begin
-                                           if(g_cycle_order=0)then
-                                             if(g_royal_r>0)then g_royal_r-=1;
-                                           Scenario_DefaultEndConditions;
-                                        end;
+                         mc_royale,
                          mc_KeyPoints,
                          mc_KotH      : Scenario_DefaultDefeatConditions;
                          else           Scenario_DefaultEndConditions;

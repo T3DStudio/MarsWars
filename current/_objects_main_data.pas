@@ -301,7 +301,7 @@ begin
    uid_SightR_upgr     := upgr_hell_EvilEyeR;
    uid_SightR_upgrV    := 50;
    uid_uibtn           := 13;
-   uid_ProdTimeSec     := 1;
+   uid_ProdTimeSec     := 0;
    uid_Regen_Base      := -1;
    uid_isbuilding      := true;
    uid_issolid         := false;
@@ -1812,6 +1812,7 @@ begin
    SetDMOD(dm_SSGShot2         ,1, 50,             wtr_mech                     );
    SetDMOD(dm_AntiUnitBioLight2,0,200,wtr_unit    +wtr_bio +wtr_light           );
    SetDMOD(dm_AntiUnitBio2     ,0,200,wtr_unit    +wtr_bio                      );
+   SetDMOD(dm_AntiUnitBio2     ,1, 50,wtr_building                              );
    SetDMOD(dm_AntiUnitMech2    ,0,200,wtr_unit    +wtr_mech                     );
    SetDMOD(dm_AntiUnitLight2   ,0,200,wtr_unit             +wtr_light           );
    SetDMOD(dm_AntiFly2         ,0,200,                                wtr_fly   );

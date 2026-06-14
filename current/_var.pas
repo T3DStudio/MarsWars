@@ -17,7 +17,8 @@ g_FixedPositions  : boolean  = false;
 g_AISlots         : byte     = 0;
 g_DefeatedObs     : boolean  = true;
 
-g_royal_r         : integer  = 0;
+g_royal_Rmax      : integer  = 0;
+g_royal_RCur      : integer  = 0;
 
 g_PlayersMain     : TPList;
 g_PlayersTemp     : array[0..LastPlayer ] of TPlayerTempData;
@@ -587,6 +588,7 @@ c_dred,
 c_awhite,
 c_red,
 c_ared,
+c_ltred,
 c_orange,
 c_dorange,
 c_aorange,
@@ -868,7 +870,8 @@ spr_camp_hell,
 spr_camp_earth,
 spr_camp_phobos,
 spr_camp_deimos ,
-spr_uibtn_mmark,
+spr_uibtn_markLook,
+spr_uibtn_markAttack,
 spr_uibtn_ReplayFast,
 spr_uibtn_ReplayForw1,
 spr_uibtn_ReplayForw2,
@@ -1209,6 +1212,7 @@ str_attr_ground,
 
 str_warn_prod_BadPlace,
 str_warn_prod_BadOrder,
+str_warn_prod_Unavailable,
 str_warn_Req_Energy,
 str_warn_Req_HellPower,
 str_warn_Req_UACLoot,
@@ -1239,7 +1243,8 @@ str_warn_ngen_exh,
 str_warn_ngen_captured,
 str_warn_ngen_lost,
 str_warn_MaxLimitReached,
-str_warn_mapMark,
+str_warn_markLook,
+str_warn_markAttack,
 str_warn_NeedBuilder,
 str_warn_prod_AllBusy,
 str_warn_upgrade_InProgress,

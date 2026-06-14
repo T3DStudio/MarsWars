@@ -1269,7 +1269,7 @@ ldir,lx,ly:integer;
 alarmType :byte;
 function RoyalCR:integer;
 begin
-   RoyalCR:=min2i(g_royal_r div 3,base_r1h);
+   RoyalCR:=min2i(g_royal_RCur div 3,base_r1h);
 end;
 
 function moveEventType:byte;
@@ -1324,7 +1324,7 @@ begin
    begin
       if(point_dist_int(uo_x,uo_y,lx,ly)>=lr)then exit;
       if(map_scenario=mc_royale)then
-        if(base_r1h>(g_royal_r-point_dist_int(uo_x,uo_y,map_sizeH,map_sizeH)))then exit;
+        if(base_r1h>(g_royal_RCur-point_dist_int(uo_x,uo_y,map_sizeH,map_sizeH)))then exit;
       if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,true,255,pBuilder)<>cbr_no)then exit;
    end;
    checkLandingPlace:=true;
@@ -1402,7 +1402,7 @@ begin
                                    met_koth  : with ai_keypoint_kp^ do
                                                  setLandingPlace(kp_x,kp_y,ai_keypoint_d,keyPoint_KotRW);
                                    met_royale: begin
-                                                  lx:=min2i(g_royal_r div 3,base_r1h);
+                                                  lx:=min2i(g_royal_RCur div 3,base_r1h);
                                                   setLandingPlace(map_sizeH,map_sizeH,u_royal_cd,lx);
                                                end;
                                    met_hits  : ai_RunFrom(pBuilder,ai_enemy_u,0,0,ai_enemy_d);

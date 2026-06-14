@@ -2319,7 +2319,7 @@ begin
              if(map_scenario=mc_royale)then
              begin
                 u_royal_cd:=point_dist_int(x,y,map_Sizeh,map_Sizeh);
-                u_royal_d :=g_royal_r-u_royal_cd;
+                u_royal_d :=g_royal_RCur-u_royal_cd;
                 if(u_royal_d<uid_missileR)then
                 begin
                    unit_kill(pu,false,false,true,true,false);

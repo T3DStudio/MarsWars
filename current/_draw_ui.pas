@@ -68,7 +68,8 @@ aummat_created_u,
 aummat_created_b  : al_c:=c_lime;
 aummat_advance    : al_c:=c_aqua;
 aummat_upgrade    : al_c:=c_yellow;
-aummat_info       : al_c:=c_white;
+aummat_markLook   : al_c:=c_ltgray;
+aummat_markAttack : al_c:=c_ltred;
        end;
        ui_AddMarker:=true;
     end;
@@ -88,7 +89,8 @@ lmt_unit_ready       : if(g_uids[lm_data_u].uid_isbuilding)
                        then ui_AddMarker(lm_x,lm_y,aummat_created_b ,true)
                        else ui_AddMarker(lm_x,lm_y,aummat_created_u ,true);
 lmt_upgrade_complete :      ui_AddMarker(lm_x,lm_y,aummat_upgrade   ,true);
-lmt_map_mark         :      ui_AddMarker(lm_x,lm_y,aummat_info      ,true);
+lmt_markLook         :      ui_AddMarker(lm_x,lm_y,aummat_markLook  ,true);
+lmt_markAttack       :      ui_AddMarker(lm_x,lm_y,aummat_markAttack,true);
 lmt_allies_attacked,
 lmt_unit_attacked    : begin
                        if(g_uids[lm_data_u].uid_isbuilding)
@@ -103,22 +105,22 @@ end;
 function ui_PanelBTNUnit(POVPlayer:PTPlayerGameData;uid:byte):boolean;
 begin
    ui_PanelBTNUnit:=false;
-   if(uid=0)then exit;
-   if(POVPlayer<>nil)then
-     with POVPlayer^ do
-       with g_uids[uid] do
-         if (units_uid_e[uid]<=0)
-         and(units_ucl_e[uid_isbuilding,uid_uibtn]<=0)
-         and(units_uid_m[uid]<=0)then exit;
+   if(uid=0)
+   or(POVPlayer=nil)then exit;
+   with POVPlayer^ do
+     with g_uids[uid] do
+       if (units_uid_e[uid]<=0)
+       and(units_ucl_e[uid_isbuilding,uid_uibtn]<=0)
+       and(units_uid_m[uid]<=0)then exit;
    ui_PanelBTNUnit:=true;
 end;
 function ui_PanelBTNUpgrade(POVPlayer:PTPlayerGameData;uid:byte):boolean;
 begin
    ui_PanelBTNUpgrade:=false;
-   if(uid=0)then exit;
-   if(POVPlayer<>nil)then
-     with POVPlayer^ do
-       if(upgrs_max[uid]<=0)then exit;
+   if(uid=0)
+   or(POVPlayer=nil)then exit;
+   with POVPlayer^ do
+     if(upgrs_max[uid]<=0)then exit;
    ui_PanelBTNUpgrade:=true;
 end;
 function ui_PanelBTNAbility(pu:PTUnit;abilityN:byte):boolean;
@@ -150,7 +152,8 @@ aummat_upgrade    : RectangleColor(ui_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, a
 aummat_advance,
 aummat_attacked_u,
 aummat_created_u,
-aummat_info       : CircleColor   (ui_minimap,al_mx  ,al_my  ,              r, al_c);
+aummat_markLook,
+aummat_markAttack : CircleColor   (ui_minimap,al_mx  ,al_my  ,              r, al_c);
           end;
 
           al_t-=2;
@@ -179,7 +182,7 @@ begin
 
    map_MiniMap_KeyPoints(ui_minimap,true);
    case map_scenario of
-   mc_royale: circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_r*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
+   mc_royale: circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_RCur*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
    end;
 
    if(ui_PlayersScreens)then
@@ -533,6 +536,9 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Control_USelBase  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F1        ,false,not iActEnabled(uid));
                        iAct_Control_USelArmy  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F2        ,false,not iActEnabled(uid));
 
+                       iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,false);
+                       iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,false);
+
                        iAct_Replay_Fog,
                        iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog ,ui_fog,not iActEnabled(uid));
 
@@ -584,7 +590,8 @@ begin
        if(al_t>0)then
        begin
           case al_v of
-aummat_info     : ;
+          aummat_markLook,
+          aummat_markAttack:;
           else continue;
           end;
 
@@ -593,7 +600,7 @@ aummat_info     : ;
 
           r:=(32-(g_tick mod 32))*4;
 
-          circleColor(tar,sx,sy,r,c_white);
+          circleColor(tar,sx,sy,r,al_c);
        end;
 end;
 
@@ -634,6 +641,8 @@ end;
 begin
    case m_uifocus of
    mf_map      : case m_brush of
+                 co_markLook,
+                 co_markAttack,
                  co_apatrol,
                  co_patrol : ;
                  1..255    : with g_uids[ m_brush] do AddLine(@uid_str_name);
@@ -917,6 +926,7 @@ begin
    co_empty  :;
    co_move,
    co_patrol : draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubG);
+   co_markAttack,
    co_amove,
    co_apatrol: draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubR);
    else        draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubA);

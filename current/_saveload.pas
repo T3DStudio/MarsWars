@@ -180,7 +180,6 @@ begin
    AddItem(@g_effects           ,SizeOf(g_effects          ));
    AddItem(@g_random_i          ,SizeOf(g_random_i         ));
    AddItem(@g_random_p          ,SizeOf(g_random_p         ));
-   AddItem(@g_royal_r           ,SizeOf(g_royal_r          ));
    AddItem(@g_status            ,SizeOf(g_status           ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));
    AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen      ));
@@ -323,6 +322,7 @@ begin
       gt_scirmish: map_seed2theme;
       end;
 
+      GameRoyalUpdateR;
       KeyPoints_UpdateVisData;
       units_DefaultVisData;
       map_MakeThemeSprites;

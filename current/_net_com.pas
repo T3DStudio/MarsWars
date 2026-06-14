@@ -354,7 +354,7 @@ begin
    end;
 end;
 
-procedure net_SendMapMark(x,y:integer);
+procedure net_SendMapMark(x,y,mType:integer);
 begin
    if(net_status=ns_client)then
    begin
@@ -362,6 +362,7 @@ begin
       net_writebyte(nmid_map_mark);
       net_writeint(x);
       net_writeint(y);
+      net_writeint(mType);
       net_send(net_cl_svip,net_cl_svport);
    end;
 end;

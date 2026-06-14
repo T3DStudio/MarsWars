@@ -530,12 +530,14 @@ lmt_unit_resurrected,
 lmt_unit_captured,
 lmt_unit_ready          : with g_uids[lm_data_u] do
                           snd_SoundPlayUnitCommand(uid_snd_ready);
-lmt_upgrade_complete    : snd_SoundPlayAnoncer(snd_upgrade_complete[race],true,false);
-lmt_prod_BadPlace       : snd_SoundPlayAnoncer(snd_cannot_build    [race],true,false);
-lmt_map_mark,
-lmt_allies_attacked     : snd_SoundPlayAnoncer(snd_mapmark,false,false);
+lmt_upgrade_complete    : snd_SoundPlayAnoncer(snd_upgrade_complete[race],true ,false);
+lmt_prod_BadPlace       : snd_SoundPlayAnoncer(snd_cannot_build    [race],true ,false);
+lmt_allies_attacked     : snd_SoundPlayAnoncer(snd_mapmark               ,false,false);
 lmt_unit_attacked       : with g_uids[lm_data_u] do
                           snd_SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
+lmt_markAttack          : snd_SoundPlayMMapAlarm(snd_mapmark,false);
+lmt_markLook            : snd_SoundPlayMMapAlarm(snd_Stink  ,false);
+
 // Key Point Events
 lmt_Req_Energy          : snd_SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control        : snd_SoundPlayAnoncer(snd_KeyPointControl,true,false);
@@ -563,6 +565,7 @@ lmt_Req_UACLoot,
 lmt_upgrade_InProgress,
 lmt_prod_AllBusy,
 lmt_prod_BadOrder,
+lmt_prod_Unavailable,
 lmt_Invalid_Order       : snd_SoundPlayAnoncer(snd_cant_order[race],true,false);
 
 
