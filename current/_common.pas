@@ -38,7 +38,7 @@ procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
 procedure ui_EnableControlActs;forward;
 procedure ui_InitControlPanelBTNActions;forward;
-function LogMes2UIAlarm:boolean; forward;
+function LogMes2UIAlarm(POVPlayer:byte):boolean; forward;
 procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
 
 procedure unit_UICountersAll; forward;
@@ -646,30 +646,23 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]
                lmt_game_StartsIn     : g_LobbyTimer:=adatau*fr_fps1-1;
                lmt_game_BreakStarting: g_LobbyTimer:=0;
                end;
-        {true : case amtype of
-               lmt_player_leave,
-               lmt_player_surrender,
-               lmt_player_timeout,
-               lmt_player_defeated   : if(adatau<=LastPlayer)then
-                                         with g_PlayersMain[adatau] do
-                                           case amtype of
-                                           lmt_player_leave,
-                                           lmt_player_timeout  : begin
-                                                                 isdefeated:=true;
-                                                                 state:=ps_none;
-                                                                 end;
-                                           lmt_player_surrender,
-                                           lmt_player_defeated : begin
-                                                                 isdefeated:=true;
-                                                                 if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
-                                                                 end;
-                                           end;
-               end;   }
+        true : if(adatau<=LastPlayer)then
+                 case amtype of
+                 lmt_player_leave,
+                 lmt_player_timeout  : with g_PlayersMain[adatau] do
+                                       begin
+                                          //name :='';
+                                          state:=ps_none;
+                                       end;
+                 lmt_player_connected: with g_PlayersMain[adatau] do
+                                       begin
+                                          name :=astr;
+                                          state:=ps_human;
+                                       end;
+                 end;
         end;
 
-        //if(amtype=lmt_player_connected)then g_PlayersMain[adatau].name:=astr;
-
-        if(net_status=ns_client)or(not g_started)
+        if(net_status<>ns_none)or(not g_started) //??
         then POVPlayer:=LocalPlayer
         else POVPlayer:=UIPlayer;
         if(ptarget=POVPlayer)then
@@ -679,7 +672,7 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]
 
            menu_update:=true;
 
-           if(LogMes2UIAlarm)then snd_SoundLogUIPlayer(POVPlayer);
+           if(LogMes2UIAlarm(POVPlayer))then snd_SoundLogUIPlayer(POVPlayer);
 
            if(rpls_pstate<rpls_read)and(g_type<>gt_campaing)then
              if((amtype=lmt_player_defeated)and(g_DefeatedObs)and(adatau=UIPlayer))
@@ -1276,6 +1269,41 @@ begin
    end;
 end;
 
+function unit_IsProducting(pu:PTUnit):boolean;
+var i:byte;
+begin
+   unit_IsProducting:=false;
+   with pu^  do
+   with uid^ do
+     if(uid_isbarrack)or(uid_isforge)then
+       for i:=0 to LastUnitLevel do
+       begin
+          if(i>level)then break;
+          if((uid_isbarrack)and(uprod_r[i]>0))
+          or((uid_isforge  )and(pprod_r[i]>0))then
+          begin
+             unit_IsProducting:=true;
+             exit;
+          end;
+       end;
+end;
+
+function unit_OrderCheckProdCancel(pu:pTunit):boolean;
+begin
+   unit_OrderCheckProdCancel:=true;
+   with pu^ do
+   with uid^ do
+    if(not iscomplete)
+    then exit
+    else
+     if(transformTimer>0)
+     then exit
+     else
+      if(unit_IsProducting(pu))
+      then exit;
+   unit_OrderCheckProdCancel:=false;
+end;
+
 function unit_OrderCheckForge(pu:pTunit;oid:byte):boolean;
 begin
    unit_OrderCheckForge:=true;
@@ -1740,6 +1768,22 @@ begin
    if(check)then exit;
 
    UIPlayer:=NewPlayerN;
+end;
+
+function ui_ObserverPov(POVPlayer:byte):boolean;
+begin
+   ui_ObserverPov:=false;
+   if(POVPlayer>LastPlayer)
+   or(POVPlayer=LocalPlayer)
+   then exit
+   else
+     with g_PlayersTemp[POVPlayer] do
+     with g_PlayersMain[POVPlayer] do
+       if(cam_w<=0)
+       or(cam_h<=0)
+       or(state<>ps_human)then exit;
+
+   ui_ObserverPov:=true;
 end;
 
 function ui_ControlTabType:TTabControlContent;

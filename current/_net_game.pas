@@ -507,13 +507,10 @@ begin
        with g_PlayersMain[p] do
        with g_PlayersTemp[p] do
        begin
-          if(state=ps_human)then
-          begin
-             net_ttl :=net_readword;
-             pval    :=net_ping;
-             net_ping:=net_readword;
-             if(net_ping<>pval)then menu_update:=true;
-          end;
+          net_ttl :=net_readword;
+          pval    :=net_ping;
+          net_ping:=net_readword;
+          if(net_ping<>pval)then menu_update:=true;
        end;
 end;
 

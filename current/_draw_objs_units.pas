@@ -306,17 +306,21 @@ begin
       if(unit_F2SelectFilter(pu))then ui_IncGroupCounter(@ui_group_f2      ,x,y,uidi); // all battle units
       if(unit_F1SelectFilter(pu))then ui_IncGroupCounter(@ui_group_f1      ,x,y,uidi); // all builders
 
-      // UI update the commander
       if(isselected)then
-        case m_brush of
-        -255..-1: if(unit_OrderCheckAbility(pu,byte(-m_brush)))then
-                  UnitOrderSetNearestTarget(pu,mouse_map_x,mouse_map_y,@ui_CommandercPU,@ui_CommandercD,@ui_CommandercW,unit_AbilityCheck(pu,byte(-m_brush),false)=0,false,true );
-        else      ui_CommanderSet(pu);
-        end;
+      begin
+         // UI update the commander
+         case m_brush of
+         -255..-1: if(unit_OrderCheckAbility(pu,byte(-m_brush)))then
+                   UnitOrderSetNearestTarget(pu,mouse_map_x,mouse_map_y,@ui_CommandercPU,@ui_CommandercD,@ui_CommandercW,unit_AbilityCheck(pu,byte(-m_brush),false)=0,false,true );
+         else      ui_CommanderSet(pu);
+         end;
 
-      // have rally point
-      if(isselected)and(uid_HaveRallyPoint)then
-        ui_uibtn_rpoint+=1;
+         // have rally point
+         if(uid_HaveRallyPoint)then ui_uibtn_rpoint+=1;
+
+         // cancel production order
+         if(unit_OrderCheckProdCancel(pu))then ui_uibtn_ProdCncl+=1;
+      end;
 
       if(iscomplete)then
       begin
@@ -341,22 +345,18 @@ begin
            if(rld<ui_bucl_reload[uid_uibtn])
            or(ui_bucl_reload[uid_uibtn]<0)then ui_bucl_reload[uid_uibtn]:=rld;
 
-         // main orders
-         if(isselected)then
-           if(transformTimer>0)
-           then ui_uibtn_ProdCncl+=1
-           else
-           begin
-              HaveAttack:=ui_HaveAttack(pu);
-              if (speed>0   )then ui_uibtn_move   +=1;
-              if (HaveAttack)then ui_uibtn_attack +=1;
-              if (speed>0   )
-              and(HaveAttack)then ui_uibtn_apatrol+=1;
-           end;
+         // basic move/attack orders
+         if(isselected)and(transformTimer<=0)then
+         begin
+            HaveAttack:=ui_HaveAttack(pu);
+            if (speed>0   )then ui_uibtn_move   +=1;
+            if (HaveAttack)then ui_uibtn_attack +=1;
+            if (speed>0   )
+            and(HaveAttack)then ui_uibtn_apatrol+=1;
+         end;
       end
       else
       begin
-         if(isselected)then ui_uibtn_ProdCncl+=1;
          // building time
          ui_UICountersProductionUID(uidi,min2i(uid_ProdTimeSec,((uid_MaxHits1-hits+uid_ProdHitStep) div uid_ProdHitStep) div 2)*fr_fps1,buffs[ub_SphereTurbo]>0);
       end;
@@ -402,10 +402,6 @@ begin
    ui_uibtn_attack   :=0;
    ui_uibtn_apatrol  :=0;
    ui_uibtn_ProdCncl :=0;
-   if(UIPlayer=LocalPlayer)then
-     with g_PlayersMain[UIPlayer] do
-       ui_uibtn_ProdCncl:=units_upgrProds_s+
-                          units_unitProds_s;
 
    ui_CommanderClear;
 

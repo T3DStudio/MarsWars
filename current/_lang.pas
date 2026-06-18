@@ -770,6 +770,7 @@ begin
    str_SetActionBaseHint(iAct_Replay_Player7     ,'Player #8');
 
    str_SetActionBaseHint(iAct_Observer_Fog       ,'Fog of war' );
+   str_SetActionBaseHint(iAct_Observer_POV       ,'Player POV' );
    str_SetActionBaseHint(iAct_Observer_PlayerAll ,'All players');
    str_SetActionBaseHint(iAct_Observer_Player0   ,'Player #1');
    str_SetActionBaseHint(iAct_Observer_Player1   ,'Player #2');
@@ -791,10 +792,12 @@ begin
 
    menu_set_hint(mi_SaveLoad_fname,mi_SaveLoad_list,'');
 
-   for i in [mi_Players_Panel ..mi_Players_Obs7       ] do menu_set_hint(i,mi_Players_Panel ,'');
+   for i in [mi_Players_Panel ..mi_Players_Obs7       ]-
+            [mi_Players_Ready]                          do menu_set_hint(i,mi_Players_Panel ,'');
    for i in [mi_Map_Panel     ..mi_Map_Random         ] do menu_set_hint(i,mi_Map_Panel     ,'');
    for i in [mi_Game_Panel    ..mi_Game_Random        ] do menu_set_hint(i,mi_Game_Panel    ,'');
-   for i in [mi_MP_Panel      ..mi_MP_ChatLine        ] do menu_set_hint(i,mi_MP_Panel      ,'');
+   for i in [mi_MP_Panel      ..mi_MP_ChatLine        ]-
+            [mi_MP_Disconnect]                          do menu_set_hint(i,mi_MP_Panel      ,'');
 
    for i in [mi_SG_PlayerName ..mi_SG_ShowPlayerScrns ] do menu_set_hint(i,mi_SG_PlayerName ,'');
    for i in [mi_SR_RecordGames..mi_SR_RecordQuality   ] do menu_set_hint(i,mi_SR_RecordGames,'');
@@ -1071,6 +1074,7 @@ begin
    DocHelp_AddHotKeyAction([],tc_docbr);
 
    DocHelp_AddHotKeyAction([iAct_Observer_Fog      ],'toggle fog of war' );
+   DocHelp_AddHotKeyAction([iAct_Observer_POV      ],'toggle player POV' );
    DocHelp_AddHotKeyAction([iAct_Observer_PlayerAll],'set all players vision');
    DocHelp_AddHotKeyAction([iAct_Observer_Player0..
                             iAct_Observer_Player7  ],'set player vision');

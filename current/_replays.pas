@@ -271,10 +271,12 @@ end;
 // REPLAY WRITE
 procedure replay_WriteHead;
 var p:byte;
+fname:shortstring;
 begin
    replay_Abort;
 
-   rpls_str_path:=folder_replay+rpls_NamePrefix+'_'+str_fileinfo_ScenarioL[map_scenario]+'_'+str_DateTime+fileExt_Replay;
+   fname:=rpls_NamePrefix+'_'+str_fileinfo_ScenarioL[map_scenario]+'_'+str_DateTime+fileExt_Replay;
+   rpls_str_path:=folder_replay+fname;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
@@ -299,7 +301,7 @@ begin
       rpls_log_c  :=0;
       rpls_Ticks  :=0;
       rpls_GameStatus := 255;
-      rpls_POVRecorder:=false;
+      ui_playerPOV:=false;
 
       if(rpls_head_itemn>0)then
         for p:=0 to rpls_head_itemn-1 do
@@ -310,9 +312,9 @@ begin
       begin
          replay_Abort;
          rpls_pstate:=rpls_none;
-         GameLogRecError(rpls_str_path+rpls_file_LastErrS);
+         GameLogRecError(fname+rpls_file_LastErrS);
       end
-      else GameLogRecStart(rpls_str_path);
+      else GameLogRecStart(fname);
    end;
 end;
 
@@ -492,7 +494,7 @@ begin
          LocalPlayer:=rpls_player;
          UIPlayer   :=LocalPlayer;
 
-         rpls_POVRecorder:=false;
+         ui_playerPOV:=false;
 
          Map_Make;
          ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
@@ -551,7 +553,7 @@ begin
    end;
    if(rpls_ForwardSkip=0)then rpls_FastSkip:=false;
 
-   if(rpls_POVRecorder)then
+   if(ui_playerPOV)then
    begin
       ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl camXYt1b)-ui_cam_hw) div 2;
       ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl camXYt1b)-ui_cam_hh) div 2;

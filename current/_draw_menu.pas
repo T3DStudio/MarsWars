@@ -467,7 +467,7 @@ begin
      else drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,PlayerStateString(p),color);
 
           drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name                ,color);
-          if(G_Started)and(isdefeated)then
+          if(G_Started)and(isdefeated)and(length(name)>0)then
             with menu_items[mi_Players_AIskil0+p] do
               if(mi_state>as_off)then
                 hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
@@ -498,7 +498,7 @@ begin
           if(g_started)then
           begin
              drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name,c_gray);
-             if(isdefeated)then
+             if(isdefeated)and(length(name)>0)then
                with menu_items[mi_Players_AIskil0+p] do
                  if(mi_state>as_off)then
                    hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
@@ -629,8 +629,10 @@ var i:byte;
 begin
    // COMMON
    if(menu_DarkBack)
-   then draw_sdlsurface(tar,0,0,spr_MenuBackgroundD)
-   else draw_sdlsurface(tar,0,0,spr_MenuBackgroundL);
+   then draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundD)
+   else draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundL);
+
+   //vlineColor(tar,400,0,600,c_yellow);
 
    {$IFDEF TESTMODE}
    if(TestMode>0)then

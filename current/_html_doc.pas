@@ -139,6 +139,24 @@ begin
        htmldoc_WriteLine(plist^[i]);
 end;
 
+procedure htmldoc_SaveSprites;
+var
+uid,i:byte;
+begin
+   for uid:=0 to 255 do
+     with g_uids[uid] do
+       if(uid_r>0)then
+        begin
+           if(htmldoc_UID1Spr(uid))
+           then htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,0)^.surf )
+           else
+             for i:=0 to LastUnitLevel do
+               htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+'_'+b2s(i)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,i)^.surf );
+
+           htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitBTN  +b2s(uid)+str_htmldoc_img_ext,uid_BTNDoc.surf );
+        end;
+end;
+
 procedure htmldoc_make;
 var
 uid,i:byte;
@@ -187,8 +205,7 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  GAME UI
    htmldoc_WriteCaption(str_help_GameUI);
-   //with str_doc_HotKeys do
-   //htmldoc_WriteStringArray(@slist_l,slist_n);
+   //
 
    /////////////////////////////////////////////////////////////////////////////
    //  GAME BASICS CONTROLS
@@ -256,24 +273,9 @@ begin
    with str_doc_Other do
    htmldoc_WriteStringArray(@slist_l,slist_n);
 
-
    /////////////
    writeln(html_f,'</td></tr></table></div></html>');
    close(html_f);
-
-   // save sprites
-   for uid:=0 to 255 do
-     with g_uids[uid] do
-       if(uid_r>0)then
-        begin
-           if(htmldoc_UID1Spr(uid))
-           then htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,0)^.surf )
-           else
-             for i:=0 to LastUnitLevel do
-               htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+'_'+b2s(i)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,i)^.surf );
-
-           htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitBTN  +b2s(uid)+str_htmldoc_img_ext,uid_BTNDoc.surf );
-        end;
 end;
 
 

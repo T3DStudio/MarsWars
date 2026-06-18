@@ -140,8 +140,8 @@ ai_name_i         : byte = 0;
 ai_names_l        : array[0..ai_names_max-1] of shortstring = (
                     ' TGA'   ,' NRM'    ,' BFG'   ,' Dant3'   ,' marat'  ,' Notarget' ,' Am$ek'   ,' Chainie' ,' BND'     ,' Nico',
                     ' Mud'   ,' Aurora' ,' Archi' ,' print423',' Rising' ,' KolyanRPG',' MWG'     ,' Teran'   ,' ZZYZX'   ,' Abaddon',
-                    ' Afrit' ,' Agaures',' Archon',' Azazel'  ,' Arah'   ,' Garrin'   ,' Blot'    ,' Bruiser' ,' Sarutti' ,' CacoLich',
-                    ' Romero',' Carmack',' Sting' ,' Catharsi',' Celt'   ,' Crash'    ,' Cryotron',' Zetor'   ,' Daedabus',' Defiler',
+                    ' Afrit' ,' Agaures',' Archon',' Azazel'  ,' Issyl'  ,' Garrin'   ,' Blot'    ,' Bruiser' ,' Sarutti' ,' CacoLich',
+                    ' Romero',' Carmack',' Sting' ,' Soban'   ,' Celt'   ,' Crash'    ,' Cryotron',' Zetor'   ,' Daedabus',' Defiler',
                     ' Zymeth',' Yvaine' ,' Vetkin',' Tao'     ,' Otomo'  ,' Kenji'    ,' Shinja'  ,' Utara'   ,' Deimos'  ,' Phobos');
 
 {$IFDEF TESTMODE}
@@ -221,6 +221,8 @@ ui_blink3         : byte;
 ui_mm_ScanBlink   : boolean = false;
 
 ui_panel_race     : byte = r_random;
+
+ui_playerPOV      : boolean = false;
 
 ui_UIPanelTemplate,
 ui_UIPanel,
@@ -536,7 +538,6 @@ rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
 rpls_GameStatus   : byte = 0;
 rpls_showlog      : boolean = false;
-rpls_POVRecorder  : boolean = false;
 rpls_Ticks        : cardinal = 0;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_head_itemn   : integer = 0;

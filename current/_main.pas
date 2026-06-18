@@ -70,6 +70,10 @@ begin
    if(TestMode=2)then
    begin
    htmldoc_make;
+   ui_language:=not ui_language;SwitchLanguage;
+   htmldoc_make;
+   ui_language:=not ui_language;SwitchLanguage;
+   htmldoc_SaveSprites;
    end;
    {$ENDIF}
    {$ENDIF}

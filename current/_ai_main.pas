@@ -958,7 +958,7 @@ begin
        UID_UBarracks,
        UID_UFactory,
        UID_HBarracks,
-       UID_HGate          : if(not ai_IsProducting(pu))then
+       UID_HGate          : if(not unit_IsProducting(pu))then
                             begin
                                if(units_uid_c[uidi]>1)and(ai_selfUID_minLevel=level)then
                                begin
@@ -1030,7 +1030,7 @@ UID_UFactory,
 UID_HPools,
 UID_UWeaponFactory: if(u_royal_d>base_r3)
                     or(map_scenario<>mc_royale)then
-                      if(not ai_IsProducting(pu))then
+                      if(not unit_IsProducting(pu))then
                         case uidi of
                         UID_HGate         : ai_UnitAbility(pu,uab_ToHGate         ,0,0,0);
                         UID_HBarracks     : ai_UnitAbility(pu,uab_ToHBarracks     ,0,0,0);
@@ -1429,7 +1429,7 @@ begin
      else
        if(prod_upgr_Now>0)then
        begin
-          if(uid_isforge)then unit_ProdStopUpgrade(pu,255,false,false);
+          if(uid_isforge)then unit_ProdStopUpgrade(pu,255,false,true,false);
        end
        else
          if(ai_UnitsInTransform>0)then

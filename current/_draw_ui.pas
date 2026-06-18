@@ -75,13 +75,13 @@ aummat_markAttack : al_c:=c_ltred;
     end;
 end;
 
-function LogMes2UIAlarm:boolean;
+function LogMes2UIAlarm(POVPlayer:byte):boolean;
 begin
    // true  - need announcer sound
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
-   if(UIPlayer<=LastPlayer)then
-     with g_PlayersMain[UIPlayer] do
+   if(POVPlayer<=LastPlayer)then
+     with g_PlayersMain[POVPlayer] do
        with log_l[log_i] do
          case lm_type of
 lmt_unit_LevelUp    :      ui_AddMarker(lm_x,lm_y,aummat_advance   ,true);
@@ -128,11 +128,12 @@ begin
    ui_PanelBTNAbility:=false;
    if(pu<>nil)then
      if(unit_ReadyForAbilityOrder(pu))then
+       with pu^.player^ do
        with pu^.uid^ do
          case abilityN of
-         1 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability1,true)=0;
-         2 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability2,true)=0;
-         3 : ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability3,true)=0;
+         1 : if(uid_ability1 in a_ability)then ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability1,true)=0;
+         2 : if(uid_ability2 in a_ability)then ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability2,true)=0;
+         3 : if(uid_ability3 in a_ability)then ui_PanelBTNAbility:=unit_AbilityCheck(pu,uid_ability3,true)=0;
          end;
 end;
 
@@ -536,8 +537,8 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Control_USelBase  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F1        ,false,not iActEnabled(uid));
                        iAct_Control_USelArmy  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F2        ,false,not iActEnabled(uid));
 
-                       iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,false);
-                       iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,false);
+                       iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,not iActEnabled(uid));
+                       iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,not iActEnabled(uid));
 
                        iAct_Replay_Fog,
                        iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog ,ui_fog,not iActEnabled(uid));
@@ -559,7 +560,8 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                                      draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColor(p,false),UIPlayer=p,not iActEnabled(uid));
                                                 end;
                        iAct_Replay_Log        : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayLog  ,rpls_showlog    ,not iActEnabled(uid));
-                       iAct_Replay_POV        : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayPOV  ,rpls_POVRecorder,not iActEnabled(uid));
+                       iAct_Observer_POV,
+                       iAct_Replay_POV        : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayPOV  ,ui_playerPOV    ,not iActEnabled(uid));
                        iAct_Replay_Fast       : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFast ,sys_uncappedFPS ,not iActEnabled(uid));
                        iAct_Replay_Pause      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayPause,replay_IsPaused ,not iActEnabled(uid));
                        iAct_Replay_Back60     : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayBack3,false           ,not iActEnabled(uid));

@@ -327,14 +327,17 @@ begin
          if(uid_isbuilding    )then wudata_prod(pu,rpl);
       end;
 
-      if(uid_HaveRallyPoint and(isselected or not rpl))then
-        if(IsUnitRange(rpoint_tar,nil))
-        then wudata_int(-rpoint_tar,rpl)
-        else
-        begin
-           wudata_int(rpoint_x,rpl);
-           wudata_int(rpoint_y,rpl);
-        end;
+      if(uid_HaveRallyPoint)then
+        //if(not rpl)
+        //or(rpl and isselected)then
+        if(not rpl or isselected)then
+          if(IsUnitRange(rpoint_tar,nil))
+          then wudata_int(-rpoint_tar,rpl)
+          else
+          begin
+             wudata_int(rpoint_x,rpl);
+             wudata_int(rpoint_y,rpl);
+          end;
    end;
 end;
 
@@ -391,11 +394,13 @@ begin
                  end;
 
                  if(uid_client_WCastTarget)then
-                   if(buffs[ub_Cast]>0)then
-                   begin
-                      wudata_byte(byte(uo_x shr 5),rpl);
-                      wudata_byte(byte(uo_y shr 5),rpl);
-                   end;
+                   if(g_PlayersMain[POVPlayer].isobserver)
+                   or(g_PlayersMain[POVPlayer].team=g_PlayersMain[playeri].team)then
+                     if(buffs[ub_Cast]>0)then
+                     begin
+                        wudata_byte(byte(uo_x shr 5),rpl);
+                        wudata_byte(byte(uo_y shr 5),rpl);
+                     end;
               end;
 
             if(playeri=POVPlayer)
@@ -1299,7 +1304,7 @@ begin
 
       uo:=(b and %01110000)shr 4;
 
-      //if(not rpl)and(iscomplete)and(transformTimer<=0)then rudata_UnitOrderTar(uu,uo,rpl);
+      if(not rpl)and(iscomplete)and(transformTimer<=0)then rudata_UnitOrderTar(uu,uo,rpl);
 
       if((b and %10000000)=0)then exit;
 
@@ -1310,25 +1315,28 @@ begin
          if(uid_isbuilding    )then rudata_prod(uu,rpl);
       end;
 
-      if(uid_HaveRallyPoint and(isselected or not rpl))then
-      begin
-         i:=rpoint_x;
-         rpoint_x:=rudata_int(rpl,0);
-         if(i<>rpoint_x)and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
-         if(IsUnitRange(-rpoint_x,@tu))then
-         begin
-            rpoint_tar:=-rpoint_x;
-            rpoint_x  :=tu^.vx;
-            rpoint_y  :=tu^.vy;
-         end
-         else
-         begin
-            i:=rpoint_y;
-            rpoint_tar:=0;
-            rpoint_y  :=rudata_int(rpl,0);
-            if(i<>rpoint_y)and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
-         end;
-      end;
+      if(uid_HaveRallyPoint)then
+        //if(not rpl)
+        //or(rpl and isselected)then
+        if(not rpl or isselected)then
+        begin
+           i:=rpoint_x;
+           rpoint_x:=rudata_int(rpl,0);
+           if(i<>rpoint_x)and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
+           if(IsUnitRange(-rpoint_x,@tu))then
+           begin
+              rpoint_tar:=-rpoint_x;
+              rpoint_x  :=tu^.vx;
+              rpoint_y  :=tu^.vy;
+           end
+           else
+           begin
+              i:=rpoint_y;
+              rpoint_tar:=0;
+              rpoint_y  :=rudata_int(rpl,0);
+              if(i<>rpoint_y)and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
+           end;
+        end;
    end;
 end;
 
@@ -1406,11 +1414,13 @@ begin
                  end;
 
                  if(uid^.uid_client_WCastTarget)then
-                   if(buffs[ub_Cast]>0)then
-                   begin
-                      uo_x:=integer(rudata_byte(rpl,0) shl 5);
-                      uo_y:=integer(rudata_byte(rpl,0) shl 5);
-                   end;
+                   if(g_PlayersMain[POVPlayer].isobserver)
+                   or(g_PlayersMain[POVPlayer].team=g_PlayersMain[playeri].team)then
+                     if(buffs[ub_Cast]>0)then
+                     begin
+                        uo_x:=integer(rudata_byte(rpl,0) shl 5);
+                        uo_y:=integer(rudata_byte(rpl,0) shl 5);
+                     end;
               end;
 
             if(playeri=POVPlayer)

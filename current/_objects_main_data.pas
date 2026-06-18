@@ -198,7 +198,7 @@ begin
    uid_ProdTimeSec     := ptime1;
    uid_Regen_Base      := BaseRegenh;
    uid_isbuilding      := true;
-   uid_islight         := true;
+   uid_islight         := false;
    uid_ismech          := false;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_Regen_Upgr      := upgr_hell_BuildRestore;

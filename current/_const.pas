@@ -176,7 +176,7 @@ g_GameStartTime        = fr_fps1*5+fr_fps1-1;
 //
 
 str_ver                = 'v54';
-str_gcaption           = 'MarsWars: HELL vs UAC';
+str_gcaption           = 'MarsWars: HELL & UAC';
 str_wcaption           : shortstring = str_gcaption+', '+str_ver+#0;
 str_cprt               : shortstring = 'TGA[T3DStudio] (c) 2016-2026';
 str_ps_ttl             : char = '?';
@@ -360,35 +360,6 @@ nmid_ping_Request         = 40;
 nmid_ping_Answer          = 41;
 nmid_ServerInfo           = 42;
 nmid_ServerInfoReq        = 43;
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//  REQUIREMENTS BITS
-//
-{
-ureq_limit             : cardinal = 1;
-ureq_uid               : cardinal = 1 shl 1;
-ureq_upgr              : cardinal = 1 shl 2;
-ureq_HellPower         : cardinal = 1 shl 3;
-ureq_UACLoot           : cardinal = 1 shl 4;
-ureq_energy            : cardinal = 1 shl 5;
-ureq_BadProd           : cardinal = 1 shl 6;
-ureq_max               : cardinal = 1 shl 7;
-ureq_builders          : cardinal = 1 shl 8;
-ureq_BuildCD           : cardinal = 1 shl 9;
-ureq_barracks          : cardinal = 1 shl 10;
-ureq_forges            : cardinal = 1 shl 11;
-ureq_InProgress        : cardinal = 1 shl 12;
-ureq_armylimit         : cardinal = 1 shl 13;
-ureq_place             : cardinal = 1 shl 14;
-ureq_busy              : cardinal = 1 shl 15;
-ureq_other             : cardinal = 1 shl 16;
-ureq_reloading         : cardinal = 1 shl 17;
-ureq_landplace         : cardinal = 1 shl 18;
-ureq_InvalidTarget     : cardinal = 1 shl 19;
-ureq_MaxLevel          : cardinal = 1 shl 20;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1194,15 +1165,16 @@ iAct_Replay_Player6    = 128;
 iAct_Replay_Player7    = 129;
 
 iAct_Observer_Fog      = 130;
-iAct_Observer_PlayerAll= 131;
-iAct_Observer_Player0  = 132;
-iAct_Observer_Player1  = 133;
-iAct_Observer_Player2  = 134;
-iAct_Observer_Player3  = 135;
-iAct_Observer_Player4  = 136;
-iAct_Observer_Player5  = 137;
-iAct_Observer_Player6  = 138;
-iAct_Observer_Player7  = 139;
+iAct_Observer_POV      = 131;
+iAct_Observer_PlayerAll= 132;
+iAct_Observer_Player0  = 133;
+iAct_Observer_Player1  = 134;
+iAct_Observer_Player2  = 135;
+iAct_Observer_Player3  = 136;
+iAct_Observer_Player4  = 137;
+iAct_Observer_Player5  = 138;
+iAct_Observer_Player6  = 139;
+iAct_Observer_Player7  = 140;
 
 iAct_SProd1            = 141;
 iAct_SProd2            = 142;

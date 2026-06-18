@@ -330,6 +330,7 @@ begin
    ui_panel_CTabIActs[tcc_replay  ,MPos(20)]:=iAct_Replay_Player7;
 
    ui_panel_CTabIActs[tcc_observer,MPos(0 )]:=iAct_Observer_Fog;
+   ui_panel_CTabIActs[tcc_observer,MPos(1 )]:=iAct_Observer_POV;
    ui_panel_CTabIActs[tcc_observer,MPos(2 )]:=iAct_Observer_PlayerAll;
    ui_panel_CTabIActs[tcc_observer,MPos(3 )]:=iAct_Observer_Player0;
    ui_panel_CTabIActs[tcc_observer,MPos(4 )]:=iAct_Observer_Player1;
@@ -339,7 +340,8 @@ begin
    ui_panel_CTabIActs[tcc_observer,MPos(8 )]:=iAct_Observer_Player5;
    ui_panel_CTabIActs[tcc_observer,MPos(9 )]:=iAct_Observer_Player6;
    ui_panel_CTabIActs[tcc_observer,MPos(10)]:=iAct_Observer_Player7;
-   ui_panel_CTabIActs[tcc_observer,MPos(13)]:=iAct_Control_MarkLook;
+   ui_panel_CTabIActs[tcc_observer,MPos(12)]:=iAct_Control_MarkLook;
+   ui_panel_CTabIActs[tcc_observer,MPos(13)]:=iAct_Control_MarkAttack;
 
 end;
 
@@ -458,25 +460,26 @@ begin
    end;
 
    // replay controls
-   iActSetOnEnabled(iAct_Replay_Fast       ,ctabType=tcc_Replay,G_Status=gs_running);
-   iActSetOnEnabled(iAct_Replay_Pause      ,ctabType=tcc_Replay,replay_Pause(true));
-   iActSetOnEnabled(iAct_Replay_Back2      ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
-   iActSetOnEnabled(iAct_Replay_Back10     ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
-   iActSetOnEnabled(iAct_Replay_Back60     ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     ,true));
-   iActSetOnEnabled(iAct_Replay_Forward2   ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_Forward10  ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_Forward60  ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_POV        ,ctabType=tcc_Replay,true);
-   iActSetOnEnabled(iAct_Replay_Log        ,ctabType=tcc_Replay,true);
-   iActSetOnEnabled(iAct_Replay_Fog        ,ctabType=tcc_Replay,true);
-   iActSetOnEnabled(iAct_Replay_PlayerAll  ,ctabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Fast         ,ctabType=tcc_Replay,G_Status=gs_running);
+   iActSetOnEnabled(iAct_Replay_Pause        ,ctabType=tcc_Replay,replay_Pause(true));
+   iActSetOnEnabled(iAct_Replay_Back2        ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
+   iActSetOnEnabled(iAct_Replay_Back10       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
+   iActSetOnEnabled(iAct_Replay_Back60       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     ,true));
+   iActSetOnEnabled(iAct_Replay_Forward2     ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1,true));
+   iActSetOnEnabled(iAct_Replay_Forward10    ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1,true));
+   iActSetOnEnabled(iAct_Replay_Forward60    ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1,true));
+   iActSetOnEnabled(iAct_Replay_POV          ,ctabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Log          ,ctabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Fog          ,ctabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_PlayerAll    ,ctabType=tcc_Replay,true);
 
    for ucl:=0 to LastPlayer do
-   iActSetOnEnabled(iAct_Replay_Player0+ucl,ctabType=tcc_Replay,ui_SetUIPlayer(ucl,true));
+   iActSetOnEnabled(iAct_Replay_Player0+ucl  ,ctabType=tcc_Replay,ui_SetUIPlayer(ucl,true));
 
    // observer controls
-   iActSetOnEnabled(iAct_Observer_Fog        ,ctabType=tcc_Observer,true);
-   iActSetOnEnabled(iAct_Observer_PlayerAll  ,ctabType=tcc_Observer,true);
+   iActSetOnEnabled(iAct_Observer_Fog        , ctabType=tcc_Observer,true);
+   iActSetOnEnabled(iAct_Observer_POV        ,(ctabType=tcc_Observer)and(net_status<>ns_none),ui_ObserverPov(UIPlayer));
+   iActSetOnEnabled(iAct_Observer_PlayerAll  , ctabType=tcc_Observer,true);
    for ucl:=0 to LastPlayer do
    iActSetOnEnabled(iAct_Observer_Player0+ucl,ctabType=tcc_Observer,ui_SetUIPlayer(ucl,true));
 end;
@@ -694,83 +697,87 @@ begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
 
-   if(UIPlayer<>LocalPlayer)
-   then m_brush:=co_empty
-   else
-     case m_brush of
-     1..255             : if not(m_brush in ui_bprod_possible)then
-                          begin
-                             if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,lmt_unit_NeedBuilder,-1,-1);
-                             m_brush:=co_empty;
-                          end
-                          else
-                          begin
-                             ReqBits:=CheckUnitReqs(@g_PlayersMain[LocalPlayer],m_brush);
-                             if(ReqBits>0)then
-                             begin
-                                if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
-                                m_brush:=co_empty;
-                             end
-                             else
-                               with g_PlayersMain[LocalPlayer] do
-                               begin
-                                  if(not InputAction(iact_Control))then
-                                  begin
-                                     BuildingFindNewPlace(mouse_map_x,mouse_map_y,m_brush,LocalPlayer,@m_brushx,@m_brushy);
-                                     m_brushx:=mm3i(ui_cam_x,m_brushx,ui_cam_x+ui_cam_w);
-                                     m_brushy:=mm3i(ui_cam_y,m_brushy,ui_cam_y+ui_cam_h);
-                                  end;
+   case ui_ControlTabType of
+   tcc_controls: case m_brush of
+                 1..255             : if not(m_brush in ui_bprod_possible)then
+                                      begin
+                                         if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,lmt_unit_NeedBuilder,-1,-1);
+                                         m_brush:=co_empty;
+                                      end
+                                      else
+                                      begin
+                                         ReqBits:=CheckUnitReqs(@g_PlayersMain[LocalPlayer],m_brush);
+                                         if(ReqBits>0)then
+                                         begin
+                                            if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
+                                            m_brush:=co_empty;
+                                         end
+                                         else
+                                           with g_PlayersMain[LocalPlayer] do
+                                           begin
+                                              if(not InputAction(iact_Control))then
+                                              begin
+                                                 BuildingFindNewPlace(mouse_map_x,mouse_map_y,m_brush,LocalPlayer,@m_brushx,@m_brushy);
+                                                 m_brushx:=mm3i(ui_cam_x,m_brushx,ui_cam_x+ui_cam_w);
+                                                 m_brushy:=mm3i(ui_cam_y,m_brushy,ui_cam_y+ui_cam_h);
+                                              end;
 
-                                  case CheckBuildPlace(m_brushx,m_brushy,0,0,LocalPlayer,m_brush) of
-                                  cbp_good   :  m_brushc:=c_lime;
-                                  cbp_noplace:  m_brushc:=c_red;
-                                  cbp_out    :  m_brushc:=c_blue;
-                                  else          m_brushc:=c_gray;
-                                  end;
-                               end;
-                          end;
-     -254..-1           : with g_aids[-m_brush] do
-                            case ua_type of
-                            uat_point,
-                            uat_UnitAny,
-                            uat_UnitOwn,
-                            uat_UnitAlly,
-                            uat_UnitEnemy: if(ui_CommandercPU=nil)
-                                           then m_brush:=co_empty
-                                           else
-                                             with ui_CommandercPU^ do
-                                               if(GameLog_ReqMsg(LocalPlayer,byte(-m_brush),lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,byte(-m_brush),false),x,y,not logErrors))
-                                               then m_brush:=co_empty
-                                               else
-                                               begin
-                                                  m_brushc:=c_aqua;
-                                                  tuid:=unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi);
-                                                  if(tuid>0)then
-                                                    with g_uids[tuid] do
-                                                    begin
-                                                       if(not InputAction(iact_Control))
-                                                       then math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,true,LocalPlayer)
+                                              case CheckBuildPlace(m_brushx,m_brushy,0,0,LocalPlayer,m_brush) of
+                                              cbp_good   :  m_brushc:=c_lime;
+                                              cbp_noplace:  m_brushc:=c_red;
+                                              cbp_out    :  m_brushc:=c_blue;
+                                              else          m_brushc:=c_gray;
+                                              end;
+                                           end;
+                                      end;
+                 -254..-1           : with g_aids[-m_brush] do
+                                        case ua_type of
+                                        uat_point,
+                                        uat_UnitAny,
+                                        uat_UnitOwn,
+                                        uat_UnitAlly,
+                                        uat_UnitEnemy: if(ui_CommandercPU=nil)
+                                                       then m_brush:=co_empty
                                                        else
-                                                       begin
-                                                          m_brushx:=mouse_map_x;
-                                                          m_brushy:=mouse_map_y;
-                                                       end;
+                                                         with ui_CommandercPU^ do
+                                                           if(GameLog_ReqMsg(LocalPlayer,byte(-m_brush),lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,byte(-m_brush),false),x,y,not logErrors))
+                                                           then m_brush:=co_empty
+                                                           else
+                                                           begin
+                                                              m_brushc:=c_aqua;
+                                                              tuid:=unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi);
+                                                              if(tuid>0)then
+                                                                with g_uids[tuid] do
+                                                                begin
+                                                                   if(not InputAction(iact_Control))
+                                                                   then math_push_out(mouse_map_x,mouse_map_y,uid_r,unum,@m_brushx,@m_brushy,true,LocalPlayer)
+                                                                   else
+                                                                   begin
+                                                                      m_brushx:=mouse_map_x;
+                                                                      m_brushy:=mouse_map_y;
+                                                                   end;
 
-                                                       if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,true,g_PlayersMain[LocalPlayer].team)<>cbr_no)
-                                                       then m_brushc:=c_red;
-                                                    end;
-                                               end
-                            else m_brush:=co_empty
-                            end;
+                                                                   if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,true,g_PlayersMain[LocalPlayer].team)<>cbr_no)
+                                                                   then m_brushc:=c_red;
+                                                                end;
+                                                           end
+                                        else m_brush:=co_empty
+                                        end;
 
-     co_move            : if(not iActEnabled(iAct_Control_UMove     ))then m_brush:=co_empty;
-     co_patrol          : if(not iActEnabled(iAct_Control_UPatrol   ))then m_brush:=co_empty;
-     co_amove           : if(not iActEnabled(iAct_Control_UAMove    ))then m_brush:=co_empty;
-     co_apatrol         : if(not iActEnabled(iAct_Control_UAPatrol  ))then m_brush:=co_empty;
-     co_markLook        : if(not iActEnabled(iAct_Control_MarkLook  ))then m_brush:=co_empty;
-     co_markAttack      : if(not iActEnabled(iAct_Control_MarkAttack))then m_brush:=co_empty;
-     else  m_brush:=co_empty
-     end;
+                 co_move            : if(not iActEnabled(iAct_Control_UMove     ))then m_brush:=co_empty;
+                 co_patrol          : if(not iActEnabled(iAct_Control_UPatrol   ))then m_brush:=co_empty;
+                 co_amove           : if(not iActEnabled(iAct_Control_UAMove    ))then m_brush:=co_empty;
+                 co_apatrol         : if(not iActEnabled(iAct_Control_UAPatrol  ))then m_brush:=co_empty;
+                 co_markLook        : if(not iActEnabled(iAct_Control_MarkLook  ))then m_brush:=co_empty;
+                 co_markAttack      : if(not iActEnabled(iAct_Control_MarkAttack))then m_brush:=co_empty;
+                 else  m_brush:=co_empty
+                 end;
+   tcc_observer: case m_brush of
+                 co_markLook        : if(not iActEnabled(iAct_Control_MarkLook  ))then m_brush:=co_empty;
+                 co_markAttack      : if(not iActEnabled(iAct_Control_MarkAttack))then m_brush:=co_empty;
+                 end;
+   else m_brush:=co_empty
+   end;
 end;
 
 procedure ui_MBrush2Command(x,y,target:integer);
@@ -928,15 +935,16 @@ begin
    iAct_Replay_Forward2   : if(SoundEnabledLeft)then replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1,false);
    iAct_Replay_Forward10  : if(SoundEnabledLeft)then replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1,false);
    iAct_Replay_Forward60  : if(SoundEnabledLeft)then replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1,false);
-   iAct_Replay_POV        : if(SoundEnabledLeft)then rpls_POVRecorder:=not rpls_POVRecorder;
-   iAct_Replay_Log        : if(SoundEnabledLeft)then rpls_showlog    :=not rpls_showlog;
-   iAct_Replay_Fog        : if(SoundEnabledLeft)then ui_fog:=not ui_fog;
-   iAct_Replay_PlayerAll  : if(SoundEnabledLeft)then UIPlayer:=255;
+   iAct_Replay_POV        : if(SoundEnabledLeft)then ui_playerPOV:=not ui_playerPOV;
+   iAct_Replay_Log        : if(SoundEnabledLeft)then rpls_showlog:=not rpls_showlog;
+   iAct_Replay_Fog        : if(SoundEnabledLeft)then ui_fog      :=not ui_fog;
+   iAct_Replay_PlayerAll  : if(SoundEnabledLeft)then UIPlayer    :=255;
    iAct_Replay_Player0..
    iAct_Replay_Player7    : if(SoundEnabledLeft)then ui_SetUIPlayer(action-iAct_Replay_Player0,false);
 
-   iAct_Observer_Fog      : if(SoundEnabledLeft)then ui_fog:=not ui_fog;
-   iAct_Observer_PlayerAll: if(SoundEnabledLeft)then UIPlayer:=255;
+   iAct_Observer_Fog      : if(SoundEnabledLeft)then ui_fog      :=not ui_fog;
+   iAct_Observer_POV      : if(SoundEnabledLeft)then ui_playerPOV:=not ui_playerPOV;
+   iAct_Observer_PlayerAll: if(SoundEnabledLeft)then UIPlayer    :=255;
    iAct_Observer_Player0..
    iAct_Observer_Player7  : if(SoundEnabledLeft)then ui_SetUIPlayer(action-iAct_Observer_Player0,false);
    end;
@@ -1130,7 +1138,7 @@ begin
                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
                    co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
                    co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
-                   else           if(not rpls_POVRecorder)then m_mmap_move:=true;
+                   else           if(not ui_playerPOV)then m_mmap_move:=true;
                    end;
      mf_tabs     : if(0<=m_btnN)and(m_btnN<4)then
                    begin
@@ -1234,7 +1242,7 @@ act,k:byte;
 clickSound:boolean;
 begin
    clickSound:=false;
-   if(not m_DragCamMove)and(not rpls_POVRecorder)then GameControlsCameraMove;
+   if(not m_DragCamMove)and(not ui_playerPOV)then GameControlsCameraMove;
 
    // Chat
    if(rpls_pstate=rpls_read)or(net_status=ns_none)

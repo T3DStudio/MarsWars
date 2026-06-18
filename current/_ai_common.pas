@@ -802,24 +802,6 @@ begin
    end;
 end;
 
-function ai_IsProducting(pu:PTUnit):boolean;
-var i:byte;
-begin
-   ai_IsProducting:=false;
-   with pu^  do
-   with uid^ do
-     for i:=0 to LastUnitLevel do
-     begin
-        if(i>level)then break;
-        if((uid_isbarrack)and(uprod_r[i]>0))
-        or((uid_isforge  )and(pprod_r[i]>0))then
-        begin
-           ai_IsProducting:=true;
-           exit;
-        end;
-     end;
-end;
-
 function ai_GetLevel(pu:PTUnit):byte;
 begin
    with pu^ do

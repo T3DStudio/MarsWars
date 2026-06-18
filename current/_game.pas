@@ -279,9 +279,9 @@ begin
 
    svld_str_fname:='';
 
-   rpls_pnu  :=0;
-   rpls_POVRecorder:=false;
-   rpls_pstate:=rpls_none;
+   rpls_pnu    :=0;
+   ui_playerPOV:=false;
+   rpls_pstate :=rpls_none;
    {$ENDIF}
 end;
 
@@ -574,15 +574,18 @@ begin
    if(ui_CommandercPU<>nil)then
      with ui_CommandercPU^ do
      with uid^ do
-       if(uid_isbuilder)
-       then ui_tab:=0
-       else
-         if(uid_isbarrack)
-         then ui_tab:=1
-         else
-           if(uid_isforge)
-           then ui_tab:=2
-           else ui_tab:=3;
+     begin
+        ui_tab:=3;
+        if(iscomplete)then
+          if(uid_isbuilder)
+          then ui_tab:=0
+          else
+            if(uid_isbarrack)
+            then ui_tab:=1
+            else
+              if(uid_isforge)
+              then ui_tab:=2;
+     end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -738,7 +741,7 @@ procedure Scenario_DefaultDefeatConditions;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
-     if(g_PlayersMain[p].units_all_e>0)then exit;
+     if(g_PlayersMain[p].units_all_c>0)then exit;
    Game_SetStatusWinnerTeam(255);
 end;
 
@@ -836,15 +839,12 @@ begin
                            begin
                               case o_x0 of
                               co_supgrade : if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUpgrade(pu,o_a0           ,true)=0,true ,true );
-                              co_cupgrade : if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false     ,true)=0,true ,false);
+                              co_cupgrade : if(unit_OrderCheckForge  (pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUpgrade (pu,o_a0,false,true,true)=0,true ,false);
 
                               co_sunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStartUnit   (pu,o_a0           ,true)=0,true ,true );
                               co_cunit    : if(unit_OrderCheckBarrack(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_ProdStopUnit    (pu,o_a0,false,true,true)=0,true ,false);
                               co_pcancle  : if(isselected)then
-                                              UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,(not iscomplete)
-                                                                                                         or(unit_TransformStop  (pu,true)=0)
-                                                                                                         or(unit_ProdStopUnit   (pu,o_a0,false,true,true)=0)
-                                                                                                         or(unit_ProdStopUpgrade(pu,o_a0,false     ,true)=0),true ,false);
+                                              UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_OrderCheckProdCancel(pu),true ,true);
                               end;
 
                               if(isselected)then
@@ -870,25 +870,33 @@ begin
                         with tar_u^ do
                           case o_x0 of
                           co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStartUpgrade(tar_u,o_a0           ,false),x,y);
-                          co_cupgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y);
+                          co_cupgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,true,false),x,y);
                           co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStartUnit   (tar_u,o_a0           ,false),x,y);
                           co_cunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
 
                           co_pcancle :
-                                    if(not iscomplete)then unit_kill(tar_u,false,false,true,false,true) else
-                                    if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_TransformStop   (tar_u,false                ),x,y))then
-                                    if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false     ,false),x,y))then
-                                       GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);
+                                    if(not iscomplete)
+                                    then unit_kill(tar_u,false,false,true,false,true)
+                                    else
+                                      if(transformTimer>0)
+                                      then unit_TransformStop(tar_u,false)
+                                      else
+                                        if(unit_ProdStopUpgrade(tar_u,o_a0,false,true,false)>0)then
+                                           unit_ProdStopUnit   (tar_u,o_a0,false,true,false);
+
+                                    {if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_TransformStop   (tar_u,false                ),x,y))then
+                                    if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,true,false),x,y))then
+                                       GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);   }
                           co_ability :
                                 if(not GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false           ),x,y))then
                                   unit_SetAbilityOrder(tar_u,o_a0,o_y0,o_x1,o_y1,false);
                           end
                       else
                         case o_x0 of
-                        co_supgrade,
-                        co_cupgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_NeedProdUnit ,-1,-1);
-                        co_sunit,
-                        co_cunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_NeedProdUnit ,-1,-1);
+                        co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_NeedProdUnit ,-1,-1);
+                        co_cupgrade: ;
+                        co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_NeedProdUnit ,-1,-1);
+                        co_cunit   : ;
                         co_pcancle : GameLog_ReqMsg(tPlayer,0   ,255             ,lmt_Invalid_Order,-1,-1);
                         co_ability : ;
                         end;
@@ -1267,7 +1275,7 @@ begin
    GameMapSetSeed:=false;
 
    if(not GameOptionsChangeable)
-   or(map_seed=newSeed)then exit;
+   or((map_seed=newSeed)and not check)then exit;
 
    {$IFDEF _FULLGAME}
    if(not GameOptionsIsLobbyMaster(PlayerRequestor))then exit;
@@ -1380,6 +1388,16 @@ begin
               else net_Client;
    ns_none  : if(g_Started)and(MainMenu)then exit;
    end;
+   if(net_status<>ns_none)and(ui_playerPOV)then
+     if(not ui_ObserverPov(UIPlayer))
+     then ui_playerPOV:=false
+     else
+       with g_PlayersTemp[UIPlayer] do
+       begin
+          ui_cam_x:=(ui_cam_x+ui_cam_hw+(cam_x+(cam_w div 2))) div 2;
+          ui_cam_y:=(ui_cam_y+ui_cam_hh+(cam_y+(cam_h div 2))) div 2;
+          ui_Camera_Bounds;
+       end;
 
    replay_Code;
 
@@ -1403,8 +1421,8 @@ begin
 
       {$IFDEF _FULLGAME}
       if(ServerSide)then
-      {$ENDIF}
       begin
+      {$ENDIF}
          g_tick+=1;
          Scenario_KeyPointsCodeServer;
          {$IFDEF _FULLGAME}
@@ -1413,18 +1431,15 @@ begin
          {$ENDIF}
                          Scenario_KeyPointsEndConditions;
                          case map_scenario of
-                         mc_royale,
                          mc_KeyPoints,
                          mc_KotH      : Scenario_DefaultDefeatConditions;
                          else           Scenario_DefaultEndConditions;
                          end;
-         {$IFDEF _FULLGAME}
+      {$IFDEF _FULLGAME}
                       end;
          gt_campaing: cmp_MissionCode;
          end;
-         {$ENDIF}
       end
-      {$IFDEF _FULLGAME}
       else Scenario_KeyPointsCodeClient
       {$ENDIF};
       GameObjectsCode;

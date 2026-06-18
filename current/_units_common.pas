@@ -1,6 +1,6 @@
 
 
-function unit_ProdStopUpgrade(uForge  :PTUnit;upid:byte;all,         check:boolean):byte;forward;
+function unit_ProdStopUpgrade(uForge  :PTUnit;upid:byte;all,canceled,check:boolean):byte;forward;
 function unit_ProdStopUnit   (uBarrack:PTUnit;puid:byte;all,canceled,check:boolean):byte;forward;
 
 {$IFDEF _FULLGAME}
@@ -624,7 +624,7 @@ begin
       ((uid_Regen_Base>0)and(hits<UID_MaxHits1))or
       (not iscomplete   )or
       (transformTimer<=0)or
-      (unit_ProdStopUpgrade(pTarget,255,true      ,true)=0)or
+      (unit_ProdStopUpgrade(pTarget,255,true,false,true)=0)or
       (unit_ProdStopUnit   (pTarget,255,true,false,true)=0)or
       (rld>0            )
       )then exit;
@@ -2296,7 +2296,7 @@ begin
               pprod_r[pn]:=0;
            end;
 end;
-function unit_ProdStopUpgrade(uForge:PTUnit;upid:byte;all,check:boolean):byte;
+function unit_ProdStopUpgrade(uForge:PTUnit;upid:byte;all,canceled,check:boolean):byte;
 var pn:byte;
 begin
    with uForge^ do
@@ -2347,13 +2347,19 @@ begin
       true : if((res_energyl_cur+energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
              or(res_energyl_max<ptarUID^.uid_req_EnergyLevel)
              then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-             {else                                                 energyCur_transforms
-               if((energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
-               then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-               }
       end;
 
+      unit_TransformStart:=lmt_prod_AllBusy;
+      if(state<>ps_AI)then
+        with uid^ do
+          if(uid_isbarrack)or(uid_isforge)then
+            if(not unit_IsProducting(pu))
+            or((units_all_s=1)and isselected)
+            then
+            else exit;
+
       unit_TransformStart:=0;
+
       if(check)then exit;
 
       vx:=x;
@@ -2365,7 +2371,7 @@ begin
       res_UACLoot         -=ptarUID^.uid_req_UACLoot;
 
       unit_ProdStopUnit   (pu,255,true,true,false);
-      unit_ProdStopUpgrade(pu,255,true     ,false);
+      unit_ProdStopUpgrade(pu,255,true,true,false);
 
       transformUID  :=tarUID;
       transformTimer:=ptarUID^.uid_ProdTimeTick;
@@ -2468,7 +2474,7 @@ begin
       else
       begin
          unit_ProdStopUnit   (pu,255,true,true,false);
-         unit_ProdStopUpgrade(pu,255,true     ,false);
+         unit_ProdStopUpgrade(pu,255,true,true,false);
          unit_TransformStop  (pu,false);
 
          units_ucl_c[uid_isbuilding,uid_uibtn]-=1;

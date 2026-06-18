@@ -114,7 +114,14 @@ begin
 
    FollowCommander:=(pu<>commander_u);
    if(FollowCommander)then
-     ai_RunTo(pu,commander_u,0,0,commander_d,-pu^.srange);
+   begin
+      ai_RunTo(pu,commander_u,0,0,commander_d,-pu^.srange);
+      if(commander_d>pu^.srange)then
+      begin
+         commander_u^.uo_x:=commander_u^.x;
+         commander_u^.uo_y:=commander_u^.y;
+      end;
+   end;
 end;
 function TryTeleporting(toU:PTUnit):boolean;
 begin

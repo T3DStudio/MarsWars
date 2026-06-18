@@ -775,8 +775,8 @@ begin
    setMWSModel(1,@spr_UPTurret);
    setBuildingSND(snd_uac_ctower);
    uid_eid_bcrater_y:=1;
-   setWeaponESND(0,nil,snd_shot_plasma ,0,0);
-   setWeaponESND(1,nil,snd_shot_shotgun,0,0);
+   setWeaponESND(0,nil,snd_shot_plasma,0,0);
+   setWeaponESND(1,nil,snd_shot_pistol,0,0);
 end;
 UID_UATurret:
 begin

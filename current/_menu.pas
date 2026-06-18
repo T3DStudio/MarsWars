@@ -766,7 +766,7 @@ begin
    menu_DarkBack:=true;
    menu_page_TopCaption(mi_caption_Scirmish);
    with menu_items[mi_caption_Scirmish] do
-   menu_Item_Set(mi_SubCaptionInfoLine,0,mi_y1,menu_w,mi_y1+menu_BaseW1,true);
+   menu_Item_Set(mi_SubCaptionInfoLine,0,mi_y1,menu_w,mi_y1+menu_BaseWh,true);
 
    // bottom buttons
    if(g_LobbyTimer>0)and(net_status<>ns_client)
@@ -1430,8 +1430,7 @@ procedure SetSelectedItem(newItem:byte;fromTarget:boolean=false);
 begin
    if(menu_items[newItem].mi_state>as_off)then
      case fromTarget of
-     false: if(menu_ItemSelected=0)then
-              menu_ItemSelected:=newItem;
+     false: menu_ItemSelected:=newItem;
      true : if(newItem=menu_ItemTarget)then
               menu_ItemSelected:=newItem;
      end;
@@ -1476,11 +1475,12 @@ begin
   case(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))or(InputActionStuck(iAct_backspace))of
   true : begin
             SetSelectedItem(mi_SaveLoad_fname);
-            SetSelectedItem(mi_MP_ChatList);
+            if(menu_ItemSelected<>mi_Map_Seed)then
+              SetSelectedItem(mi_MP_ChatList);
 
             if(menu_Controls_Text(menu_ItemSelected,false,@changed))then
             begin
-               SetBBit(@menu_ItemActs,miat_TextEdit,true);
+               if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_TextEdit,true);
                menu_update:=menu_update or changed;
             end;
          end;
@@ -1491,7 +1491,7 @@ begin
    case InputActionPressed(iact_MLB) of
    true : if(menu_Controls_MLB(menu_ItemSelected,false))then
           begin
-             SetBBit(@menu_ItemActs,miat_BtnLeft,true);
+             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnLeft,true);
              menu_update:=true;
              clickSound :=true;
              if(not GetBBit(@menu_ItemActs,miat_TextEdit))
@@ -1503,7 +1503,7 @@ begin
    case InputActionDPressed(iact_MLB) of
    true : if(menu_Controls_DMLB(menu_ItemSelected,false))then
           begin
-             SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
+             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
              menu_update:=true;
              clickSound :=true;
           end;
@@ -1514,7 +1514,7 @@ begin
    case InputActionPressed(iact_MRB) of
    true : if(menu_Controls_MRB(menu_ItemSelected,false))then
           begin
-             SetBBit(@menu_ItemActs,miat_BtnRight,true);
+             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnRight,true);
              menu_update:=true;
              clickSound :=true;
              menu_ItemSelected:=0;
@@ -1538,7 +1538,7 @@ begin
 
              if(menu_Controls_MWD(menu_ItemSelected,false))then
              begin
-                SetBBit(@menu_ItemActs,miat_MWhell,true);
+                if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_MWhell,true);
                 menu_update:=true;
                 menu_ItemSelected:=0;
              end;
@@ -1562,7 +1562,7 @@ begin
 
              if(menu_Controls_MWU(menu_ItemSelected,false))then
              begin
-                SetBBit(@menu_ItemActs,miat_MWhell,true);
+                if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_MWhell,true);
                 menu_update:=true;
                 menu_ItemSelected:=0;
              end;
