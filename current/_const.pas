@@ -333,7 +333,7 @@ nmid_GameData             = 8;
 nmid_pause                = 9;
 nmid_ServerFull           = 10;
 nmid_WrongVersion         = 11;
-nmid_GameStarted          = 12;
+nmid_NoNewObservers       = 12;
 nmid_NotConnected         = 13;
 nmid_order                = 14;
 nmid_PlayerLeave          = 15;
@@ -354,12 +354,16 @@ nmid_lobby_MSymmetry      = 29;
 nmid_lobby_MRandom        = 30;
 nmid_lobby_GFixedPositions= 31;
 nmid_lobby_GAISlots       = 32;
-nmid_lobby_GDefeatedObs   = 33;
+nmid_lobby_GNewObservers  = 33;
 nmid_lobby_GRandomScirmish= 34;
 nmid_ping_Request         = 40;
 nmid_ping_Answer          = 41;
 nmid_ServerInfo           = 42;
 nmid_ServerInfoReq        = 43;
+
+
+chat_all                  = 255;
+chat_allies               = 254;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1690,7 +1694,7 @@ mi_Map_Random          = 189;
 mi_Game_Panel          = 190;
 mi_Game_FixedPositions = 191;
 mi_Game_AISlots        = 192;
-mi_Game_DefeatedObs    = 193;
+mi_Game_NewObservers   = 193;
 mi_Game_Random         = 194;
 
 //// SCIRMISH MULTIPLAYER BLOCK
@@ -1907,10 +1911,6 @@ sep_slash              = '/';
 
 MaxChatStringLength    = 220;
 
-
-chat_all               = 255;
-chat_allies            = 254;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  MAP THEME
@@ -1973,7 +1973,7 @@ str_map_Template         : shortstring = 'Template';
 str_map_Symmetry         : shortstring = 'Symmetry';
 str_game_AISlots         : shortstring = 'Fill empty slots';
 str_game_FixedPositions  : shortstring = 'Fixed player starts';
-str_game_DefeatedObs     : shortstring = 'Observer mode after lose';
+str_game_NoNewObservers  : shortstring = 'New observers after game start';
 str_gmsg_PlayerPaused    : shortstring = 'player paused the game';
 str_gmsg_PlayerResumed   : shortstring = 'player has resumed the game';
 

@@ -68,6 +68,40 @@ begin
      end;
 end;
 
+procedure unit_PainHit(pTarget:PTUnit);
+begin
+   with pTarget^ do
+   with uid^ do
+   begin
+      {$IFDEF _FULLGAME}
+      if(not ServerSide)then
+        if(buffs[ub_PainState]<=0)then exit;
+      {$ENDIF}
+
+      if(not uid_isbuilding)and(not uid_ismech)then
+        if(uid_PainState_Base>0)then
+        begin
+           if(pains>0)then pains-=1;
+           if(pains<=0)then
+           begin
+              pains:=uid_PainState_Base;
+
+              buffs[ub_PainState]:=max2i(pain_time,a_rld);
+
+              with player^ do
+                if(uid_PainState_upgr>0)then
+                  pains+=integer(upgrs_cur[uid_PainState_upgr])*uid_PainState_upgrV;
+
+              if(level>0)then pains+=level*uid_LevelBonusPainC;
+
+              {$IFDEF _FULLGAME}
+              effect_UnitPain(pTarget,nil);
+              {$ENDIF}
+           end;
+       end;
+   end;
+end;
+
 procedure unit_damage(pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);
 var armor:integer;
 begin
@@ -76,9 +110,13 @@ begin
    begin
       if(buffs[ub_SphereInvuln]>0)
       or(hits<=0)
-      or(damage<=0)
       then exit;
 
+      if(damage<=0)then
+      begin
+         unit_PainHit(pTarget);
+         exit;
+      end;
       //damage:=1;
 
       armor:=0;
@@ -120,35 +158,10 @@ begin
       begin
          buffs[ub_Damaged]:=fr_fps2;
          {$IFDEF _FULLGAME}
-         if(not ServerSide)then
-         begin
-            if(buffs[ub_PainState]<=0)then exit;
-         end
-         else
+         if(ServerSide)then
          {$ENDIF}
          hits-=damage;
-
-         if(not uid_isbuilding)and(not uid_ismech)then
-           if(uid_PainState_Base>0)then
-           begin
-              if(pains>0)then pains-=1;
-              if(pains<=0)then
-              begin
-                 pains:=uid_PainState_Base;
-
-                 buffs[ub_PainState]:=max2i(pain_time,a_rld);
-
-                 with player^ do
-                   if(uid_PainState_upgr>0)then
-                     pains+=integer(upgrs_cur[uid_PainState_upgr])*uid_PainState_upgrV;
-
-                 if(level>0)then pains+=level*uid_LevelBonusPainC;
-
-                 {$IFDEF _FULLGAME}
-                 effect_UnitPain(pTarget,nil);
-                 {$ENDIF}
-              end;
-          end;
+         unit_PainHit(pTarget);
       end;
    end;
 end;

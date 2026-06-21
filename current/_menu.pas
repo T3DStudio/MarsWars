@@ -204,7 +204,7 @@ begin
              begin
                 net_status   :=ns_client;
                 rpls_pnu     :=0;
-                net_SvList :=false;
+                net_SvList   :=false;
                 net_cl_Hoster:=255;
                 net_cl_svttl :=TTLServer;
                 net_cl_log_n :=net_cl_log_n.MaxValue;
@@ -630,7 +630,7 @@ begin
    for p:=0 to LastPlayer do
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
-      if(p<map_MaxPlayers)then
+      if(p<map_MaxPlayers)or(g_PlayersMain[p].state=ps_Human)then
       menu_Item_Set(mi_Players_State0   +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle      (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
 
       if(g_PlayersMain[p].state=ps_None)and(not g_started)then
@@ -698,13 +698,13 @@ begin
 
    menu_Item_Set(mi_Game_FixedPositions,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Game_AISlots       ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
-   menu_Item_Set(mi_Game_DefeatedObs   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
+   menu_Item_Set(mi_Game_NewObservers   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
                                                                        mty0+=menu_ListLineH;
    menu_Item_Set(mi_Game_Random        ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);
 
    menu_items[mi_Game_FixedPositions].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Game_AISlots       ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
-   menu_items[mi_Game_DefeatedObs   ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
+   menu_items[mi_Game_NewObservers   ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Game_Random        ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
 end;
 
@@ -1169,7 +1169,7 @@ mi_Map_Random          : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_
 
 mi_Game_FixedPositions : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GFixedPositions,true,false);
 mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots       ,true,false);
-mi_Game_DefeatedObs    : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GDefeatedObs   ,true,false);
+mi_Game_NewObservers    : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GNewObservers   ,true,false);
 mi_Game_Random         : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GRandomScirmish,true,false);
 
 // SCIRMISH MULTIPLAYER
@@ -1446,8 +1446,8 @@ begin
    changed:=false;
 
    // force menu msg box error awaiting for server
-   if(net_status=ns_client)and(not net_SvList)and(not g_started)then
-     if(net_cl_svttl>=TTLServer)
+   if(net_status=ns_client)and(not net_SvList)then
+     if(net_cl_svttl>=TTLServer)and(not g_started)
      then menu_msgBox_Set(str_Caption_Multiplayer,menu_ClientAddress+' - '+str_gstat_WaitForServer,mmbt_netWaitServer)
      else
        if(menu_msg_type=mmbt_netWaitServer)then menu_msg_type:=mmbt_none;

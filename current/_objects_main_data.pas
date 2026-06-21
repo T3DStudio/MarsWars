@@ -777,8 +777,8 @@ begin
    uid_MaxHits1        := 1000;
    uid_r               := 11;
    uid_SightR_Base     := 200;
-   uid_ProdTimeSec     := ptime1q;
-   uid_LimitUse        := ul1h;
+   uid_ProdTimeSec     := ptime1;
+   uid_LimitUse        := ul1;
    uid_FastDeathHits   := hits_fdead_border;
    uid_MSpeed_Base     := 12;
    uid_arms_BonusAntiFlyRange:=-50;
@@ -786,17 +786,17 @@ begin
    case i of
 UID_Commando : begin
                uid_uibtn          := 2;
-               uid_req_EnergyLevel:= 250;
+               uid_req_EnergyLevel:= 200;
                uid_MSpeed_Upgr    := upgr_uac_BioSpeed;
                uid_Armor_upgr1    := upgr_uac_BioArmor;
                uid_SightR_upgr    := upgr_uac_UnitSightR;
                uid_ZombieUID      := UID_ZCommando;
                uid_islight        := true;
-               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_uac_DistDamage  ,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,3,dm_AntiUnitBioLight2);
+               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_uac_DistDamage  ,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,6,dm_AntiUnitBioLight2);
                end;
 UID_ZCommando: begin
                uid_uibtn          := 16;
-               uid_req_UACLoot    := 150;
+               uid_req_UACLoot    := 100;
                uid_ProdTimeSec    -= uid_ProdTimeSec div 4;
                uid_MSpeed_Base    += UpgradeUnitSpeedBonus;
                uid_Armor_upgr1    := upgr_hell_UnitArmor;
@@ -805,7 +805,7 @@ UID_ZCommando: begin
                uid_PainState_Base := 1;
                uid_PainState_upgr := upgr_hell_PainFactor;
                uid_islight        := false;
-               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,3,dm_AntiUnitBioLight2);
+               SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpss,MID_Chaingun,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,6,dm_AntiUnitBioLight2);
                end;
    end;
 end;
@@ -1327,6 +1327,7 @@ begin
    uid_ability3        := uab_LvlUpURMStation;
    uid_isbuilding      := true;
    uid_ismech          := true;
+   uid_islight         := true;
 end;
 
 // STAT DEF
@@ -1638,7 +1639,8 @@ end;
          if(uid_CanAttack)and(uid_LevelBonusDamage=0)then
          uid_LevelBonusDamage:=round(BaseDamageLevel1*uid_LimitUse/ul1);
          uid_LevelBonusArmor :=round(BaseArmorLevel1 *uid_LimitUse/ul1);
-         uid_LevelBonusPainC :=round(uid_LimitUse/ul1);
+         uid_LevelBonusPainC :=round(0.6*uid_LimitUse/ul1);
+         if(uid_LevelBonusPainC<1)then uid_LevelBonusPainC:=1;
       end;
       if(uid_LevelBonusDamage<0)then uid_LevelBonusDamage:=0;
       if(uid_LevelBonusArmor <0)then uid_LevelBonusArmor :=0;
@@ -2168,7 +2170,8 @@ begin
             armfactor2:=DamageFactor_UID2UID(uid_tar,uid_src);
             if(armfactor1>armfactor2)then
             begin
-               if(not g_uids[uid_tar].uid_isbuilding)or(armfactor1>1)
+               if((not g_uids[uid_tar].uid_isbuilding)and(g_uids[uid_tar].uid_CanAttack))
+               or(armfactor1>1)
                then g_uids[uid_src].uid_balance_Good+=[uid_tar];
             end
             else

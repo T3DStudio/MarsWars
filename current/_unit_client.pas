@@ -264,7 +264,7 @@ begin
    end;
 end;
 
-procedure wudata_OwnerUData(pu:PTUnit;rpl:boolean);
+procedure wudata_OwnerUData(pu:PTUnit;POVPlayer:byte;rpl:boolean);
 var wudtick : pcardinal;
     wudelay : cardinal;
     wb      : boolean;
@@ -281,7 +281,7 @@ begin
                 wudelay:=fr_fpsh;
              end;
       false: begin
-                wudtick:=@net_wudata_t [unum];
+                wudtick:=@g_PlayersTemp[POVPlayer].net_wudata_t[unum];
                 wudelay:=fr_fpsq;
              end;
       end;
@@ -292,7 +292,9 @@ begin
         if((g_tick-wudtick^)>=wudelay)
         then wb:=true;
 
-      if(rpl)then
+      b:=0;
+      if(rpl)
+      or(g_PlayersMain[POVPlayer].isobserver)then
         b:=group and %00001111;
 
       if(not iscomplete)
@@ -328,8 +330,6 @@ begin
       end;
 
       if(uid_HaveRallyPoint)then
-        //if(not rpl)
-        //or(rpl and isselected)then
         if(not rpl or isselected)then
           if(IsUnitRange(rpoint_tar,nil))
           then wudata_int(-rpoint_tar,rpl)
@@ -404,7 +404,7 @@ begin
               end;
 
             if(playeri=POVPlayer)
-            or(g_PlayersMain[POVPlayer].isobserver)then wudata_OwnerUData(pu,rpl);
+            or(g_PlayersMain[POVPlayer].isobserver)then wudata_OwnerUData(pu,POVPlayer,rpl);
          end;
       end;
    end;
@@ -470,9 +470,11 @@ wdkpi: pbyte;
 begin
    if(rpl)
    then wdkpi:=@rpls_kpoints_kpi
-   else wdkpi:= @net_kpoints_kpi;
+   else wdkpi:=@g_PlayersTemp[POVPlayer].net_kpoints_kpi;
 
-   wdkpi^:=(wdkpi^+1) mod map_KeyPointsN;
+   if(map_KeyPointsN>0)
+   then wdkpi^:=(wdkpi^+1) mod map_KeyPointsN
+   else wdkpi^:=0;
 
    if(g_PlayersMain[POVPlayer].isobserver)
    then kpteam:=MaxPlayers
@@ -489,18 +491,20 @@ begin
            wudata_word(w,rpl);
 
            if(kptd_OwnerPlayer<MaxPlayers)
-           then a:=kptd_OwnerPlayer
+           then a:=kptd_OwnerPlayer and %00001111
            else a:=%00001111;
 
-           if(kptd_TimerOwnerPlayer<MaxPlayers)and(kptd_Timer>0)
-           then b:=(kptd_TimerOwnerPlayer and %00001111) shl 4
-           else b:=%11110000;
+           if(kptd_Timer<=0)
+           then b:=a
+           else
+             if(kptd_TimerOwnerPlayer<MaxPlayers)
+             then b:=kptd_TimerOwnerPlayer and %00001111
+             else b:=%00001111;
 
-           a:=a or b;
-           wudata_byte(a,rpl);
+           wudata_byte(a or (b shl 4),rpl);
 
-           if(kptd_TimerOwnerPlayer<=LastPlayer)and(kptd_Timer>0)then
-           wudata_reload(kptd_Timer,rpl);
+           if(a<>b)then
+             wudata_reload(kptd_Timer,rpl);
         end
         else wudata_byte(w and %0000000000011111,rpl);
      end;
@@ -552,6 +556,8 @@ begin
    wudata_card(g_tick,rpl);
 
    cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
+
+   //writeln(g_tick,' ',wtickb0,' ',wtickb1,' ',wtickb2);
 
    if(rpl)then
    begin
@@ -1287,7 +1293,7 @@ begin
    end;
 end;
 
-procedure rudata_OwnerUData(uu:PTUnit;rpl:boolean);
+procedure rudata_OwnerUData(uu:PTUnit;POVPlayer:byte;rpl:boolean);
 var
 uo,
 b : byte;
@@ -1299,7 +1305,8 @@ begin
    begin
       b:=rudata_byte(rpl,0);
 
-      if(rpl)then
+      if(rpl)
+      or(g_PlayersMain[POVPlayer].isobserver)then
         group:=b and %00001111;
 
       uo:=(b and %01110000)shr 4;
@@ -1316,8 +1323,6 @@ begin
       end;
 
       if(uid_HaveRallyPoint)then
-        //if(not rpl)
-        //or(rpl and isselected)then
         if(not rpl or isselected)then
         begin
            i:=rpoint_x;
@@ -1373,7 +1378,7 @@ begin
          if(i<>uidi)then
          begin
             unit_SetDefaults(uu,false);
-            unit_ApplyUID(uu,true);        //после промотки у ЦЦ на земле появлются тени, проверить
+            unit_ApplyUID(uu,true);
             FillChar(buffs,SizeOf(buffs),0);
          end;
          hits:=hits_si2li(sh,uid^.uid_MaxHits1,uid^.uid_hits_li2si);
@@ -1424,7 +1429,7 @@ begin
               end;
 
             if(playeri=POVPlayer)
-            or(g_PlayersMain[POVPlayer].isobserver)then rudata_OwnerUData(uu,rpl);
+            or(g_PlayersMain[POVPlayer].isobserver)then rudata_OwnerUData(uu,POVPlayer,rpl);
          end;
       end
       else
@@ -1491,7 +1496,8 @@ end;
 
 procedure rclinet_KeyPoint(rpl,no_effect:boolean);
 var
-kpi,a,b:byte;
+kpi,a,b,
+nowner :byte;
 w      :word;
 pactive:boolean;
 begin
@@ -1513,11 +1519,13 @@ begin
         w:=word(a) or (b shl 8);
         kptd_lifeTime:=((w shr 5) and %0000011111111111)*fr_fps1;
         if(kptd_lifeTime>0)then kptd_lifeTime-=1;
+
         b:=rudata_byte(rpl,0);
-        KeyPoint_ChangeOwner(kpi,b and %00001111,false);
+        nowner:=b and %00001111;
+        KeyPoint_ChangeOwner(kpi,nowner,false);
         kptd_TimerOwnerPlayer:=b shr 4;
 
-        if(kptd_TimerOwnerPlayer<=LastPlayer)
+        if(kptd_TimerOwnerPlayer<>nowner)
         then rudata_reload(@kptd_Timer,rpl)
         else kptd_Timer:=0;
      end;

@@ -15,7 +15,7 @@ g_status          : byte     = 0;
 
 g_FixedPositions  : boolean  = false;
 g_AISlots         : byte     = 0;
-g_DefeatedObs     : boolean  = true;
+g_NewObservers    : boolean  = true;
 
 g_royal_Rmax      : integer  = 0;
 g_royal_RCur      : integer  = 0;
@@ -87,8 +87,6 @@ net_TimerBase     : byte = 0;
 net_svLanAdv      : boolean = true;
 net_svLanAdv_timer: integer = 0;
 net_TimerPing     : integer = 0;
-net_wudata_t      : TWUDataTime;
-net_kpoints_kpi   : byte = 0;
 net_socket        : PUDPSocket;
 net_buffer        : PUDPPacket;
 net_bufpos        : integer = 0;
@@ -136,7 +134,6 @@ wtrset_resurect   : cardinal;
 u_royal_cd,
 u_royal_d         : integer;
 
-ai_name_i         : byte = 0;
 ai_names_l        : array[0..ai_names_max-1] of shortstring = (
                     ' TGA'   ,' NRM'    ,' BFG'   ,' Dant3'   ,' marat'  ,' Notarget' ,' Am$ek'   ,' Chainie' ,' BND'     ,' Nico',
                     ' Mud'   ,' Aurora' ,' Archi' ,' print423',' Rising' ,' KolyanRPG',' MWG'     ,' Teran'   ,' ZZYZX'   ,' Abaddon',
@@ -1066,7 +1063,7 @@ str_SR_ReplayPrefix,
 str_SR_Quality,
 
 str_GO_AISlots,
-str_GO_DefeatedObs,
+str_GO_NewObservers,
 str_GO_FixedStarts,
 str_GO_Random,
 
@@ -1171,7 +1168,7 @@ str_gmsg_GameSaved,
 str_gmsg_GameLoaded,
 str_gmsg_WrongVersion,
 str_gmsg_ServerFull,
-str_gmsg_GameStarted,
+str_gmsg_NoNewObservers,
 str_gmsg_PortBlocked,
 
 str_gstat_WaitForServer,

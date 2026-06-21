@@ -252,7 +252,9 @@ begin
         ud:=point_dist_rint(m_vx,m_vy,tu^.x,tu^.y)-tu^.uid^.uid_r-mid_size;
         if(ud<0)then ud:=0;
 
-        rdamage:=ApplyDamageMod(tu,m_dmod,m_damage);
+        if(m_fake)
+        then rdamage:=0
+        else rdamage:=ApplyDamageMod(tu,m_dmod,m_damage);
 
         if(ud<=0)and((m_dtars=0)or(mid_size>0))then // direct target
         begin
@@ -263,8 +265,7 @@ begin
            m_mtars-=1;
            m_dtars+=1;
 
-           if(not m_fake)
-           then unit_damage(tu,rdamage,m_playeri,false);
+           unit_damage(tu,rdamage,m_playeri,false);
         end
         else
           if(mid_base_SplashR>0)and(ud<mid_base_SplashR)and(not tu^.uid^.uid_isbuilding)and(not tu^.uid^.uid_ismech)then // splash m_damage
@@ -276,10 +277,8 @@ begin
              m_mtars-=1;
 
              if(not m_fake)then
-             begin
-                rdamage:=mm3i(0,trunc(rdamage*(1-(ud/mid_base_SplashR))),rdamage);
-                unit_damage(tu,rdamage,m_playeri,false);
-             end;
+               rdamage:=mm3i(0,trunc(rdamage*(1-(ud/mid_base_SplashR))),rdamage);
+             unit_damage(tu,rdamage,m_playeri,false);
           end;
      end;
 end;

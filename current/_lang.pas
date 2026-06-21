@@ -181,7 +181,7 @@ begin
 
    str_GO_AISlots                := 'Fill empty slots';
    str_GO_FixedStarts            := 'Fixed player starts';
-   str_GO_DefeatedObs            := 'Observer mode after lose';
+   str_GO_NewObservers           := 'New observers after game start';
    str_GO_Random                 := 'Random skirmish';
 
    str_map                       := 'Map';
@@ -311,7 +311,7 @@ begin
 
    str_gmsg_GameSaved            := 'Game saved';
    str_gmsg_GameLoaded           := 'Game loaded';
-   str_gmsg_GameStarted          := 'Game started';
+   str_gmsg_NoNewObservers       := 'New observers after game start is not allowed';
    str_gmsg_PlayerConnected      := ' has connected';
    str_gmsg_PlayerLeave          := ' left the game';
    str_gmsg_PlayerTimeOut        := ' was kicked due to a timeout';
@@ -322,7 +322,7 @@ begin
    str_gmsg_PlayerRevealed       := ' is revealed';
    str_gmsg_PortBlocked          := 'UDP Port is blocked!';
    str_gmsg_WrongVersion         := 'Wrong version!';
-   str_gmsg_ServerFull           := 'Server full!';
+   str_gmsg_ServerFull           := 'Server is full!';
    str_gmsg_RecordStart          := 'Start recording: ';
    str_gmsg_RecordError          := 'Recording error: ';
    str_gmsg_RecordStop           := 'Stop recording: ';
@@ -374,8 +374,8 @@ begin
    str_ui_KothTime               := 'Center capture time left: ';
    str_ui_KotHTime_act           := 'Time left until center area is active: ';
    str_ui_KotHWinner             := ' is King of the Hill!';
-   str_ui_ChatAll                := 'ALL:';
-   str_ui_ChatAllies             := 'ALLIES:';
+   str_ui_ChatAll                := 'ALL';
+   str_ui_ChatAllies             := 'ALLIES';
    str_ui_Tab[tab_Buildings]     := 'Buildings';
    str_ui_Tab[tab_Units    ]     := 'Units';
    str_ui_Tab[tab_Upgrades ]     := 'Upgrades';
@@ -484,7 +484,7 @@ begin
    str_help_GameUI               := 'Game UI';
    str_help_GameMechanics        := 'Game Mechanics';
    str_help_UnitsInfo            := 'Units Info';
-   str_help_BalanceTable         := 'Balance Table';
+   str_help_BalanceTable         := 'Units Balance';
    str_help_Other                := 'Other';
 
    str_doc_HotKey                := 'Hot key: ';
@@ -527,7 +527,7 @@ begin
    str_doc_LMB                   := tc_lime+'LMB'+tc_white;
    str_doc_RMB                   := tc_red +'RMB'+tc_white;
    str_doc_MWH                   := tc_yellow+'MWheel'+tc_white;
-   str_doc_unitBalanceNote       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects.';
+   str_doc_unitBalanceNote       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.';
 
    /////////////////////////////////////////////////////////////////////////////
    //  ABILITIES
@@ -635,7 +635,6 @@ begin
    str_SetUnitBaseHint(UID_ZFPlasmagunner    ,'Zombie Plasmaguner'               ,'');
    str_SetUnitBaseHint(UID_ZBFGMarine        ,'Zombie BFG Marine'                ,'');
 
-
    str_SetUnitBaseHint(UID_UCommandCenter    ,'Command Center'                   ,''      );
    str_SetUnitBaseHint(UID_UACommandCenter   ,'Advanced Command Center'          ,''      );
    str_SetUnitBaseHint(UID_UGenerator1       ,'Generator level 1'                ,''      );
@@ -668,6 +667,8 @@ begin
    str_SetUnitBaseHint(UID_Terminator        ,'Terminator'                       ,'');
    str_SetUnitBaseHint(UID_Tank              ,'Tank'                             ,'');
    str_SetUnitBaseHint(UID_Flyer             ,'Fighter'                          ,'');
+
+   str_SetUnitBalanceHint([UID_BFGMarine,UID_ZBFGMarine],'due to big splash damage - good against big groups of ['+str_attr_bio+'] units','','');
 
    /////////////////////////////////////////////////////////////////////////////
    //  UPGRADES
@@ -1030,7 +1031,7 @@ begin
                             iAct_USelGroup9       ],'select units from the numbered control group; double tap - move camera to nearest unit from the group');
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_UASlGroup1..
-                            iAct_UASlGroup9        ],'add to selection units from the numbered control group');
+                            iAct_UASlGroup9       ],'add to selection units from the numbered control group');
    DocHelp_AddHotKeyAction([],tc_docbr);
 
    DocHelp_AddHotKeyAction([iAct_Control_UAbility1..
@@ -1108,6 +1109,17 @@ begin
    DocHelp_AddOther(tc_docbr);
    DocHelp_AddOther('where X - UDP port (optional argument, default value - 10666). Any connected player can change the game settings in a dedicated server`s lobby.');
    DocHelp_AddOther('The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.');
+   DocHelp_AddOther(tc_docbr);
+   DocHelp_AddOther(tc_orange+'AI Bot skill levels'+tc_default+tc_doccpt);
+   DocHelp_AddOther(tc_docbr);
+   DocHelp_AddOther('AI1-5 - bot operates under the same conditions as a human; there are no unfair advantages and it does not ignore the fog of war; the difference is various size of army, super weapon or "magic" using, some micro-control abilities and build-order;');
+   DocHelp_AddOther('AI3+ - there is a chance of an early attack by a small group of units;');
+   DocHelp_AddOther('AI4+ - there is a chance of an super early attack by a first unit;');
+   DocHelp_AddOther('AI6 - AI5 + bot can see enemy buildings, ignoring fog of war;');
+   DocHelp_AddOther('AI7 - AI6 + bot can see enemy units, ignoring fog of war; unit production speed is doubled;');
+   DocHelp_AddOther('AI8 - AI7 + upgrades production speed is doubled;');
+   DocHelp_AddOther('AI9 - AI8 + building construction speed is doubled.');
+
 
    /////////////////////////////////////////////////////////////////////////////
    //  CAMPAING STRINGS
@@ -1399,7 +1411,7 @@ begin
   str_ui_KothTime          := 'Время до захвата центра: ';
   str_ui_KotHTime_act      := 'Время до активации центральной зоны: ';
   str_ui_KotHWinner        := ' - Царь Горы!';
-  str_GO_DefeatedObs     := 'Наблюдатель после поражения';
+  str_GO_NewObservers     := 'Наблюдатель после поражения';
   str_SV_MenuScale        := 'Растягивание меню';
   str_SV_MenuScaleSmooth       := 'Гладкое растянутое меню';
   str_SV_ShowFPS               := 'Показать FPS';
@@ -1519,7 +1531,6 @@ begin
   str_gmsg_PortBlocked       := 'Порт занят!';
   str_gmsg_WrongVersion              := 'Другая версия!';
   str_gmsg_ServerFull             := 'Нет мест!';
-  str_gmsg_GameStarted              := 'Игра началась!';
 
   str_ui_Tab[0]         := 'Здания';
   str_ui_Tab[1]         := 'Юниты';

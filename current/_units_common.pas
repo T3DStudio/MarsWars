@@ -2666,7 +2666,7 @@ begin
      begin
         isdefeated:=true;
         GameLog_PlayerDefeated(pnum);
-        if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
+        if(g_NewObservers)and(state=ps_human)then isobserver:=true;
         build_cd:=0;
      end;
 end;

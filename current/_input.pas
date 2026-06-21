@@ -595,7 +595,10 @@ begin
          for u:=1 to MaxUnits do
            with g_punits[u]^ do
              if(hits>0)and(isselected)and(LocalPlayer=playeri)and(not IsUnitRange(transportU,nil))then
-               net_writeint(unum);
+             begin
+                net_writeint (unum);
+                net_writebyte(group);
+             end;
 
          net_send(net_cl_svip,net_cl_svport);
       end
@@ -1254,13 +1257,6 @@ begin
         begin
            if(length(net_chat_str)>0)then
            begin
-              case ui_InGameChat of
-              chat_all   : ui_InGameChat:=255;
-              chat_allies: if(PlayerGetAlliesByte(LocalPlayer,false)>0)then
-                             ui_InGameChat:=PlayerGetAlliesByte(LocalPlayer,true);
-              else         ui_InGameChat:=0;
-              end;
-
               if(ui_InGameChat>0)then
                 if(net_status=ns_client)
                 then net_send_chat(            ui_InGameChat,net_chat_str)

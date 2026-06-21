@@ -196,7 +196,7 @@ begin
              rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
                                        round( cam_y       *map_MiniMap_cx),
                                        round((cam_x+cam_w)*map_MiniMap_cx),
-                                       round((cam_y+cam_h)*map_MiniMap_cx), PlayerGetColor(i,true));
+                                       round((cam_y+cam_h)*map_MiniMap_cx), PlayerColorsDefault[i]);
 
    ui_mm_ScanBlink:=not ui_mm_ScanBlink;
 end;
@@ -756,14 +756,6 @@ limit :integer;
 logPov:byte;
   str :shortstring;
   col :TMWColor;
-function ChatString:shortstring;
-begin
-   case ui_InGameChat of
-chat_all     : ChatString:=str_ui_ChatAll;
-chat_allies  : ChatString:=str_ui_ChatAllies;
-1..MaxPlayers: ChatString:=g_PlayersMain[ui_InGameChat-1].name+':';
-   end;
-end;
 begin
    // replay progress bar
    if(rpls_pstate=rpls_read)then
@@ -779,10 +771,13 @@ begin
       draw_UILog(tar,ui_logx,ui_logy-txt_line_h3,ta_LB,logPov,ui_log_LineLen,ui_log_ListSize,lmts_menu_chat);
       if(ui_InGameChat>0)then
       begin
-         str:=ChatString;
+         case ui_InGameChat of
+         chat_all     : str:=str_ui_ChatAll;
+         chat_allies  : str:=str_ui_ChatAllies;
+         end;
          draw_text(tar,ui_logx,
                        ui_logy,
-                       str+str_CutLast(net_chat_str+chat_type[ui_blink1_colorb],ui_log_LineLen-length(str)),
+                       str+':'+str_CutLast(net_chat_str+chat_type[ui_blink1_colorb],ui_log_LineLen-length(str)),
                        ta_LB,ui_log_LineLen,c_white);
       end;
    end
@@ -816,7 +811,7 @@ begin
        end;
 
    // GAME STATUS VICTORY/DEFEAT/PAUSE/REPLAY END
-   if(GameGetStatus(@str,@col,UIPlayer))then draw_text(tar,ui_GameStatusX,ui_GameStatusY,str,ta_MU,255,col);
+   if(GameGetStatus(g_status,@str,@col,UIPlayer))then draw_text(tar,ui_GameStatusX,ui_GameStatusY,str,ta_MU,255,col);
 
    // POV PLAYER
    if(rpls_pstate=rpls_read)or(g_PlayersMain[LocalPlayer].isobserver)then

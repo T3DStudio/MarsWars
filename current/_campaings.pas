@@ -87,7 +87,7 @@ procedure cmp_StartMission;
 begin
    FillChar(camp_data,SizeOf(camp_data),0);
 
-   g_DefeatedObs:=false;
+   g_NewObservers:=false;
    case camp_sel of
    0 : case camp_mis_sel of
        0 : begin

@@ -374,7 +374,7 @@ end;
 procedure drawmenu_BlockHelpUnitsBalance(tar:pSDL_Surface);
 var
 tx,ty:integer;
-procedure DrawTSoBUnits(caption:shortstring;psob:PTSoB);
+procedure DrawTSoBUnits(caption,hint:shortstring;psob:PTSoB);
 var u:byte;
 begin
    tx:=menu_items[mi_help_InfoList].mi_x0+font_wh;
@@ -391,7 +391,15 @@ begin
            ty+=ui_ButtonWh;
         end;
    end;
-   ty+=ui_ButtonWh+txt_line_h1;
+   tx:=menu_items[mi_help_InfoList].mi_x0+font_wh;
+   ty+=ui_ButtonWh;
+   if(length(hint)>0)then
+   begin
+      ty+=font_w1;
+      draw_text(tar,tx,ty,hint,ta_LU,menu_items[mi_help_InfoList].mi_charw,c_ltgray,@ty);
+      ty+=txt_line_h1;
+   end;
+   ty+=txt_line_h1+font_w1;
 end;
 begin
    if(menu_HelpUID=0)then exit;
@@ -400,15 +408,16 @@ begin
      drawmenu_ItemTextC(tar,mi_help_InfoList,ta_MA,uid_str_name,c_white);
 
    with menu_items[mi_help_InfoList] do
-   begin
-      ty:=mi_y0+font_wh;
+     with g_uids[menu_HelpUID] do
+     begin
+        ty:=mi_y0+font_wh;
 
-      DrawTSoBUnits(str_doc_BalanceGood   ,@g_uids[menu_HelpUID].uid_balance_Good   );
-      DrawTSoBUnits(str_doc_BalanceBad    ,@g_uids[menu_HelpUID].uid_balance_Bad    );
-      DrawTSoBUnits(str_doc_BalanceUseless,@g_uids[menu_HelpUID].uid_balance_Useless);
+        DrawTSoBUnits(str_doc_BalanceGood   ,uid_str_balance_Good   ,@uid_balance_Good   );
+        DrawTSoBUnits(str_doc_BalanceBad    ,uid_str_balance_Bad    ,@uid_balance_Bad    );
+        DrawTSoBUnits(str_doc_BalanceUseless,uid_str_balance_Useless,@uid_balance_Useless);
 
-      drawmenu_ItemTextC(tar,mi_help_InfoList,ta_LB,str_doc_unitBalanceNote,c_ltgray);
-   end;
+        drawmenu_ItemTextC(tar,mi_help_InfoList,ta_LB,str_doc_unitBalanceNote,c_ltgray);
+     end;
 end;
 
 procedure drawmenu_BlockScirmish(tar:pSDL_Surface);
@@ -544,10 +553,10 @@ begin
    // SCIRMISH GAME
    drawmenu_ItemCaption(tar,mi_Game_Panel,str_Caption_GOptions);
 
-   drawmenu_ItemText2(tar,mi_Game_FixedPositions,str_GO_FixedStarts,str_YesNoC[g_FixedPositions],0);
-   drawmenu_ItemText2(tar,mi_Game_AISlots       ,str_GO_AISlots    ,AISlotsSOpt                 ,0);
-   drawmenu_ItemText2(tar,mi_Game_DefeatedObs   ,str_GO_DefeatedObs,str_YesNoC[g_DefeatedObs]   ,0);
-   drawmenu_ItemText1(tar,mi_Game_Random        ,str_GO_Random     ,0);
+   drawmenu_ItemText2(tar,mi_Game_FixedPositions,str_GO_FixedStarts ,str_YesNoC[g_FixedPositions],0);
+   drawmenu_ItemText2(tar,mi_Game_AISlots       ,str_GO_AISlots     ,AISlotsSOpt                 ,0);
+   drawmenu_ItemText2(tar,mi_Game_NewObservers  ,str_GO_NewObservers,str_YesNoC[g_NewObservers]  ,0);
+   drawmenu_ItemText1(tar,mi_Game_Random        ,str_GO_Random      ,0);
 
    if(not g_started)and(g_LobbyTimer>0)then
    drawmenu_ItemText1(tar,mi_UnderBottomInfoLine,str_lobby_GameStartIn+ir2s(g_LobbyTimer),0);

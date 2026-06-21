@@ -622,10 +622,24 @@ end;
 //
 
 procedure keyPoints_AddSprites;
-var t,i:integer;
-   ddir:single;
+var
+t,i,y  :integer;
+ddir   :single;
 colorN,
 colorS :TMWColor;
+procedure addLimitLine(p:byte;defColor:boolean);
+var col:cardinal;
+begin
+   with map_KeyPointsL[t] do
+     if(kp_LimitPlayerC[p]>0)then
+     begin
+        if(defColor)
+        then col:=ui_max_color[kp_LimitPlayerC[p]>=keyPoint_MinLimit]
+        else col:=PlayerGetColor(p,false);
+        UnitsInfo_AddText(kp_x,kp_y+txt_line_h1+y,limit2s(kp_LimitPlayerC[p],ul1)+'/'+limit2s(keyPoint_MinLimit,ul1),col);
+        y+=txt_line_h1;
+     end;
+end;
 begin
    for t:=0 to LastKeyPoint do
      with map_KeyPointsL[t] do
@@ -678,11 +692,16 @@ begin
 
           if(kptd_VisTimer>0)then
           begin
-             if(UIPlayer<=LastPlayer)and(kp_Energy>0)then
-               if(kp_LimitPlayerC[UIPlayer]>0)then
-                 UnitsInfo_AddText(kp_x,kp_y-txt_line_h1,limit2s(kp_LimitPlayerC[UIPlayer],ul1)+'/'+limit2s(keyPoint_MinLimit,ul1),ui_max_color[kp_LimitPlayerC[UIPlayer]>=keyPoint_MinLimit]);
-             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y            ,cr2s(kptd_lifeTime            ),c_aqua);
-             if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y+txt_line_h1,ir2s(kp_CaptureTime-kptd_Timer),colorN );
+             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1,cr2s(kptd_lifeTime            ),c_aqua);
+             if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y            ,ir2s(kp_CaptureTime-kptd_Timer),colorN );
+
+             y:=0;
+             if(kp_Energy>0)then
+               if(UIPlayer<=LastPlayer)
+               then addLimitLine(UIPlayer,true)
+               else
+                 for i:=0 to LastPlayer do
+                   addLimitLine(i,false);
           end;
        end;
 end;

@@ -116,7 +116,7 @@ begin
    if(FollowCommander)then
    begin
       ai_RunTo(pu,commander_u,0,0,commander_d,-pu^.srange);
-      if(commander_d>pu^.srange)then
+      if(commander_d>pu^.srange)and(pu^.a_rld<=0)and(not IsUnitRange(pu^.a_tar,nil))then
       begin
          commander_u^.uo_x:=commander_u^.x;
          commander_u^.uo_y:=commander_u^.y;
@@ -175,7 +175,7 @@ begin
                TransportDropAndRunOut:=true;
             end;
      end;
-   with pu^ do if(isselected)then writeln('TransportDropAndRunOut ',TransportDropAndRunOut,' tar_dist=',tar_dist,' tar_zone=',tar_zone,' mapZone=',mapZone);
+   //with pu^ do if(isselected)then writeln('TransportDropAndRunOut ',TransportDropAndRunOut,' tar_dist=',tar_dist,' tar_zone=',tar_zone,' mapZone=',mapZone);
 end;
 procedure TransportGoForUnit(tu:PTUnit;du:integer);
 begin
@@ -198,14 +198,14 @@ begin
        begin
           TransportBaseDefenders:=true;
           TransportGoForUnit(ai_TransportTar_BDefend_u,ai_TransportTar_BDefend_d);
-          with pu^ do if(isselected)then writeln('TransportDefendBase 1',TransportBaseDefenders);
+          //with pu^ do if(isselected)then writeln('TransportDefendBase 1',TransportBaseDefenders);
        end
        else
          if(pu^.transportC>0)then
          begin
             ai_RunTo(pu,ai_BaseDef_u,0,0,ai_BaseDef_d,-pu^.srange);
             TransportBaseDefenders:=true;
-            with pu^ do if(isselected)then writeln('TransportDefendBase 2',TransportBaseDefenders);
+            //with pu^ do if(isselected)then writeln('TransportDefendBase 2',TransportBaseDefenders);
          end;
 end;
 function TransportTransferAttackers:boolean;
@@ -238,7 +238,7 @@ begin
            TransportGoForUnit(ai_TransportTar_Attack_u,ai_TransportTar_Attack_d);
            TransportTransferAttackers:=true;
         end;
-   with pu^ do if(isselected)then writeln('TransportTransferAttackers ',TransportTransferAttackers);
+   //with pu^ do if(isselected)then writeln('TransportTransferAttackers ',TransportTransferAttackers);
 end;
 function TransportGeneratorTeam:boolean;
 begin

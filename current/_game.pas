@@ -202,7 +202,6 @@ begin
         ai_names_l[i]:=ai_names_l[u];
         ai_names_l[u]:=ts;
      end;
-   ai_name_i:=random(ai_names_max);
 end;
 
 procedure Game_DefaultAll;
@@ -313,7 +312,7 @@ begin
    {$IFDEF _FULLGAME}
    or(rpls_pstate=rpls_read)
    {$ENDIF}
-   or(not g_DefeatedObs)
+   or(not g_NewObservers)
    or(g_started and Game_IsEnded)then exit;
 
    with g_PlayersMain[pid] do
@@ -1329,7 +1328,7 @@ begin
 
       nmid_lobby_GFixedPositions,
       nmid_lobby_GAISlots,
-      nmid_lobby_GDefeatedObs,
+      nmid_lobby_GNewObservers,
       nmid_lobby_GRandomScirmish: net_SendGSettings(param_type,forward);
       end;
       exit;
@@ -1361,7 +1360,7 @@ begin
                                   map_RedrawMenuMinimap;
                                   {$ENDIF}
                                end;
-   nmid_lobby_GDefeatedObs   : g_DefeatedObs:=not g_DefeatedObs;
+   nmid_lobby_GNewObservers  : g_NewObservers:=not g_NewObservers;
    nmid_lobby_GRandomScirmish: if(forward)then game_MakeRandomSkirmish;
    end;
 end;
@@ -1393,9 +1392,9 @@ begin
      then ui_playerPOV:=false
      else
        with g_PlayersTemp[UIPlayer] do
-       begin
-          ui_cam_x:=(ui_cam_x+ui_cam_hw+(cam_x+(cam_w div 2))) div 2;
-          ui_cam_y:=(ui_cam_y+ui_cam_hh+(cam_y+(cam_h div 2))) div 2;
+       begin             //ui_cam_hh
+          ui_cam_x:=(ui_cam_x+(cam_x+(cam_w div 2)-ui_cam_hw)) div 2;
+          ui_cam_y:=(ui_cam_y+(cam_y+(cam_h div 2)-ui_cam_hh)) div 2;
           ui_Camera_Bounds;
        end;
 

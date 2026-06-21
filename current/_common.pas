@@ -518,19 +518,26 @@ end;
 function PlayerGetAlliesByte(playeri:byte;AddSelf:boolean):byte;
 var p:byte;
 begin
-   PlayerGetAlliesByte:=0;
-   for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
-       if(state>ps_None)then
-       begin
-          if(not AddSelf)and(p=playeri)then continue;
+   if(playeri>LastPlayer)
+   then PlayerGetAlliesByte:=255
+   else
+   begin
+      PlayerGetAlliesByte:=0;
+      for p:=0 to LastPlayer do
+        with g_PlayersMain[p] do
+          if(state>ps_None)then
+          begin
+             if(not AddSelf)and(p=playeri)then continue;
 
-          case g_PlayersMain[playeri].isobserver of
-          false: if(team<>g_PlayersMain[playeri].team)then continue;
-          true : if(not isobserver)then continue;
+             case g_PlayersMain[playeri].isobserver of
+             false: if(team<>g_PlayersMain[playeri].team)
+                    or(isobserver)
+                    or(isdefeated)then continue;
+             true : if(not isobserver)then continue;
+             end;
+             SetBBit(@PlayerGetAlliesByte,p,true);
           end;
-          SetBBit(@PlayerGetAlliesByte,p,true);
-       end;
+   end;
 end;
 
 function PlayerLogCheckNearEvent(playeri:byte;tickDiff:cardinal;x,y:integer;mtypes:TSoB):boolean;
@@ -649,15 +656,12 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]
         true : if(adatau<=LastPlayer)then
                  case amtype of
                  lmt_player_leave,
-                 lmt_player_timeout  : with g_PlayersMain[adatau] do
-                                       begin
-                                          //name :='';
-                                          state:=ps_none;
-                                       end;
+                 lmt_player_timeout  : with g_PlayersMain[adatau] do state:=ps_none;
                  lmt_player_connected: with g_PlayersMain[adatau] do
                                        begin
-                                          name :=astr;
-                                          state:=ps_human;
+                                          name      :=astr;
+                                          state     :=ps_human;
+                                          isobserver:=true;
                                        end;
                  end;
         end;
@@ -675,7 +679,7 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]
            if(LogMes2UIAlarm(POVPlayer))then snd_SoundLogUIPlayer(POVPlayer);
 
            if(rpls_pstate<rpls_read)and(g_type<>gt_campaing)then
-             if((amtype=lmt_player_defeated)and(g_DefeatedObs)and(adatau=UIPlayer))
+             if((amtype=lmt_player_defeated)and(g_NewObservers)and(adatau=UIPlayer))
              or(amtype=lmt_game_end)then
              begin
                 ui_tab:=3;
@@ -699,23 +703,36 @@ end;
 //   TYPICAL GAME LOG MESSAGES
 
 // LOG
-procedure GameLog_Chat(sender,targets:byte;message:shortstring);
+procedure GameLog_Chat(sender,chat_tar:byte;message:shortstring);
+var dt:byte;
 begin
-   if(targets>0)then
+   case chat_tar of
+   chat_all   : begin
+                   chat_tar:=255;
+                   dt:=0;
+                end;
+   chat_allies: begin
+                   chat_tar:=PlayerGetAlliesByte(sender,true);
+                   dt:=1;
+                end;
+   else         chat_tar:=1 shl sender;
+   end;
+
+   if(chat_tar>0)then
      if(sender<=LastPlayer)
-     then PlayersAddToLog(sender,targets,lmt_chat_player0+sender,0,0,g_PlayersMain[sender].name+': '+message,0,0)
-     else PlayersAddToLog(sender,targets,lmt_chat_common        ,0,0,message                             ,0,0);
+     then PlayersAddToLog(sender,chat_tar,lmt_chat_player0+sender,dt,0,g_PlayersMain[sender].name+': '+message,0,0)
+     else PlayersAddToLog(sender,chat_tar,lmt_chat_common        ,0 ,0,message                                ,0,0);
 end;
-procedure GameLog_Common(sender,targets:byte;message:shortstring);
+{procedure GameLog_Common(sender,targets:byte;message:shortstring);
 begin
    PlayersAddToLog(sender,targets,lmt_game_message,0,0,message,0,0);
-end;
+end;  }
 
 // PLAYERS
 procedure GameLog_PlayerConnected(player:byte);
 begin
    if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_connected,0,0,g_PlayersMain[player].name,0,0);
+   PlayersAddToLog(player,log_to_all,lmt_player_connected,0,player,g_PlayersMain[player].name,0,0);
 end;
 procedure GameLog_PlayerLeave(player:byte);
 begin
@@ -809,9 +826,6 @@ begin
 
    with g_PlayersMain[playerN] do
    begin
-      //if(auid>0)and(atype=lmt_argt_unit)then
-      //  if(units_uid_e[auid]<=0)and(units_uid_m[auid]<=0)then exit;
-
       GameLog_ReqMsg:=true;
 
       if(check)
@@ -944,7 +958,7 @@ begin
    for p:=0 to LastPlayer do PlayerClearLog(p);
 end;
 
-// OTHEr
+// OTHER
 
 function PlayersAllReady:boolean;
 var p,
@@ -1371,7 +1385,7 @@ begin
    begin
       ai_name:=str_ps_AI+b2s(ain);
       if(playerN<=LastPlayer)then
-        ai_name+=ai_names_l[(ai_name_i+playerN) mod ai_names_max];
+        ai_name+=ai_names_l[(map_seed+playerN) mod ai_names_max];
    end;
 end;
 
@@ -1531,7 +1545,7 @@ end;
 //   GAME
 //
 
-function GameGetStatus(pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
+function GameGetStatus(gstatus:byte;pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
 function GetLagPlayers:shortstring;
 var p:byte;
 begin
@@ -1542,62 +1556,76 @@ begin
        if(state=ps_human)and(not isobserver)and(not isdefeated)and(net_ttl>=fr_fps1)then
          STRADD(@GetLagPlayers,name+'('+b2s((TTLMaxClientGame-net_ttl) div fr_fps1)+')',sep_comma);
 end;
+procedure SetS(str:shortstring;add:boolean=false);
+begin
+   if(pstr=nil)then exit;
+   if(add)
+   then pstr^+=str
+   else pstr^:=str;
+end;
+procedure SetC(col:cardinal);
+begin
+   if(pcol<>nil)then pcol^:=col;
+end;
 begin
    GameGetStatus:=false;
 
-   if(G_status<>gs_running)then
+   if(gstatus<>gs_running)then
    begin
       GameGetStatus:=true;
-      if(pstr<>nil)then pstr^:=str_gstat_Unknown;
-      if(pcol<>nil)then pcol^:=c_gray;
+      SetS(str_gstat_Unknown);
+      SetC(c_gray);
 
-      if(pstr<>nil)and(pcol<>nil)then
-        case G_status of
+      case gstatus of
 gs_paused0..
 gs_paused7    : begin
-                   pstr^:=str_gstat_GamePaused+g_PlayersMain[G_status].name;
-                   pcol^:=PlayerGetColor(G_status,false);
+                   SetS(str_gstat_GamePaused+g_PlayersMain[gstatus-gs_paused0].name);
+                   SetC(PlayerGetColor(gstatus-gs_paused0,false));
                 end;
 gs_replayerror: begin
-                   pstr^:=str_gstat_ReplayError+rpls_file_LastErrS;
-                   pcol^:=c_white;
+                   SetS(str_gstat_ReplayError+rpls_file_LastErrS);
+                   SetC(c_white);
                 end;
 gs_replayend  : begin
-                   pstr^:='';
-                   pcol^:=c_white;
+                   SetS('');
+                   SetC(c_white);
                 end;
 gs_replaypause: begin
-                   pstr^:=str_gstat_ReplayPaused;
-                   pcol^:=c_white;
+                   SetS(str_gstat_ReplayPaused);
+                   SetC(c_white);
                 end;
 gs_waitserver : begin
-                   pstr^:=str_gstat_WaitForServer;
+                   SetS(str_gstat_WaitForServer);
                    if(net_cl_Hoster<=LastPlayer)then
-                   pstr^+=tc_nl2+'('+g_PlayersMain[net_cl_Hoster].name+')';
-                   pcol^:=PlayerGetColor(net_cl_Hoster,false);
+                     SetS(tc_nl2+'('+g_PlayersMain[net_cl_Hoster].name+')',true);
+                   SetC(PlayerGetColor(net_cl_Hoster,false));
                 end;
 gs_waitplayers: begin
-                   pstr^:=str_gstat_WaitForPlayers;
-                   if(rpls_pstate<>rpls_read)then pstr^+=tc_nl2+GetLagPlayers;
-                   pcol^:=c_white;
+                   SetS(str_gstat_WaitForPlayers);
+                   if(rpls_pstate<>rpls_read)then
+                     SetS(tc_nl2+GetLagPlayers,true);
+                   SetC(c_white);
                 end;
 gs_win_team0..
-gs_win_team7  : if(POVPlayer>LastPlayer)
-                then pstr^:=str_gstat_WonByTeam+b2s(G_status-gs_win_team0+1)
+gs_win_team7  : if(POVPlayer>LastPlayer)then
+                begin
+                   SetS(str_gstat_WonByTeam+b2s(gstatus-gs_win_team0+1));
+                   SetC(c_ltgray);
+                end
                 else
-                  if((G_status-gs_win_team0)=g_PlayersMain[POVPlayer].team)then
+                  if((gstatus-gs_win_team0)=g_PlayersMain[POVPlayer].team)then
                   begin
-                     pstr^:=str_gstat_Win;
-                     pcol^:=c_lime;
+                     SetS(str_gstat_Win);
+                     SetC(c_lime);
                   end
                   else
                   begin
-                     pstr^:=str_gstat_Lose;
-                     pcol^:=c_red;
+                     SetS(str_gstat_Lose);
+                     SetC(c_red);
                   end;
         end;
 
-      if(rpls_pstate=rpls_read)and(rpls_file_pos>=rpls_file_size)then pstr^+=tc_nl2+tc_white+str_gstat_ReplayEnd;
+      if(rpls_pstate=rpls_read)and(rpls_file_pos>=rpls_file_size)then SetS(tc_nl2+tc_white+str_gstat_ReplayEnd,true);
    end;
 end;
 
@@ -2072,7 +2100,9 @@ lmt_chat_player0..
 lmt_chat_player7      : if(length(lm_string)>0)then
                         begin
                            mcolor^:=PlayerGetColor(lm_type-lmt_chat_player0,false);
-                           ParseLogMessage:=lm_string;
+                           if(lm_data_t=0)
+                           then ParseLogMessage:=str_ui_ChatAll   +') '+lm_string
+                           else ParseLogMessage:=str_ui_ChatAllies+') '+lm_string;
                         end;
 lmt_chat_common       : ParseLogMessage:=lm_string;
 lmt_Req_Limit         : ParseLogMessage:=str_warn_MaxLimitReached;

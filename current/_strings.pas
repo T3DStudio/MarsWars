@@ -452,6 +452,17 @@ begin
       uid_str_BaseDescript:=DESCR;
    end;
 end;
+procedure str_SetUnitBalanceHint(uids:TSoB;hintG,hintB,hintU:shortstring);
+var u:byte;
+begin
+   for u in uids do
+     with g_uids[u] do
+     begin
+        if(length(hintG)>0)then uid_str_balance_Good   :=hintG;
+        if(length(hintB)>0)then uid_str_balance_Bad    :=hintB;
+        if(length(hintU)>0)then uid_str_balance_Useless:=hintU;
+     end;
+end;
 
 procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
 begin

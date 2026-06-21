@@ -550,7 +550,11 @@ TUID = record
    uid_str_RebuildHint,
    uid_str_ArmsCommon,
    uid_str_Reqs,
-   uid_str_Prod          : shortstring;
+   uid_str_Prod,
+   uid_str_balance_Good,
+   uid_str_balance_Bad,
+   uid_str_balance_Useless
+                         : shortstring;
    uid_HintInGame,
    uid_HintDoc           : TUIStringList;
 
@@ -625,24 +629,27 @@ PTLogMes = ^TLogMes;
 
 TPlayerTempData = record
    PNU
-            : byte;
+                : byte;
    n_u,
    net_ping,
-   net_ttl  : word;
-   net_ip   : cardinal;
-   net_port : word;
+   net_ttl      : word;
+   net_ip       : cardinal;
+   net_port     : word;
    net_TimerLogSend
-            : integer;
+                : integer;
+   net_wudata_t : TWUDataTime;
+   net_kpoints_kpi
+                : byte;
 
    o_id,
-   o_a0     : byte;
+   o_a0         : byte;
    o_x0,o_y0,
-   o_x1,o_y1: integer;
+   o_x1,o_y1    : integer;
 
    cam_x,
    cam_y,
    cam_w,
-   cam_h    : integer;
+   cam_h        : integer;
 end;
 
 
