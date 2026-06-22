@@ -84,7 +84,6 @@ begin
    write(html_f,'<font color="'+htmldoc_color2hex(c)+'">');
    tag_c:=true;
 end;
-
 begin
    l:=length(line);
    if(l=0)then exit;
@@ -103,7 +102,7 @@ begin
       tc_docbr    : write(html_f,'<br>');
       tc_doccpt   : ;
       tc_player0..
-      tc_player7  : TagColor(PlayerColorsDefault[ord(c)]);
+      tc_player7  : TagColor(PlayerGetColorDef(ord(c)));
       tc_nl1,
       tc_nl2,
       tc_nl3      :;

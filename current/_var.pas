@@ -611,11 +611,11 @@ c_purple,
 c_violet,
 c_black           : TMWColor;
 
-PlayerColorsDefault,
-PlayerColorsCurrent,
-PlayerColorsShadow : array[0..LastPlayer] of TMWColor;
-PlayerColorDefaultCurrent: TMWColor = 0;
-PlayerColorDefaultShadow : TMWColor = 0;
+PlayerColorsSchemeDefault,
+PlayerColorsSchemeCurNormal,
+PlayerColorsSchemeCurShadow: TPlayersColorScheme;
+PlayerColorDefaultNormal   : TMWColor = 0;
+PlayerColorDefaultShadow   : TMWColor = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -265,7 +265,7 @@ begin
    drawmenu_ItemText2(tar,mi_SG_PlayerName      ,str_SG_PlayerName      ,PlayerName+vc(mi_SG_PlayerName)            ,menu_ItemSelected);
    drawmenu_ItemText2(tar,mi_SG_Language        ,str_SG_Language        ,str_SG_LanguageL[ui_language]              ,0);
    drawmenu_ItemText2(tar,mi_SG_ColoredShadows  ,str_SG_ColoredShadow   ,str_YesNoC[ui_ColoredShadow]               ,0);
-   drawmenu_ItemText2(tar,mi_SG_PlayersColor    ,str_SG_PlayersColor    ,str_SG_PlayersColorL[ui_PlayersColor]      ,0);
+   drawmenu_ItemText2(tar,mi_SG_PlayersColor    ,str_SG_PlayersColor    ,str_SG_PlayersColorL[ui_PlayersColor  ]    ,0);
    drawmenu_ItemText2(tar,mi_SG_ShowAPM         ,str_SG_ShowAPM         ,str_YesNoC[ui_ShowAPM]                     ,0);
    drawmenu_ItemText2(tar,mi_SG_HealthBars      ,str_SG_HealthBars      ,str_SG_HealthBarsL[ui_HealthBars]          ,0);
    drawmenu_ItemText2(tar,mi_SG_RightClickAction,str_SG_RightClickAct   ,str_SG_RightClickActL[m_RightClickAct]     ,0);
@@ -392,7 +392,8 @@ begin
         end;
    end;
    tx:=menu_items[mi_help_InfoList].mi_x0+font_wh;
-   ty+=ui_ButtonWh;
+   if(psob^<>[])then
+     ty+=ui_ButtonWh;
    if(length(hint)>0)then
    begin
       ty+=font_w1;
@@ -522,16 +523,16 @@ begin
        if(mi_state>as_off)then
          if(net_status=ns_none)or(state<>ps_Human)
          then boxColor(tar,mi_x0+font_wh,mi_y0+font_wh,
-                           mi_x1-font_wh,mi_y1-font_wh,PlayerGetColor(p,false))
+                           mi_x1-font_wh,mi_y1-font_wh,PlayerGetColorDef(p))
          else
            with g_PlayersTemp[p] do
              if((net_status<>ns_client)and(p=LocalPlayer  ))
              or((net_status= ns_client)and(p=net_cl_Hoster))
-             then draw_text(tar,mi_xc,mi_yc,str_ps_Host,ta_MM,255,PlayerGetColor(p,false))
+             then draw_text(tar,mi_xc,mi_yc,str_ps_Host,ta_MM,255,PlayerGetColorDef(p))
              else
                if(net_ping<=999)
-               then draw_text(tar,mi_xc,mi_yc,w2s(net_ping),ta_MM,255,PlayerGetColor(p,false))
-               else draw_text(tar,mi_xc,mi_yc,'999'        ,ta_MM,255,PlayerGetColor(p,false));
+               then draw_text(tar,mi_xc,mi_yc,w2s(net_ping),ta_MM,255,PlayerGetColorDef(p))
+               else draw_text(tar,mi_xc,mi_yc,'999'        ,ta_MM,255,PlayerGetColorDef(p));
 
    // SCIRMISH MAP
    drawmenu_ItemCaption(tar,mi_Map_Panel,str_Caption_Map);

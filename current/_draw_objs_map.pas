@@ -34,9 +34,12 @@ begin
    end;
 end;
 
-procedure map_MiniMap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:TMWColor);
+procedure map_MiniMap_KeyPoint(tar:pSDL_Surface;x,y,r:integer;sym:char;color:TMWColor;double:boolean=false);
 begin
    circleColor   (tar,x  ,y  ,r  ,color);
+   if(double)then
+   circleColor   (tar,x  ,y  ,r+2,color);
+
    if(sym<>#0)then
    characterColor(tar,x-3,y-3,sym,color);
 end;
@@ -52,7 +55,7 @@ begin
         if(g_FixedPositions)then
         begin
            if(g_PlayersMain[p].state=ps_none)and(g_AISlots=0)then continue;
-           color:=PlayerGetColor(p,false);
+           color:=PlayerGetColorDef(p);
            pc:=b2s(p+1)[1];
         end
         else
@@ -62,7 +65,8 @@ begin
         end;
 
         map_MiniMap_KeyPoint(tar,round(map_PlayerStartX[p]*map_MiniMap_cx),
-                                 round(map_PlayerStartY[p]*map_MiniMap_cx),trunc(base_r1*map_MiniMap_cx),pc,color);
+                                 round(map_PlayerStartY[p]*map_MiniMap_cx),
+                                 trunc(base_r1*map_MiniMap_cx),pc,color);
      end;
 end;
 
@@ -95,7 +99,7 @@ begin
           then ch:=char_kp
           else ch:=char_gen;
 
-        map_MiniMap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,ch,c);
+        map_MiniMap_KeyPoint(tar,kpmmx,kpmmy,kpmmr,ch,c,ch=char_kp);
      end;
 end;
 

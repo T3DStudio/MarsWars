@@ -56,7 +56,8 @@ function menu_ChatSize:integer;  forward;
 
 function PlayerNameChangeble  :boolean;forward;
 
-function PlayerGetColor  (player:byte;shadow:boolean):TMWColor;  forward;
+function PlayerGetColorCur(player:byte;shadow:boolean):TMWColor;  forward;
+function PlayerGetColorDef(player:byte):TMWColor; forward;
 function PlayerAIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
 function PlayerRaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
 function PlayerTeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;forward;
@@ -647,26 +648,29 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]
         {$IFDEF _FULLGAME}
         if(ptarget=rpls_player)and(rpls_log_c<MaxPlayerLog)and(rpls_fstate=rpls_write)then rpls_log_c+=1;
 
-        case g_started of
-        false: case amtype of
-               lmt_game_ReadyToStart : g_LobbyTimer:=g_GameStartTime;
-               lmt_game_StartsIn     : g_LobbyTimer:=adatau*fr_fps1-1;
-               lmt_game_BreakStarting: g_LobbyTimer:=0;
-               end;
-        true : if(adatau<=LastPlayer)then
-                 case amtype of
-                 lmt_player_leave,
-                 lmt_player_timeout  : with g_PlayersMain[adatau] do state:=ps_none;
-                 lmt_player_connected: with g_PlayersMain[adatau] do
-                                       begin
-                                          name      :=astr;
-                                          state     :=ps_human;
-                                          isobserver:=true;
-                                       end;
+        if(not ServerSide)then
+          case g_started of
+          false: case amtype of
+                 lmt_game_ReadyToStart : g_LobbyTimer:=g_GameStartTime;
+                 lmt_game_StartsIn     : g_LobbyTimer:=adatau*fr_fps1-1;
+                 lmt_game_BreakStarting: g_LobbyTimer:=0;
                  end;
-        end;
+          true :
+                   case amtype of
+                   lmt_player_leave,
+                   lmt_player_timeout  : if(adatau<=LastPlayer)then
+                                           with g_PlayersMain[adatau] do state:=ps_none;
+                   lmt_player_connected: if(adatau<=LastPlayer)then
+                                           with g_PlayersMain[adatau] do
+                                           begin
+                                              name      :=astr;
+                                              state     :=ps_human;
+                                              isobserver:=true;
+                                           end;
+                   end;
+          end;
 
-        if(net_status<>ns_none)or(not g_started) //??
+        if(net_status<>ns_none)or(not g_started)
         then POVPlayer:=LocalPlayer
         else POVPlayer:=UIPlayer;
         if(ptarget=POVPlayer)then
@@ -770,19 +774,21 @@ begin
        else PlayersAddToLog(255,255,lmt_player_nready,0,0,name,0,0)
 end;
 
+{$IFDEF _FULLGAME}
 // RECORDS
 procedure GameLogRecStart(fname:shortstring);
 begin
-   PlayersAddToLog(255,255,lmt_replay_RecStart,0,0,fname,0,0)
+   PlayersAddToLog(LocalPlayer,0,lmt_replay_RecStart,0,0,fname,0,0)
 end;
 procedure GameLogRecStop (fname:shortstring);
 begin
-   PlayersAddToLog(255,255,lmt_replay_RecStop,0,0,fname,0,0)
+   PlayersAddToLog(LocalPlayer,0,lmt_replay_RecStop,0,0,fname,0,0)
 end;
 procedure GameLogRecError(errorStr:shortstring);
 begin
-   PlayersAddToLog(255,255,lmt_replay_RecError,0,0,errorStr,0,0)
+   PlayersAddToLog(LocalPlayer,0,lmt_replay_RecError,0,0,errorStr,0,0)
 end;
+{$ENDIF}
 
 // GAME
 procedure GameLog_ReadyToStart;
@@ -1067,9 +1073,9 @@ begin
                  if(net_ttl>=fr_fps1)
                  then PlayerStateString:=str_ps_ttl
                  else
-                   if(not g_started)
-                   then PlayerStateString:=b2c[isready]
-                   else PlayerStateString:=str_ps_Hum;
+                   if(g_started)
+                   then PlayerStateString:=str_ps_Hum
+                   else PlayerStateString:=b2c[isready{$IFDEF _FULLGAME} or((net_status=ns_client)and(p=net_cl_Hoster)){$ENDIF}];
      end;
 end;
 
@@ -1580,7 +1586,7 @@ begin
 gs_paused0..
 gs_paused7    : begin
                    SetS(str_gstat_GamePaused+g_PlayersMain[gstatus-gs_paused0].name);
-                   SetC(PlayerGetColor(gstatus-gs_paused0,false));
+                   SetC(PlayerGetColorDef(gstatus-gs_paused0));
                 end;
 gs_replayerror: begin
                    SetS(str_gstat_ReplayError+rpls_file_LastErrS);
@@ -1597,8 +1603,11 @@ gs_replaypause: begin
 gs_waitserver : begin
                    SetS(str_gstat_WaitForServer);
                    if(net_cl_Hoster<=LastPlayer)then
-                     SetS(tc_nl2+'('+g_PlayersMain[net_cl_Hoster].name+')',true);
-                   SetC(PlayerGetColor(net_cl_Hoster,false));
+                   begin
+                      SetS(tc_nl2+'('+g_PlayersMain[net_cl_Hoster].name+')',true);
+                      SetC(PlayerGetColorDef(gstatus-gs_paused0));
+                   end
+                   else SetC(PlayerColorDefaultNormal);
                 end;
 gs_waitplayers: begin
                    SetS(str_gstat_WaitForPlayers);
@@ -1718,54 +1727,61 @@ begin
    for p:=0 to LastPlayer do
    begin
       if(POVPlayer>LastPlayer)
-      then PlayerColorsCurrent[p]:=PlayerColorsDefault[p]
+      then PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[p]
       else
         case ui_PlayersColor of
         1,
         2,
         3: if(p=POVPlayer)then
              case ui_PlayersColor of
-             1: PlayerColorsCurrent[p]:=c_lime;
+             1: PlayerColorsSchemeCurNormal[p]:=c_lime;
              2,
-             3: PlayerColorsCurrent[p]:=c_white;
+             3: PlayerColorsSchemeCurNormal[p]:=c_white;
              end
            else
                 if(g_PlayersMain[POVPlayer].team<>g_PlayersMain[p].team)
-                then PlayerColorsCurrent[p]:=c_red
+                then PlayerColorsSchemeCurNormal[p]:=c_red
                 else
                   case ui_PlayersColor of
                   1,
-                  2: PlayerColorsCurrent[p]:=c_yellow;
-                  3: PlayerColorsCurrent[p]:=c_aqua;
+                  2: PlayerColorsSchemeCurNormal[p]:=c_yellow;
+                  3: PlayerColorsSchemeCurNormal[p]:=c_aqua;
                   end;
-        4: PlayerColorsCurrent[p]:=PlayerColorsDefault[g_PlayersMain[p].team];
+        4: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[g_PlayersMain[p].team];
         5: if(p=POVPlayer)
-           then PlayerColorsCurrent[p]:=c_white
-           else PlayerColorsCurrent[p]:=PlayerColorsDefault[g_PlayersMain[p].team];
-        else    PlayerColorsCurrent[p]:=PlayerColorsDefault[p];
+           then PlayerColorsSchemeCurNormal[p]:=c_white
+           else PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[g_PlayersMain[p].team];
+        else    PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[p];
         end;
-      PlayerColorsShadow[p]:=gfx_ShadowColor(PlayerColorsCurrent[p]);
+
+      PlayerColorsSchemeCurShadow[p]:=gfx_ShadowColor(PlayerColorsSchemeCurNormal[p]);
    end;
 end;
 
-function PlayerGetColor(player:byte;shadow:boolean):TMWColor;
+function PlayerGetColorDef(player:byte):TMWColor;
+begin
+   if(player>LastPlayer)
+   then PlayerGetColorDef:=PlayerColorDefaultNormal
+   else PlayerGetColorDef:=PlayerColorsSchemeDefault[player];
+end;
+
+function PlayerGetColorCur(player:byte;shadow:boolean):TMWColor;
 begin
    if(player>LastPlayer)then
      case shadow of
-     false: PlayerGetColor:=PlayerColorDefaultCurrent;
-     true : PlayerGetColor:=PlayerColorDefaultShadow;
+     true : PlayerGetColorCur:=PlayerColorDefaultShadow;
+     false: PlayerGetColorCur:=PlayerColorDefaultNormal;
      end
    else
-     case shadow of
-     false: PlayerGetColor:=PlayerColorsCurrent[player];
-     true : PlayerGetColor:=PlayerColorsShadow [player];
-     end;
+     if(shadow)
+     then PlayerGetColorCur:=PlayerColorsSchemeCurShadow[player]
+     else PlayerGetColorCur:=PlayerColorsSchemeCurNormal[player];
 end;
 
 function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):TMWColor;
 begin
    case shadow of
-   false: KeyPoint_GetColor:=PlayerColorDefaultCurrent;
+   false: KeyPoint_GetColor:=PlayerColorDefaultNormal;
    true : KeyPoint_GetColor:=PlayerColorDefaultShadow;
    end;
    if(keyPoint>LastKeyPoint)then exit;
@@ -1773,8 +1789,8 @@ begin
      with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
        if(kptd_Active)then
          if(kptd_Timer>0)and(ui_blink3=0)
-         then KeyPoint_GetColor:=PlayerGetColor(kptd_TimerOwnerPlayer,shadow)
-         else KeyPoint_GetColor:=PlayerGetColor(kptd_OwnerPlayer     ,shadow);
+         then KeyPoint_GetColor:=PlayerGetColorCur(kptd_TimerOwnerPlayer,shadow)
+         else KeyPoint_GetColor:=PlayerGetColorCur(kptd_OwnerPlayer     ,shadow);
 end;
 
 function ui_SetUIPlayer(NewPlayerN:byte;check:boolean):boolean;
@@ -2099,10 +2115,10 @@ begin
 lmt_chat_player0..
 lmt_chat_player7      : if(length(lm_string)>0)then
                         begin
-                           mcolor^:=PlayerGetColor(lm_type-lmt_chat_player0,false);
+                           mcolor^:=PlayerGetColorDef(lm_type-lmt_chat_player0);
                            if(lm_data_t=0)
-                           then ParseLogMessage:=str_ui_ChatAll   +') '+lm_string
-                           else ParseLogMessage:=str_ui_ChatAllies+') '+lm_string;
+                           then ParseLogMessage:=str_ui_ChatAll   +'> '+lm_string
+                           else ParseLogMessage:=str_ui_ChatAllies+'> '+lm_string;
                         end;
 lmt_chat_common       : ParseLogMessage:=lm_string;
 lmt_Req_Limit         : ParseLogMessage:=str_warn_MaxLimitReached;

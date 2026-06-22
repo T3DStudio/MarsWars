@@ -380,7 +380,7 @@ begin
    with uid^  do
    with usmodel^ do
    begin
-      acolor:=PlayerGetColor(playeri,false);
+      acolor:=PlayerGetColorCur(playeri,false);
 
       choosen:=(ui_blink1_colorb)and((m_UnitTargetN=unum)or(ui_umark_u=unum));
 
@@ -635,7 +635,7 @@ begin
      begin
         if(defColor)
         then col:=ui_max_color[kp_LimitPlayerC[p]>=keyPoint_MinLimit]
-        else col:=PlayerGetColor(p,false);
+        else col:=PlayerGetColorCur(p,false);
         UnitsInfo_AddText(kp_x,kp_y+txt_line_h1+y,limit2s(kp_LimitPlayerC[p],ul1)+'/'+limit2s(keyPoint_MinLimit,ul1),col);
         y+=txt_line_h1;
      end;
@@ -801,7 +801,7 @@ begin
       begin
          ix:=170+89*u;
 
-         c:=PlayerGetColor(u,false);
+         c:=PlayerGetColorDef(u);
 
          draw_text(vid_screen,ix,80,b2s(units_bld_s[false]), ta_MU,255, c);
 
@@ -849,11 +849,11 @@ begin
 
            end;
 
-           draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_LU,255, PlayerGetColor(playeri,false));
-           draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColor(playeri,false));
+           draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_LU,255, PlayerGetColorDef(playeri));
+           draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
-           draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColor(playeri,false));
-           draw_text(vid_screen,ix,iy+30,b2c[buffs[ub_AltMode]>0], ta_LU,255, PlayerGetColor(playeri,false));
+           draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColorDef(playeri));
+           draw_text(vid_screen,ix,iy+30,b2c[buffs[ub_AltMode]>0], ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));

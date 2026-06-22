@@ -277,7 +277,7 @@ begin
                apos:=ui_CtrlPanelBW*(apos mod ui_CtrlPanelBW)+(apos div ui_CtrlPanelBW);
                MPos:=step+apos;
                case MPos of
-               24: MPos:=20;
+               24: MPos:=20; //20
                25: MPos:=23;
                end;
                end;
@@ -1310,7 +1310,7 @@ begin
    begin
       {$IFDEF TESTMODE}
       // Test mode
-      if(TestMode>0)and(net_status=ns_none)then
+      if(TestMode>0)and(net_status=ns_none)and(rpls_pstate<>rpls_read)then
       begin
          if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;

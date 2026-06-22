@@ -594,7 +594,7 @@ begin
                      end;
                 end;
 
-                SetUpgrade(upgr_hell_DistDamage1+g_random(21),aip_MaxUpgradeLevel);
+                SetUpgrade(upgr_hell_DistDamage1+g_random(22),aip_MaxUpgradeLevel);
              end;
      r_uac : begin
                 if((aip_flags and aif_upgr_smart_order)>0)then
@@ -1252,8 +1252,11 @@ begin
                       if(ai_enemy_inv_d<NOTSET)then
                         if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
                           aip_timer_detection:=aip_pause_detection;
-                      if(aiu_alarm_d=NOTSET)then
-                        ai_UnitAbility(pCaster,uab_UACScan   ,0,g_random(map_Size1),g_random(map_Size1));
+                      if(map_generators<mapg_inf)and(ai_choosen)and(units_uid_e[uidi]>1)and(ai_generator_d<NOTSET)
+                      then with ai_generator_kp^ do ai_UnitAbility(pCaster,uab_UACScan   ,0,kp_x,kp_y)
+                      else
+                        if(aiu_alarm_d=NOTSET)then
+                          ai_UnitAbility(pCaster,uab_UACScan   ,0,g_random(map_Size1),g_random(map_Size1));
                    end;
      end;
 end;

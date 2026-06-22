@@ -233,7 +233,7 @@ end;
 procedure InitThemes;
 var o:integer;
 begin
-   theme_n:=9;
+   theme_n:=4;
 
    setlength(str_themes,theme_n);
 
@@ -395,6 +395,66 @@ begin
    theme_i:=nTheme;
    case theme_i of
    0 : begin  // UAC BASE
+          SetThemeDecals  ('-1_-4,2_3,21,22,26,27,29,31,32');
+          SetThemeCraters ('17,18,19,26');
+          SetThemeTerrains('17,18,19'   );
+          SetThemeLiquidsB('26'         );
+          SetThemeLiquidsF('0_2,6'      );
+          SetThemeObs0    ('19,22_27,35,37_41,52_53');
+          SetThemeObs1    ('81_87'      );
+          SetThemeObs2    ('56_58,65,67,75');
+
+          theme_liquid_style:=tcs_smooth;
+          theme_crater_style:=tcs_square;
+       end;
+   1 : begin  // ICE CAVES
+          SetThemeDecals  ('-1_-4,1,4_20,23_25,28,30,33,34');
+          SetThemeCraters ('0,2,11_13,20,25,28');
+          SetThemeTerrains('0,2,11_13,20,25');
+          SetThemeLiquidsB('0,2,11_13,20,25,28');
+          SetThemeLiquidsF('16'             );
+          SetThemeObs0    ('0_12,15,17,18,21,28,36,42_47,48');
+          SetThemeObs1    ('77,88_92,96_101'  );
+          SetThemeObs2    ('55,66,69,70');
+
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
+   2 : begin  // HELL CAVES
+          SetThemeDecals  ('-1_-4,1,4,8,9,15,18_20,23_25,28,30,33,34');
+          SetThemeCraters ('4,10,14,16,21,22,23,29,30,35');
+          SetThemeTerrains('4,10,14,16,21,22,23'         );
+          SetThemeLiquidsB('4,10,14,16,21,22,23,29,30,35');
+          SetThemeLiquidsF('4,8,17,18'               );
+          SetThemeObs0    ('3,13_17,20,21,36,42_47,106,112');
+          SetThemeObs1    ('77,88_92,96_101,103_105,107_111,113,114');
+          SetThemeObs2    ('55,66,69,70'                    );
+
+          theme_liquid_style:=tcs_default;
+          theme_crater_style:=tcs_default;
+       end;
+   3 : begin  // HELL CITY
+          SetThemeDecals  ('-1_-4,1_3,30,33,34');
+          SetThemeCraters ('31_35');
+          SetThemeTerrains('31_34');
+          SetThemeLiquidsB('31_35');
+          SetThemeLiquidsF('3,5,9_11');
+          SetThemeObs0    ('13_17,20,21,36,42_47,106,112');
+          SetThemeObs1    ('103_105,107_111,113_116'     );
+          SetThemeObs2    ('117_120'                     );
+
+          theme_liquid_style:=tcs_smooth;
+          theme_crater_style:=tcs_square;
+       end;
+
+   {
+   unused
+     decals    0
+     terrains  1 3 5
+               6 7
+   }
+
+   {0 : begin  // UAC BASE
           SetThemeDecals  ('-1_-4,1_3,21,22,26,27,29,31,32');
           SetThemeCraters ('17,18,19,26');
           SetThemeTerrains('17,18'      );
@@ -488,32 +548,7 @@ begin
           theme_liquid_style:=tcs_default;
           theme_crater_style:=tcs_default;
        end;
-   7 : begin  // HELL CAVES
-          SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-          SetThemeCraters ('4,10,14,16,21,23,29,30,35');
-          SetThemeTerrains('4,10,14,16,21,23'         );
-          SetThemeLiquidsB('4,10,14,16,21,23,29,30,35');
-          SetThemeLiquidsF('4,8,17,18'               );
-          SetThemeObs0    ('3,13_17,20,21,36,42_47,106,112');
-          SetThemeObs1    ('77,88_92,96_101,103_105,107_111,113,114');
-          SetThemeObs2    ('55,66,69,70,117_120'                    );
-
-          theme_liquid_style:=tcs_default;
-          theme_crater_style:=tcs_default;
-       end;
-   8 : begin  // HELL CITY
-          SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-          SetThemeCraters ('31_35');
-          SetThemeTerrains('31_34');
-          SetThemeLiquidsB('31_35');
-          SetThemeLiquidsF('3,4,5,8_11,18');
-          SetThemeObs0    ('13_17,20,21,36,42_47,106,112');
-          SetThemeObs1    ('103_105,107_111,113_116'     );
-          SetThemeObs2    ('117_120'                     );
-
-          theme_liquid_style:=tcs_smooth;
-          theme_crater_style:=tcs_square;
-       end;
+}
    end;
    theme_map_RBattleFront:=72;
    SetTLBlC;

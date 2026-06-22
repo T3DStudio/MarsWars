@@ -563,6 +563,7 @@ upgr_hell_EvilEyeR     = 18; // hell Eye time
 upgr_hell_TotemInvis   = 19; // totem and eye invisible
 upgr_hell_BuildRestore = 20; // build restoration
 upgr_hell_TowerBlink   = 21; // teleport towers
+upgr_hell_FTowerAMech  = 22; // Fire tower caco weapon
 
 
 upgr_uac_DistDamage    = 31; // distance attack               // "t1"
@@ -1252,7 +1253,7 @@ char_koth              : char = ' ';
 dead_time              = -hits_dead;
 char_detect            = #7;
 
-spr_upgrade_icons      = 20;
+spr_upgrade_icons      = 21;
 
 MaxUnitGroups          = 9;
 
@@ -1558,22 +1559,22 @@ mi_settings_Record     = 31;
 mi_settings_Video      = 32;
 mi_settings_Sound      = 33;
 
-mi_SG_PlayerName       = 39;
-mi_SG_Language         = 40;
-mi_SG_ColoredShadows   = 41;
-mi_SG_PlayersColor     = 42;
-mi_SG_ShowAPM          = 43;
-mi_SG_HealthBars       = 44;
-mi_SG_RightClickAction = 45;
-mi_SG_ScrollSpeed      = 46;
-mi_SG_MouseScroll      = 47;
-mi_SG_ControlPanelPos  = 48;
-mi_SG_ControlPanelAuto = 49;
-mi_SG_ShowPlayerScrns  = 50;
+mi_SG_PlayerName       = 40;
+mi_SG_Language         = 41;
+mi_SG_ColoredShadows   = 42;
+mi_SG_PlayersColor     = 43;
+mi_SG_ShowAPM          = 44;
+mi_SG_HealthBars       = 45;
+mi_SG_RightClickAction = 46;
+mi_SG_ScrollSpeed      = 47;
+mi_SG_MouseScroll      = 48;
+mi_SG_ControlPanelPos  = 49;
+mi_SG_ControlPanelAuto = 50;
+mi_SG_ShowPlayerScrns  = 51;
 
-mi_SR_RecordGames      = 51;
-mi_SR_RecordPrefix     = 52;
-mi_SR_RecordQuality    = 53;
+mi_SR_RecordGames      = 55;
+mi_SR_RecordPrefix     = 56;
+mi_SR_RecordQuality    = 57;
 
 mi_SV_ResolutionW      = 60;
 mi_SV_ResolutionH      = 61;

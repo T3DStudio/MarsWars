@@ -26,7 +26,7 @@ begin
            or(((aip_flags and aif_cheat_VisBuildings)>0)and(    tu^.uid^.uid_isbuilding))
            or(((aip_flags and aif_cheat_VisUnits    )>0)and(not tu^.uid^.uid_isbuilding))then  // enemy in vision
            begin
-              if(ud<srange)
+              if((ud<srange)and not uid_AI_Melee)
               or(isfly)
               or(uid_isfly)
               or(mapZone=tu^.mapZone)then

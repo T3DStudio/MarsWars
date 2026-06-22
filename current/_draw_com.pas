@@ -120,7 +120,7 @@ begin
                        ix+= font_w1;
                        end;
          tc_player0..
-         tc_player7  : color:=PlayerGetColor(ord(charc),false);
+         tc_player7  : color:=PlayerGetColorDef(ord(charc));
          tc_purple   : color:=c_purple ;
          tc_red      : color:=c_red    ;
          tc_orange   : color:=c_orange ;

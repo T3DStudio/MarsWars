@@ -615,7 +615,7 @@ end;
 //    PLAYER STARTS
 //
 
-procedure map_ShuffleStarts(teamShuffle:boolean);
+procedure map_ShuffleStarts(trueRandom,teamShuffle:boolean);
 var
 x,y:byte;
   i:integer;
@@ -623,8 +623,13 @@ begin
    if(map_MaxPlayers>0)then
      for x:=0 to map_MaxPlayers-1 do
      for y:=0 to map_MaxPlayers-1 do
-       if(random(2)=0)and(x<>y)then
+       if(x<>y)then
        begin
+          case trueRandom of
+          true : if(random(2)=0)then continue;
+          false: if((abs(integer(map_seed)+x+y) mod 3)=0)then continue;
+          end;
+
           if(teamShuffle)and(map_MaxPlayers>2)and(g_PlayersMain[x].team<>g_PlayersMain[y].team)then continue;
           i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
           i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
@@ -795,9 +800,6 @@ begin
       map_PlayerStartX[p]:=NOTSET;
       map_PlayerStartY[p]:=NOTSET;
    end;
-   {
-   map_SizeH
-   }
 
    case map_template of
    mapt_lake,
@@ -843,6 +845,8 @@ begin
                                map_Starts_Circle(map_Sizeh,map_Sizeh,map_SymmetryDir,map_Sizeh-(map_Size1 div 8));
                  end;
    end;
+
+   if(g_FixedPositions)then map_ShuffleStarts(false,map_scenario in mc_fixed_teams);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

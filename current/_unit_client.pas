@@ -477,6 +477,7 @@ begin
    else wdkpi^:=0;
 
    if(g_PlayersMain[POVPlayer].isobserver)
+   or(rpl)
    then kpteam:=MaxPlayers
    else kpteam:=g_PlayersMain[POVPlayer].team;
 

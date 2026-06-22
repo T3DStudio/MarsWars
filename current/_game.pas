@@ -166,26 +166,18 @@ begin
       name :=PlayerName;
    end;
 
-   PlayerColorDefaultCurrent:=c_white;
-   PlayerColorDefaultShadow :=gfx_ShadowColor(PlayerColorDefaultCurrent);
+   PlayerColorDefaultNormal:=c_white;
+   PlayerColorDefaultShadow:=gfx_ShadowColor(PlayerColorDefaultNormal);
 
-   PlayerColorsDefault[0]:=c_red;
-   PlayerColorsDefault[1]:=c_orange;
-   PlayerColorsDefault[2]:=c_yellow;
-   PlayerColorsDefault[3]:=c_lime;
-   PlayerColorsDefault[4]:=c_aqua;
-   PlayerColorsDefault[5]:=c_blue;
-   PlayerColorsDefault[6]:=c_violet;
-   PlayerColorsDefault[7]:=c_purple;
+   PlayerColorsSchemeDefault[0]:=c_red;
+   PlayerColorsSchemeDefault[1]:=c_orange;
+   PlayerColorsSchemeDefault[2]:=c_yellow;
+   PlayerColorsSchemeDefault[3]:=c_lime;
+   PlayerColorsSchemeDefault[4]:=c_aqua;
+   PlayerColorsSchemeDefault[5]:=c_blue;
+   PlayerColorsSchemeDefault[6]:=c_violet;
+   PlayerColorsSchemeDefault[7]:=c_purple;
 
-   PlayerColorsCurrent[0]:=c_red;
-   PlayerColorsCurrent[1]:=c_orange;
-   PlayerColorsCurrent[2]:=c_yellow;
-   PlayerColorsCurrent[3]:=c_lime;
-   PlayerColorsCurrent[4]:=c_aqua;
-   PlayerColorsCurrent[5]:=c_blue;
-   PlayerColorsCurrent[6]:=c_violet;
-   PlayerColorsCurrent[7]:=c_purple;
    {$ENDIF}
 end;
 
@@ -286,14 +278,26 @@ end;
 
 {$IFDEF _FULLGAME}
 procedure GameLocalStart;
+var p:byte;
 begin
-   ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer] , map_PlayerStartY[LocalPlayer]);
    if(g_PlayersMain[LocalPlayer].isobserver)then
    begin
       ui_tab  :=tab_controls;
-      UIPlayer:=255;
+      UIPlayer:=MaxPlayers;
+      for p:=0 to LastPlayer do
+        with g_PlayersMain[p] do
+          if (state>ps_none)
+          and(not isobserver)
+          and(not isdefeated)then break;
+      if(p<MaxPlayers)
+      then ui_Camera_MoveToPoint(map_PlayerStartX[p],map_PlayerStartY[p])
+      else ui_Camera_MoveToPoint(map_SizeH,map_SizeH);
    end
-   else UIPlayer :=LocalPlayer;
+   else
+   begin
+      UIPlayer :=LocalPlayer;
+      ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
+   end;
    ui_log_LastTimer:=0;
    rpls_RecordTryPause:=0;
    if(snd_RenewMusicList)then
@@ -385,7 +389,7 @@ procedure Game_StartSkirmish;
 var p:byte;
 begin
    g_royal_RCur:=g_royal_Rmax;
-   if(not g_FixedPositions)then map_ShuffleStarts(map_scenario in mc_fixed_teams);
+   if(not g_FixedPositions)then map_ShuffleStarts(true,map_scenario in mc_fixed_teams);
 
    for p:=0 to LastPlayer do
      with g_PlayersMain[p] do
@@ -465,6 +469,7 @@ begin
 
    if(check)then exit;
 
+   map_Seed2RandomBase;
    {$IFDEF _FULLGAME}
    case g_type of
    gt_campaing: cmp_StartMission;
@@ -474,7 +479,6 @@ begin
    {$ELSE}
    Game_StartSkirmish;
    {$ENDIF}
-   map_Seed2RandomBase;
 
    {$IFDEF _FULLGAME}
    unit_UICountersAll;
@@ -882,10 +886,6 @@ begin
                                       else
                                         if(unit_ProdStopUpgrade(tar_u,o_a0,false,true,false)>0)then
                                            unit_ProdStopUnit   (tar_u,o_a0,false,true,false);
-
-                                    {if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_TransformStop   (tar_u,false                ),x,y))then
-                                    if(GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,unit_ProdStopUpgrade (tar_u,o_a0,false,true,false),x,y))then
-                                       GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,unit_ProdStopUnit    (tar_u,o_a0,false,true,false),x,y);   }
                           co_ability :
                                 if(not GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_ability,unit_AbilityCheck    (tar_u,o_a0,false           ),x,y))then
                                   unit_SetAbilityOrder(tar_u,o_a0,o_y0,o_x1,o_y1,false);
@@ -1385,14 +1385,22 @@ begin
    ns_client: if(net_SvList)
               then net_ServerListProc
               else net_Client;
+   ns_server: if(G_Started)then
+                with g_PlayersTemp[LocalPlayer] do
+                begin
+                   cam_x:=ui_cam_x;
+                   cam_y:=ui_cam_y;
+                   cam_w:=ui_cam_w;
+                   cam_h:=ui_cam_h;
+                end;
    ns_none  : if(g_Started)and(MainMenu)then exit;
    end;
-   if(net_status<>ns_none)and(ui_playerPOV)then
+   if(G_Started)and(net_status<>ns_none)and(ui_playerPOV)then
      if(not ui_ObserverPov(UIPlayer))
      then ui_playerPOV:=false
      else
        with g_PlayersTemp[UIPlayer] do
-       begin             //ui_cam_hh
+       begin
           ui_cam_x:=(ui_cam_x+(cam_x+(cam_w div 2)-ui_cam_hw)) div 2;
           ui_cam_y:=(ui_cam_y+(cam_y+(cam_h div 2)-ui_cam_hh)) div 2;
           ui_Camera_Bounds;

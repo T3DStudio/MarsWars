@@ -158,12 +158,20 @@ begin
    if(net_status=ns_client)
    or(rpls_pstate<>rpls_none)
    or(G_Started)
-   or(menu_msg_type<>mmbt_none)then exit;
+   or(menu_msg_type<>mmbt_none)
+   then exit;
 
    case start of
    true : begin   // start
              if(net_status<>ns_none)
-             or(g_LobbyTimer>0)then exit;
+             or(g_LobbyTimer>0)
+             {$IFDEF NONETINTEST}
+             {$IFDEF TESTMODE}
+             or(TestMode>0)
+             {$ENDIF}
+             {$ENDIF}
+             then exit;
+
              GameNetServer:=true;
              if(check)then exit;
 
@@ -195,7 +203,14 @@ begin
              if(net_status<>ns_none)
              or(rpls_pstate=rpls_read)
              or(g_LobbyTimer>0)
-             or(G_Started)then exit;
+             or(G_Started)
+             {$IFDEF NONETINTEST}
+             {$IFDEF TESTMODE}
+             or(TestMode>0)
+             {$ENDIF}
+             {$ENDIF}
+             then exit;
+
              GameNetClient:=true;
              if(check)then exit;
 
@@ -236,7 +251,14 @@ begin
    true : begin
              if(net_SvList)
              or(g_LobbyTimer>0)
-             or(net_status<>ns_none)then exit;
+             or(net_status<>ns_none)
+             {$IFDEF NONETINTEST}
+             {$IFDEF TESTMODE}
+             or(TestMode>0)
+             {$ENDIF}
+             {$ENDIF}
+             then exit;
+
              GameNetServerList:=true;
              if(check)then exit;
 

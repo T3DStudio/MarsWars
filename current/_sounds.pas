@@ -506,7 +506,8 @@ begin
          case lm_type of
 lmt_chat_player0..
 lmt_chat_player7        : if((lm_type-lmt_chat_player0)<>PListener)then snd_SoundPlayUI(snd_chat);
-lmt_player_leave,
+lmt_player_leave        : if(not g_started)
+                          or(g_PlayersMain[LocalPlayer].isobserver)then snd_SoundPlayUI(snd_chat);
 lmt_player_surrender,
 lmt_chat_common,
 lmt_game_message        : snd_SoundPlayUI(snd_chat);

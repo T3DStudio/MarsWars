@@ -2,7 +2,9 @@
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE TESTMODE}
-  //{$APPTYPE GUI}
+  //{$DEFINE NONETINTEST}
+  {$DEFINE DOCGEN}
+  {$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
 {$ENDIF}
@@ -66,15 +68,12 @@ begin
    GameInit;
 
    {$IFDEF _FULLGAME}
-   {$IFDEF TESTMODE}
-   if(TestMode=2)then
-   begin
+   {$IFDEF DOCGEN}
    htmldoc_make;
    ui_language:=not ui_language;SwitchLanguage;
    htmldoc_make;
    ui_language:=not ui_language;SwitchLanguage;
    htmldoc_SaveSprites;
-   end;
    {$ENDIF}
    {$ENDIF}
 

@@ -191,12 +191,14 @@ begin
        with g_PlayersMain[i] do
        with g_PlayersTemp[i] do
          if(cam_w>0)then
-           if(g_PlayersMain[LocalPlayer].isobserver)
-           or(g_PlayersMain[LocalPlayer].team=team)then
-             rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
-                                       round( cam_y       *map_MiniMap_cx),
-                                       round((cam_x+cam_w)*map_MiniMap_cx),
-                                       round((cam_y+cam_h)*map_MiniMap_cx), PlayerColorsDefault[i]);
+           if(i<>LocalPlayer)or(net_status<>ns_server)then
+           if(state=ps_Human)or(net_status<>ns_server)then
+             if(g_PlayersMain[LocalPlayer].isobserver)
+             or(g_PlayersMain[LocalPlayer].team=team)then
+               rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
+                                         round( cam_y       *map_MiniMap_cx),
+                                         round((cam_x+cam_w)*map_MiniMap_cx),
+                                         round((cam_y+cam_h)*map_MiniMap_cx), PlayerGetColorDef(i));
 
    ui_mm_ScanBlink:=not ui_mm_ScanBlink;
 end;
@@ -453,8 +455,8 @@ begin
          3: draw_UITabButtonT(tar,ucl,0                   ,0            ,0                 ,0                 ,0      ,0       ,0     ,0       );
          end;
 
-   if(iActOn(iAct_InGameMenu ))then draw_UIButtonSText(tar,0,ui_CtrlPanelBL,ta_MM,@str_ui_menu   ,c_white                       ,false,false);
-   if(iActOn(iAct_InGamePause))then draw_UIButtonSText(tar,2,ui_CtrlPanelBL,ta_MM,@str_menu_Pause,PlayerGetColor(g_status,false),false,false);
+   if(iActOn(iAct_InGameMenu ))then draw_UIButtonSText(tar,0,ui_CtrlPanelBL,ta_MM,@str_ui_menu   ,c_white                    ,false,false);
+   if(iActOn(iAct_InGamePause))then draw_UIButtonSText(tar,2,ui_CtrlPanelBL,ta_MM,@str_menu_Pause,PlayerGetColorDef(g_status),false,false);
 
 {
 draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
@@ -550,14 +552,14 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Observer_Player7  : begin
                                                    p:=uid-iAct_Observer_Player0;
                                                    with g_PlayersMain[p] do
-                                                     draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColor(p,false),UIPlayer=p,not iActEnabled(uid));
+                                                     draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColorDef(p),UIPlayer=p,not iActEnabled(uid));
                                                 end;
 
                        iAct_Replay_Player0..
                        iAct_Replay_Player7    : begin
                                                    p:=uid-iAct_Replay_Player0;
                                                    with g_PlayersMain[p] do
-                                                     draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColor(p,false),UIPlayer=p,not iActEnabled(uid));
+                                                     draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColorDef(p),UIPlayer=p,not iActEnabled(uid));
                                                 end;
                        iAct_Replay_Log        : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayLog  ,rpls_showlog    ,not iActEnabled(uid));
                        iAct_Observer_POV,
@@ -814,10 +816,12 @@ begin
    if(GameGetStatus(g_status,@str,@col,UIPlayer))then draw_text(tar,ui_GameStatusX,ui_GameStatusY,str,ta_MU,255,col);
 
    // POV PLAYER
-   if(rpls_pstate=rpls_read)or(g_PlayersMain[LocalPlayer].isobserver)then
-     if(UIPlayer<=LastPlayer)
-     then draw_text(tar,ui_GameStatusX,ui_PovPlayerY,g_PlayersMain[UIPlayer].name,ta_MU,255,PlayerGetColor(UIPlayer,false))
-     else draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_all                  ,ta_MU,255,c_white                       );
+   case ui_ControlTabType of
+   tcc_observer,
+   tcc_replay  : if(UIPlayer<=LastPlayer)
+                 then draw_text(tar,ui_GameStatusX,ui_PovPlayerY,g_PlayersMain[UIPlayer].name,ta_MU,255,PlayerGetColorCur(UIPlayer,false))
+                 else draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_all                     ,ta_MU,255,c_white                          );
+   end;
 
    // TIMER
    draw_timer(tar,ui_timerX,ui_timerY,g_tick,ta_LU,255,str_ui_time,c_white);
@@ -837,14 +841,14 @@ begin
                                else
                                  with kp_TeamData[MaxPlayers] do
                                    if(kptd_OwnerPlayer<=LastPlayer)
-                                   then draw_text(tar,ui_objectivesx,y,g_PlayersMain[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColor(kptd_OwnerPlayer,false),@y)
+                                   then draw_text(tar,ui_objectivesx,y,g_PlayersMain[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
                                    else
                                      if(kptd_Timer<=0)
                                      then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
                                      else
                                        if(ui_blink2_colorb)
                                        then draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
-                                       else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColor(kptd_TimerOwnerPlayer,false),@y);
+                                       else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColorCur(kptd_TimerOwnerPlayer,false),@y);
                               end;
                 mc_KeyPoints: draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white);
                 mc_royale   : draw_text(tar,ui_objectivesx,y,str_objective_RoyalBattle,ta_LU,ui_Objectives_LineLen,c_white);
@@ -981,7 +985,7 @@ begin
    draw_UIText(tar);
    if(mouse_select_xs0<>NOTSET)then
      rectangleColor(tar,mouse_select_xs0-ui_cam_x,
-                        mouse_select_ys0-ui_cam_y, mouse_x, mouse_y, PlayerGetColor(UIPlayer,false));
+                        mouse_select_ys0-ui_cam_y, mouse_x, mouse_y, PlayerGetColorCur(UIPlayer,false));
 
    draw_sdlsurface(tar,ui_UIPanelX,ui_UIPanelY,ui_UIPanel);
 

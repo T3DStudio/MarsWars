@@ -13,8 +13,8 @@ begin
         with g_unitsVis[unum] do
           if(uid^.uid_isbuilding)and(uid_MiniMapR>0)
           then rectangleColor(ui_minimap,mmx-uid_MiniMapR,mmy-uid_MiniMapR,
-                                         mmx+uid_MiniMapR,mmy+uid_MiniMapR,PlayerGetColor(player^.pnum,false))
-          else pixelColor    (ui_minimap,mmx,mmy,                          PlayerGetColor(player^.pnum,false));
+                                         mmx+uid_MiniMapR,mmy+uid_MiniMapR,PlayerGetColorCur(player^.pnum,false))
+          else pixelColor    (ui_minimap,mmx,mmy,                          PlayerGetColorCur(player^.pnum,false));
 
         with player^ do
         begin
@@ -25,7 +25,7 @@ begin
              if(buffs[ub_Cast]>0)then
                filledCircleColor(ui_minimap,trunc(uo_x  *map_MiniMap_cx),
                                             trunc(uo_y  *map_MiniMap_cx),
-                                            trunc(srange*map_MiniMap_cx),PlayerGetColor(pnum,true));
+                                            trunc(srange*map_MiniMap_cx),PlayerGetColorCur(pnum,true));
         end;
      end;
 end;
@@ -695,7 +695,7 @@ begin
         end;
 
       if(ui_ColoredShadow)
-      then ColorShadow:=PlayerGetColor(playeri,true)
+      then ColorShadow:=PlayerGetColorCur(playeri,true)
       else ColorShadow:=c_ablack;
 
       SpriteList_AddUnit(vx,vy,spr_depth,shadowz,ColorShadow,ColorAura,spr,spr_alpha);

@@ -752,6 +752,16 @@ end;
 
 procedure net_ServerList_ItemUpdate(aip:cardinal;aport:word;ainfo:shortstring;aping:cardinal);
 var i,e:integer;
+function pingChar(p:cardinal):char;
+begin
+   case p div fr_FrameMS of
+   0     : pingChar:=tc_aqua;
+   1     : pingChar:=tc_lime;
+   2     : pingChar:=tc_yellow;
+   3     : pingChar:=tc_orange;
+   else    pingChar:=tc_red;
+   end;
+end;
 begin
    e:=0;
 
@@ -772,7 +782,7 @@ begin
         setlength(net_SvList_lists,net_SvList_Size);
         with net_SvList_listi[net_SvList_Size-1] do
         begin
-           si_ping:=0;
+           si_ping:=999;
            si_ip  :=aip;
            si_port:=aport;
            si_line:=c2ip(si_ip)+':'+w2s(swap(si_port));
@@ -786,9 +796,11 @@ begin
       e-=1;
       with net_SvList_listi[e] do
       begin
+         si_info:=ainfo;
+         si_ttl :=0;
          if(aping<aping.MaxValue)then
            si_ping:=aping;
-         ainfo:=tc_orange+c2s(si_ping)+tc_default+' '+si_line+' '+ainfo;
+         ainfo:=pingChar(si_ping)+c2s(si_ping)+tc_default+' '+si_line+' '+si_info;
       end;
       if(net_SvList_lists[e]<>ainfo)then menu_update:=true;
       net_SvList_lists[e]:=ainfo;
@@ -873,15 +885,21 @@ begin
    end;
 
    net_TimerBase+=1;
-   net_TimerBase:=net_TimerBase mod fr_fps2;
-   if(net_SvList_Size>0)and(net_TimerBase=1)then
+   net_TimerBase:=net_TimerBase mod net_SendTimePing;
+   if(net_SvList_Size>0)then
      for i:=0 to net_SvList_Size-1 do
        with net_SvList_listi[i] do
        begin
-          net_clearbuffer;
-          net_writebyte(nmid_ServerInfoReq);
-          net_writecard(SDL_GetTicks);
-          net_send(si_ip,si_port);
+          if(si_ttl<si_ttl.MaxValue)then si_ttl+=1;
+          if(si_ttl=net_SendTimePing)then net_ServerList_ItemUpdate(si_ip,si_port,si_info,999);
+
+          if(net_TimerBase=2)then
+          begin
+             net_clearbuffer;
+             net_writebyte(nmid_ServerInfoReq);
+             net_writecard(SDL_GetTicks);
+             net_send(si_ip,si_port);
+          end;
        end;
 end;
 

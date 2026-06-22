@@ -548,6 +548,17 @@ begin
         end
         else
         begin
+           if(ai_choosen)then
+             case uidi of
+             UID_Phantom,
+             UID_LostSoul: if(ai_generator_d<NOTSET)then
+                             with ai_generator_kp^ do
+                             begin
+                                if(ai_generator_d>srange)then uo_id:=ua_move;
+                                ai_RunTo(pu,nil,kp_x,kp_y,ai_generator_d,aic_BaseIdle_r);
+                                exit;
+                             end;
+             end;
            case uidi of
            UID_Pain     : if (min2i(x,abs(map_Size1-x))>srange)
                           and(min2i(y,abs(map_Size1-y))>srange)then

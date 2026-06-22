@@ -976,6 +976,7 @@ upgr_hell_EvilEyeR      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,6 ]; end;
 upgr_hell_TotemInvis    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,16]; end;
 upgr_hell_BuildRestore  : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,17]; end;
 upgr_hell_TowerBlink    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,18]; end;
+upgr_hell_FTowerAMech   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,21]; end;
 
 upgr_uac_DistDamage     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,0 ]; end;
 upgr_uac_BioArmor       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,1 ]; end;

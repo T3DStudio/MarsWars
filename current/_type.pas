@@ -37,6 +37,9 @@ PTUIStringList = ^TUIStringList;
 TMWColor = cardinal;
 PTMWColor = ^TMWColor;
 
+TPlayersColorScheme  = array[0..LastPlayer] of TMWColor;
+PTPlayersColorScheme = ^TPlayersColorScheme;
+
 TMWTexture = record
    surf :pSDL_Surface;
    w,h,
@@ -270,7 +273,9 @@ TServerInfo = record
    si_manual  : boolean;
    si_ping,
    si_ip      : cardinal;
+   si_ttl,
    si_port    : word;
+   si_info,
    si_line    : shortstring;
 end;
 
@@ -439,7 +444,8 @@ TUID = record
    uid_ZombieHits        : integer;
    uid_ZombieUID         : byte;
 
-   uid_AI_TargetWeight  : byte;
+   uid_AI_TargetWeight   : byte;
+   uid_AI_Melee,
    uid_AI_Healer,
    uid_AI_Siedge         : boolean;
    uid_AI_NextFormUID    : byte;

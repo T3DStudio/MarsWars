@@ -280,14 +280,17 @@ begin
    str_all                       := 'All';
 
    str_themes[0]                 :=tc_lime  +'UAC BASE';
-   str_themes[1]                 :=tc_blue  +'TECH BASE' ;
+   str_themes[1]                 :=tc_aqua  +'ICE CAVES';
+   str_themes[2]                 :=tc_yellow+'HELL CAVES';
+   str_themes[3]                 :=tc_red   +'HELL CITY';
+
+   {str_themes[1]                 :=tc_blue  +'TECH BASE' ;
    str_themes[2]                 :=tc_white +'UNKNOWN PLANET';
    str_themes[3]                 :=tc_aqua  +'UNKNOWN MOON';
    str_themes[4]                 :=tc_gray  +'CAVES';
-   str_themes[5]                 :=tc_aqua  +'ICE CAVES';
+
    str_themes[6]                 :=tc_orange+'HELL PLANET';
-   str_themes[7]                 :=tc_yellow+'HELL CAVES';
-   str_themes[8]                 :=tc_red   +'HELL CITY';
+ }
 
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
@@ -697,6 +700,7 @@ begin
    str_SetUpgrBaseHint(upgr_hell_TowerR      ,'Demonic Spirits'                  ,'Increases the range for '+t1                             );
    str_SetUpgrBaseHint(upgr_hell_TowerBlink  ,g_aids[uab_HTowerBlink].ua_str_name,'Unlocks "'+g_aids[uab_HTowerBlink].ua_str_name+'" ability for '+t1);
    str_SetUpgrBaseHint(upgr_hell_Resurrect   ,'Resurrection'                     ,'Unlocks ArchVile`s resurrection weapon'                    );
+   str_SetUpgrBaseHint(upgr_hell_FTowerAMech ,'Cacodemon`s Nest '                ,'Anti-['+str_attr_mech+'] weapon for '+g_uids[UID_HFTower].uid_str_name);
 
 
    str_SetUpgrBaseHint(upgr_uac_DistDamage   ,'Weapons Upgrade'                  ,'Increases the damage of ranged attacks for all UAC units and defensive structures');
@@ -718,16 +722,13 @@ begin
    str_SetUpgrBaseHint(upgr_uac_TerAAWeapon  ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
    str_SetUpgrBaseHint(upgr_uac_Transport    ,'Dropship Upgrade'                 ,'Increases the capacity of Dropship'                       );
    str_SetUpgrBaseHint(upgr_uac_RadarR       ,'Radar Upgrade'                    ,'Increases radar scanning radius and range of sight'             );
-   str_SetUpgrBaseHint(upgr_uac_TurretPlasma ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for Anti-ground turret'  );
+   str_SetUpgrBaseHint(upgr_uac_TurretPlasma ,'Anti-ground Plasmagun'            ,'Anti-['+str_attr_mech+'] weapon for '+g_uids[UID_UGTurret].uid_str_name  );
    t1:=str_UnitsNamesList([UID_UATurret,UID_UGTurret]);
    str_SetUpgrBaseHint(upgr_uac_TowerR       ,'Spotlights'                       ,'Increases the range for '+t1                    );
    str_SetUpgrBaseHint(upgr_uac_TurretArmor  ,'Additional Armoring'              ,'Additional armor for '+t1 );
 
    /////////////////////////////////////////////////////////////////////////////
    //  GAME ACT HINTS
-
-   str_SetActionBaseHint(iAct_Control_USelBase   ,'Select all builders');
-   str_SetActionBaseHint(iAct_Control_USelArmy   ,'Select all not busy battle units;');
 
    t1:='attack enemies';
    str_SetActionBaseHint(iAct_Control_UAMove     ,'Move, '  +t1);
@@ -740,7 +741,13 @@ begin
 
    str_SetActionBaseHint(iAct_Control_UProdCncl  ,'Cancel production');
    str_SetActionBaseHint(iAct_Control_UDestroy   ,'Destroy');
-   str_SetActionBaseHint(iAct_Control_USelArmy   ,'Select all battle units');
+
+   str_SetActionBaseHint(iAct_Control_USelBase   ,'Select all builders');
+   str_SetActionBaseHint(iAct_Control_USelArmy   ,'Select all not busy battle units; "not busy battle units" criterias:'+tc_nl1+
+                                                  '- alive, completed, can attack, can move, NOT ['+str_attr_building+'];'+tc_nl1+
+                                                  '- no "Patrol" or "Stop, '+t1+'" orders;'+tc_nl1+
+                                                  '- no order to use an ability;'+tc_nl1+
+                                                  '- no order to teleport or transport;'+tc_nl1);
 
    str_SetActionBaseHint(iAct_Control_MarkLook   ,'Map mark: look here');
    str_SetActionBaseHint(iAct_Control_MarkAttack ,'Map mark: attack here');
@@ -1045,6 +1052,7 @@ begin
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_Control_USelBase  ],'select all builders; double tap - move camera to nearest builder');
    DocHelp_AddHotKeyAction([iAct_Control_USelArmy  ],'select all not busy battle units; double tap - move camera to nearest unit');
+
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark: "look here"');
    DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark: "attack here"');
@@ -1508,7 +1516,7 @@ begin
   str_SG_HealthBarsL[1]         := tc_aqua  +'всегда'   +tc_default;
   str_SG_HealthBarsL[2]         := tc_orange+'только '  +tc_lime+'выбранные'+tc_default;
 
-  str_SG_PlayersColor            := '÷вета игроков';
+  //str_SG_PlayersColor            := '÷ветова€ схема игроков()';
   str_SG_PlayersColorL[0]        := tc_white +'по умолчанию'+tc_default;
   str_SG_PlayersColorL[1]        := tc_lime  +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;
   str_SG_PlayersColorL[2]        := tc_white +'свои '+tc_yellow+'союзники '+tc_red+'враги'+tc_default;

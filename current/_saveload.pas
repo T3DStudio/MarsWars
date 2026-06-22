@@ -194,8 +194,8 @@ begin
    AddItem(@ui_blink_timer1     ,SizeOf(ui_blink_timer1    ));
    AddItem(@ui_blink_timer2     ,SizeOf(ui_blink_timer2    ));
    AddItem(@ui_alarms           ,SizeOf(ui_alarms          ));
-   AddItem(@PlayerColorsDefault ,SizeOf(PlayerColorsDefault));
    AddItem(@m_brush             ,SizeOf(m_brush            ));
+   AddItem(@PlayerColorsSchemeDefault,SizeOf(PlayerColorsSchemeDefault));
 end;
 
 function saveload_Allowed:boolean;
