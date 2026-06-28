@@ -298,6 +298,8 @@ lmt_argt_ability       = 2;
 //  NETGAME
 //
 
+net_DefaultPort           = 10666;
+
 net_MaxQuality            = 9;
 rpls_MaxQuality           = net_MaxQuality div 2;
                                                              // 60 140 220 300 380 460 540 620 700 800
@@ -310,7 +312,8 @@ TTLServer                 = fr_fps1;
 net_MaxPing               = word.MaxValue-fr_FrameMS;
 
 net_SendTimePing          = fr_fps2;
-net_SendTimeClient        = fr_fpsq;
+net_SendTimeClient1       = fr_fpsq;
+net_SendTimeClient2       = fr_fpsd10;
 net_SendTimeServer        = fr_fps1 div 30;
 MaxNetBuffer              = 4096;
 
@@ -474,19 +477,20 @@ aif_base_suicide       : cardinal = 1 shl 1;
 aif_base_advanceMain   : cardinal = 1 shl 2;
 aif_base_advanceOther  : cardinal = 1 shl 3;
 aif_base_BuilderMove   : cardinal = 1 shl 4;
-aif_army_scout         : cardinal = 1 shl 5;
-aif_army_early_attack0 : cardinal = 1 shl 6; // 'scout' attack
-aif_army_early_attack1 : cardinal = 1 shl 7; // 'early minimum group' attack
-aif_army_smart_order   : cardinal = 1 shl 8;
-aif_army_smart_micro   : cardinal = 1 shl 9;
-aif_army_smart_Target  : cardinal = 1 shl 10;
-aif_upgr_smart_order   : cardinal = 1 shl 11;
-aif_ability_detection  : cardinal = 1 shl 12;
-aif_ability_other      : cardinal = 1 shl 13;
-aif_ability_TowerRush  : cardinal = 1 shl 14;
-aif_allies_help        : cardinal = 1 shl 15;
-aif_cheat_VisBuildings : cardinal = 1 shl 16;
-aif_cheat_VisUnits     : cardinal = 1 shl 17;
+aif_base_DefendOwn     : cardinal = 1 shl 5;
+aif_base_DefendAlly    : cardinal = 1 shl 6;
+aif_army_scout         : cardinal = 1 shl 7;
+aif_army_early_attack0 : cardinal = 1 shl 8; // 'scout' attack
+aif_army_early_attack1 : cardinal = 1 shl 9; // 'early minimum group' attack
+aif_army_smart_order   : cardinal = 1 shl 10;
+aif_army_smart_micro   : cardinal = 1 shl 11;
+aif_army_smart_Target  : cardinal = 1 shl 12;
+aif_upgr_smart_order   : cardinal = 1 shl 13;
+aif_ability_detection  : cardinal = 1 shl 14;
+aif_ability_other      : cardinal = 1 shl 15;
+aif_ability_TowerRush  : cardinal = 1 shl 16;
+aif_cheat_VisBuildings : cardinal = 1 shl 17;
+aif_cheat_VisUnits     : cardinal = 1 shl 18;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -811,11 +815,7 @@ UID_UBaseGen           = 70;
 UID_UBaseRef           = 71;
 UID_UBaseNuc           = 72;
 UID_UBaseLab           = 73;
-UID_UCBuild0           = 74;
-UID_UCBuild1           = 75;
-UID_UCBuild2           = 76;
-UID_UCBuild3           = 77;
-UID_USPort             = 78;
+UID_USPort             = 74;
 
 UID_Engineer           = 80;
 UID_Medic              = 81;
@@ -979,6 +979,9 @@ base_r4                = base_r1*4;
 base_r5                = base_r1*5;
 base_r6                = base_r1*6;
 
+scirmish_MaxLost       = 20;
+scirmish_MaxHAltar     = 3;
+
 transport_exp_damage   = BaseDamage4;
 regen_period           = fr_fps1;
 regen_period1          = regen_period/fr_fps1;
@@ -991,10 +994,10 @@ HellPower_PerHP        = 10;
 HellPower_AddPeriod    = fr_fps1;
 HellPower_Add1         = HellPower_PerLimit;
 HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 2);
-HellPower_Add3         = HellPower_Add1+ HellPower_Add1;
+HellPower_Add3         = HellPower_Add1*2;
 UACLoot_Max            = 30000;
 
-UACStrike_Revealing_sec= 4;
+UACStrike_Revealing_sec= 5;
 UACStrike_Revealing    = UACStrike_Revealing_sec*fr_fps1;
 
 detection_time_sec     = 8;
@@ -1206,6 +1209,8 @@ iAct_SProd22           = 162;
 iAct_SProd23           = 163;
 iAct_SProd24           = 164;
 
+iAct_ToggleWindowed    = 170;
+
 iAct_InGameChat        = 200;
 iAct_InGameChatAll     = 201;
 iAct_InGameChatAllies  = 202;
@@ -1228,8 +1233,10 @@ iAct_test_BePlayer4    = 221;
 iAct_test_BePlayer5    = 222;
 iAct_test_BePlayer6    = 223;
 iAct_test_BePlayer7    = 224;
-iAct_test_debug0       = 225;
-iAct_test_debug1       = 226;
+iAct_test_AddHellPower = 225;
+iAct_test_AddUACLoot   = 226;
+iAct_test_debug0       = 227;
+iAct_test_debug1       = 228;
 {$ENDIF}
 
 k_LastCharStuckDelay   = fr_fps1 div 3;
@@ -1257,6 +1264,8 @@ spr_upgrade_icons      = 21;
 
 MaxUnitGroups          = 9;
 
+pingGradeStep          = 35;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SPRITE DEPTH
@@ -1265,7 +1274,7 @@ MaxUnitGroups          = 9;
 // terrain
 sd_liquidBack          = -32002;
 sd_liquidFront         = -32000;
-sd_decals              = map_MaxSize+sd_liquidFront;      // -24000
+sd_decals              = map_MaxSize+sd_liquidFront; // -24000
 sd_Obstacles2          = map_MaxSize+sd_decals;      // -16000
 sd_Obstacles1          = map_MaxSize+sd_Obstacles2;  // -8000
 sd_build               = map_MaxSize+sd_Obstacles1;  //  0
@@ -1733,6 +1742,7 @@ mi_help_Other          = 237;
 
 mi_help_InfoPanel      = 240;
 mi_help_InfoList       = 241;
+mi_help_GameUIImg1     = 242;
 
 //// CAMPAIGNs
 
@@ -1859,6 +1869,8 @@ folder_RaceMissiles    : array[1..r_count] of shortstring = ('hell\missiles\' ,'
 folder_graphic         : shortstring = 'graphic\';
 folder_map             : shortstring = 'map\';
 folder_sound           : shortstring = 'sound\';
+folder_music_menu      : shortstring = 'music\menu\';
+folder_music_game      : shortstring = 'music\game\';
 folder_save            : shortstring = 'save\';
 folder_replay          : shortstring = 'replay\';
 folder_effects         : shortstring = 'effs\';
@@ -1921,6 +1933,16 @@ crater_ri              = 4;
 crater_r               : array[1..crater_ri] of smallint = (33,60,88,110);
 
 LiquidAnimCount        = 4;
+
+{$IFDEF TESTMODE}
+////////////////////////////////////////////////////////////////////////////////
+//
+//  TEST MODE
+//
+
+testmode_HellPower     = 1000;
+testmode_UACLoot       = testmode_HellPower;
+{$ENDIF}
 
 {$ELSE }
 

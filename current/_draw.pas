@@ -15,7 +15,7 @@ begin
 
    ui_DrawEdges:=ui_MouseBrushNeedDrawEdges;
 
-   draw_AddAllSprites(G_Status<>gs_running);
+   draw_AddAllSprites(g_status<>gs_running);
 
    draw_LayerTerrain   (vid_screen);
    {$IFDEF TESTMODE}

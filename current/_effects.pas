@@ -145,7 +145,7 @@ end;
 
 begin
    if(MainMenu)
-   or(G_Status<>gs_running)
+   or(g_status<>gs_running)
    or(not vid_draw)
    or(ee=0)
    or(g_eids[ee].smodel=nil)then exit;

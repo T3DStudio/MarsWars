@@ -239,7 +239,7 @@ function saveload_Save(check:boolean):boolean;
 begin
    saveload_Save:=false;
 
-   if(not G_Started)
+   if(not g_started)
    or(not saveload_Allowed)
    or(length(svld_str_fname)=0)
    or(menu_msg_type<>mmbt_none)then exit;
@@ -316,6 +316,7 @@ begin
          exit;
       end;
 
+      menu_mseed:=c2s(map_seed);
       map_BaseVars(false);
       case g_type of
       gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
@@ -333,7 +334,7 @@ begin
       map_Decals_Create;
       ui_Camera_Bounds;
 
-      G_Started:=true;
+      g_started:=true;
 
       MenuBack(true,false);
 

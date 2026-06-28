@@ -32,6 +32,7 @@ procedure KeyPoints_Clear;   forward;
 
 procedure GameRemoveAIObservers; forward;
 procedure game_MakeRandomSkirmish; forward;
+procedure Game_ShuffleAINames; forward;
 
 {$IFDEF _FULLGAME}
 procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
@@ -1108,14 +1109,14 @@ procedure Game_SetStatusWinnerTeam(team:byte);
 begin
    if(team>LastPlayer)then exit;
 
-   G_status:=gs_win_team0+team;
+   g_status:=gs_win_team0+team;
    //if(g_DefeatedObs)and(state=ps_human)then isobserver:=true;
    GameLog_EndGame(team);
 end;
 
 function Game_IsEnded:boolean;
 begin
-   Game_IsEnded:=(gs_win_team0<=G_status)and(G_status<=gs_win_team7);
+   Game_IsEnded:=(gs_win_team0<=g_status)and(g_status<=gs_win_team7);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1672,7 +1673,7 @@ begin
       if(not offMenu)then exit;
    end;
 
-   if(not G_Started)and(g_type<>0)and(net_status=ns_none)then
+   if(not g_started)and(g_type<>0)and(net_status=ns_none)then
    begin
       MenuBack:=true;
       if(check)then exit;
@@ -1682,7 +1683,7 @@ begin
       if(not offMenu)then exit;
    end;
 
-   if(G_Started)then
+   if(g_started)then
    begin
       MenuBack:=true;
       if(check)then exit;
@@ -2551,7 +2552,7 @@ begin
    strInfoVar1^+=tc_nl2;
 
    vcard:=0;
-   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar1^+=str_ui_time+str_GTick2Time(vcard)+tc_nl2+tc_nl2;
+   BlockRead(f,vcard  ,sizeof(g_tick       ));   strInfoVar1^+=str_menu_InGameTime+str_GTick2Time(vcard)+tc_nl2+tc_nl2;
 
    strInfoVar1^+=str_Players+tc_nl2;
    //----------------  seconds string

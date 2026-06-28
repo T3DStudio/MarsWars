@@ -82,7 +82,7 @@ LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
 
 net_status        : byte = 0;
-net_ServerPort    : word = 10666;
+net_ServerPort    : word = net_DefaultPort;
 net_TimerBase     : byte = 0;
 net_svLanAdv      : boolean = true;
 net_svLanAdv_timer: integer = 0;
@@ -134,12 +134,13 @@ wtrset_resurect   : cardinal;
 u_royal_cd,
 u_royal_d         : integer;
 
-ai_names_l        : array[0..ai_names_max-1] of shortstring = (
-                    ' TGA'   ,' NRM'    ,' BFG'   ,' Dant3'   ,' marat'  ,' Notarget' ,' Am$ek'   ,' Chainie' ,' BND'     ,' Nico',
-                    ' Mud'   ,' Aurora' ,' Archi' ,' print423',' Rising' ,' KolyanRPG',' MWG'     ,' Teran'   ,' ZZYZX'   ,' Abaddon',
-                    ' Afrit' ,' Agaures',' Archon',' Azazel'  ,' Issyl'  ,' Garrin'   ,' Blot'    ,' Bruiser' ,' Sarutti' ,' CacoLich',
-                    ' Romero',' Carmack',' Sting' ,' Soban'   ,' Celt'   ,' Crash'    ,' Cryotron',' Zetor'   ,' Daedabus',' Defiler',
-                    ' Zymeth',' Yvaine' ,' Vetkin',' Tao'     ,' Otomo'  ,' Kenji'    ,' Shinja'  ,' Utara'   ,' Deimos'  ,' Phobos');
+ai_names_o        : array[0..ai_names_max-1] of shortstring = (
+                    ' TGA'   ,' NRM'    ,' BFG'      ,' Dant3'    ,' marat'   ,' Notarget' ,' Am$ek'   ,' Chainie' ,' BND'      ,' NicoThFug',
+                    ' Mud'   ,' Aurora' ,' Archi'    ,' print423' ,' Rising'  ,' KolyanRPG',' Boiec'   ,' MWG'     ,' Teran'    ,' ZZYZX'    ,
+                    ' Jet'   ,' ABK'    ,' NekoRangr',' OutCast'  ,' Igara'   ,' VoZj'     ,' Raymund' ,' Murphy'  ,' Jabber'   ,' NikcGreen',
+                    ' Zetor' ,' Bertie' ,' Doomersov',' Seifer'   ,' m0rdecai',' KrikIDDQD',' Ipse'    ,' Sergh'   ,' cybermind',' Dem',
+                    ' Romero',' Carmack',' Keen'     ,' BJ'       ,' Doomguy' ,' Slayer'   ,' Ranger'  ,' Grunt'   ,' Deimos'   ,' Phobos');
+ai_names_l        : array[0..ai_names_max-1] of shortstring;
 
 {$IFDEF TESTMODE}
 test_InstaProd    : boolean = false;
@@ -154,6 +155,7 @@ TestMode          : byte = 0;
 
 {$IFDEF _FULLGAME}
 
+//sys_WindowFocus   : boolean = true;
 sys_uncappedFPS   : boolean = false;
 
 ServerSide        : boolean = true; // only server side code
@@ -270,7 +272,6 @@ ui_fog_pgrid      : array of array of boolean;
 ui_fog_gridw      : integer = 0;
 ui_fog_gridh      : integer = 0;
 ui_fog            : boolean = true;
-//ui_fog_surf       : pSDL_Surface;
 ui_fog_Tiles      : TFogTileSet;
 ui_fog_sx         : integer = 0;
 ui_fog_sy         : integer = 0;
@@ -308,7 +309,7 @@ ui_uprod_uid_cur,
 ui_uprod_uid_time,
 ui_pprod_upg_max,
 ui_pprod_upg_cur,
-ui_pprod_upg_time     : array[byte] of integer;
+ui_pprod_upg_time : array[byte] of integer;
 ui_pprod_first    : integer;
 ui_bprod_possible : TSoB;
 ui_bprod_uid_count,
@@ -329,7 +330,6 @@ ui_umark_u        : integer = 0;
 ui_umark_t        : byte = 0;
 ui_max_color,                                       // unit max count color
 ui_cenergy,                                         // energy limit colors
-ui_limit,                                           // unit limit colors
 ui_blink_color2,
 ui_blink_color1   : array[false..true] of TMWColor;
 
@@ -414,6 +414,7 @@ menu_redraw_pause : integer = 0;
 menu_msg_type     : TMenuMessageBoxType;
 menu_msg_Caption,
 menu_msg_Body     : shortstring;
+menu_image        : pSDL_Surface = nil;
 
 menu_hint_pos     : array[byte] of byte;
 
@@ -460,17 +461,17 @@ map_KeyPointsVis  : array[0..LastKeyPoint] of TKeyPointVis;
 //  CAMPAINGS
 //
 
-camp_diff     : byte = 1;
-camp_data     : TCampaignData;
-camp_size     : integer = 0;
-camp_scroll   : integer = 0;
-camp_list     : TStringArray;
-camp_sel      : integer = 0;
+camp_diff      : byte = 1;
+camp_data      : TCampaignData;
+camp_size      : integer = 0;
+camp_scroll    : integer = 0;
+camp_list      : TStringArray;
+camp_sel       : integer = 0;
 
-camp_mis_sel  : integer = 0;
+camp_mis_sel   : integer = 0;
 camp_mis_scroll:integer = 0;
-camp_mis_list : array of TStringArray;
-camp_mis_size : array of integer;
+camp_mis_list  : array of TStringArray;
+camp_mis_size  : array of integer;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -555,6 +556,8 @@ mouse_select_xs0,
 mouse_select_ys0,
 mouse_map_x,
 mouse_map_y,
+mouse_prev_x,
+mouse_prev_y,
 mouse_x,
 mouse_y           : integer;
 m_brushc          : TMWColor;
@@ -808,10 +811,6 @@ spr_ubase2,
 spr_ubase3,
 spr_ubase4,
 spr_ubase5,
-spr_ubuild0,
-spr_ubuild1,
-spr_ubuild2,
-spr_ubuild3,
 
 spr_eff_bfg,
 spr_eff_eb,
@@ -910,6 +909,7 @@ spr_uibtn_F1,
 spr_uibtn_F2,
 spr_uibtn_ProdCancel,
 spr_uibtn_Delete,
+spr_ui_doc,
 spr_MenuBackgroundL,
 spr_MenuBackgroundD,
 spr_cursor,
@@ -946,15 +946,17 @@ spr_cursorHh         : integer;
 str_doc_BaseControls,
 str_doc_BaseMechanics,
 str_doc_HotKeys,
+str_doc_GameUI,
 str_doc_Other,
 str_doc_Credits
                     : TUIStringList;
 
 str_themes          : array of shortstring;
 
-str_race            : array[0..r_count  ] of shortstring;
+str_race            : array[0..r_count] of shortstring;
 str_map_ScenarioL,
-str_fileinfo_ScenarioL: array[0..mc_Last] of shortstring;
+str_fileinfo_ScenarioL
+                    : array[0..mc_Last] of shortstring;
 
 str_ps_AI,
 str_ps_Hum,
@@ -975,6 +977,8 @@ str_help_GameMechanics,
 str_help_UnitsInfo,
 str_help_BalanceTable,
 str_help_Other,
+
+str_help_GameUIImg1,
 
 str_doc_HotKey,
 str_doc_Attributes,
@@ -1037,6 +1041,9 @@ str_menu_Back,
 str_menu_Pause,
 str_menu_Chat,
 
+str_menu_InGameTime,
+
+str_menuMsg_HintImg,
 str_menuMsg_HintDefault,
 str_menuMsg_HintClient,
 
@@ -1333,8 +1340,6 @@ str_YesNoG,
 str_SG_LanguageL,
 str_SG_RightClickActL    : array[false..true] of shortstring;
 
-str_rstatus              : array[0..2] of shortstring = ('OFF','RECORD','PLAY');
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SOUND
@@ -1414,15 +1419,15 @@ snd_commando_attack,
 snd_commando_select,
 snd_commando_move,
 
+snd_aairmarine_ready,
+snd_aairmarine_annoy,
+snd_aairmarine_attack,
+snd_aairmarine_select,
+snd_aairmarine_move,
+
 snd_engineer_ready,
-snd_engineer_annoy,
-snd_engineer_attack,
 snd_engineer_select,
 snd_engineer_move,
-
-snd_scout_ready,
-snd_scout_select,
-snd_scout_move,
 
 snd_medic_ready,
 snd_medic_annoy,

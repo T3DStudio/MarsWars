@@ -3,9 +3,10 @@ const
 
 
 str_htmldoc_folder   = 'docs';
+str_htmldoc_imgsGame = 'imgs_game\';
 str_htmldoc_imgs     = 'imgs\';
-str_htmldoc_unitFront= str_htmldoc_imgs+'unitFront';
-str_htmldoc_unitBTN  = str_htmldoc_imgs+'unitBTN';
+str_htmldoc_unitFront= str_htmldoc_imgsGame+'unitFront';
+str_htmldoc_unitBTN  = str_htmldoc_imgsGame+'unitBTN';
 str_htmldoc_img_ext  = '.bmp';
 str_htmldoc_fname    = str_htmldoc_folder+'\MarsWars_';
 str_htmldoc_ext      = '.html';
@@ -204,7 +205,9 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  GAME UI
    htmldoc_WriteCaption(str_help_GameUI);
-   //
+   writeln(html_f,'<center><img src="..\graphic\ui_doc.png" alt="image #1" title="image #1"></br>image #1</center>');
+   with str_doc_GameUI do
+   htmldoc_WriteStringArray(@slist_l,slist_n);
 
    /////////////////////////////////////////////////////////////////////////////
    //  GAME BASICS CONTROLS

@@ -43,6 +43,9 @@ begin
    input_SetAction(iAct_ScreenShot        ,ikt_keyboard,0           ,SDLK_Print       );
    input_SetAction(iAct_LastEvent         ,ikt_keyboard,0           ,SDLK_Space       );
 
+   input_SetAction(iAct_ToggleWindowed    ,ikt_keyboard,iAct_Alt    ,SDLK_RETURN      );
+
+
    input_SetAction(iAct_USetGroup0        ,ikt_keyboard,iAct_control,SDLK_0           );
    input_SetAction(iAct_USetGroup1        ,ikt_keyboard,iAct_control,SDLK_1           );
    input_SetAction(iAct_USetGroup2        ,ikt_keyboard,iAct_control,SDLK_2           );
@@ -146,6 +149,8 @@ begin
    input_SetAction(iAct_test_BePlayer5    ,ikt_keyboard,0           ,SDLK_KP5         );
    input_SetAction(iAct_test_BePlayer6    ,ikt_keyboard,0           ,SDLK_KP6         );
    input_SetAction(iAct_test_BePlayer7    ,ikt_keyboard,0           ,SDLK_KP7         );
+   input_SetAction(iAct_test_AddHellPower ,ikt_keyboard,iAct_Control,SDLK_UP          );
+   input_SetAction(iAct_test_AddUACLoot   ,ikt_keyboard,iAct_Alt    ,SDLK_UP          );
    input_SetAction(iAct_test_debug0       ,ikt_keyboard,0           ,SDLK_KP8         );
    input_SetAction(iAct_test_debug1       ,ikt_keyboard,0           ,SDLK_KP9         );
    {$ENDIF}
@@ -172,6 +177,7 @@ begin
 
 
    input_SetAction(iAct_Observer_Fog      ,ikt_keyboard,0           ,SDLK_Q           );
+   input_SetAction(iAct_Observer_POV      ,ikt_keyboard,0           ,SDLK_W           );
    input_SetAction(iAct_Observer_PlayerAll,ikt_keyboard,0           ,SDLK_E           );
    input_SetAction(iAct_Observer_Player0  ,ikt_keyboard,0           ,SDLK_1           );
    input_SetAction(iAct_Observer_Player1  ,ikt_keyboard,0           ,SDLK_2           );
@@ -460,7 +466,7 @@ begin
    end;
 
    // replay controls
-   iActSetOnEnabled(iAct_Replay_Fast         ,ctabType=tcc_Replay,G_Status=gs_running);
+   iActSetOnEnabled(iAct_Replay_Fast         ,ctabType=tcc_Replay,g_status=gs_running);
    iActSetOnEnabled(iAct_Replay_Pause        ,ctabType=tcc_Replay,replay_Pause(true));
    iActSetOnEnabled(iAct_Replay_Back2        ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
    iActSetOnEnabled(iAct_Replay_Back10       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
@@ -577,7 +583,7 @@ end;
 procedure PlayerSendOrder(ox0,oy0,ox1,oy1:integer;oa0,oid,playerN:byte);
 var u:integer;
 begin
-   if(G_Status=gs_running)and(rpls_pstate<rpls_read)then
+   if(g_status=gs_running)and(rpls_pstate<rpls_read)then
    begin
       if(net_status=ns_client)then
       begin
@@ -992,17 +998,20 @@ begin
    while (SDL_PollEvent(sys_EVENT)>0) do
      case (sys_EVENT^.type_) of
       SDL_QUITEV         : GameCycle:=false;
+      //SDL_ACTIVEEVENT    : sys_WindowFocus:=not sys_WindowFocus;
       SDL_VIDEORESIZE    : begin
                               nvid_vw:=max2i(vid_minw,sys_EVENT^.resize.w);
                               nvid_vh:=max2i(vid_minh,sys_EVENT^.resize.h);
                            end;
       SDL_MOUSEMOTION    : begin
-                              if(m_DragCamMove)and(not MainMenu)and(G_Started)then
+                              if(m_DragCamMove)and(not MainMenu)and(g_started)then
                               begin
                                  ui_cam_x-=sys_EVENT^.motion.x-mouse_x;
                                  ui_cam_y-=sys_EVENT^.motion.y-mouse_y;
                                  ui_Camera_Bounds;
                               end;
+                              mouse_prev_x:=mouse_x;
+                              mouse_prev_y:=mouse_y;
                               mouse_x:=sys_EVENT^.motion.x;
                               mouse_y:=sys_EVENT^.motion.y;
                            end;
@@ -1230,14 +1239,6 @@ begin
    if(vx<>ui_cam_x)or(vy<>ui_cam_y)then ui_Camera_Bounds;
 end;
 
-procedure test_nullupgr(playeri:byte);
-var i:byte;
-begin
-   with g_PlayersMain[playeri] do
-     for i:=1 to 255 do
-       upgrs_cur[i]:=0;
-end;
-
 procedure GameControlsKeyboard;
 var
 ctab :TTabControlContent;
@@ -1313,12 +1314,12 @@ begin
       if(TestMode>0)and(net_status=ns_none)and(rpls_pstate<>rpls_read)then
       begin
          if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
-         if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd:=not test_InstaProd;
+         if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd :=not test_InstaProd;
          if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersMain[LocalPlayer] do if(state=ps_human          )then state:=ps_AI              else state:=ps_human;
          if(InputActionPressed(iAct_test_iddqd       ))then with g_PlayersMain[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
-         if(InputActionPressed(iAct_test_NullUpgrades))then test_nullupgr(LocalPlayer);
+         if(InputActionPressed(iAct_test_NullUpgrades))then with g_PlayersMain[LocalPlayer] do FillChar(upgrs_cur,SizeOf(upgrs_cur),0);
          if(InputActionPressed(iAct_test_BePlayer0   ))then LocalPlayer:=0;
          if(InputActionPressed(iAct_test_BePlayer1   ))then LocalPlayer:=1;
          if(InputActionPressed(iAct_test_BePlayer2   ))then LocalPlayer:=2;
@@ -1327,10 +1328,21 @@ begin
          if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
          if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
          if(InputActionPressed(iAct_test_BePlayer7   ))then LocalPlayer:=7;
+         if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersMain[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
+         if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersMain[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
+
          //if(InputActionPressed(iAct_test_debug0      ))then Game_ShuffleAINames;
          if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
       end;
       {$ENDIF}
+
+      // To last event
+      if(InputActionPressed(iAct_LastEvent))then
+      begin
+         ui_Camera_ToLastEvent;
+         clickSound:=true;
+      end;
+
       // Controls tab actions
       ctab:=ui_ControlTabType;
       if(ctab=tcc_observer)
@@ -1345,13 +1357,6 @@ begin
 
       if(g_status=gs_running)then
       begin
-         // To last event
-         if(InputActionPressed(iAct_LastEvent))then
-         begin
-            ui_Camera_ToLastEvent;
-            clickSound:=true;
-         end;
-
          // Groups
          for k:=iAct_USetGroup0 to iAct_USetGroup9 do if(InputActionPressed(k))then units_SetGroup   (false,k-iAct_USetGroup0);
          for k:=iAct_UAddGroup1 to iAct_UAddGroup9 do if(InputActionPressed(k))then units_SetGroup   (true ,k-iAct_UAddGroup1+1);
@@ -1387,6 +1392,7 @@ begin
    WindowEvents;
 
    if(InputActionReleased(iact_Screenshot))then gfx_MakeScreenshot;
+   if(InputActionPressed(iAct_ToggleWindowed))then menu_ToggleFullScreen;
 
    if(MainMenu)then
    begin

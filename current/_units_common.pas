@@ -2666,7 +2666,8 @@ begin
      begin
         isdefeated:=true;
         GameLog_PlayerDefeated(pnum);
-        if(g_NewObservers)and(state=ps_human)then isobserver:=true;
+        if(g_NewObservers)then
+          if(state=ps_human){$IFDEF TESTMODE}or(TestMode>0){$ENDIF}then isobserver:=true;
         build_cd:=0;
      end;
 end;

@@ -68,8 +68,6 @@ begin
    ui_max_color[true ]:=c_gray;
    ui_cenergy  [false]:=c_white;
    ui_cenergy  [true ]:=c_red;
-   ui_limit    [false]:=c_white;
-   ui_limit    [true ]:=c_red;
 
    ui_blink_color2[false]:=c_black;
    ui_blink_color2[true ]:=c_yellow;
@@ -754,10 +752,12 @@ begin
    spr_uibtn_AbilitySRDamage   := gfx_ButtonLoad(folder_ui+'b_SResistDamage'   ,ui_ButtonW1);
    spr_uibtn_AbilitySTurbo     := gfx_ButtonLoad(folder_ui+'b_STurbo'          ,ui_ButtonW1);
 
-  spr_uibtn_Tabs[0]:=gfx_ButtonLoad(folder_ui+'b_F1'        ,ui_TabButtonW-2,false);
-  spr_uibtn_Tabs[1]:=gfx_ButtonLoad(folder_ui+'b_F2'        ,ui_TabButtonW-2,false);
-  spr_uibtn_Tabs[2]:=gfx_ButtonLoad(folder_ui+'tab_upgrades',ui_TabButtonW-2,false);
-  spr_uibtn_Tabs[3]:=gfx_ButtonLoad(folder_ui+'tab_controls',ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[0]:=gfx_ButtonLoad(folder_ui+'b_F1'        ,ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[1]:=gfx_ButtonLoad(folder_ui+'b_F2'        ,ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[2]:=gfx_ButtonLoad(folder_ui+'tab_upgrades',ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[3]:=gfx_ButtonLoad(folder_ui+'tab_controls',ui_TabButtonW-2,false);
+
+   spr_ui_doc                  := gfx_LoadSDLSurface('ui_doc',false,true);
 
    for r:=1 to r_count do
    begin
@@ -929,10 +929,6 @@ begin
    gfx_LoadMWSModel(@spr_ubase3             ,folder_RaceBuildings[r_uac ] +'u_base30'  ,smt_buiding);
    gfx_LoadMWSModel(@spr_ubase4             ,folder_RaceBuildings[r_uac ] +'u_base40'  ,smt_buiding);
    gfx_LoadMWSModel(@spr_ubase5             ,folder_RaceBuildings[r_uac ] +'u_base50'  ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild0            ,folder_RaceBuildings[r_uac ] +'build00'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild1            ,folder_RaceBuildings[r_uac ] +'build10'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild2            ,folder_RaceBuildings[r_uac ] +'build20'   ,smt_buiding);
-   gfx_LoadMWSModel(@spr_ubuild3            ,folder_RaceBuildings[r_uac ] +'build30'   ,smt_buiding);
 
    gfx_LoadMWSModel(@spr_db_h0              ,folder_Race[r_hell]+'db_h0'               ,smt_effect );
    gfx_LoadMWSModel(@spr_db_h1              ,folder_Race[r_hell]+'db_h1'               ,smt_effect );

@@ -11,9 +11,11 @@ begin
 
       PlayerSetAllowedUnits(playerN,[ UID_LostSoul,
                                       UID_Phantom ],
-                                    20      ,false);
+                                    scirmish_MaxLost
+                                            ,false);
       PlayerSetAllowedUnits(playerN,[ UID_HAltar  ],
-                                    3       ,false);
+                                    scirmish_MaxHAltar
+                                            ,false);
 
 
       if(map_generators>0)then
@@ -186,9 +188,10 @@ var
 u,i:byte;
 ts :shortstring;
 begin
+   ai_names_l:=ai_names_o;
    for u:=0 to ai_names_max-1 do
    for i:=0 to ai_names_max-1 do
-     if(u<>i)and(random(2)=0)then
+     if(u<>i)and(((map_seed+u*i) mod 3)=0)then
      begin
         ts:=ai_names_l[i];
         ai_names_l[i]:=ai_names_l[u];
@@ -202,7 +205,7 @@ begin
    randomize;
 
    g_tick         :=0;
-   G_Status       :=gs_running;
+   g_status       :=gs_running;
 
    KeyPoints_Clear;
    FillChar(g_missiles ,SizeOf(g_missiles ),0);
@@ -218,8 +221,6 @@ begin
    LastCreatedUnitP:=@g_units[LastCreatedUnit];
 
    PlayersSetDefault;
-
-   Game_ShuffleAINames;
 
    UnitStepTicks := 8;
 
@@ -441,7 +442,7 @@ function GameStart(check:boolean):boolean;
 begin
    GameStart:=false;
 
-   if(G_Started)
+   if(g_started)
    or(net_status=ns_client)
    then exit;
 
@@ -488,14 +489,14 @@ begin
    {$ELSE}
    menu_update:=true;
    {$ENDIF}
-   G_Started:=true;
+   g_started:=true;
 end;
 
 function GameBreak(check:boolean):boolean;
 begin
    GameBreak:=false;
 
-   if(not G_Started)
+   if(not g_started)
    or(net_status=ns_client)then exit;
 
    GameBreak:=true;
@@ -514,7 +515,7 @@ begin
 
    menu_ItemSelected:=0;
    {$ENDIF}
-   G_Started:=false;
+   g_started:=false;
    Game_DefaultAll;
 end;
 
@@ -524,7 +525,7 @@ begin
    GamePauseToggle:=false;
 
    case net_status of
-   ns_client  : case G_Status of
+   ns_client  : case g_status of
                 gs_running,
                 gs_paused0..
                 gs_paused7  : begin
@@ -533,12 +534,12 @@ begin
                               net_pause;
                               end;
                 end;
-   ns_server  : case G_Status of
+   ns_server  : case g_status of
                 gs_running  : begin
                                  GamePauseToggle:=true;
                                  if(check)then exit;
 
-                                 G_Status:=LocalPlayer;
+                                 g_status:=LocalPlayer;
                                  GameLog_Paused(LocalPlayer);
                               end;
                 gs_paused0..
@@ -546,8 +547,8 @@ begin
                                  GamePauseToggle:=true;
                                  if(check)then exit;
 
-                                 GameLog_Resumed(G_Status-gs_paused0);
-                                 G_Status:=gs_running;
+                                 GameLog_Resumed(g_status-gs_paused0);
+                                 g_status:=gs_running;
                               end;
                 end;
    end;
@@ -756,7 +757,6 @@ end;
 procedure game_MakeRandomSkirmish;
 var p:byte;
 begin
-   Game_ShuffleAINames;
    Map_randommap;
 
    case random(7) of
@@ -923,7 +923,7 @@ begin
                 if((net_ttl mod fr_fps2)=0)then menu_update:=true;
                 if(net_ping<net_MaxPing)then net_ping+=fr_FrameMS;
              end;
-             case G_Started of
+             case g_started of
              false: if(net_ttl>=TTLMaxClientLobby)then
                     begin
                        GameLog_PlayerTimeOut(p);
@@ -942,7 +942,7 @@ begin
              if(net_TimerLogSend>0)then net_TimerLogSend-=1;
           end;
 
-          if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(G_Started)and(G_Status=gs_running)and(not isobserver)and(not isdefeated)then
+          if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(g_started)and(g_status=gs_running)and(not isobserver)and(not isdefeated)then
           begin
              if(build_cd>0)then build_cd-=1;
              if(race=r_hell)and(res_HellPower<HellPower_Max)then
@@ -1005,7 +1005,7 @@ end;
 
 procedure game_LobbyTimer;
 begin
-   if(not G_Started)then
+   if(not g_started)then
      case net_status of
      ns_none,
      ns_server: if(g_LobbyTimer>0)then
@@ -1385,7 +1385,7 @@ begin
    ns_client: if(net_SvList)
               then net_ServerListProc
               else net_Client;
-   ns_server: if(G_Started)then
+   ns_server: if(g_started)then
                 with g_PlayersTemp[LocalPlayer] do
                 begin
                    cam_x:=ui_cam_x;
@@ -1393,9 +1393,9 @@ begin
                    cam_w:=ui_cam_w;
                    cam_h:=ui_cam_h;
                 end;
-   ns_none  : if(g_Started)and(MainMenu)then exit;
+   ns_none  : if(g_started)and(MainMenu)then exit;
    end;
-   if(G_Started)and(net_status<>ns_none)and(ui_playerPOV)then
+   if(g_started)and(net_status<>ns_none)and(ui_playerPOV)then
      if(not ui_ObserverPov(UIPlayer))
      then ui_playerPOV:=false
      else
@@ -1416,7 +1416,7 @@ begin
    game_LobbyTimer;
    game_PlayersCycle;
 
-   if(G_Started)and(G_Status=gs_running)then
+   if(g_started)and(g_status=gs_running)then
    begin
       g_cycle_order+=1;g_cycle_order:=g_cycle_order mod order_period;
       g_cycle_regen+=1;g_cycle_regen:=g_cycle_regen mod regen_period;

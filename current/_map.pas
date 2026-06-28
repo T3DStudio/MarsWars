@@ -1138,6 +1138,7 @@ begin
 gt_none,
 gt_scirmish: begin
    {$ENDIF}
+             Game_ShuffleAINames;
              map_BaseVars;
 
              map_ObstaclesGap:= 50;

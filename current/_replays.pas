@@ -327,7 +327,7 @@ begin
    camx:=byte(ui_cam_cx shr camXYt1b);
    camy:=byte(ui_cam_cy shr camXYt1b);
 
-   gs:=G_Status and %00111111;
+   gs:=g_status and %00111111;
    i :=gs;
    if(rpls_log_c>0)then i:=i or %10000000;
    if(rpls_vidx<>camx)
@@ -497,11 +497,12 @@ begin
          ui_playerPOV:=false;
 
          Map_Make;
+         menu_mseed:=c2s(map_seed);
          ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
 
          ui_Camera_Bounds;
          ui_tab    :=tab_controls;
-         G_Started :=true;
+         g_started :=true;
          MenuBack(true,false);
          ServerSide:=false;
       end;
@@ -513,8 +514,8 @@ i,gs: byte;
 begin
    if(rpls_file_pos>=rpls_file_size)then
    begin
-      if(G_Status=gs_running)then
-        G_Status:=gs_replayend;
+      if(g_status=gs_running)then
+        g_status:=gs_replayend;
       sys_uncappedFPS :=false;
       rpls_ForwardSkip:=0;
       exit;
@@ -523,21 +524,21 @@ begin
    if(rpls_file_LastErr<>0)then
    begin
       rpls_file_LastErrS:='('+w2s(rpls_file_LastErr)+')';
-      G_Status        :=gs_replayerror;
+      g_status        :=gs_replayerror;
       sys_uncappedFPS :=false;
       rpls_ForwardSkip:=0;
       exit;
    end;
 
-   gs:=G_Status;
+   gs:=g_status;
    if(rpls_ForwardSkip>1)then rpls_FastSkip:=true;
-   if(rpls_ForwardSkip<=0)and(G_Status=gs_running)and(not MainMenu)then rpls_ForwardSkip:=1;
+   if(rpls_ForwardSkip<=0)and(g_status=gs_running)and(not MainMenu)then rpls_ForwardSkip:=1;
    while(rpls_ForwardSkip>0)do
    begin
       replay_SavePlayPosition;
 
       i:=rudata_byte(true,0);
-      G_Status:=i and %00111111;
+      g_status:=i and %00111111;
 
       if((i and %10000000)>0)then rudata_log(rpls_player,true);
       if((i and %01000000)>0)then
@@ -546,7 +547,7 @@ begin
          rpls_vidy:=rudata_byte(true,0);
       end;
 
-      if(G_Status=gs_running)then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip);
+      if(g_status=gs_running)then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip);
 
       if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;
@@ -560,7 +561,7 @@ begin
       ui_Camera_Bounds;
    end;
 
-   if(gs=gs_replaypause)then G_Status:=gs;
+   if(gs=gs_replaypause)then g_status:=gs;
 end;
 
 procedure replay_Code;
@@ -571,17 +572,17 @@ begin
       then rpls_RecordTryPause-=1
       else
       begin
-         if(g_Started)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
+         if(g_started)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
          rpls_RecordTryPause:=fr_fps2;
       end;
    end
    else
      if(rpls_pstate=rpls_write)then replay_Abort;
 
-   if(not G_Started)or(rpls_pstate=rpls_none)or(g_type=gt_campaing)
+   if(not g_started)or(rpls_pstate=rpls_none)or(g_type=gt_campaing)
    then replay_Abort
    else
-     if(G_Started)then
+     if(g_started)then
      begin
         rpls_Ticks+=1;
         case rpls_pstate of
@@ -696,7 +697,7 @@ end;
 
 function replay_IsPaused:boolean;
 begin
-   replay_IsPaused:=(G_Status=gs_replaypause)or((gs_paused0<=G_Status)and(G_Status<=gs_paused7));
+   replay_IsPaused:=(g_status=gs_replaypause)or((gs_paused0<=g_status)and(g_status<=gs_paused7));
 end;
 
 function replay_Pause(check:boolean):boolean;
@@ -705,12 +706,12 @@ begin
 
    if(rpls_file_pos>=rpls_file_size)then exit;
 
-   if(G_Status=gs_running)then
+   if(g_status=gs_running)then
    begin
       replay_Pause:=true;
       if(check)then exit;
 
-      G_Status:=gs_replaypause;
+      g_status:=gs_replaypause;
       rpls_ForwardSkip:=0;
    end
    else
@@ -719,7 +720,7 @@ begin
         replay_Pause:=true;
         if(check)then exit;
 
-        G_Status:=gs_running;
+        g_status:=gs_running;
         rpls_ForwardSkip:=0;
      end;
 end;

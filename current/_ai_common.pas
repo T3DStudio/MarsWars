@@ -8,7 +8,7 @@ aic_GeneratorsEnergy       = 9000;
 aic_GeneratorsDestroyEnergy= 10000;
 aic_GeneratorsDestoryLimit = ul1*35;
 
-aic_TowerLifeTime          = fr_fps1*60;/// ???????
+aic_TowerLifeTime          = fr_fps1*60;
 
 aic_BaseIdle_r             = 50;
 
@@ -46,11 +46,11 @@ ai_generators_limit,
 ai_enemylimit_baseR2_grd,
 ai_enemylimit_baseR2_fly,
 
-ai_enemylimit_flyMech,
-ai_enemylimit_fly,
-ai_enemylimit_groundMech,
-ai_enemylimit_groundBio,
-ai_enemylimit_Towers,
+ai_enemyhits_flyMech,
+ai_enemyhits_fly,
+ai_enemyhits_groundMech,
+ai_enemyhits_groundBio,
+ai_enemyhits_Towers,
 
 ai_armylimit_ForTeleport,
 ai_armylimit_siedge,
@@ -327,12 +327,12 @@ begin
       case aip_skill of
       //              energy buil bar   forges dete  min   max            pause
       //                     ders racks        ctors tower tower     army  atta det  spec
-      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0   ,0   ,0   );//,0    ,0    ,0    ,0    ,0      ,0       ,0    ,0     ,0     ,0          ,0             ,0  ,[]);
-      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,0  ,10   ,150 ,90  ,240 );//,0    ,0    ,0    ,0    ,0      ,0       ,1    ,1     ,10    ,fr_fps1*120,12            ,0  ,[]);
-      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,30   ,100 ,60  ,180 );//,0    ,0    ,0    ,6    ,0      ,1       ,6    ,6     ,40    ,fr_fps1*40 ,45            ,1  ,[]);
-      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,55   ,50  ,30  ,120 );//,0    ,1    ,1    ,10   ,1      ,2       ,10   ,14    ,65    ,1          ,70            ,3  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,0   ,10  ,80  );//,1    ,1    ,1    ,12   ,1      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,4  ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
-      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,0   ,0   ,0   );//,1    ,1    ,1    ,12   ,2      ,2       ,5    ,14    ,120   ,1          ,MaxPlayerUnits,15 ,[UID_Pain,UID_ArchVile,UID_Medic,UID_ZMedic,UID_Engineer,UID_ZEngineer,UID_BFGMarine,UID_ZBFGMarine]);
+      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0   ,0   ,0   );
+      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,0  ,10   ,150 ,90  ,240 );
+      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,30   ,100 ,60  ,180 );
+      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,55   ,50  ,30  ,120 );
+      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,0   ,10  ,80  );
+      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,0   ,0   ,0   );
       end;
 
       if(aip_skill>1)
@@ -341,16 +341,19 @@ begin
 
       case aip_skill of
       0  :;
-      1  : aip_flags:=aif_allies_help;
+      1  : aip_flags:=aif_base_DefendOwn
+                     +aif_base_DefendAlly;
       2  : aip_flags:=aif_army_scout
                      +aif_base_advanceMain
-                     +aif_allies_help;
+                     +aif_base_DefendOwn
+                     +aif_base_DefendAlly;
       3  : aip_flags:=aif_army_scout
                      +aif_base_smart_order
                      +aif_base_advanceOther
                      +aif_base_advanceMain
                      +aif_ability_detection
-                     +aif_allies_help;
+                     +aif_base_DefendOwn
+                     +aif_base_DefendAlly;
       4  : aip_flags:=aif_army_scout
                      +aif_army_smart_order
                      +aif_base_suicide
@@ -360,7 +363,8 @@ begin
                      +aif_base_BuilderMove
                      +aif_ability_detection
                      +aif_ability_other
-                     +aif_allies_help;
+                     +aif_base_DefendOwn
+                     +aif_base_DefendAlly;
       else aip_flags:=aif_base_smart_order
                      +aif_base_suicide
                      +aif_base_advanceOther
@@ -374,12 +378,13 @@ begin
                      +aif_ability_detection
                      +aif_ability_other
                      +aif_ability_TowerRush
-                     +aif_allies_help;
+                     +aif_base_DefendOwn
+                     +aif_base_DefendAlly;
       end;
       if not(map_scenario in [mc_koth,mc_royale])then
       begin
-         if(aip_skill>2)and(random(2)=0)then aip_flags+=aif_army_early_attack0;
-         if(aip_skill>3)and(random(2)=0)then aip_flags+=aif_army_early_attack1;
+         if(aip_skill>2)and(random(2)=0)then aip_flags+=aif_army_early_attack1;
+         if(aip_skill>3)and(random(2)=0)then aip_flags+=aif_army_early_attack0;
       end;
       case aip_skill of
       6 : begin
@@ -387,7 +392,6 @@ begin
           end;
       7 : begin
           aip_flags+=aif_cheat_VisBuildings;
-          aip_flags+=aif_cheat_VisUnits;
           upgrs_cur[upgr_fprod_unit ]:=1;
           end;
       8 : begin
@@ -517,11 +521,11 @@ begin
 
    ai_enemylimit_baseR2_fly:= 0;
    ai_enemylimit_baseR2_grd:= 0;
-   ai_enemylimit_flyMech   := 0;
-   ai_enemylimit_fly       := 0;
-   ai_enemylimit_groundMech:= 0;
-   ai_enemylimit_groundBio := 0;
-   ai_enemylimit_Towers    := 0;
+   ai_enemyhits_flyMech    := 0;
+   ai_enemyhits_fly        := 0;
+   ai_enemyhits_groundMech := 0;
+   ai_enemyhits_groundBio  := 0;
+   ai_enemyhits_Towers     := 0;
 
    ai_armylimit_ForTeleport:= 0;
    ai_armylimit_siedge     := 0;
@@ -543,12 +547,11 @@ begin
         if(prod_unit_uid[i]>0)then
           with g_uids[i] do
           begin
-             // transportU in production
              if(uid_isfly)
              and(not uid_isbuilding)then
              begin
-                if(uid_TransportMax_Base>0)then ai_transport_cur+=uid_TransportMax_Base*prod_unit_uid[i];
-                if(uid_CanAttack)then ai_armylimit_fly+=uid_LimitUse*prod_unit_uid[i];
+                if(uid_TransportMax_Base>0)then ai_transport_cur+=prod_unit_uid[i]*uid_TransportMax_Base;
+                if(uid_CanAttack)then ai_armylimit_fly+=prod_unit_uid[i]*uid_LimitUse;
              end;
 
              if(uid_AI_Siedge)then ai_armylimit_siedge+=uid_LimitUse*prod_unit_uid[i];
@@ -556,7 +559,19 @@ begin
         if(units_uid_c[i]>0)then
           with g_uids[i] do
             if(uid_AI_Siedge)then
-              ai_armylimit_siedge+=uid_LimitUse*units_uid_c[i];
+              ai_armylimit_siedge+=units_uid_c[i]*uid_LimitUse;
+
+        if(units_uid_c[i]>0)then
+          with g_uids[i] do
+          begin
+             if(uid_isbuilding)
+             then ai_armylimit_alive_b+=units_uid_c[i]*uid_LimitUse
+             else ai_armylimit_alive_u+=units_uid_c[i]*uid_LimitUse;
+
+             if(uid_isfly)
+             and(not uid_isbuilding)
+             and(uid_CanAttack)then ai_armylimit_fly+=units_uid_c[i]*uid_LimitUse;
+          end;
      end;
 
    // scout candidate
@@ -1145,33 +1160,37 @@ begin
            if(newu^.group=aic_group_Scout)<(ai_ScoutCandidate_u^.group=aic_group_Scout)
            then exit
            else
-               if(newu^.unum<ai_ScoutCandidate_u^.unum)
-               then
-               else exit;
+             if(newu^.unum<ai_ScoutCandidate_u^.unum)
+             then
+             else exit;
 
    ai_ScoutCandidate_u:=newu;
 end;
 
 procedure ai_SetBDefend(pu,newu:PTUnit;ud:integer);
 begin
+   case(pu^.playeri=newu^.playeri)of
+   true : if((pu^.player^.aip_flags and aif_base_DefendOwn )=0)then exit;
+   false: if((pu^.player^.aip_flags and aif_base_DefendAlly)=0)then exit;
+   end;
+
    if(ai_BaseDef_u=nil)
    then
    else
-     {if(pu^.playeri=newu^.playeri)>(pu^.playeri=ai_BaseDef_u^.playeri)
-     then
-     else
-     if(pu^.playeri=newu^.playeri)<(pu^.playeri=ai_BaseDef_u^.playeri)
-     then exit
-     else }
-       if(pu^.mapZone=newu^.mapZone)>(pu^.mapZone=ai_BaseDef_u^.mapZone)
-       then
-       else
-       if(pu^.mapZone=newu^.mapZone)<(pu^.mapZone=ai_BaseDef_u^.mapZone)
-       then exit
-       else
-         if(ud<ai_BaseDef_d)
-         then
-         else exit;
+     case pu^.isfly of
+     true : if(ud<ai_BaseDef_d)
+            then
+            else exit;
+     false: if(pu^.mapZone=newu^.mapZone)>(pu^.mapZone=ai_BaseDef_u^.mapZone)
+            then
+            else
+            if(pu^.mapZone=newu^.mapZone)<(pu^.mapZone=ai_BaseDef_u^.mapZone)
+            then exit
+            else
+              if(ud<ai_BaseDef_d)
+              then
+              else exit;
+     end;
 
    ai_BaseDef_u:=newu;
    ai_BaseDef_d:=ud;

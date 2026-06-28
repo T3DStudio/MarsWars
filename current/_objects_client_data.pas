@@ -559,7 +559,7 @@ begin
    uid_AnimStepWalk:=15;
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Engineer);
-   setCommandSND(snd_scout_ready   ,snd_scout_move   ,snd_scout_move     ,snd_scout_select  ,snd_scout_select   );
+   setCommandSND(snd_engineer_ready   ,snd_engineer_move   ,snd_engineer_move     ,snd_engineer_select  ,snd_engineer_select   );
    setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
    setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
    setWeaponESND(0,nil,snd_repairing,0,0);
@@ -623,8 +623,8 @@ begin
    uid_AnimStepWalk:=16;
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Antiaircrafter);
-   setCommandSND(snd_engineer_ready,snd_engineer_move,snd_engineer_attack,snd_engineer_annoy,snd_engineer_select);
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
+   setCommandSND(snd_aairmarine_ready,snd_aairmarine_move,snd_aairmarine_attack,snd_aairmarine_annoy,snd_aairmarine_select);
+   setEffectEID (0,0  ,0           ,EID_InfantryGibs,0  );
    setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
    setWeaponESND(0,nil,snd_shot_rocket,0,0);
 end;
@@ -711,13 +711,13 @@ UID_UCommandCenter:
 begin
    setMWSModel(0,@spr_UCommandCenter);
    setBuildingSND(snd_uac_cc);
-   setWeaponESND(0    ,nil,snd_shot_plasma,0,0);
+   setWeaponESND(0    ,nil,snd_shot_flyer,0,0);
 end;
 UID_UACommandCenter:
 begin
    setMWSModel(0,@spr_UACommandCenter);
    setBuildingSND(snd_uac_cc);
-   setWeaponESND(0    ,nil,snd_shot_plasma,0,0);
+   setWeaponESND(0    ,nil,snd_shot_flyer,0,0);
 end;
 UID_UBarracks:
 begin
@@ -847,26 +847,6 @@ begin
    setBuildingSND(snd_uac_cc);
 end;
 
-UID_UCBuild0:
-begin
-   setMWSModel(0,@spr_ubuild0);
-   setBuildingSND(snd_uac_suply);
-end;
-UID_UCBuild1:
-begin
-   setMWSModel(0,@spr_ubuild1);
-   setBuildingSND(snd_uac_suply);
-end;
-UID_UCBuild2:
-begin
-   setMWSModel(0,@spr_ubuild2);
-   setBuildingSND(snd_uac_suply);
-end;
-UID_UCBuild3:
-begin
-   setMWSModel(0,@spr_ubuild3);
-   setBuildingSND(snd_uac_suply);
-end;
 UID_USPort  :
 begin
    setMWSModel(0,@spr_starport);

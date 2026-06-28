@@ -553,7 +553,6 @@ TUID = record
    uid_str_NameHK,
    uid_str_CostLimit,
    uid_str_DefaultAttr,
-   uid_str_RebuildHint,
    uid_str_ArmsCommon,
    uid_str_Reqs,
    uid_str_Prod,

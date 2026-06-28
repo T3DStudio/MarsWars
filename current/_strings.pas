@@ -450,6 +450,7 @@ begin
    begin
       uid_str_name        :=NAME;
       uid_str_BaseDescript:=DESCR;
+      str_EndDot(@uid_str_BaseDescript);
    end;
 end;
 procedure str_SetUnitBalanceHint(uids:TSoB;hintG,hintB,hintU:shortstring);
@@ -1012,8 +1013,6 @@ begin
           then uid_str_Prod:=str_hint_bprod+ITEMP
           else uid_str_Prod:=str_hint_uprod+ITEMP;
 
-        uid_str_RebuildHint:='';
-
         ITEMP:='';
         if(uid_req_uid1>0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [uid_req_uid1].uid_str_name ,uid_req_uid1n),sep_comma);
         if(uid_req_uid2>0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [uid_req_uid2].uid_str_name ,uid_req_uid2n),sep_comma);
@@ -1051,9 +1050,9 @@ begin
         if(uid_HaveAbility)then
         begin
            AddLineUnitGameHint(str_hint_Abilities);
-           if(uid_ability1>0)then AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability1,255));
-           if(uid_ability2>0)then AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));
-           if(uid_ability3>0)then AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));
+           if(uid_ability1>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability1,255));AddLineUnitGameHint(g_aids[uid_ability1].ua_str_Descript); end;
+           if(uid_ability2>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));AddLineUnitGameHint(g_aids[uid_ability2].ua_str_Descript); end;
+           if(uid_ability3>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));AddLineUnitGameHint(g_aids[uid_ability3].ua_str_Descript); end;
         end;
         AddLineUnitGameHint(uid_str_Reqs);
         AddLineUnitGameHint(uid_str_Prod);

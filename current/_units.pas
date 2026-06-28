@@ -1002,6 +1002,7 @@ begin
    end;
 end;
 
+{$IFDEF _FULLGAME}
 procedure unit_AllCycleClient(pu:PTUnit);
 var
 uc,ud  : integer;
@@ -1024,6 +1025,7 @@ begin
           end;
        end;
 end;
+{$ENDIF}
 
 function unit_Load(pTransport,pPassenger:PTUnit):boolean;
 begin

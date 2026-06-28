@@ -853,7 +853,7 @@ begin
            draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
            draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColorDef(playeri));
-           draw_text(vid_screen,ix,iy+30,b2c[buffs[ub_AltMode]>0], ta_LU,255, PlayerGetColorDef(playeri));
+           draw_text(vid_screen,ix,iy+30,i2s(aiu_NeedDetect), ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));

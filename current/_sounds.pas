@@ -215,7 +215,7 @@ begin
    draw_LoadingScreen(@str_loading_msc,c_aqua);
    snd_SoundSetUnLoad(snd_music_game);
 
-   snd_music_game:=snd_MusicSetLoad('music\game\',snd_musicListSize);
+   snd_music_game:=snd_MusicSetLoad(folder_music_game,snd_musicListSize);
 end;
 
 procedure snd_SoundShafleSoundSet(SoundSet:PTSoundSet);
@@ -585,7 +585,7 @@ end;
 procedure snd_SoundMusicControll(ForceNextTreck:boolean);
 var current_music_ss: PTSoundSet;
 begin
-   if(G_Started)
+   if(g_started)
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
 
@@ -610,7 +610,7 @@ begin
    if(snd_command_ticks>0)then snd_command_ticks-=1;
    if(snd_mmap_ticks   >0)then snd_mmap_ticks   -=1;
 
-   if(G_Started)and(G_status=gs_running)and(not MainMenu)and(ui_UnitSelSound)then
+   if(g_started)and(g_status=gs_running)and(not MainMenu)and(ui_UnitSelSound)then
    begin
       snd_SoundPlayUnitSelect;
       ui_UnitSelSound:=false;
@@ -646,7 +646,7 @@ begin
      end;
 
    snd_GameMusicReLoad;
-   snd_music_menu:=snd_MusicSetLoad('music\menu\',snd_musicListSize);
+   snd_music_menu:=snd_MusicSetLoad(folder_music_menu,snd_musicListSize);
 
    snd_SoundShafleSoundSet(snd_music_menu);
    snd_SoundShafleSoundSet(snd_music_game);
@@ -748,15 +748,15 @@ begin
    snd_commando_select      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'commando\select'    );
    snd_commando_move        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'commando\move'      );
 
-   snd_engineer_ready       :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\ready'     );
-   snd_engineer_annoy       :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\annoy'     );
-   snd_engineer_attack      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\attack'    );
-   snd_engineer_select      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\select'    );
-   snd_engineer_move        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\move'      );
+   snd_aairmarine_ready     :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'antiaircrafter\ready' );
+   snd_aairmarine_annoy     :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'antiaircrafter\annoy' );
+   snd_aairmarine_attack    :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'antiaircrafter\attack');
+   snd_aairmarine_select    :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'antiaircrafter\select');
+   snd_aairmarine_move      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'antiaircrafter\move'  );
 
-   snd_scout_ready          :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'scout\ready'        );
-   snd_scout_select         :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'scout\select'       );
-   snd_scout_move           :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'scout\go'           );
+   snd_engineer_ready       :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\ready'     );
+   snd_engineer_select      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\select'    );
+   snd_engineer_move        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'engineer\go'        );
 
    snd_medic_ready          :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'medic\ready'        );
    snd_medic_annoy          :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'medic\annoy'        );

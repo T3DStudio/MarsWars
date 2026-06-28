@@ -4,6 +4,20 @@
 //   AI DATA
 //
 
+function ai_VisionOnUnit(pDetector,pTarget:PTUnit;SkipInvisCheck:boolean):boolean;
+begin
+   ai_VisionOnUnit:=false;
+   if(pDetector^.player^.state=ps_AI)then
+     if(pTarget^.buffs[ub_Invisibility]<=0)
+     or(pTarget^.hits<=0)
+     or(SkipInvisCheck)then
+       case pTarget^.uid^.uid_isbuilding of
+       true : if((pDetector^.player^.aip_flags and aif_cheat_VisBuildings)>0)then begin ai_VisionOnUnit:=true;exit;end;
+       false: if((pDetector^.player^.aip_flags and aif_cheat_VisUnits    )>0)then begin ai_VisionOnUnit:=true;exit;end;
+       end;
+   ai_VisionOnUnit:=CheckUnitTeamVision(pDetector^.player^.team,pTarget,SkipInvisCheck);
+end;
+
 procedure ai_Local_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit);
 begin
    with pu^     do
@@ -22,9 +36,7 @@ begin
        end
        else
          if(tu^.buffs[ub_SphereInvuln]<=0)then
-           if(CheckUnitTeamVision(team,tu,ai_AvailableDetectors>0))
-           or(((aip_flags and aif_cheat_VisBuildings)>0)and(    tu^.uid^.uid_isbuilding))
-           or(((aip_flags and aif_cheat_VisUnits    )>0)and(not tu^.uid^.uid_isbuilding))then  // enemy in vision
+           if(ai_VisionOnUnit(pu,tu,ai_AvailableDetectors>0))then  // enemy in vision
            begin
               if((ud<srange)and not uid_AI_Melee)
               or(isfly)
@@ -39,11 +51,13 @@ begin
               if (ud<base_r1h)
               and(tu^.uid^.uid_CanAttack)then aiu_limitaround_enemy+=tu^.uid^.uid_LimitUse;
 
-              if(ud<srange)and(tu^.a_rld>0)then
+              if(ud<srange)
+              //and(tu^.a_rld>0)
+              //and(tu^.uid^.uid_CanAttack)
+              then
                 if (tu^.buffs[ub_Invisibility]>0)
                 and(tu^.TeamDetection[team]<=0)
-                and(tu^.uid^.uid_CanAttack)
-                then aiu_NeedDetect:=min2i(aiu_NeedDetect,ud-srange);   // ???????
+                then aiu_NeedDetect:=min2i(aiu_NeedDetect,ud-srange);
            end;
 end;
 
@@ -109,34 +123,36 @@ begin
       if(tu^.uid^.uid_CanAttack)then // can attack
       begin
          // towers
-         if(ud<srange)and(tu^.uid^.uid_isbuilding)and(not tu^.isfly)and(tu<>pu)then
+         if (ud<srange)
+         and(tu^.uid^.uid_isbuilding)
+         and(not tu^.isfly)
+         and(tu<>pu)then
          begin
             if(tu^.uid^.uid_CanAttackGround)then ai_towers_near_AG+=1;
             if(tu^.uid^.uid_CanAttackAir   )then ai_towers_near_AA+=1;
          end;
+         // active detection
+         // hell eye target
          if(tu^.iscomplete)then
-         begin
-            // active detection
-            // hell eye target
-            if(tu^.buffs[ub_Detector]<=0)and(tu^.buffs[ub_HellVision]<=0)then
-              setNearestTarget(@ai_need_heye_u,@ai_need_heye_d,tu^.aiu_NeedDetect);
-         end;
+           if (tu^.buffs[ub_Detector  ]<=0)
+           and(tu^.buffs[ub_HellVision]<=0)then
+             setNearestTarget(@ai_need_heye_u,@ai_need_heye_d,tu^.aiu_NeedDetect);
       end;
 
       // teleporter beacon
       if(tu^.aiu_alarm_d<NOTSET)
       and(tu^.mapZone=tu^.aiu_alarm_zone)
-      and(not map_IfObstacleZone(tu^.aiu_alarm_zone))
       and(tu^.mapZone<>mapZone)
+      and(not map_IfObstacleZone(tu^.aiu_alarm_zone))
       and(not map_IfObstacleZone(tu^.mapZone))then
         setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for KOTH
       if(map_scenario=mc_koth)then
         with map_KeyPointsL[0] do
-          if (not map_IfObstacleZone(kp_Zone))
-          and(tu^.mapZone=kp_Zone)
-          and(tu^.mapZone<>mapZone)then
+          if (tu^.mapZone=kp_Zone)
+          and(tu^.mapZone<>mapZone)
+          and(not map_IfObstacleZone(kp_Zone))then
             setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for generator capture
@@ -154,8 +170,7 @@ begin
       and(tu^.uid^.uid_isbuilding   )
       and(tu^.uidi<>UID_HEye )
       and(tu^.aiu_alarm_d<base_r1h)then
-        //if((tu^.aiu_limitaround_enemy-tu^.aiu_limitaround_ally)>=0)then
-          ai_SetBDefend(pu,tu,ud);
+        ai_SetBDefend(pu,tu,ud);
 
       // nearest base
       if (tu^.uidi<>UID_HEye)
@@ -178,28 +193,37 @@ begin
         or(ud<    srange)then ai_near_HEye+=1;
 
       // magic targets
-      if(ability_CheckTarget_UACGeneral   (team,tu))then ai_SetTarget_UACGeneral   (tu);
-      if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
-      if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
-      if(tu^.group<>aic_group_Scout)or(tu^.player^.state<>ps_AI)then
-      begin
-      if(ability_CheckTarget_SphereInvuln (team,tu))then ai_SetTarget_SphereInvuln (tu);
-      if(ability_CheckTarget_SphereRDamage(team,tu))then ai_SetTarget_SphereRDamage(tu);
-      if(ability_CheckTarget_SphereDDamage(team,tu))then ai_SetTarget_SphereDDamage(tu);
-      if(ability_CheckTarget_SphereTurbo  (team,tu))then ai_SetTarget_SphereTurbo  (tu);
+      case uidi of
+      UID_UAcademy        : if(ability_CheckTarget_UACGeneral   (team,tu))then ai_SetTarget_UACGeneral   (tu);
+      UID_UHPowerConductor: begin
+                            if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
+                            if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
+                            end;
       end;
 
+      if(tu^.group<>aic_group_Scout)
+      or(tu^.player^.state<>ps_AI)then
+        case uidi of
+        UID_UHPowerConductor: if(ability_CheckTarget_SphereInvuln (team,tu))then ai_SetTarget_SphereInvuln (tu);
+        UID_HAltar          : begin
+                              if(ability_CheckTarget_SphereRDamage(team,tu))then ai_SetTarget_SphereRDamage(tu);
+                              if(ability_CheckTarget_SphereDDamage(team,tu))then ai_SetTarget_SphereDDamage(tu);
+                              if(ability_CheckTarget_SphereTurbo  (team,tu))then ai_SetTarget_SphereTurbo  (tu);
+                              end;
+        end;
+
       // repair/heal target
-      if(pfcheck)
-      or(isattackable)then
-        if (tu^.iscomplete)
-        and(tu^.hits<tu^.uid^.uid_MaxHits1)
-        and(tu^.uid^.uid_Regen_Base>=0)then
-          if(speed>tu^.speed)
-          or(ud<srange)then
-            if(tu^.uid^.uid_ismech)
-            then setNearestTarget(@ai_RepairTar_u,@ai_RepairTar_d,ud)
-            else setNearestTarget(@ai_HealTar_u  ,@ai_HealTar_d  ,ud);
+      if(uid_AI_Healer)then
+        if(pfcheck)
+        or(isattackable)then
+          if (tu^.iscomplete)
+          and(tu^.hits<tu^.uid^.uid_MaxHits1)
+          and(tu^.uid^.uid_Regen_Base>=0)then
+            if(speed>tu^.speed)
+            or(ud<srange)then
+              if(tu^.uid^.uid_ismech)
+              then setNearestTarget(@ai_RepairTar_u,@ai_RepairTar_d,ud)
+              else setNearestTarget(@ai_HealTar_u  ,@ai_HealTar_d  ,ud);
    end;
 end;
 
@@ -209,60 +233,63 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(CheckUnitTeamVision(team,tu,false))
-      or(((aip_flags and aif_cheat_VisBuildings)>0)and(    tu^.uid^.uid_isbuilding))
-      or(((aip_flags and aif_cheat_VisUnits    )>0)and(not tu^.uid^.uid_isbuilding))then  // enemy in vision
+      if(ai_VisionOnUnit(pu,tu,ai_AvailableDetectors>0))then  // enemy in vision
       begin
          if(tu^.buffs[ub_SphereInvuln]<=0)then
          begin
-            // enemy other
-            if(not tu^.isfly)or(tu^.uid^.uid_FlyLevelLikeTarget)then
+            // enemy
+            if(not tu^.isfly)
+            or(tu^.uid^.uid_FlyLevelLikeTarget)then
             begin
                setNearestTarget(@ai_enemy_grd_u,@ai_enemy_grd_d,ud);
-               if(tu^.uid^.uid_CanAttack)then
-               begin
-                  if(ud<base_r2)then ai_enemylimit_baseR2_grd+=tu^.uid^.uid_LimitUse;
-               end;
+               if(tu^.uid^.uid_CanAttack)
+               and(ud<base_r2)then ai_enemylimit_baseR2_grd+=tu^.uid^.uid_LimitUse;
             end
             else
             begin
                setNearestTarget(@ai_enemy_air_u,@ai_enemy_air_d,ud);
-               if(tu^.uid^.uid_CanAttack)then
-               begin
-                  if(ud<base_r2)then ai_enemylimit_baseR2_fly+=tu^.uid^.uid_LimitUse;
-               end;
+               if(tu^.uid^.uid_CanAttack)
+               and(ud<base_r2)then ai_enemylimit_baseR2_fly+=tu^.uid^.uid_LimitUse;
             end;
             if(tu^.uid^.uid_isbuilding)and(pfcheck)then
               if(not tu^.isfly)
               or(isattackable)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
             if(tu^.uid^.uid_CanAttack)then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
 
+            // invis enemy in vision
+            if (tu^.a_rld>0)
+            and(tu^.buffs[ub_Invisibility]>0)
+            and(tu^.TeamDetection[team]<=0)then
+              setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
+
             // uac strike target
-            ai_SetTarget_Strike(tu);
+            if(uidi=UID_URMStation)then
+              ai_SetTarget_Strike(tu);
 
             // Primary Target
-            if(ud<=srange)and(isattackable)and(tu^.uid^.uid_AI_TargetWeight>0)then ai_SetPrimaryTarget(tu);
+            if(ud<=srange)and(uid_CanAttack)then
+              if(isattackable)and(tu^.uid^.uid_AI_TargetWeight>0)then ai_SetPrimaryTarget(tu);
          end;
 
          if(tu^.uid^.uid_isbuilding)then
          begin
             if(tu^.isfly)
-            then ai_enemylimit_fly   +=tu^.uid^.uid_LimitUse
-            else ai_enemylimit_Towers+=tu^.uid^.uid_LimitUse*3;
+            then ai_enemyhits_fly   +=tu^.hits
+            else ai_enemyhits_Towers+=tu^.hits*3;
          end
          else
            if(tu^.isfly)then
            begin
-              ai_enemylimit_fly    +=tu^.uid^.uid_LimitUse;
+              ai_enemyhits_fly    +=tu^.hits;
               if(tu^.uid^.uid_ismech)then
-              ai_enemylimit_flyMech+=tu^.uid^.uid_LimitUse;
+              ai_enemyhits_flyMech+=tu^.hits;
            end
            else
              if(tu^.uid^.uid_ismech)
-             then ai_enemylimit_groundMech+=tu^.uid^.uid_LimitUse
-             else ai_enemylimit_groundBio +=tu^.uid^.uid_LimitUse;
+             then ai_enemyhits_groundMech+=tu^.hits
+             else ai_enemyhits_groundBio +=tu^.hits;
 
-         if(ud<srange)then
+         if(ud<srange)and(race=r_UAC)and(units_uid_c[UID_UAcademy]>0)then
            case tu^.uid^.uid_isbuilding of
            true : if(ability_CheckTarget_Bribe(team,tu,true ))then ai_SetTarget_Hack (tu);
            false: if(ability_CheckTarget_Bribe(team,tu,false))then ai_SetTarget_Bribe(tu);
@@ -273,11 +300,6 @@ begin
            if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then
              if((ud-uid_r-tu^.uid^.uid_r)<=melee_r)then ai_PhantomWantZombieMe:=true;  }
       end;
-
-      if(CheckUnitTeamVision(team,tu,true))then    // invis enemy in vision
-        if(tu^.a_rld>0){or(tu^.uo_bx>-1)or(tu^.uo_id=ua_hold)}then   // ????????
-          if(tu^.buffs[ub_Invisibility]>0)and(tu^.TeamDetection[team]<=0){and(tu^.buffs[ub_Scaned]<=0)}then
-            setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
    end;
 end;
 
@@ -405,9 +427,9 @@ begin
       end;
 
       // armylimit
-      if(tu^.uid^.uid_isbuilding)
+      {if(tu^.uid^.uid_isbuilding)
       then ai_armylimit_alive_b+=tu^.uid^.uid_LimitUse
-      else ai_armylimit_alive_u+=tu^.uid^.uid_LimitUse;
+      else ai_armylimit_alive_u+=tu^.uid^.uid_LimitUse;}
 
       // detection near
       if(ud<=srange)then
@@ -463,15 +485,9 @@ begin
          if(player=tu^.player)then for_AliveOwn;
       end;
 
-      if (playeri=tu^.playeri)
-      and(tu^.isfly)
-      and(not tu^.uid^.uid_isbuilding)
-      and(tu^.uid^.uid_CanAttack)then
-        ai_armylimit_fly+=tu^.uid^.uid_LimitUse;
-
       if(tu^.uid^.uid_ZombieUID>0)and(pfcheck)then
         if(hits_fdead<tu^.hits)and(tu^.hits<=tu^.uid^.uid_ZombieHits)then
-          if(CheckUnitTeamVision(team,tu,false))then
+          if(ai_VisionOnUnit(pu,tu,false))then
             setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
    end;
 end;

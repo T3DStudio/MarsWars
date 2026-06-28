@@ -338,6 +338,8 @@ begin
    if(menu_HelpIList<>nil)then
      with menu_HelpIList^ do
        drawmenu_StringArray(tar,mi_help_InfoList,@slist_l,slist_n,menu_HelpScroll,-1,txt_line_h1,-1,ui_DocListH,false,true);
+   if(menu_HelpPage=mi_help_GameUI)then
+     drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg1,0);
 end;
 
 procedure drawmenu_BlockHelpUnitsInfo(tar:pSDL_Surface;forBalance:boolean=false);  // HELP UNITS TABLE
@@ -477,7 +479,7 @@ begin
      else drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,PlayerStateString(p),color);
 
           drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name                ,color);
-          if(G_Started)and(isdefeated)and(length(name)>0)then
+          if(g_started)and(isdefeated)and(length(name)>0)then
             with menu_items[mi_Players_AIskil0+p] do
               if(mi_state>as_off)then
                 hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
@@ -636,6 +638,7 @@ end;
 
 procedure drawmenu_Update(tar:pSDL_Surface); //////////////////////////////////////
 var i:byte;
+ix,iy:integer;
 begin
    // COMMON
    if(menu_DarkBack)
@@ -759,6 +762,18 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
      with menu_items[menu_hint_pos[menu_ItemTarget]] do
        draw_text(tar,mi_x1-font_w1,mi_y0-font_wh,drawmenu_ItemActsStr+str_menu_hint[menu_ItemTarget],ta_RB,255,c_white);
 
+   //menu_image
+   if(menu_image<>nil)then
+   begin
+      boxColor(tar,0,0,menu_w,menu_h,c_ablack);
+      ix:=menu_hw-(menu_image^.w div 2);
+      iy:=menu_hh-(menu_image^.h div 2);
+      draw_text(tar,ix+(menu_image^.w div 2),iy-font_w1,str_menuMsg_HintImg,ta_MB,255,c_white);
+      draw_sdlsurface(tar,ix,iy,menu_image);
+      rectangleColor(tar,ix,iy,
+                         ix+menu_image^.w,iy+menu_image^.h,c_white);
+   end;
+
    // MESSAGE BOX
    if(menu_msg_type<>mmbt_none)then
    begin
@@ -789,8 +804,6 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
                           end;
       end;
    end;
-
-
     {
    // replays
    draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_LU  ,255, c_white);

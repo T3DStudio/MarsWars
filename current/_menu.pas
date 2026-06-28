@@ -119,6 +119,12 @@ end;
 //
 //   MENU ACTIONS
 
+procedure menu_ToggleFullScreen;
+begin
+   vid_windowed:=not vid_windowed;
+   vid_MakeScreen;
+end;
+
 procedure menu_ControlPanelPosScroll(forward:boolean);
 begin
    ScrollByte(@ui_ControlPanelPos,forward,0,ui_MaxControlPanelPos);
@@ -147,7 +153,7 @@ end;
 
 function PlayerNameChangeble:boolean;
 begin
-   PlayerNameChangeble:=(net_status=ns_none)and(not G_Started);
+   PlayerNameChangeble:=(net_status=ns_none)and(not g_started);
 end;
 
 
@@ -157,7 +163,7 @@ begin
 
    if(net_status=ns_client)
    or(rpls_pstate<>rpls_none)
-   or(G_Started)
+   or(g_started)
    or(menu_msg_type<>mmbt_none)
    then exit;
 
@@ -203,7 +209,7 @@ begin
              if(net_status<>ns_none)
              or(rpls_pstate=rpls_read)
              or(g_LobbyTimer>0)
-             or(G_Started)
+             or(g_started)
              {$IFDEF NONETINTEST}
              {$IFDEF TESTMODE}
              or(TestMode>0)
@@ -244,7 +250,7 @@ begin
    GameNetServerList:=false;
 
    if(rpls_pstate<>rpls_none)
-   or(G_Started)
+   or(g_started)
    or(menu_msg_type<>mmbt_none)then exit;
 
    case start of
@@ -303,7 +309,7 @@ begin
    GameNetServerListConnect:=false;
 
    if(rpls_pstate<>rpls_none)
-   or(G_Started)
+   or(g_started)
    or(net_status<>ns_client)
    or(not net_SvList)
    or(length(menu_ClientAddress)=0)
@@ -613,6 +619,10 @@ begin
                             tx:=mtx0+menu_BigButtonW+menu_BaseW1;
                             menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
                                                            tx+(ui_DocLineLen2*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH,true);
+                            //
+                            if(menu_HelpPage=mi_help_GameUI)then
+                              menu_Item_Set(mi_help_GameUIImg1,tx                ,menu_underCaptionY-menu_BigButtonH,
+                                                               tx+menu_BigButtonW,menu_underCaptionY                ,true);
                          end;
    mi_help_UnitsBalance,
    mi_help_UnitsInfo   : begin
@@ -1119,7 +1129,7 @@ mi_SV_ResolutionApply  : if(not check)then
                             theme_map_pTerrain:=255;
                             gfx_MapMakeTerrain;
                          end;
-mi_SV_Windowed         : if(not check)then begin vid_windowed:=not vid_windowed; vid_MakeScreen;end;
+mi_SV_Windowed         : if(not check)then menu_ToggleFullScreen;
 mi_SV_ShowFPS          : if(not check)then vid_ShowFPS:=not vid_ShowFPS;
 mi_SV_MenuScaling      : if(not check)then menu_scale:=not menu_scale;
 mi_SV_SmoothScaled     : if(not check)then menu_ScaleSmooth:=not menu_ScaleSmooth;
@@ -1228,7 +1238,7 @@ mi_help_Credits
                             mi_help_GameControls : menu_HelpIList:=@str_doc_BaseControls;
                             mi_help_GameMechanics: menu_HelpIList:=@str_doc_BaseMechanics;
                             mi_help_GameHotKeys  : menu_HelpIList:=@str_doc_HotKeys;
-                            mi_help_GameUI       : ;
+                            mi_help_GameUI       : menu_HelpIList:=@str_doc_GameUI;
                             mi_help_UnitsBalance : if(not IsUIDValidForHelpTable(menu_HelpUID,true))then menu_HelpUID:=0;
                             mi_help_UnitsInfo    : menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
                             mi_help_Other        : menu_HelpIList:=@str_doc_Other;
@@ -1244,6 +1254,8 @@ mi_help_InfoPanel      : case menu_HelpPage of
                                              end;
                          else menu_Controls_MLB:=false;
                          end;
+mi_help_GameUIImg1     : if(not check)then menu_image:=spr_ui_doc;
+
 // CAMPAIGNS
 mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,true,0,camp_Maxdiff);
 mi_camp_Campaigns      : if(not check)then menu_ListMouseXY2Line(item,@camp_sel    ,camp_scroll    ,menu_CampLineH);
@@ -1476,6 +1488,19 @@ begin
 
    if(menu_msgBox_Code)then
    begin
+      mouse_x:=mnx;
+      mouse_y:=mny;
+      exit;
+   end;
+
+   if(menu_image<>nil)then
+   begin
+      if(InputActionPressed(iAct_any))then
+      begin
+         menu_image:=nil;
+         clickSound:=true;
+         changed:=true;
+      end;
       mouse_x:=mnx;
       mouse_y:=mny;
       exit;

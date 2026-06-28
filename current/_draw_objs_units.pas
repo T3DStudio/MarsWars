@@ -620,7 +620,7 @@ begin
         if(buffs[ub_Cast]>0)then exit;
 
       wanim:=false;
-      if(G_Status=gs_running)then
+      if(g_status=gs_running)then
         if(unit_canMove(pu))then
           wanim:=(x<>move_x)or(y<>move_y)or(x<>vx)or(y<>vy);
 

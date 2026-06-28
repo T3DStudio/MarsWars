@@ -22,7 +22,7 @@ begin
             isready      :=false;
             PlayerClearLog(p);
             PlayerSetDefault(p);
-            if(G_Started)
+            if(g_started)
             or(g_LobbyTimer>0)then isobserver:=true;
             {$IFNDEF _FULLGAME}
             GameLog_Chat(p,0,'MarsWars dedicated server, '+str_ver);
@@ -85,7 +85,7 @@ begin
       tbool  :=isready;
       isready:=net_readbool;
       if(tbool<>isready)then
-        if(not G_Started)and(g_LobbyTimer<=0)then
+        if(not g_started)and(g_LobbyTimer<=0)then
         begin
            GameLog_PlayerReadyStat(pid);
            menu_update:=true;
@@ -144,7 +144,7 @@ var p:byte;
 begin
    net_clearbuffer;
    net_writebyte(nmid_LobbyInfo);
-   net_writebool(G_Started);
+   net_writebool(g_started);
 
    for p:=0 to LastPlayer do
      with g_PlayersMain[p] do
@@ -159,7 +159,7 @@ begin
         net_writebool(isready );
         net_writeword(net_ttl );
         net_writeword(net_ping);
-        if(G_Started)then
+        if(g_started)then
         net_writebyte(race    );
      end;
 
@@ -177,7 +177,7 @@ begin
    net_writebyte(g_AISlots       );
    net_writebool(g_NewObservers  );
 
-   if(G_Started)and(not g_FixedPositions)then
+   if(g_started)and(not g_FixedPositions)then
      for p:=0 to LastPlayer do
      begin
         net_writeint(map_PlayerStartX[p]);
@@ -202,12 +202,12 @@ begin
    i:=net_GetPlayer(net_LastinIP,net_LastinPort);
    if(i<=LastPlayer)then
    begin
-      if(not G_Started)then
+      if(not g_started)then
         net_ServerReadPlayerData(i);
       net_SendGameLobbyInfo(i);
    end
    else
-     if((G_Started)or(g_LobbyTimer>0))and(not g_NewObservers)then
+     if((g_started)or(g_LobbyTimer>0))and(not g_NewObservers)then
      begin
         net_clearbuffer;
         net_writebyte(nmid_NoNewObservers);
@@ -297,7 +297,7 @@ begin
                                    end;
             nmid_PlayerLeave     : begin
                                       GameLog_PlayerLeave(pid);
-                                      case G_Started of
+                                      case g_started of
                                       false: PlayerSetState(pid,ps_None);
                                       true : begin
                                                 PlayerKill(pid,true);
@@ -307,7 +307,7 @@ begin
                                       menu_update:=true;
                                    end;
             else
-               if(G_Started)then
+               if(g_started)then
                  case mid of
                  nmid_order          : with g_PlayersMain[pid]do
                                        with g_PlayersTemp[pid]do
@@ -352,15 +352,15 @@ begin
                                           cam_h   :=net_readint;
                                        end;
                  nmid_pause          : begin
-                                          if(G_Status<=LastPlayer)then
+                                          if(g_status<=LastPlayer)then
                                           begin
-                                             G_Status:=gs_running;
+                                             g_status:=gs_running;
                                              GameLog_Resumed(pid);
                                           end
                                           else
-                                            if(G_Status=gs_running)then
+                                            if(g_status=gs_running)then
                                             begin
-                                               G_Status:=pid;
+                                               g_status:=pid;
                                                GameLog_Paused(pid);
                                             end;
                                          {$IFNDEF _FULLGAME}
@@ -439,12 +439,12 @@ begin
        with g_PlayersTemp[pid] do
          if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
-            if(G_Started)and(net_TimerBase=0)then
+            if(g_started)and(net_TimerBase=0)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_GameData);
-               net_writebyte(G_Status);
-               case G_Status of
+               net_writebyte(g_status);
+               case g_status of
                gs_running    : wclinet_gframe(pid,net_SendTimeServer,false);
                gs_waitplayers: net_WritePlayersDelay;
                end;
@@ -637,7 +637,7 @@ nmid_NoNewObservers
                       exit;
                    end;
 nmid_NotConnected: begin
-                      G_Started  :=false;
+                      g_started  :=false;
                       MainMenu   :=true;
                       PlayerReady:=false;
                       Game_DefaultAll;
@@ -680,10 +680,10 @@ nmid_LobbyInfo    : begin
 
                       net_ClientReadLobbyMapData(svstarted);
 
-                      if(svstarted<>G_Started)then
+                      if(svstarted<>g_started)then
                       begin
-                         G_Started:=svstarted;
-                         if(G_Started)then
+                         g_started:=svstarted;
+                         if(g_started)then
                          begin
                             MainMenu  :=false;
                             ServerSide:=false;
@@ -697,10 +697,10 @@ nmid_LobbyInfo    : begin
                          end;
                       end;
                    end;
-nmid_GameData    : if(G_Started)then
+nmid_GameData    : if(g_started)then
                    begin
-                      G_Status:=net_readbyte;
-                      case G_Status of
+                      g_status:=net_readbyte;
+                      case g_status of
                       gs_running    : rclinet_gframe(LocalPlayer,net_SendTimeServer,false,false);
                       gs_waitplayers: net_ReadPlayersDelay;
                       end;
@@ -712,7 +712,7 @@ nmid_GameData    : if(G_Started)then
    if(net_TimerBase=0)then
    begin
       net_clearbuffer;
-      if(G_Started)then
+      if(g_started)then
       begin
          net_writebyte(nmid_ClientData);
          net_writebyte(Quality2Units[net_cl_Quality]);
@@ -736,11 +736,14 @@ nmid_GameData    : if(G_Started)then
 
    // CLIENT TIMERS
    net_TimerBase+=1;
-   net_TimerBase:=net_TimerBase mod net_SendTimeClient;
+   case g_started of
+   false: net_TimerBase:=net_TimerBase mod net_SendTimeClient1;
+   true : net_TimerBase:=net_TimerBase mod net_SendTimeClient2;
+   end;
    net_cl_svttl+=1;
    if(net_cl_svttl>=TTLServer)then
    begin
-      if(g_started)then G_Status:=gs_waitserver;
+      if(g_started)then g_status:=gs_waitserver;
       if((net_cl_svttl mod fr_fps2)=0)then menu_update:=true;
    end;
 end;
@@ -754,11 +757,10 @@ procedure net_ServerList_ItemUpdate(aip:cardinal;aport:word;ainfo:shortstring;ap
 var i,e:integer;
 function pingChar(p:cardinal):char;
 begin
-   case p div fr_FrameMS of
-   0     : pingChar:=tc_aqua;
-   1     : pingChar:=tc_lime;
-   2     : pingChar:=tc_yellow;
-   3     : pingChar:=tc_orange;
+   case p div pingGradeStep of
+   0     : pingChar:=tc_lime;
+   1     : pingChar:=tc_yellow;
+   2     : pingChar:=tc_orange;
    else    pingChar:=tc_red;
    end;
 end;

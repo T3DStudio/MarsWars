@@ -4,6 +4,7 @@
 //  MAIN
 //
 
+
 function UIDsArmsImpactUpgr(upgr:byte):TSoB;
 var uid,arm:byte;
 begin
@@ -38,6 +39,10 @@ procedure DocHelp_AddBaseMchanics(line:shortstring);
 begin
    str_AddToStrList(@str_doc_BaseMechanics,ui_DocLineLen2,false,false,line);
 end;
+procedure DocHelp_AddGamUI(line:shortstring);
+begin
+   str_AddToStrList(@str_doc_GameUI,ui_DocLineLen2,false,false,line);
+end;
 procedure DocHelp_AddOther(line:shortstring);
 begin
    str_AddToStrList(@str_doc_Other,ui_DocLineLen2,false,false,line);
@@ -46,6 +51,22 @@ procedure DocHelp_AddCredits(line:shortstring);
 begin
    if(line<>tc_docbr)then line+=tc_docbr;
    str_AddToStrList(@str_doc_Credits,ui_DocLineLen2,false,false,line);
+end;
+procedure DocHelp_AddCreditsMusic;
+var Info: TSearchRec;
+begin
+   if(FindFirst(folder_sound+folder_music_menu+'*.ogg',faReadonly,info)=0)then
+     repeat
+       setlength(info.Name,length(info.Name)-4);
+       DocHelp_AddCredits('- '+info.Name);
+     until(FindNext(info)<>0);
+   FindClose(info);
+   if(FindFirst(folder_sound+folder_music_game+'*.ogg',faReadonly,info)=0)then
+     repeat
+       setlength(info.Name,length(info.Name)-4);
+       DocHelp_AddCredits('- '+info.Name);
+     until(FindNext(info)<>0);
+   FindClose(info);
 end;
 
 procedure str_camp_Add(name:shortstring);
@@ -108,6 +129,7 @@ begin
 
    str_menu_Chat                 := 'chat(all players)';
    str_menu_Pause                := 'Pause';
+   str_menu_InGameTime           := 'In-game timer: ';
 
    str_and                       := 'and';
    str_YesNoG[true ]             := 'YES';
@@ -122,6 +144,7 @@ begin
    str_lobby_GameStartIn         := 'Game starts in ';
    str_lobby_GameResetIn         := 'Reset in the lobby in ';
 
+   str_menuMsg_HintImg           := '- press any key to close -';
    str_menuMsg_HintDefault       := '- press any key to close the message -';
    str_menuMsg_HintClient        := '- press any key to disconnect -';
 
@@ -283,6 +306,10 @@ begin
    str_themes[1]                 :=tc_aqua  +'ICE CAVES';
    str_themes[2]                 :=tc_yellow+'HELL CAVES';
    str_themes[3]                 :=tc_red   +'HELL CITY';
+   str_themes[4]                 :=tc_blue  +'EARTH CITY';
+   str_themes[5]                 :=tc_white +'EARTH MOON';
+   str_themes[6]                 :=tc_orange+'PHOBOS';
+   str_themes[7]                 :=tc_gray  +'DEIMOS';
 
    {str_themes[1]                 :=tc_blue  +'TECH BASE' ;
    str_themes[2]                 :=tc_white +'UNKNOWN PLANET';
@@ -490,6 +517,8 @@ begin
    str_help_BalanceTable         := 'Units Balance';
    str_help_Other                := 'Other';
 
+   str_help_GameUIImg1           := 'image #1';
+
    str_doc_HotKey                := 'Hot key: ';
    str_doc_Attributes            := 'Attributes: ';
    str_doc_ReqEnergy             := 'Energy required: ';
@@ -536,15 +565,15 @@ begin
    //  ABILITIES
 
    t1:='The ability`s cooldown is multiplied by the target`s limit.';
-   str_SetAbilityBaseHint(uab_Teleport           ,'Teleportation'            ,'Transfers units directed at it to the specified unit-beacon. '+t1);
+   str_SetAbilityBaseHint(uab_Teleport           ,'Teleportation'            ,'Transfers units directed at it to the specified allied unit-beacon. '+t1);
    str_SetAbilityBaseHint(uab_Recall             ,'Recall'                   ,'Transfers target unit to the Teleport. '+t1);
    str_SetAbilityBaseHint(uab_UACScan            ,'Scan'                     ,'Reveals units (including invisible ones) in the target area for '+i2s(detection_time_sec)+' seconds');
    with g_mids[MID_Blizzard] do
-   str_SetAbilityBaseHint(uab_UACStrike          ,'Missile strike'           ,'Strikes a taktical rocket missile that deal '+tc_red+i2s(mid_base_damage)+tc_default+' damage('+str_uarm_SplashDamageR+i2s(mid_base_SplashR)+')'+str_uarm_Factor+str_DamageMod(dm_RSMShot));
-   str_SetAbilityBaseHint(uab_HEyeSpawn          ,'Spawn Evil Eye'           ,'Spawns the Evil Eye at target point. There must be at least one Hell unit allied with you around the point target');
+   str_SetAbilityBaseHint(uab_UACStrike          ,'Missile strike'           ,'Strikes a taktical rocket missile that deal '+tc_red+i2s(mid_base_damage)+tc_default+' damage('+str_uarm_SplashDamageR+i2s(mid_base_SplashR)+')'+str_uarm_Factor+str_DamageMod(dm_RSMShot)+'. Note: launching a missile reveals the building to all players for '+i2s(UACStrike_Revealing_sec)+' seconds');
+   str_SetAbilityBaseHint(uab_HEyeSpawn          ,'Spawn '                   ,'Spawns the Evil Eye at target point. There must be at least one Hell unit allied with you around the point target');
    str_SetAbilityBaseHint(uab_HEyeVision         ,'Hell Vision'              ,'Gives allied target ability to detect invisible units for '+i2s(detection_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_HTowerBlink        ,'Planar Jump'              ,'Short-range teleportation');
-   str_SetAbilityBaseHint(uab_HKeepShift         ,'Dimension Shift'          ,'The building teleport itself to target location. Required upgrade canceled after teleportation.');
+   str_SetAbilityBaseHint(uab_HKeepShift         ,'Dimension Shift'          ,'The building teleport itself to target location. Required upgrade canceled after teleportation');
    str_SetAbilityBaseHint(uab_HKeepAura          ,'Decay Aura'               ,'Deals damage('+tc_red+i2s(DecayAuraDamage)+tc_default+', hits 2 times per sec.) to all non-building units around. Damage ignores units armor.');
    str_SetAbilityBaseHint(uab_SpawnLost          ,'Spawn Lost Soul'          ,'');
    str_SetAbilityBaseHint(uab_SpawnLostTo        ,'Spawn Lost Soul to point' ,'');
@@ -609,13 +638,13 @@ begin
    str_SetUnitBaseHint(UID_HEyeNest          ,'Evil Eye Nest'                    ,'Detection and scouting structure.');
    str_SetUnitBaseHint(UID_HEye              ,'Evil Eye'                         ,'Detection and scouting structure.');
    str_SetUnitBaseHint(UID_HTeleport         ,'Teleport'                         ,'');
-   str_SetUnitBaseHint(UID_HAltar            ,'Altar of Pain'                    ,'Uses "'+str_ui_HellPower+'" to perform special abilities. Generates "'+str_ui_HellPower+'"');
+   str_SetUnitBaseHint(UID_HAltar            ,'Altar of Pain'                    ,'Uses "'+str_ui_HellPower+'" to perform special abilities. Generates "'+str_ui_HellPower+'". Maximum quantity: '+i2s(scirmish_MaxHAltar));
    str_SetUnitBaseHint(UID_HCommandCenter    ,'Hell Command Center'              ,'Corrupted Command Center'         );
    str_SetUnitBaseHint(UID_HACommandCenter   ,'Advanced Hell Command Center'     ,'Corrupted Advanced Command Center');
    str_SetUnitBaseHint(UID_HBarracks         ,'Zombie Barracks'                  ,'Corrupted Barracks'               );
 
-   str_SetUnitBaseHint(UID_LostSoul          ,'Lost Soul'                        ,'');
-   str_SetUnitBaseHint(UID_Phantom           ,'Phantom'                          ,'');
+   str_SetUnitBaseHint(UID_LostSoul          ,'Lost Soul'                        ,'Maximum quantity: '+i2s(scirmish_MaxLost));
+   str_SetUnitBaseHint(UID_Phantom           ,'Phantom'                          ,'Maximum quantity: '+i2s(scirmish_MaxLost));
    str_SetUnitBaseHint(UID_Imp               ,'Imp'                              ,'');
    str_SetUnitBaseHint(UID_Demon             ,'Pinky Demon'                      ,'');
    str_SetUnitBaseHint(UID_Cacodemon         ,'Cacodemon'                        ,'');
@@ -654,7 +683,7 @@ begin
    str_SetUnitBaseHint(UID_URadar            ,'Radar'                            ,'Reveals the map and detects invisible enemy units');
    str_SetUnitBaseHint(UID_UAcademy          ,'UAC Academy'                      ,'Uses "'+str_ui_UACLoot+'" to perform special abilities');
    str_SetUnitBaseHint(UID_UHPowerConductor  ,'Hell Power Conductor'             ,'Uses "'+str_ui_HellPower+'" to perform special abilities');
-   str_SetUnitBaseHint(UID_URMStation        ,'Rocket Launcher Station'          ,'');
+   str_SetUnitBaseHint(UID_URMStation        ,'Rocket Launcher Station'          ,'Delivers a powerful missile strike');
 
    str_SetUnitBaseHint(UID_Sergant           ,'Shotguner'                        ,'');
    str_SetUnitBaseHint(UID_SSergant          ,'SuperShotguner'                   ,'');
@@ -825,43 +854,47 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  Help docs  CREDITS
    str_StringListClear(@str_doc_Credits);
-   DocHelp_AddCredits(tc_orange+str_gcaption+tc_default+' - is a real-time strategy game based on  Doom 2 universe. Current version is '+str_ver+'.');
+   DocHelp_AddCredits(tc_orange+str_gcaption+tc_default+' - is a real-time strategy game based on Doom 2 universe. Current version is '+str_ver+'.');
    DocHelp_AddCredits(tc_docbr);
-   DocHelp_AddCredits(tc_docbr+'Main developer and project leader: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.');
+   DocHelp_AddCredits('Project leader and main developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.');
    DocHelp_AddCredits(tc_docbr);
-   DocHelp_AddCredits(tc_docbr+'Sources: https://github.com/T3DStudio/MarsWars');
-   DocHelp_AddCredits(tc_docbr+'Web site: https://t3dstudio.ru/');
+   DocHelp_AddCredits('Sources: www.github.com/T3DStudio/MarsWars');
+   DocHelp_AddCredits('Web site: www.t3dstudio.ru');
    DocHelp_AddCredits(tc_docbr);
-   DocHelp_AddCredits(tc_docbr+'Tools used:');
-   DocHelp_AddCredits(tc_docbr+'- Free Pascal 3.2.2;');
-   DocHelp_AddCredits(tc_docbr+'- Lazarus IDE 4.2;');
-   DocHelp_AddCredits(tc_docbr+'- Simple DirectMedia Layer (SDL) Version 1.2;');
-   DocHelp_AddCredits(tc_docbr+'- Ultimate Doom Builder (https://github.com/UltimateDoomBuilder/UltimateDoomBuilder);');
-   DocHelp_AddCredits(tc_docbr+'- NASTY tool by jmickle66666666 (https://www.doomworld.com/forum/topic/98689-nasty-nota-sourceport-thank-you-alpha-4/);');
-   DocHelp_AddCredits(tc_docbr+'- Game Maker 8.0 by Mark Overmas.');
+   DocHelp_AddCredits('Software used:'+tc_default+tc_doccpt);
+   DocHelp_AddCredits('- Free Pascal 3.2.2 (www.freepascal.org);');
+   DocHelp_AddCredits('- Lazarus IDE 4.2 (www.lazarus-ide.org);');
+   DocHelp_AddCredits('- Simple DirectMedia Layer (SDL) Version 1.2 (www.libsdl.org);');
+   DocHelp_AddCredits('- Ultimate Doom Builder (www.github.com/UltimateDoomBuilder/UltimateDoomBuilder);');
+   DocHelp_AddCredits('- NASTY tool by jmickle66666666 (www.doomworld.com/forum/topic/98689-nasty-nota-sourceport-thank-you-alpha-4);');
+   DocHelp_AddCredits('- Game Maker 8.0 by Mark Overmas.');
    DocHelp_AddCredits(tc_docbr);
-   DocHelp_AddCredits(tc_docbr+'Thanks to:');
-   DocHelp_AddCredits(tc_docbr+'- ID Software for DooM game;');
-   DocHelp_AddCredits(tc_docbr+'- Daniel Tormentor667 Gimmer for Doom 2 repository (www.realm667.com);');
-   DocHelp_AddCredits(tc_docbr+'- 3D Realms for Duke Nukem 3D game;');
-   DocHelp_AddCredits(tc_docbr+'- Monolith Productions for BLOOD game;');
-   DocHelp_AddCredits(tc_docbr+'- cybermind aka Mistranger for DoomWars game;');
-   DocHelp_AddCredits(tc_docbr+'- Doom Hacker for Doom: The Battle For Mars game.');
+   DocHelp_AddCredits('Thanks to:'+tc_default+tc_doccpt);
+   DocHelp_AddCredits('- ID Software for "DooM" game;');
+   DocHelp_AddCredits('- Daniel Tormentor667 Gimmer for Doom 2 repository (www.realm667.com);');
+   DocHelp_AddCredits('- 3D Realms for "Duke Nukem 3D" game;');
+   DocHelp_AddCredits('- Monolith Productions for "BLOOD" game;');
+   DocHelp_AddCredits('- cybermind aka Mistranger for "DoomWars" game;');
+   DocHelp_AddCredits('- Doom Hacker for "Doom: The Battle For Mars" game;');
+   DocHelp_AddCredits('- Bertie Butts for main menu background image.');
    DocHelp_AddCredits(tc_docbr);
-   DocHelp_AddCredits(tc_docbr+'Unit voices:');
-   DocHelp_AddCredits(tc_docbr+'- Jake Crusher - Shotgunner, Super Shotgunner;');
-   DocHelp_AddCredits(tc_docbr+'- cybermind aka Mistranger - Commando;');
-   DocHelp_AddCredits(tc_docbr+'- Swoy45 - Siedge Marine, Transport;');
-   DocHelp_AddCredits(tc_docbr+'- Demonologist - Hell announcer;');
-   DocHelp_AddCredits(tc_docbr+'- b-o - Combat Medic;');
-   DocHelp_AddCredits(tc_docbr+'- Diabol - UAC Fighter;');
-   DocHelp_AddCredits(tc_docbr+'- Mr.Basik - Engineer;');
-   DocHelp_AddCredits(tc_docbr+'- DinkyDyeAussie - UAC Tank.');
+   DocHelp_AddCredits('Unit voices:'+tc_default+tc_doccpt);
+   DocHelp_AddCredits('- Jake Crusher - Shotgunner, Super Shotgunner;');
+   DocHelp_AddCredits('- cybermind aka Mistranger - Commando;');
+   DocHelp_AddCredits('- Swoy45 - Siedge Marine, Transport;');
+   DocHelp_AddCredits('- Kyran Jackson - Plasmaguner;');
+   DocHelp_AddCredits('- Demonologist - Hell announcer;');
+   DocHelp_AddCredits('- b-o - Combat Medic;');
+   DocHelp_AddCredits('- Diabol - UAC Fighter;');
+   DocHelp_AddCredits('- Mr.Basik - Antiaircrafter;');
+   DocHelp_AddCredits('- DinkyDyeAussie - UAC Tank.');
+   DocHelp_AddCredits(tc_docbr);
+   DocHelp_AddCredits('Used music:'+tc_default+tc_doccpt);
+   DocHelp_AddCreditsMusic;
    DocHelp_AddCredits(tc_docbr);
 
    /////////////////////////////////////////////////////////////////////////////
-   //  Help docs  GAME BASICS
-
+   //  Help docs  GAME Controls
    str_StringListClear(@str_doc_BaseControls);
 
    DocHelp_AddBaseControls(tc_orange+'BASIC GAME CONTROLS'+tc_default+tc_doccpt);
@@ -882,26 +915,184 @@ begin
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_orange+'BASE CONSTRUCTION'+tc_default+tc_doccpt);
    DocHelp_AddBaseControls(tc_docbr);
-   DocHelp_AddBaseControls('You must have at least one builder to build a base. Switch the control panel to "Buildings" tab and click on the building icon to select the type of building you need.');
+   DocHelp_AddBaseControls('You must have at least one builder to build a base. Switch the control panel to "'+str_ui_Tab[tab_Buildings]+'" tab and click on the building icon to select the type of building you need(or press the associated hotkey).');
    DocHelp_AddBaseControls('If the requirements for the selected building type are not met, the game will display an error message; otherwise, the game will draw the building`s sprite and a circle around the mouse cursor.');
    DocHelp_AddBaseControls('The radius of the circle is the radius of the building. If the circle is red - the building needs more space, if it is blue - the build place is too far away from the nearest builder, if it is green - the building can be built here.');
+   DocHelp_AddBaseControls('To deselect a building type, right-click.');
+   DocHelp_AddBaseControls('To cancel the construction of a building, select it and issue the "'+str_action_hint[iAct_Control_UProdCncl]+'" or "'+str_action_hint[iAct_Control_UDestroy]+'" order.');
+   DocHelp_AddBaseControls('Note: each player cannot have more than '+i2s(PlayerMaxBuilders)+' builders.');
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_orange+'UNIT PRODUCTION'+tc_default+tc_doccpt);
    DocHelp_AddBaseControls(tc_docbr);
-   DocHelp_AddBaseControls('Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met. Switch the control panel to "Units" tab and click on the unit icon.');
+   DocHelp_AddBaseControls('Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met. Switch the control panel to "'+str_ui_Tab[tab_Units]+'" tab and click on the unit icon(or press the associated hotkey).');
    DocHelp_AddBaseControls('If the requirements for the selected unit type are not met, the game will display an error message.');
    DocHelp_AddBaseControls('If no unit production building is selected - the game sends the production order to nearest unbusy production building, otherwise it sends the order to nearest unbusy selected production buildings.');
    DocHelp_AddBaseControls('It is impossible to create a unit production queue.');
+   DocHelp_AddBaseControls('To cancel unit production process, right-click on the unit icon or select production buildings and issue then "'+str_action_hint[iAct_Control_UProdCncl]+'" order.');
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_orange+'UPGRADES PRODUCTION'+tc_default+tc_doccpt);
    DocHelp_AddBaseControls(tc_docbr);
-   DocHelp_AddBaseControls('Go to the "Upgrades" tab in the Control Panel and click the upgrade icon. If the requirements for the selected upgrade type are not met, the game will display an error message.');
+   DocHelp_AddBaseControls('Go to the "'+str_ui_Tab[tab_Upgrades]+'" tab in the Control Panel and click the upgrade icon. If the requirements for the selected upgrade type are not met, the game will display an error message.');
    DocHelp_AddBaseControls('If no upgrade production facility is selected - the game sends the production order to any nearest unbusy production facility, otherwise it sends the order to nearest unbusy selected production facilities.');
    DocHelp_AddBaseControls('It is impossible to create an upgrade production queue.');
+   DocHelp_AddBaseControls('To cancel upgrade production process, right-click on the upgrade icon or select production buildings and issue then "'+str_action_hint[iAct_Control_UProdCncl]+'" order.');
    DocHelp_AddBaseControls(tc_docbr);
 
+   /////////////////////////////////////////////////////////////////////////////
+   //  Help docs  GAME HOTKEYS
+   str_StringListClear(@str_doc_HotKeys);
+
+   DocHelp_AddHotKeyAction([],tc_orange+'COMMON HOTKEYS'+tc_default+tc_doccpt);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_InGameChat       ],'in-game chat(common)');
+   DocHelp_AddHotKeyAction([iAct_InGameChatAll    ],'in-game chat(to all players)'       );
+   DocHelp_AddHotKeyAction([iAct_InGameChatAllies ],'in-game chat(to allied players)'    );
+   DocHelp_AddHotKeyAction([iAct_InGamePause      ],'toggle pause(only multiplayer game)');
+   DocHelp_AddHotKeyAction([iAct_InGameMenu       ],'toggle menu');
+   DocHelp_AddHotKeyAction([iAct_Tab              ],'switch control panel tab' );
+   DocHelp_AddHotKeyAction([iAct_ScreenShot       ],'make *.bmp screenshot'    );
+   DocHelp_AddHotKeyAction([iAct_ToggleWindowed   ],'toggle fullscreen'        );
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_orange+'GAME HOTKEYS'+tc_default+tc_doccpt);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_LastEvent        ],'move camera to last event location');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_USetGroup1..
+                            iAct_USetGroup9]       ,'assign currently selected units to the numbered control group');
+   DocHelp_AddHotKeyAction([iAct_USetGroup0       ],'unassign currently selected units from any numbered control group');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_UAddGroup1..
+                            iAct_UAddGroup9       ],'add currently selected units to the numbered control group');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_USelGroup1..
+                            iAct_USelGroup9       ],'select units from the numbered control group; double tap - move camera to nearest unit from the group');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_UASlGroup1..
+                            iAct_UASlGroup9       ],'add to selection units from the numbered control group');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+
+   DocHelp_AddHotKeyAction([iAct_Control_UAbility1..
+                            iAct_Control_UAbility3 ],'abilities of selected units');
+
+   DocHelp_AddHotKeyAction([iAct_Control_UMove,iAct_Control_UStop,iAct_Control_UPatrol,
+                            iAct_Control_UAMove,iAct_Control_UAStop,iAct_Control_UAPatrol]
+                                                   ,'basic orders of selected units');
+   DocHelp_AddHotKeyAction([iAct_Control_UProdCncl ],'cancel production in selected buildings');
+   DocHelp_AddHotKeyAction([iAct_Control_UDestroy  ],'kill selected units');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Control_USelBase  ],'select all builders; double tap - move camera to nearest builder');
+   DocHelp_AddHotKeyAction([iAct_Control_USelArmy  ],'select all not busy battle units; double tap - move camera to nearest unit');
+
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark: "look here"');
+   DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark: "attack here"');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_SProd1..
+                            iAct_SProd24           ],'production hotkeys');
+
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_orange+'REPLAY PLAYBACK HOTKEYS'+tc_default+tc_doccpt);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Replay_Fast       ],'toggle uncapped FPS(faster game speed)' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Pause      ],'pause playback'    );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back60     ],'rewind 60 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back10     ],'rewind 10 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Back2      ],'rewind 2 seconds'  );
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward2   ],'fast forward 2 seconds' );
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward10  ],'fast forward 10 seconds');
+   DocHelp_AddHotKeyAction([iAct_Replay_Forward60  ],'fast forward 60 seconds');
+   DocHelp_AddHotKeyAction([iAct_Replay_POV        ],'toggle player-recorder POV'  );
+   DocHelp_AddHotKeyAction([iAct_Replay_Log        ],'toggle list of game messages');
+   DocHelp_AddHotKeyAction([iAct_Replay_Fog        ],'toggle fog of war' );
+   DocHelp_AddHotKeyAction([iAct_Replay_PlayerAll  ],'set all players vision');
+   DocHelp_AddHotKeyAction([iAct_Replay_Player0..
+                            iAct_Replay_Player7    ],'set player vision');
+
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+
+   DocHelp_AddHotKeyAction([iAct_Observer_Fog      ],'toggle fog of war' );
+   DocHelp_AddHotKeyAction([iAct_Observer_POV      ],'toggle player POV' );
+   DocHelp_AddHotKeyAction([iAct_Observer_PlayerAll],'set all players vision');
+   DocHelp_AddHotKeyAction([iAct_Observer_Player0..
+                            iAct_Observer_Player7  ],'set player vision');
+
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([],tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt);
+   DocHelp_AddHotKeyAction([],tc_docbr);
+
+   {$IFDEF TESTMODE}
+   DocHelp_AddHotKeyAction([iAct_test_FastTime     ],'toggle uncapped FPS(faster game speed)');
+   DocHelp_AddHotKeyAction([iAct_test_InstaProd    ],'toggle instant production');
+   DocHelp_AddHotKeyAction([iAct_test_ToggleAI     ],'toggle AI control for current player');
+   DocHelp_AddHotKeyAction([iAct_test_iddqd        ],'toggle invulnerability for current player');
+   DocHelp_AddHotKeyAction([iAct_test_FogToggle    ],'toggle fog of war'   );
+   DocHelp_AddHotKeyAction([iAct_test_DrawToggle   ],'toggle screen redraw');
+   DocHelp_AddHotKeyAction([iAct_test_NullUpgrades ],'cancel all upgrades for current player');
+   DocHelp_AddHotKeyAction([iAct_test_BePlayer0..
+                            iAct_test_BePlayer7    ],'set current player');
+   DocHelp_AddHotKeyAction([iAct_test_AddHellPower ],'add '+i2s(testmode_HellPower)+' '+str_ui_HellPower+' to current player');
+   DocHelp_AddHotKeyAction([iAct_test_AddUACLoot   ],'add '+i2s(testmode_UACLoot  )+' '+str_ui_UACLoot  +' to current player');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   {
+   iAct_test_debug0       = 227;
+   iAct_test_debug1       = 228;
+   }
+   {$ENDIF}
+
+   /////////////////////////////////////////////////////////////////////////////
+   //  Help docs  GAME UI
+   str_StringListClear(@str_doc_GameUI);
+   DocHelp_AddGamUI(tc_orange+'COMMON'+tc_default+tc_doccpt);
+   DocHelp_AddGamUI(tc_docbr);
+   DocHelp_AddGamUI(tc_docbr+'See "image #1".');
+   DocHelp_AddGamUI(tc_docbr+'1) game timer;');
+   DocHelp_AddGamUI(tc_docbr+'2) objectives and information, specific to current scenario;');
+   DocHelp_AddGamUI(tc_docbr+'3) player resources;');
+   DocHelp_AddGamUI(tc_docbr+'4) army limit;');
+   DocHelp_AddGamUI(tc_docbr+'5) FPS&APM counters;');
+   DocHelp_AddGamUI(tc_docbr+'6) numbered control group;');
+   DocHelp_AddGamUI(tc_docbr+'7) minimap;');
+   DocHelp_AddGamUI(tc_docbr+'8) control panel;');
+   DocHelp_AddGamUI(tc_docbr+'9) last messages.');
+   DocHelp_AddGamUI(tc_docbr);
+   DocHelp_AddGamUI(tc_docbr);
+   DocHelp_AddGamUI(tc_orange+'CONTROL PANEL'+tc_default+tc_doccpt);
+   DocHelp_AddGamUI(tc_docbr);
+   DocHelp_AddGamUI(tc_docbr+'Minimap marks:'+tc_doccpt);
+   DocHelp_AddGamUI(tc_docbr+'- pulsating red rectangle - base is under attack;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating red circle - unit is under attack;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating lime circle - unit ready;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating lime rectangle - construction complete;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating aqua circle - unit promoted;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating yellow rectangle - upgrade complete;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating light-gray circle - "look here" mark;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating light-red circle - "attack here" mark;');
+   DocHelp_AddGamUI(tc_docbr);
+   DocHelp_AddGamUI(tc_docbr+'Tabs:'+tc_doccpt);
+   DocHelp_AddGamUI(tc_docbr+'"'+str_ui_Tab[tab_Buildings]+'" - available buildings;');
+   DocHelp_AddGamUI(tc_docbr+'"'+str_ui_Tab[tab_Units    ]+'" - available units;');
+   DocHelp_AddGamUI(tc_docbr+'"'+str_ui_Tab[tab_Upgrades ]+'" - available upgrades;');
+   DocHelp_AddGamUI(tc_docbr+'"'+str_ui_Tab[tab_Controls ]+'" - abilities and basic orders of selected units; some game controls;');
+   DocHelp_AddGamUI(tc_docbr);
+   DocHelp_AddGamUI(tc_docbr+'Description of numbers on icons:'+tc_doccpt);
+   DocHelp_AddGamUI(tc_docbr+tc_lime  +'green' +tc_default+' - number of selected units of this type;');
+   DocHelp_AddGamUI(tc_docbr+tc_yellow+'yellow'+tc_default+' - number of production processes of this type;');
+   DocHelp_AddGamUI(tc_docbr+tc_orange+'orange'+tc_default+' or '
+                            +tc_gray  +'gray'  +tc_default+' - total number of that type of building/unit or upgrade level;');
+   DocHelp_AddGamUI(tc_docbr+tc_purple+'purple'+tc_default+' - number of units of that type in selected transport(s);');
+   DocHelp_AddGamUI(tc_docbr+tc_white +'white' +tc_default+' - time remaining until completion of production;');
+   DocHelp_AddGamUI(tc_docbr+tc_aqua  +'aqua'  +tc_default+' - remaining time until ability cooldown;');
+
+   /////////////////////////////////////////////////////////////////////////////
+   //  Help docs  GAME Mechanics
    str_StringListClear(@str_doc_BaseMechanics);
 
    DocHelp_AddBaseMchanics(tc_orange+'RESOURCES'+tc_default+tc_doccpt);
@@ -939,7 +1130,7 @@ begin
    DocHelp_AddBaseMchanics(' ');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_stuned  +' - unit is stuned and can`t attack or move;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and receives 1.5 times less damage;');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and takes a third less damage;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Decay   +' - unit is under "Decay Aura" effect; it slowly lose health;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_HVision +' - unit is under "Hell Vision" effect; it can see invisible enemy units;');
@@ -948,21 +1139,22 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SInvis  +' - unit is under "Invisibility Sphere" effect; it invisibile;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SDDamage+' - unit is under "Double Damage Sphere" effect; it deals double damage;');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_STurbo  +' - unit is under "Turbo Sphere" effect; it is significantly accelerated.');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_STurbo  +' - unit is under "Turbo Sphere" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'PAIN STATE'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics(' ');
+   DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics('Some units have "Pain State" - it is a 1-second stun state after a certain number of damage hits. During the "Pain State" unit can`t attack or move. "Pain State" is accompanied by a special sound and unit animation.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'VETERAN SYSTEM'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics('All combat units gain combat experience and increase their level. All units spawn at level 1 and can be upgraded to level 4. With each new level, the unit increases its damage, armor, and pain threshold.');
+   DocHelp_AddBaseMchanics('The time in combat required to reach the next level varies for each type of unit(see "'+str_help_UnitsInfo+'" section).');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics(' ');
+   DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr+'1) The game takes the attacking unit`s base damage and adds bonuses from upgrades and veteran level;');
    DocHelp_AddBaseMchanics(tc_docbr+'2) Special effects of the attacking unit that affect its damage amount are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SDDamage+'" effect);');
    DocHelp_AddBaseMchanics(tc_docbr+'3) A damage modifier for the attacking unit is applied to the resulting value;');
@@ -976,157 +1168,35 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'OTHER'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics(' ');
+   DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr+'If a player loses all his builders - all his units revealed on the map.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr+'Unit hits regeneration period is 1 second.');
-   {
-     Game Basics: UI
-
-     Game minimap:
-     Minimap indicator types:
-     - Green pulse circle ñ unit ready;
-     - Green pulse square ñ construction complete;
-     - Yellow pulse square - upgrade complete;
-     - Aqua pulse circle - unit promoted;
-     - Red pulse circle ñ unit is under attack;
-     - Red pulse square ñ base is under attack.
-
-     Tabs:
-     - Buildings ñ available buildings;
-     - Units ñ available units;
-     - Upgrades/researches ñ available upgrades/researches;
-     - Controls ñ unit abilities, basic orders and other game controls.
-
-     Numbers on icons:
-     Green ñ total number of selected units/buildings;
-     Yellow ñ number of productions;
-     Orange or gray - total number of that type of building/unit or research level;
-     Purple - number of units of that type in selected transport(s);
-     White - time left to finish production;
-     Aqua ñ ability recharge time;
-
-     }
-
-   /////////////////////////////////////////////////////////////////////////////
-   //  Help docs  GAME HOTKEYS
-   str_StringListClear(@str_doc_HotKeys);
-
-   DocHelp_AddHotKeyAction([],tc_orange+'COMMON HOTKEYS'+tc_default+tc_doccpt);
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_InGameChat       ],'in-game chat(common)');
-   DocHelp_AddHotKeyAction([iAct_InGameChatAll    ],'in-game chat(to all players)');
-   DocHelp_AddHotKeyAction([iAct_InGameChatAll    ],'in-game chat(to allied players)');
-   DocHelp_AddHotKeyAction([iAct_InGamePause      ],'toggle pause(only multiplayer game)');
-   DocHelp_AddHotKeyAction([iAct_InGameMenu       ],'toggle menu');
-
-   DocHelp_AddHotKeyAction([iAct_Tab              ],'switch control panel tab' );
-   DocHelp_AddHotKeyAction([iAct_ScreenShot       ],'make *.bmp screenshot'    );
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([],tc_orange+'GAME HOTKEYS'+tc_default+tc_doccpt);
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_LastEvent        ],'move camera to last event place');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_USetGroup1..
-                            iAct_USetGroup9]       ,'assign currently selected units to the numbered control group');
-   DocHelp_AddHotKeyAction([iAct_USetGroup0       ],'unassign currently selected units from any numbered control group');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_UAddGroup1..
-                            iAct_UAddGroup9       ],'add currently selected units to the numbered control group');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_USelGroup1..
-                            iAct_USelGroup9       ],'select units from the numbered control group; double tap - move camera to nearest unit from the group');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_UASlGroup1..
-                            iAct_UASlGroup9       ],'add to selection units from the numbered control group');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-
-   DocHelp_AddHotKeyAction([iAct_Control_UAbility1..
-                            iAct_Control_UAbility3 ],'abilities of selected units');
-
-   DocHelp_AddHotKeyAction([iAct_Control_UMove,iAct_Control_UStop,iAct_Control_UPatrol,
-                            iAct_Control_UAMove,iAct_Control_UAStop,iAct_Control_UAPatrol]
-                                                   ,'basic orders of selected units');
-   DocHelp_AddHotKeyAction([iAct_Control_UProdCncl ],'cancel production in selected buildings');
-   DocHelp_AddHotKeyAction([iAct_Control_UDestroy  ],'kill selected units');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Control_USelBase  ],'select all builders; double tap - move camera to nearest builder');
-   DocHelp_AddHotKeyAction([iAct_Control_USelArmy  ],'select all not busy battle units; double tap - move camera to nearest unit');
-
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark: "look here"');
-   DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark: "attack here"');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_SProd1..
-                            iAct_SProd24           ],'production hotkeys');
-
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([],tc_orange+'REPLAY PLAYBACK HOTKEYS'+tc_default+tc_doccpt);
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Replay_Fast       ],'toggle uncapped FPS(faster game speed)' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Pause      ],'pause playback'    );
-   DocHelp_AddHotKeyAction([iAct_Replay_Back60     ],'rewind 60 seconds' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Back10     ],'rewind 10 seconds' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Back2      ],'rewind 2 seconds'  );
-   DocHelp_AddHotKeyAction([iAct_Replay_Forward2   ],'fast forward 2 seconds' );
-   DocHelp_AddHotKeyAction([iAct_Replay_Forward10  ],'fast forward 10 seconds');
-   DocHelp_AddHotKeyAction([iAct_Replay_Forward60  ],'fast forward 60 seconds');
-   DocHelp_AddHotKeyAction([iAct_Replay_POV        ],'toggle player-recorder POV'  );
-   DocHelp_AddHotKeyAction([iAct_Replay_Log        ],'toggle list of game messages');
-   DocHelp_AddHotKeyAction([iAct_Replay_Fog        ],'toggle fog of war' );
-   DocHelp_AddHotKeyAction([iAct_Replay_PlayerAll  ],'set all players vision');
-   DocHelp_AddHotKeyAction([iAct_Replay_Player0..
-                            iAct_Replay_Player7    ],'set player vision');
-
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([],tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt);
-   DocHelp_AddHotKeyAction([],tc_docbr);
-
-   DocHelp_AddHotKeyAction([iAct_Observer_Fog      ],'toggle fog of war' );
-   DocHelp_AddHotKeyAction([iAct_Observer_POV      ],'toggle player POV' );
-   DocHelp_AddHotKeyAction([iAct_Observer_PlayerAll],'set all players vision');
-   DocHelp_AddHotKeyAction([iAct_Observer_Player0..
-                            iAct_Observer_Player7  ],'set player vision');
-
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([],tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt);
-   DocHelp_AddHotKeyAction([],tc_docbr);
-
-   {$IFDEF TESTMODE}
-   DocHelp_AddHotKeyAction([iAct_test_FastTime     ],'toggle uncapped FPS(faster game speed)');
-   DocHelp_AddHotKeyAction([iAct_test_InstaProd    ],'toggle instant production');
-   DocHelp_AddHotKeyAction([iAct_test_ToggleAI     ],'toggle AI control for current player');
-   DocHelp_AddHotKeyAction([iAct_test_iddqd        ],'toggle invulnerability for current player');
-   DocHelp_AddHotKeyAction([iAct_test_FogToggle    ],'toggle fog of war'   );
-   DocHelp_AddHotKeyAction([iAct_test_DrawToggle   ],'toggle screen redraw');
-   DocHelp_AddHotKeyAction([iAct_test_NullUpgrades ],'cancel all upgrades for current player');
-   DocHelp_AddHotKeyAction([iAct_test_BePlayer0..
-                            iAct_test_BePlayer7    ],'set current player');
-   DocHelp_AddHotKeyAction([],tc_docbr);
-   {$ENDIF}
 
    /////////////////////////////////////////////////////////////////////////////
    //  Help docs  OTHER
    str_StringListClear(@str_doc_Other);
 
-   DocHelp_AddOther(tc_orange+'Dedicated server'+tc_default+tc_doccpt);
+   DocHelp_AddOther(tc_orange+'DEDICATED SERVER'+tc_default+tc_doccpt);
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther('Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:');
+   DocHelp_AddOther(tc_docbr+'Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:');
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther('   MarsWars_ded.exe [X]');
+   DocHelp_AddOther('   MarsWars_ded.exe [X] [Y]');
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther('where X - UDP port (optional argument, default value - 10666). Any connected player can change the game settings in a dedicated server`s lobby.');
-   DocHelp_AddOther('The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.');
+   DocHelp_AddOther('where X - UDP port (optional argument, default value - '+w2s(net_DefaultPort)+'); Y - LAN Advertise (optional argument, default value - true).');
+   DocHelp_AddOther(tc_docbr+'Any connected player can change the game settings in a dedicated server`s lobby.');
+   DocHelp_AddOther(tc_docbr+'The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.');
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther(tc_orange+'AI Bot skill levels'+tc_default+tc_doccpt);
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther('AI1-5 - bot operates under the same conditions as a human; there are no unfair advantages and it does not ignore the fog of war; the difference is various size of army, super weapon or "magic" using, some micro-control abilities and build-order;');
-   DocHelp_AddOther('AI3+ - there is a chance of an early attack by a small group of units;');
-   DocHelp_AddOther('AI4+ - there is a chance of an super early attack by a first unit;');
-   DocHelp_AddOther('AI6 - AI5 + bot can see enemy buildings, ignoring fog of war;');
-   DocHelp_AddOther('AI7 - AI6 + bot can see enemy units, ignoring fog of war; unit production speed is doubled;');
-   DocHelp_AddOther('AI8 - AI7 + upgrades production speed is doubled;');
-   DocHelp_AddOther('AI9 - AI8 + building construction speed is doubled.');
+   DocHelp_AddOther(tc_orange+'AI BOT SKILL LEVELS'+tc_default+tc_doccpt);
+   DocHelp_AddOther(tc_docbr);
+   DocHelp_AddOther(tc_docbr+'AI1-5 - bot operates under the same conditions as a player-human; there are no unfair advantages and it does not ignore the fog of war; the difference is various size of army, super weapon or "magic" using, some micro-control abilities and build-order;');
+   DocHelp_AddOther(tc_docbr+'AI3+ - there is a chance of an early attack by a small group of units;');
+   DocHelp_AddOther(tc_docbr+'AI4+ - there is a chance of an super early attack by a first unit;');
+   DocHelp_AddOther(tc_docbr+'AI6 - AI5 + bot can see enemy buildings, ignoring fog of war;');
+   DocHelp_AddOther(tc_docbr+'AI7 - AI6 + unit production speed is doubled;');
+   DocHelp_AddOther(tc_docbr+'AI8 - AI7 + bot can see enemy units, ignoring fog of war; upgrades production speed is doubled;');
+   DocHelp_AddOther(tc_docbr+'AI9 - AI8 + building construction speed is doubled.');
 
 
    /////////////////////////////////////////////////////////////////////////////
@@ -1286,7 +1356,7 @@ procedure lng_rus;
 var t: shortstring;
     i: byte;
 begin
-  str_ps_AI                     := '»»';
+  {str_ps_AI                     := '»»';
 
   str_Caption_Map               := ' ¿–“¿';
   str_Caption_Players           := '»√–Œ »';
@@ -1787,7 +1857,7 @@ begin
   str_camp_MissionMap[6]         := tc_lime+'ƒ‡Ú‡:'+tc_default+tc_nl3+'18.11.2145'+tc_nl3+tc_lime+'ÃÂÒÚÓ:'+tc_default+tc_nl3+'«≈ÃÀﬂ' +tc_nl3+tc_lime+'–‡ÈÓÌ:'+tc_default+tc_nl3+'ÕÂËÁ‚ÂÒÚÌÓ';
   str_camp_MissionMap[7]         := tc_lime+'ƒ‡Ú‡:'+tc_default+tc_nl3+'19.11.2145'+tc_nl3+tc_lime+'ÃÂÒÚÓ:'+tc_default+tc_nl3+'«≈ÃÀﬂ' +tc_nl3+tc_lime+'–‡ÈÓÌ:'+tc_default+tc_nl3+'ÕÂËÁ‚ÂÒÚÌÓ';  }
 
-  str_makeAllHints;
+  str_makeAllHints; }
 end;
 
 procedure SwitchLanguage;
