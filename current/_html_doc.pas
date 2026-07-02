@@ -3,8 +3,7 @@ const
 
 
 str_htmldoc_folder   = 'docs';
-str_htmldoc_imgsGame = 'imgs_game\';
-str_htmldoc_imgs     = 'imgs\';
+str_htmldoc_imgsGame = 'imgs\';
 str_htmldoc_unitFront= str_htmldoc_imgsGame+'unitFront';
 str_htmldoc_unitBTN  = str_htmldoc_imgsGame+'unitBTN';
 str_htmldoc_img_ext  = '.bmp';
@@ -33,17 +32,19 @@ begin
 end;
 
 function htmldoc_UIDImg(uid:byte):shortstring;
-var l:byte;
+var  l:byte;
+titels:shortstring;
 begin
+   with g_uids[uid] do titels:=' title="'+uid_str_name+'"';
    if(htmldoc_UID1Spr(uid))
-   then htmldoc_UIDImg:='<img src="'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext+'">'
+   then htmldoc_UIDImg:='<img src="'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext+'"'+titels+'>'
    else
    begin
       htmldoc_UIDImg:='';
       for l:=0 to LastUnitLevel do
       begin
          if(length(htmldoc_UIDImg)>0)then htmldoc_UIDImg+=' ';
-         htmldoc_UIDImg+='<img src="'+str_htmldoc_unitFront+b2s(uid)+'_'+b2s(l)+str_htmldoc_img_ext+'">';
+         htmldoc_UIDImg+='<img src="'+str_htmldoc_unitFront+b2s(uid)+'_'+b2s(l)+str_htmldoc_img_ext+'"'+titels+'>';
          if(l=1)then
            htmldoc_UIDImg+='<br>';
       end;
@@ -51,7 +52,7 @@ begin
 end;
 function htmldoc_UIDBTN(uid:byte):shortstring;
 begin
-   htmldoc_UIDBTN:='<img src="'+str_htmldoc_unitBTN+b2s(uid)+str_htmldoc_img_ext+'" alt="'+g_uids[uid].uid_str_name+'" title="'+g_uids[uid].uid_str_name+'">';
+   htmldoc_UIDBTN:='<img src="'+str_htmldoc_unitBTN+b2s(uid)+str_htmldoc_img_ext+'" title="'+g_uids[uid].uid_str_name+'">';
 end;
 
 function htmldoc_color2hex(color:TMWColor):shortstring;
@@ -205,14 +206,16 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  GAME UI
    htmldoc_WriteCaption(str_help_GameUI);
-   writeln(html_f,'<center><img src="..\graphic\ui_doc.png" alt="image #1" title="image #1"></br>image #1</center>');
+   writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_ui.png" title="'+str_help_GameUIImg1+'"><br>'+str_help_GameUIImg1+'</center>');
    with str_doc_GameUI do
    htmldoc_WriteStringArray(@slist_l,slist_n);
 
    /////////////////////////////////////////////////////////////////////////////
-   //  GAME BASICS CONTROLS
-
+   //  GAME MECHANICS
    htmldoc_WriteCaption(str_help_GameMechanics);
+   writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_Generators.png" title="'+str_help_GameUIImg2+'"><br>'+str_help_GameUIImg2,'<br><br>');
+   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_KeyPoint.png" title="'  +str_help_GameUIImg3+'"><br>'+str_help_GameUIImg3,'<br><br>');
+   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_koth.png" title="'      +str_help_GameUIImg4+'"><br>'+str_help_GameUIImg4+'</center>');
    with str_doc_BaseMechanics do
    htmldoc_WriteStringArray(@slist_l,slist_n);
 
@@ -255,14 +258,17 @@ begin
 
           htmldoc_WriteLine(str_doc_BalanceGood);   writeln(html_f,'<br>');
           for i in uid_balance_Good do writeln(html_f,htmldoc_UIDBTN(i));
+          if(length(uid_str_balance_Good)>0)then begin writeln(html_f,'<br>');htmldoc_WriteLine(uid_str_balance_Good);end;
           writeln(html_f,'<br><br>');
 
           htmldoc_WriteLine(str_doc_BalanceBad);    writeln(html_f,'<br>');
           for i in uid_balance_Bad do writeln(html_f,htmldoc_UIDBTN(i));
+          if(length(uid_str_balance_Bad)>0)then begin writeln(html_f,'<br>');htmldoc_WriteLine(uid_str_balance_Bad);end;
           writeln(html_f,'<br><br>');
 
           htmldoc_WriteLine(str_doc_BalanceUseless);writeln(html_f,'<br>');
           for i in uid_balance_Useless do writeln(html_f,htmldoc_UIDBTN(i));
+          if(length(uid_str_balance_Useless)>0)then begin writeln(html_f,'<br>');htmldoc_WriteLine(uid_str_balance_Useless);end;
           writeln(html_f,'<br><br>');
 
           writeln(html_f,'</td></tr>');

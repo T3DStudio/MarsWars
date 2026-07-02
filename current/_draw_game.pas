@@ -641,7 +641,8 @@ begin
      end;
 end;
 begin
-   for t:=0 to LastKeyPoint do
+   if(map_KeyPointsN>0)then
+   for t:=0 to map_KeyPointsN-1 do
      with map_KeyPointsL[t] do
      with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
        if(kptd_Active)and(RectInCam(kp_x,kp_y,kp_RCapture,kp_RCapture,0))then

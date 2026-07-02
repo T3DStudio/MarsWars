@@ -600,14 +600,14 @@ begin
 
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
-   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonq;
+   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
 
    case menu_HelpPage of
    mi_help_GameControls,
@@ -620,9 +620,18 @@ begin
                             menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
                                                            tx+(ui_DocLineLen2*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH,true);
                             //
-                            if(menu_HelpPage=mi_help_GameUI)then
-                              menu_Item_Set(mi_help_GameUIImg1,tx                ,menu_underCaptionY-menu_BigButtonH,
-                                                               tx+menu_BigButtonW,menu_underCaptionY                ,true);
+                            case menu_HelpPage of
+                            mi_help_GameUI       : menu_Item_Set(mi_help_GameUIImg1,tx                ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);
+                            mi_help_GameMechanics: begin
+                                                   menu_Item_Set(mi_help_GameUIImg1,tx                ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);tx+=menu_BigButtonW;
+                                                   menu_Item_Set(mi_help_GameUIImg2,tx                ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);tx+=menu_BigButtonW;
+                                                   menu_Item_Set(mi_help_GameUIImg3,tx                ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);
+                                                   end;
+                            end;
                          end;
    mi_help_UnitsBalance,
    mi_help_UnitsInfo   : begin
@@ -830,7 +839,7 @@ begin
                                         menu_w,menu_h-menu_StepFromBottom-menu_BigButtonH  ,true);
 
    // PLAYERS BLOCK
-   menu_page_Scirmish_Players (menu_BaseW1h,menu_BaseW1h+menu_PlayersW,menu_underCaptionY);
+   menu_page_Scirmish_Players (menu_BaseW1h-font_w1,menu_BaseW1h+menu_PlayersW-font_w1,menu_underCaptionY);
 
    // MAP BLOCK
    with menu_items[mi_Players_Panel] do
@@ -1254,8 +1263,31 @@ mi_help_InfoPanel      : case menu_HelpPage of
                                              end;
                          else menu_Controls_MLB:=false;
                          end;
-mi_help_GameUIImg1     : if(not check)then menu_image:=spr_ui_doc;
-
+mi_help_GameUIImg1     : if(not check)then
+                           case menu_HelpPage of
+                           mi_help_GameUI       : begin
+                                                  menu_image        :=spr_doc_ui;
+                                                  menu_image_caption:=str_help_GameUIImg1;
+                                                  end;
+                           mi_help_GameMechanics: begin
+                                                  menu_image        :=spr_doc_Generators;
+                                                  menu_image_caption:=str_help_GameUIImg2;
+                                                  end;
+                           end;
+mi_help_GameUIImg2     : if(not check)then
+                           case menu_HelpPage of
+                           mi_help_GameMechanics: begin
+                                                  menu_image        :=spr_doc_KeyPoint;
+                                                  menu_image_caption:=str_help_GameUIImg3;
+                                                  end;
+                           end;
+mi_help_GameUIImg3     : if(not check)then
+                           case menu_HelpPage of
+                           mi_help_GameMechanics: begin
+                                                  menu_image        :=spr_doc_koth;
+                                                  menu_image_caption:=str_help_GameUIImg4;
+                                                  end;
+                           end;
 // CAMPAIGNS
 mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,true,0,camp_Maxdiff);
 mi_camp_Campaigns      : if(not check)then menu_ListMouseXY2Line(item,@camp_sel    ,camp_scroll    ,menu_CampLineH);

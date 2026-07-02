@@ -66,7 +66,7 @@ begin
         end;
 
         rectangleColor(tar,mi_xc-menu_ItemCaptionhW,mi_y0,
-                           mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonq,c_ltgray);
+                           mi_xc+menu_ItemCaptionhW,mi_y0+menu_BigButtonHh,c_ltgray);
         draw_text(tar,mi_xc,mi_y0+font_wh ,text,ta_MU,255,color);
      end;
 end;
@@ -340,6 +340,14 @@ begin
        drawmenu_StringArray(tar,mi_help_InfoList,@slist_l,slist_n,menu_HelpScroll,-1,txt_line_h1,-1,ui_DocListH,false,true);
    if(menu_HelpPage=mi_help_GameUI)then
      drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg1,0);
+   case menu_HelpPage of
+   mi_help_GameUI       : drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg1,0);
+   mi_help_GameMechanics: begin
+                          drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg2,0);
+                          drawmenu_ItemText1(tar,mi_help_GameUIImg2,str_help_GameUIImg3,0);
+                          drawmenu_ItemText1(tar,mi_help_GameUIImg3,str_help_GameUIImg4,0);
+                          end;
+   end;
 end;
 
 procedure drawmenu_BlockHelpUnitsInfo(tar:pSDL_Surface;forBalance:boolean=false);  // HELP UNITS TABLE
@@ -645,6 +653,8 @@ begin
    then draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundD)
    else draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundL);
 
+   //vlineColor(tar,0     ,0,menu_h,c_white);
+   //vlineColor(tar,menu_w-1,0,menu_h,c_white);
    //vlineColor(tar,400,0,600,c_yellow);
 
    {$IFDEF TESTMODE}
@@ -765,10 +775,11 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
    //menu_image
    if(menu_image<>nil)then
    begin
-      boxColor(tar,0,0,menu_w,menu_h,c_ablack);
+      boxColor(tar,0,0,menu_w,menu_h,c_iblack);
       ix:=menu_hw-(menu_image^.w div 2);
       iy:=menu_hh-(menu_image^.h div 2);
-      draw_text(tar,ix+(menu_image^.w div 2),iy-font_w1,str_menuMsg_HintImg,ta_MB,255,c_white);
+      draw_text(tar,ix+(menu_image^.w div 2),iy                      ,menu_image_caption ,ta_MB,255,c_white);
+      draw_text(tar,ix+(menu_image^.w div 2),iy+menu_image^.h+font_wh,str_menuMsg_HintImg,ta_MU,255,c_white);
       draw_sdlsurface(tar,ix,iy,menu_image);
       rectangleColor(tar,ix,iy,
                          ix+menu_image^.w,iy+menu_image^.h,c_white);

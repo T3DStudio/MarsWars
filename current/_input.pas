@@ -784,6 +784,7 @@ begin
    tcc_observer: case m_brush of
                  co_markLook        : if(not iActEnabled(iAct_Control_MarkLook  ))then m_brush:=co_empty;
                  co_markAttack      : if(not iActEnabled(iAct_Control_MarkAttack))then m_brush:=co_empty;
+                 else m_brush:=co_empty;
                  end;
    else m_brush:=co_empty
    end;
@@ -1311,7 +1312,7 @@ begin
    begin
       {$IFDEF TESTMODE}
       // Test mode
-      if(TestMode>0)and(net_status=ns_none)and(rpls_pstate<>rpls_read)then
+      if(TestMode>0)and(net_status=ns_none){and(rpls_pstate<>rpls_read)}then
       begin
          if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd :=not test_InstaProd;
@@ -1331,7 +1332,7 @@ begin
          if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersMain[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
          if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersMain[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
 
-         //if(InputActionPressed(iAct_test_debug0      ))then Game_ShuffleAINames;
+        // if(InputActionPressed(iAct_test_debug0      ))then net_debug:= not net_debug;
          if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
       end;
       {$ENDIF}

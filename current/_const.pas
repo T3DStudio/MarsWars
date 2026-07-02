@@ -161,7 +161,7 @@ MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
 
-MaxKeyPoints           = MaxPlayers*2;
+MaxKeyPoints           = MaxPlayers*3;
 LastKeyPoint           = MaxKeyPoints-1;
 
 map_MaxSize            = 8000;
@@ -842,9 +842,6 @@ uids_arch_res          = [UID_Imp,UID_Demon,UID_Cacodemon,UID_Knight,UID_Baron,U
 uids_demons            = [UID_LostSoul..UID_Archvile]+uids_zimbas;
 uids_all               = [0..255];
 
-//uid_race_start_fbase   : array[1..r_count] of smallint = (UID_HKeep ,UID_UCommandCenter );
-//uid_race_start_gen     : array[1..r_count] of smallint = (UID_HKeep ,UID_UCommandCenter );
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1023,9 +1020,9 @@ invuln_time_sec        = 30;
 invuln_time            = fr_fps1*invuln_time_sec;
 rdamage_time_sec       = 30;
 rdamage_time           = fr_fps1*rdamage_time_sec;
-ddamage_time_sec       = 15;
+ddamage_time_sec       = 20;
 ddamage_time           = fr_fps1*ddamage_time_sec;
-dturbo_time_sec        = 10;
+dturbo_time_sec        = 15;
 dturbo_time            = fr_fps1*dturbo_time_sec;
 
 tank_sr                = 20;
@@ -1743,6 +1740,8 @@ mi_help_Other          = 237;
 mi_help_InfoPanel      = 240;
 mi_help_InfoList       = 241;
 mi_help_GameUIImg1     = 242;
+mi_help_GameUIImg2     = 243;
+mi_help_GameUIImg3     = 244;
 
 //// CAMPAIGNs
 
@@ -1779,7 +1778,7 @@ menu_ListLinehH        = menu_ListLineH div 2;
 menu_CaptionhW         = menu_BaseW1*3;
 menu_BigButtonW        = menu_BaseW1*3+menu_BaseWh;
 menu_BigButtonH        = menu_BaseW1;
-menu_BigButtonq        = menu_BigButtonH div 2;
+menu_BigButtonHh       = menu_BigButtonH div 2;
 menu_StepFromBottom    = menu_BaseW1+menu_BasehW;
 menu_ItemCaptionhW     = menu_BaseW1*3;
 menu_LowerBorderY      = menu_h-menu_StepFromBottom-menu_BigButtonH;

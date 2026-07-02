@@ -65,7 +65,7 @@ begin
                           EID_HLevelUp,
                           EID_ULevelUp,
                           EID_PowerUp     : snd_SoundPlayUnit(snd_PowerUp        ,pu,nil);
-                          EID_UnitCaptured: snd_SoundPlayUnit(snd_KeyPointCapture,pu,nil);
+                          EID_UnitCaptured: snd_SoundPlayUnit(snd_GeneratorCapture,pu,nil);
                           EID_HVision     : snd_SoundPlayUnit(snd_hell_eye       ,pu,nil);
                           end;
 

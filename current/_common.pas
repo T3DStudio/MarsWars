@@ -1929,9 +1929,7 @@ begin
 
    if(UIplayer>LastPlayer)then
    begin
-      if(rpls_pstate=rpls_read)
-      or(g_PlayersMain[LocalPlayer].isobserver)
-      or(Game_IsEnded)then exit;
+      if(ui_ControlTabType in [tcc_observer,tcc_replay])then exit;
    end
    else
       if(tu^.TeamVision[g_PlayersMain[UIplayer].team]>0)then exit;
@@ -1944,9 +1942,7 @@ begin
    ui_CheckUnitFullFogReveal:=false;
    if(tu=nil)then exit;
 
-   if(rpls_pstate=rpls_read)
-   or(g_PlayersMain[LocalPlayer].isobserver)
-   or(Game_IsEnded)then
+   if(ui_ControlTabType in [tcc_observer,tcc_replay])then
    begin
       if(UIPlayer>LastPlayer)
       then ui_CheckUnitFullFogReveal:=true

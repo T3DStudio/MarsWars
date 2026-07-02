@@ -135,11 +135,11 @@ u_royal_cd,
 u_royal_d         : integer;
 
 ai_names_o        : array[0..ai_names_max-1] of shortstring = (
-                    ' TGA'   ,' NRM'    ,' BFG'      ,' Dant3'    ,' marat'   ,' Notarget' ,' Am$ek'   ,' Chainie' ,' BND'      ,' NicoThFug',
-                    ' Mud'   ,' Aurora' ,' Archi'    ,' print423' ,' Rising'  ,' KolyanRPG',' Boiec'   ,' MWG'     ,' Teran'    ,' ZZYZX'    ,
-                    ' Jet'   ,' ABK'    ,' NekoRangr',' OutCast'  ,' Igara'   ,' VoZj'     ,' Raymund' ,' Murphy'  ,' Jabber'   ,' NikcGreen',
-                    ' Zetor' ,' Bertie' ,' Doomersov',' Seifer'   ,' m0rdecai',' KrikIDDQD',' Ipse'    ,' Sergh'   ,' cybermind',' Dem',
-                    ' Romero',' Carmack',' Keen'     ,' BJ'       ,' Doomguy' ,' Slayer'   ,' Ranger'  ,' Grunt'   ,' Deimos'   ,' Phobos');
+                    ' TGA'   ,' NRM'    ,' BFG'       ,' Dant3'    ,' marat'   ,' Notarget'  ,' Am$ek'   ,' Chainie' ,' BND'      ,' NicoThFug',
+                    ' Mud'   ,' Aurora' ,' Archi'     ,' print423' ,' Rising'  ,' KolyanRPG' ,' Boiec'   ,' MWG'     ,' Teran'    ,' ZZYZX'    ,
+                    ' Jet'   ,' ABK'    ,' NekoRangr' ,' OutCast'  ,' Igara'   ,' VoZj'      ,' Raymund' ,' Murphy'  ,' Jabber'   ,' NikcGreen',
+                    ' Zetor' ,' Bertie' ,' Doomersov' ,' Seifer'   ,' m0rdecai',' KrikIDDQD' ,' Ipse'    ,' Sergh'   ,' cybermind',' Dem',
+                    ' Romero',' Carmack',' Keen'      ,' BJ'       ,' Doomguy' ,' Slayer'    ,' Ranger'  ,' Grunt'   ,' Deimos'   ,' Phobos');
 ai_names_l        : array[0..ai_names_max-1] of shortstring;
 
 {$IFDEF TESTMODE}
@@ -148,12 +148,12 @@ test_w            : word = 0;
 TestMode          : byte = 0;
 {$ENDIF}
 
+{$IFDEF _FULLGAME}
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   CLIENT GAME VARS
 //
 
-{$IFDEF _FULLGAME}
 
 //sys_WindowFocus   : boolean = true;
 sys_uncappedFPS   : boolean = false;
@@ -348,6 +348,7 @@ ui_MouseHintY     : integer = 0;
 ui_MouseHintL     : TUIStringList;
 
 ui_ReplayBarW     : integer = 0;
+ui_ReplayBarWh    : integer = 0;
 ui_ReplayBarH     : integer = font_w2;
 ui_ReplayBarX     : integer = 0;
 ui_ReplayBarY     : integer = 0;
@@ -415,6 +416,7 @@ menu_msg_type     : TMenuMessageBoxType;
 menu_msg_Caption,
 menu_msg_Body     : shortstring;
 menu_image        : pSDL_Surface = nil;
+menu_image_caption: shortstring;
 
 menu_hint_pos     : array[byte] of byte;
 
@@ -609,6 +611,7 @@ c_ltgray,
 c_gray,
 c_dgray,
 c_ablack,
+c_iblack,
 c_mablack,
 c_purple,
 c_violet,
@@ -909,7 +912,10 @@ spr_uibtn_F1,
 spr_uibtn_F2,
 spr_uibtn_ProdCancel,
 spr_uibtn_Delete,
-spr_ui_doc,
+spr_doc_ui,
+spr_doc_Generators,
+spr_doc_KeyPoint,
+spr_doc_koth,
 spr_MenuBackgroundL,
 spr_MenuBackgroundD,
 spr_cursor,
@@ -979,6 +985,9 @@ str_help_BalanceTable,
 str_help_Other,
 
 str_help_GameUIImg1,
+str_help_GameUIImg2,
+str_help_GameUIImg3,
+str_help_GameUIImg4,
 
 str_doc_HotKey,
 str_doc_Attributes,
@@ -1588,8 +1597,9 @@ snd_explode_plasma,
 snd_explode,
 snd_mapmark,
 snd_KeyPointControl,
-snd_KeyPointCapture,
 snd_KeyPointLost,
+snd_GeneratorCapture,
+snd_GeneratorLost,
 snd_SwitchOn,
 snd_SwitchOff,
 snd_Stink,

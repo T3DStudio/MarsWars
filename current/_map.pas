@@ -332,29 +332,35 @@ begin
          end;
 end;
 
-function map_DistToObstacleEdge(x,y:integer):integer;
+function map_DistToObstacleEdge(x,y,r:integer):integer;
 var
-dx,dy,
+dx0,dy0,
+dx1,dy1,
+ix ,iy,
 i,d,o:integer;
 begin
    map_DistToObstacleEdge:=NOTSET;
-   dx:=x div MapObstaclesGridW;
-   dy:=y div MapObstaclesGridW;
-   if (0<=dx)and(dx<=MapObstaclesGridN)
-   and(0<=dy)and(dy<=MapObstaclesGridN)then
-     with map_ObstaclesGrid[dx,dy] do
-       if(oc_n>0)then
-         for i:=0 to oc_n-1 do
-           with oc_l[i]^ do
-             if(o_rO>0)then
-             begin
-                d:=point_dist_int(o_x,o_y,x,y);
-                o:=abs(d-o_rO);
-                map_DistToObstacleEdge:=min2i(o,map_DistToObstacleEdge);
-                if(o_ri<=0)then continue;
-                o:=abs(d-o_ri);
-                map_DistToObstacleEdge:=min2i(o,map_DistToObstacleEdge);
-             end;
+   dx0:=(x-r) div MapObstaclesGridW;
+   dy0:=(y-r) div MapObstaclesGridW;
+   dx1:=(x+r) div MapObstaclesGridW;
+   dy1:=(y+r) div MapObstaclesGridW;
+   for ix:=dx0 to dx1 do
+   for iy:=dy0 to dy1 do
+     if (0<=ix)and(ix<=MapObstaclesGridN)
+     and(0<=iy)and(iy<=MapObstaclesGridN)then
+       with map_ObstaclesGrid[ix,iy] do
+         if(oc_n>0)then
+           for i:=0 to oc_n-1 do
+             with oc_l[i]^ do
+               if(o_rO>0)then
+               begin
+                  d:=point_dist_int(o_x,o_y,x,y);
+                  o:=abs(d-o_rO);
+                  map_DistToObstacleEdge:=min2i(o,map_DistToObstacleEdge);
+                  if(o_ri<=0)then continue;
+                  o:=abs(d-o_ri);
+                  map_DistToObstacleEdge:=min2i(o,map_DistToObstacleEdge);
+               end;
 end;
 
 function map_RObstaclePointIn(x,y:integer):integer;
@@ -496,12 +502,12 @@ end;
 
 function map_KeyPoints_CheckPos(ix,iy,aCaptureR:integer):boolean;
 begin
-   map_KeyPoints_CheckPos:=(map_IfPlayerStartHere (ix,iy,base_r1h,0,map_PStartsGap))
-                         or(map_IfKeyPointHere    (ix,iy,base_r1h  ))
-                         or(map_DistToObstacleEdge(ix,iy)<aCaptureR);
+   map_KeyPoints_CheckPos:=(map_IfPlayerStartHere (ix,iy,base_r1,0,map_PStartsGap))
+                         or(map_IfKeyPointHere    (ix,iy,base_r1  ))
+                         or(map_DistToObstacleEdge(ix,iy,aCaptureR)<aCaptureR);
 end;
 
-procedure map_KeyPoints_Rect(cx,cy,cr,cdir,acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+{procedure map_KeyPoints_Rect(cx,cy,cr,cdir,acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
 var
 adir,
 astep: single;
@@ -536,7 +542,7 @@ begin
       if(sx<>NOTSET)then
         if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))then exit;
    end;
-end;
+end;}
 
 procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
 const max_attempts = 500;
@@ -564,7 +570,7 @@ begin
          ix:=u+g_random(b);
          iy:=u+g_random(b);
 
-         map_symmetryPoints2(@ix,@iy,@sx,@sy,base_r1h);
+         map_symmetryPoints2(@ix,@iy,@sx,@sy,base_r1);
 
          if(map_KeyPoints_CheckPos(ix,iy,aCaptureR))then continue;
          if(sx<>NOTSET)then
@@ -583,11 +589,11 @@ begin
       end;
    end;
 
-   if(success<map_MaxPlayers)and(map_MaxPlayers>0)then
+   {if(success<map_MaxPlayers)and(map_MaxPlayers>0)then
    begin
       b:=map_MaxPlayers-success;
       map_KeyPoints_Rect(map_SizeH,map_SizeH,map_SizeH-u,map_SymmetryDir+((360 div map_MaxPlayers) div 2),b,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-   end;
+   end;  }
 end;
 
 procedure map_KeyPoints_Create;
@@ -604,7 +610,15 @@ mc_KeyPoints: begin
    end;
 
    if(map_generators>0)then
-     map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+   begin
+      if(map_MaxPlayers>0)then
+        for i:=0 to map_MaxPlayers-1 do
+          map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i])*keyPoint_GenR),
+                            map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i])*keyPoint_GenR),
+                            keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+
+      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+   end;
 
    map_KeyPoints_UpdateZone;
    map_KeyPoints_UpdateTeamData;

@@ -425,7 +425,7 @@ begin
    uid_SightR_Base     := 200;
    uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 1;
-   uid_PainState_Base  := 6;
+   uid_PainState_Base  := 8;
    uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1;
    uid_LevelUpTimeSecs := ptime1;
@@ -445,10 +445,10 @@ begin
    uid_MSpeed_Base     := 10;
    uid_Armor_upgr1     := upgr_hell_UnitArmor;
    uid_Regen_Upgr      := upgr_hell_Regeneration;
-   uid_SightR_Base     := 250;
+   uid_SightR_Base     := 275;
    uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 2;
-   uid_PainState_Base  := 6;
+   uid_PainState_Base  := 8;
    uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1q;
    uid_LimitUse        := ul2;
@@ -707,6 +707,7 @@ begin
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
    uid_MSpeed_Base     := 12;
+   uid_LevelUpTimeSecs := ptime1;
 
    case i of
 UID_Sergant : begin
@@ -1995,7 +1996,7 @@ uab_Bribe           : begin
                       end;
 uab_Hack            : begin
                          ua_type        := uat_UnitEnemy;
-                         ua_req_UACLoot := 10000;
+                         ua_req_UACLoot := 7500;
                       end;
 uab_UACGeneral         : begin
                          ua_type        := uat_UnitAlly;

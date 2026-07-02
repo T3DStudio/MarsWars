@@ -311,14 +311,6 @@ begin
    str_themes[6]                 :=tc_orange+'PHOBOS';
    str_themes[7]                 :=tc_gray  +'DEIMOS';
 
-   {str_themes[1]                 :=tc_blue  +'TECH BASE' ;
-   str_themes[2]                 :=tc_white +'UNKNOWN PLANET';
-   str_themes[3]                 :=tc_aqua  +'UNKNOWN MOON';
-   str_themes[4]                 :=tc_gray  +'CAVES';
-
-   str_themes[6]                 :=tc_orange+'HELL PLANET';
- }
-
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
    str_FileLoad                  := 'Load';
@@ -518,6 +510,9 @@ begin
    str_help_Other                := 'Other';
 
    str_help_GameUIImg1           := 'image #1';
+   str_help_GameUIImg2           := 'image #2';
+   str_help_GameUIImg3           := 'image #3';
+   str_help_GameUIImg4           := 'image #4';
 
    str_doc_HotKey                := 'Hot key: ';
    str_doc_Attributes            := 'Attributes: ';
@@ -1095,6 +1090,31 @@ begin
    //  Help docs  GAME Mechanics
    str_StringListClear(@str_doc_BaseMechanics);
 
+   {
+   str_map_ScenarioL[mc_1x1      ]:= tc_yellow+'1x1'         +tc_default;
+   str_map_ScenarioL[mc_2x2      ]:= tc_yellow+'2x2'         +tc_default;
+   str_map_ScenarioL[mc_3x3      ]:= tc_yellow+'3x3'         +tc_default;
+   str_map_ScenarioL[mc_4x4      ]:= tc_yellow+'4x4'         +tc_default;
+   str_map_ScenarioL[mc_2x2x2    ]:= tc_orange+'2x2x2'       +tc_default;
+   str_map_ScenarioL[mc_2x2x2x2  ]:= tc_orange+'2x2x2x2'     +tc_default;
+   str_map_ScenarioL[mc_KeyPoints]:= tc_aqua  +'Key points'  +tc_default;
+   str_map_ScenarioL[mc_KotH     ]:= tc_aqua  +'KotH'        +tc_default;
+   str_map_ScenarioL[mc_royale   ]:= tc_red   +'Royal Battle'+tc_default;
+
+   DocHelp_AddBaseMchanics(str_ui_objectives+str_objective_Scirmish);
+   }
+
+   DocHelp_AddBaseMchanics(tc_orange+'MAP SCENARIOS'+tc_default+tc_doccpt);
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics(str_map_ScenarioL[mc_ffa3]+'-'+str_map_ScenarioL[mc_ffa8]+' - free-for-all for few players; no team-lock;');
+   DocHelp_AddBaseMchanics(str_map_ScenarioL[mc_1x1 ]+' - FFA for few players; no team-lock;');
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics(tc_orange+'SPECIAL MAP OBJECTS'+tc_default+tc_doccpt);
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics('Neutral generators - see image #2 - ');
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'RESOURCES'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(' ');
    DocHelp_AddBaseMchanics(tc_docbr+'There are 3 types of resources in the game:');

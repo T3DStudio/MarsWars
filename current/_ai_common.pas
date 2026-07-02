@@ -480,17 +480,24 @@ begin
    if(pcurkp^=nil)
    then
    else
-     if((newkp^.kp_Zone=tu^.mapZone)or tu^.isfly)>((pcurkp^^.kp_Zone=tu^.mapZone)or tu^.isfly)
-     then
-     else
-     if((newkp^.kp_Zone=tu^.mapZone)or tu^.isfly)<((pcurkp^^.kp_Zone=tu^.mapZone)or tu^.isfly)
-     then exit
-     else
-       if(newd<pcurd^)
-       then
-       else
-       if(newd>pcurd^)
-       then exit;
+     case tu^.isfly of
+     true : if(newd<pcurd^)
+            then
+            else
+            if(newd>pcurd^)
+            then exit;
+     false: if((newkp^.kp_Zone=tu^.mapZone)>(pcurkp^^.kp_Zone=tu^.mapZone))
+            then
+            else
+            if((newkp^.kp_Zone=tu^.mapZone)<(pcurkp^^.kp_Zone=tu^.mapZone))
+            then exit
+            else
+              if(newd<pcurd^)
+              then
+              else
+              if(newd>pcurd^)
+              then exit;
+     end;
 
    pcurkp^:=newkp;
    pcurd^ :=newd;
@@ -668,6 +675,7 @@ begin
 
              d:=point_dist_int(kp_x,kp_y,x,y);
 
+             //uid_LimitUse
              if(not koth_point)then
                if((kp_LimitPlayerP[playeri]>=(keyPoint_MinLimit  +uid_LimitUse))and(d> kp_RCapture))
                or((kp_LimitPlayerP[playeri]> (keyPoint_MaxLimitAI+uid_LimitUse))and(d<=kp_RCapture))then continue;

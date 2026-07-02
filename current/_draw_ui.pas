@@ -740,6 +740,9 @@ begin
 
    boxColor (tar,ui_ReplayBarX,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+w,ui_ReplayBarY,c_yellow);
    draw_text(tar,ui_ReplayBarX,ui_ReplayBarY-font_wh,i2s(round(cx*100))+'%',ta_LB,255,c_white);
+
+   if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then
+     draw_text(tar,ui_ReplayBarWh,ui_ReplayBarY-font_wh,rpls_list[rpls_list_sel],ta_MB,255,c_white);
 end;
 
 procedure draw_UILog(tar:pSDL_Surface;x,y:integer;logAlign,POVPlayer,LogLineLen,LogListH:byte;LogSet:TSob);

@@ -441,8 +441,8 @@ begin
           SetThemeLiquidsB('31_35');
           SetThemeLiquidsF('3,5,9_11');
           SetThemeObs0    ('13_17,20,21,36,42_47,106,112');
-          SetThemeObs1    ('103_105,107_111'     );
-          SetThemeObs2    ('117_120'                     );
+          SetThemeObs1    ('103_105,107_111');
+          SetThemeObs2    ('117_120'        );
 
           theme_liquid_style:=tcs_smooth;
           theme_crater_style:=tcs_square;
@@ -451,11 +451,11 @@ begin
           SetThemeDecals  ('-1_-4,0,21,22');
           SetThemeCraters ('6,7,5,15,17'  );
           SetThemeTerrains('6,7,15'       );
-          SetThemeLiquidsB('17,26'      );
-          SetThemeLiquidsF('14'      );
+          SetThemeLiquidsB('17,26'        );
+          SetThemeLiquidsF('14'           );
           SetThemeObs0    ('19,22_27,35,41,52_53');
           SetThemeObs1    ('81_82'      );
-          SetThemeObs2    ('58,121_124');
+          SetThemeObs2    ('58,121_124' );
 
           theme_liquid_style:=tcs_smooth;
           theme_crater_style:=tcs_smooth;
@@ -499,109 +499,6 @@ begin
           theme_liquid_style:=tcs_default;
           theme_crater_style:=tcs_default;
        end;
-   {        4,10,14,16,21,22,23,29,30,35
-   unused
-     decals    0
-     terrains  1      // red
-               3 5    // brown
-               6 7    // green
-   }
-
-   {0 : begin  // UAC BASE
-          SetThemeDecals  ('-1_-4,1_3,21,22,26,27,29,31,32');
-          SetThemeCraters ('17,18,19,26');
-          SetThemeTerrains('17,18'      );
-          SetThemeLiquidsB('19,26'      );
-          SetThemeLiquidsF('0_2,6'      );
-          SetThemeObs0    ('19,22_27,32,35,37_41,52_53');
-          SetThemeObs1    ('81_87'      );
-          SetThemeObs2    ('56_58,65,67,75');
-
-          theme_liquid_style:=tcs_smooth;
-          theme_crater_style:=tcs_square;
-       end;
-   1 : begin  // TECH BLUE BASE
-          SetThemeDecals  ('-1_-4,1_3,21,22,26,27,29,31,32');
-          SetThemeCraters ('17,18,19,26');
-          SetThemeTerrains('19'         );
-          SetThemeLiquidsB('17,18,26'   );
-          SetThemeLiquidsF('13_15'      );
-          SetThemeObs0    ('19,22_27,32,35,37_41,30,48');
-          SetThemeObs1    ('81_87'      );
-          SetThemeObs2    ('56_58,65,67,75'       );
-
-          theme_liquid_style:=tcs_smooth;
-          theme_crater_style:=tcs_smooth;
-       end;
-
-   2 : begin  // UNKNOWN PLANET
-          SetThemeDecals  ('-1_-4,1,4_17,23_25');
-          SetThemeCraters ('0,2_16,20_25,28' );
-          SetThemeTerrains('0,2_16,20_25'    );
-          SetThemeLiquidsB('0,2_16,20_25,28' );
-          SetThemeLiquidsF('0,2,3,6,14'      );
-          SetThemeObs0    ('0_12,18,28,48_50');
-          SetThemeObs1    ('77,88_92,96_101' );
-          SetThemeObs2    ('55,58,66,69,70'  );
-
-          theme_liquid_style:=tcs_default;
-          theme_crater_style:=tcs_default;
-       end;
-   3 : begin  // UNKNOWN MOON
-          SetThemeDecals  ('-1_-4,1,4_17,23_25'       );
-          SetThemeCraters ('0,2_4,8,10_13,20_23,25,28');
-          SetThemeTerrains('0,2_4,8,10_13,20_23,25'   );
-          SetThemeLiquidsF('0,4,6,8,9,11,14'          );
-          SetThemeLiquidsB('0,2_4,8,10_13,20_23,25,28');
-          SetThemeObs0    ('0_12,18,28_32,48_50'      );
-          SetThemeObs1    ('77,88_92,96_101,33,34'    );
-          SetThemeObs2    ('55,58,66,69,70'           );
-
-          theme_liquid_style:=tcs_default;
-          theme_crater_style:=tcs_default;
-       end;
-
-   4 : begin  // CAVES
-          SetThemeDecals  ('-1_-4,1,4_20,23_25,28,30,33,34');
-          SetThemeCraters ('0_4,8_16,20_25,28_30');
-          SetThemeTerrains('0_4,8_16,20_25'      );
-          SetThemeLiquidsB('0_4,8_16,20_25,28_30');
-          SetThemeLiquidsF('0_14'                );
-          SetThemeObs0    ('0_13,15_28,35,36,42_47,48');
-          SetThemeObs1    ('77,88_92,96_101'          );
-          SetThemeObs2    ('55,58,66,69,70'           );
-
-          theme_liquid_style:=tcs_default;
-          theme_crater_style:=tcs_default;
-       end;
-   5 : begin  // ICE CAVES
-          SetThemeDecals  ('-1_-4,1_20,23_25,28,30,33,34');
-          SetThemeCraters ('0,2,11_13,20,25,28');
-          SetThemeTerrains('0,2,11_13,20,25');
-          SetThemeLiquidsB('0,2,11_13,20,25,28');
-          SetThemeLiquidsF('16'             );
-          SetThemeObs0    ('0_13,15_28,35,36,42_47,48');
-          SetThemeObs1    ('77,88_92,96_101'  );
-          SetThemeObs2    ('55,56,58,66,69,70');
-
-          theme_liquid_style:=tcs_default;
-          theme_crater_style:=tcs_default;
-       end;
-
-   6 : begin  // HELL PLANET
-          SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-          SetThemeCraters ('1,27,23'               );
-          SetThemeTerrains('1,27,23'               );
-          SetThemeLiquidsB('1,27,23'               );
-          SetThemeLiquidsF('5,9,11'                );
-          SetThemeObs0    ('3,13_17,20,21,36,42_47,112');
-          SetThemeObs1    ('76,78_80,93_95,102,103_105,107_111,113,114');
-          SetThemeObs2    ('54,59_64,68,71_74,117_120'             );
-
-          theme_liquid_style:=tcs_default;
-          theme_crater_style:=tcs_default;
-       end;
-}
    end;
    theme_map_RBattleFront:=72;
    SetTLBlC;

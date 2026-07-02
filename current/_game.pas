@@ -357,35 +357,6 @@ begin
        if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
-
-procedure GameCreateStartBase(x,y:integer;uid_Builder,uid_Gen,playerN:byte);
-var
-stepR,
-stepD,
-dir,
-num  :integer;
-begin
-   unit_add(x,y,0,uid_Builder,playerN,true,false,0);
-   if(map_generators>0)and(uid_Gen>0)then
-   begin
-      stepR:=g_uids[uid_Builder].uid_r+g_uids[uid_Gen].uid_r;
-      if(g_uids[uid_Gen].uid_LimitUse>ul1)
-      then num:=2
-      else num:=4;
-      stepD:=360 div num;
-      dir:=point_dir(x,y,map_Sizeh,map_Sizeh)+(stepD div 2);
-      while(num>0)do
-      begin
-         unit_add(
-         x+round(stepR*cos(dir*DEGTORAD)),
-         y-round(stepR*sin(dir*DEGTORAD)),
-         0,uid_Gen,playerN,true,false,0);
-         num-=1;
-         dir+=stepD;
-      end;
-   end;
-end;
-
 procedure Game_StartSkirmish;
 var p:byte;
 begin
@@ -428,8 +399,8 @@ begin
           ai_PlayerSetSkirmishSettings(p);
           if(not isobserver)then
             case race of
-            r_hell: GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],uid_HKeep         ,uid_HSymbol4   ,p);
-            r_uac : GameCreateStartBase(map_PlayerStartX[p],map_PlayerStartY[p],UID_UCommandCenter,UID_UGenerator4,p);
+            r_hell: unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,uid_HKeep         ,p,true,false,0);
+            r_uac : unit_add(map_PlayerStartX[p],map_PlayerStartY[p],0,UID_UCommandCenter,p,true,false,0);
             end;
        end;
 
@@ -755,7 +726,8 @@ end;
 //
 
 procedure game_MakeRandomSkirmish;
-var p:byte;
+var p,
+ainum:byte;
 begin
    Map_randommap;
 
@@ -764,13 +736,14 @@ begin
    1:   map_scenario:=mc_KeyPoints;
    2:   map_scenario:=mc_KotH;
    else
-     case random(6) of
+     case random(7) of
      0: map_scenario:=mc_ffa3;
      1: map_scenario:=mc_ffa4;
      2: map_scenario:=mc_ffa5;
      3: map_scenario:=mc_ffa6;
      4: map_scenario:=mc_ffa7;
      5: map_scenario:=mc_ffa8;
+     6: map_scenario:=mc_1x1;
      end;
    end;
 
@@ -789,6 +762,7 @@ begin
    PlayersSwap(random(map_MaxPlayers),LocalPlayer,false);
    {$ENDIF}
 
+   ainum:=0;
    for p:=0 to map_MaxPlayers-1 do
      with g_PlayersMain[p] do
        if(state<>ps_human)then
@@ -798,11 +772,14 @@ begin
 
           team:=random(6);
 
-          aip_skill:=random(6)+2;
-
           if(random(2)=0)
-          then PlayerSetState(p,ps_None)
-          else PlayerSetState(p,ps_AI);
+          or(ainum=0)then
+          begin
+             aip_skill:=random(6)+2;
+             PlayerSetState(p,ps_AI);
+             ainum+=1;
+          end
+          else PlayerSetState(p,ps_None);
        end;
 
    if(random(3)=0)

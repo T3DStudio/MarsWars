@@ -841,6 +841,7 @@ procedure unit_CaptureKeyPoint(pu:PTUnit);
 var
 kpi:byte;
 d  :integer;
+l  :longint;
 begin
    if(map_KeyPointsN>0)then
      with pu^ do
@@ -849,11 +850,15 @@ begin
          begin
             d:=point_dist_int(x,y,kp_x,kp_y);
             if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
-              if(d<=(kp_RCapture+uid^.uid_r))then
-              begin
-                 kp_LimitPlayerC[playeri     ]+=uid^.uid_LimitUse;
-                 kp_LimitTeamC  [player^.team]+=uid^.uid_LimitUse;
-              end;
+              with uid^ do
+                if(d<=(kp_RCapture+uid_r))then
+                begin
+                   if(uid_isbuilder)
+                   then l:=keyPoint_MinLimit
+                   else l:=uid_LimitUse;
+                   kp_LimitPlayerC[playeri     ]+=l;
+                   kp_LimitTeamC  [player^.team]+=l;
+                end;
 
             // update team data
             with uid^ do
@@ -2260,9 +2265,10 @@ begin
           else
             if(transformTimer>0)then
             begin
-               if(buffs[ub_SphereTurbo]>0)
-               then transformTimer-=2
-               else transformTimer-=1;
+               if(res_energyl_cur>=0)then
+                 if(buffs[ub_SphereTurbo]>0)
+                 then transformTimer-=2
+                 else transformTimer-=1;
 
                if(transformTimer<1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF} then transformTimer:=1;
                if(transformTimer=1)then
@@ -2366,13 +2372,16 @@ begin
       with pu^ do
         if(hits>hits_dead)then
         begin
-           with player^ do
-             if(isdefeated)
-             or(isobserver)then
-             begin
-                unit_kill(pu,true,true,false,true,true);
-                continue;
-             end;
+           {$IFDEF _FULLGAME}
+           if(ServerSide)then
+           {$ENDIF}
+             with player^ do
+               if(isdefeated)
+               or(isobserver)then
+               begin
+                  unit_kill(pu,true,true,false,true,true);
+                  continue;
+               end;
 
            if(cycle_order=g_cycle_order)then
              unit_TeamReveal(pu,false);

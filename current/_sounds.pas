@@ -508,6 +508,7 @@ lmt_chat_player0..
 lmt_chat_player7        : if((lm_type-lmt_chat_player0)<>PListener)then snd_SoundPlayUI(snd_chat);
 lmt_player_leave        : if(not g_started)
                           or(g_PlayersMain[LocalPlayer].isobserver)then snd_SoundPlayUI(snd_chat);
+lmt_player_revealed,
 lmt_player_surrender,
 lmt_chat_common,
 lmt_game_message        : snd_SoundPlayUI(snd_chat);
@@ -541,12 +542,12 @@ lmt_markLook            : snd_SoundPlayMMapAlarm(snd_Stink  ,false);
 
 // Key Point Events
 lmt_Req_Energy          : snd_SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
-lmt_koth_control        : snd_SoundPlayAnoncer(snd_KeyPointControl,true,false);
-lmt_ngen_captured,
-lmt_kpoint_captured     : snd_SoundPlayAnoncer(snd_KeyPointCapture,true,false);
+lmt_koth_control,
+lmt_kpoint_captured     : snd_SoundPlayAnoncer(snd_KeyPointControl,true,false);
+lmt_kpoint_lost         : snd_SoundPlayAnoncer(snd_KeyPointLost ,false,false);
+lmt_ngen_captured       : snd_SoundPlayAnoncer(snd_GeneratorCapture,true,false);
 lmt_ngen_exh,
-lmt_ngen_lost,
-lmt_kpoint_lost         : snd_SoundPlayAnoncer(snd_KeyPointLost,false,false);
+lmt_ngen_lost           : snd_SoundPlayAnoncer(snd_GeneratorLost,false,false);
 
 lmt_invalid_Target,
 lmt_ability_BadPlace,
@@ -669,8 +670,10 @@ begin
    snd_Healing              :=snd_SoundSetLoad('healing'         );
    snd_IconOfSinCube        :=snd_SoundSetLoad('IconOfSinCube'   );
    snd_KeyPointControl      :=snd_SoundSetLoad('KeyPointControl' );
-   snd_KeyPointCapture      :=snd_SoundSetLoad('KeyPointCapture' );
    snd_KeyPointLost         :=snd_SoundSetLoad('KeyPointLost'    );
+   snd_GeneratorCapture     :=snd_SoundSetLoad('GeneratorCapture' );
+   snd_GeneratorLost        :=snd_SoundSetLoad('GeneratorLost'    );
+
    snd_mapmark              :=snd_SoundSetLoad('MapMark'         );
    snd_PowerUp              :=snd_SoundSetLoad('PowerUp'         );
    snd_SwitchOn             :=snd_SoundSetLoad('SwitchOn'        );

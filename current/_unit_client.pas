@@ -465,6 +465,7 @@ procedure wclinet_KeyPoint(rpl:boolean;POVPlayer:byte);
 var
 kpteam,
 a,b  : byte;
+kpt,
 w    : word;
 wdkpi: pbyte;
 begin
@@ -472,9 +473,7 @@ begin
    then wdkpi:=@rpls_kpoints_kpi
    else wdkpi:=@g_PlayersTemp[POVPlayer].net_kpoints_kpi;
 
-   if(map_KeyPointsN>0)
-   then wdkpi^:=(wdkpi^+1) mod map_KeyPointsN
-   else wdkpi^:=0;
+   wdkpi^:=(wdkpi^+1) mod map_KeyPointsN;
 
    if(g_PlayersMain[POVPlayer].isobserver)
    or(rpl)
@@ -484,11 +483,17 @@ begin
    with map_KeyPointsL[wdkpi^] do
      with kp_TeamData[kpteam] do
      begin
-        w:=(wdkpi^) and %0000000000001111;
-        if(kptd_Active)then w:=w or %0000000000010000;
+        w:=(wdkpi^) and %0000000000011111;
+        if(kptd_Active)then w:=w or %0000000000100000;
         if(kptd_Active)then
         begin
-           w:=w or ((word(ct2s(kptd_lifeTime)) and %0000011111111111) shl 5);
+           kpt:=word(ct2s(kptd_lifeTime));
+           {$IFDEF _FULLGAME}
+           if(ServerSide)then
+           {$ENDIF}
+             kpt:=kpt shr 1;
+           w:=w or ((kpt and %0000001111111111) shl 6);
+
            wudata_word(w,rpl);
 
            if(kptd_OwnerPlayer<MaxPlayers)
@@ -507,7 +512,7 @@ begin
            if(a<>b)then
              wudata_reload(kptd_Timer,rpl);
         end
-        else wudata_byte(w and %0000000000011111,rpl);
+        else wudata_byte(w and %0000000000111111,rpl);
      end;
 end;
 
@@ -650,6 +655,9 @@ end;
 
 var
 rpoint_ChangeAnnoncer: boolean = false;
+
+u_prev :TUnit;
+pu_prev:PTUnit = @u_prev;
 
 
 procedure client_UnitCountersInc(pu:PTUnit;rpl:boolean);
@@ -823,60 +831,61 @@ begin
        if(a_tar=tar)then a_tar:=0;
 end;
 
-procedure client_ChangeUnitState(cu:PTUnit;rpl:boolean);
+procedure client_ChangeUnitState(pu_cur:PTUnit;rpl:boolean);
 var
-pu,tu,
+tu,
 cuTransport:PTUnit;
    vis:boolean;
 begin
-   // pu - previous state
-   // cu - current state
-   pu:=@g_units[0];
+   // pu_prev - previous state
+   // pu_cur - current state
    cuTransport:=nil;
-   IsUnitRange(cu^.transportU,@cuTransport);
+   IsUnitRange(pu_cur^.transportU,@cuTransport);
+
+   //if(pu_cur^.unum=755)then writeln('client_ChangeUnitState 755 ',pu_prev^.unum,' ',pu_prev^.hits,'  ',pu_cur^.unum,' ',pu_cur^.hits);
 
    if(not rpl)then
-     if(pu^.uidi<>cu^.uidi)then
+     if(pu_prev^.uidi<>pu_cur^.uidi)then
      begin
-        unit_UnSelect(pu);
-        cu^.group:=0;
-        cu^.isselected:=false;
+        unit_UnSelect(pu_prev);
+        pu_cur^.group:=0;
+        pu_cur^.isselected:=false;
      end
      else
-       if(cu^.hits<=0)
+       if(pu_cur^.hits<=0)
        or(cuTransport<>nil)then
        begin
-          unit_UnSelect(cu);
-          cu^.group:=0;
+          unit_UnSelect(pu_cur);
+          pu_cur^.group:=0;
        end;
 
-   with cu^ do
+   with pu_cur^ do
    with player^ do
-     if(pu^.hits<=hits_dead)and(hits>hits_dead)then // create unit
+     if(pu_prev^.hits<=hits_dead)and(hits>hits_dead)then // create unit
      begin
-        unit_SetDefaults(cu,true);
-        unit_TeamReveal (cu,true);
+        unit_SetDefaults(pu_cur,true);
+        unit_TeamReveal (pu_cur,true);
         vx :=x;
         vy :=y;
-        vis:=ui_CheckUnitUIPlayerVision(cu,true);
+        vis:=ui_CheckUnitUIPlayerVision(pu_cur,true);
 
         if(cuTransport<>nil)then
-          unit_InTransportCode(cu,cuTransport);
+          unit_InTransportCode(pu_cur,cuTransport);
 
-        unit_Bonuses(cu);
+        unit_Bonuses(pu_cur);
 
         if(hits>0)then
         begin
-           unit_CalcFogR(cu);
-           if(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(cu,             @vis);
-           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (cu,             @vis);
-           if(buffs[ub_HellVision   ]>0)then   effect_Common    (cu,EID_HVision ,@vis);
-           if(buffs[ub_Heroic       ]>0)then   effect_Common    (cu,EID_PowerUp ,@vis);
+           unit_CalcFogR(pu_cur);
+           if(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(pu_cur,             @vis);
+           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (pu_cur,             @vis);
+           if(buffs[ub_HellVision   ]>0)then   effect_Common    (pu_cur,EID_HVision ,@vis);
+           if(buffs[ub_Heroic       ]>0)then   effect_Common    (pu_cur,EID_PowerUp ,@vis);
            if(buffs[ub_SphereInvuln ]>0)
-           or(buffs[ub_SphereInvis  ]>0)then   effect_Common    (cu,EID_ULevelUp,@vis);
+           or(buffs[ub_SphereInvis  ]>0)then   effect_Common    (pu_cur,EID_ULevelUp,@vis);
            if(buffs[ub_SphereRDamage]>0)
            or(buffs[ub_SphereDDamage]>0)
-           or(buffs[ub_SphereTurbo  ]>0)then   effect_Common    (cu,EID_HLevelUp,@vis);
+           or(buffs[ub_SphereTurbo  ]>0)then   effect_Common    (pu_cur,EID_HLevelUp,@vis);
 
            if(playeri=UIPlayer)and(not iscomplete)then
              with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
@@ -885,123 +894,129 @@ begin
         missiles_clear_tar(unum,true);
         unit_clear_a_tar(unum);
 
-        client_UnitCountersInc(cu,rpl);
+        client_UnitCountersInc(pu_cur,rpl);
      end
      else
-       if(pu^.hits>hits_dead)and(hits<=hits_dead)then // remove unit
+       if(pu_prev^.hits>hits_dead)and(hits<=hits_dead)then // remove unit
        begin
-          unit_Bonuses(pu);
+          unit_Bonuses(pu_prev);
+
+          //if (playeri=6)then writeln('remove unit  ',unum);
 
           vx:=x;
           vy:=y;
-          vis:=ui_CheckUnitUIPlayerVision(cu,true);
+          vis:=ui_CheckUnitUIPlayerVision(pu_cur,true)
+            or ui_CheckUnitUIPlayerVision(pu_prev,true);
 
-          if(pu^.hits>0)and(vis)then
+          if(pu_prev^.hits>0)and(vis)then
           begin
              if(hits>hits_ndead)and(cuTransport=nil)then
              begin
-                if(buffs[ub_Teleported]>0)then cleffect_teleport(cu,@vis);
+                if(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,@vis);
 
                 with uid^ do
                   if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
-                effect_UnitDeath(cu,true,@vis);
+                effect_UnitDeath(pu_cur,true,@vis);
              end;
           end;
 
           missiles_clear_tar(unum,true);
           unit_clear_a_tar(unum);
 
-          client_UnitCountersDec(pu,rpl);
+          client_UnitCountersDec(pu_prev,rpl);
        end
        else
-         if(pu^.hits>hits_dead)and(hits>hits_dead)then    // existed
+         if(pu_prev^.hits>hits_dead)and(hits>hits_dead)then    // existed
          begin
-            if(pu^.uidi<>uidi)then
+            if(pu_prev^.uidi<>uidi)then
             begin
                vx:=x;
                vy:=y;
                missiles_clear_tar(unum,true);
                unit_clear_a_tar(unum);
             end;
-            vis:=ui_CheckUnitUIPlayerVision(cu,true);
+            vis:=ui_CheckUnitUIPlayerVision(pu_cur,true)
+              or ui_CheckUnitUIPlayerVision(pu_prev,true);
 
-            unit_Bonuses(pu);
-            client_UnitCountersDec(pu,rpl);
+            unit_Bonuses(pu_prev);
+            client_UnitCountersDec(pu_prev,rpl);
 
-            unit_Bonuses(cu);
-            client_UnitCountersInc(cu,rpl);
+            unit_Bonuses(pu_cur);
+            client_UnitCountersInc(pu_cur,rpl);
 
             if(hits>0)then
             begin
                case(speed>0)of
-               false: if(    buffs[ub_Teleported]> 0)then if(pu^.x<>x)or(pu^.y<>y)then cleffect_teleport(cu,pu);
-               true : if(pu^.buffs[ub_Teleported]<=0)  and(buffs[ub_Teleported]>0)then cleffect_teleport(cu,pu);
+               false: if(    buffs[ub_Teleported]> 0)then if(pu_prev^.x<>x)or(pu_prev^.y<>y)then cleffect_teleport(pu_cur,pu_prev);
+               true : if(pu_prev^.buffs[ub_Teleported]<=0)  and(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev);
                end;
-               if (pu^.buffs[ub_Summoned     ]<=0)and(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(cu,             @vis);
-               if (pu^.buffs[ub_PainState    ]<=0)and(buffs[ub_PainState    ]>0)then   effect_UnitPain  (cu,             @vis);
-               if (pu^.buffs[ub_HellVision   ]<=0)and(buffs[ub_HellVision   ]>0)then   effect_Common    (cu,EID_HVision ,@vis);
-               if (pu^.buffs[ub_Heroic       ]<=0)and(buffs[ub_Heroic       ]>0)then   effect_Common    (cu,EID_PowerUp ,@vis);
-               if((pu^.buffs[ub_SphereInvuln ]<=0)and(buffs[ub_SphereInvuln ]>0))
-               or((pu^.buffs[ub_SphereInvis  ]<=0)and(buffs[ub_SphereInvis  ]>0))
-               or((pu^.buffs[ub_SphereSoul   ]<=0)and(buffs[ub_SphereSoul   ]>0))then  effect_Common    (cu,EID_ULevelUp,@vis);
-               if((pu^.buffs[ub_SphereRDamage]<=0)and(buffs[ub_SphereRDamage]>0))
-               or((pu^.buffs[ub_SphereDDamage]<=0)and(buffs[ub_SphereDDamage]>0))
-               or((pu^.buffs[ub_SphereTurbo  ]<=0)and(buffs[ub_SphereTurbo  ]>0))then  effect_Common    (cu,EID_HLevelUp,@vis);
+               if (pu_prev^.buffs[ub_Summoned     ]<=0)and(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(pu_cur,             @vis);
+               if (pu_prev^.buffs[ub_PainState    ]<=0)and(buffs[ub_PainState    ]>0)then   effect_UnitPain  (pu_cur,             @vis);
+               if (pu_prev^.buffs[ub_HellVision   ]<=0)and(buffs[ub_HellVision   ]>0)then   effect_Common    (pu_cur,EID_HVision ,@vis);
+               if (pu_prev^.buffs[ub_Heroic       ]<=0)and(buffs[ub_Heroic       ]>0)then   effect_Common    (pu_cur,EID_PowerUp ,@vis);
+               if((pu_prev^.buffs[ub_SphereInvuln ]<=0)and(buffs[ub_SphereInvuln ]>0))
+               or((pu_prev^.buffs[ub_SphereInvis  ]<=0)and(buffs[ub_SphereInvis  ]>0))
+               or((pu_prev^.buffs[ub_SphereSoul   ]<=0)and(buffs[ub_SphereSoul   ]>0))then  effect_Common    (pu_cur,EID_ULevelUp,@vis);
+               if((pu_prev^.buffs[ub_SphereRDamage]<=0)and(buffs[ub_SphereRDamage]>0))
+               or((pu_prev^.buffs[ub_SphereDDamage]<=0)and(buffs[ub_SphereDDamage]>0))
+               or((pu_prev^.buffs[ub_SphereTurbo  ]<=0)and(buffs[ub_SphereTurbo  ]>0))then  effect_Common    (pu_cur,EID_HLevelUp,@vis);
 
                if(playeri=UIPlayer)then
                begin
-                  if((pu^.iscomplete)and(not iscomplete))
-                  or((pu^.transformTimer<=0)and(transformTimer>0))then // start rebuilding/transforming to
+                  if((pu_prev^.iscomplete)and(not iscomplete))
+                  or((pu_prev^.transformTimer<=0)and(transformTimer>0))then // start rebuilding/transforming to
                     with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
 
-                  if(not pu^.isselected)and(isselected)then ui_UnitSelSound:=true;
+                  if(not pu_prev^.isselected)and(isselected)then ui_UnitSelSound:=true;
                end;
 
-               if(pu^.transportU<>transportU)and(vis)then snd_SoundPlayUnit(snd_Transport,nil,@vis);
+               if(pu_prev^.transportU<>transportU)and(vis)then snd_SoundPlayUnit(snd_Transport,nil,@vis);
 
                if(iscomplete)then
                begin
-                  if(pu^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
+                  if(pu_prev^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
                     case uidi of
-                    UID_URadar    : effect_ScanSound(cu);
-                    UID_URMStation: ability_UACStrike_missile(cu);
+                    UID_URadar    : effect_ScanSound(pu_cur);
+                    UID_URMStation: ability_UACStrike_missile(pu_cur);
                     UID_Pain      : if(upgrs_cur[upgr_hell_Phantoms]>0)
-                                     then unit_ArmSpawnUnit(pu,UID_Phantom )
-                                     else unit_ArmSpawnUnit(pu,UID_LostSoul);
+                                     then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
+                                     else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
                     end;
-                  if (pu^.transformTimer<=0)
-                  and(pu^.level<level)then effect_Common(cu,0,@vis);
+                  if (pu_prev^.transformTimer<=0)
+                  and(pu_prev^.level<level)then effect_Common(pu_cur,0,@vis);
                end;
             end;
 
-            if(pu^.hits<=0)and(hits>0)then  //resurrected
+            if(pu_prev^.hits<=0)and(hits>0)then  //resurrected
             begin
-               unit_CalcFogR(cu);
+               unit_CalcFogR(pu_cur);
                vx:=x;
                vy:=y;
             end
             else
-              if(pu^.hits>0)and(hits<=0)and(buffs[ub_Resurected]=0)then  // death
+              if(pu_prev^.hits>0)and(hits<=0)and(buffs[ub_Resurected]=0)then  // death
               begin
+                // if (playeri=6)then writeln('kill unit  ',unum);
+
                  with uid^ do
                    if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
-                 effect_UnitDeath(cu,hits<=hits_fdead,@vis);
+                 effect_UnitDeath(pu_cur,hits<=hits_fdead,@vis);
 
                  rld:=0;
               end;
 
-            if(not IsUnitRange(pu^.transportU,nil))then
-              if(IsUnitRange(transportU,@tu))then unit_InTransportCode(cu,tu);
+            if(not IsUnitRange(pu_prev^.transportU,nil))then
+              if(IsUnitRange(transportU,@tu))then unit_InTransportCode(pu_cur,tu);
 
             if(speed>0)then
             begin
-               move_x:=pu^.x;
-               move_y:=pu^.y;
+               move_x:=pu_prev^.x;
+               move_y:=pu_prev^.y;
             end;
 
-            if(pu^.x<>x)or(pu^.y<>y)then
+            if(pu_prev^.x<>x)or(pu_prev^.y<>y)then
             begin
-               unit_UpdateXY(cu);
+               unit_UpdateXY(pu_cur);
 
                if(speed>0)then
                begin
@@ -1355,10 +1370,10 @@ begin
    if(fast_skip)then
    begin
       tmpu:=uu;
-      g_units[0].unum:=uu^.unum;
-      uu:=@g_units[0];
+      u_prev.unum:=uu^.unum;
+      uu:=pu_prev;
    end
-   else g_units[0]:=uu^;  // 'previous state' of unit
+   else u_prev:=uu^;  // 'previous state' of unit
 
    with uu^ do
    begin
@@ -1503,22 +1518,25 @@ w      :word;
 pactive:boolean;
 begin
    a  :=rudata_byte(rpl,0);
-   kpi:=a and %00001111;
+   kpi:=a and %00011111;
 
    if(kpi<=LastKeyPoint)then
      with map_KeyPointsL[kpi] do
      with kp_TeamData[MaxPlayers] do
      begin
         pactive:=kptd_Active;
-        kptd_Active:=(a and %00010000)>0;
-        if(not no_effect)and(pactive)and(not kptd_Active)then
-          KeyPoints_Explode(kpi);
+        kptd_Active:=(a and %00100000)>0;
+        if(pactive)and(not kptd_Active)then
+        begin
+           KeyPoint_ChangeOwner(kpi,255,false);
+           if(not no_effect)then KeyPoints_Explode(kpi);
+        end;
 
         if(not kptd_Active)then exit;
 
         b:=rudata_byte(rpl,0);
         w:=word(a) or (b shl 8);
-        kptd_lifeTime:=((w shr 5) and %0000011111111111)*fr_fps1;
+        kptd_lifeTime:=(((w shr 6) and %0000001111111111) shl 1)*fr_fps1;
         if(kptd_lifeTime>0)then kptd_lifeTime-=1;
 
         b:=rudata_byte(rpl,0);
@@ -1631,7 +1649,6 @@ begin
       end;
 
       lastUnit:=rudata_int(rpl,0);
-      //writeln('- ',g_tick,' ',units_now,' ',lastUnit,' ',POVPlayer,' ',g_PlayersMain[POVPlayer].isobserver);
       for i:=1 to units_now do
       begin
          while(true)do
@@ -1645,7 +1662,6 @@ begin
          end;
          rudata_unit(@g_units[lastUnit],rpl,false,POVPlayer,fast_skip);
       end;
-      //writeln;
    end;
 
    if(rpoint_ChangeAnnoncer)then

@@ -62,6 +62,7 @@ begin
    c_agray   :=gfx_TMWColor(80 ,80 ,80 ,128);
    c_black   :=gfx_TMWColor(0  ,0  ,0  ,255);
    c_ablack  :=gfx_TMWColor(0  ,0  ,0  ,128);
+   c_iblack  :=gfx_TMWColor(0  ,0  ,0  ,210);
    c_mablack :=gfx_TMWColor(0  ,0  ,0  ,96 );
 
    ui_max_color[false]:=c_orange;
@@ -757,7 +758,10 @@ begin
    spr_uibtn_Tabs[2]:=gfx_ButtonLoad(folder_ui+'tab_upgrades',ui_TabButtonW-2,false);
    spr_uibtn_Tabs[3]:=gfx_ButtonLoad(folder_ui+'tab_controls',ui_TabButtonW-2,false);
 
-   spr_ui_doc                  := gfx_LoadSDLSurface('ui_doc',false,true);
+   spr_doc_ui                  := gfx_LoadSDLSurface('doc_ui'        ,false,true);
+   spr_doc_Generators          := gfx_LoadSDLSurface('doc_Generators',false,true);
+   spr_doc_KeyPoint            := gfx_LoadSDLSurface('doc_KeyPoint'  ,false,true);
+   spr_doc_koth                := gfx_LoadSDLSurface('doc_koth'      ,false,true);
 
    for r:=1 to r_count do
    begin
@@ -1189,6 +1193,7 @@ begin
    cpp_top   : ui_ReplayBarX:=0;
    cpp_bottom: ui_ReplayBarX:=ui_UIPanelX;
    end;
+   ui_ReplayBarWh:=ui_ReplayBarW div 2;
 
    // OTHER
 

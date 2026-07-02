@@ -79,7 +79,7 @@ begin
               res_energyl_cur+=kp_Energy;
               res_energyl_max+=kp_Energy;
            end;
-           if(log)then GameLog_KeyPointCaptured(kptd_OwnerPlayer,kpi);
+           if(log)and(g_tick>=fr_fps1)then GameLog_KeyPointCaptured(kptd_OwnerPlayer,kpi);
         end;
      end;
 end;
@@ -242,8 +242,10 @@ begin
                     if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
                     kptd_Timer:=0;
                  end;
-                 if(kptd_Timer<kp_CaptureTime)
-                 then kptd_Timer+=1
+                 if(kptd_Timer<kp_CaptureTime)then
+                   if(g_tick<fr_fps1)
+                   then kptd_Timer:=kp_CaptureTime
+                   else kptd_Timer+=1
                  else
                  begin
                     kptd_Timer:=0;
