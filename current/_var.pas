@@ -70,6 +70,7 @@ map_ObstaclesGrid : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TObstacl
 map_KeyPointsN    : byte = 0;
 map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
 map_NeedTransport : boolean = false;
+map_BusyCenter    : boolean = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -97,7 +97,7 @@ begin
    begin
       commander_u:=ai_commander_fly_u;
       commander_d:=ai_commander_fly_d;
-      if(ai_commander_grd_u<>nil)then
+      if(ai_commander_grd_u<>nil)and(pu^.player^.units_bld_l[true]>0)then
         if(ai_commander_grd_u^.group<>aic_group_AttackWait)then
         begin
            commander_u:=ai_commander_grd_u;

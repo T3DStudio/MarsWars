@@ -134,7 +134,7 @@ begin
          if(ai_need_UpgrProds> aip_MaxForges    )then ai_need_UpgrProds:=aip_MaxForges;
          if(ai_need_UpgrProds>=ai_curr_UnitProds)then ai_need_UpgrProds:=ai_curr_UnitProds-1;
 
-         if(ai_need_UpgrProds<1)and(res_energyl_max>1200)then ai_need_UpgrProds:=1;
+         if(ai_need_UpgrProds<1)and(res_energyl_max>1500)then ai_need_UpgrProds:=1;
       end;
 
       // unit prods
@@ -153,7 +153,7 @@ begin
       end;
 
       // teleport
-      ai_need_Teleports:=(ai_armylimit_ForTeleport div ul12)+1;
+      ai_need_Teleports:=(ai_armylimit_ForTeleport div ul10)+3;
 
       // DETECTORS
       if(ai_enemy_inv_u<>nil)
@@ -215,7 +215,7 @@ begin
        if(buid in pBuilder^.uid^.uid_prod_Buildings)then
          if(CheckUnitReqs(pBuilder^.player,buid,checkExtraEnergy)=0)then
          begin
-            if(pBuilder^.player^.res_UACLoot<1000)and(g_uids[buid].uid_req_UACLoot>0)then exit;
+            if(pBuilder^.player^.res_UACLoot<600)and(g_uids[buid].uid_req_UACLoot>0)then exit;
 
             SetBuildUID1:=true;
             build_uid   :=buid;
@@ -369,6 +369,7 @@ begin
       and(ai_curr_Builders<aip_MaxBuilders )
       and(ai_curr_Builders<PlayerMaxBuilders)
       and(ai_curr_UnitProds>=2)
+      and(units_bld_l[false]>=aip_MaxUnitMinPart)
       and((units_builders_e-units_builders_c)=0)
       and(not ai_earlyAttack)then
       begin
@@ -713,9 +714,14 @@ uprod_smart      : begin
                       exit;
                    end;
 uprod_base       : begin
+                      if(map_scenario=mc_royale)and(map_BusyCenter)then
+                        if(ai_armylimit_fly<ul30)then
+                          if(ai_Barrack(pBarrack,uprod_randomFly))then exit;
+
                       if((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitMinPart)and(ai_enemy_d>base_r2)then
                       begin
                          if(ai_Barrack(pBarrack,uprod_Transport))then exit;
+
 
                          if(ai_armylimit_siedge<=ul10)and(ai_BaseDef_d=NOTSET)then
                            if(ai_Barrack(pBarrack,uprod_Sidge))then exit;
@@ -1020,6 +1026,7 @@ UID_UCommandCenter: if(u_royal_d>base_r3)
                     or(map_scenario<>mc_royale)then
                       if(ai_curr_UnitProds>1) //ai_need_UnitProds
                       and((aip_flags and aif_army_early_attack0)=0)
+                      and(units_bld_l[false]>=aip_MaxUnitMinPart)
                       then
                         case uidi of
                         UID_HKeep         : ai_UnitAbility(pu,uab_ToHAKeep         ,0,0,0);

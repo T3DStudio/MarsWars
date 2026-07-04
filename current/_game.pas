@@ -729,8 +729,6 @@ procedure game_MakeRandomSkirmish;
 var p,
 ainum:byte;
 begin
-   Map_randommap;
-
    case random(7) of
    0:   map_scenario:=mc_royale;
    1:   map_scenario:=mc_KeyPoints;
@@ -746,6 +744,14 @@ begin
      6: map_scenario:=mc_1x1;
      end;
    end;
+
+   case map_scenario of
+   mc_1x1,
+   mc_ffa3 : Map_randommap(3000,4000);
+   mc_ffa4 : Map_randommap(3500,5000);
+   else      Map_randommap(4000);
+   end;
+   Game_ShuffleAINames;
 
    if(random(3)=0)
    then map_generators:=random(mapg_Last)+1
@@ -770,8 +776,6 @@ begin
           race :=random(r_count+1);
           mrace:=race;
 
-          team:=random(6);
-
           if(random(2)=0)
           or(ainum=0)then
           begin
@@ -780,6 +784,7 @@ begin
              ainum+=1;
           end
           else PlayerSetState(p,ps_None);
+          team:=random(MaxPlayers);
        end;
 
    if(random(3)=0)

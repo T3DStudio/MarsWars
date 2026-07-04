@@ -127,31 +127,6 @@ begin
      end;
 end;
 
-procedure map_SetNeedTransportStatus;
-var d:integer;
-begin
-   map_NeedTransport:=false;
-   for d:=1 to MaxObstacles do
-     with map_ObstaclesL[d] do
-       if(o_rO>0)and(o_rI>0)then
-       begin
-          map_NeedTransport:=true;
-          exit;
-       end;
-end;
-
-function map_ObstacleR(obs_f:byte):integer;
-begin
-   map_ObstacleR:=ObstaclesRMin;
-   case obs_f of
-   0  : ;
-   1  : map_ObstacleR+=ObstaclesRStep;
-   2  : map_ObstacleR+=ObstaclesRStep*2;
-   else map_ObstacleR+=integer(obs_f*obs_f*ObstaclesRStep)
-   end;
-   if(map_ObstacleR>map_Sizeh)then map_ObstacleR:=map_Sizeh;
-end;
-
 function map_IfObstacleZone(zone:word):boolean;
 begin
    map_IfObstacleZone:=(zone=zone_solid);
@@ -189,6 +164,35 @@ begin
                 map_GetZone:=o_zone;
              end;
 end;
+
+procedure map_DataForAI;
+var d:integer;
+begin
+   map_NeedTransport:=false;
+   for d:=1 to MaxObstacles do
+     with map_ObstaclesL[d] do
+       if(o_rO>0)and(o_rI>0)then
+       begin
+          map_NeedTransport:=true;
+          exit;
+       end;
+
+   map_BusyCenter:=map_IfObstacleZone(map_GetZone(map_SizeH,map_SizeH));
+end;
+
+function map_ObstacleR(obs_f:byte):integer;
+begin
+   map_ObstacleR:=ObstaclesRMin;
+   case obs_f of
+   0  : ;
+   1  : map_ObstacleR+=ObstaclesRStep;
+   2  : map_ObstacleR+=ObstaclesRStep*2;
+   else map_ObstacleR+=integer(obs_f*obs_f*ObstaclesRStep)
+   end;
+   if(map_ObstacleR>map_Sizeh)then map_ObstacleR:=map_Sizeh;
+end;
+
+
 
 procedure map_Seed2RandomBase;
 begin
@@ -615,9 +619,9 @@ mc_KeyPoints: begin
         for i:=0 to map_MaxPlayers-1 do
           map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i])*keyPoint_GenR),
                             map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i])*keyPoint_GenR),
-                            keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+                            keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
 
-      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LifeTime[map_generators]);
+      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
    end;
 
    map_KeyPoints_UpdateZone;
@@ -1096,7 +1100,7 @@ begin
       map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotR-1,0);
 
    map_RefreshObstaclesGrid;
-   map_SetNeedTransportStatus;
+   map_DataForAI;
 end;
 
 procedure map_CreateObjects;
@@ -1118,11 +1122,11 @@ begin
    {$ENDIF}
 end;
 
-procedure Map_randommap;
+procedure Map_randommap(minMapSize:integer=map_MinSize;maxMapSize:integer=map_MaxSize);
 begin
    map_RandomSeed;
 
-   map_Size1   :=map_MinSize+round(random(map_MaxSize-map_MinSize)/map_SizeMenuStep)*map_SizeMenuStep;
+   map_Size1   :=minMapSize+round(random(maxMapSize-minMapSize)/map_SizeMenuStep)*map_SizeMenuStep;
    map_Template:=random(mapt_last+1);
    map_Symmetry:=random(maps_last+1);
 end;

@@ -1,7 +1,7 @@
 
 const
 
-aic_MaxLimitBorder         = MaxPlayerLimit-ul5;
+aic_MaxLimitBorder         = MaxPlayerLimit-keyPoint_MinLimit;
 
 aic_GeneratorsLimit        = ul1*30;
 aic_GeneratorsEnergy       = 9000;
@@ -36,7 +36,8 @@ ai_choosen,
 ai_flags_BaseAMain,
 ai_flags_BaseAOther,
 ai_earlyAttack,
-ai_available_HKeep
+ai_available_HKeep,
+ai_HaveTransport
                      : boolean;
 
 ai_generator_kp,
@@ -480,7 +481,7 @@ begin
    if(pcurkp^=nil)
    then
    else
-     case tu^.isfly of
+     case (tu^.isfly)or(ai_HaveTransport) of
      true : if(newd<pcurd^)
             then
             else
@@ -520,6 +521,8 @@ begin
       ai_UpgradesLeft      := ai_CalcUpgradesLeft(player);
 
       ai_available_HKeep   := ai_IsAvailableUID(player,UID_HKeep);
+
+      ai_HaveTransport     := (units_uid_c[UID_HTeleport]>0)or(units_uid_c[UID_UTransport]>0);
    end;
 
    FillChar(ai_GroupAll_ucount,SizeOf(ai_GroupAll_ucount),0);
@@ -674,6 +677,8 @@ begin
              end;
 
              d:=point_dist_int(kp_x,kp_y,x,y);
+
+             if(kptd_OwnerTeam>LastPlayer)and(kp_Energy>0)then d:=d div 3;
 
              //uid_LimitUse
              if(not koth_point)then

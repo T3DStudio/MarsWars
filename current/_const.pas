@@ -155,14 +155,9 @@ r_hell                 = 1;
 r_uac                  = 2;
 r_count                = 2;  // race num 0-r_count
 
-
-
 MaxPlayerUnits         = 125;
 MinUnitLimit           = 100;
 MaxPlayerLimit         = MaxPlayerUnits*MinUnitLimit;
-
-MaxKeyPoints           = MaxPlayers*3;
-LastKeyPoint           = MaxKeyPoints-1;
 
 map_MaxSize            = 8000;
 
@@ -682,6 +677,7 @@ ul10                   = MinUnitLimit*10;
 ul12                   = MinUnitLimit*12;
 ul15                   = MinUnitLimit*15;
 ul20                   = MinUnitLimit*20;
+ul30                   = MinUnitLimit*30;
 
 // production time
 ptime1                 = 20;
@@ -923,8 +919,16 @@ uab_LvlUpURMStation    = 53;
 //  Key Points
 //
 
-map_generators_LifeTime: array[0..mapg_Last] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+
+map_generators_LFSecs  : array[0..mapg_Last] of cardinal = (0,        60*5,        60*10,        60*15,        60*20,0);
+map_generators_LFTicks : array[0..mapg_Last] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
 map_generators_Energy  = 1000;
+
+MaxKeyPoints           = MaxPlayers*3;
+LastKeyPoint           = MaxKeyPoints-1;
+KeyPointLifeClientMax  = (1 shl 10)-1; // 1024
+KeyPointLifeClientCX   = KeyPointLifeClientMax/(60*20);
+KeyPointLifeClientXC   = (60*20)/KeyPointLifeClientMax;
 
 keyPoint_CaptTime_Def  = fr_fps1*ptimeh;
 keyPoint_CaptTime_Gen  = fr_fps1*ptime1;

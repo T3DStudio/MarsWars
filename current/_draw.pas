@@ -105,7 +105,7 @@ begin
    //' '+b2c[ui_uibtn_pabilityu=nil]+
    //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   ui_CheckMapPointFogVision(mouse_map_x,mouse_map_y,true)
    ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y))+
-   ' '+tc_aqua+b2s(menu_ItemSelected)
+   ' '+tc_aqua+b2s(menu_ItemSelected)+' '+b2c[map_BusyCenter]
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+
    ' '+tc_green+w2s(pf_pathgrid_areas[mm3i(0,mouse_map_x div pf_pathmap_w,pf_pathmap_c),mm3i(0,mouse_map_y div pf_pathmap_w,pf_pathmap_c)])+tc_default+

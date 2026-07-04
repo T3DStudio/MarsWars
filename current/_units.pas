@@ -1828,6 +1828,10 @@ begin
       uab_HTowerBlink      : unit_AbilityCheck:=unit_ability_HTowerBlink  (pCaster,x,y      ,true );
       uab_HKeepShift       : unit_AbilityCheck:=unit_ability_HKeepBlink   (pCaster,x,y      ,true );
 
+      uab_SpawnLost        : if(rld>0)
+                             or(buffs[ub_Cast]>0)then
+                               unit_AbilityCheck:=lmt_ability_reload;
+
       uab_UACStrike        : unit_AbilityCheck:=unit_ability_UACStrike    (pCaster,x,y      ,true );
       uab_UACScan          : unit_AbilityCheck:=unit_ability_UACScan      (pCaster,x,y      ,true );
 

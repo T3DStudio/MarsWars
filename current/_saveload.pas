@@ -328,7 +328,7 @@ begin
       units_DefaultVisData;
       map_MakeThemeSprites;
       map_RefreshObstaclesGrid;
-      map_SetNeedTransportStatus;
+      map_DataForAI;
       map_Obstacles_SetDrawData;
       map_RedrawMenuMinimap;
       map_Decals_Create;

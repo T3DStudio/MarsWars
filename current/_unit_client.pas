@@ -461,6 +461,8 @@ begin
    if((b and %00000001)>0)then b2bs[8]:='1';
 end;}
 
+//KeyPointLifeClient
+
 procedure wclinet_KeyPoint(rpl:boolean;POVPlayer:byte);
 var
 kpteam,
@@ -468,6 +470,22 @@ a,b  : byte;
 kpt,
 w    : word;
 wdkpi: pbyte;
+function kpLifeTime(lifeSecs:cardinal):word;
+begin
+   if(lifeSecs=0)
+   or(map_generators=0)
+   or(map_generators=mapg_last)
+   then kpLifeTime:=0
+   else
+   begin
+      kpLifeTime:=round(lifeSecs*KeyPointLifeClientCX);
+      if(kpLifeTime=0)
+      then kpLifeTime:=1
+      else
+        if(kpLifeTime>=KeyPointLifeClientMax)
+        then kpLifeTime:=KeyPointLifeClientMax;
+   end;
+end;
 begin
    if(rpl)
    then wdkpi:=@rpls_kpoints_kpi
@@ -487,11 +505,7 @@ begin
         if(kptd_Active)then w:=w or %0000000000100000;
         if(kptd_Active)then
         begin
-           kpt:=word(ct2s(kptd_lifeTime));
-           {$IFDEF _FULLGAME}
-           if(ServerSide)then
-           {$ENDIF}
-             kpt:=kpt shr 1;
+           kpt:=kpLifeTime(ct2s(kptd_lifeTime));
            w:=w or ((kpt and %0000001111111111) shl 6);
 
            wudata_word(w,rpl);
@@ -1516,6 +1530,22 @@ kpi,a,b,
 nowner :byte;
 w      :word;
 pactive:boolean;
+function kpLifeTime(lifeSecs:cardinal):word;
+begin
+   if(lifeSecs=0)
+   or(map_generators=0)
+   or(map_generators=mapg_last)
+   then kpLifeTime:=0
+   else
+   begin
+      kpLifeTime:=round(lifeSecs*KeyPointLifeClientXC);
+      if(kpLifeTime=0)
+      then kpLifeTime:=1
+      else
+        if(kpLifeTime>=map_generators_LFSecs[map_generators])
+        then kpLifeTime:=map_generators_LFSecs[map_generators];
+   end;
+end;
 begin
    a  :=rudata_byte(rpl,0);
    kpi:=a and %00011111;
@@ -1536,8 +1566,8 @@ begin
 
         b:=rudata_byte(rpl,0);
         w:=word(a) or (b shl 8);
-        kptd_lifeTime:=(((w shr 6) and %0000001111111111) shl 1)*fr_fps1;
-        if(kptd_lifeTime>0)then kptd_lifeTime-=1;
+        kptd_lifeTime:=kpLifeTime((w shr 6) and %0000001111111111)*fr_fps1;
+        //if(kptd_lifeTime>0)then kptd_lifeTime-=1;
 
         b:=rudata_byte(rpl,0);
         nowner:=b and %00001111;
