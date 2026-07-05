@@ -632,7 +632,28 @@ TLogMes = record
 end;
 PTLogMes = ^TLogMes;
 
-TPlayerTempData = record
+TPlayerDataScore = record
+   ps_name      : shortstring;
+   ps_state     : byte;
+
+   ps_units_created,
+   ps_units_summoned,
+   ps_units_resurected,
+   ps_units_lost,
+   ps_units_destroyed,
+
+   ps_builds_created,
+   ps_builds_lost,
+   ps_builds_destroyed,
+
+   ps_res_energy_max,
+   ps_res_UACLoot,
+   ps_res_HellPower
+
+                : longint;
+end;
+
+TPlayerDataTemp = record
    PNU
                 : byte;
    n_u,
@@ -657,8 +678,7 @@ TPlayerTempData = record
    cam_h        : integer;
 end;
 
-
-TPlayerGameData = record
+TPlayerDataGame = record
    name            : shortstring;
 
    team,
@@ -778,8 +798,8 @@ TPlayerGameData = record
    aip_pause_superweapon
                        : integer;
 end;
-PTPlayerGameData = ^TPlayerGameData;
-TPList = array[0..LastPlayer] of TPlayerGameData;
+PTPlayerGameData = ^TPlayerDataGame;
+TPList = array[0..LastPlayer] of TPlayerDataGame;
 
 TUnitVisionData = array[0..LastPlayer] of integer;
 

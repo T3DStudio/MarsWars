@@ -711,15 +711,15 @@ begin
    str_SetUpgrBaseHint(upgr_hell_HKeepShift  ,g_aids[uab_HKeepShift].ua_str_name ,'Charge of "'+g_aids[uab_HKeepShift].ua_str_name+'" ability for '+t1     );
    str_SetUpgrBaseHint(upgr_hell_DecayAura   ,g_aids[uab_HKeepAura].ua_str_name  ,'Unlocks "'+g_aids[uab_HKeepAura].ua_str_name+'" ability for '+t1);
    str_SetUpgrBaseHint(upgr_hell_BuilderR    ,'Builder Range Upgrade'            ,'Increases range of sight for '+t1                                );
-   str_SetUpgrBaseHint(upgr_hell_Spectre     ,'Specters'                         ,'Pinky Demon becomes invisible'                                  );
+   str_SetUpgrBaseHint(upgr_hell_Spectre     ,'Specters'                         ,'Pinky Demon becomes invisible'                                   );
    str_SetUpgrBaseHint(upgr_hell_UnitSightR  ,'Hell Sight'                       ,'Increases the sight range of all Hell units'                     );
-   str_SetUpgrBaseHint(upgr_hell_Phantoms    ,'Phantoms'                         ,'Pain Elemental spawns Phantoms instead of Lost Soul'            );
+   str_SetUpgrBaseHint(upgr_hell_Phantoms    ,'Phantoms'                         ,'Pain Elemental spawns Phantoms instead of Lost Soul'             );
    str_SetUpgrBaseHint(upgr_hell_DistDamage2 ,'Demon`s Weapons'                  ,'Increases the damage of ranged attacks for '+str_UnitsNamesList(UIDsArmsImpactUpgr(upgr_hell_DistDamage2)));
-   str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Teleport Upgrade'                 ,'Reduces the cooldown of the Teleport ability'                   );
+   str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Teleport Upgrade'                 ,'Reduces the cooldown of the Teleport ability'                    );
    str_SetUpgrBaseHint(upgr_hell_T2TNoCD     ,'Portal link'                      ,'If the destination is another Teleport, the teleportation occurs without cooldown.'  );
    str_SetUpgrBaseHint(upgr_hell_EvilEyeR    ,'Evil Eye Upgrade'                 ,'Increases the sight range of Evil Eye'                           );
-   str_SetUpgrBaseHint(upgr_hell_TotemInvis  ,'Totem of Horror Invisibility'     ,'Totem of Horror becomes invisible'                              );
-   str_SetUpgrBaseHint(upgr_hell_BuildRestore,'Building Restoration'             ,'Health regeneration for all Hell buildings'                     );
+   str_SetUpgrBaseHint(upgr_hell_TotemInvis  ,'Totem of Horror Invisibility'     ,'Totem of Horror becomes invisible'                               );
+   str_SetUpgrBaseHint(upgr_hell_BuildRestore,'Building Restoration'             ,'Health regeneration upgrade for all Hell buildings'              );
    t1:=str_UnitsNamesList([UID_HFTower,UID_HTotem]);
    str_SetUpgrBaseHint(upgr_hell_TowerR      ,'Demonic Spirits'                  ,'Increases the range for '+t1                             );
    str_SetUpgrBaseHint(upgr_hell_TowerBlink  ,g_aids[uab_HTowerBlink].ua_str_name,'Unlocks "'+g_aids[uab_HTowerBlink].ua_str_name+'" ability for '+t1);
@@ -984,6 +984,8 @@ begin
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark: "look here"');
    DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark: "attack here"');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Control_ToggleRec ],'toggle replay recording');
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_SProd1..
                             iAct_SProd24           ],'production hotkeys');

@@ -8,7 +8,7 @@ begin
      {$IFDEF _FULLGAME}
      if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_PlayersMain[p] do
+       with g_PlayersGame[p] do
        with g_PlayersTemp[p] do
          if(state=ps_None)then
          begin
@@ -40,7 +40,7 @@ begin
      {$IFDEF _FULLGAME}
      if(p<>LocalPlayer)then
      {$ENDIF}
-       with g_PlayersMain[p] do
+       with g_PlayersGame[p] do
        with g_PlayersTemp[p] do
          if(state=ps_human)and(net_ip=aip)and(net_port=aport)then
          begin
@@ -59,7 +59,7 @@ begin
    c_players:=0;
    c_out    :=0;
    for p:=0 to MaxPlayers do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      with g_PlayersTemp[p] do
        if(state=PS_human)and(not isobserver)and(not isdefeated)then
        begin
@@ -74,7 +74,7 @@ var
 tbool:boolean;
 tstr :shortstring;
 begin
-   with g_PlayersMain[pid] do
+   with g_PlayersGame[pid] do
    with g_PlayersTemp[pid] do
    begin
       tstr:=name;
@@ -112,11 +112,11 @@ var p,s:byte;
 begin
    s:=0;
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
        SetBBit(@s,p,state=ps_human);
    net_writebyte(s);
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      with g_PlayersTemp[p] do
        if(state=ps_human)then
        begin
@@ -134,7 +134,7 @@ begin
    if(g_started)then
      net_writebyte(g_status );
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
        net_writestring(name);
 end;
 
@@ -147,7 +147,7 @@ begin
    net_writebool(g_started);
 
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      with g_PlayersTemp[p] do
      begin
         net_writestring(name );
@@ -301,7 +301,7 @@ begin
                                       false: PlayerSetState(pid,ps_None);
                                       true : begin
                                                 PlayerKill(pid,true);
-                                                g_PlayersMain[pid].state:=ps_none;
+                                                g_PlayersGame[pid].state:=ps_none;
                                              end;
                                       end;
                                       menu_update:=true;
@@ -309,7 +309,7 @@ begin
             else
                if(g_started)then
                  case mid of
-                 nmid_order          : with g_PlayersMain[pid]do
+                 nmid_order          : with g_PlayersGame[pid]do
                                        with g_PlayersTemp[pid]do
                                        begin
                                           o_x0:=net_readint;
@@ -340,7 +340,7 @@ begin
                                           end;
                                        end;
                  nmid_map_mark       : net_ReadMapMark(pid);
-                 nmid_ClientData     : with g_PlayersMain[pid] do
+                 nmid_ClientData     : with g_PlayersGame[pid] do
                                        with g_PlayersTemp[pid] do
                                        begin
                                           PNU     :=net_readbyte;
@@ -435,7 +435,7 @@ begin
      {$IFDEF _FULLGAME}
      if(pid<>LocalPlayer)then
      {$ENDIF}
-       with g_PlayersMain[pid] do
+       with g_PlayersGame[pid] do
        with g_PlayersTemp[pid] do
          if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
@@ -514,7 +514,7 @@ begin
    s:=net_readbyte;
    for p:=0 to LastPlayer do
      if(GetBBit(@s,p))then
-       with g_PlayersMain[p] do
+       with g_PlayersGame[p] do
        with g_PlayersTemp[p] do
        begin
           net_ttl :=net_readword;
@@ -568,7 +568,7 @@ procedure net_ClientReadLobbyPlayerData(pid:byte);
 var i,w:integer;
 oldname:shortstring;
 begin
-   with g_PlayersMain[pid] do
+   with g_PlayersGame[pid] do
    with g_PlayersTemp[pid] do
    begin
       oldname:=name;
@@ -659,7 +659,7 @@ nmid_LobbyInfo    : begin
                       svstarted:=net_readbool;
 
                       for i:=0 to LastPlayer do
-                        with g_PlayersMain[i] do
+                        with g_PlayersGame[i] do
                         begin
                            net_ClientReadLobbyPlayerData(i);
                            if(svstarted)then

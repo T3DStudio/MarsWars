@@ -25,7 +25,9 @@ fr_fpsh                = fr_fps1 div 2; // half
 fr_fpst                = fr_fps1 div 3; // thrid
 fr_fpsq                = fr_fps1 div 4; // quarter
 fr_fpsq3               = fr_fps1-fr_fpsq;
-fr_fpss                = fr_fps1 div 6; // six
+fr_fpsf                = fr_fps1 div 5; // 1/5
+fr_fpss                = fr_fps1 div 6; // 1/6
+fr_fpso                = round(fr_fps1/8); // 1/8
 fr_fpsd10              = fr_fps1 div 10;
 fr_fps1h               = fr_fpsh*3;     // 1,5
 fr_fps2                = fr_fps1*2;
@@ -148,7 +150,7 @@ gs_win_team4           = 24;
 gs_win_team5           = 25;
 gs_win_team6           = 26;
 gs_win_team7           = 27;
-gs_running             = 63; // last status can't be more thatn 63 (%00111111)
+gs_running             = 31; // last status can't be more than 31 (%00011111)
 
 r_random               = 0;
 r_hell                 = 1;
@@ -961,7 +963,7 @@ fr_mancubus_rld_s3     = fr_fpsh;
 
 fr_archvile_s          = fr_fps1+fr_fpss;
 
-MaxPlayerNameLen       = 13;
+MaxPlayerNameLen       = 14;
 
 hits_dead              = -ptime1*fr_fps1;
 hits_fdead             = hits_dead+fr_fps3;
@@ -1007,7 +1009,7 @@ detection_time         = fr_fps1*detection_time_sec;
 hell_vision_time       = fr_fps1*detection_time_sec;
 
 step_build_reload      = fr_fps1*5;
-max_build_reload       = step_build_reload*3;
+max_build_reload       = step_build_reload*2;
 
 melee_r                = 8;
 
@@ -1044,7 +1046,7 @@ fly_height             : array[false..true] of integer = (1,fly_z);
 
 pain_time              = fr_fps1;
 
-ai_names_max           = 50;
+ai_names_max           = 52;
 
 
 {$IFDEF _FULLGAME}
@@ -1151,6 +1153,7 @@ iAct_Control_USelBase  = 72;
 iAct_Control_USelArmy  = 73;
 iAct_Control_MarkLook  = 74;
 iAct_Control_MarkAttack= 75;
+iAct_Control_ToggleRec = 76;
 
 iAct_Replay_Fast       = 110;
 iAct_Replay_Back2      = 111;

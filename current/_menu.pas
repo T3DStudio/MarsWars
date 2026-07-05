@@ -125,6 +125,11 @@ begin
    vid_MakeScreen;
 end;
 
+procedure menu_ToggleRecord;
+begin
+   rpls_Record:=not rpls_Record;
+end;
+
 procedure menu_ControlPanelPosScroll(forward:boolean);
 begin
    ScrollByte(@ui_ControlPanelPos,forward,0,ui_MaxControlPanelPos);
@@ -671,17 +676,17 @@ begin
    for p:=0 to LastPlayer do
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
-      if(p<map_MaxPlayers)or(g_PlayersMain[p].state=ps_Human)then
+      if(p<map_MaxPlayers)or(g_PlayersGame[p].state=ps_Human)then
       menu_Item_Set(mi_Players_State0   +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle      (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
 
-      if(g_PlayersMain[p].state=ps_None)and(not g_started)then
+      if(g_PlayersGame[p].state=ps_None)and(not g_started)then
       menu_Item_Set(mi_Players_Slot0    +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSwap         (p,LocalPlayer,true))
       else
       menu_Item_Set(mi_Players_AIskil0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
 
-      if(p<map_MaxPlayers)and(not g_PlayersMain[p].isobserver)then
+      if(p<map_MaxPlayers)and(not g_PlayersGame[p].isobserver)then
       menu_Item_Set(mi_Players_Race0    +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll    (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
-      if(p<map_MaxPlayers)and(not g_PlayersMain[p].isobserver)then
+      if(p<map_MaxPlayers)and(not g_PlayersGame[p].isobserver)then
       menu_Item_Set(mi_Players_Team0    +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll    (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
 
       menu_Item_Set(mi_Players_Obs0     +p,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_PListLineH,PlayerToggleObserver(p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersObsW;
@@ -839,7 +844,8 @@ begin
                                         menu_w,menu_h-menu_StepFromBottom-menu_BigButtonH  ,true);
 
    // PLAYERS BLOCK
-   menu_page_Scirmish_Players (menu_BaseW1h-font_w1,menu_BaseW1h+menu_PlayersW-font_w1,menu_underCaptionY);
+   menu_page_Scirmish_Players (menu_BaseW1h              -font_w1h,
+                               menu_BaseW1h+menu_PlayersW-font_w1h,menu_underCaptionY);
 
    // MAP BLOCK
    with menu_items[mi_Players_Panel] do
@@ -955,7 +961,7 @@ function menu_EndEdition(EnterKey:boolean):boolean;
 begin
    menu_EndEdition:=true;
    case menu_ItemSelected of
-mi_SG_PlayerName   : g_PlayersMain[LocalPlayer].name:=PlayerName;
+mi_SG_PlayerName   : g_PlayersGame[LocalPlayer].name:=PlayerName;
 mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
                      then menu_mseed:=c2s(map_seed)
                      else GameMapSetSeed(LocalPlayer,s2c(menu_mseed),false);
@@ -1121,7 +1127,7 @@ mi_SG_ShowPlayerScrns  : if(not check)then ui_PlayersScreens:=not ui_PlayersScre
 
 // SETTINGS GAME RECORDING
 
-mi_SR_RecordGames      : if(not check)then rpls_Record:=not rpls_Record;
+mi_SR_RecordGames      : if(not check)then menu_ToggleRecord;
 mi_SR_RecordPrefix     : ;
 mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality,true,0,rpls_MaxQuality);
 
@@ -1346,7 +1352,7 @@ end;
 
 function menu_ChatSize:integer;
 begin
-   with g_PlayersMain[LocalPlayer] do
+   with g_PlayersGame[LocalPlayer] do
      if(log_n<MaxPlayerLog)
      then menu_ChatSize:=integer(log_n)
      else menu_ChatSize:=MaxPlayerLog;

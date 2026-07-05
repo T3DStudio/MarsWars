@@ -96,7 +96,7 @@ b  :byte;
 begin
    wudata_log:=false;
    if(p<=LastPlayer)then
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      begin
         s:=0;
         if(not rpl)then
@@ -294,7 +294,7 @@ begin
 
       b:=0;
       if(rpl)
-      or(g_PlayersMain[POVPlayer].isobserver)then
+      or(g_PlayersGame[POVPlayer].isobserver)then
         b:=group and %00001111;
 
       if(not iscomplete)
@@ -349,9 +349,9 @@ begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(g_PlayersMain[POVPlayer].team,pu,true))
+      if(CheckUnitTeamVision(g_PlayersGame[POVPlayer].team,pu,true))
       or(rpl)
-      or(g_PlayersMain[POVPlayer].isobserver)
+      or(g_PlayersGame[POVPlayer].isobserver)
       then hits_si:=hits_li2si(hits,uid_MaxHits1,uid_hits_li2si)
       else hits_si:=-128;
 
@@ -394,17 +394,15 @@ begin
                  end;
 
                  if(uid_client_WCastTarget)then
-                   if(g_PlayersMain[POVPlayer].isobserver)
-                   or(g_PlayersMain[POVPlayer].team=g_PlayersMain[playeri].team)then
-                     if(buffs[ub_Cast]>0)then
-                     begin
-                        wudata_byte(byte(uo_x shr 5),rpl);
-                        wudata_byte(byte(uo_y shr 5),rpl);
-                     end;
+                   if(buffs[ub_Cast]>0)then
+                   begin
+                      wudata_byte(byte(uo_x shr 5),rpl);
+                      wudata_byte(byte(uo_y shr 5),rpl);
+                   end;
               end;
 
             if(playeri=POVPlayer)
-            or(g_PlayersMain[POVPlayer].isobserver)then wudata_OwnerUData(pu,POVPlayer,rpl);
+            or(g_PlayersGame[POVPlayer].isobserver)then wudata_OwnerUData(pu,POVPlayer,rpl);
          end;
       end;
    end;
@@ -414,7 +412,7 @@ procedure wpdata_Upgrades(rpl:boolean;bs_alive:byte);
 var p,n,bp,bv:byte;
 begin
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
        if(GetBBit(@bs_alive,p))then
        begin
           bp:=0;
@@ -440,7 +438,7 @@ end;
 
 procedure wpdata_BuildCDRes(p:byte;rpl:boolean);
 begin
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
    begin
       wudata_reload(build_cd,rpl);
       wudata_int(res_HellPower,rpl);
@@ -493,10 +491,10 @@ begin
 
    wdkpi^:=(wdkpi^+1) mod map_KeyPointsN;
 
-   if(g_PlayersMain[POVPlayer].isobserver)
+   if(g_PlayersGame[POVPlayer].isobserver)
    or(rpl)
    then kpteam:=MaxPlayers
-   else kpteam:=g_PlayersMain[POVPlayer].team;
+   else kpteam:=g_PlayersGame[POVPlayer].team;
 
    with map_KeyPointsL[wdkpi^] do
      with kp_TeamData[kpteam] do
@@ -537,13 +535,13 @@ begin
    bs_cam:=0;
    for p:=0 to LastPlayer do
      if(p<>POVPlayer)then
-       with g_PlayersMain[p] do
+       with g_PlayersGame[p] do
        with g_PlayersTemp[p] do
          if(state=ps_human)
          and(not isdefeated)
          and(not isobserver)then
-           if(g_PlayersMain[POVPlayer].isobserver)
-           or(team=g_PlayersMain[POVPlayer].team)then
+           if(g_PlayersGame[POVPlayer].isobserver)
+           or(team=g_PlayersGame[POVPlayer].team)then
              SetBBit(@bs_cam,p,true);
 
    wudata_byte(bs_cam,rpl);
@@ -594,7 +592,7 @@ begin
    bs_observer :=0;
    bs_revealed :=0;
    for i:=0 to LastPlayer do
-     with g_PlayersMain[i] do
+     with g_PlayersGame[i] do
        if(state>ps_None)then
        begin
           if(    isrevealed)then SetBBit(@bs_revealed,i,true );
@@ -1243,8 +1241,8 @@ begin
          transformTimer         :=0;
       end;
 
-      if(not rpl)and(not g_PlayersMain[POVPlayer].isobserver)then
-        with g_PlayersMain[POVPlayer] do
+      if(not rpl)and(not g_PlayersGame[POVPlayer].isobserver)then
+        with g_PlayersGame[POVPlayer] do
           AddToInt(@TeamVision[team],MinVisionTime);
    end;
 end;
@@ -1336,7 +1334,7 @@ begin
       b:=rudata_byte(rpl,0);
 
       if(rpl)
-      or(g_PlayersMain[POVPlayer].isobserver)then
+      or(g_PlayersGame[POVPlayer].isobserver)then
         group:=b and %00001111;
 
       uo:=(b and %01110000)shr 4;
@@ -1393,7 +1391,7 @@ begin
    begin
       cycle_order:=unum mod order_period;
       playeri:=(unum-1) div MaxPlayerUnits;
-      player :=@g_PlayersMain[playeri];
+      player :=@g_PlayersGame[playeri];
       if(not DEAD)
       then sh:=rudata_sint(rpl,-128)
       else
@@ -1449,17 +1447,15 @@ begin
                  end;
 
                  if(uid^.uid_client_WCastTarget)then
-                   if(g_PlayersMain[POVPlayer].isobserver)
-                   or(g_PlayersMain[POVPlayer].team=g_PlayersMain[playeri].team)then
-                     if(buffs[ub_Cast]>0)then
-                     begin
-                        uo_x:=integer(rudata_byte(rpl,0) shl 5);
-                        uo_y:=integer(rudata_byte(rpl,0) shl 5);
-                     end;
+                   if(buffs[ub_Cast]>0)then
+                   begin
+                      uo_x:=integer(rudata_byte(rpl,0) shl 5);
+                      uo_y:=integer(rudata_byte(rpl,0) shl 5);
+                   end;
               end;
 
             if(playeri=POVPlayer)
-            or(g_PlayersMain[POVPlayer].isobserver)then rudata_OwnerUData(uu,POVPlayer,rpl);
+            or(g_PlayersGame[POVPlayer].isobserver)then rudata_OwnerUData(uu,POVPlayer,rpl);
          end;
       end
       else
@@ -1492,7 +1488,7 @@ procedure rpdata_Upgrades(rpl:boolean;bs_alive:byte);
 var p,n,bp,bv:byte;
 begin
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
        if(GetBBit(@bs_alive,p))then
        begin
           bp:=0;
@@ -1516,7 +1512,7 @@ end;
 
 procedure rpdata_BuildCDRes(p:byte;rpl:boolean);
 begin
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
    begin
      rudata_reload(@build_cd,rpl);
      res_HellPower:=rudata_int(rpl,0);
@@ -1604,7 +1600,7 @@ begin
    bs_alive    :=0;
    units_ingame:=0;
    for i:=0 to LastPlayer do
-     with g_PlayersMain[i] do
+     with g_PlayersGame[i] do
      begin
         isobserver:=GetBBit(@bs_observer,i);
         isdefeated:=GetBBit(@bs_defeated,i);
@@ -1674,7 +1670,7 @@ begin
          rpdata_Upgrades(rpl,bs_alive);
          bs:=rudata_byte(rpl,0);
          for i:=0 to LastPlayer do
-           with g_PlayersMain[i] do
+           with g_PlayersGame[i] do
              isrevealed:=GetBBit(@bs,i);
       end;
 
@@ -1697,7 +1693,7 @@ begin
    if(rpoint_ChangeAnnoncer)then
    begin
       if(UIPlayer<=LastPlayer)then
-        with g_PlayersMain[UIPlayer] do
+        with g_PlayersGame[UIPlayer] do
           snd_SoundPlayUnitCommand(snd_rally_point[race]);
       rpoint_ChangeAnnoncer:=false;
    end;

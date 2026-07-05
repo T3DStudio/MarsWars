@@ -19,7 +19,7 @@ begin
         with player^ do
         begin
            if(UIPlayer<=LastPlayer)then
-             if(team<>g_PlayersMain[UIPlayer].team)then exit;
+             if(team<>g_PlayersGame[UIPlayer].team)then exit;
 
            if(uid_ability_isradar)and(ui_mm_ScanBlink)then
              if(buffs[ub_Cast]>0)then
@@ -118,7 +118,7 @@ begin
          if(UIplayer>LastPlayer)
          then unit_FogReveal:=true
          else
-           if(CheckUnitTeamVision(g_PlayersMain[UIplayer].team,pu,false))then unit_FogReveal:=true;
+           if(CheckUnitTeamVision(g_PlayersGame[UIplayer].team,pu,false))then unit_FogReveal:=true;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

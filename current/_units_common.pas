@@ -201,7 +201,7 @@ end;
 procedure effect_ScanSound(pCaster:PTUnit);
 begin
    if(UIPlayer<=LastPlayer)then
-     if(pCaster^.player^.team<>g_PlayersMain[UIPlayer].team)then exit;
+     if(pCaster^.player^.team<>g_PlayersGame[UIPlayer].team)then exit;
    snd_SoundPlayUnit(snd_RadarScan,nil,nil);
 end;
 
@@ -1300,7 +1300,7 @@ begin
 
    VisionTeam:=255;
    if(VisionPlayer<MaxPlayers)then
-     VisionTeam:=g_PlayersMain[VisionPlayer].team;
+     VisionTeam:=g_PlayersGame[VisionPlayer].team;
 
    if(check_obstacles)then
    begin
@@ -1534,7 +1534,7 @@ var u:integer;
  zone:word;
 begin
    if(playerN<=LastPlayer)then
-     with g_PlayersMain[playerN] do
+     with g_PlayersGame[playerN] do
        if(units_builders_e<=0)then
        begin
           CheckInBuildArea:=cba_noBuilders; // no builders
@@ -1862,6 +1862,8 @@ begin
          {$ENDIF}
       end;
 
+      //g_PlayersScore
+
       if(usummoned)and(iscomplete)then
       begin
          buffs[ub_Summoned]:=fr_fps1;
@@ -1957,7 +1959,7 @@ begin
    unit_add:=false;
    LastCreatedUnit :=0;
    LastCreatedUnitP:=g_punits[0];
-   with g_PlayersMain[UplayerN] do
+   with g_PlayersGame[UplayerN] do
    begin
       if(Uuid=0)then exit;
 
@@ -1985,7 +1987,7 @@ begin
             unit_SetXY(LastCreatedUnitP,Ux,Uy,mvxy_strict);
             uidi       := Uuid;
             playeri    := UplayerN;
-            player     :=@g_PlayersMain[playeri];
+            player     :=@g_PlayersGame[playeri];
             uo_x       := x;
             uo_y       := y;
             uo_bx      := -1;
@@ -2018,9 +2020,9 @@ function unit_start_build(bx,by:integer;buid,bplayer:byte;skipReqCheck:boolean=f
 begin
    if(skipReqCheck)
    then unit_start_build:=0
-   else unit_start_build:=CheckUnitReqs(@g_PlayersMain[bplayer],buid);
+   else unit_start_build:=CheckUnitReqs(@g_PlayersGame[bplayer],buid);
    if(unit_start_build=0)then
-     with g_PlayersMain[bplayer] do
+     with g_PlayersGame[bplayer] do
        if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=cbp_good)then
        begin
           if(not unit_add(bx,by,-1,buid,bplayer,false,false,0))then unit_start_build:=lmt_Invalid_Order;

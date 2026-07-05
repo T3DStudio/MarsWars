@@ -493,7 +493,9 @@ begin
                                     then MainTargetGo(tar_r)
                                     else
                                       if(not FollowCommander)then
-                                        MainTargetGo(tar_r);
+                                        if(tar_dist<NOTSET)
+                                        then MainTargetGo(tar_r)
+                                        else ai_DefaultIdle(pu);
                                     CheckSetGeneratorGuard;
                                  end;
       aic_group_AttackWait,
@@ -548,17 +550,18 @@ begin
         end
         else
         begin
-           if(ai_choosen)then
-             case uidi of
-             UID_Phantom,
-             UID_LostSoul: if(ai_generator_d<NOTSET)then
+           case uidi of
+           UID_Phantom,
+           UID_LostSoul: if(ai_generator_d<NOTSET)then
+                           if(uidi<>UID_Phantom)or(ai_generator_d<ai_ZombieTarget_d)then
                              with ai_generator_kp^ do
                              begin
+
                                 if(ai_generator_d>srange)then uo_id:=ua_move;
                                 ai_RunTo(pu,nil,kp_x,kp_y,ai_generator_d,aic_BaseIdle_r);
                                 exit;
                              end;
-             end;
+           end;
            case uidi of
            UID_Pain     : if (min2i(x,abs(map_Size1-x))>srange)
                           and(min2i(y,abs(map_Size1-y))>srange)then

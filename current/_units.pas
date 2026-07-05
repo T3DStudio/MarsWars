@@ -146,7 +146,7 @@ begin
          begin
             unit_kill(pTarget,false,(hits-damage)<=uid_FastDeathHits,true,false,false);
             if(damagePlayer<=LastPlayer)and(iscomplete)then
-              with g_PlayersMain[damagePlayer] do
+              with g_PlayersGame[damagePlayer] do
               begin
                  if(race<>r_hell)then
                  res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
@@ -2379,13 +2379,14 @@ begin
            {$IFDEF _FULLGAME}
            if(ServerSide)then
            {$ENDIF}
-             with player^ do
-               if(isdefeated)
-               or(isobserver)then
-               begin
-                  unit_kill(pu,true,true,false,true,true);
-                  continue;
-               end;
+             //if(hits>0)then
+               with player^ do
+                 if(isdefeated)
+                 or(isobserver)then
+                 begin
+                    unit_kill(pu,true,true,false,true,true);
+                    continue;
+                 end;
 
            if(cycle_order=g_cycle_order)then
              unit_TeamReveal(pu,false);

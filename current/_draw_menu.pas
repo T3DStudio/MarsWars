@@ -154,7 +154,7 @@ begin
      end;
 end;
 
-procedure drawmenu_ItemInfo(tar:pSDL_Surface;mi:byte;text1,text2:shortstring);
+procedure drawmenu_ItemInfo(tar:pSDL_Surface;mi:byte;text1,text2,text3:shortstring);
 var
 color:TMWColor;
 y    :integer;
@@ -169,7 +169,9 @@ begin
 
         draw_text(tar,mi_x0+font_wh,mi_y0+menu_BigButtonH,text1,ta_LU,mi_charw,color,@y);
         if(length(text2)>0)then
-        draw_text(tar,mi_x0+font_wh,y                    ,text2,ta_LU,mi_charw,color);
+        draw_text(tar,mi_x0+font_wh,y                    ,text2,ta_LU,mi_charw,color,@y);
+        if(length(text3)>0)then
+        draw_text(tar,mi_x0+font_wh,y                    ,text3,ta_LU,mi_charw,color,@y);
      end;
 end;
 procedure drawmenu_ItemTextC(tar:pSDL_Surface;mi,pos:byte;text:shortstring;color:TMWColor);
@@ -311,7 +313,7 @@ begin
    drawmenu_StringArray(tar,mi_SaveLoad_list,@svld_list,svld_list_size,svld_list_scroll,svld_list_sel,menu_ListLineH,menu_ListLineWChars1,menu_BaseList1H,true);
 
    drawmenu_ItemCaption(tar,mi_SaveLoad_info,str_FileInfo );
-   drawmenu_ItemInfo   (tar,mi_SaveLoad_info,svld_str_info1,svld_str_info2);
+   drawmenu_ItemInfo   (tar,mi_SaveLoad_info,svld_str_info1,svld_str_info2,svld_str_info3);
 
    with menu_items[mi_SaveLoad_fname] do
    drawmenu_ItemText   (tar,mi_SaveLoad_fname,ta_LM,str_CutLast(svld_str_fname+vc(mi_SaveLoad_fname),mi_charw),menu_ItemSelected);
@@ -327,7 +329,7 @@ begin
    drawmenu_StringArray(tar,mi_Replays_list   ,@rpls_list,rpls_list_size,rpls_list_scroll,rpls_list_sel,menu_ListLineH,menu_ListLineWChars1,menu_BaseList1H,true);
 
    drawmenu_ItemCaption(tar,mi_Replays_info   ,str_FileInfo );
-   drawmenu_ItemInfo   (tar,mi_Replays_info   ,rpls_str_info1,rpls_str_info2);
+   drawmenu_ItemInfo   (tar,mi_Replays_info   ,rpls_str_info1,rpls_str_info2,rpls_str_info3);
 
    drawmenu_ItemText1  (tar,mi_Replays_play   ,str_FilePlay,0);
    drawmenu_ItemText1  (tar,mi_Replays_delete ,str_FileDelete,0);
@@ -439,7 +441,7 @@ function TeamChar(p:byte):char;
 begin
    if(map_scenario in mc_fixed_teams)
    then TeamChar:=b2s(PlayerGetFixedTeams(map_scenario,p)+1)[1]
-   else TeamChar:=b2s(g_PlayersMain[p].team+1)[1]
+   else TeamChar:=b2s(g_PlayersGame[p].team+1)[1]
 end;
 function AISlotsSOpt:shortstring;
 begin
@@ -475,7 +477,7 @@ begin
 
 
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
        if(state<>ps_None)then
        begin
           if(p=LocalPlayer)
@@ -528,7 +530,7 @@ begin
        end;
 
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      with menu_items[mi_Players_Ping0+p] do
        if(mi_state>as_off)then
          if(net_status=ns_none)or(state<>ps_Human)

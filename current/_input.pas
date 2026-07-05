@@ -102,6 +102,8 @@ begin
    input_SetAction(iAct_Control_USelArmy  ,ikt_keyboard,0           ,SDLK_F2          );
    input_SetAction(iAct_Control_MarkLook  ,ikt_keyboard,0           ,SDLK_F5          );
    input_SetAction(iAct_Control_MarkAttack,ikt_keyboard,0           ,SDLK_F6          );
+   input_SetAction(iAct_Control_ToggleRec ,ikt_keyboard,0           ,SDLK_F10         );
+
 
    input_SetAction(iAct_SProd1            ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_SProd2            ,ikt_keyboard,0           ,SDLK_T           );
@@ -389,7 +391,7 @@ begin
    ctabType :=ui_ControlTabType;
 
    if(UIPlayer<=LastPlayer)
-   then POVPlayer:=@g_PlayersMain[UIPlayer]
+   then POVPlayer:=@g_PlayersGame[UIPlayer]
    else POVPlayer:=nil;
 
    iActSetOnEnabled(iAct_InGamePause,GamePauseToggle(true),true);
@@ -503,7 +505,7 @@ function local_TarIsEnemy:boolean;
 begin
    local_TarIsEnemy:=false;
    if(IsUnitRange(otar,nil))then
-     if(g_units[otar].player^.team<>g_PlayersMain[LocalPlayer].team)then local_TarIsEnemy:=true;
+     if(g_units[otar].player^.team<>g_PlayersGame[LocalPlayer].team)then local_TarIsEnemy:=true;
 end;
 procedure local_ClickEffect(color:TMWColor);
 begin
@@ -596,7 +598,7 @@ begin
          net_writebyte(oa0);
          net_writebyte(oid);
 
-         with g_PlayersMain[LocalPlayer] do
+         with g_PlayersGame[LocalPlayer] do
            net_writeint(units_all_s);
          for u:=1 to MaxUnits do
            with g_punits[u]^ do
@@ -634,7 +636,7 @@ begin
    if(not PointInCam(tx,ty))then exit;
 
    if(UIPlayer<=LastPlayer)
-   then pUIPlayer:=@g_PlayersMain[UIPlayer]
+   then pUIPlayer:=@g_PlayersGame[UIPlayer]
    else pUIPlayer:=nil;
 
    if(pUIPlayer<>nil)then
@@ -715,14 +717,14 @@ begin
                                       end
                                       else
                                       begin
-                                         ReqBits:=CheckUnitReqs(@g_PlayersMain[LocalPlayer],m_brush);
+                                         ReqBits:=CheckUnitReqs(@g_PlayersGame[LocalPlayer],m_brush);
                                          if(ReqBits>0)then
                                          begin
                                             if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
                                             m_brush:=co_empty;
                                          end
                                          else
-                                           with g_PlayersMain[LocalPlayer] do
+                                           with g_PlayersGame[LocalPlayer] do
                                            begin
                                               if(not InputAction(iact_Control))then
                                               begin
@@ -766,7 +768,7 @@ begin
                                                                       m_brushy:=mouse_map_y;
                                                                    end;
 
-                                                                   if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,true,g_PlayersMain[LocalPlayer].team)<>cbr_no)
+                                                                   if(CheckCollisionR(m_brushx,m_brushy,uid_r,unum,uid_isbuilding,true,g_PlayersGame[LocalPlayer].team)<>cbr_no)
                                                                    then m_brushc:=c_red;
                                                                 end;
                                                            end
@@ -805,7 +807,7 @@ begin
                 then PlayerSendOrder(co_ability,target,x,y,byte(-m_brush),
                                                      uo_corder,LocalPlayer)   // ability
                 else GameLog_ReqMsg(LocalPlayer,byte(-m_brush),lmt_argt_ability,lmt_invalid_Target,mouse_map_x,mouse_map_y);
-                if(g_PlayersMain[LocalPlayer].units_all_s>1)then exit;
+                if(g_PlayersGame[LocalPlayer].units_all_s>1)then exit;
              end;
 co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // move
 co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // attack
@@ -865,7 +867,7 @@ begin
                             begin
                                u:=action-iAct_SProd1;
                                if(0<=u)and(u<=ui_ButtonsNum)then
-                                 with g_PlayersMain[LocalPlayer] do
+                                 with g_PlayersGame[LocalPlayer] do
                                    case ui_tab of
                                    tab_buildings: case click_type of
                                                   pct_left : if(SoundOn)then m_brush:=ui_panel_uids[race,ui_tab,u];
@@ -927,7 +929,7 @@ begin
    iAct_Control_UAStop    : if(SoundEnabledLeft)then PlayerSendOrder(co_astand,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UStop     : if(SoundEnabledLeft)then PlayerSendOrder(co_stand ,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UProdCncl : if(SoundEnabledLeft)then
-                              with g_PlayersMain[LocalPlayer] do
+                              with g_PlayersGame[LocalPlayer] do
                                 if(ui_uibtn_ProdCncl>0)then
                                    PlayerSendOrder(co_pcancle,0,ui_cam_cx,ui_cam_cy,255,uo_corder,LocalPlayer);
    iAct_Control_UDestroy  : if(SoundEnabledLeft)then PlayerSendOrder(co_destroy,0,0,0,0,uo_corder,LocalPlayer);
@@ -1316,11 +1318,11 @@ begin
       begin
          if(InputActionPressed(iAct_test_FastTime    ))then sys_uncappedFPS:=not sys_uncappedFPS;
          if(InputActionPressed(iAct_test_InstaProd   ))then test_InstaProd :=not test_InstaProd;
-         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersMain[LocalPlayer] do if(state=ps_human          )then state:=ps_AI              else state:=ps_human;
-         if(InputActionPressed(iAct_test_iddqd       ))then with g_PlayersMain[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
+         if(InputActionPressed(iAct_test_ToggleAI    ))then with g_PlayersGame[LocalPlayer] do if(state=ps_human          )then state:=ps_AI              else state:=ps_human;
+         if(InputActionPressed(iAct_test_iddqd       ))then with g_PlayersGame[LocalPlayer] do if(upgrs_cur[upgr_invuln]=0)then upgrs_cur[upgr_invuln]:=1 else upgrs_cur[upgr_invuln]:=0;
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
-         if(InputActionPressed(iAct_test_NullUpgrades))then with g_PlayersMain[LocalPlayer] do FillChar(upgrs_cur,SizeOf(upgrs_cur),0);
+         if(InputActionPressed(iAct_test_NullUpgrades))then with g_PlayersGame[LocalPlayer] do FillChar(upgrs_cur,SizeOf(upgrs_cur),0);
          if(InputActionPressed(iAct_test_BePlayer0   ))then LocalPlayer:=0;
          if(InputActionPressed(iAct_test_BePlayer1   ))then LocalPlayer:=1;
          if(InputActionPressed(iAct_test_BePlayer2   ))then LocalPlayer:=2;
@@ -1329,8 +1331,8 @@ begin
          if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
          if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
          if(InputActionPressed(iAct_test_BePlayer7   ))then LocalPlayer:=7;
-         if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersMain[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
-         if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersMain[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
+         if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersGame[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
+         if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersGame[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
 
         // if(InputActionPressed(iAct_test_debug0      ))then net_debug:= not net_debug;
          if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
@@ -1355,6 +1357,10 @@ begin
            if(InputActionPressed(act))then
              ui_ExecInGameAction(act,pct_left,@clickSound);
         end;
+
+      // Record toggle
+      if(ctab=tcc_controls)then
+        if(InputActionPressed(iAct_Control_ToggleRec))then menu_ToggleRecord;
 
       if(g_status=gs_running)then
       begin

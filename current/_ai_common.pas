@@ -74,6 +74,7 @@ ai_nearGenGuards
 ai_UpgradesLeft,
 ai_AvailableDetectors,
 ai_generator_d,
+ai_generator_w,
 ai_generator_n,
 ai_keypoint_d,
 ai_keypoint_n,
@@ -274,10 +275,10 @@ begin
      begin
         if(g_FixedPositions)then
         begin
-           if(g_PlayersMain[i].state=ps_None)then continue;
-           if(g_PlayersMain[i].team=g_PlayersMain[p].team)then continue;
+           if(g_PlayersGame[i].state=ps_None)then continue;
+           if(g_PlayersGame[i].team=g_PlayersGame[p].team)then continue;
         end;
-        ai_Alarm_SetForTeam(g_PlayersMain[p].team,map_PlayerStartX[i],map_PlayerStartY[i],1,base_r1,true,map_GetZone(map_PlayerStartX[i],map_PlayerStartY[i]));
+        ai_Alarm_SetForTeam(g_PlayersGame[p].team,map_PlayerStartX[i],map_PlayerStartY[i],1,base_r1,true,map_GetZone(map_PlayerStartX[i],map_PlayerStartY[i]));
      end;
 end;
 
@@ -303,7 +304,7 @@ end;
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
 procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxSuper,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
 begin
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
    begin
       aip_MaxEnergy        :=aMaxEnergy;
       aip_MaxBuilders      :=aMaxBuilders;
@@ -323,7 +324,7 @@ begin
    end;
 end;
 begin
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
    begin
       case aip_skill of
       //              energy buil bar   forges dete  min   max            pause
@@ -476,16 +477,16 @@ begin
          end;
 end;
 
-procedure ai_SetKeyPoint(pcurkp:ppTKeyPoint;pcurd:pinteger;newkp:pTKeyPoint;newd:integer;tu:PTUnit);
+procedure ai_SetKeyPoint(pcurkp:ppTKeyPoint;pcurw,pcurd:pinteger;newkp:pTKeyPoint;neww,newd:integer;tu:PTUnit);
 begin
    if(pcurkp^=nil)
    then
    else
      case (tu^.isfly)or(ai_HaveTransport) of
-     true : if(newd<pcurd^)
+     true : if(neww<pcurw^)
             then
             else
-            if(newd>pcurd^)
+            if(neww>pcurw^)
             then exit;
      false: if((newkp^.kp_Zone=tu^.mapZone)>(pcurkp^^.kp_Zone=tu^.mapZone))
             then
@@ -493,19 +494,20 @@ begin
             if((newkp^.kp_Zone=tu^.mapZone)<(pcurkp^^.kp_Zone=tu^.mapZone))
             then exit
             else
-              if(newd<pcurd^)
+              if(neww<pcurw^)
               then
               else
-              if(newd>pcurd^)
+              if(neww>pcurw^)
               then exit;
      end;
 
    pcurkp^:=newkp;
+   pcurw^ :=neww;
    pcurd^ :=newd;
 end;
 
 procedure ai_Global_InitVars(pu:PTUnit);
-var i,d   :integer;
+var i,d,w :integer;
 koth_point:boolean;
 begin
    with pu^ do
@@ -614,6 +616,7 @@ begin
 
    ai_generator_kp   := nil;
    ai_generator_d    := NOTSET;
+   ai_generator_w    := NOTSET;
    ai_generator_n    := 0;
 
    // energy
@@ -678,7 +681,9 @@ begin
 
              d:=point_dist_int(kp_x,kp_y,x,y);
 
-             if(kptd_OwnerTeam>LastPlayer)and(kp_Energy>0)then d:=d div 3;
+             if(kptd_OwnerTeam>LastPlayer)and(kp_Energy>0)
+             then w:=d div 3
+             else w:=d;
 
              //uid_LimitUse
              if(not koth_point)then
@@ -686,8 +691,8 @@ begin
                or((kp_LimitPlayerP[playeri]> (keyPoint_MaxLimitAI+uid_LimitUse))and(d<=kp_RCapture))then continue;
 
              case(kp_Energy>0)and(not koth_point)of
-             true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_d,@map_KeyPointsL[i],d,pu);
-             false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@map_KeyPointsL[i],d,pu);
+             true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_w,@ai_generator_d,@map_KeyPointsL[i],w,d,pu);
+             false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@ai_keypoint_d ,@map_KeyPointsL[i],w,d,pu);
              end;
           end;
 
@@ -1247,7 +1252,7 @@ limit_AGroup,
 limit_Attack,
 limit_Base:longint;
 begin
-   with g_PlayersMain[playerN] do
+   with g_PlayersGame[playerN] do
    begin
       if(aip_timer_detection  >0)then aip_timer_detection  -=1;
       if(aip_timer_magic      >0)then aip_timer_magic      -=1;
@@ -1255,10 +1260,10 @@ begin
 
       {if(g_cycle_order=playerN)and(playerN=LocalPlayer)then
       begin
-         //writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack,' - ',armylimit,' ',aic_MaxLimitBorder,' : ',units_bld_l[false]+prod_unit_Limit,' ',aip_MaxUnitLimit);
+         writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack,' - ',armylimit,' ',aic_MaxLimitBorder,' : ',units_bld_l[false]+prod_unit_Limit,' ',aip_MaxUnitLimit,' ',units_bld_l[false],' ',units_bld_l[true]);
          //writeln(aip_timer_detection);
-         writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
-      end;  }
+         //writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
+      end; }
 
       if(aip_timer_attack<0)then
       begin
@@ -1289,7 +1294,7 @@ begin
            or(((aip_flags and aif_army_early_attack1)>0)and(units_bld_l[false]>=aip_MaxUnitMinPart))
            then aip_timer_attack:=1
            else
-             if(armylimit>=aic_MaxLimitBorder)
+             if((armylimit+prod_unit_Limit)>=aic_MaxLimitBorder)
              or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitLimit)
              then aip_timer_attack:=aip_pause_attack+1;
         end

@@ -12,7 +12,7 @@ begin
 end;
 begin
    ui_UpdateUIPlayer:=false;
-   if(not g_PlayersMain[LocalPlayer].isobserver)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
+   if(not g_PlayersGame[LocalPlayer].isobserver)and(not Game_IsEnded)and(rpls_pstate<rpls_read)
    then UIPlayer:=LocalPlayer
    else ui_UpdateUIPlayer:=TryUpd(@UIPlayer);
 end;
@@ -81,7 +81,7 @@ begin
    // false - no need announcer sound
    LogMes2UIAlarm:=true;
    if(POVPlayer<=LastPlayer)then
-     with g_PlayersMain[POVPlayer] do
+     with g_PlayersGame[POVPlayer] do
        with log_l[log_i] do
          case lm_type of
 lmt_unit_LevelUp    :      ui_AddMarker(lm_x,lm_y,aummat_advance   ,true);
@@ -171,7 +171,7 @@ begin
    // debug
    {$IFDEF TESTMODE}
    if(TestMode>1)and(UIPlayer<=LastPlayer)then
-     with g_PlayersMain[UIPlayer] do
+     with g_PlayersGame[UIPlayer] do
        for i:=0 to ai_LastAlarm do
          with ai_TeamAlarms[team,i] do
            if(aia_limit>0)then
@@ -188,13 +188,13 @@ begin
 
    if(ui_PlayersScreens)then
      for i:=0 to LastPlayer do
-       with g_PlayersMain[i] do
+       with g_PlayersGame[i] do
        with g_PlayersTemp[i] do
          if(cam_w>0)then
            if(i<>LocalPlayer)or(net_status<>ns_server)then
            if(state=ps_Human)or(net_status<>ns_server)then
-             if(g_PlayersMain[LocalPlayer].isobserver)
-             or(g_PlayersMain[LocalPlayer].team=team)then
+             if(g_PlayersGame[LocalPlayer].isobserver)
+             or(g_PlayersGame[LocalPlayer].team=team)then
                rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
                                          round( cam_y       *map_MiniMap_cx),
                                          round((cam_x+cam_w)*map_MiniMap_cx),
@@ -244,7 +244,7 @@ begin
    m_brushx-=ui_cam_x;
    m_brushy-=ui_cam_y;
 
-   with g_PlayersMain[LocalPlayer]do
+   with g_PlayersGame[LocalPlayer]do
    case m_brush of
    1..255     : with g_uids[m_brush] do
                 begin
@@ -262,7 +262,7 @@ begin
                    begin
                       uidi      :=m_brush;
                       playeri   :=LocalPlayer;
-                      player    :=@g_PlayersMain[playeri];
+                      player    :=@g_PlayersGame[playeri];
                       iscomplete:=true;
                       hits      :=uid_MaxHits1;
                    end;
@@ -551,14 +551,14 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Observer_Player0..
                        iAct_Observer_Player7  : begin
                                                    p:=uid-iAct_Observer_Player0;
-                                                   with g_PlayersMain[p] do
+                                                   with g_PlayersGame[p] do
                                                      draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColorDef(p),UIPlayer=p,not iActEnabled(uid));
                                                 end;
 
                        iAct_Replay_Player0..
                        iAct_Replay_Player7    : begin
                                                    p:=uid-iAct_Replay_Player0;
-                                                   with g_PlayersMain[p] do
+                                                   with g_PlayersGame[p] do
                                                      draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColorDef(p),UIPlayer=p,not iActEnabled(uid));
                                                 end;
                        iAct_Replay_Log        : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayLog  ,rpls_showlog    ,not iActEnabled(uid));
@@ -672,7 +672,7 @@ begin
                    tab_Buildings,
                    tab_Units,
                    tab_Upgrades : if(UIPlayer<=LastPlayer)then
-                                    with g_PlayersMain[UIPlayer] do
+                                    with g_PlayersGame[UIPlayer] do
                                     begin
                                        taid:=ui_panel_PTabIActs[m_btnN];
                                        tuid:=ui_panel_uids[race,ui_tab,taid-iAct_SProd1];
@@ -795,7 +795,7 @@ begin
 
    // resources
    if(UIPlayer<=LastPlayer)then
-     with g_PlayersMain[UIPlayer] do
+     with g_PlayersGame[UIPlayer] do
        if(state<>ps_none)and(not isdefeated)and(not isobserver)then
        begin
           limit:=armylimit+prod_unit_Limit;
@@ -821,9 +821,13 @@ begin
    // POV PLAYER
    case ui_ControlTabType of
    tcc_observer,
-   tcc_replay  : if(UIPlayer<=LastPlayer)
-                 then draw_text(tar,ui_GameStatusX,ui_PovPlayerY,g_PlayersMain[UIPlayer].name,ta_MU,255,PlayerGetColorCur(UIPlayer,false))
-                 else draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_all                     ,ta_MU,255,c_white                          );
+   tcc_replay  : begin
+                    draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_observer+' (',ta_RU,255,c_white);
+                    if(UIPlayer<=LastPlayer)
+                    then str:=g_PlayersGame[UIPlayer].name+tc_white+')'
+                    else str:=str_all                              +')';
+                    draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str,ta_LU,255,PlayerGetColorCur(UIPlayer,false));
+                 end;
    end;
 
    // TIMER
@@ -844,7 +848,7 @@ begin
                                else
                                  with kp_TeamData[MaxPlayers] do
                                    if(kptd_OwnerPlayer<=LastPlayer)
-                                   then draw_text(tar,ui_objectivesx,y,g_PlayersMain[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
+                                   then draw_text(tar,ui_objectivesx,y,g_PlayersGame[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
                                    else
                                      if(kptd_Timer<=0)
                                      then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
@@ -960,7 +964,7 @@ begin
 
    if(UIPlayer>LastPlayer)
    then PVisPlayer:=nil
-   else PVisPlayer:=@g_PlayersMain[UIPlayer];
+   else PVisPlayer:=@g_PlayersGame[UIPlayer];
 
    if(rpls_pstate<rpls_read)then
    begin

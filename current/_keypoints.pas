@@ -59,7 +59,7 @@ begin
      begin
         if(kptd_OwnerPlayer<=LastPlayer)then
         begin
-           with g_PlayersMain[kptd_OwnerPlayer] do
+           with g_PlayersGame[kptd_OwnerPlayer] do
            begin
               res_energyl_cur-=kp_Energy;
               res_energyl_max-=kp_Energy;
@@ -69,12 +69,12 @@ begin
 
         kptd_OwnerPlayer:=newOwnerPlayer;
         if(kptd_OwnerPlayer<=LastPlayer)
-        then kptd_OwnerTeam:=g_PlayersMain[newOwnerPlayer].team
+        then kptd_OwnerTeam:=g_PlayersGame[newOwnerPlayer].team
         else kptd_OwnerTeam:=kptd_OwnerPlayer;
 
         if(kptd_OwnerPlayer<=LastPlayer)then
         begin
-           with g_PlayersMain[kptd_OwnerPlayer] do
+           with g_PlayersGame[kptd_OwnerPlayer] do
            begin
               res_energyl_cur+=kp_Energy;
               res_energyl_max+=kp_Energy;
@@ -237,7 +237,7 @@ begin
                  begin
                     kptd_TimerOwnerPlayer:=tCapturingPlayer;
                     if(kptd_TimerOwnerPlayer<=LastPlayer)
-                    then kptd_TimerOwnerTeam:=g_PlayersMain[kptd_TimerOwnerPlayer].team
+                    then kptd_TimerOwnerTeam:=g_PlayersGame[kptd_TimerOwnerPlayer].team
                     else kptd_TimerOwnerTeam:=255;
                     if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
                     kptd_Timer:=0;
@@ -282,6 +282,7 @@ begin
           end;
        end;
 
-   if(kp_captured_n>0)and(wteam_n=kp_captured_n)and(wteam<=LastPlayer)then Game_SetStatusWinnerTeam(wteam);
+   if(kp_captured_n>0)and(wteam_n=kp_captured_n)and(wteam<=LastPlayer)then
+     Game_SetStatusWinnerTeam(wteam);
 end;
 

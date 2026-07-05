@@ -78,7 +78,7 @@ begin
                        BlockRead(f,vbyte1,sizeof(camp_diff   ));
                        BlockRead(f,vcdata,sizeof(camp_data   ));
 
-                       if(not FileReadBaseGameInfo(f,@svld_str_info1,@svld_str_info2))then svld_str_info1:=str_FileError_WData;
+                       if(not FileReadBaseGameInfo(f,@svld_str_info1,@svld_str_info2,@svld_str_info3))then svld_str_info1:=str_FileError_WData;
                     end;
       else svld_str_info1:=str_FileError_WVer;
       end;
@@ -163,7 +163,7 @@ begin
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer   ));
    AddItem(@g_tick              ,SizeOf(g_tick        ));
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      begin
         AddItem(@state     ,SizeOf(state     ));
         AddItem(@name      ,SizeOf(name      ));
@@ -174,7 +174,7 @@ begin
 
    // other
    AddItem(@g_FixedPositions    ,SizeOf(g_FixedPositions   ));
-   AddItem(@g_PlayersMain       ,SizeOf(TPList             ));
+   AddItem(@g_PlayersGame       ,SizeOf(TPList             ));
    AddItem(@g_units             ,SizeOf(g_units            ));
    AddItem(@g_missiles          ,SizeOf(g_missiles         ));
    AddItem(@g_effects           ,SizeOf(g_effects          ));
@@ -196,6 +196,7 @@ begin
    AddItem(@ui_alarms           ,SizeOf(ui_alarms          ));
    AddItem(@m_brush             ,SizeOf(m_brush            ));
    AddItem(@PlayerColorsSchemeDefault,SizeOf(PlayerColorsSchemeDefault));
+   AddItem(@g_PlayersScore      ,SizeOf(g_PlayersScore     ));
 end;
 
 function saveload_Allowed:boolean;
@@ -304,7 +305,7 @@ begin
       for u:=1 to MaxUnits do
         with g_units[u] do
         begin
-           player:=@g_PlayersMain[playeri];
+           player:=@g_PlayersGame[playeri];
            uid   :=@g_uids[uidi];
         end;
 
@@ -328,6 +329,7 @@ begin
       units_DefaultVisData;
       map_MakeThemeSprites;
       map_RefreshObstaclesGrid;
+      map_KeyPoints_UpdateZone;
       map_DataForAI;
       map_Obstacles_SetDrawData;
       map_RedrawMenuMinimap;

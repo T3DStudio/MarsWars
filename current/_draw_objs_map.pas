@@ -54,7 +54,7 @@ begin
      begin
         if(g_FixedPositions)then
         begin
-           if(g_PlayersMain[p].state=ps_none)and(g_AISlots=0)then continue;
+           if(g_PlayersGame[p].state=ps_none)and(g_AISlots=0)then continue;
            color:=PlayerGetColorDef(p);
            pc:=b2s(p+1)[1];
         end

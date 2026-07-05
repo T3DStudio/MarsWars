@@ -45,7 +45,7 @@ begin
    if(vbyte1<>g_version)
    then rpls_str_info1:=str_FileError_WVer
    else
-     if(not FileReadBaseGameInfo(f,@rpls_str_info1,@rpls_str_info2))then rpls_str_info1:=str_FileError_WData;
+     if(not FileReadBaseGameInfo(f,@rpls_str_info1,@rpls_str_info2,@rpls_str_info3))then rpls_str_info1:=str_FileError_WData;
    {$I+}
    ioer:=IOResult;
    if(ioer<>0)then rpls_str_info1:=str_FileError_WData+'('+w2s(ioer)+')';
@@ -114,7 +114,7 @@ begin
    AddItem(@rpls_player         ,SizeOf(rpls_player   ));
    AddItem(@g_tick              ,SizeOf(g_tick        ));
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
      begin
         AddItem(@state     ,SizeOf(state     ));
         AddItem(@name      ,SizeOf(name      ));
@@ -124,7 +124,7 @@ begin
      end;
 
    for p:=0 to LastPlayer do
-     with g_PlayersMain[p] do
+     with g_PlayersGame[p] do
        AddItem(@race,SizeOf(race));
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
 end;
@@ -294,14 +294,15 @@ begin
       rpls_file_Size:=0;
       rpls_file_LastErr:=0;
 
-      rpls_fstate :=rpls_write;
-      rpls_pstate :=rpls_write;
-      rpls_u      :=0;
-      rpls_player :=LocalPlayer;
-      rpls_log_c  :=0;
-      rpls_Ticks  :=0;
-      rpls_GameStatus := 255;
-      ui_playerPOV:=false;
+      rpls_fstate      :=rpls_write;
+      rpls_pstate      :=rpls_write;
+      rpls_u           :=0;
+      rpls_player      :=LocalPlayer;
+      rpls_log_c       :=0;
+      rpls_Ticks       :=0;
+      rpls_GameStatus  :=255;
+      rpls_PlayersScore:=false;
+      ui_playerPOV     :=false;
 
       if(rpls_head_itemn>0)then
         for p:=0 to rpls_head_itemn-1 do
@@ -327,14 +328,16 @@ begin
    camx:=byte(ui_cam_cx shr camXYt1b);
    camy:=byte(ui_cam_cy shr camXYt1b);
 
-   gs:=g_status and %00111111;
+   gs:=g_status and %00011111;
    i :=gs;
    if(rpls_log_c>0)then i:=i or %10000000;
    if(rpls_vidx<>camx)
    or(rpls_vidy<>camy)then
      if(gs=gs_running)then i:=i or %01000000;
+   if(not rpls_PlayersScore)then
+     if(game_IsEnded)then i:=i or %00100000;
 
-   if((i and %11000000)>0)
+   if((i and %11100000)>0)
    or(gs=gs_running)
    or(rpls_GameStatus<>gs)then
    begin
@@ -347,9 +350,15 @@ begin
          wudata_byte(rpls_vidx,true);
          wudata_byte(rpls_vidy,true);
       end;
+      if((i and %00100000)>0)then
+      begin
+         rpls_PlayersScore:=true;
+         //g_PlayersScore
+      end;
       rpls_GameStatus:=gs;
 
-      if(gs=gs_running)then wclinet_gframe(rpls_player,rpls_WriteTimeServer,true);
+      if(gs=gs_running)
+      then wclinet_gframe(rpls_player,rpls_WriteTimeServer,true);
    end;
 
    if(rpls_file_LastErr<>0)then
@@ -465,7 +474,7 @@ begin
          end;
 
          for p:=0 to LastPlayer do
-           with g_PlayersMain[p] do
+           with g_PlayersGame[p] do
              if not(state in [ps_None,ps_human,ps_AI])
              or(race >r_count)
              or(mrace>r_count)
@@ -481,7 +490,7 @@ begin
              end;
 
          for p:=0 to LastPlayer do
-           with g_PlayersMain[p] do
+           with g_PlayersGame[p] do
              if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
 
          if(rpls_pnu=0)then rpls_pnu:=net_SendTimeServer;
@@ -538,7 +547,7 @@ begin
       replay_SavePlayPosition;
 
       i:=rudata_byte(true,0);
-      g_status:=i and %00111111;
+      g_status:=i and %00011111;
 
       if((i and %10000000)>0)then rudata_log(rpls_player,true);
       if((i and %01000000)>0)then
@@ -546,6 +555,7 @@ begin
          rpls_vidx:=rudata_byte(true,0);
          rpls_vidy:=rudata_byte(true,0);
       end;
+      if((i and %00100000)>0)then ;// read players scores
 
       if(g_status=gs_running)then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip);
 
@@ -572,7 +582,7 @@ begin
       then rpls_RecordTryPause-=1
       else
       begin
-         if(g_started)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
+         if(g_started)and(not Game_IsEnded)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
          rpls_RecordTryPause:=fr_fps2;
       end;
    end

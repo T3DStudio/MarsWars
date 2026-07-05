@@ -77,13 +77,13 @@ procedure PlayerDataLine(p:byte);
 function PlayerGetPINGStr:shortstring;
 begin
    PlayerGetPINGStr:='';
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
    with g_PlayersTemp[p] do
      if(state=ps_human)then PlayerGetPINGStr:=w2s(net_ping);
 end;
 
 begin
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
      if(state=ps_none)
      then   Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,'',29,'',39,'',49)
      else
@@ -100,7 +100,7 @@ begin
      case G_status of
      gs_running    : Dedicated_GameStatusStr:=str_GameStarted;
      gs_paused0..
-     gs_paused7    : Dedicated_GameStatusStr:=str_GamePaused+g_PlayersMain[G_status-gs_paused0].name;
+     gs_paused7    : Dedicated_GameStatusStr:=str_GamePaused+g_PlayersGame[G_status-gs_paused0].name;
      gs_waitplayers: Dedicated_GameStatusStr:=str_GameWFPlayers;
      gs_win_team0..
      gs_win_team7  : Dedicated_GameStatusStr:=str_GameEnded+b2s(G_Status-gs_win_team0+1);

@@ -20,8 +20,9 @@ g_NewObservers    : boolean  = true;
 g_royal_Rmax      : integer  = 0;
 g_royal_RCur      : integer  = 0;
 
-g_PlayersMain     : TPList;
-g_PlayersTemp     : array[0..LastPlayer ] of TPlayerTempData;
+g_PlayersGame     : TPList;
+g_PlayersTemp     : array[0..LastPlayer ] of TPlayerDataTemp;
+g_PlayersScore    : array[0..LastPlayer ] of TPlayerDataScore;
 g_units           : array[0..MaxUnits   ] of TUnit;
 g_punits          : array[0..MaxUnits   ] of PTUnit;
 
@@ -136,11 +137,11 @@ u_royal_cd,
 u_royal_d         : integer;
 
 ai_names_o        : array[0..ai_names_max-1] of shortstring = (
-                    ' TGA'   ,' NRM'    ,' BFG'       ,' Dant3'    ,' marat'   ,' Notarget'  ,' Am$ek'   ,' Chainie' ,' BND'      ,' NicoThFug',
-                    ' Mud'   ,' Aurora' ,' Archi'     ,' print423' ,' Rising'  ,' KolyanRPG' ,' Boiec'   ,' MWG'     ,' Teran'    ,' ZZYZX'    ,
-                    ' Jet'   ,' ABK'    ,' NekoRangr' ,' OutCast'  ,' Igara'   ,' VoZj'      ,' Raymund' ,' Murphy'  ,' Jabber'   ,' NikcGreen',
-                    ' Zetor' ,' Bertie' ,' Doomersov' ,' Seifer'   ,' m0rdecai',' KrikIDDQD' ,' Ipse'    ,' Sergh'   ,' cybermind',' Dem',
-                    ' Romero',' Carmack',' Keen'      ,' BJ'       ,' Doomguy' ,' Slayer'    ,' Ranger'  ,' Grunt'   ,' Deimos'   ,' Phobos');
+                    ' TGA'   ,' NRM'    ,' BFG'       ,' Dant3'    ,' marat'   ,' Notarget'  ,' Am$ek'   ,' Chainie'   ,' BND'       ,' NicoTheFug',
+                    ' Mud'   ,' Aurora' ,' Archi'     ,' print423' ,' Rising'  ,' KolyanRPG' ,' Boiec'   ,' ManWithGun',' Teran'     ,' ZZYZX'     ,
+                    ' Jet'   ,' ABK'    ,' NekoRanger',' OutCast'  ,' Igara'   ,' VoZj'      ,' Raymund' ,' Murphy'    ,' Jabberwock',' NikcGreen' ,
+                    ' Zetor' ,' Bertie' ,' Doomersov' ,' Seifer'   ,' m0rdecai',' Krik_IDDQD',' Ipse'    ,' Sergh'     ,' cybermind' ,' Dem'       ,' Revento',
+                    ' Romero',' Carmack',' Keen'      ,' BJ'       ,' Doomguy' ,' Slayer'    ,' Ranger'  ,' Grunt'     ,' Deimos'    ,' Phobos'    ,' Bitterman');
 ai_names_l        : array[0..ai_names_max-1] of shortstring;
 
 {$IFDEF TESTMODE}
@@ -503,6 +504,7 @@ net_SvList_sel    : integer = 0;
 
 svld_str_info1    : shortstring = '';
 svld_str_info2    : shortstring = '';
+svld_str_info3    : shortstring = '';
 svld_str_fname    : shortstring = '';
 svld_items        : array of TSaveLoadItem;
 svld_itemn        : integer = 0;
@@ -526,6 +528,7 @@ rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
+rpls_str_info3    : shortstring = '';
 rpls_list         : TStringArray;
 rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
@@ -538,6 +541,7 @@ rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_player       : byte = 0;
 rpls_GameStatus   : byte = 0;
+rpls_PlayersScore : boolean = false;
 rpls_showlog      : boolean = false;
 rpls_Ticks        : cardinal = 0;
 rpls_head_items   : array of TSaveLoadItem;

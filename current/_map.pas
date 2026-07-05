@@ -255,12 +255,12 @@ begin
    end;
 end;
 
-procedure map_Obstacle_Remove(ox,oy,orO,orI:integer);
+procedure map_Obstacle_Remove(ox,oy,orO,orI:integer;skipR:integer=integer.MaxValue);
 var o:integer;
 begin
    for o:=0 to MaxObstacles do
      with map_ObstaclesL[o]  do
-       if(o_rO>0)then
+       if(0<o_rO)and(o_rO<skipR)then
          if(RingCollision(ox,oy,orO,orI,o_x,o_y,o_rO,o_rI))then
          begin
             o_x :=0;
@@ -336,7 +336,7 @@ begin
          end;
 end;
 
-function map_DistToObstacleEdge(x,y,r:integer):integer;
+function map_DistToObstacleEdge(x,y,r:integer;skipR:integer=0):integer;
 var
 dx0,dy0,
 dx1,dy1,
@@ -358,6 +358,7 @@ begin
              with oc_l[i]^ do
                if(o_rO>0)then
                begin
+                  if(o_rO<skipR)then continue;
                   d:=point_dist_int(o_x,o_y,x,y);
                   o:=abs(d-o_rO);
                   map_DistToObstacleEdge:=min2i(o,map_DistToObstacleEdge);
@@ -508,7 +509,7 @@ function map_KeyPoints_CheckPos(ix,iy,aCaptureR:integer):boolean;
 begin
    map_KeyPoints_CheckPos:=(map_IfPlayerStartHere (ix,iy,base_r1,0,map_PStartsGap))
                          or(map_IfKeyPointHere    (ix,iy,base_r1  ))
-                         or(map_DistToObstacleEdge(ix,iy,aCaptureR)<aCaptureR);
+                         or(map_DistToObstacleEdge(ix,iy,aCaptureR,ObstacleMinInnerR)<aCaptureR);
 end;
 
 {procedure map_KeyPoints_Rect(cx,cy,cr,cdir,acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
@@ -621,7 +622,8 @@ mc_KeyPoints: begin
                             map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i])*keyPoint_GenR),
                             keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
 
-      map_KeyPoints_Random(MaxKeyPoints-byte(map_scenario=mc_KotH),keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
+      //MaxKeyPoints-byte(map_scenario=mc_KotH)
+      map_KeyPoints_Random(map_MaxPlayers*2,keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
    end;
 
    map_KeyPoints_UpdateZone;
@@ -648,7 +650,7 @@ begin
           false: if((abs(integer(map_seed)+x+y) mod 3)=0)then continue;
           end;
 
-          if(teamShuffle)and(map_MaxPlayers>2)and(g_PlayersMain[x].team<>g_PlayersMain[y].team)then continue;
+          if(teamShuffle)and(map_MaxPlayers>2)and(g_PlayersGame[x].team<>g_PlayersGame[y].team)then continue;
           i:=map_PlayerStartX[x];map_PlayerStartX[x]:=map_PlayerStartX[y];map_PlayerStartX[y]:=i;
           i:=map_PlayerStartY[x];map_PlayerStartY[x]:=map_PlayerStartY[y];map_PlayerStartY[y]:=i;
        end;
@@ -1100,14 +1102,24 @@ begin
       map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotR-1,0);
 
    map_RefreshObstaclesGrid;
-   map_DataForAI;
 end;
 
 procedure map_CreateObjects;
+var i:byte;
 begin
    map_Seed2RandomBase;
    map_Obstacles_Create;
    map_KeyPoints_Create;
+
+   if(map_KeyPointsN>0)then
+     for i:=0 to map_KeyPointsN-1 do
+       with map_KeyPointsL[i] do
+         if(kp_Energy>0)and(kp_RCapture>0)then
+           map_Obstacle_Remove(kp_x,kp_y,kp_RCapture-1,0,ObstacleMinInnerR);
+   map_RefreshObstaclesGrid;
+   map_KeyPoints_UpdateZone;
+
+   map_DataForAI;
    {$IFDEF _FULLGAME}
    map_Obstacles_SetDrawData;
    map_Decals_Create;

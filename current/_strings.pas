@@ -548,7 +548,7 @@ begin
       begin
          uidi   :=auid;
          playeri:=0;
-         player :=@g_PlayersMain[playeri];
+         player :=@g_PlayersGame[playeri];
          unit_ApplyUID(pu);
          hits   :=hits_fdead-1;
       end;

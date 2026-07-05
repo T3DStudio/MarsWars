@@ -501,13 +501,13 @@ end;
 procedure snd_SoundLogUIPlayer(PListener:byte);
 begin
    if(PListener<=LastPlayer)then
-     with g_PlayersMain[PListener] do
+     with g_PlayersGame[PListener] do
        with log_l[log_i] do
          case lm_type of
 lmt_chat_player0..
 lmt_chat_player7        : if((lm_type-lmt_chat_player0)<>PListener)then snd_SoundPlayUI(snd_chat);
 lmt_player_leave        : if(not g_started)
-                          or(g_PlayersMain[LocalPlayer].isobserver)then snd_SoundPlayUI(snd_chat);
+                          or(g_PlayersGame[LocalPlayer].isobserver)then snd_SoundPlayUI(snd_chat);
 lmt_player_revealed,
 lmt_player_surrender,
 lmt_chat_common,

@@ -71,7 +71,7 @@ begin
 end;
 procedure camp_SetPlayer(p,r,t:byte);
 begin
-   with g_PlayersMain[p] do
+   with g_PlayersGame[p] do
    begin
       state:=t;
       race :=r;
@@ -132,7 +132,7 @@ begin
    0 : case camp_mis_sel of
        0 : begin
               // tutorial stages, subtasks
-              with g_PlayersMain[LocalPlayer] do
+              with g_PlayersGame[LocalPlayer] do
               begin
                  {if(res_energyl_max<2000)
                  then cmp_data_b1:=1
@@ -140,7 +140,7 @@ begin
                    if(res_energyl_max<2000)}
 
               end;
-              //if(g_PlayersMain[4].units_ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_PlayersMain[LocalPlayer].team);
+              //if(g_PlayersGame[4].units_ucl_e[true,0]=0)then Game_SetStatusWinnerTeam(g_PlayersGame[LocalPlayer].team);
            end;
        end;
    end;

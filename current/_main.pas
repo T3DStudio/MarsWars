@@ -64,7 +64,17 @@ uses SysUtils, SDL, SDL_Net,crt
 
 {$R *.res}
 
+{var
+  st:single;   }
+
 begin
+   {st:=st.NegativeInfinity;
+   writeln((st<=0),' ',st.IsNan,' ',st.IsNegativeInfinity,' ',st.IsPositiveInfinity,' ',st.IsInfinity);
+
+
+   readln;
+   halt;   }
+
    GameInit;
 
    {$IFDEF _FULLGAME}

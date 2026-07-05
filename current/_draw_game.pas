@@ -624,6 +624,7 @@ end;
 procedure keyPoints_AddSprites;
 var
 t,i,y  :integer;
+sdir,
 ddir   :single;
 colorN,
 colorS :TMWColor;
@@ -641,7 +642,12 @@ begin
      end;
 end;
 begin
-   if(map_KeyPointsN>0)then
+   if(map_KeyPointsN<=0)then exit;
+
+   if(map_scenario=mc_KotH)
+   then sdir:=g_tick/25
+   else sdir:=g_tick/4;
+
    for t:=0 to map_KeyPointsN-1 do
      with map_KeyPointsL[t] do
      with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
@@ -649,9 +655,6 @@ begin
        begin
           colorN:=KeyPoint_GetColor(t,false);
           colorS:=KeyPoint_GetColor(t,true );
-
-          //UnitsInfo_AddText(kp_x,kp_y+50,i2s(kptd_TimerOwnerTeam),c_white);
-          //UnitsInfo_AddText(kp_x,kp_y+60,i2s(kptd_OwnerTeam     ),c_aqua);
 
           if(kp_Energy>0)then
           begin
@@ -671,7 +674,7 @@ begin
             begin
                for i:=1 to 24 do
                begin
-                  ddir:=(i*15)*degtorad;
+                  ddir:=(i*15+sdir)*degtorad;
                   SpriteList_AddEffect(
                   kp_x+round(kp_RCapture*cos(ddir)),
                   kp_y+round(kp_RCapture*sin(ddir)),
@@ -682,7 +685,7 @@ begin
             begin
                for i:=1 to 8 do
                begin
-                  ddir:=(i*45-integer((g_tick shr 2) mod 360))*degtorad;
+                  ddir:=(i*45-sdir)*degtorad;
                   SpriteList_AddEffect(
                   kp_x+round(kp_RCapture*cos(ddir)),
                   kp_y+round(kp_RCapture*sin(ddir)),
@@ -779,7 +782,7 @@ begin
 
    //draw_text(vid_screen,750,0,b2pm[map_ffly] , ta_RU,255, c_white);
 
-  { with g_PlayersMain[LocalPlayer] do
+  { with g_PlayersGame[LocalPlayer] do
    begin
       draw_text(vid_screen,ui_CtrlPanelW,200,i2s(ai_pushtimei) , ta_LU,255, c_white);
       draw_text(vid_screen,ui_CtrlPanelW,210,i2s(ai_pushfrmi ) , ta_LU,255, c_white);
@@ -798,7 +801,7 @@ begin
                                                               }
    if(InputAction(iact_Shift))then
      for u:=0 to LastPlayer do
-      with g_PlayersMain[u] do
+      with g_PlayersGame[u] do
       begin
          ix:=170+89*u;
 
@@ -894,7 +897,7 @@ begin
         end;
 
          //draw_text(vid_screen,imap_mwcx,iy,b2s(painc)+' '+b2s(pains), ta_LU,255, plcolor[player]);
-         //if(isselected)then            i2s(TeamVision[g_PlayersMain[player].team])+#13+i2s(TeamDetection[g_PlayersMain[player].team])
+         //if(isselected)then            i2s(TeamVision[g_PlayersGame[player].team])+#13+i2s(TeamDetection[g_PlayersGame[player].team])
          //if(alrm_r<=0)then
          //
 

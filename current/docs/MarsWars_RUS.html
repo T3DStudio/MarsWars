@@ -209,6 +209,8 @@ unit<br>
 <font color="00FF00">F5</font>: set map mark: "look here"<br>
 <font color="00FF00">F6</font>: set map mark: "attack here"<br>
 <br>
+<font color="00FF00">F10</font>: toggle replay recording<br>
+<br>
 <font color="00FF00">R</font> <font color="00FF00">T</font> <font color="00FF00">Y</font> <font color="00FF00">F</font> <font color="00FF00">G</font> <font color="00FF00">H</font> <font color="00FF00">V</font> <font color="00FF00">B</font> <font color="00FF00">N</font> <font color="00FF00">U</font> <font color="00FF00">I</font> <font color="00FF00">O</font> <font color="00FF00">J</font> <font color="00FF00">K</font> <font color="00FF00">L</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">R</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">T</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">Y</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">F</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">G</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">H</font> 
 <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">B</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">N</font>: production hotkeys<br>
 <br>
@@ -612,7 +614,7 @@ Center,Advanced Hell Command Center
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 8000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 60
@@ -641,7 +643,7 @@ Center,Advanced Hell Command Center
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 8000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 53
@@ -742,7 +744,7 @@ Center,Advanced Hell Command Center
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 3000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">25</font>
 <br>Size: 20
@@ -756,12 +758,12 @@ Center,Advanced Hell Command Center
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
+[<font color="00FF00">ALIVE</font>,<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>] except [Cacodemon], base impact 
+<font color="FF0000">45</font>*3, upgrade: "Hell Firepower"(+7), factor: x2 
+[<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>], {<font color="FFFF00">Req.: </font>upgrade "Cacodemon`s Nest "}
+<br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>*3, upgrade: "Hell 
 Firepower"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
-<br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Cacodemon], base impact <font color="FF0000">45</font>*3, upgrade: 
-"Hell Firepower"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>], 
-{<font color="FFFF00">Req.: </font>upgrade "Cacodemon`s Nest "}
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Stone Walls"(+18)
@@ -782,7 +784,7 @@ Firepower"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="FF8C00
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 3000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">30</font>
 <br>Size: 20
@@ -1031,7 +1033,7 @@ upgrade: "Hell Firepower"(+7), factor: x2
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 8000
-<br>UAC Loot required: <font color="00FF00">400</font>
+<br>UAC Loot required: <font color="00FF00">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 60
@@ -1535,7 +1537,7 @@ factor: x2 [<font color="009600">HEAVY</font>]
 <br>Hot key: <font color="00FF00">O</font>
 <br>Attributes: 
 <br>[<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>Max hits: 15000
+<br>Max hits: 14000
 <br>Energy required: <font color="00FFFF">1200</font>
 <br>Limit used: <font color="FF8C00">10</font>
 <br>Build time: <font color="FFFFFF">80</font>
@@ -1555,9 +1557,9 @@ factor: x2 [<font color="009600">HEAVY</font>]
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Cyberdemon], base impact <font color="FF0000">225</font>*1, splash 
-damage radius: 40, upgrade: "Demon`s Weapons"(+7), 
-factor: x3 [<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>] except [Cyberdemon], base impact <font color="FF0000">225</font>*1.25, 
+splash damage radius: 40, upgrade: "Demon`s 
+Weapons"(+7), factor: x3 [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-building range: +50
 <br><br>
 <br>Upgrades:
@@ -1574,7 +1576,7 @@ factor: x3 [<font color="FF0000">BUILDING</font>]
 <br>Hot key: <font color="00FF00">I</font>
 <br>Attributes: 
 <br>[<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>Max hits: 14000
+<br>Max hits: 13000
 <br>Energy required: <font color="00FFFF">1200</font>
 <br>Limit used: <font color="FF8C00">10</font>
 <br>Build time: <font color="FFFFFF">80</font>
@@ -1594,7 +1596,7 @@ factor: x3 [<font color="FF0000">BUILDING</font>]
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>*3, upgrade: "Demon`s 
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>*3.75, upgrade: "Demon`s 
 Weapons"(+7), factor: x2 [<font color="FF8C00">BIOLOGICAL</font>],x0.5 [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-unit range: +50
 <br><br>
@@ -2130,7 +2132,7 @@ Turret"}
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 8000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 60
@@ -2159,7 +2161,7 @@ Turret"}
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 8000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 60
@@ -2186,7 +2188,7 @@ Turret"}
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 8000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 62
@@ -2257,7 +2259,7 @@ Turret"}
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 3000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">25</font>
 <br>Size: 15
@@ -2298,7 +2300,7 @@ Upgrade"(+7), factor: x2 [<font color="787878">UNIT</font>,<font color="FF8C00">
 <br>Attributes: 
 <br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FF00">GROUND</font>]
 <br>Max hits: 3000
-<br>Energy required: <font color="00FFFF">400</font>
+<br>Energy required: <font color="00FFFF">350</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">25</font>
 <br>Size: 15
@@ -3138,8 +3140,8 @@ Upgrade"(+7), factor: x3 [<font color="FF0000">BUILDING</font>]
 <br>Limit used: <font color="FF8C00">3</font>
 <br>Build time: <font color="FFFFFF">20</font>
 <br>Size: 18
-<br>Base speed: 19
-<br>Base sight range: 275
+<br>Base speed: 20
+<br>Base sight range: 300
 <br>PainState base threshold: NO
 <br>Places in transport: 3
 <br>Time in combat to level up: 42
@@ -3204,6 +3206,7 @@ Note: this data is calculated for "ideal" conditions with fully upgraded units w
 <br><br>
 <font color="787878">Useless against</font>:
 <br>
+<img src="imgs\unitBTN25.bmp" title="Imp">
 <br><br>
 </td></tr>
 <tr><td align="center" style="width: 100px;">
