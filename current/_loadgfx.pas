@@ -738,7 +738,6 @@ begin
    spr_uibtn_AbilityHack       := gfx_ButtonLoad(folder_ui+'b_Hack'            ,ui_ButtonW1);
    spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'         ,ui_ButtonW1);
    spr_uibtn_AbilityUACScan    := gfx_ButtonLoad(folder_ui+'b_scan'            ,ui_ButtonW1);
-   spr_uibtn_AbilityBlink      := gfx_ButtonLoad(folder_ui+'b_blink'           ,ui_ButtonW1);
    spr_uibtn_AbilitySpawnLost  := gfx_ButtonLoad(folder_ui+'b_SpawnLost'       ,ui_ButtonW1);
    spr_uibtn_AbilitySpawnLostTo:= gfx_ButtonLoad(folder_ui+'b_SpawnLostTo'     ,ui_ButtonW1);
    spr_uibtn_AbilityHVision    := gfx_ButtonLoad(folder_ui+'b_HVision'         ,ui_ButtonW1);

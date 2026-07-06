@@ -422,6 +422,8 @@ begin
                   begin
                      UnitsInfo_AddText   (vx+ui_ButtonWq,vy,i2s(it2s(transformTimer)),c_white);
                      UnitsInfo_AddUSprite(vx-ui_ButtonWq,vy,c_gray,@g_uids[transformUID].uid_BTNDoc,'','','','','',c_black);
+                     if(transformUID=uidi)and(level<LastUnitLevel)then
+                     UnitsInfo_AddText   (vx-ui_ButtonWq,vy-ui_ButtonWq-font_wh,str_UnitLevel[level+1,uid_race],c_white);
                   end
                   else
                   begin

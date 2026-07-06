@@ -1001,7 +1001,7 @@ UID_Medic : begin
             end;
 UID_ZMedic: begin
             uid_uibtn          := 21;
-            uid_req_UACLoot    := 100;
+            uid_req_UACLoot    := 200;
             uid_ProdTimeSec    -= uid_ProdTimeSec div 4;
             uid_MSpeed_Base    += UpgradeUnitSpeedBonus;
             uid_Armor_upgr1    := upgr_hell_UnitArmor;
@@ -1038,12 +1038,12 @@ UID_Engineer : begin
                uid_SightR_upgr    := upgr_uac_UnitSightR;
                uid_ZombieUID      := UID_ZEngineer;
                uid_req_uid1       := UID_UWeaponFactory;
-               SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,upgr_uac_RepairTools ,BaseRepairBonus1,wtrset_repair            ,wpr_any,uids_all,[],0,0 ,0,0);
+               SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,upgr_uac_RepairTools ,BaseRepairBonus1   ,wtrset_repair            ,wpr_any,uids_all,[],0, 0,0,0);
                SetWeapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsh,MID_Bullet,0,0,upgr_uac_DistDamage  ,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,0);
                end;
 UID_ZEngineer: begin
                uid_uibtn          := 22;
-               uid_req_UACLoot    := 100;
+               uid_req_UACLoot    := 200;
                uid_ProdTimeSec    -= uid_ProdTimeSec div 4;
                uid_MSpeed_Base    += UpgradeUnitSpeedBonus;
                uid_Armor_upgr1    := upgr_hell_UnitArmor;
@@ -1052,7 +1052,7 @@ UID_ZEngineer: begin
                uid_PainState_Base := 1;
                uid_PainState_upgr := upgr_hell_PainFactor;
                uid_req_uid1       := UID_HACommandCenter;
-               SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,0                    ,0               ,wtrset_repair            ,wpr_any,uids_all,[],0,0 ,0,0);
+               SetWeapon(0,wpt_heal  ,aw_hmelee,0,BaseRepair1,fr_fpsh,0         ,0,0,0                    ,0                  ,wtrset_repair            ,wpr_any,uids_all,[],0, 0,0,0);
                SetWeapon(1,wpt_missle,aw_srange,0,0          ,fr_fpsh,MID_Bullet,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,0);
                end;
    end;
@@ -1105,7 +1105,7 @@ UID_UACommandCenter: begin
                      end;
 UID_HCommandCenter : begin
                      uid_gen_EnergyLevel := 500;
-                     uid_req_UACLoot     := 1000;
+                     uid_req_UACLoot     := 2000;
                      uid_ProdTimeSec     -= uid_ProdTimeSec div 4;
                      uid_uibtn           := 3;
                      uid_ability1        := uab_HellCCLand;
@@ -1121,7 +1121,7 @@ UID_HCommandCenter : begin
                      end;
 UID_HACommandCenter: begin
                      uid_gen_EnergyLevel := 1000;
-                     uid_req_UACLoot     := 1000;
+                     uid_req_UACLoot     := 2000;
                      uid_ProdTimeSec     -= uid_ProdTimeSec div 4;
                      uid_uibtn           := 3;
                      uid_ability1        := uab_HellCCLand;

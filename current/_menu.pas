@@ -919,9 +919,9 @@ begin
        gt_campaing : menu_page_Campaing;
        else menu_page_BottomButtons(mi_Campaings,mi_Scirmish,mi_SaveLoad,mi_Replays,mi_Settings,mi_Help,mi_Exit);
        end;
-       menu_item_setEnabled(mi_Break        ,GameBreak(true ));
-       menu_item_setEnabled(mi_StartNow     ,GameStart(true ));
-       menu_item_setEnabled(mi_StartTimer   ,GameStart(true )and(g_LobbyTimer<=0));
+       menu_item_setEnabled(mi_Break        ,Game_Break(true ));
+       menu_item_setEnabled(mi_StartNow     ,Game_Start(true ));
+       menu_item_setEnabled(mi_StartTimer   ,Game_Start(true )and(g_LobbyTimer<=0));
        menu_item_setEnabled(mi_StopTimer    ,g_LobbyTimer>0);
        menu_item_setEnabled(mi_Surrender    ,PlayerSurrender(LocalPlayer,true ));
        menu_item_setEnabled(mi_MP_Disconnect,GameNetClient(false,true));
@@ -1091,8 +1091,8 @@ mi_StopTimer           : if(not check)then begin
                                            g_LobbyTimer:=0;
                                            GameLog_BreakStarting;
                                            end;
-mi_StartNow            : if(not check)then GameStart(false);
-mi_Break               : if(not check)then GameBreak(false);
+mi_StartNow            : if(not check)then Game_Start(false);
+mi_Break               : if(not check)then Game_Break(false);
 mi_Surrender           : if(not check)then
                            if(PlayerSurrender(LocalPlayer,false))then
                              if(MainMenu)then MenuBack(true,false);

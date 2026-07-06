@@ -374,6 +374,7 @@ begin
    str_warn_NeedBuilder          := 'Need builder';
    str_warn_NeedProdUnit         := 'Need production unit';
    str_warn_MaxCountReached      := 'Maximum reached';
+   str_warn_MaxBuildersReached   := 'Maximum number of builders has been reached';
    str_warn_MarkLook             := ': look here!';
    str_warn_MarkAttack           := ': attack here!';
    str_warn_kpoint_captured      := 'The Key point was captured';
@@ -417,8 +418,6 @@ begin
    str_hint_req                  := 'Req.: ';
    str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
    str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
-   str_hint_Ability              := 'Special ability: ';
-   str_hint_TransformTo          := 'transformation to ';
    str_hint_UpgradesLvl          := 'Upgrades: ';
    str_hint_Demons               := 'demons&zombies';
    str_hint_Except               := 'except';
@@ -428,7 +427,6 @@ begin
    str_hint_barrack              := 'Unit production';
    str_hint_forge                := 'Upgrades facility';
    str_hint_IncEnergyLevel       := 'Increase energy level: ';
-   str_hint_CanRebuildTo         := 'Can be rebuilt into ';
    str_hint_UnitArming           := 'Arming: ';
    str_hint_Abilities            := 'Abilities: ';
    str_hint_SightR               := 'sight range';
@@ -554,7 +552,8 @@ begin
    str_doc_LMB                   := tc_lime+'LMB'+tc_white;
    str_doc_RMB                   := tc_red +'RMB'+tc_white;
    str_doc_MWH                   := tc_yellow+'MWheel'+tc_white;
-   str_doc_unitBalanceNote       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.';
+   str_doc_NoteUnitBalance       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.';
+   str_doc_NoteMaxBuilders       := 'Note: each player cannot have more than '+i2s(PlayerMaxBuilders)+' builders';
 
    /////////////////////////////////////////////////////////////////////////////
    //  ABILITIES
@@ -569,7 +568,7 @@ begin
    str_SetAbilityBaseHint(uab_HEyeVision         ,'Hell Vision'              ,'Gives allied target ability to detect invisible units for '+i2s(detection_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_HTowerBlink        ,'Planar Jump'              ,'Short-range teleportation');
    str_SetAbilityBaseHint(uab_HKeepShift         ,'Dimension Shift'          ,'The building teleport itself to target location. Required upgrade canceled after teleportation');
-   str_SetAbilityBaseHint(uab_HKeepAura          ,'Decay Aura'               ,'Deals damage('+tc_red+i2s(DecayAuraDamage)+tc_default+', hits 2 times per sec.) to all non-building units around. Damage ignores units armor.');
+   str_SetAbilityBaseHint(uab_HKeepAura          ,'Decay Aura'               ,'Deals damage('+tc_red+i2s(DecayAuraDamage)+tc_default+', hits 2 times per sec.) to all non-building enemy units around. Damage ignores units armor.');
    str_SetAbilityBaseHint(uab_SpawnLost          ,'Spawn Lost Soul'          ,'');
    str_SetAbilityBaseHint(uab_SpawnLostTo        ,'Spawn Lost Soul to point' ,'');
    str_SetAbilityBaseHint(uab_SphereSoul         ,'Soul Sphere'              ,'Restores '+i2s(soul_maxHeal)+' health to the target over '+i2s(soul_time_sec)+' seconds');
@@ -820,27 +819,27 @@ begin
    FillChar(str_menu_hint,sizeOf(str_menu_hint),0);
    FillChar(menu_hint_pos,sizeOf(menu_hint_pos),0);
 
-   for i:=1 to 255 do menu_set_hint(i,i,'');
+   for i in [1..255] do menu_set_hint(i,i,'');
 
    menu_set_hint(mi_SaveLoad_fname,mi_SaveLoad_list,'');
 
-   for i in [mi_Players_Panel ..mi_Players_Obs7       ]-
-            [mi_Players_Ready]                          do menu_set_hint(i,mi_Players_Panel ,'');
-   for i in [mi_Map_Panel     ..mi_Map_Random         ] do menu_set_hint(i,mi_Map_Panel     ,'');
-   for i in [mi_Game_Panel    ..mi_Game_Random        ] do menu_set_hint(i,mi_Game_Panel    ,'');
-   for i in [mi_MP_Panel      ..mi_MP_ChatLine        ]-
+   for i in [mi_Players_Panel  ..mi_Players_Obs7       ]-
+            [mi_Players_Ready]                           do menu_set_hint(i,mi_Players_Panel ,'');
+   for i in [mi_Map_Panel      ..mi_Map_Random         ] do menu_set_hint(i,mi_Map_Panel     ,'');
+   for i in [mi_Game_Panel     ..mi_Game_Random        ] do menu_set_hint(i,mi_Game_Panel    ,'');
+   for i in [mi_MP_Panel       ..mi_MP_ChatLine        ]-
             [mi_MP_Disconnect]                          do menu_set_hint(i,mi_MP_Panel      ,'');
 
-   for i in [mi_SG_PlayerName ..mi_SG_ShowPlayerScrns ] do menu_set_hint(i,mi_SG_PlayerName ,'');
-   for i in [mi_SR_RecordGames..mi_SR_RecordQuality   ] do menu_set_hint(i,mi_SR_RecordGames,'');
-   for i in [mi_SV_ResolutionW..mi_SV_SmoothScaled    ] do menu_set_hint(i,mi_SV_ResolutionW,'');
-   for i in [mi_SS_SoundVolume..mi_SS_RenewPlaylist   ] do menu_set_hint(i,mi_SS_SoundVolume,'');
-   for i in [mi_help_Credits  ..mi_help_Other         ] do menu_set_hint(i,mi_help_Credits  ,'');
+   for i in [mi_SG_PlayerName  ..mi_SG_ShowPlayerScrns ] do menu_set_hint(i,mi_SG_PlayerName ,'');
+   for i in [mi_SR_RecordGames ..mi_SR_RecordQuality   ] do menu_set_hint(i,mi_SR_RecordGames,'');
+   for i in [mi_SV_ResolutionW ..mi_SV_SmoothScaled    ] do menu_set_hint(i,mi_SV_ResolutionW,'');
+   for i in [mi_SS_SoundVolume ..mi_SS_RenewPlaylist   ] do menu_set_hint(i,mi_SS_SoundVolume,'');
+   for i in [mi_help_Credits   ..mi_help_Other         ] do menu_set_hint(i,mi_help_Credits  ,'');
 
    // PLAYERS
-   for i:=mi_Players_AIskil0 to mi_Players_AIskil7 do menu_set_hint(i,mi_Players_Panel,': change AI skill'     );
-   for i:=mi_Players_Slot0   to mi_Players_Slot7   do menu_set_hint(i,mi_Players_Panel,': jump to this slot'   );
-   for i:=mi_Players_State0  to mi_Players_State7  do menu_set_hint(i,mi_Players_Panel,': add/remove AI Player');
+   for i in [mi_Players_AIskil0..mi_Players_AIskil7    ] do menu_set_hint(i,mi_Players_Panel,': change AI skill'     );
+   for i in [mi_Players_Slot0  ..mi_Players_Slot7      ] do menu_set_hint(i,mi_Players_Panel,': jump to this slot'   );
+   for i in [mi_Players_State0 ..mi_Players_State7     ] do menu_set_hint(i,mi_Players_Panel,': add/remove AI Player');
 
    // MAP
    menu_set_hint(mi_Map_Generators,mi_Map_Panel,': generators life time');
@@ -851,7 +850,7 @@ begin
    str_StringListClear(@str_doc_Credits);
    DocHelp_AddCredits(tc_orange+str_gcaption+tc_default+' - is a real-time strategy game based on Doom 2 universe. Current version is '+str_ver+'.');
    DocHelp_AddCredits(tc_docbr);
-   DocHelp_AddCredits('Project leader and main developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.');
+   DocHelp_AddCredits('Project leader and developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.');
    DocHelp_AddCredits(tc_docbr);
    DocHelp_AddCredits('Sources: www.github.com/T3DStudio/MarsWars');
    DocHelp_AddCredits('Web site: www.t3dstudio.ru');
@@ -915,7 +914,7 @@ begin
    DocHelp_AddBaseControls('The radius of the circle is the radius of the building. If the circle is red - the building needs more space, if it is blue - the build place is too far away from the nearest builder, if it is green - the building can be built here.');
    DocHelp_AddBaseControls('To deselect a building type, right-click.');
    DocHelp_AddBaseControls('To cancel the construction of a building, select it and issue the "'+str_action_hint[iAct_Control_UProdCncl]+'" or "'+str_action_hint[iAct_Control_UDestroy]+'" order.');
-   DocHelp_AddBaseControls('Note: each player cannot have more than '+i2s(PlayerMaxBuilders)+' builders.');
+   DocHelp_AddBaseControls(str_doc_NoteMaxBuilders+'.');
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_orange+'UNIT PRODUCTION'+tc_default+tc_doccpt);

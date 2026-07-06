@@ -547,11 +547,8 @@ begin
       or(uid_isbarrack)
       or(uid_isforge)
       or(uid_ability_RldReducByLvl)then
-        case level of
-        1: lvlstr_l:=str_UnitLevel1[uid_race];
-        2: lvlstr_l:=str_UnitLevel2[uid_race];
-        3: lvlstr_l:=str_UnitLevel3[uid_race];
-        end;
+        if(level<=LastUnitLevel)then
+          lvlstr_l:=str_UnitLevel[level,uid_race];
 
       // reload
       if(rld>0)

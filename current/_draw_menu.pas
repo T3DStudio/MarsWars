@@ -429,7 +429,7 @@ begin
         DrawTSoBUnits(str_doc_BalanceBad    ,uid_str_balance_Bad    ,@uid_balance_Bad    );
         DrawTSoBUnits(str_doc_BalanceUseless,uid_str_balance_Useless,@uid_balance_Useless);
 
-        drawmenu_ItemTextC(tar,mi_help_InfoList,ta_LB,str_doc_unitBalanceNote,c_ltgray);
+        drawmenu_ItemTextC(tar,mi_help_InfoList,ta_LB,str_doc_NoteUnitBalance,c_ltgray);
      end;
 end;
 

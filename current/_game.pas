@@ -180,7 +180,6 @@ begin
    PlayerColorsSchemeDefault[5]:=c_blue;
    PlayerColorsSchemeDefault[6]:=c_violet;
    PlayerColorsSchemeDefault[7]:=c_purple;
-
    {$ENDIF}
 end;
 
@@ -350,7 +349,7 @@ begin
    PlayerKill(pid,true);
 end;
 
-procedure GameRemoveAIObservers;
+procedure Game_RemoveAIObservers;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
@@ -358,7 +357,7 @@ begin
        if(p>=map_MaxPlayers)and(state=ps_AI)then PlayerSetState(p,ps_none);
 end;
 
-procedure GameScoresInit;
+procedure Game_ScoresInit;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
@@ -375,9 +374,9 @@ procedure Game_MakeSkirmishBase(x,y:integer;playerN,ubuilder,ubarrack:byte);
 var i:integer;
 begin
    unit_add(x,y,0,ubuilder,playerN,true,false,0);
-   i:=round((g_uids[ubuilder].uid_r+g_uids[ubarrack].uid_r)/1.44);
-   unit_add(x-sign(map_SizeH-x)*i,
-            y-sign(map_SizeH-y)*i,0,ubarrack,playerN,true,false,0);
+   i:=round((g_uids[ubuilder].uid_r+g_uids[ubarrack].uid_r)/1.43);
+   unit_add(x-sign(map_SizeH-x,true)*i,
+            y-sign(map_SizeH-y,true)*i,0,ubarrack,playerN,true,false,0);
 end;
 
 procedure Game_StartSkirmish;
@@ -432,9 +431,9 @@ begin
    {$ENDIF}
 end;
 
-function GameStart(check:boolean):boolean;
+function Game_Start(check:boolean):boolean;
 begin
-   GameStart:=false;
+   Game_Start:=false;
 
    if(g_started)
    or(net_status=ns_client)
@@ -460,7 +459,7 @@ begin
    then exit;
    {$ENDIF}
 
-   GameStart:=true;
+   Game_Start:=true;
 
    if(check)then exit;
 
@@ -474,7 +473,7 @@ begin
    {$ELSE}
    Game_StartSkirmish;
    {$ENDIF}
-   GameScoresInit;
+   Game_ScoresInit;
 
    {$IFDEF _FULLGAME}
    unit_UICountersAll;
@@ -487,14 +486,14 @@ begin
    g_started:=true;
 end;
 
-function GameBreak(check:boolean):boolean;
+function Game_Break(check:boolean):boolean;
 begin
-   GameBreak:=false;
+   Game_Break:=false;
 
    if(not g_started)
    or(net_status=ns_client)then exit;
 
-   GameBreak:=true;
+   Game_Break:=true;
 
    if(check)then exit;
 
@@ -515,23 +514,23 @@ begin
 end;
 
 {$IFDEF _FULLGAME}
-function GamePauseToggle(check:boolean):boolean;
+function Game_PauseToggle(check:boolean):boolean;
 begin
-   GamePauseToggle:=false;
+   Game_PauseToggle:=false;
 
    case net_status of
    ns_client  : case g_status of
                 gs_running,
                 gs_paused0..
                 gs_paused7  : begin
-                              GamePauseToggle:=true;
+                              Game_PauseToggle:=true;
                               if(check)then exit;
                               net_pause;
                               end;
                 end;
    ns_server  : case g_status of
                 gs_running  : begin
-                                 GamePauseToggle:=true;
+                                 Game_PauseToggle:=true;
                                  if(check)then exit;
 
                                  g_status:=LocalPlayer;
@@ -539,7 +538,7 @@ begin
                               end;
                 gs_paused0..
                 gs_paused7  : begin
-                                 GamePauseToggle:=true;
+                                 Game_PauseToggle:=true;
                                  if(check)then exit;
 
                                  GameLog_Resumed(g_status-gs_paused0);
@@ -1018,7 +1017,7 @@ begin
                 begin
                    if(g_LobbyTimer>=g_GameStartTime)then
                      GameLog_ReadyToStart;
-                   if(not GameStart(true))then
+                   if(not Game_Start(true))then
                    begin
                       g_LobbyTimer:=0;
                       GameLog_BreakStarting;
@@ -1026,7 +1025,7 @@ begin
                    end;
                    g_LobbyTimer-=1;
                    if(g_LobbyTimer<=0)
-                   then GameStart(false)
+                   then Game_Start(false)
                    else
                      if((g_LobbyTimer mod fr_fps1)=0)then GameLog_StartsIn(g_LobbyTimer div fr_fps1);
                 end;

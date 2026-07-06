@@ -662,6 +662,8 @@ begin
        STRADD(@str_Unit1LineDescript,str_doc_LifeTime+i2s(round(uid_MaxHits1/-uid_Regen_Base*regen_period1))+' '+str_hint_sec ,sep_sdot);
        STRADD(@str_Unit1LineDescript,str_doc_BaseSightR+i2s(uid_SightR_Base),sep_sdot);
        STRADD(@str_Unit1LineDescript,str_UnitRole(uid)                      ,sep_sdot);
+       if(uid_isbuilder)then
+       STRADD(@str_Unit1LineDescript,str_doc_NoteMaxBuilders,sep_sdot);
 
        if(uid_gen_EnergyLevel>0)then
          STRADD(@str_Unit1LineDescript,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_sdot);

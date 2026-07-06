@@ -394,7 +394,7 @@ begin
    then POVPlayer:=@g_PlayersGame[UIPlayer]
    else POVPlayer:=nil;
 
-   iActSetOnEnabled(iAct_InGamePause,GamePauseToggle(true),true);
+   iActSetOnEnabled(iAct_InGamePause,Game_PauseToggle(true),true);
    iActSetOnEnabled(iAct_InGameMenu ,true                 ,true);
 
    // production actions
@@ -936,7 +936,7 @@ begin
    iAct_Control_MarkLook  : if(SoundEnabledLeft)then m_brush :=co_markLook;
    iAct_Control_MarkAttack: if(SoundEnabledLeft)then m_brush :=co_markAttack;
 
-   iAct_InGamePause       : if(SoundEnabledLeft)then GamePauseToggle(false);
+   iAct_InGamePause       : if(SoundEnabledLeft)then Game_PauseToggle(false);
    iAct_InGameMenu        : if(SoundEnabledLeft)then GameOpenMenu;
 
    iAct_Replay_Fast       : if(SoundEnabledLeft)then sys_uncappedFPS:=not sys_uncappedFPS;

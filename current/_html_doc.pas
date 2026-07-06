@@ -243,7 +243,7 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  BALANCE TABLE
    htmldoc_WriteCaption(str_help_BalanceTable);
-   writeln(html_f,str_doc_unitBalanceNote,'<br>');
+   writeln(html_f,str_doc_NoteUnitBalance,'<br>');
    writeln(html_f,'<center><table bgcolor="#000000" width="900" border="1" bordercolor="#ffffff">');
    for uid:=0 to 255 do
      with g_uids[uid] do

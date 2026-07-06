@@ -36,7 +36,7 @@ begin
 
              if(NoHumanPlayers)
              or(GameEnded and(g_LobbyTimer=0))then
-               GameBreak(false);
+               Game_Break(false);
           end;
    end;
 end;

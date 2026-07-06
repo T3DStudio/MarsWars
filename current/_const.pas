@@ -238,27 +238,28 @@ lmt_Req_UACLoot        = 42;
 lmt_Req_Common         = 43;
 lmt_Req_Limit          = 44;
 lmt_Req_MaxCount       = 45;
-lmt_markLook           = 46;
-lmt_markAttack         = 47;
-lmt_allies_attacked    = 48;
-lmt_NeedProdUnit       = 49;
-lmt_ability_reload     = 50;
-lmt_ability_Casting    = 51;
-lmt_ability_BadPlace   = 52;
-lmt_ability_ReqUACNear = 53;
-lmt_ability_ReqHelNear = 54;
-lmt_ability_Tar2Close  = 55;
-lmt_kpoint_captured    = 56;
-lmt_kpoint_lost        = 57;
-lmt_ngen_exh           = 58;
-lmt_ngen_captured      = 59;
-lmt_ngen_lost          = 60;
-lmt_koth_control       = 61;
-lmt_invalid_Target     = 62;
-lmt_Invalid_Order      = 63;
-lmt_replay_RecStart    = 64;
-lmt_replay_RecStop     = 65;
-lmt_replay_RecError    = 66;
+lmt_Req_MaxBuilders    = 46;
+lmt_markLook           = 47;
+lmt_markAttack         = 48;
+lmt_allies_attacked    = 49;
+lmt_NeedProdUnit       = 50;
+lmt_ability_reload     = 51;
+lmt_ability_Casting    = 52;
+lmt_ability_BadPlace   = 53;
+lmt_ability_ReqUACNear = 54;
+lmt_ability_ReqHelNear = 55;
+lmt_ability_Tar2Close  = 56;
+lmt_kpoint_captured    = 57;
+lmt_kpoint_lost        = 58;
+lmt_ngen_exh           = 59;
+lmt_ngen_captured      = 60;
+lmt_ngen_lost          = 61;
+lmt_koth_control       = 62;
+lmt_invalid_Target     = 63;
+lmt_Invalid_Order      = 64;
+lmt_replay_RecStart    = 65;
+lmt_replay_RecStop     = 66;
+lmt_replay_RecError    = 67;
 
 lmts_menu_chat         = [
                           lmt_chat_player0..
@@ -1915,12 +1916,11 @@ tc_RankHell            = #177;
 
 tc_SpecChars           = [tc_player0..tc_default];
 
-str_UnitLevel1         : array[1..r_count] of shortstring = (tc_RankHell,
-                                                             tc_RankUAC);
-str_UnitLevel2         : array[1..r_count] of shortstring = (tc_RankHell+tc_RankHell,
-                                                             tc_RankUAC +tc_RankUAC);
-str_UnitLevel3         : array[1..r_count] of shortstring = (tc_RankHell+tc_RankHell+tc_RankHell,
-                                                             tc_RankUAC +tc_RankUAC +tc_RankUAC);
+str_UnitLevel          : array[0..LastUnitlevel,1..r_count] of string[3] = ((''                                 ,''                              ),
+                                                                            (tc_RankHell                        ,tc_RankUAC                      ),
+                                                                            (tc_RankHell+tc_RankHell            ,tc_RankUAC+tc_RankUAC           ),
+                                                                            (tc_RankHell+tc_RankHell+tc_RankHell,tc_RankUAC+tc_RankUAC+tc_RankUAC));
+
 sep_comma              = ',';
 sep_scomma             = ', ';
 sep_sdot               = '. ';

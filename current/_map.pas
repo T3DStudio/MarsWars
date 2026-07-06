@@ -618,8 +618,8 @@ mc_KeyPoints: begin
    begin
       if(map_MaxPlayers>0)then
         for i:=0 to map_MaxPlayers-1 do
-          map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i])*keyPoint_GenR),
-                            map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i])*keyPoint_GenR),
+          map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i],true)*keyPoint_GenR),
+                            map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i],true)*keyPoint_GenR),
                             keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
 
       //MaxKeyPoints-byte(map_scenario=mc_KotH)
@@ -1174,7 +1174,7 @@ gt_scirmish: begin
              map_ObstaclesGap:= 50;
              map_PStartsGap  := base_r1;
              Map_SetScenarioMaxPlayers;
-             GameRemoveAIObservers;
+             Game_RemoveAIObservers;
 
              map_PlayersStarts;
              {$IFDEF _FULLGAME}

@@ -30,7 +30,7 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 
 procedure KeyPoints_Clear;   forward;
 
-procedure GameRemoveAIObservers; forward;
+procedure Game_RemoveAIObservers; forward;
 procedure game_MakeRandomSkirmish; forward;
 procedure Game_ShuffleAINames; forward;
 
@@ -47,7 +47,7 @@ procedure unit_UICountersAll; forward;
 function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function gfx_ShadowColor(c:TMWColor):TMWColor;forward;
 
-function GamePauseToggle(check:boolean):boolean;forward;
+function Game_PauseToggle(check:boolean):boolean;forward;
 function GameNetServerList(start,check:boolean):boolean;forward;
 
 procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);forward;
@@ -176,13 +176,6 @@ begin
    else ct2s:=0;
 end;
 
-function strMX(x:byte):shortstring;
-begin
-   if(x=0)
-   then strMX:='-'
-   else strMX:='x'+b2s(x);
-end;
-
 procedure STRADD(s:pshortstring;ad,sep:shortstring);
 begin
    if(length(ad)>0)then
@@ -242,9 +235,11 @@ begin
      if((pb^ and i)>0)then pb^:=pb^ xor i;
 end;
 
-function sign(x:integer):integer;
+function sign(x:integer;noZero:boolean=false):integer;
 begin
-   sign:=0;
+   if(noZero)
+   then sign:=1
+   else sign:=0;
    if(x>0)then sign:= 1;
    if(x<0)then sign:=-1;
 end;
@@ -1203,8 +1198,10 @@ false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;
 
       if(units_uid_m[uid]<=0)then begin CheckUnitReqs:=lmt_prod_Unavailable;exit;end;
 
-      if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])
-      or((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders))then
+      if((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders))then
+      begin CheckUnitReqs:=lmt_Req_MaxBuilders;exit;end;
+
+      if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])then
       begin CheckUnitReqs:=lmt_Req_MaxCount;exit;end;
 
       if((uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n))
@@ -2123,6 +2120,7 @@ lmt_chat_player7      : if(length(lm_string)>0)then
 lmt_chat_common       : ParseLogMessage:=lm_string;
 lmt_Req_Limit         : ParseLogMessage:=str_warn_MaxLimitReached;
 lmt_Req_MaxCount      : ParseLogMessage:=str_warn_MaxCountReached;
+lmt_Req_MaxBuilders   : ParseLogMessage:=str_warn_MaxBuildersReached;
 lmt_Req_Common,
 lmt_Req_Energy,
 lmt_Req_HellPower,
