@@ -22,7 +22,7 @@ procedure ai_Global_InitVars(pu:PTUnit);forward;
 procedure ai_Global_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;isattackable:boolean);forward;
 procedure ai_Global_Code(pu:PTUnit);forward;
 
-function map_IfObstacleZone(zone:word):boolean;       forward;
+function map_IsObstacleZone(zone:word):boolean;       forward;
 function map_GetZone(mx,my:integer;mr:integer=0):word;forward;
 procedure map_SymmetryPoints(startx,starty:integer;resultx,resulty:pinteger);forward;
 
@@ -41,6 +41,7 @@ procedure ui_EnableControlActs;forward;
 procedure ui_InitControlPanelBTNActions;forward;
 function LogMes2UIAlarm(POVPlayer:byte):boolean; forward;
 procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
+procedure snd_StopSoundSourceAll;forward;
 
 procedure unit_UICountersAll; forward;
 
@@ -611,8 +612,8 @@ lmt_game_Resumed
                      :;
 
 lmt_unit_attacked,
-lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[lmt_unit_attacked,lmt_allies_attacked]))then exit;
-lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps5,ax,ay,[amtype]))then exit;
+lmt_allies_attacked  : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[lmt_unit_attacked,lmt_allies_attacked]))then exit;
+lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[amtype]))then exit;
 
 lmt_markLook,
 lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]))then exit;
@@ -1191,10 +1192,12 @@ begin
       case uid_isbuilding of
 true  : begin
            if(units_builders_c<=0)then begin CheckUnitReqs:=lmt_unit_NeedBuilder;exit;end;
-           if(build_cd        > 0)then begin CheckUnitReqs:=lmt_prod_BadOrder;   exit;end;  ////
+           if(build_cd        > 0)then begin CheckUnitReqs:=lmt_prod_CD;         exit;end;
         end;
 false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;end;
       end;
+
+      if(uid_MaxHits1<=0)then begin CheckUnitReqs:=lmt_prod_BadOrder;exit;end;
 
       if(units_uid_m[uid]<=0)then begin CheckUnitReqs:=lmt_prod_Unavailable;exit;end;
 
@@ -1364,6 +1367,7 @@ begin
      or(uid_ability3=aid)then
        unit_OrderCheckAbility:=unit_ReadyForAbilityOrder(pu);
 end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   OTHER
@@ -1496,6 +1500,34 @@ begin
    Close(f);
 end;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//   APM
+//
+
+procedure apm_Inc;
+begin
+   with g_PlayerAPM do
+     apm_history_l[apm_history_p]+=1;
+end;
+
+procedure apm_Calc;
+var i:word;
+apm_new:word;
+begin
+   with g_PlayerAPM do
+   begin
+      apm_new:=0;
+      for i:=0 to apm_period_ticks do apm_new+=apm_history_l[i];
+      apm_new:=round(apm_new*apm_period_min);
+
+      apm_cur+=sign(apm_new-apm_cur);
+
+      apm_history_p+=1;
+      if(apm_history_p>apm_period_ticks)then apm_history_p:=0;
+      apm_history_l[apm_history_p]:=0;
+   end;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1703,6 +1735,7 @@ begin
    menu_redraw_pause:=0;
    ui_update_mmap:=0;
    menu_ItemSelected:=0;
+   snd_StopSoundSourceAll;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2128,6 +2161,7 @@ lmt_Req_UACLoot,
 lmt_unit_MaxLevel,
 lmt_prod_Unavailable,
 lmt_prod_BadOrder,
+lmt_prod_CD,
 lmt_prod_BadPlace     : begin
                            case lm_type of
                            lmt_Req_Common      : ParseLogMessage:=str_warn_Req_Common;
@@ -2137,6 +2171,7 @@ lmt_prod_BadPlace     : begin
                            lmt_unit_MaxLevel   : ParseLogMessage:=str_warn_unit_MaxLevel;
                            lmt_prod_Unavailable: ParseLogMessage:=str_warn_prod_Unavailable;
                            lmt_prod_BadOrder   : ParseLogMessage:=str_warn_prod_BadOrder;
+                           lmt_prod_CD         : ParseLogMessage:=str_warn_prod_CD;
                            lmt_prod_BadPlace   : ParseLogMessage:=str_warn_prod_BadPlace;
                            end;
                            AddDataStr;
@@ -2519,7 +2554,7 @@ begin
    if not(vbyte1 in allmapscenarios        )then exit
                                             else strInfoVar1^+=' '+str_map_Scenario  +': '+str_map_ScenarioL  [vbyte1]+tc_default+tc_nl2;
    vbyte1:=255;
-   BlockRead(f,vbyte1,sizeof(map_generators));
+   BlockRead(f,vbyte1,sizeof(map_GeneratorT));
    if(vbyte1>mapg_Last                     )then exit
                                             else strInfoVar1^+=' '+str_map_Generators+': '+str_map_GeneratorsL[vbyte1]+tc_nl2;
    vcard:=0;

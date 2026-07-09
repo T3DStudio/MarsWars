@@ -51,7 +51,7 @@ ai_TeamAlarms     : array[0..LastPlayer,0..ai_LastAlarm] of TAIAlarm;
 //
 
 map_scenario      : byte     = mc_ffa8;
-map_generators    : byte     = 0;
+map_GeneratorT    : byte     = 0;
 map_seed          : cardinal = 1;
 map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
@@ -72,6 +72,8 @@ map_KeyPointsN    : byte = 0;
 map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
 map_NeedTransport : boolean = false;
 map_BusyCenter    : boolean = false;
+
+map_Start2GeneratorStep: integer = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -168,12 +170,14 @@ g_eids            : array[byte] of TEID;
 g_effects         : array[1..vid_MaxScreenSprites] of TEffect;
 g_unitsVis        : array[0..MaxUnits] of TUnitVis;
 
+g_PlayerAPM       : TAPMData;
+
 missiles_UIDsBioEff         // units that trigger "bio" effect of missiles
                   : TSoB;
 
 CircleRX2Y        : array[0..fog_MaxR,0..fog_MaxR] of integer;
 
-LocalPlayer       : byte = 1; // 'this' player
+LocalPlayer       : byte = 0; // 'this' player
 PlayerName        : shortstring = 'DoomPlayer';
 PlayerReady       : boolean = false;
 
@@ -758,10 +762,6 @@ spr_HGate1,
 spr_HGate2,
 spr_HGate3,
 spr_HGate4,
-spr_HSymbol1,
-spr_HSymbol2,
-spr_HSymbol3,
-spr_HSymbol4,
 spr_HPools1,
 spr_HPools2,
 spr_HPools3,
@@ -792,10 +792,6 @@ spr_UFactory1,
 spr_UFactory2,
 spr_UFactory3,
 spr_UFactory4,
-spr_UGenerator1,
-spr_UGenerator2,
-spr_UGenerator3,
-spr_UGenerator4,
 spr_UWeaponFactory1,
 spr_UWeaponFactory2,
 spr_UWeaponFactory3,
@@ -866,7 +862,6 @@ spr_buff_SphereDDamage,
 spr_buff_SphereTurbo,
 spr_buff_SphereSoul,
 spr_buff_HellVision,
-spr_buff_Stun,
 spr_buff_Heroic      : TMWTexture;
 
 
@@ -1131,6 +1126,7 @@ str_hint_UnitArming,
 str_hint_Abilities,
 str_hint_SplashResist,
 str_hint_SightR,
+str_hint_MaxQuantity,
 str_hint_builder,
 str_hint_barrack,
 str_hint_forge,
@@ -1228,6 +1224,7 @@ str_attr_ground,
 
 str_warn_prod_BadPlace,
 str_warn_prod_BadOrder,
+str_warn_prod_CD,
 str_warn_prod_Unavailable,
 str_warn_Req_Energy,
 str_warn_Req_HellPower,
@@ -1293,6 +1290,9 @@ str_ui_HellPower,
 str_ui_UACLoot,
 str_ui_objectives,
 str_ui_SelectTarget,
+str_ui_SelectBPlace,
+str_ui_BuildHint,
+str_ui_RightClickCancel,
 
 str_objective_Scirmish,
 str_objective_RoyalBattle,
@@ -1343,9 +1343,11 @@ str_SG_PlayersColorL     : array[0..ui_MaxPlayersColor] of shortstring;
 str_SG_HealthBarsL       : array[0..2] of shortstring;
 str_SG_ControlPanelPosL  : array[0..3] of shortstring;
 
+str_action_name,
 str_action_hint,
 str_menu_hint            : array[byte] of shortstring;
 
+str_or,
 str_and                  : shortstring;
 str_YesNoC,
 str_YesNoG,

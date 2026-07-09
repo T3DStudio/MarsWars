@@ -554,7 +554,7 @@ begin
    draw_sdlsurface(tar,mi_x0+1,mi_y0+1,ui_mminimap);
 
    drawmenu_ItemText2(tar,mi_Map_Scenario  ,str_map_Scenario  ,str_map_ScenarioL[map_scenario]    ,0);
-   drawmenu_ItemText2(tar,mi_Map_Generators,str_map_Generators,str_map_GeneratorsL[map_generators],0);
+   drawmenu_ItemText2(tar,mi_Map_Generators,str_map_Generators,str_map_GeneratorsL[map_GeneratorT],0);
    drawmenu_ItemText2(tar,mi_Map_Seed      ,str_map_Seed      ,menu_mseed+vc(mi_Map_Seed)         ,menu_ItemSelected);
    drawmenu_ItemText2(tar,mi_Map_Size      ,str_map_Size      ,i2s(map_Size1)                     ,0);
    drawmenu_ItemText2(tar,mi_Map_Template  ,str_map_Template  ,str_map_TemplateL[map_Template]    ,0);

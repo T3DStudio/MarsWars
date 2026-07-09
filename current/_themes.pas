@@ -479,8 +479,8 @@ begin
           SetThemeTerrains('3,4,5,8'     );
           SetThemeLiquidsB('16,21_23' );
           SetThemeLiquidsF('0,6,13'        );
-          SetThemeObs0    ('0_12,28_32,125' );
-          SetThemeObs1    ('33,34,77,88_92,96_101' );
+          SetThemeObs0    ('0_12,0_12,0_12,28_32,125' );
+          SetThemeObs1    ('33,34,77,88_92,77,88_92,96_101,96_101' );
           SetThemeObs2    ('69,70');
 
           theme_liquid_style:=tcs_default;
@@ -492,9 +492,9 @@ begin
           SetThemeTerrains('0,2,11'      );
           SetThemeLiquidsB('0,2,25,11'   );
           SetThemeLiquidsF('1,2'         );
-          SetThemeObs0    ('0_12,28_32,125' );
-          SetThemeObs1    ('33,77,88_92,96_101,103_108' );
-          SetThemeObs2    ('69,70,117,118');
+          SetThemeObs0    ('0_12,0_12,0_12,28_32,125' );
+          SetThemeObs1    ('33,77,88_92,77,88_92,77,88_92,96_101,96_101,103_108' );
+          SetThemeObs2    ('69,70,69,70,69,70,117,118');
 
           theme_liquid_style:=tcs_default;
           theme_crater_style:=tcs_default;

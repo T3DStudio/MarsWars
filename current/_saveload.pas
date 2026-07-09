@@ -154,7 +154,7 @@ begin
    AddItem(@camp_diff           ,SizeOf(camp_diff     ));
    AddItem(@camp_data           ,sizeof(camp_data     ));
    AddItem(@map_scenario        ,SizeOf(map_scenario  ));
-   AddItem(@map_generators      ,SizeOf(map_generators));
+   AddItem(@map_GeneratorT      ,SizeOf(map_GeneratorT));
    AddItem(@map_seed            ,SizeOf(map_seed      ));
    AddItem(@map_Size1           ,SizeOf(map_Size1     ));
    AddItem(@map_Template        ,SizeOf(map_Template  ));

@@ -218,6 +218,8 @@ begin
             true  : if(ik_kstate=ks_none)and(InputAction(ik_depend))then
                     begin
                     ik_kstate:=ks_pressed;
+                    if(not MainMenu)then
+                      if(i in apm_Acts)then apm_Inc;
                     exit;
                     end;
             end;
@@ -234,7 +236,11 @@ begin
                    then ik_kstate:=ks_both
                    else ik_kstate:=ks_released;
            true  : if(ik_kstate=ks_none)then
+                   begin
                    ik_kstate:=ks_pressed;
+                   if(not MainMenu)then
+                     if(i in apm_Acts)then apm_Inc;
+                   end;
            end;
 end;
 

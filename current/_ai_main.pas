@@ -105,11 +105,25 @@ begin
      then ai_DefaultIdle(pu)
      else
      begin
-        if(td<0)
-        or(td=NOTSET)then td:=point_dist_int(x,y,tx,ty);
-        if(td<1)then td:=1;
-        px:=round(((tx-x)/td)*srange);
-        py:=round(((ty-y)/td)*srange);
+        if(tx=x)and(ty=y)then
+        begin
+           px:=0;
+           py:=0;
+           case g_tick mod 4 of
+           0: px:= 1;
+           1: px:=-1;
+           2: py:= 1;
+           3: py:=-1;
+           end;
+        end
+        else
+        begin
+           if(td<0)
+           or(td=NOTSET)then td:=point_dist_int(x,y,tx,ty);
+           if(td<1)then td:=1;
+           px:=round(((tx-x)/td)*srange);
+           py:=round(((ty-y)/td)*srange);
+        end;
 
         uo_x:=x-px;
         uo_y:=y-py;
@@ -151,16 +165,6 @@ begin
      if((ai_selfUID_nocomplete=0)and(    iscomplete))
      or((ai_selfUID_nocomplete>0)and(not iscomplete))then
        case uidi of
-       UID_HSymbol1,
-       UID_HSymbol2,
-       UID_HSymbol3,
-       UID_HSymbol4,
-       UID_UGenerator1,
-       UID_UGenerator2,
-       UID_UGenerator3,
-       UID_UGenerator4    : if (res_energyl_cur>uid_req_EnergyLevel)
-                            and(res_energyl_max>aic_GeneratorsDestroyEnergy)
-                            and(armylimit      >aic_GeneratorsDestoryLimit )then ai_NeedSuicide:=true;
        UID_HCommandCenter,
        UID_HACommandCenter: if ((units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])>=PlayerMaxBuilders)
                             and(ai_available_HKeep)then ai_NeedSuicide:=true;
@@ -209,21 +213,6 @@ begin
    with uid^    do
    with player^ do
      case uidi of
-UID_HSymbol1,
-UID_HSymbol2,
-UID_HSymbol3,
-UID_UGenerator1,
-UID_UGenerator2,
-UID_UGenerator3   : if((res_energyl_cur-g_uids[uid_AI_NextFormUID].uid_req_EnergyLevel)>=400)
-                    or((ai_curr_UnitProds>1)and(ai_armylimit_alive_u>aip_MaxUnitMinPart))then
-                      case uidi of
-                      UID_HSymbol1   : ai_UnitAbility(pu,uab_ToHSymbol2   ,0,0,0);
-                      UID_HSymbol2   : ai_UnitAbility(pu,uab_ToHSymbol3   ,0,0,0);
-                      UID_HSymbol3   : ai_UnitAbility(pu,uab_ToHSymbol4   ,0,0,0);
-                      UID_UGenerator1: ai_UnitAbility(pu,uab_ToUGenerator2,0,0,0);
-                      UID_UGenerator2: ai_UnitAbility(pu,uab_ToUGenerator3,0,0,0);
-                      UID_UGenerator3: ai_UnitAbility(pu,uab_ToUGenerator4,0,0,0);
-                      end;
 UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter: if(u_royal_d>base_r3)
@@ -434,7 +423,7 @@ begin
    with pCaster^ do
      with player^ do
        if(ai_HEyeNest_u<>nil)and(ai_near_HEye<=0)and(ai_need_heye_u=nil)and(aip_timer_magic=0)then
-         if(not map_IfObstacleZone(mapZone))then
+         if(not map_IsObstacleZone(mapZone))then
            if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
 
    if(ai_Bribe_u<>nil)
@@ -470,7 +459,7 @@ begin
                         if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_need_heye_u^.x,ai_need_heye_u^.y))then
                           aip_timer_detection:=aip_pause_detection;
 
-                      if(map_generators<mapg_inf)and(ai_choosen)and(units_uid_e[uidi]>1)and(ai_generator_d<NOTSET)
+                      if(map_GeneratorT<mapg_inf)and(ai_choosen)and(units_uid_e[uidi]>1)and(ai_generator_d<NOTSET)
                       then with ai_generator_kp^ do ai_UnitAbility(pCaster,uab_UACScan   ,0,kp_x,kp_y)
                       else
                         if(aiu_alarm_d=NOTSET)then
@@ -659,8 +648,10 @@ begin
          end
          else
            if(not iscomplete)then
-             if((uid_req_EnergyLevel>0)and(energyCur_BldGens >0))
-             or((uid_req_EnergyLevel=0)and(energyCur_BldOther>0))
+             if((energyCur_BldGens>0)and(uid_gen_EnergyLevel=0))
+             or(uid_gen_EnergyLevel=0)
+             //if((uid_gen_EnergyLevel>0)and(energyCur_BldGens >0))
+             //or((uid_gen_EnergyLevel=0)and(energyCur_BldOther>0))
              then ai_Suicide(pu);
 end;
 
@@ -689,6 +680,7 @@ begin
 
       if(res_energyl_cur<0)then
       begin
+         if(isselected)then writeln('ai_Cancel_Prod ',energyCur_BldOther,' ',energyCur_BldGens,' ',g_tick);
          ai_Cancel_Prod(pu);
          exit;
       end;

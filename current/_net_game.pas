@@ -167,7 +167,7 @@ begin
    net_writebyte({$IFDEF _FULLGAME}LocalPlayer{$ELSE}255{$ENDIF});
 
    net_writebyte(map_scenario  );
-   net_writebyte(map_generators);
+   net_writebyte(map_GeneratorT);
    net_writeint (map_Size1     );
    net_writebyte(map_Template  );
    net_writecard(map_seed      );
@@ -539,7 +539,7 @@ begin
    new_map    :=false;
 
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrByte(@map_generators  ))then begin redraw_menu:=true;new_map:=true;end;
+   if(nrByte(@map_GeneratorT  ))then ;//begin redraw_menu:=true;new_map:=true;end;
    if(nrInt (@map_Size1       ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_Template    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;

@@ -87,14 +87,13 @@ allmapscenarios        : set of byte = [mc_ffa3..mc_royale];
 mc_Last                = 14;
 
 // map neutrall generators
-mapg_no                = 0;
-mapg_5                 = 1;
-mapg_10                = 2;
-mapg_15                = 3;
-mapg_20                = 4;
-mapg_inf               = 5;
+mapg_5                 = 0;
+mapg_10                = 1;
+mapg_15                = 2;
+mapg_20                = 3;
+mapg_inf               = 4;
 
-mapg_Last              = 5;  // 0-5  max neutrall generators options
+mapg_Last              = 4;  // 0-4  max neutrall generators options
 
 // map symmetry types
 maps_none              = 0;
@@ -220,46 +219,47 @@ lmt_player_ready       = 24;
 lmt_player_nready      = 25;
 lmt_prod_BadPlace      = 26;
 lmt_prod_BadOrder      = 27;
-lmt_prod_AllBusy       = 28;
-lmt_prod_Unavailable   = 29;
-lmt_unit_ready         = 30;
-lmt_unit_captured      = 31;
-lmt_unit_lost          = 32;
-lmt_unit_LevelUp       = 33;
-lmt_unit_attacked      = 34;
-lmt_unit_NeedBuilder   = 35;
-lmt_unit_resurrected   = 36;
-lmt_unit_MaxLevel      = 37;
-lmt_upgrade_InProgress = 38;
-lmt_upgrade_complete   = 39;
-lmt_Req_Energy         = 40;
-lmt_Req_HellPower      = 41;
-lmt_Req_UACLoot        = 42;
-lmt_Req_Common         = 43;
-lmt_Req_Limit          = 44;
-lmt_Req_MaxCount       = 45;
-lmt_Req_MaxBuilders    = 46;
-lmt_markLook           = 47;
-lmt_markAttack         = 48;
-lmt_allies_attacked    = 49;
-lmt_NeedProdUnit       = 50;
-lmt_ability_reload     = 51;
-lmt_ability_Casting    = 52;
-lmt_ability_BadPlace   = 53;
-lmt_ability_ReqUACNear = 54;
-lmt_ability_ReqHelNear = 55;
-lmt_ability_Tar2Close  = 56;
-lmt_kpoint_captured    = 57;
-lmt_kpoint_lost        = 58;
-lmt_ngen_exh           = 59;
-lmt_ngen_captured      = 60;
-lmt_ngen_lost          = 61;
-lmt_koth_control       = 62;
-lmt_invalid_Target     = 63;
-lmt_Invalid_Order      = 64;
-lmt_replay_RecStart    = 65;
-lmt_replay_RecStop     = 66;
-lmt_replay_RecError    = 67;
+lmt_prod_CD            = 28;
+lmt_prod_AllBusy       = 29;
+lmt_prod_Unavailable   = 30;
+lmt_unit_ready         = 31;
+lmt_unit_captured      = 32;
+lmt_unit_lost          = 33;
+lmt_unit_LevelUp       = 34;
+lmt_unit_attacked      = 35;
+lmt_unit_NeedBuilder   = 36;
+lmt_unit_resurrected   = 37;
+lmt_unit_MaxLevel      = 38;
+lmt_upgrade_InProgress = 39;
+lmt_upgrade_complete   = 40;
+lmt_Req_Energy         = 41;
+lmt_Req_HellPower      = 42;
+lmt_Req_UACLoot        = 43;
+lmt_Req_Common         = 44;
+lmt_Req_Limit          = 45;
+lmt_Req_MaxCount       = 46;
+lmt_Req_MaxBuilders    = 47;
+lmt_markLook           = 48;
+lmt_markAttack         = 49;
+lmt_allies_attacked    = 50;
+lmt_NeedProdUnit       = 51;
+lmt_ability_reload     = 52;
+lmt_ability_Casting    = 53;
+lmt_ability_BadPlace   = 54;
+lmt_ability_ReqUACNear = 55;
+lmt_ability_ReqHelNear = 56;
+lmt_ability_Tar2Close  = 57;
+lmt_kpoint_captured    = 58;
+lmt_kpoint_lost        = 59;
+lmt_ngen_exh           = 60;
+lmt_ngen_captured      = 61;
+lmt_ngen_lost          = 62;
+lmt_koth_control       = 63;
+lmt_invalid_Target     = 64;
+lmt_Invalid_Order      = 65;
+lmt_replay_RecStart    = 66;
+lmt_replay_RecStop     = 67;
+lmt_replay_RecError    = 68;
 
 lmts_menu_chat         = [
                           lmt_chat_player0..
@@ -743,78 +743,70 @@ DecayAuraDamage        = UpgradeDamageBonus1;
 
 UID_HKeep              = 1;
 UID_HAKeep             = 2;
-UID_HSymbol1           = 3;
-UID_HSymbol2           = 4;
-UID_HSymbol3           = 5;
-UID_HSymbol4           = 6;
-UID_HGate              = 7;
-UID_HPools             = 8;
-UID_HPentagram         = 9;
-UID_HMonastery         = 10;
-UID_HFortress          = 11;
-UID_HFTower            = 12;
-UID_HTotem             = 13;
-UID_HTeleport          = 14;
-UID_HEyeNest           = 15;
-UID_HEye               = 16;
-UID_HAltar             = 17;
-UID_HCommandCenter     = 18;
-UID_HACommandCenter    = 19;
-UID_HBarracks          = 20;
+UID_HGate              = 3;
+UID_HPools             = 4;
+UID_HPentagram         = 5;
+UID_HMonastery         = 6;
+UID_HFortress          = 7;
+UID_HFTower            = 8;
+UID_HTotem             = 9;
+UID_HTeleport          = 10;
+UID_HEyeNest           = 11;
+UID_HEye               = 12;
+UID_HAltar             = 13;
+UID_HCommandCenter     = 14;
+UID_HACommandCenter    = 15;
+UID_HBarracks          = 16;
 
-UID_LostSoul           = 23;
-UID_Phantom            = 24;
-UID_Imp                = 25;
-UID_Demon              = 26;
-UID_Cacodemon          = 27;
-UID_Knight             = 28;
-UID_Baron              = 29;
-UID_Revenant           = 30;
-UID_Pain               = 31;
-UID_Mancubus           = 32;
-UID_Arachnotron        = 33;
-UID_Archvile           = 34;
-UID_Cyberdemon         = 35;
-UID_Mastermind         = 36;
+UID_LostSoul           = 20;
+UID_Phantom            = 21;
+UID_Imp                = 22;
+UID_Demon              = 23;
+UID_Cacodemon          = 24;
+UID_Knight             = 25;
+UID_Baron              = 26;
+UID_Revenant           = 27;
+UID_Pain               = 28;
+UID_Mancubus           = 29;
+UID_Arachnotron        = 30;
+UID_Archvile           = 31;
+UID_Cyberdemon         = 32;
+UID_Mastermind         = 33;
 
-UID_ZMedic             = 37;
-UID_ZEngineer          = 38;
-UID_ZSergant           = 39;
-UID_ZSSergant          = 40;
-UID_ZCommando          = 41;
-UID_ZAntiaircrafter    = 42;
-UID_ZSiegeMarine       = 43;
-UID_ZFPlasmagunner     = 44;
-UID_ZBFGMarine         = 45;
+UID_ZMedic             = 35;
+UID_ZEngineer          = 36;
+UID_ZSergant           = 37;
+UID_ZSSergant          = 38;
+UID_ZCommando          = 39;
+UID_ZAntiaircrafter    = 40;
+UID_ZSiegeMarine       = 41;
+UID_ZFPlasmagunner     = 42;
+UID_ZBFGMarine         = 43;
 
 // UAC
 
 UID_UCommandCenter     = 50;
 UID_UACommandCenter    = 51;
-UID_UGenerator1        = 52;
-UID_UGenerator2        = 53;
-UID_UGenerator3        = 54;
-UID_UGenerator4        = 55;
-UID_UBarracks          = 56;
-UID_UFactory           = 57;
-UID_UWeaponFactory     = 58;
-UID_UScienceCenter     = 59;
-UID_UComputerStation   = 60;
-UID_UGTurret           = 61;
-UID_UATurret           = 62;
-UID_URadar             = 63;
-UID_UAcademy           = 64;
-UID_UHPowerConductor   = 65;
-UID_URMStation         = 66;
+UID_UBarracks          = 52;
+UID_UFactory           = 53;
+UID_UWeaponFactory     = 54;
+UID_UScienceCenter     = 55;
+UID_UComputerStation   = 56;
+UID_UGTurret           = 57;
+UID_UATurret           = 58;
+UID_URadar             = 59;
+UID_UAcademy           = 60;
+UID_UHPowerConductor   = 61;
+UID_URMStation         = 62;
 
-UID_UPortal            = 67;
-UID_UBaseMil           = 68;
-UID_UBaseCom           = 69;
-UID_UBaseGen           = 70;
-UID_UBaseRef           = 71;
-UID_UBaseNuc           = 72;
-UID_UBaseLab           = 73;
-UID_USPort             = 74;
+UID_UPortal            = 65;
+UID_UBaseMil           = 66;
+UID_UBaseCom           = 67;
+UID_UBaseGen           = 68;
+UID_UBaseRef           = 69;
+UID_UBaseNuc           = 70;
+UID_UBaseLab           = 71;
+UID_USPort             = 72;
 
 UID_Engineer           = 80;
 UID_Medic              = 81;
@@ -894,9 +886,6 @@ uab_Hack               = 28;
 
 uab_ToHAKeep           = 30;
 uab_ToHGate            = 31;
-uab_ToHSymbol2         = 32;
-uab_ToHSymbol3         = 33;
-uab_ToHSymbol4         = 34;
 uab_ToHPools           = 35;
 uab_ToHACommandCenter  = 36;
 uab_ToHBarracks        = 37;
@@ -905,9 +894,6 @@ uab_ToUACommandCenter  = 40;
 uab_ToUBarracks        = 41;
 uab_ToUFactory         = 42;
 uab_ToUWeaponFactory   = 43;
-uab_ToUGenerator2      = 44;
-uab_ToUGenerator3      = 45;
-uab_ToUGenerator4      = 46;
 uab_ToUAGTurret        = 47;
 uab_ToUAATurret        = 48;
 uab_ToUACDron          = 49;
@@ -923,9 +909,12 @@ uab_LvlUpURMStation    = 53;
 //
 
 
-map_generators_LFSecs  : array[0..mapg_Last] of cardinal = (0,        60*5,        60*10,        60*15,        60*20,0);
-map_generators_LFTicks : array[0..mapg_Last] of cardinal = (0,fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
-map_generators_Energy  = 1000;
+map_generators_LFSecs  : array[0..mapg_Last] of cardinal = (        60*5,        60*10,        60*15,        60*20,0);
+map_generators_LFTicks : array[0..mapg_Last] of cardinal = (fr_fps1*60*5,fr_fps1*60*10,fr_fps1*60*15,fr_fps1*60*20,0);
+map_generators_EnergyS = 1000;
+map_generators_EnergyO = 2000;
+map_generators_LimitS  = ul1;
+map_generators_LimitO  = ul5;
 
 MaxKeyPoints           = MaxPlayers*3;
 LastKeyPoint           = MaxKeyPoints-1;
@@ -933,20 +922,22 @@ KeyPointLifeClientMax  = (1 shl 10)-1; // 1024
 KeyPointLifeClientCX   = KeyPointLifeClientMax/(60*20);
 KeyPointLifeClientXC   = (60*20)/KeyPointLifeClientMax;
 
-keyPoint_CaptTime_Def  = fr_fps1*ptimeh;
-keyPoint_CaptTime_Gen  = fr_fps1*ptime1;
-keyPoint_CaptTime_KotH = fr_fps1*ptime3;
+keyPoint_CTime_Def_Sec = ptimeh;
+keyPoint_CTime_Def_Tick= fr_fps1*keyPoint_CTime_Def_Sec;
+keyPoint_CTime_Gen_Tick= fr_fps1*ptime1;
+keyPoint_CTime_KotH_Sec= ptime3;
+keyPoint_CTime_KotH_Tick= fr_fps1*keyPoint_CTime_KotH_Sec;
 keyPoint_DefR          = 100;
 keyPoint_GenR          = 75;
+keyPoint_GenNB         = keyPoint_GenR-25;
 keyPoint_KotR          = 350;
 keyPoint_KotRW         = round(keyPoint_KotR/1.44);
-keyPoint_MinLimit      = ul5;
-keyPoint_MaxLimitAI    = keyPoint_MinLimit*2;
 
 keyPoint_mcN           = 4;
 keyPoint_mcDirStep     = 360 div keyPoint_mcN;
 
-keyPoint_KotH_pause     = fr_fps1*180;
+keyPoint_KotH_pause_sec= 60*5;
+keyPoint_KotH_pause    = fr_fps1*keyPoint_KotH_pause_sec;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1048,7 +1039,6 @@ fly_height             : array[false..true] of integer = (1,fly_z);
 pain_time              = fr_fps1;
 
 ai_names_max           = 52;
-
 
 {$IFDEF _FULLGAME}
 
@@ -1243,6 +1233,25 @@ iAct_test_AddUACLoot   = 226;
 iAct_test_debug0       = 227;
 iAct_test_debug1       = 228;
 {$ENDIF}
+
+apm_Acts               = [1..255]-[iAct_ScreenShot,
+                                   iAct_mwu,iAct_mwd,
+                                   iAct_mmb,iAct_esc,
+                                   iAct_return,
+                                   iAct_control,
+                                   iAct_alt,
+                                   iAct_shift,
+                                   iAct_backspace,
+                                   iAct_ToggleWindowed,
+                                   iAct_InGameChat,
+                                   iAct_InGameChatAll,
+                                   iAct_InGameChatAllies,
+                                   iAct_InGamePause,
+                                   iAct_InGameMenu];
+
+apm_period_sec         = 10;
+apm_period_min         = 60/apm_period_sec;
+apm_period_ticks       = fr_fps1*apm_period_sec;
 
 k_LastCharStuckDelay   = fr_fps1 div 3;
 kt_TwiceDelay          = fr_fps1 div 4;

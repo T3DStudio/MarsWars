@@ -6,8 +6,6 @@ begin
    with pu^  do
    with player^ do
    begin
-      ai_need_Energy:=1250+ai_curr_UnitProds*650;
-
       // upgrade prods
       ai_need_UpgrProds:=0;
       if(aip_MaxForges>0)
@@ -38,7 +36,7 @@ begin
       end;
 
       // teleport
-      ai_need_Teleports:=(ai_armylimit_ForTeleport div ul10)+3;
+      ai_need_Teleports:=(ai_armylimit_ForTeleport div ul12)+3;
 
       // DETECTORS
       if(ai_enemy_inv_u<>nil)
@@ -53,7 +51,7 @@ begin
       end;
 
       // ai_TechPriority
-      case race of
+      {case race of
       r_hell: ;
       r_uac : ;
       end;
@@ -65,7 +63,7 @@ begin
          //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds);
         // writeln('ai_need_UpgrProds=',ai_need_UpgrProds,' ai_curr_UpgrProds=',ai_curr_UpgrProds);
          //writeln('ai_need_UpgrProds ',ai_need_UpgrProds);
-      end;
+      end; }
    end;
 end;
 
@@ -253,22 +251,6 @@ begin
 
    end;
 end;
-procedure SetGenerators(needL:integer);
-begin
-   if(build_uid>0)
-   or(map_generators>0)then exit;
-
-   with pBuilder^  do
-   with player^ do
-     if (ai_energy_future   <needL)
-     and(ai_energy_future   <aip_MaxEnergy)
-     and(ai_energy_future   <aic_GeneratorsEnergy)
-     and(ai_generators_limit<aic_GeneratorsLimit)then
-       case race of
-       r_hell: SetBuildUID1(UID_HSymbol1);
-       r_uac : SetBuildUID1(UID_UGenerator1);
-       end;
-end;
 
 procedure SetBarracks(needN:integer);
 begin
@@ -423,12 +405,10 @@ begin
          if(NeedMaxTowers)then
            SetTowers(aip_MaxTowers);
          SetDetectors(ai_need_detect);
-         SetGenerators(500);
          if(aiu_alarm_d=NOTSET)then
            SetTeleport;
          SetBarracks  (1);
          SetBuilders  (aip_MaxBuilders  );
-         SetGenerators(ai_need_Energy   );
          SetTeleport;
          SetTech;
          SetSpecial;
@@ -438,23 +418,22 @@ begin
          //SetDetectors (aip_MaxDetectors );
       end
       else
-        case g_random(9) of
+        case g_random(8) of
         0 : if(NeedMaxTowers)
             then SetTowers(aip_MaxTowers)
             else SetTowers(aip_MinTowers);
-        1 : SetGenerators(ai_need_Energy   );
-        2 : SetBarracks  (ai_need_UnitProds);
-        3 : SetForges    (ai_need_UpgrProds);
-        4 : SetBuilders  (aip_MaxBuilders  );
-        5 : SetTeleport;
-        6 : SetTech;
-        7 : SetSpecial;
-        8 : SetDetectors (ai_need_Detect   );
+        1 : SetBarracks  (ai_need_UnitProds);
+        2 : SetForges    (ai_need_UpgrProds);
+        3 : SetBuilders  (aip_MaxBuilders  );
+        4 : SetTeleport;
+        5 : SetTech;
+        6 : SetSpecial;
+        7 : SetDetectors (ai_need_Detect   );
         end;
 
       if(build_uid=0)then exit;
 
-      if(isselected)then writeln('build_dir=',build_dir,' build_step=',build_step);
+     // if(isselected)then writeln('build_dir=',build_dir,' build_step=',build_step);
 
       // build
       if(build_x=0)then

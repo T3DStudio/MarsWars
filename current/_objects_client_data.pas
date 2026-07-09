@@ -434,26 +434,6 @@ begin
    setMWSModel(3,@spr_HGate4);
    setBuildingSND(snd_hell_hgate);
 end;
-UID_HSymbol1:
-begin
-   setMWSModel(0,@spr_HSymbol1);
-   setBuildingSND(snd_hell_hsymbol);
-end;
-UID_HSymbol2:
-begin
-   setMWSModel(0,@spr_HSymbol2);
-   setBuildingSND(snd_hell_hsymbol);
-end;
-UID_HSymbol3:
-begin
-   setMWSModel(0,@spr_HSymbol3);
-   setBuildingSND(snd_hell_hsymbol);
-end;
-UID_HSymbol4:
-begin
-   setMWSModel(0,@spr_HSymbol4);
-   setBuildingSND(snd_hell_hsymbol);
-end;
 UID_HPools:
 begin
    setMWSModel(0,@spr_HPools1);
@@ -734,26 +714,6 @@ begin
    setMWSModel(2,@spr_UFactory3);
    setMWSModel(3,@spr_UFactory4);
    setBuildingSND(snd_uac_factory);
-end;
-UID_UGenerator1:
-begin
-   setMWSModel(0,@spr_UGenerator1);
-   setBuildingSND(snd_uac_generator);
-end;
-UID_UGenerator2:
-begin
-   setMWSModel(0,@spr_UGenerator2);
-   setBuildingSND(snd_uac_suply);
-end;
-UID_UGenerator3:
-begin
-   setMWSModel(0,@spr_UGenerator3);
-   setBuildingSND(snd_uac_suply);
-end;
-UID_UGenerator4:
-begin
-   setMWSModel(0,@spr_UGenerator4);
-   setBuildingSND(snd_uac_suply);
 end;
 UID_UWeaponFactory:
 begin
@@ -1052,9 +1012,6 @@ uab_ToUGTurretTo     : ua_mbrush_r:=-UID_UGTurret;
 uab_ToUATurretTo     : ua_mbrush_r:=-UID_UATurret;
 
 uab_ToHAKeep         : ua_mbrush_r:=-UID_HAKeep;
-uab_ToHSymbol2       : ua_mbrush_r:=-UID_HSymbol2;
-uab_ToHSymbol3       : ua_mbrush_r:=-UID_HSymbol3;
-uab_ToHSymbol4       : ua_mbrush_r:=-UID_HSymbol4;
 uab_ToHACommandCenter: ua_mbrush_r:=-UID_HACommandCenter;
 
 uab_ToHGate          : ua_mbrush_r:=-UID_HGate;
@@ -1062,9 +1019,6 @@ uab_ToHPools         : ua_mbrush_r:=-UID_HPools;
 uab_ToHBarracks      : ua_mbrush_r:=-UID_HBarracks;
 
 uab_ToUACommandCenter: ua_mbrush_r:=-UID_UACommandCenter;
-uab_ToUGenerator2    : ua_mbrush_r:=-UID_UGenerator2;
-uab_ToUGenerator3    : ua_mbrush_r:=-UID_UGenerator3;
-uab_ToUGenerator4    : ua_mbrush_r:=-UID_UGenerator4;
 uab_ToUAGTurret      : ua_mbrush_r:=-UID_UGTurret;
 uab_ToUAATurret      : ua_mbrush_r:=-UID_UATurret;
 uab_ToUACDron        : ua_mbrush_r:=-UID_UACDron;
@@ -1082,17 +1036,11 @@ uab_HEyeSpawn,
 uab_ToUGTurretTo,
 uab_ToUATurretTo,
 uab_ToHAKeep,
-uab_ToHSymbol2,
-uab_ToHSymbol3,
-uab_ToHSymbol4,
 uab_ToHACommandCenter,
 uab_ToHGate,
 uab_ToHPools,
 uab_ToHBarracks,
 uab_ToUACommandCenter,
-uab_ToUGenerator2,
-uab_ToUGenerator3,
-uab_ToUGenerator4,
 uab_ToUAGTurret,
 uab_ToUAATurret,
 uab_ToUACDron,

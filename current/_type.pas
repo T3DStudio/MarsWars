@@ -283,6 +283,12 @@ TCampaignData = record
    cd_byte1:byte;
 end;
 
+TAPMData = record
+   apm_history_l: array[0..apm_period_ticks] of word;
+   apm_history_p,
+   apm_cur      : word;
+end;
+
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,6 +312,7 @@ TUnitAbility = record
    ua_rldDec_upgr : byte;
    ua_rldDec_upgrS,
    ua_rldDec_level: integer;
+   ua_OrderToAll  : boolean;
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
    ua_mbrush_hint : byte;
@@ -905,14 +912,15 @@ TKeyPoint = record
    kp_RNoBuild,
    kp_ToCenterD,
    kp_Energy,
-   kp_CaptureTime: integer;
-   kp_Zone       : word;
+   kp_CaptureTime : integer;
+   kp_CaptureLimit: longint;
+   kp_Zone        : word;
    kp_LimitTeamP,
    kp_LimitTeamC,
    kp_LimitPlayerP,
    kp_LimitPlayerC
-                 : array[0..LastPlayer] of longint;
-   kp_TeamData   : array[0..MaxPlayers] of TKeyPointTeamData;
+                  : array[0..LastPlayer] of longint;
+   kp_TeamData    : array[0..MaxPlayers] of TKeyPointTeamData;
 end;
 pTKeyPoint = ^TKeyPoint;
 ppTKeyPoint = ^pTKeyPoint;

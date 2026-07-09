@@ -73,12 +73,13 @@ begin
    with pTarget^ do
    with uid^ do
    begin
+      if(buffs[ub_SphereRDamage]>0)then exit;
       {$IFDEF _FULLGAME}
       if(not ServerSide)then
         if(buffs[ub_PainState]<=0)then exit;
       {$ENDIF}
 
-      if(not uid_isbuilding)and(not uid_ismech)then
+      if(not uid_isbuilding)then
         if(uid_PainState_Base>0)then
         begin
            if(pains>0)then pains-=1;
@@ -841,7 +842,6 @@ procedure unit_CaptureKeyPoint(pu:PTUnit);
 var
 kpi:byte;
 d  :integer;
-l  :longint;
 begin
    if(map_KeyPointsN>0)then
      with pu^ do
@@ -853,11 +853,8 @@ begin
               with uid^ do
                 if(d<=(kp_RCapture+uid_r))then
                 begin
-                   if(uid_isbuilder)
-                   then l:=keyPoint_MinLimit
-                   else l:=uid_LimitUse;
-                   kp_LimitPlayerC[playeri     ]+=l;
-                   kp_LimitTeamC  [player^.team]+=l;
+                   kp_LimitPlayerC[playeri     ]+=uid_LimitUse;
+                   kp_LimitTeamC  [player^.team]+=uid_LimitUse;
                 end;
 
             // update team data
@@ -1556,7 +1553,7 @@ begin
         if(unit_GetCastingAbility(pTransport)=uab_unload)
         or(pTransport^.transportC>pTransport^.transportM)then
           if(not pTransport^.isfly)
-          or(not map_IfObstacleZone(pTransport^.mapZone))then
+          or(not map_IsObstacleZone(pTransport^.mapZone))then
           begin
              unit_UnLoad(pTransport,pu);
              if(pTransport^.transportC<=0)then
@@ -1844,17 +1841,11 @@ begin
       uab_ToHGate          : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HGate          ,true);
       uab_ToHPools         : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HPools         ,true);
       uab_ToHBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HBarracks      ,true);
-      uab_ToHSymbol2       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol2       ,true);
-      uab_ToHSymbol3       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol3       ,true);
-      uab_ToHSymbol4       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HSymbol4       ,true);
 
       uab_ToUACommandCenter: unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UACommandCenter,true);
       uab_ToUBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UBarracks      ,true);
       uab_ToUFactory       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UFactory       ,true);
       uab_ToUWeaponFactory : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UWeaponFactory ,true);
-      uab_ToUGenerator2    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator2    ,true);
-      uab_ToUGenerator3    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator3    ,true);
-      uab_ToUGenerator4    : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGenerator4    ,true);
       uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
       uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
       uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,true);
@@ -2031,17 +2022,11 @@ begin
       uab_ToHGate,
       uab_ToHPools,
       uab_ToHBarracks,
-      uab_ToHSymbol2,
-      uab_ToHSymbol3,
-      uab_ToHSymbol4,
 
       uab_ToUACommandCenter,
       uab_ToUBarracks,
       uab_ToUFactory,
       uab_ToUWeaponFactory,
-      uab_ToUGenerator2,
-      uab_ToUGenerator3,
-      uab_ToUGenerator4,
       uab_ToUAGTurret,
       uab_ToUAATurret,
       uab_ToUACDron,
@@ -2053,17 +2038,11 @@ begin
                               uab_ToHGate          : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HGate          ,false);
                               uab_ToHPools         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HPools         ,false);
                               uab_ToHBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HBarracks      ,false);
-                              uab_ToHSymbol2       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol2       ,false);
-                              uab_ToHSymbol3       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol3       ,false);
-                              uab_ToHSymbol4       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HSymbol4       ,false);
 
                               uab_ToUACommandCenter: unit_AbilityExec:=unit_TransformStart(pCaster,uid_UACommandCenter,false);
                               uab_ToUBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UBarracks      ,false);
                               uab_ToUFactory       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UFactory       ,false);
                               uab_ToUWeaponFactory : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UWeaponFactory ,false);
-                              uab_ToUGenerator2    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator2    ,false);
-                              uab_ToUGenerator3    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator3    ,false);
-                              uab_ToUGenerator4    : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGenerator4    ,false);
                               uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
                               uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
                               uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,false);

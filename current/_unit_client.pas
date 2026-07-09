@@ -471,8 +471,7 @@ wdkpi: pbyte;
 function kpLifeTime(lifeSecs:cardinal):word;
 begin
    if(lifeSecs=0)
-   or(map_generators=0)
-   or(map_generators=mapg_last)
+   or(map_GeneratorT=mapg_last)
    then kpLifeTime:=0
    else
    begin
@@ -623,10 +622,7 @@ begin
       if(wtickb2)then
       begin
          if(map_KeyPointsN>0)then
-           if(map_scenario=mc_KeyPoints)
-           or(map_scenario=mc_KotH)
-           or(map_generators>0)then
-             wclinet_KeyPoint(rpl,POVPlayer);
+           wclinet_KeyPoint(rpl,POVPlayer);
 
          if(not rpl)then
            wclinet_PlayerCams(POVPlayer,rpl);
@@ -1529,8 +1525,7 @@ pactive:boolean;
 function kpLifeTime(lifeSecs:cardinal):word;
 begin
    if(lifeSecs=0)
-   or(map_generators=0)
-   or(map_generators=mapg_last)
+   or(map_GeneratorT=mapg_last)
    then kpLifeTime:=0
    else
    begin
@@ -1538,8 +1533,8 @@ begin
       if(kpLifeTime=0)
       then kpLifeTime:=1
       else
-        if(kpLifeTime>=map_generators_LFSecs[map_generators])
-        then kpLifeTime:=map_generators_LFSecs[map_generators];
+        if(kpLifeTime>=map_generators_LFSecs[map_GeneratorT])
+        then kpLifeTime:=map_generators_LFSecs[map_GeneratorT];
    end;
 end;
 begin
@@ -1630,10 +1625,7 @@ begin
       if(wtickb2)then
       begin
          if(map_KeyPointsN>0)then
-           if(map_scenario=mc_KeyPoints)
-           or(map_scenario=mc_KotH)
-           or(map_generators>0)then
-             rclinet_KeyPoint(rpl,fast_skip);
+           rclinet_KeyPoint(rpl,fast_skip);
 
          // player's cam
          if(not rpl)then

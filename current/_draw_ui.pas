@@ -615,7 +615,9 @@ taid:byte;
 s1  :shortstring;
 procedure AddLine(pstr:pshortstring);
 begin
-   str_AddToStrList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,pstr^);
+   if(pstr=nil)
+   then str_AddToStrList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,tc_docbr)
+   else str_AddToStrList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,pstr^);
 end;
 procedure BrushUnitTargetHint;
 begin
@@ -645,25 +647,50 @@ end;
 begin
    case m_uifocus of
    mf_map      : case m_brush of
-                 co_markLook,
-                 co_markAttack,
-                 co_apatrol,
-                 co_patrol : ;
-                 1..255    : with g_uids[ m_brush] do AddLine(@uid_str_name);
+                 1..255    : begin
+                                with g_uids[ m_brush] do
+                                s1:=str_ui_SelectBPlace+'"'+uid_str_name+'"';
+                                AddLine(@s1);
+                                AddLine(nil);
+                                AddLine(@str_ui_BuildHint);
+                                AddLine(@str_ui_RightClickCancel);
+                             end;
                  -255..-1  : with g_aids[-m_brush] do
                              begin
                                 s1:=str_ui_SelectTarget+'"'+ua_str_name+'"';
                                 AddLine(@s1);
-                                s1:=tc_docbr;
-                                AddLine(@s1);
+                                AddLine(nil);
                                 case ua_type of
                                 uat_UnitAny,
                                 uat_UnitOwn,
                                 uat_UnitAlly,
                                 uat_UnitEnemy: BrushUnitTargetHint;
                                 end;
+                                AddLine(@str_ui_RightClickCancel);
                              end
-                 else BrushUnitTargetHint;
+                 else
+                   s1:='';
+                   case m_brush of
+                   co_markLook  : s1:=str_action_name[iAct_Control_MarkLook  ];
+                   co_markAttack: s1:=str_action_name[iAct_Control_MarkAttack];
+                   co_apatrol   : s1:=str_action_name[iAct_Control_UAPatrol  ];
+                   co_patrol    : s1:=str_action_name[iAct_Control_UPatrol   ];
+                   co_amove     : s1:=str_action_name[iAct_Control_UAMove    ];
+                   co_move      : s1:=str_action_name[iAct_Control_UMove     ];
+                   end;
+                   if(length(s1)>0)then
+                   begin
+                      s1:=str_ui_SelectTarget+'"'+s1+'"';
+                      AddLine(@s1);
+                   end;
+
+                   case m_brush of
+                   co_markLook,
+                   co_markAttack,
+                   co_apatrol,
+                   co_patrol    : ;
+                   else BrushUnitTargetHint;
+                   end;
                  end;
 
    mf_Tabs     : if(0<=m_btnN)and(m_btnN<4)then AddLine(@str_ui_Tab[m_BtnN]);
@@ -828,6 +855,7 @@ begin
                     else str:=str_all                              +')';
                     draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str,ta_LU,255,PlayerGetColorCur(UIPlayer,false));
                  end;
+   tcc_controls: if(ui_ShowAPM)then draw_text(tar,ui_APMx,ui_APMy,'APM: '+w2s(g_PlayerAPM.apm_cur),ta_LU,255,c_white);
    end;
 
    // TIMER
@@ -858,7 +886,11 @@ begin
                                        else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColorCur(kptd_TimerOwnerPlayer,false),@y);
                               end;
                 mc_KeyPoints: draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white);
-                mc_royale   : draw_text(tar,ui_objectivesx,y,str_objective_RoyalBattle,ta_LU,ui_Objectives_LineLen,c_white);
+                mc_royale   : begin
+                              draw_text(tar,ui_objectivesx,y,str_objective_RoyalBattle,ta_LU,ui_Objectives_LineLen,c_white);y+=txt_line_h2;
+                              draw_text(tar,ui_objectivesx,y,str_or                   ,ta_LU,ui_Objectives_LineLen,c_white);y+=txt_line_h2;
+                              draw_text(tar,ui_objectivesx,y,str_objective_Scirmish   ,ta_LU,ui_Objectives_LineLen,c_white);
+                              end;
                 else          draw_text(tar,ui_objectivesx,y,str_objective_Scirmish   ,ta_LU,ui_Objectives_LineLen,c_white);
                 end;
    end;
@@ -884,7 +916,7 @@ begin
    if(TestMode>0)then draw_text(tar,ui_cam_hw,ui_cam_hh,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
    {$ENDIF}
 
-   if(ui_ShowAPM            )then draw_text(tar,ui_APMx,ui_APMy,'APM: '                                              ,ta_LU,255,c_white);
+
    if(vid_ShowFPS           )then draw_text(tar,ui_FPSx,ui_FPSy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
 
    if(rpls_pstate=rpls_write)then draw_text(tar,ui_RECx,ui_RECy,'*REC',ta_RU,255,c_red);

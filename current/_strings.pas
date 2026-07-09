@@ -479,6 +479,7 @@ procedure str_SetActionBaseHint(action:byte;hint:shortstring);
 var hk:shortstring;
 begin
    hk:=input_actions[action].ik_str_HK;
+   str_action_name[action]:=hint;
    if(length(hk)>0)
    then str_action_hint[action]:=hint+' ('+hk+')'
    else str_action_hint[action]:=hint;
@@ -985,11 +986,6 @@ begin
 end;
 
 begin
-   /////////////////////////////////////////////////////////////////////////////
-   //   ACTIONS
-   for uid:=0 to 255 do
-     input_actions[uid].ik_str_HK:=str_ActionHotKey(uid);
-
    /////////////////////////////////////////////////////////////////////////////
    //   UNITS
    for uid:=0 to 255 do

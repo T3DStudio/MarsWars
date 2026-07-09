@@ -871,10 +871,6 @@ begin
    gfx_LoadMWSModel(@spr_HGate2             ,folder_RaceBuildings[r_hell]+'h_b1b'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HGate3             ,folder_RaceBuildings[r_hell]+'h_b1c'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HGate4             ,folder_RaceBuildings[r_hell]+'h_b1d'      ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol1           ,folder_RaceBuildings[r_hell]+'h_b2_'      ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol2           ,folder_RaceBuildings[r_hell]+'h_b2a'      ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol3           ,folder_RaceBuildings[r_hell]+'h_b2b'      ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_HSymbol4           ,folder_RaceBuildings[r_hell]+'h_b2c'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HPools1            ,folder_RaceBuildings[r_hell]+'h_b3_'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HPools2            ,folder_RaceBuildings[r_hell]+'h_b3a'      ,smt_buiding  );
    gfx_LoadMWSModel(@spr_HPools3            ,folder_RaceBuildings[r_hell]+'h_b3b'      ,smt_buiding  );
@@ -901,10 +897,6 @@ begin
    gfx_LoadMWSModel(@spr_UBarracks2         ,folder_RaceBuildings[r_uac ] +'u_b1a'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UBarracks3         ,folder_RaceBuildings[r_uac ] +'u_b1b'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UBarracks4         ,folder_RaceBuildings[r_uac ] +'u_b1c'     ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator1        ,folder_RaceBuildings[r_uac ] +'u_b2_'     ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator2        ,folder_RaceBuildings[r_uac ] +'u_b2b_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator3        ,folder_RaceBuildings[r_uac ] +'u_b2c_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UGenerator4        ,folder_RaceBuildings[r_uac ] +'u_b2d_'    ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UWeaponFactory1    ,folder_RaceBuildings[r_uac ] +'u_b3_'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UWeaponFactory2    ,folder_RaceBuildings[r_uac ] +'u_b3a'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UWeaponFactory3    ,folder_RaceBuildings[r_uac ] +'u_b3b'     ,smt_buiding  );
@@ -980,7 +972,6 @@ begin
    gfx_LoadMWTexture(@spr_buff_HellVision   ,folder_effects+'buff_HellVision'          ,true);
    gfx_LoadMWTexture(@spr_buff_Scan         ,folder_effects+'buff_scan'                ,true);
    gfx_LoadMWTexture(@spr_buff_Decay        ,folder_effects+'buff_decay'               ,true);
-   gfx_LoadMWTexture(@spr_buff_Stun         ,folder_effects+'buff_stun'                ,true);
    gfx_LoadMWTexture(@spr_buff_Heroic       ,folder_effects+'buff_heroic'              ,true);
 
    gfx_LoadMWTexture(@spr_kp_koth           ,'kp_koth'                                 ,true);

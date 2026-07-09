@@ -66,7 +66,7 @@ cfg_key_VidWindowed     : vid_windowed       :=(vl=b2c[true]);
 cfg_key_VidShowFPS      : vid_ShowFPS        :=(vl=b2c[true]);
 cfg_key_GFixedSpawns    : g_FixedPositions   :=(vl=b2c[true]);
 cfg_key_GAISlots        : g_AISlots          := vlw;
-cfg_key_MapGenerators   : map_generators     := vlw;
+cfg_key_MapGenerators   : map_GeneratorT     := vlw;
 cfg_key_GRecord         : rpls_Record        :=(vl=b2c[true]);
 cfg_key_GRecordQuality  : rpls_Quality       := vlw;
 cfg_key_menuScalse      : menu_scale         :=(vl=b2c[true]);
@@ -131,7 +131,7 @@ begin
       vid_vh:=max2i(vid_minh,vid_vh);
 
       if(g_AISlots     >g_MaxAISlots   )then g_AISlots     :=g_MaxAISlots;
-      if(map_generators>mapg_Last      )then map_generators:=mapg_Last;
+      if(map_GeneratorT>mapg_Last      )then map_GeneratorT:=mapg_Last;
 
       if(rpls_Quality  >rpls_MaxQuality)then rpls_Quality  :=rpls_MaxQuality;
       if(net_cl_Quality>net_MaxQuality )then net_cl_Quality:=net_MaxQuality;
@@ -172,7 +172,7 @@ begin
    writeln(f,cfg_key_VidResolutionH  ,'=',vid_vh                );
    writeln(f,cfg_key_VidWindowed     ,'=',b2c[vid_windowed]     );
    writeln(f,cfg_key_VidShowFPS      ,'=',b2c[vid_ShowFPS]      );
-   writeln(f,cfg_key_MapGenerators   ,'=',map_generators        );
+   writeln(f,cfg_key_MapGenerators   ,'=',map_GeneratorT        );
    writeln(f,cfg_key_GRecord         ,'=',b2c[rpls_Record]      );
    writeln(f,cfg_key_GRecordQuality  ,'=',rpls_Quality          );
    writeln(f,cfg_key_GFixedSpawns    ,'=',b2c[g_FixedPositions] );

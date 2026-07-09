@@ -18,12 +18,7 @@ begin
                                             ,false);
 
 
-      if(map_generators>0)then
-      PlayerSetAllowedUnits(playerN,[ UID_HSymbol1   ..UID_HSymbol4,
-                                      UID_UGenerator1..UID_UGenerator4],0,false);
-
-
-      PlayerSetAllowedUpgrades(playerN,[0..255],255,true); //
+      PlayerSetAllowedUpgrades(playerN,[0..255],255,true);
 
       a_ability:=[1..255];
    end;
@@ -254,6 +249,7 @@ begin
 
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
    FillChar(g_effects,SizeOf(g_effects),0);
+   FillChar(g_PlayerAPM,SizeOf(g_PlayerAPM),0);
 
    ui_InGameChat :=0;
    net_chat_str:='';
@@ -374,7 +370,7 @@ procedure Game_MakeSkirmishBase(x,y:integer;playerN,ubuilder,ubarrack:byte);
 var i:integer;
 begin
    unit_add(x,y,0,ubuilder,playerN,true,false,0);
-   i:=round((g_uids[ubuilder].uid_r+g_uids[ubarrack].uid_r)/1.43);
+   i:=round((g_uids[ubuilder].uid_r+g_uids[ubarrack].uid_r)/1.415);
    unit_add(x-sign(map_SizeH-x,true)*i,
             y-sign(map_SizeH-y,true)*i,0,ubarrack,playerN,true,false,0);
 end;
@@ -776,9 +772,7 @@ begin
    end;
    Game_ShuffleAINames;
 
-   if(random(3)=0)
-   then map_generators:=random(mapg_Last)+1
-   else map_generators:=0;
+   map_GeneratorT:=random(mapg_Last)+1;
 
    Map_SetScenarioMaxPlayers;
 
@@ -822,10 +816,14 @@ end;
 procedure game_PlayerExecuteOrder(tPlayer:byte);
 var
 pu,
-tar_u : PTUnit;
+tar_u     : PTUnit;
 u,
-tar_d : integer;
-tar_ex: boolean;
+tar_d     : integer;
+tar_ex    : boolean;
+toall_n,
+toall_msg : byte;
+toall_msgx,
+toall_msgy: integer;
 begin
    with g_PlayersGame[tPlayer] do
    with g_PlayersTemp[tPlayer] do
@@ -834,9 +832,13 @@ begin
       case o_id of
       uo_build   : if(o_a0>0)then GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit,unit_start_build(o_x0,o_y0,o_a0,tPlayer),-1,-1);
       uo_corder  : begin
-                      tar_d :=tar_d.MaxValue;
-                      tar_u :=nil;
-                      tar_ex:=false;
+                      tar_d     :=tar_d.MaxValue;
+                      tar_u     :=nil;
+                      tar_ex    :=false;
+                      toall_n   :=0;
+                      toall_msg :=0;
+                      toall_msgx:=0;
+                      toall_msgy:=0;
 
                       for u:=1 to MaxUnits do
                       begin
@@ -858,7 +860,23 @@ begin
                               if(isselected)then
                                 case o_x0 of
                                 // TO ONE
-                                co_ability  : if(unit_OrderCheckAbility(pu,o_a0))then UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_AbilityCheck    (pu,o_a0     ,false)=0,false,true );
+                                co_ability  : if(unit_OrderCheckAbility(pu,o_a0))then
+                                                case g_aids[o_a0].ua_OrderToAll of
+                                                false: UnitOrderSetNearestTarget(pu,o_x1,o_y1,@tar_u,@tar_d,@tar_ex,unit_AbilityCheck    (pu,o_a0     ,false)=0,false,true );
+                                                true : begin
+                                                          toall_msg:=unit_AbilityCheck(pu,o_a0,false);
+                                                          if(toall_msg=0)then
+                                                          begin
+                                                             unit_SetAbilityOrder(pu,o_a0,o_y0,o_x1,o_y1,false);
+                                                             toall_n+=1;
+                                                          end
+                                                          else
+                                                          begin
+                                                             toall_msgx:=pu^.x;
+                                                             toall_msgy:=pu^.y;
+                                                          end;
+                                                       end;
+                                                end;
 
                                 // TO ALL
                                 co_destroy  : unit_kill(pu,false,false,true,false,true);
@@ -902,7 +920,9 @@ begin
                         co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_NeedProdUnit ,-1,-1);
                         co_cunit   : ;
                         co_pcancle : GameLog_ReqMsg(tPlayer,0   ,255             ,lmt_Invalid_Order,-1,-1);
-                        co_ability : ;
+                        co_ability : if(toall_n=0)and(toall_msg>0)then
+                                       if(g_aids[o_a0].ua_OrderToAll)then
+                                         GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_ability,toall_msg,toall_msgx,toall_msgy);
                         end;
                    end;
       end;
@@ -920,6 +940,10 @@ begin
      with g_PlayersTemp[p] do
        if(state>ps_None)then
        begin
+          {$IFDEF TESTMODE}
+          if(TestMode>0)and(state=ps_AI)and(isdefeated)then isobserver:=(p=LocalPlayer);
+          {$ENDIF}
+
           if(state=ps_human)and(net_status=ns_server){$IFDEF _FULLGAME}and(p<>LocalPlayer){$ENDIF}then
           begin
              if(net_ttl<net_ttl.MaxValue)then net_ttl+=1;
@@ -1342,7 +1366,7 @@ begin
 
    case param_type of
    nmid_lobby_MScenario      : begin ScrollByteSet(@map_scenario,forward,@allmapscenarios);PlayersValidateTeam;Map_Make;end;
-   nmid_lobby_MGenerators    : begin ScrollByte   (@map_generators,forward,0,mapg_Last);Map_Make;end;
+   nmid_lobby_MGenerators    : begin ScrollByte   (@map_GeneratorT,forward,0,mapg_Last);end;
    nmid_lobby_MSize          : begin
                                   case forward of
                                   true : ScrollInt(@map_Size1, map_SizeMenuStep,map_MinSize,map_MaxSize);
@@ -1410,6 +1434,8 @@ begin
           ui_cam_y:=(ui_cam_y+(cam_y+(cam_h div 2)-ui_cam_hh)) div 2;
           ui_Camera_Bounds;
        end;
+
+   apm_Calc;
 
    replay_Code;
 

@@ -339,7 +339,7 @@ end;
 //
 
 procedure snd_StopSoundSource(sss:byte);
-var i:integer;
+var i:byte;
 begin
    if(sss>=sss_count)then exit;
 
@@ -347,6 +347,14 @@ begin
     if(snd_srcset_n>0)then
      for i:=0 to snd_srcset_n-1 do
       with snd_srcset_l[i] do alSourceStop(snd_src_source);
+end;
+
+procedure snd_StopSoundSourceAll;
+var i:byte;
+begin
+   for i:=0 to sss_count-1 do
+     if(i<>sss_music)then
+       snd_StopSoundSource(i);
 end;
 
 procedure snd_SoundResetAllSources;
@@ -508,21 +516,22 @@ lmt_chat_player0..
 lmt_chat_player7        : if((lm_type-lmt_chat_player0)<>PListener)then snd_SoundPlayUI(snd_chat);
 lmt_player_leave        : if(not g_started)
                           or(g_PlayersGame[LocalPlayer].isobserver)then snd_SoundPlayUI(snd_chat);
-lmt_player_revealed,
-lmt_player_surrender,
 lmt_chat_common,
 lmt_game_message        : snd_SoundPlayUI(snd_chat);
-lmt_game_ReadyToStart   : snd_SoundPlayAnoncer(snd_PowerUp,false,true);
+lmt_game_ReadyToStart   : snd_SoundPlayUI(snd_PowerUp);
 lmt_game_BreakStarting  : ;
 lmt_game_StartsIn,
-lmt_game_ResetIn        : snd_SoundPlayAnoncer(snd_Stink,false,true);
+lmt_game_ResetIn        : snd_SoundPlayUI(snd_Stink);
 // Basic
+
 lmt_game_end            : if(lm_data_u<=LastPlayer)then
                             if(lm_data_u=team)
                             then snd_SoundPlayAnoncer(snd_victory[race],false,true)
                             else snd_SoundPlayAnoncer(snd_defeat [race],false,true);
 lmt_game_Paused         : snd_SoundPlayAnoncer(snd_SwitchOn ,false,true);
 lmt_game_Resumed        : snd_SoundPlayAnoncer(snd_SwitchOff,false,true);
+lmt_player_revealed,
+lmt_player_surrender    : snd_SoundPlayAnoncer(snd_chat,false,true);
 lmt_player_ready,
 lmt_player_nready       : ;
 lmt_player_defeated     : if(lm_data_u<=LastPlayer)and(g_status=gs_running)then
@@ -534,7 +543,8 @@ lmt_unit_ready          : with g_uids[lm_data_u] do
                           snd_SoundPlayUnitCommand(uid_snd_ready);
 lmt_upgrade_complete    : snd_SoundPlayAnoncer(snd_upgrade_complete[race],true ,false);
 lmt_prod_BadPlace       : snd_SoundPlayAnoncer(snd_cannot_build    [race],true ,false);
-lmt_allies_attacked     : snd_SoundPlayAnoncer(snd_mapmark               ,false,false);
+
+lmt_allies_attacked     : snd_SoundPlayMMapAlarm(snd_mapmark,false);
 lmt_unit_attacked       : with g_uids[lm_data_u] do
                           snd_SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
 lmt_markAttack          : snd_SoundPlayMMapAlarm(snd_mapmark,false);
@@ -543,11 +553,11 @@ lmt_markLook            : snd_SoundPlayMMapAlarm(snd_Stink  ,false);
 // Key Point Events
 lmt_Req_Energy          : snd_SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 lmt_koth_control,
-lmt_kpoint_captured     : snd_SoundPlayAnoncer(snd_KeyPointControl,true,false);
-lmt_kpoint_lost         : snd_SoundPlayAnoncer(snd_KeyPointLost ,false,false);
-lmt_ngen_captured       : snd_SoundPlayAnoncer(snd_GeneratorCapture,true,false);
+lmt_kpoint_captured     : snd_SoundPlayAnoncer(snd_KeyPointControl ,true ,false);
+lmt_kpoint_lost         : snd_SoundPlayAnoncer(snd_KeyPointLost    ,false,false);
+lmt_ngen_captured       : snd_SoundPlayAnoncer(snd_GeneratorCapture,true ,false);
 lmt_ngen_exh,
-lmt_ngen_lost           : snd_SoundPlayAnoncer(snd_GeneratorLost,false,false);
+lmt_ngen_lost           : snd_SoundPlayAnoncer(snd_GeneratorLost   ,false,false);
 
 lmt_invalid_Target,
 lmt_ability_BadPlace,
@@ -568,6 +578,7 @@ lmt_Req_UACLoot,
 lmt_upgrade_InProgress,
 lmt_prod_AllBusy,
 lmt_prod_BadOrder,
+lmt_prod_CD,
 lmt_prod_Unavailable,
 lmt_Invalid_Order       : snd_SoundPlayAnoncer(snd_cant_order[race],true,false);
 

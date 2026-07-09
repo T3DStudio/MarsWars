@@ -105,7 +105,7 @@ begin
 
    AddItem(@g_version           ,SizeOf(g_version     ));
    AddItem(@map_scenario        ,SizeOf(map_scenario  ));
-   AddItem(@map_generators      ,SizeOf(map_generators));
+   AddItem(@map_GeneratorT      ,SizeOf(map_GeneratorT));
    AddItem(@map_seed            ,SizeOf(map_seed      ));
    AddItem(@map_Size1           ,SizeOf(map_Size1     ));
    AddItem(@map_Template        ,SizeOf(map_Template  ));
@@ -460,7 +460,7 @@ begin
 
          if(map_Size1<map_MinSize)or(map_Size1>map_MaxSize)
          or(map_Template  >mapt_Last)
-         or(map_Generators>mapg_Last)
+         or(map_GeneratorT>mapg_Last)
          or not(map_scenario in allmapscenarios)
          or(rpls_player>LastPlayer)then
          begin
@@ -561,6 +561,11 @@ begin
 
       if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;
+      if(rpls_file_pos>=rpls_file_size)then
+      begin
+         rpls_ForwardSkip:=0;
+         break;
+      end;
    end;
    if(rpls_ForwardSkip=0)then rpls_FastSkip:=false;
 

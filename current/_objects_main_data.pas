@@ -131,7 +131,7 @@ begin
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isbuilder       := true;
-   uid_prod_Buildings  := [UID_HKeep..UID_HCommandCenter]-[UID_HAKeep,UID_HSymbol2,UID_HSymbol3,UID_HSymbol4,UID_HACommandCenter,UID_HBarracks,UID_HEye];
+   uid_prod_Buildings  := [UID_HKeep..UID_HCommandCenter]-[UID_HAKeep,UID_HACommandCenter,UID_HBarracks,UID_HEye];
    uid_ability1        := uab_HKeepShift;
    uid_ability2        := uab_HKeepAura;
 
@@ -183,44 +183,6 @@ begin
    uid_isforge         := true;
    uid_ability3        := uab_ToHPools;
    uid_AI_NextFormUID  := i;
-end;
-
-// ENERGY PROD
-UID_HSymbol1,
-UID_HSymbol2,
-UID_HSymbol3,
-UID_HSymbol4:
-begin
-   uid_MaxHits1        := 1000;
-   uid_gen_EnergyLevel := 50;
-   uid_r               := 22;
-   uid_uibtn           := 2;
-   uid_ProdTimeSec     := ptime1;
-   uid_Regen_Base      := BaseRegenh;
-   uid_isbuilding      := true;
-   uid_islight         := false;
-   uid_ismech          := false;
-   uid_Armor_upgr1     := upgr_hell_BuildArmor;
-   uid_Regen_Upgr      := upgr_hell_BuildRestore;
-
-   case i of
-UID_HSymbol1: begin
-              uid_ability3       := uab_ToHSymbol2;
-              uid_AI_NextFormUID := UID_HSymbol2;
-              end;
-UID_HSymbol2: begin
-              uid_gen_EnergyLevel*= 2;
-              uid_ability3       := uab_ToHSymbol3;
-              uid_AI_NextFormUID := UID_HSymbol3;
-              end;
-UID_HSymbol3: begin
-              uid_gen_EnergyLevel*= 3;
-              uid_ability3       := uab_ToHSymbol4;
-              uid_AI_NextFormUID := UID_HSymbol4;
-              end;
-UID_HSymbol4: uid_gen_EnergyLevel*= 4;
-   end;
-   uid_req_EnergyLevel := uid_gen_EnergyLevel;
 end;
 
 // TECH
@@ -497,8 +459,8 @@ begin
    uid_LimitUse        := ul1h;
    uid_islight         := false;
    uid_arms_BonusAntiFlyRange:=100;
-   SetWeapon(0,wpt_missle   ,aw_srange ,0,0          ,fr_fps1,MID_Revenant ,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Revenant],[],0,-7,0,dm_AntiFly2);
-   SetWeapon(1,wpt_directdmg,aw_dmelee ,0,BaseDamage1,fr_fps1,0            ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Revenant],[],0, 0,0,0);
+   SetWeapon(0,wpt_missle   ,aw_srange ,0,0           ,fr_fps1,MID_Revenant ,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Revenant],[],0,-7,0,dm_AntiFly2);
+   SetWeapon(1,wpt_directdmg,aw_dmelee ,0,BaseDamage1h,fr_fps1,0            ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Revenant],[],0, 0,0,0);
 end;
 UID_Cacodemon :
 begin
@@ -588,7 +550,7 @@ begin
    uid_SightR_Base     := 375;
    uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 8;
-   uid_PainState_Base  := 10;
+   uid_PainState_Base  := 12;
    uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HMonastery;
@@ -1086,7 +1048,7 @@ UID_UCommandCenter : begin
                      uid_ability2        := uab_UACCCLandTo;
                      uid_ability3        := uab_ToUACommandCenter;
                      uid_AI_NextFormUID  := UID_UACommandCenter;
-                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_URMStation]-[UID_UGenerator2,UID_UGenerator3,UID_UGenerator4,UID_UACommandCenter];
+                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_URMStation]-[UID_UACommandCenter];
                      uid_SightR_upgr     := upgr_uac_BuilderR;
                      uid_Armor_upgr1     := upgr_uac_BuildArmor;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fps1,MID_Flyer,0,upgr_uac_CCAttack,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all,[],3,-65,0,0);
@@ -1098,7 +1060,7 @@ UID_UACommandCenter: begin
                      uid_ZombieUID       := UID_HACommandCenter;
                      uid_ability1        := uab_UACCCLand;
                      uid_ability2        := uab_UACCCLandTo;
-                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_URMStation]-[UID_UGenerator2,UID_UGenerator3,UID_UGenerator4,UID_UACommandCenter];
+                     uid_prod_Buildings  :=[UID_UCommandCenter..UID_URMStation]-[UID_UACommandCenter];
                      uid_SightR_upgr     := upgr_uac_BuilderR;
                      uid_Armor_upgr1     := upgr_uac_BuildArmor;
                      SetWeapon(0,wpt_missle,aw_srange,uid_r,0,fr_fps1,MID_Flyer,0,upgr_uac_CCAttack,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any+wpr_move,uids_all,[],3,-65,0,0);
@@ -1112,7 +1074,7 @@ UID_HCommandCenter : begin
                      uid_ability2        := uab_HellCCLandTo;
                      uid_ability3        := uab_ToHACommandCenter;
                      uid_AI_NextFormUID  := UID_HACommandCenter;
-                     uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HFTower,UID_HBarracks,UID_HEyeNest];
+                     uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HFTower,UID_HBarracks,UID_HEyeNest];
                      uid_Regen_Base      := BaseRegenh;
                      uid_Regen_Upgr      := upgr_hell_BuildRestore;
                      uid_Armor_upgr1     := upgr_hell_BuildArmor;
@@ -1126,7 +1088,7 @@ UID_HACommandCenter: begin
                      uid_uibtn           := 3;
                      uid_ability1        := uab_HellCCLand;
                      uid_ability2        := uab_HellCCLandTo;
-                     uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HSymbol1,UID_HFTower,UID_HBarracks,UID_HEyeNest];
+                     uid_prod_Buildings  :=[UID_HKeep,UID_HCommandCenter,UID_HFTower,UID_HBarracks,UID_HEyeNest];
                      uid_Regen_Base      := BaseRegenh;
                      uid_Regen_Upgr      := upgr_hell_BuildRestore;
                      uid_Armor_upgr1     := upgr_hell_BuildArmor;
@@ -1199,43 +1161,6 @@ begin
    uid_AI_NextFormUID  := i;
    uid_prod_Upgrades   := [];
 end;
-
-// ENERGY PROD
-UID_UGenerator1,
-UID_UGenerator2,
-UID_UGenerator3,
-UID_UGenerator4:
-begin
-   uid_MaxHits1        := 2000;
-   uid_gen_EnergyLevel := 100;
-   uid_r               := 38;
-   uid_uibtn           := 2;
-   uid_ProdTimeSec     := ptime1;
-   uid_Armor_upgr1     := upgr_uac_BuildArmor;
-   uid_isbuilding      := true;
-   uid_ismech          := true;
-   uid_LimitUse        := ul2;
-
-   case i of
-UID_UGenerator1: begin
-                 uid_ability3       := uab_ToUGenerator2;
-                 uid_AI_NextFormUID := UID_UGenerator2;
-                 end;
-UID_UGenerator2: begin
-                 uid_gen_EnergyLevel*= 2;
-                 uid_ability3       := uab_ToUGenerator3;
-                 uid_AI_NextFormUID := UID_UGenerator3;
-                 end;
-UID_UGenerator3: begin
-                 uid_gen_EnergyLevel*= 3;
-                 uid_ability3       := uab_ToUGenerator4;
-                 uid_AI_NextFormUID := UID_UGenerator4;
-                 end;
-UID_UGenerator4: uid_gen_EnergyLevel*= 4;
-   end;
-   uid_req_EnergyLevel := uid_gen_EnergyLevel;
-end;
-
 
 // BASE TECH
 UID_UScienceCenter :
@@ -1475,7 +1400,7 @@ begin
    uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
    uid_Armor_upgr1     := upgr_uac_MechArmor;
    uid_SightR_upgr     := upgr_uac_UnitSightR;
-   uid_SightR_Base     := 300;
+   uid_SightR_Base     := 275;
    uid_uibtn           := 13;
    uid_ProdTimeSec     := ptime1;
    uid_isfly           := uf_fly;
@@ -1915,6 +1840,7 @@ begin
       ua_req_upgr    :=0;
       ua_req_uid     :=0;
       ua_rldDec_level:=0;
+      ua_OrderToAll  :=false;
 
       case a of
 uab_Teleport        : begin
@@ -2005,6 +1931,7 @@ uab_UACGeneral         : begin
 
 uab_SpawnLost       : begin
                          ua_type        := uat_NoTarget;
+                         ua_OrderToAll  := true;
                       end;
 uab_SpawnLostTo     : begin
                          ua_type        := uat_Point;
@@ -2013,6 +1940,7 @@ uab_SpawnLostTo     : begin
 uab_UACCCLand       : begin
                          ua_type        := uat_NoTarget;
                          ua_req_upgr    := upgr_uac_CCFly;
+                         ua_OrderToAll  := true;
                       end;
 uab_UACCCLandTo     : begin
                          ua_type        := uat_Point;
@@ -2021,6 +1949,7 @@ uab_UACCCLandTo     : begin
 
 uab_HellCCLand      : begin
                          ua_type        := uat_NoTarget;
+                         ua_OrderToAll  := true;
                       end;
 uab_HellCCLandTo    : begin
                          ua_type        := uat_Point;
@@ -2029,6 +1958,7 @@ uab_HellCCLandTo    : begin
 
 uab_Unload          : begin
                          ua_type        := uat_NoTarget;
+                         ua_OrderToAll  := true;
                       end;
 uab_UnloadTo        : begin
                          ua_type        := uat_Point;
@@ -2047,9 +1977,6 @@ uab_ToUACDron       : begin
                          ua_req_upgr    := upgr_uac_DronTurret;
                       end;
 uab_ToHAKeep,
-uab_ToHSymbol2,
-uab_ToHSymbol3,
-uab_ToHSymbol4,
 uab_ToHACommandCenter: ua_type        := uat_NoTarget;
 
 uab_ToHGate,
@@ -2060,9 +1987,6 @@ uab_ToHBarracks     : begin
                       end;
 
 uab_ToUACommandCenter,
-uab_ToUGenerator2,
-uab_ToUGenerator3,
-uab_ToUGenerator4,
 uab_ToUAGTurret,
 uab_ToUAATurret     : ua_type        := uat_NoTarget;
 
@@ -2214,4 +2138,6 @@ begin
    InitDMODs;
 
    InitUnitBalanceData;
+
+   map_Start2GeneratorStep:=round((keyPoint_GenNB+g_uids[UID_HKeep].uid_r)/1.415);
 end;

@@ -143,8 +143,8 @@ begin
       if(tu^.aiu_alarm_d<NOTSET)
       and(tu^.mapZone=tu^.aiu_alarm_zone)
       and(tu^.mapZone<>mapZone)
-      and(not map_IfObstacleZone(tu^.aiu_alarm_zone))
-      and(not map_IfObstacleZone(tu^.mapZone))then
+      and(not map_IsObstacleZone(tu^.aiu_alarm_zone))
+      and(not map_IsObstacleZone(tu^.mapZone))then
         setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for KOTH
@@ -152,7 +152,7 @@ begin
         with map_KeyPointsL[0] do
           if (tu^.mapZone=kp_Zone)
           and(tu^.mapZone<>mapZone)
-          and(not map_IfObstacleZone(kp_Zone))then
+          and(not map_IsObstacleZone(kp_Zone))then
             setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for generator capture
@@ -412,15 +412,16 @@ begin
 
         { if(tu^.uid^.uid_ability=uab_UACScan)then ai_radars+=1;  }
          // transportU
-         if(not tu^.uid^.uid_isbuilding)then
+         if (not tu^.uid^.uid_isbuilding)
+         and(map_NeedTransport)then
          begin
-            if(tu^.transportM>0)and(tu^.isfly)then ai_transport_cur+=tu^.transportM;
-            if(tu^.transportM=tu^.transportC)and(not tu^.isfly)and(tu^.uid^.uid_CanAttack)then
-            begin
-               ai_armylimit_ForTeleport+=tu^.uid^.uid_LimitUse;
-               if(map_NeedTransport)then
-               ai_transport_need       +=tu^.uid^.uid_TransportSize;
-            end;
+            if (tu^.transportM>0)
+            and(tu^.isfly)then ai_transport_cur+=tu^.transportM;
+
+            if (tu^.transportM=tu^.transportC)
+            and(not tu^.isfly)
+            and(tu^.uid^.uid_CanAttack)then
+              ai_transport_need+=tu^.uid^.uid_TransportSize;
          end;
 
          if(tu^.transformTimer>0)then ai_UnitsInTransform+=1;
@@ -460,7 +461,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      pfcheck   :=(isfly)or((mapZone=tu^.mapZone)and not map_IfObstacleZone(mapZone));
+      pfcheck   :=(isfly)or((mapZone=tu^.mapZone)and not map_IsObstacleZone(mapZone));
       busyHealer:=false;
       if(tu^.uid^.uid_AI_healer)and(isUnitRange(tu^.a_tar,@tmpu))then
         if(tmpu^.player^.team=team)then busyHealer:=true;

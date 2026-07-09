@@ -84,6 +84,19 @@ begin
       ai_RunTo(pu,nil,tar_x,tar_y,tar_dist,wrect);
    end;
 end;
+function GroundCommanderAllowed:boolean;
+begin
+   GroundCommanderAllowed:=false;
+
+   if(ai_commander_grd_u^.group=aic_group_AttackWait)
+   or(pu^.player^.units_bld_l[true]<=0)then exit;
+
+   if(pu^.group=aic_group_GenAssault)and(ai_generator_d<NOTSET)then
+     if(map_IsObstacleZone(ai_generator_kp^.kp_Zone))then exit;
+
+   GroundCommanderAllowed:=true;
+end;
+
 function FollowCommander:boolean;
 var
 commander_d:integer;
@@ -97,8 +110,8 @@ begin
    begin
       commander_u:=ai_commander_fly_u;
       commander_d:=ai_commander_fly_d;
-      if(ai_commander_grd_u<>nil)and(pu^.player^.units_bld_l[true]>0)then
-        if(ai_commander_grd_u^.group<>aic_group_AttackWait)then
+      if(ai_commander_grd_u<>nil)then
+        if(GroundCommanderAllowed)then
         begin
            commander_u:=ai_commander_grd_u;
            commander_d:=ai_commander_grd_d;
@@ -169,7 +182,7 @@ begin
                uo_id:=unit_Ability2Act(pu,uab_Unload);
                TransportDropAndRunOut:=true;
             end;
-     false: if(ai_enemy_battle_d<base_r1)and(buffs[ub_damaged]>0)then   //???
+     false: if(ai_enemy_battle_d<base_r1)and(buffs[ub_damaged]>0)then
             begin
                ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
                TransportDropAndRunOut:=true;
@@ -283,16 +296,15 @@ begin
    with uid^ do
    with player^ do
      NeedCaptureGenerators:=(ai_generator_d<NOTSET)
-                         and(map_generators>0)
                          and(ai_energy_future<aip_MaxEnergy)
-                         and(uid_LimitUse<=keyPoint_MaxLimitAI)
+                         and(uid_LimitUse<=aic_keyPoint_LimitMax)
                          and(uid_AI_TargetWeight=0);
 end;
 procedure CheckSetGeneratorGuard;
 begin
    with pu^ do
    with uid^ do
-     if(ai_generator_d<srange)and(ai_nearGenGuards<keyPoint_MinLimit)and(uid_AI_TargetWeight=0)then
+     if(ai_generator_d<srange)and(ai_nearGenGuards<aic_keyPoint_LimitMin)and(uid_AI_TargetWeight=0)then
        group:=aic_group_GenGuard;
 end;
 procedure SetGroupsForHome;
@@ -525,13 +537,15 @@ begin
                                    end
                                    else
                                    begin
-                                      if(ai_HTeleportRemote_u<>nil)then
-                                        ai_UnitAbility(ai_HTeleportRemote_u,uab_Recall,unum,0,0);
-
-                                      if(not FollowCommander)then
-                                        ai_BaseIdle(pu,aic_BaseIdle_r);
+                                      if(ai_HTeleportRemote_u<>nil)
+                                      then ai_UnitAbility(ai_HTeleportRemote_u,uab_Recall,unum,0,0)
+                                      else
+                                        case isfly of
+                                        false: if(not FollowCommander)then
+                                                ai_BaseIdle(pu,aic_BaseIdle_r);
+                                        true : ai_DefaultIdle(pu);
+                                        end;
                                    end;
-
       aic_group_Scout          : begin
                                     uo_id:=ua_move;
                                     if(ai_enemy_battle_u<>nil)and(ai_enemy_battle_d<srange)
@@ -550,18 +564,19 @@ begin
         end
         else
         begin
-           case uidi of
-           UID_Phantom,
-           UID_LostSoul: if(ai_generator_d<NOTSET)then
-                           if(uidi<>UID_Phantom)or(ai_generator_d<ai_ZombieTarget_d)then
-                             with ai_generator_kp^ do
-                             begin
+           if(ai_choosen)then
+             case uidi of
+             UID_Phantom,
+             UID_LostSoul: if(ai_generator_d<NOTSET)then
+                             if(uidi<>UID_Phantom)or(ai_generator_d<ai_ZombieTarget_d)then
+                               with ai_generator_kp^ do
+                               begin
 
-                                if(ai_generator_d>srange)then uo_id:=ua_move;
-                                ai_RunTo(pu,nil,kp_x,kp_y,ai_generator_d,aic_BaseIdle_r);
-                                exit;
-                             end;
-           end;
+                                  if(ai_generator_d>srange)then uo_id:=ua_move;
+                                  ai_RunTo(pu,nil,kp_x,kp_y,ai_generator_d,aic_BaseIdle_r);
+                                  exit;
+                               end;
+             end;
            case uidi of
            UID_Pain     : if (min2i(x,abs(map_Size1-x))>srange)
                           and(min2i(y,abs(map_Size1-y))>srange)then

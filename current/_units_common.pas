@@ -835,7 +835,7 @@ begin
       or(pTBeacon^.hits<=0)then exit;
 
       if(isfly=uf_ground)then
-        if(map_IfObstacleZone(pTBeacon^.mapZone))then exit;
+        if(map_IsObstacleZone(pTBeacon^.mapZone))then exit;
 
       pTeleporter^.rpoint_x:=pTBeacon^.x;
       pTeleporter^.rpoint_y:=pTBeacon^.y;

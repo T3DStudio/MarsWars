@@ -92,7 +92,7 @@ begin
    0 : case camp_mis_sel of
        0 : begin
               map_scenario  :=mc_ffa8;
-              map_generators:=0;
+              map_GeneratorT:=0;
               map_seed      :=666;
               map_Size1     :=4000;
               map_Template  :=mapt_cave;
@@ -114,7 +114,7 @@ begin
               camp_CreateUnit(4,map_PlayerStartX[4]-150,map_PlayerStartY[4]-150,UID_UCommandCenter);
               camp_CreateUnit(4,map_PlayerStartX[4]+150,map_PlayerStartY[4]+150,UID_UPortal);
 
-              PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HSymbol1..UID_HSymbol4,UID_HPools,UID_HFTower,
+              PlayerSetAllowedUnits(LocalPlayer,[ UID_HGate,UID_HPools,UID_HFTower,
                                                   UID_Imp,UID_Demon], MaxUnits,true);
            end;
        end;

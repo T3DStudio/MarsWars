@@ -142,7 +142,6 @@ i,p,
 tCapturingPlayer,
 tPlayers,
 tTeams  : integer;
-cLimit  : longint;
 begin
    Scenario_KeyPointsTeam;
 
@@ -174,22 +173,18 @@ begin
              continue;
           end;
 
-          if(kp_Energy>0)
-          then cLimit:=keyPoint_MinLimit
-          else cLimit:=ul1;
-
           tPlayers:=0;
           tCapturingPlayer:=kptd_OwnerPlayer;
           kp_LimitPlayerP :=kp_LimitPlayerC;
           kp_LimitTeamP   :=kp_LimitTeamC;
           if(kptd_OwnerPlayer<=LastPlayer)then
-            if(kp_LimitPlayerC[kptd_OwnerPlayer]>=cLimit)then
+            if(kp_LimitPlayerC[kptd_OwnerPlayer]>=kp_CaptureLimit)then
             begin
                tPlayers:=1;
                tCapturingPlayer:=kptd_OwnerPlayer;
             end;
           if(kptd_TimerOwnerPlayer<=LastPlayer)then
-            if(kp_LimitPlayerC[kptd_TimerOwnerPlayer]>=cLimit)then
+            if(kp_LimitPlayerC[kptd_TimerOwnerPlayer]>=kp_CaptureLimit)then
             begin
                tPlayers:=1;
                tCapturingPlayer:=kptd_TimerOwnerPlayer;
@@ -198,12 +193,12 @@ begin
           tTeams:=0;
           for p:=0 to LastPlayer do
           begin
-             if(kp_LimitPlayerC[p]>=cLimit)and(p<>kptd_OwnerPlayer)and(p<>kptd_TimerOwnerPlayer)then
+             if(kp_LimitPlayerC[p]>=kp_CaptureLimit)and(p<>kptd_OwnerPlayer)and(p<>kptd_TimerOwnerPlayer)then
              begin
                 if(tPlayers=0)then tCapturingPlayer:=p;
                 tPlayers+=1;
              end;
-             if(kp_LimitTeamC  [p]>=cLimit)then
+             if(kp_LimitTeamC  [p]>=kp_CaptureLimit)then
                tTeams+=1;
 
              kp_LimitPlayerC[p]:=0;

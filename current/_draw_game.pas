@@ -506,7 +506,6 @@ begin
       if(buffs[ub_SphereTurbo  ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereTurbo  );buffx+=buff_sprite_w;end;
       if(buffs[ub_SphereSoul   ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_SphereSoul   );buffx+=buff_sprite_w;end;
       if(buffs[ub_Heroic       ]>0)then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_Heroic       );buffx+=buff_sprite_w;end;
-      if(pain                     )then begin UnitsInfo_AddBuff(buffx,buffy,@spr_buff_Stun         );buffx+=buff_sprite_w;end;
    end;
 end;
 
@@ -637,9 +636,9 @@ begin
      if(kp_LimitPlayerC[p]>0)then
      begin
         if(defColor)
-        then col:=ui_max_color[kp_LimitPlayerC[p]>=keyPoint_MinLimit]
+        then col:=ui_max_color[kp_LimitPlayerC[p]>=kp_CaptureLimit]
         else col:=PlayerGetColorCur(p,false);
-        UnitsInfo_AddText(kp_x,kp_y+txt_line_h1+y,limit2s(kp_LimitPlayerC[p],ul1)+'/'+limit2s(keyPoint_MinLimit,ul1),col);
+        UnitsInfo_AddText(kp_x,kp_y+txt_line_h1+y,limit2s(kp_LimitPlayerC[p],ul1)+'/'+limit2s(kp_CaptureLimit,ul1),col);
         y+=txt_line_h1;
      end;
 end;
@@ -660,8 +659,11 @@ begin
 
           if(kp_Energy>0)then
           begin
-             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG        ,255);
-             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y+1,0     ,@spr_kp_gen[t mod 2],255);
+             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG  ,255);
+             if(kp_Energy=map_generators_EnergyS)
+             then i:=1
+             else i:=0;
+             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y+1,0     ,@spr_kp_gen[i],255);
              for i:=1 to 6 do
              begin
                 ddir:=(i*60)*degtorad;
@@ -698,8 +700,9 @@ begin
 
           if(kptd_VisTimer>0)then
           begin
-             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1,cr2s(kptd_lifeTime            ),c_aqua);
-             if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y            ,ir2s(kp_CaptureTime-kptd_Timer),colorN );
+             if(kp_Energy    >0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1*2,i2s(kp_Energy)                 ,c_aqua );
+             if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1 ,cr2s(kptd_lifeTime            ),c_white);
+             if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y             ,ir2s(kp_CaptureTime-kptd_Timer),colorN );
 
              y:=0;
              if(kp_Energy>0)then

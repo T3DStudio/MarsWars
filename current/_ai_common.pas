@@ -1,12 +1,10 @@
 
 const
 
-aic_MaxLimitBorder         = MaxPlayerLimit-keyPoint_MinLimit;
+aic_keyPoint_LimitMin      = map_generators_LimitO;
+aic_keyPoint_LimitMax      = aic_keyPoint_LimitMin*2;
 
-aic_GeneratorsLimit        = ul1*30;
-aic_GeneratorsEnergy       = 9000;
-aic_GeneratorsDestroyEnergy= 10000;
-aic_GeneratorsDestoryLimit = ul1*35;
+aic_MaxLimitBorder         = MaxPlayerLimit-aic_keyPoint_LimitMin;
 
 aic_TowerLifeTime          = fr_fps1*60;
 
@@ -114,7 +112,6 @@ ai_towers_near_AA,
 
 ai_near_detect,
 
-ai_need_Energy,
 ai_need_UnitProds,
 ai_need_UpgrProds,
 ai_need_Teleports,
@@ -320,7 +317,7 @@ begin
       aip_pause_magic      :=max2i(fr_fps1,fr_fps1*aSpecialPause  );
       aip_pause_superweapon:=max2i(fr_fps1,fr_fps1*aSpecialPause  );
 
-      aip_MaxUnitMinPart   :=mm3i(keyPoint_MinLimit,aip_MaxUnitLimit div 4,keyPoint_MaxLimitAI);
+      aip_MaxUnitMinPart   :=mm3i(aic_keyPoint_LimitMin,aip_MaxUnitLimit div 4,aic_keyPoint_LimitMax);
    end;
 end;
 begin
@@ -390,24 +387,23 @@ begin
       end;
       case aip_skill of
       6 : begin
-          aip_flags+=aif_cheat_VisBuildings;
+          upgrs_cur[upgr_fprod_build]:=1;
           end;
       7 : begin
-          aip_flags+=aif_cheat_VisBuildings;
-          upgrs_cur[upgr_fprod_unit ]:=1;
+          upgrs_cur[upgr_fprod_build]:=1;
+          upgrs_cur[upgr_fprod_upgr ]:=1;
           end;
       8 : begin
-          aip_flags+=aif_cheat_VisBuildings;
-          aip_flags+=aif_cheat_VisUnits;
-          upgrs_cur[upgr_fprod_unit ]:=1;
+          upgrs_cur[upgr_fprod_build]:=1;
           upgrs_cur[upgr_fprod_upgr ]:=1;
+          upgrs_cur[upgr_fprod_unit ]:=1;
           end;
       9 : begin
+          upgrs_cur[upgr_fprod_build]:=1;
+          upgrs_cur[upgr_fprod_upgr ]:=1;
+          upgrs_cur[upgr_fprod_unit ]:=1;
           aip_flags+=aif_cheat_VisBuildings;
           aip_flags+=aif_cheat_VisUnits;
-          upgrs_cur[upgr_fprod_unit ]:=1;
-          upgrs_cur[upgr_fprod_upgr ]:=1;
-          upgrs_cur[upgr_fprod_build]:=1;
           end;
       end;
    end;
@@ -507,7 +503,9 @@ begin
 end;
 
 procedure ai_Global_InitVars(pu:PTUnit);
-var i,d,w :integer;
+var
+i,d,w     :integer;
+l         :longint;
 koth_point:boolean;
 begin
    with pu^ do
@@ -549,7 +547,7 @@ begin
 
    ai_AttackGroupFlyLimit  := 0;
 
-   // transport
+   // transport & other
    ai_transport_cur        := 0;
    ai_transport_need       := 0;
    with pu^ do
@@ -559,30 +557,38 @@ begin
         if(prod_unit_uid[i]>0)then
           with g_uids[i] do
           begin
+             l:=prod_unit_uid[i]*uid_LimitUse;
+
              if(uid_isfly)
              and(not uid_isbuilding)then
              begin
                 if(uid_TransportMax_Base>0)then ai_transport_cur+=prod_unit_uid[i]*uid_TransportMax_Base;
-                if(uid_CanAttack)then ai_armylimit_fly+=prod_unit_uid[i]*uid_LimitUse;
+                if(uid_CanAttack)then ai_armylimit_fly+=l;
              end;
 
-             if(uid_AI_Siedge)then ai_armylimit_siedge+=uid_LimitUse*prod_unit_uid[i];
+             if(uid_AI_Siedge)then ai_armylimit_siedge+=l;
           end;
-        if(units_uid_c[i]>0)then
-          with g_uids[i] do
-            if(uid_AI_Siedge)then
-              ai_armylimit_siedge+=units_uid_c[i]*uid_LimitUse;
 
         if(units_uid_c[i]>0)then
           with g_uids[i] do
           begin
+             l:=units_uid_c[i]*uid_LimitUse;
+             if(uid_AI_Siedge)
+             then ai_armylimit_siedge+=l;
+
              if(uid_isbuilding)
-             then ai_armylimit_alive_b+=units_uid_c[i]*uid_LimitUse
-             else ai_armylimit_alive_u+=units_uid_c[i]*uid_LimitUse;
+             then ai_armylimit_alive_b+=l
+             else ai_armylimit_alive_u+=l;
+
+             if (not uid_isbuilding)
+             and(not uid_isfly)
+             and(uid_CanAttack)
+             then ai_armylimit_ForTeleport+=l;
 
              if(uid_isfly)
              and(not uid_isbuilding)
-             and(uid_CanAttack)then ai_armylimit_fly+=units_uid_c[i]*uid_LimitUse;
+             and(uid_CanAttack)
+             then ai_armylimit_fly+=l;
           end;
      end;
 
@@ -661,7 +667,7 @@ begin
 
              if(transportM>0)
              or(not isfly)then
-               if(map_IfObstacleZone(kp_zone))then continue;
+               if(map_IsObstacleZone(kp_zone))then continue;
 
              if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
              or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
@@ -681,14 +687,17 @@ begin
 
              d:=point_dist_int(kp_x,kp_y,x,y);
 
-             if(kptd_OwnerTeam>LastPlayer)and(kp_Energy>0)
-             then w:=d div 3
-             else w:=d;
-
-             //uid_LimitUse
              if(not koth_point)then
-               if((kp_LimitPlayerP[playeri]>=(keyPoint_MinLimit  +uid_LimitUse))and(d> kp_RCapture))
-               or((kp_LimitPlayerP[playeri]> (keyPoint_MaxLimitAI+uid_LimitUse))and(d<=kp_RCapture))then continue;
+               if((kp_LimitPlayerP[playeri]>=(aic_keyPoint_LimitMin+uid_LimitUse))and(d> kp_RCapture))
+               or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
+
+             if(kptd_OwnerTeam<=LastPlayer)
+             or(kp_Energy<=0)
+             then w:=d
+             else
+               if(kp_Energy>map_generators_EnergyS)
+               then w:=d div 3
+               else w:=d div 2;
 
              case(kp_Energy>0)and(not koth_point)of
              true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_w,@ai_generator_d,@map_KeyPointsL[i],w,d,pu);

@@ -127,9 +127,9 @@ begin
      end;
 end;
 
-function map_IfObstacleZone(zone:word):boolean;
+function map_IsObstacleZone(zone:word):boolean;
 begin
-   map_IfObstacleZone:=(zone=zone_solid);
+   map_IsObstacleZone:=(zone=zone_solid);
 end;
 
 function map_GetZone(mx,my:integer;mr:integer=0):word;
@@ -177,7 +177,7 @@ begin
           exit;
        end;
 
-   map_BusyCenter:=map_IfObstacleZone(map_GetZone(map_SizeH,map_SizeH));
+   map_BusyCenter:=map_IsObstacleZone(map_GetZone(map_SizeH,map_SizeH));
 end;
 
 function map_ObstacleR(obs_f:byte):integer;
@@ -273,11 +273,11 @@ end;
 procedure map_CalcLakeR(ro,ri:pinteger);
 var t0,t1:integer;
 begin
-   t0:=round(map_size1/3  );
+   t0:=round(map_size1/3.3);
    t1:=round(map_size1/2.6);
    ro^:=t1;//t0+g_random(t1-t0);
    t0:=round(map_size1/5  );
-   t1:=round(map_size1/3.5);
+   t1:=round(map_size1/3.6);
    ri^:=t0+g_random(t1-t0);
 end;
 
@@ -474,10 +474,12 @@ begin
      end;
 end;
 
-function map_KeyPoints_Add(akpx,akpy,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal):boolean;
+function map_KeyPoints_Add(akpx,akpy,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal;aCaptureLimit:longint):boolean;
 begin
    map_KeyPoints_Add:=false;
    if(map_KeyPointsN>=MaxKeyPoints)then exit;
+
+   if(aCaptureLimit<ul1)then aCaptureLimit:=ul1;
 
    with map_KeyPointsL  [map_KeyPointsN] do
    {$IFDEF _FULLGAME}
@@ -486,19 +488,20 @@ begin
      with kp_TeamData[MaxPlayers] do
      if(not kptd_Active)then
      begin
-        kp_x          :=akpx;
-        kp_y          :=akpy;
-        kp_ToCenterD  :=point_dist_int(kp_x,kp_y,map_Sizeh,map_Sizeh);
-        kp_RNoBuild   :=aNoBuildR;
-        kp_Energy     :=aEnergy;
-        kp_RCapture   :=aCaptureR;
-        kp_CaptureTime:=aCaptureTime;
-        kptd_Active   :=true;
-        kptd_lifeTime :=aLifeTime;
+        kp_x           :=akpx;
+        kp_y           :=akpy;
+        kp_ToCenterD   :=point_dist_int(kp_x,kp_y,map_Sizeh,map_Sizeh);
+        kp_RNoBuild    :=aNoBuildR;
+        kp_Energy      :=aEnergy;
+        kp_RCapture    :=aCaptureR;
+        kp_CaptureTime :=aCaptureTime;
+        kp_CaptureLimit:=aCaptureLimit;
+        kptd_Active    :=true;
+        kptd_lifeTime  :=aLifeTime;
         {$IFDEF _FULLGAME}
-        kpmmx         :=round(map_MiniMap_cx*kp_x);
-        kpmmy         :=round(map_MiniMap_cx*kp_y);
-        kpmmr         :=round(map_MiniMap_cx*kp_RCapture);
+        kpmmx          :=round(map_MiniMap_cx*kp_x);
+        kpmmy          :=round(map_MiniMap_cx*kp_y);
+        kpmmr          :=round(map_MiniMap_cx*kp_RCapture);
         {$ENDIF}
         map_KeyPoints_Add:=true;
         map_KeyPointsN+=1;
@@ -549,18 +552,16 @@ begin
    end;
 end;}
 
-procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
+procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal;aCaptureLimit:longint);
 const max_attempts = 500;
 var
 ix,iy,
 sx,sy,
 u,b,
-success,
 attempts:integer;
 begin
    u:=aCaptureR;
    b:=map_Size1-(u*2);
-   success:=0;
 
    while(acount>0)do
    begin
@@ -581,24 +582,16 @@ begin
          if(sx<>NOTSET)then
            if(map_KeyPoints_CheckPos(sx,sy,aCaptureR))then continue;
 
-         if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))
-         then exit
-         else success+=1;
+         if(not map_KeyPoints_Add(ix,iy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime,aCaptureLimit))
+         then exit;
 
          if(sx<>NOTSET)then
-           if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime))
-           then exit
-           else success+=1;
+           if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime,aCaptureLimit))
+           then exit;
 
          break;
       end;
    end;
-
-   {if(success<map_MaxPlayers)and(map_MaxPlayers>0)then
-   begin
-      b:=map_MaxPlayers-success;
-      map_KeyPoints_Rect(map_SizeH,map_SizeH,map_SizeH-u,map_SymmetryDir+((360 div map_MaxPlayers) div 2),b,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime);
-   end;  }
 end;
 
 procedure map_KeyPoints_Create;
@@ -607,24 +600,20 @@ begin
    KeyPoints_Clear;
 
    case map_scenario of
-mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_KotR,0,0,keyPoint_CaptTime_KotH,0);
+mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_KotR,0,0,keyPoint_CTime_KotH_Tick,0,map_generators_LimitS);
 mc_KeyPoints: begin
-                 for i:=1 to keyPoint_mcN do map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_DefR,0,0,keyPoint_CaptTime_Def,0);
+                 for i:=1 to keyPoint_mcN do map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_DefR,0,0,keyPoint_CTime_Def_Tick,0,map_generators_LimitS);
                  map_KeyPoints_UpdatePos;
               end;
    end;
 
-   if(map_generators>0)then
-   begin
-      if(map_MaxPlayers>0)then
-        for i:=0 to map_MaxPlayers-1 do
-          map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i],true)*keyPoint_GenR),
-                            map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i],true)*keyPoint_GenR),
-                            keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
+   if(map_MaxPlayers>0)then
+     for i:=0 to map_MaxPlayers-1 do
+       map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i],true)*map_Start2GeneratorStep),
+                         map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i],true)*map_Start2GeneratorStep),
+                         keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyS,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitS);
 
-      //MaxKeyPoints-byte(map_scenario=mc_KotH)
-      map_KeyPoints_Random(map_MaxPlayers*2,keyPoint_GenR,keyPoint_GenR-25,map_generators_Energy,keyPoint_CaptTime_Gen,map_generators_LFTicks[map_generators]);
-   end;
+   map_KeyPoints_Random(map_MaxPlayers*2,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
 
    map_KeyPoints_UpdateZone;
    map_KeyPoints_UpdateTeamData;

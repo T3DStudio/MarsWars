@@ -48,10 +48,6 @@ begin
      UID_UPortal,
      UID_HTeleport,
      UID_HPentagram,
-     UID_HSymbol1,
-     UID_HSymbol2,
-     UID_HSymbol3,
-     UID_HSymbol4,
      UID_HAltar    : unit_GetSpriteDepth:=sd_decals+vy;
      else
        if(uid^.uid_isbuilding)and((not iscomplete)or(transformTimer>0))
