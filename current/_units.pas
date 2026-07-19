@@ -87,7 +87,9 @@ begin
            begin
               pains:=uid_PainState_Base;
 
-              buffs[ub_PainState]:=max2i(pain_time,a_rld);
+              if(uid_race=r_hell)
+              then buffs[ub_PainState]:=max2i(pain_time_hell,a_rld)
+              else buffs[ub_PainState]:=max2i(pain_time_uac ,a_rld);
 
               with player^ do
                 if(uid_PainState_upgr>0)then
@@ -448,7 +450,7 @@ begin
    with pu^ do
      if(speed<=0)
      or(isfly<>uf_ground)
-     or(uid^.uid_isfly) //and uid_FlyLevelLikeTarget ???
+     or(uid^.uid_isfly)
      or(not uid^.uid_issolid)
      or(zfall<>0)
      or(transformTimer>0)
@@ -739,10 +741,27 @@ begin
      end;
 end;
 
-function unit_ArmTarget(pAttacker,n_tarp:PTUnit;udist:integer;a_tard:pinteger;a_arm:pbyte;a_tarp:PPTUnit;a_fac:psingle):boolean;
+function unit_ArmTarget(pAttacker,n_tarp:PTUnit;udist:integer;a_tard:pinteger;a_arm:pbyte;a_tarp:PPTUnit;a_fac:psingle;aiSmartTarget:boolean):boolean;
 var
 n_arm:byte;
 n_fac:single;
+//uid_TargetWeight
+function SpecPriority:byte;
+begin
+   SpecPriority:=1; //0 - lower, exit, 1=equal, 2 - higher
+   case(aiSmartTarget)of
+   true : if(n_tarp^.uid^.uid_AI_TargetWeight>a_tarp^^.uid^.uid_AI_TargetWeight)
+          then SpecPriority:=2
+          else
+          if(n_tarp^.uid^.uid_AI_TargetWeight<a_tarp^^.uid^.uid_AI_TargetWeight)
+          then SpecPriority:=0;
+   false: if(n_tarp^.uid^.uid_TargetWeight>a_tarp^^.uid^.uid_TargetWeight)
+          then SpecPriority:=2
+          else
+          if(n_tarp^.uid^.uid_TargetWeight<a_tarp^^.uid^.uid_TargetWeight)
+          then SpecPriority:=0;
+   end;
+end;
 begin
    // n_tarp = next target
    // a_tarp = current target
@@ -791,15 +810,20 @@ begin
                                     if(n_fac<a_fac^)
                                     then exit
                                     else
-                                      if(n_tarp^.hits<a_tarp^^.hits)
-                                      then
-                                      else
-                                      if(n_tarp^.hits>a_tarp^^.hits)
-                                      then exit
-                                      else
-                                        if(udist<a_tard^)
-                                        then
-                                        else exit;
+                                      case SpecPriority of
+                                      0 : exit;
+                                      1 : if(n_tarp^.hits<a_tarp^^.hits)
+                                          then
+                                          else
+                                          if(n_tarp^.hits>a_tarp^^.hits)
+                                          then exit
+                                          else
+                                            if(udist<a_tard^)
+                                            then
+                                            else exit;
+                                      2 :;
+                                      end;
+
                              end
              else
                if(udist<=a_tard^) // nearest
@@ -849,15 +873,17 @@ begin
          with map_KeyPointsL[kpi] do
          begin
             d:=point_dist_int(x,y,kp_x,kp_y);
-            if(kp_TeamData[MaxPlayers].kptd_Active)and(kp_RCapture>0)then
-              with uid^ do
-                if(d<=(kp_RCapture+uid_r))then
-                begin
-                   kp_LimitPlayerC[playeri     ]+=uid_LimitUse;
-                   kp_LimitTeamC  [player^.team]+=uid_LimitUse;
-                end;
+            with player^ do
+              with kp_TeamData[MaxPlayers] do
+                if(kptd_Active)and(kp_RCapture>0)then
+                  with uid^ do
+                    if(d<=(kp_RCapture+uid_r))then
+                    begin
+                       kp_LimitPlayerC[playeri     ]+=uid_LimitUse;
+                       kp_LimitTeamC  [player^.team]+=uid_LimitUse;
+                    end;
 
-            // update team data
+            // update team vision data
             with uid^ do
               if(uid_ability_isradar)and(iscomplete)and(transformTimer<=0)then
                 if(buffs[ub_Cast]>0)then
@@ -874,9 +900,10 @@ t_fac,uds       : single;
 a_tard,uc,udi   : integer;
 a_tarp,
 tu_transport,tu : PTUnit;
-aicode,
+aiCode,
 attack_target,
 isattackable,
+aiSmartTarget,
 pushout         : boolean;
 t_weap          : byte;
 NearTeleport    : boolean;
@@ -902,11 +929,12 @@ begin
 
       pushout        := uid_issolid and unit_canMove(pu) and ((a_rld<=0)or uid_isbuilding);
       attack_target  := unit_canAttack(pu,false)and(not isdefeated);
-      aicode         := (state=ps_AI)and(not isdefeated);
+      aiCode         := (state=ps_AI)and(not isdefeated);
+      aiSmartTarget  := aiCode and((aip_flags and aif_army_smart_Target)>0);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
       NearTeleport   := false;
       NearTeleport_tu:= nil;
-      if(IsUnitRange(uo_tar,@NearTeleport_tu))and(not aicode)then
+      if(IsUnitRange(uo_tar,@NearTeleport_tu))and(not aiCode)then
         if (NearTeleport_tu^.player=player)
         and(NearTeleport_tu^.hits>0)
         and(NearTeleport_tu^.uid^.uid_ability_isteleport)then
@@ -916,10 +944,10 @@ begin
 
       isattackable:=false;
       if(attack_target)then
-        isattackable:=unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac);
+        isattackable:=unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac,aiSmartTarget);
 
       ai_Local_InitVars(pu);
-      if(aicode){or(isselected)}then
+      if(aiCode)then
       begin
          ai_Global_InitVars(pu);
          ai_Global_CollectData(pu,pu,0,nil,isattackable);
@@ -943,10 +971,10 @@ begin
 
               isattackable:=false;
               if(attack_target)then
-                isattackable:=unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac);
+                isattackable:=unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac,aiSmartTarget);
 
               ai_Local_CollectData(pu,tu,udi,tu_transport);
-              if(aicode)then
+              if(aiCode)then
               ai_Global_CollectData(pu,tu,udi,tu_transport,isattackable);
 
               if(tu^.hits>0)and(tu_transport=nil)then
@@ -992,13 +1020,7 @@ begin
       if(attack_target)and(a_tard<NOTSET)then StayWaitForNewTarget:=0;
 
       ai_Local_Code(pu);
-      if(aicode){and(playeri=LocalPlayer)}then ai_Global_Code(pu);
-      {if(TestMode>0)then
-        if(isselected)then
-        begin
-           //if(aiu_alarm_d<NOTSET)then UnitsInfo_AddLine(x,y,aiu_alarm_x,aiu_alarm_y,c_red);
-           //writeln(pnum,' ',units_all_c);
-        end;}
+      if(aiCode)then ai_Global_Code(pu);
 
       if(buffs[ub_Damaged]>0)then GameLog_UnitAttacked(pu);
    end;
@@ -1553,7 +1575,7 @@ begin
         if(unit_GetCastingAbility(pTransport)=uab_unload)
         or(pTransport^.transportC>pTransport^.transportM)then
           if(not pTransport^.isfly)
-          or(not map_IsObstacleZone(pTransport^.mapZone))then
+          or(pTransport^.mapZone<>zone_solid)then
           begin
              unit_UnLoad(pTransport,pu);
              if(pTransport^.transportC<=0)then
@@ -1721,6 +1743,12 @@ begin
                      co_amove,
                      co_apatrol: uo_id:=ua_amove;
                      end;
+
+                     if(uid_CanAttack)and(uid_isbuilding)then
+                       case aorder of
+                       co_stand,
+                       co_astand : buffs[ub_SpecPause]:=fr_fps1;
+                       end;
                   end;
       end;
    end;
@@ -2117,6 +2145,7 @@ begin
       // attack
       if(uo_id=ua_amove)then
       begin
+         //buffs[ub_SpecPause]
          unit_attack(pu);
          if(StayWaitForNewTarget>0)then
          begin
@@ -2280,12 +2309,12 @@ begin
                // move
                unit_move(pu);
 
-               // REGENERATION
+               // REGENERATION         //
                if(cycle_order=g_cycle_regen)then
                  case(uid_Regen_Base>=0)of
                  true : if(hits<uid_MaxHits1)then
                         begin
-                           i:=uid_Regen_Base;
+                           i:=uid_Regen_Base+uid_LevelBonusRegen*level;
                            if(uid_Regen_upgr>0)then
                              i+=integer(upgrs_cur[uid_Regen_upgr])*BaseRegen1;
                            if(buffs[ub_SphereTurbo]>0)then i*=2;
@@ -2322,7 +2351,7 @@ begin
              u_royal_d :=NOTSET;
              if(map_scenario=mc_royale)then
              begin
-                u_royal_cd:=point_dist_int(x,y,map_Sizeh,map_Sizeh);
+                u_royal_cd:=point_dist_int(x,y,g_royal_Rx,g_royal_Ry);
                 u_royal_d :=g_royal_RCur-u_royal_cd;
                 if(u_royal_d<uid_missileR)then
                 begin

@@ -29,9 +29,10 @@ begin
          r_uac : ai_need_UnitProds:=(res_energyl_max div 425);
          end;
 
-         ai_need_UnitProds+=ai_curr_Builders;
+         // добавлять еще один барак если у игрока только один тип бараков?
+
          if(ai_UpgradesLeft>0)then ai_need_UnitProds-=ai_need_UpgrProds;
-         if(ai_need_UnitProds<1)then ai_need_UnitProds:=1;
+         if(ai_need_UnitProds<2)then ai_need_UnitProds:=2;
          if(ai_need_UnitProds>aip_MaxBarracks)then ai_need_UnitProds:=aip_MaxBarracks;
       end;
 
@@ -39,25 +40,27 @@ begin
       ai_need_Teleports:=(ai_armylimit_ForTeleport div ul12)+3;
 
       // DETECTORS
+      ai_need_detect:=0;
       if(ai_enemy_inv_u<>nil)
       or(ai_need_heye_u<>nil)
       then ai_need_detect:=aip_MaxDetectors
       else
       begin
          ai_need_detect:=ai_armylimit_alive_u div 8;
-         //if(ai_need_detect<ul1)then ai_need_detect:=ul1;
          if(ai_need_detect>aip_MaxDetectors)then
            ai_need_detect:=aip_MaxDetectors;
+         if(g_tick<ai_DetectionBuildDelay)and(ai_need_detect>ul1)then ai_need_detect:=ul1;
       end;
 
       // ai_TechPriority
       {case race of
       r_hell: ;
       r_uac : ;
-      end;
+      end;   }
 
-      if(isselected)then
+      {if(isselected)then
       begin
+         writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds)
          //writeln('ai_need_detect=',ai_need_detect,' ai_curr_Detect=',ai_curr_Detect);
          //writeln('ai_need_Energy=',ai_need_Energy,' ai_need_UnitProds=',ai_need_UnitProds,' ai_need_UpgrProds=',ai_need_UpgrProds,' ',ai_UpgradesLeft);
          //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds);
@@ -179,25 +182,6 @@ begin
 
    SetBuildUID2:=build_uid<>0;
 end;
-function SetBuildUID3(buid1,buid2,buid3:byte):boolean;
-begin
-   with pBuilder^.player^  do
-     if (units_uid_e[buid1]<=units_uid_e[buid2])
-     and(units_uid_e[buid1]<=units_uid_e[buid3])
-     then SetBuildUID1(buid1)
-     else
-       if (units_uid_e[buid2]<=units_uid_e[buid1])
-       and(units_uid_e[buid2]<=units_uid_e[buid3])
-       then SetBuildUID1(buid2)
-       else SetBuildUID1(buid3);
-
-   if(build_uid=0)then
-     if(not SetBuildUID1(buid1))then
-     if(not SetBuildUID1(buid2))then
-            SetBuildUID1(buid3);
-
-   SetBuildUID3:=build_uid<>0;
-end;
 
 procedure SetTowers(needN:integer);
 begin
@@ -289,29 +273,35 @@ begin
    if(build_uid>0)then exit;
 
    with pBuilder^  do
-   with player^ do         //((aip_flags and aif_army_early_attack0)=0)
+   with player^ do
    begin
-      if(units_bld_l[false]<aip_MaxUnitMinPart)
-      then checkExtraEnergy:=500
-      else checkExtraEnergy:=0;
-      if (ai_curr_Builders<needN)
-      and(ai_curr_Builders<aip_MaxBuilders )
-      and(ai_curr_Builders<PlayerMaxBuilders)
+      if (units_builders_e<needN)
+      and(units_builders_e<aip_MaxBuilders )
+      and(units_builders_e<PlayerMaxBuilders)
       and(ai_curr_UnitProds>=2)
       and(units_bld_l[false]>=aip_MaxUnitMinPart)
-      and((units_builders_e-units_builders_c)=0)
+      and(ai_BuildersInTransform   =0)
+      and(ai_BuildersInConstruction=0)
+      and(units_bld_l[false]>=aip_MaxUnitMinPart)
       and(not ai_earlyAttack)then
       begin
+         checkExtraEnergy:=550;
          case race of
          r_hell: if(ai_available_HKeep)
                 and(units_builders_e=(aip_MaxBuilders-1))
                 and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
                  then SetBuildUID1(UID_HKeep)
-                 else SetBuildUID2(UID_HKeep,UID_HCommandCenter);
+                 else
+                 begin
+                    if (units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])>(units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])then
+                      SetBuildUID1(UID_HCommandCenter);
+                    SetBuildUID1(UID_HKeep)
+                 end;
+                 //SetBuildUID2(UID_HKeep,UID_HCommandCenter);
          r_uac : SetBuildUID1(UID_UCommandCenter);
          end;
+         checkExtraEnergy:=0;
       end;
-      checkExtraEnergy:=0;
    end;
 end;
 procedure SetDetectors(needL:longint);
@@ -499,6 +489,7 @@ begin
                 if((aip_flags and aif_upgr_smart_order)>0)then
                 begin
                    SetUpgrade(upgr_hell_BuilderR    ,1);
+                   SetUpgrade(upgr_hell_ADetection  ,1);
                    SetUpgrade(upgr_hell_HKeepShift  ,1);
                    SetUpgrade(upgr_hell_BuilderR    ,2);
                    SetUpgrade(upgr_hell_Spectre     ,1);
@@ -528,6 +519,7 @@ begin
                 if((aip_flags and aif_upgr_smart_order)>0)then
                 begin
                    SetUpgrade(upgr_uac_BuilderR     ,1);
+                   SetUpgrade(upgr_uac_ADetection   ,1);
                    SetUpgrade(upgr_uac_CCFly        ,1);
                    SetUpgrade(upgr_uac_BuilderR     ,2);
                    SetUpgrade(upgr_uac_SSMWeapon    ,1);

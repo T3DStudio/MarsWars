@@ -43,7 +43,7 @@ MID_Revenant   : begin
                  mid_eid_FlyTrace:=MID_Bullet;
                  mid_eid_FlyStep :=4;
                  end;
-MID_Blizzard  : begin
+MID_Blizzard   : begin
                   mid_eid_FlyTrace:=MID_Granade;
                  mid_eid_FlyStep :=1;
                  mid_eid_Decal   :=EID_db_h1;

@@ -1558,7 +1558,6 @@ begin
         b:=rudata_byte(rpl,0);
         w:=word(a) or (b shl 8);
         kptd_lifeTime:=kpLifeTime((w shr 6) and %0000001111111111)*fr_fps1;
-        //if(kptd_lifeTime>0)then kptd_lifeTime-=1;
 
         b:=rudata_byte(rpl,0);
         nowner:=b and %00001111;

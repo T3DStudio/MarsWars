@@ -19,6 +19,8 @@ g_NewObservers    : boolean  = true;
 
 g_royal_Rmax      : integer  = 0;
 g_royal_RCur      : integer  = 0;
+g_royal_Rx        : integer  = 0;
+g_royal_Ry        : integer  = 0;
 
 g_PlayersGame     : TPList;
 g_PlayersTemp     : array[0..LastPlayer ] of TPlayerDataTemp;
@@ -138,12 +140,6 @@ wtrset_resurect   : cardinal;
 u_royal_cd,
 u_royal_d         : integer;
 
-ai_names_o        : array[0..ai_names_max-1] of shortstring = (
-                    ' TGA'   ,' NRM'    ,' BFG'       ,' Dant3'    ,' marat'   ,' Notarget'  ,' Am$ek'   ,' Chainie'   ,' BND'       ,' NicoTheFug',
-                    ' Mud'   ,' Aurora' ,' Archi'     ,' print423' ,' Rising'  ,' KolyanRPG' ,' Boiec'   ,' ManWithGun',' Teran'     ,' ZZYZX'     ,
-                    ' Jet'   ,' ABK'    ,' NekoRanger',' OutCast'  ,' Igara'   ,' VoZj'      ,' Raymund' ,' Murphy'    ,' Jabberwock',' NikcGreen' ,
-                    ' Zetor' ,' Bertie' ,' Doomersov' ,' Seifer'   ,' m0rdecai',' Krik_IDDQD',' Ipse'    ,' Sergh'     ,' cybermind' ,' Dem'       ,' Revento',
-                    ' Romero',' Carmack',' Keen'      ,' BJ'       ,' Doomguy' ,' Slayer'    ,' Ranger'  ,' Grunt'     ,' Deimos'    ,' Phobos'    ,' Bitterman');
 ai_names_l        : array[0..ai_names_max-1] of shortstring;
 
 {$IFDEF TESTMODE}
@@ -172,6 +168,9 @@ g_unitsVis        : array[0..MaxUnits] of TUnitVis;
 
 g_PlayerAPM       : TAPMData;
 
+g_royal_RMMx      : integer  = 0;
+g_royal_RMMy      : integer  = 0;
+
 missiles_UIDsBioEff         // units that trigger "bio" effect of missiles
                   : TSoB;
 
@@ -181,6 +180,8 @@ LocalPlayer       : byte = 0; // 'this' player
 PlayerName        : shortstring = 'DoomPlayer';
 PlayerReady       : boolean = false;
 
+
+unit_floating_p   : array[0..unit_floating_ticks-1] of integer;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -206,6 +207,8 @@ vid_ShowFPS         : boolean = true;
 //
 //  UI
 //
+
+ui_ControlTabType : TTabControlContent = tcc_none;
 
 UIPlayer          : byte = 1;
 
@@ -501,6 +504,10 @@ net_SvList_scroll : integer = 0;
 net_SvList_Size   : integer = 0;
 net_SvList_sel    : integer = 0;
 
+net_DNSCache_n    : word = 0;
+net_DNSCache_dns  : array of shortstring;
+net_DNSCache_ip   : array of cardinal;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  SAVE LOAD
@@ -567,8 +574,6 @@ mouse_select_xs0,
 mouse_select_ys0,
 mouse_map_x,
 mouse_map_y,
-mouse_prev_x,
-mouse_prev_y,
 mouse_x,
 mouse_y           : integer;
 m_brushc          : TMWColor;
@@ -612,6 +617,7 @@ c_alime,
 c_green,
 c_ablue,
 c_blue,
+c_ltblue,
 c_aqua,
 c_aaqua,
 c_white,
@@ -821,8 +827,9 @@ spr_eff_eb,
 spr_eff_ebb,
 spr_eff_tel,
 spr_eff_gtel,
-spr_eff_exp,
+spr_eff_exp1,
 spr_eff_exp2,
+spr_eff_exp3,
 spr_eff_g,
 spr_h_p0,
 spr_h_p1,
@@ -893,10 +900,8 @@ spr_uibtn_AbilityUACGeneral,
 spr_uibtn_AbilityBribe,
 spr_uibtn_AbilityHack,
 spr_uibtn_AbilityUACStrike,
-spr_uibtn_AbilityUACScan,
 spr_uibtn_AbilitySpawnLost,
 spr_uibtn_AbilitySpawnLostTo,
-spr_uibtn_AbilityHVision,
 spr_uibtn_AbilityUnload,
 spr_uibtn_AbilityUnloadTo,
 spr_uibtn_AbilityCCLand,
@@ -935,7 +940,8 @@ spr_uibtn_Tabs       : array[0..3] of pSDL_Surface;
 spr_kp_koth,
 spr_kp_out,
 spr_kp_outG          : TMWTexture;
-spr_kp_gen           : array[0..1] of TMWTexture;
+spr_kp_key,
+spr_kp_genT          : array[0..1] of TMWTexture;
 
 spr_cursorWh,
 spr_cursorHh         : integer;
@@ -996,6 +1002,7 @@ str_doc_ReqUACLoot,
 str_doc_ProdTime,
 str_doc_Limit,
 str_doc_MaxHits,
+str_doc_FastDeath,
 str_doc_Hits,
 str_doc_LifeTime,
 str_doc_BaseRegen,
@@ -1011,6 +1018,7 @@ str_doc_LevelUpTime,
 str_doc_LevelArmorBonus,
 str_doc_LevelDamageBonus,
 str_doc_LevelPainSBonus,
+str_doc_LevelRegenBonus,
 str_doc_BountyHellPower,
 str_doc_BountyUACLoot,
 str_doc_ZombieUID,
@@ -1249,11 +1257,13 @@ str_warn_AbilityBadPlace,
 str_warn_AbilityReqUACNear,
 str_warn_AbilityReqHelNear,
 str_warn_AbilityTar2Close,
-str_warn_kpoint_captured,
-str_warn_kpoint_lost,
-str_warn_koth_control,
+str_warn_kpoint_CaptureStart,
+str_warn_kpoint_Captured,
+str_warn_koth_CaptureStart,
+str_warn_koth_Alarm,
 str_warn_ngen_exh,
 str_warn_ngen_captured,
+str_warn_ngen_Alarm,
 str_warn_ngen_lost,
 str_warn_MaxLimitReached,
 str_warn_markLook,
@@ -1292,6 +1302,7 @@ str_ui_objectives,
 str_ui_SelectTarget,
 str_ui_SelectBPlace,
 str_ui_BuildHint,
+str_ui_BuildTip,
 str_ui_RightClickCancel,
 
 str_objective_Scirmish,
@@ -1398,7 +1409,8 @@ snd_upgrade_complete,
 snd_victory,
 snd_unit_adv,
 snd_unit_promoted,
-snd_rally_point
+snd_rally_point,
+snd_select_target
                    : array[1..r_count] of PTSoundSet;
 
 snd_RadarScan,
@@ -1419,7 +1431,14 @@ snd_uac_suply,
 snd_uac_rescc,
 snd_uac_academy,
 
-snd_uac_hdeath,
+snd_uac_inf_death,
+snd_uac_inf_pain1,
+snd_uac_inf_pain2,
+snd_uac_inf_pain3,
+snd_uac_inf_pain4,
+snd_uac_mec_pain1,
+snd_uac_mec_pain2,
+snd_uac_mec_pain3,
 
 snd_bfgmarine_ready,
 snd_bfgmarine_annoy,
@@ -1601,10 +1620,12 @@ snd_Teleport,
 snd_explode_plasma,
 snd_explode,
 snd_mapmark,
-snd_KeyPointControl,
+snd_KeyPointCaptured,
 snd_KeyPointLost,
+snd_KeyPointAlarm,
 snd_GeneratorCapture,
 snd_GeneratorLost,
+snd_GeneratorAlarm,
 snd_SwitchOn,
 snd_SwitchOff,
 snd_Stink,

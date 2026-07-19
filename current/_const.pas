@@ -40,9 +40,6 @@ fr_fpst2               = fr_fpst*2; //2/3
 fr_fps60               = fr_fps1*60;
 fr_fpsd15              = fr_fps1 div 15;
 
-APM_UPDPeriod          = fr_fps1*5;
-APM_1Period            = fr_fps60;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Game settings borders
@@ -200,7 +197,7 @@ lmt_chat_player4       = 5;
 lmt_chat_player5       = 6;
 lmt_chat_player6       = 7;}
 lmt_chat_player7       = 8; // LastPlayer
-lmt_chat_common        = 9;
+lmt_chat_local         = 9;
 lmt_game_message       = 10;
 lmt_game_end           = 11;
 lmt_game_ReadyToStart  = 12;
@@ -222,49 +219,54 @@ lmt_prod_BadOrder      = 27;
 lmt_prod_CD            = 28;
 lmt_prod_AllBusy       = 29;
 lmt_prod_Unavailable   = 30;
-lmt_unit_ready         = 31;
-lmt_unit_captured      = 32;
-lmt_unit_lost          = 33;
-lmt_unit_LevelUp       = 34;
-lmt_unit_attacked      = 35;
-lmt_unit_NeedBuilder   = 36;
-lmt_unit_resurrected   = 37;
-lmt_unit_MaxLevel      = 38;
-lmt_upgrade_InProgress = 39;
-lmt_upgrade_complete   = 40;
-lmt_Req_Energy         = 41;
-lmt_Req_HellPower      = 42;
-lmt_Req_UACLoot        = 43;
-lmt_Req_Common         = 44;
-lmt_Req_Limit          = 45;
-lmt_Req_MaxCount       = 46;
-lmt_Req_MaxBuilders    = 47;
-lmt_markLook           = 48;
-lmt_markAttack         = 49;
-lmt_allies_attacked    = 50;
-lmt_NeedProdUnit       = 51;
-lmt_ability_reload     = 52;
-lmt_ability_Casting    = 53;
-lmt_ability_BadPlace   = 54;
-lmt_ability_ReqUACNear = 55;
-lmt_ability_ReqHelNear = 56;
-lmt_ability_Tar2Close  = 57;
-lmt_kpoint_captured    = 58;
-lmt_kpoint_lost        = 59;
-lmt_ngen_exh           = 60;
-lmt_ngen_captured      = 61;
-lmt_ngen_lost          = 62;
-lmt_koth_control       = 63;
-lmt_invalid_Target     = 64;
-lmt_Invalid_Order      = 65;
-lmt_replay_RecStart    = 66;
-lmt_replay_RecStop     = 67;
-lmt_replay_RecError    = 68;
+lmt_unit_readyU        = 31;
+lmt_unit_readyB        = 32;
+lmt_unit_captured      = 33;
+lmt_unit_lost          = 34;
+lmt_unit_LevelUp       = 35;
+lmt_unit_attackedU     = 36;
+lmt_unit_attackedB     = 37;
+lmt_unit_NeedBuilder   = 38;
+lmt_unit_resurrected   = 39;
+lmt_unit_MaxLevel      = 40;
+lmt_upgrade_InProgress = 41;
+lmt_upgrade_complete   = 42;
+lmt_Req_Energy         = 43;
+lmt_Req_HellPower      = 44;
+lmt_Req_UACLoot        = 45;
+lmt_Req_Common         = 46;
+lmt_Req_Limit          = 47;
+lmt_Req_MaxCount       = 48;
+lmt_Req_MaxBuilders    = 49;
+lmt_markLook           = 50;
+lmt_markAttack         = 51;
+lmt_allies_attackedU   = 52;
+lmt_allies_attackedB   = 53;
+lmt_NeedProdUnit       = 54;
+lmt_ability_reload     = 55;
+lmt_ability_Casting    = 56;
+lmt_ability_BadPlace   = 57;
+lmt_ability_ReqUACNear = 58;
+lmt_ability_ReqHelNear = 59;
+lmt_ability_Tar2Close  = 60;
+lmt_kpoint_CaptureStart= 61;
+lmt_kpoint_Captured    = 62;
+lmt_ngen_exh           = 63;
+lmt_ngen_Captured      = 64;
+lmt_ngen_Alarm         = 65;
+lmt_ngen_lost          = 66;
+lmt_koth_CaptureStart  = 67;
+lmt_koth_Alarm         = 68;
+lmt_invalid_Target     = 69;
+lmt_Invalid_Order      = 70;
+lmt_replay_RecStart    = 71;
+lmt_replay_RecStop     = 72;
+lmt_replay_RecError    = 73;
 
 lmts_menu_chat         = [
                           lmt_chat_player0..
                           lmt_chat_player7,
-                          lmt_chat_common,
+                          lmt_chat_local,
                           lmt_game_message,
                           lmt_game_end,
                           lmt_game_ReadyToStart,
@@ -549,23 +551,24 @@ upgr_hell_BuildArmor   = 3;  // base building armor
 upgr_hell_MeleeDamage  = 4;  // melee attack damage
 upgr_hell_Regeneration = 5;  // regeneration
 upgr_hell_PainFactor   = 6;  // pain state
-upgr_hell_BuilderR     = 7;  // main range
-upgr_hell_HKeepShift   = 8;  // HK teleportation
-upgr_hell_DecayAura    = 9;  // decay aura
-upgr_hell_TowerR       = 10; // towers range
+upgr_hell_ADetection   = 7;  // active detection
+upgr_hell_BuilderR     = 8;  // main range
+upgr_hell_HKeepShift   = 9;  // HK teleportation
+upgr_hell_DecayAura    = 10; // decay aura
+upgr_hell_TowerR       = 11; // towers range
 
-upgr_hell_Spectre      = 11; // demon invisibility            // "t2"
-upgr_hell_UnitSightR   = 12; // demons vision
-upgr_hell_Phantoms     = 13; // phantoms
-upgr_hell_DistDamage2  = 14; // t2 distance attacks damage
-upgr_hell_Resurrect    = 15; // archvile ability
-upgr_hell_TeleportCD   = 16; // Teleport reload
-upgr_hell_T2TNoCD      = 17; // Teleport-t-toteleport no cd teleportation
-upgr_hell_EvilEyeR     = 18; // hell Eye time
-upgr_hell_TotemInvis   = 19; // totem and eye invisible
-upgr_hell_BuildRestore = 20; // build restoration
-upgr_hell_TowerBlink   = 21; // teleport towers
-upgr_hell_FTowerAMech  = 22; // Fire tower caco weapon
+upgr_hell_Spectre      = 12; // demon invisibility            // "t2"
+upgr_hell_UnitSightR   = 13; // demons vision
+upgr_hell_Phantoms     = 14; // phantoms
+upgr_hell_DistDamage2  = 15; // t2 distance attacks damage
+upgr_hell_Resurrect    = 16; // archvile ability
+upgr_hell_TeleportCD   = 17; // Teleport reload
+upgr_hell_T2TNoCD      = 18; // Teleport-t-toteleport no cd teleportation
+upgr_hell_EvilEyeR     = 19; // hell Eye time
+upgr_hell_TotemInvis   = 20; // totem and eye invisible
+upgr_hell_BuildRestore = 21; // build restoration
+upgr_hell_TowerBlink   = 22; // teleport towers
+upgr_hell_FTowerAMech  = 23; // Fire tower caco weapon
 
 
 upgr_uac_DistDamage    = 31; // distance attack               // "t1"
@@ -574,22 +577,23 @@ upgr_uac_BuildArmor    = 33; // base b armor
 upgr_uac_RepairTools   = 34; // repair/health upgr
 upgr_uac_BioSpeed      = 35; // infantry speed
 upgr_uac_SSMWeapon     = 36; // antiaircrafter surface-to-surface attack
-upgr_uac_BuilderR      = 37; // main sr
-upgr_uac_CCFly         = 38; // CC fly ability
-upgr_uac_CCAttack      = 39; // CC turret
-upgr_uac_TowerR        = 40; // towers sr
+upgr_uac_ADetection    = 37; // active detection
+upgr_uac_BuilderR      = 38; // main sr
+upgr_uac_CCFly         = 39; // CC fly ability
+upgr_uac_CCAttack      = 40; // CC turret
+upgr_uac_TowerR        = 41; // towers sr
 
-upgr_uac_DronTurret    = 41; // dron turret                   // "t2"
-upgr_uac_UnitSightR    = 42; // infatry vision
-upgr_uac_CommandoInvis = 43; // commando invis
-upgr_uac_AASplash      = 44; // anti-air missiles splash
-upgr_uac_MechSpeed     = 45; // mech speed
-upgr_uac_MechArmor     = 46; // mech arm
-upgr_uac_TerAAWeapon   = 47; // termintator anti-air weapon
-upgr_uac_Transport     = 48; // transport capacity upgrade
-upgr_uac_RadarR        = 49; // Radar
-upgr_uac_TurretPlasma  = 50; // plasma weapons fro anti-ground turret
-upgr_uac_TurretArmor   = 51; // turrets armor
+upgr_uac_DronTurret    = 42; // dron turret                   // "t2"
+upgr_uac_UnitSightR    = 43; // infatry vision
+upgr_uac_CommandoInvis = 44; // commando invis
+upgr_uac_AASplash      = 45; // anti-air missiles splash
+upgr_uac_MechSpeed     = 46; // mech speed
+upgr_uac_MechArmor     = 47; // mech arm
+upgr_uac_TerAAWeapon   = 48; // termintator anti-air weapon
+upgr_uac_Transport     = 49; // transport capacity upgrade
+upgr_uac_RadarR        = 50; // Radar
+upgr_uac_TurretPlasma  = 51; // plasma weapons fro anti-ground turret
+upgr_uac_TurretArmor   = 52; // turrets armor
 
 
 upgr_fprod_build       = 251;
@@ -902,6 +906,10 @@ uab_ToUATurretTo       = 51;
 uab_LvlUpURadar        = 52;
 uab_LvlUpURMStation    = 53;
 
+uab_HSpecter           = 55;
+uab_HStealth           = 56;
+uab_HHTShroud          = 57;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1036,9 +1044,19 @@ fly_z                  = 80;
 fly_hz                 = fly_z div 2;
 fly_height             : array[false..true] of integer = (1,fly_z);
 
-pain_time              = fr_fps1;
+pain_time_hell         = fr_fps1;
+pain_time_uac          = fr_fpsh;
 
-ai_names_max           = 52;
+ai_names_max           = 57;
+ai_names_o             : array[0..ai_names_max-1] of shortstring = (
+                         ' TGA'       ,' NRM'       ,' BFG'       ,' Dant3'    ,' marat'    ,' Notarget'  ,' Am$ek'     ,' Chainie'   ,' BND'       ,' NicoTheFug',
+                         ' Mud'       ,' Aurora'    ,' Archi'     ,' print423' ,' Rising'   ,' KolyanRPG' ,' Boiec'     ,' ManWithGun',' Teran'     ,' ZZYZX'     ,
+                         ' Jet'       ,' ABK'       ,' NekoRanger',' OutCast'  ,' Igara'    ,' VoZj'      ,' Raymund'   ,' Murphy'    ,' Jabberwock',' NikcGreen' ,
+                         ' Zetor'     ,' Bertie'    ,' Doomersov' ,' Seifer'   ,' Mostcus'  ,' CWolf'     ,' Ipse'      ,' Sergh'     ,' cybermind' ,' Dem'       ,
+                         ' Romero'    ,' Carmack'   ,' Keen'      ,' BJ'       ,' Doomguy'  ,' Slayer'    ,' Ranger'    ,' Grunt'     ,' Deimos'    ,' Phobos'    ,
+                         ' Bitterman' ,' [LeD]JakeC',' Wereknight',' ArKnife'  ,' Revento'  ,' DRON12261' ,' Krik_IDDQD');
+
+DefaultTargetWeight    = 100;
 
 {$IFDEF _FULLGAME}
 
@@ -1205,6 +1223,7 @@ iAct_SProd23           = 163;
 iAct_SProd24           = 164;
 
 iAct_ToggleWindowed    = 170;
+iAct_TogglePlayersColor= 171;
 
 iAct_InGameChat        = 200;
 iAct_InGameChatAll     = 201;
@@ -1274,11 +1293,20 @@ char_koth              : char = ' ';
 dead_time              = -hits_dead;
 char_detect            = #7;
 
-spr_upgrade_icons      = 21;
+spr_upgrade_icons      = 22;
 
 MaxUnitGroups          = 9;
 
 pingGradeStep          = 35;
+
+rpls_UIcamXYt1b        = 5;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  NET CLIENT
+//
+
+net_ServerListTTL      = net_SendTimePing*2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1359,24 +1387,29 @@ EID_BFG                = 200;
 EID_BExp               = 201;
 EID_BBExp              = 202;
 EID_Teleport           = 203;
-EID_Exp                = 204;
+EID_Exp1               = 204;
 EID_Exp2               = 205;
-EID_InfantryGibs       = 206;
-EID_HKeep_H            = 207;
-EID_HKeep_S            = 208;
-EID_HAKeep_H           = 209;
-EID_HAKeep_S           = 210;
-EID_db_h0              = 211;
-EID_db_h1              = 212;
-EID_db_u0              = 213;
-EID_db_u1              = 214;
-EID_Blood              = 215;
-EID_ArchFire           = 216;
-EID_ULevelUp           = 217;
-EID_HLevelUp           = 218;
-EID_HVision            = 219;
-EID_PowerUp            = 220;
-EID_UnitCaptured       = 221;
+EID_Exp3               = 206;
+EID_InfantryGibs       = 207;
+EID_HKeep_H            = 208;
+EID_HKeep_S            = 209;
+EID_HAKeep_H           = 210;
+EID_HAKeep_S           = 211;
+EID_db_h0              = 212;
+EID_db_h1              = 213;
+EID_db_u0              = 214;
+EID_db_u1              = 215;
+EID_Blood              = 216;
+EID_ArchFire           = 217;
+EID_ULevelUp           = 218;
+EID_HLevelUp           = 219;
+EID_HVision            = 220;
+EID_PowerUp            = 221;
+EID_UnitCaptured       = 222;
+
+unit_floating_ticks    = fr_fps2;
+unit_floating_h        = 2;
+unit_floating_ticks2dir= 360/unit_floating_ticks;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1490,17 +1523,6 @@ ui_Objectives_LineLen  = 27;
 
 ui_HintLineLenUnit     = 50;
 
-
-// ui alarms
-
-aummat_attacked_u      = 1;
-aummat_attacked_b      = 2;
-aummat_created_u       = 3;
-aummat_created_b       = 4;
-aummat_advance         = 5;
-aummat_upgrade         = 6;
-aummat_markLook        = 7;
-aummat_markAttack      = 8;
 
 // abilities
 
@@ -1869,6 +1891,7 @@ camp_MaxDiff           = 4;
 str_loading_gfx        : shortstring = 'LOADING GRAPHICS...'+#0;
 str_loading_sfx        : shortstring = 'LOADING SOUNDS...'+#0;
 str_loading_msc        : shortstring = 'LOADING MUSIC...'+#0;
+str_loading_netdns     : shortstring = 'RESOLVING DNS...'+#0;
 
 str_ConfigFName        : shortstring = 'marswars.cfg';
 str_ScreenShotPrefix   : shortstring = 'MWSCR_';
@@ -1907,6 +1930,7 @@ tc_nl2                 = #9;
 tc_nl3                 = #10;
 tc_docbr               = #11;
 tc_doccpt              = #12;
+tc_doccnt              = #13;
 tc_purple              = #14;
 tc_red                 = #15;
 tc_orange              = #16;

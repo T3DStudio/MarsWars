@@ -49,7 +49,7 @@ cfg_key_MusicListRenew  : snd_RenewMusicList :=(vl=b2c[true]);
 cfg_key_NetServerAddr   : menu_ClientAddress := vl;
 cfg_key_NetServerPort   : menu_ServerPort    := vl;
 cfg_key_NetQuality      : net_cl_Quality     := vlw;
-cfg_key_NetServerList   : net_ServerListAdd(vl,false);
+cfg_key_NetServerList   : net_ServerListAdd(vl,false,false);
 cfg_key_UICamScrollSpeed: ui_CamSpeed        := vli;
 cfg_key_UICamMouseScroll: ui_MouseScroll     :=(vl=b2c[true]);
 cfg_key_UIColoredShadows: ui_ColoredShadow   :=(vl=b2c[true]);

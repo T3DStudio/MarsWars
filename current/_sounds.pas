@@ -209,15 +209,6 @@ begin
    dispose(sSet);
 end;
 
-procedure snd_GameMusicReLoad;
-begin
-   snd_StopSoundSource(sss_music);
-   draw_LoadingScreen(@str_loading_msc,c_aqua);
-   snd_SoundSetUnLoad(snd_music_game);
-
-   snd_music_game:=snd_MusicSetLoad(folder_music_game,snd_musicListSize);
-end;
-
 procedure snd_SoundShafleSoundSet(SoundSet:PTSoundSet);
 var i,
 m1,m2 : integer;
@@ -238,6 +229,16 @@ begin
           snd_sset_c:=random(snd_sset_n);
        end;
    end;
+end;
+
+procedure snd_GameMusicReLoad;
+begin
+   snd_StopSoundSource(sss_music);
+   draw_LoadingScreen(@str_loading_msc,c_aqua);
+   snd_SoundSetUnLoad(snd_music_game);
+
+   snd_music_game:=snd_MusicSetLoad(folder_music_game,snd_musicListSize);
+   snd_SoundShafleSoundSet(snd_music_game);
 end;
 
 function snd_SoundSetGetChunk(ss:PTSoundSet;NewChunk:boolean):PTMWSound;
@@ -516,12 +517,12 @@ lmt_chat_player0..
 lmt_chat_player7        : if((lm_type-lmt_chat_player0)<>PListener)then snd_SoundPlayUI(snd_chat);
 lmt_player_leave        : if(not g_started)
                           or(g_PlayersGame[LocalPlayer].isobserver)then snd_SoundPlayUI(snd_chat);
-lmt_chat_common,
-lmt_game_message        : snd_SoundPlayUI(snd_chat);
+//lmt_chat_local,
+lmt_game_message        : snd_SoundPlayUI(snd_chat   );
 lmt_game_ReadyToStart   : snd_SoundPlayUI(snd_PowerUp);
 lmt_game_BreakStarting  : ;
 lmt_game_StartsIn,
-lmt_game_ResetIn        : snd_SoundPlayUI(snd_Stink);
+lmt_game_ResetIn        : snd_SoundPlayUI(snd_Stink  );
 // Basic
 
 lmt_game_end            : if(lm_data_u<=LastPlayer)then
@@ -539,25 +540,37 @@ lmt_player_defeated     : if(lm_data_u<=LastPlayer)and(g_status=gs_running)then
 lmt_unit_LevelUp        : snd_SoundPlayAnoncer(snd_unit_promoted  [race],true,false);
 lmt_unit_resurrected,
 lmt_unit_captured,
-lmt_unit_ready          : with g_uids[lm_data_u] do
+lmt_unit_readyU,
+lmt_unit_readyB         : with g_uids[lm_data_u] do
                           snd_SoundPlayUnitCommand(uid_snd_ready);
 lmt_upgrade_complete    : snd_SoundPlayAnoncer(snd_upgrade_complete[race],true ,false);
 lmt_prod_BadPlace       : snd_SoundPlayAnoncer(snd_cannot_build    [race],true ,false);
 
-lmt_allies_attacked     : snd_SoundPlayMMapAlarm(snd_mapmark,false);
-lmt_unit_attacked       : with g_uids[lm_data_u] do
+// minimap
+lmt_allies_attackedU,
+lmt_allies_attackedB    : snd_SoundPlayMMapAlarm(snd_mapmark,false);
+lmt_unit_attackedU,
+lmt_unit_attackedB      : with g_uids[lm_data_u] do
                           snd_SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
 lmt_markAttack          : snd_SoundPlayMMapAlarm(snd_mapmark,false);
 lmt_markLook            : snd_SoundPlayMMapAlarm(snd_Stink  ,false);
 
 // Key Point Events
-lmt_Req_Energy          : snd_SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
-lmt_koth_control,
-lmt_kpoint_captured     : snd_SoundPlayAnoncer(snd_KeyPointControl ,true ,false);
-lmt_kpoint_lost         : snd_SoundPlayAnoncer(snd_KeyPointLost    ,false,false);
-lmt_ngen_captured       : snd_SoundPlayAnoncer(snd_GeneratorCapture,true ,false);
+lmt_koth_Alarm          : if(s2b(lm_string)>10)
+                          then snd_SoundPlayAnoncer(snd_KeyPointAlarm,false,true)
+                          else snd_SoundPlayAnoncer(snd_Stink,false,true);
+lmt_koth_CaptureStart,
+lmt_kpoint_CaptureStart : snd_SoundPlayMMapAlarm(snd_KeyPointAlarm   ,false);
+lmt_kpoint_Captured     : if(lm_data_u=team)
+                          then snd_SoundPlayMMapAlarm(snd_KeyPointCaptured,false)
+                          else snd_SoundPlayMMapAlarm(snd_KeyPointLost    ,false);
+lmt_ngen_captured       : snd_SoundPlayMMapAlarm(snd_GeneratorCapture,false);
 lmt_ngen_exh,
-lmt_ngen_lost           : snd_SoundPlayAnoncer(snd_GeneratorLost   ,false,false);
+lmt_ngen_lost           : snd_SoundPlayMMapAlarm(snd_GeneratorLost   ,false);
+lmt_ngen_alarm          : snd_SoundPlayMMapAlarm(snd_GeneratorAlarm  ,false);
+
+// other
+lmt_Req_Energy          : snd_SoundPlayAnoncer(snd_not_enough_energy[race],true,false);
 
 lmt_invalid_Target,
 lmt_ability_BadPlace,
@@ -681,10 +694,12 @@ begin
    snd_Gibs                 :=snd_SoundSetLoad('Gibs'            );
    snd_Healing              :=snd_SoundSetLoad('healing'         );
    snd_IconOfSinCube        :=snd_SoundSetLoad('IconOfSinCube'   );
-   snd_KeyPointControl      :=snd_SoundSetLoad('KeyPointControl' );
+   snd_KeyPointCaptured     :=snd_SoundSetLoad('KeyPointCaptured');
    snd_KeyPointLost         :=snd_SoundSetLoad('KeyPointLost'    );
-   snd_GeneratorCapture     :=snd_SoundSetLoad('GeneratorCapture' );
-   snd_GeneratorLost        :=snd_SoundSetLoad('GeneratorLost'    );
+   snd_KeyPointAlarm        :=snd_SoundSetLoad('KeyPointAlarm'   );
+   snd_GeneratorCapture     :=snd_SoundSetLoad('GeneratorCapture');
+   snd_GeneratorLost        :=snd_SoundSetLoad('GeneratorLost'   );
+   snd_GeneratorAlarm       :=snd_SoundSetLoad('GeneratorAlarm'  );
 
    snd_mapmark              :=snd_SoundSetLoad('MapMark'         );
    snd_PowerUp              :=snd_SoundSetLoad('PowerUp'         );
@@ -720,6 +735,7 @@ begin
    snd_unit_promoted     [r]:=snd_SoundSetLoad(folder_Race[r]+'unit_promoted'        );
    snd_cant_order        [r]:=snd_SoundSetLoad(folder_Race[r]+'cant_order'           );
    snd_rally_point       [r]:=snd_SoundSetLoad(folder_Race[r]+'new_rally_point'      );
+   snd_select_target     [r]:=snd_SoundSetLoad(folder_Race[r]+'select_target'        );
    end;
 
    /////////////////////////////////////////////////////////////////////////////////
@@ -749,7 +765,14 @@ begin
    snd_uac_suply            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'supply-depot'   );
    snd_uac_rescc            :=snd_SoundSetLoad(folder_RaceBuildings[r_uac ]+'resourse_senter');
 
-   snd_uac_hdeath           :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'death'              );
+   snd_uac_inf_death        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'inf_death'          );
+   snd_uac_inf_pain1        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'inf_pain1'          );
+   snd_uac_inf_pain2        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'inf_pain2'          );
+   snd_uac_inf_pain3        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'inf_pain3'          );
+   snd_uac_inf_pain4        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'inf_pain4'          );
+   snd_uac_mec_pain1        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'mech_pain1'         );
+   snd_uac_mec_pain2        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'mech_pain2'         );
+   snd_uac_mec_pain3        :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'mech_pain3'         );
 
    snd_bfgmarine_ready      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'bfgmarine\ready'    );
    snd_bfgmarine_annoy      :=snd_SoundSetLoad(folder_RaceUnits[r_uac ]+'bfgmarine\an'       );

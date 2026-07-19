@@ -145,6 +145,11 @@ end;
 function ai_IsTowerUsefull(pTower:PTUnit):boolean;
 begin
    ai_IsTowerUsefull:=true;
+
+   if(ai_generator_d<NOTSET)then
+     if (ai_generator_d<ai_generator_kp^.kp_RCapture)
+     and(ai_generator_d>ai_generator_kp^.kp_RNoBuild)then exit;
+
    with pTower^ do
    with player^ do
      if (aiu_alarm_timer<0)
@@ -175,15 +180,19 @@ begin
        UID_UFactory,
        UID_HBarracks,
        UID_HGate          : if(not unit_IsProducting(pu))then
-                            begin
-                               if(units_uid_c[uidi]>1)and(ai_selfUID_minLevel=level)then
-                               begin
-                                  i:=ai_GetLevel(pu)+1;
-                                  if(uid_isbarrack)and((ai_curr_UnitProds-i)>ai_need_UnitProds)then ai_NeedSuicide:=true;
-                                  if(uid_isforge  )and((ai_curr_UpgrProds-i)>ai_need_UpgrProds)then ai_NeedSuicide:=true;
-                               end;
-                               // destroy redundance barracks
-                            end;
+                              if(units_uid_c[uidi]>1)and(ai_selfUID_minLevel=level)then
+                              begin
+                                 case uidi of
+                                 UID_UBarracks: if(units_uid_c[UID_UBarracks]<units_uid_c[UID_UFactory ])then exit;
+                                 UID_UFactory : if(units_uid_c[UID_UFactory ]<units_uid_c[UID_UBarracks])then exit;
+                                 UID_HGate    : if(res_UACLoot>0)and(units_uid_c[UID_HBarracks]> 3)then exit;
+                                 UID_HBarracks: if(res_UACLoot>0)and(units_uid_c[UID_HBarracks]<=3)then exit;
+                                 end;
+
+                                 i:=ai_GetLevel(pu);
+                                 if(uid_isbarrack)and((ai_curr_UnitProds-i-4)>ai_need_UnitProds)then ai_NeedSuicide:=true;
+                                 if(uid_isforge  )and((ai_curr_UpgrProds-i-2)>ai_need_UpgrProds)then ai_NeedSuicide:=true;
+                              end;
        UID_HFTower,
        UID_HTotem         : if (not ai_IsTowerUsefull(pu))then ai_NeedSuicide:=true;
        UID_UGTurret,
@@ -217,7 +226,8 @@ UID_HKeep,
 UID_HCommandCenter,
 UID_UCommandCenter: if(u_royal_d>base_r3)
                     or(map_scenario<>mc_royale)then
-                      if(ai_curr_UnitProds>1) //ai_need_UnitProds
+                      if(ai_curr_UnitProds>1)
+                      and(ai_BuildersInConstruction<units_builders_e)
                       and((aip_flags and aif_army_early_attack0)=0)
                       and(units_bld_l[false]>=aip_MaxUnitMinPart)
                       then
@@ -396,12 +406,18 @@ begin
                          if(ai_AbilityMagic(pCaster,ai_Strike_u,uab_UACStrike ))then aip_timer_superweapon:=aip_pause_superweapon;
 
      UID_Pain        : if ((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)
-                       and((MaxPlayerLimit-armylimit)>ul1)then
-                         if((upgrs_cur[upgr_hell_Phantoms]=0)and(units_uid_e[UID_LostSoul]<units_uid_m[UID_LostSoul]))
-                         or((upgrs_cur[upgr_hell_Phantoms]>0)and(units_uid_e[UID_Phantom ]<units_uid_m[UID_Phantom ]))then
-                           if((base_r1h<ai_enemy_battle_d)and(ai_enemy_battle_d<base_r2))
-                           or((ai_ZombieTarget_d<base_r1h)and(upgrs_cur[upgr_hell_Phantoms]>0))then
-                             ai_UnitAbility(pCaster,uab_SpawnLost,0,0,0);
+                       and((MaxPlayerLimit-armylimit-prod_unit_Limit)>ul1)then
+                       begin
+                          if(upgrs_cur[upgr_hell_Phantoms]>0)
+                          then cx:=UID_Phantom
+                          else cx:=UID_LostSoul;
+
+                          if(units_uid_e[cx]<units_uid_m[cx])then
+                            if((base_r1h<ai_enemy_battle_d)and(ai_enemy_battle_d<base_r2))
+                            or((ai_ZombieTarget_d<base_r1h)and(upgrs_cur[upgr_hell_Phantoms]>0))
+                            or(units_uid_e[cx]=0)then
+                              ai_UnitAbility(pCaster,uab_SpawnLost,0,0,0);
+                       end;
      UID_UACDron     : if(ai_enemy_d>base_r1)and(ai_AbilityDronToTower)then
                          if(ai_towers_near_AG<=ai_towers_near_AA)
                          then ai_UnitAbility(pCaster,uab_ToUGTurretTo,0,x,y)
@@ -422,9 +438,8 @@ begin
 
    with pCaster^ do
      with player^ do
-       if(ai_HEyeNest_u<>nil)and(ai_near_HEye<=0)and(ai_need_heye_u=nil)and(aip_timer_magic=0)then
-         if(not map_IsObstacleZone(mapZone))then
-           if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
+       if(mapZone<>zone_solid)and(ai_HEyeNest_u<>nil)and(ai_near_HEye<=0)and(ai_need_heye_u=nil)and(aip_timer_magic=0)then
+         if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
 
    if(ai_Bribe_u<>nil)
    or(ai_Hack_u <>nil)then
@@ -459,14 +474,33 @@ begin
                         if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_need_heye_u^.x,ai_need_heye_u^.y))then
                           aip_timer_detection:=aip_pause_detection;
 
-                      if(map_GeneratorT<mapg_inf)and(ai_choosen)and(units_uid_e[uidi]>1)and(ai_generator_d<NOTSET)
-                      then with ai_generator_kp^ do ai_UnitAbility(pCaster,uab_UACScan   ,0,kp_x,kp_y)
-                      else
-                        if(aiu_alarm_d=NOTSET)then
-                          ai_UnitAbility(pCaster,uab_UACScan   ,0,g_random(map_Size1),g_random(map_Size1));
+                      if(map_GeneratorT<mapg_inf)and(ai_choosen)and(units_uid_e[uidi]>2)then
+                      begin
+                         if(ai_generator_d=NOTSET)then
+                           if(group=8)
+                           then group:=9
+                           else group:=8
+                         else
+                           with ai_generator_kp^ do
+                             if(ai_UnitAbility(pCaster,uab_UACScan,0,kp_x,kp_y))then
+                             begin
+                                if(group=8)
+                                then group:=9
+                                else group:=8;
+                                exit;
+                             end;
+                      end;
+
+                      if(aiu_alarm_d=NOTSET)then
+                        ai_UnitAbility(pCaster,uab_UACScan,0,g_random(map_Size1),g_random(map_Size1));
                    end;
      end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   MAIN MOVE
+//
 
 procedure ai_AbilitiesBuilderMove(pBuilder:PTUnit);
 const
@@ -486,13 +520,22 @@ function moveEventType:byte;
 begin
    moveEventType:=0;
    case map_scenario of
-   mc_koth  : if(ai_choosen)and(map_scenario=mc_koth)and(ai_keypoint_d<NOTSET)then
-                with ai_keypoint_kp^ do
-                  if(kp_RCapture<ai_keypoint_d)or(pBuilder^.isfly)then
-                  begin
-                     moveEventType:=met_koth;
-                     exit;
-                  end;
+   mc_koth  : with pBuilder^ do
+              with player^ do
+                if (ai_choosen)
+                and(map_scenario=mc_koth)
+                and(ai_keypoint_d<NOTSET)
+                and(units_builders_c>=aip_MaxBuilders)
+                and(ai_BuildersInTransform=0)then
+                  if ((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
+                  or not (pBuilder^.uidi in [UID_HCommandCenter,UID_HACommandCenter,UID_UCommandCenter,UID_UACommandCenter])then
+                    with ai_keypoint_kp^ do
+                      if(kp_RCapture<ai_keypoint_d)
+                      or(pBuilder^.isfly)then
+                      begin
+                         moveEventType:=met_koth;
+                         exit;
+                      end;
    mc_royale: case pBuilder^.isfly of
               true : if(u_royal_d<base_r1h)then
                      begin
@@ -534,7 +577,7 @@ begin
    begin
       if(point_dist_int(uo_x,uo_y,lx,ly)>=lr)then exit;
       if(map_scenario=mc_royale)then
-        if(base_r1h>(g_royal_RCur-point_dist_int(uo_x,uo_y,map_sizeH,map_sizeH)))then exit;
+        if(base_r1h>(g_royal_RCur-point_dist_int(uo_x,uo_y,g_royal_Rx,g_royal_Ry)))then exit;
       if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,true,255,pBuilder)<>cbr_no)then exit;
    end;
    checkLandingPlace:=true;
@@ -568,7 +611,7 @@ end;
 begin
    if((pBuilder^.player^.aip_flags and aif_base_BuilderMove )>0)
    then alarmType:=moveEventType
-   else alarmType:=0;
+   else exit;
    {if(pBuilder^.isselected)then
    begin
       writeln('alarmType ',alarmType,' ',ai_choosen,' ',u_royal_d,' ',base_r1h,' ',(u_royal_d<base_r1h));
@@ -585,8 +628,8 @@ begin
                                                                       kp_y+g_randomr(keyPoint_KotRW));
                           met_royale: begin
                                          lx:=RoyalCR;
-                                         ai_ability_KeepShift(pBuilder,map_sizeH+g_randomr(lx),
-                                                                       map_sizeH+g_randomr(lx));
+                                         ai_ability_KeepShift(pBuilder,g_royal_Rx+g_randomr(lx),
+                                                                       g_royal_Ry+g_randomr(lx));
                                       end;
                           met_hits  : begin
                                          lx:=g_random(map_size1);
@@ -613,7 +656,7 @@ begin
                                                  setLandingPlace(kp_x,kp_y,ai_keypoint_d,keyPoint_KotRW);
                                    met_royale: begin
                                                   lx:=min2i(g_royal_RCur div 3,base_r1h);
-                                                  setLandingPlace(map_sizeH,map_sizeH,u_royal_cd,lx);
+                                                  setLandingPlace(g_royal_Rx,g_royal_Ry,u_royal_cd,lx);
                                                end;
                                    met_hits  : ai_RunFrom(pBuilder,ai_enemy_u,0,0,ai_enemy_d);
                                    // met_build
@@ -671,6 +714,8 @@ begin
 
       if(uid_isbuilder)and(not isfly)and(zfall=0)and(build_cd<=0)then ai_Builder(pu);
 
+      //if(isselected)then writeln(ai_curr_UnitProds,' ',ai_need_UnitProds,' ',ai_selfUID_nocomplete);
+
       if((aip_flags and aif_base_suicide)>0)then
         if(ai_NeedSuicide(pu))then
         begin
@@ -680,7 +725,6 @@ begin
 
       if(res_energyl_cur<0)then
       begin
-         if(isselected)then writeln('ai_Cancel_Prod ',energyCur_BldOther,' ',energyCur_BldGens,' ',g_tick);
          ai_Cancel_Prod(pu);
          exit;
       end;
@@ -812,26 +856,26 @@ begin
       //if(isselected)then
       //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
       //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-     { if(isselected)then
+      {if(isselected)then
       begin
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);
          //writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
-         {if(ai_generator_d<NOTSET)then
+         if(ai_generator_d<NOTSET)then
            with ai_generator_kp^ do
            begin
               UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
-              writeln( kp_LimitPlayerP[playeri],' ',(keyPoint_MinLimit  +uid_LimitUse),' ',ai_generator_d,' ',kp_RCapture);
-           end; }
+              //writeln( kp_LimitPlayerP[playeri],' ',(keyPoint_MinLimit  +uid_LimitUse),' ',ai_generator_d,' ',kp_RCapture);
+           end;
          {if(ai_keypoint_d<NOTSET)then
            with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
          //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime); }
 
 
-         //writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil));
+         //writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
          //if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
          //if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua);
-      end;
-      if(isselected)then
+      end;}
+     { if(isselected)then
       with player^ do
       begin
         { writeln('res_energyl_max=',res_energyl_max,
@@ -857,6 +901,8 @@ begin
       if(uid_isbuilding)
       then ai_Global_Buildings(pu)
       else ai_Global_Units    (pu);
+
+      //if(isselected)then writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
    end;
 end;
 

@@ -54,6 +54,7 @@ begin
    c_green   :=gfx_TMWColor(0  ,150,0  ,255);
    c_ablue   :=gfx_TMWColor(0  ,0  ,255,82);
    c_blue    :=gfx_TMWColor(50 ,50 ,255,255);
+   c_ltblue  :=gfx_TMWColor(150,150,255,255);
    c_white   :=gfx_TMWColor(255,255,255,255);
    c_awhite  :=gfx_TMWColor(255,255,255,40 );
    c_gray    :=gfx_TMWColor(120,120,120,255);
@@ -737,10 +738,8 @@ begin
    spr_uibtn_AbilityBribe      := gfx_ButtonLoad(folder_ui+'b_Bribe'           ,ui_ButtonW1);
    spr_uibtn_AbilityHack       := gfx_ButtonLoad(folder_ui+'b_Hack'            ,ui_ButtonW1);
    spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'         ,ui_ButtonW1);
-   spr_uibtn_AbilityUACScan    := gfx_ButtonLoad(folder_ui+'b_scan'            ,ui_ButtonW1);
    spr_uibtn_AbilitySpawnLost  := gfx_ButtonLoad(folder_ui+'b_SpawnLost'       ,ui_ButtonW1);
    spr_uibtn_AbilitySpawnLostTo:= gfx_ButtonLoad(folder_ui+'b_SpawnLostTo'     ,ui_ButtonW1);
-   spr_uibtn_AbilityHVision    := gfx_ButtonLoad(folder_ui+'b_HVision'         ,ui_ButtonW1);
    spr_uibtn_AbilityUnload     := gfx_ButtonLoad(folder_ui+'b_unload'          ,ui_ButtonW1);
    spr_uibtn_AbilityUnloadTo   := gfx_ButtonLoad(folder_ui+'b_unloadto'        ,ui_ButtonW1);
    spr_uibtn_AbilityCCLand     := gfx_ButtonLoad(folder_ui+'b_CCland'          ,ui_ButtonW1);
@@ -752,10 +751,10 @@ begin
    spr_uibtn_AbilitySRDamage   := gfx_ButtonLoad(folder_ui+'b_SResistDamage'   ,ui_ButtonW1);
    spr_uibtn_AbilitySTurbo     := gfx_ButtonLoad(folder_ui+'b_STurbo'          ,ui_ButtonW1);
 
-   spr_uibtn_Tabs[0]:=gfx_ButtonLoad(folder_ui+'b_F1'        ,ui_TabButtonW-2,false);
-   spr_uibtn_Tabs[1]:=gfx_ButtonLoad(folder_ui+'b_F2'        ,ui_TabButtonW-2,false);
-   spr_uibtn_Tabs[2]:=gfx_ButtonLoad(folder_ui+'tab_upgrades',ui_TabButtonW-2,false);
-   spr_uibtn_Tabs[3]:=gfx_ButtonLoad(folder_ui+'tab_controls',ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[0]           := gfx_ButtonLoad(folder_ui+'b_F1'              ,ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[1]           := gfx_ButtonLoad(folder_ui+'b_F2'              ,ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[2]           := gfx_ButtonLoad(folder_ui+'tab_upgrades'      ,ui_TabButtonW-2,false);
+   spr_uibtn_Tabs[3]           := gfx_ButtonLoad(folder_ui+'tab_controls'      ,ui_TabButtonW-2,false);
 
    spr_doc_ui                  := gfx_LoadSDLSurface('doc_ui'        ,false,true);
    spr_doc_Generators          := gfx_LoadSDLSurface('doc_Generators',false,true);
@@ -950,10 +949,11 @@ begin
    gfx_LoadMWSModel(@spr_eff_ebb            ,folder_effects+'ef_ebb'                   ,smt_effect);
    gfx_LoadMWSModel(@spr_eff_gtel           ,folder_effects+'ef_gt_'                   ,smt_effect);
    gfx_LoadMWSModel(@spr_eff_tel            ,folder_effects+'ef_tel_'                  ,smt_effect);
-   gfx_LoadMWSModel(@spr_eff_exp            ,folder_effects+'ef_exp_'                  ,smt_effect);
-   gfx_LoadMWSModel(@spr_eff_exp2           ,folder_effects+'exp2_'                    ,smt_effect);
-   gfx_LoadMWSModel(@spr_eff_g              ,folder_effects+'g_'                       ,smt_effect);
-   gfx_LoadMWSModel(@spr_blood              ,folder_effects+'blood'                    ,smt_effect);
+   gfx_LoadMWSModel(@spr_eff_exp1           ,folder_effects+'ef_exp1_'                 ,smt_effect);
+   gfx_LoadMWSModel(@spr_eff_exp2           ,folder_effects+'ef_exp2_'                 ,smt_effect);
+   gfx_LoadMWSModel(@spr_eff_exp3           ,folder_effects+'ef_exp3_'                 ,smt_effect);
+   gfx_LoadMWSModel(@spr_eff_g              ,folder_effects+'ef_g_'                    ,smt_effect);
+   gfx_LoadMWSModel(@spr_blood              ,folder_effects+'ef_blood'                 ,smt_effect);
 
    gfx_LoadMWTexture(@spr_RallyPoint[r_hell],folder_Race[r_hell]+'h_mp'                ,true);
    gfx_LoadMWTexture(@spr_RallyPoint[r_uac ],folder_Race[r_uac ]+'u_mp'                ,true);
@@ -975,8 +975,11 @@ begin
    gfx_LoadMWTexture(@spr_buff_Heroic       ,folder_effects+'buff_heroic'              ,true);
 
    gfx_LoadMWTexture(@spr_kp_koth           ,'kp_koth'                                 ,true);
-   gfx_LoadMWTexture(@spr_kp_gen[0]         ,'kp_gen0'                                 ,true);
-   gfx_LoadMWTexture(@spr_kp_gen[1]         ,'kp_gen1'                                 ,true);
+   gfx_LoadMWTexture(@spr_kp_key[0]         ,'kp_key0'                                 ,true);
+   gfx_LoadMWTexture(@spr_kp_key[1]         ,'kp_key1'                                 ,true);
+   gfx_LoadMWTexture(@spr_kp_genT[0]        ,'kp_gen0'                                 ,true);
+   gfx_LoadMWTexture(@spr_kp_genT[1]        ,'kp_gen1'                                 ,true);
+
 
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do sm_kind:=smt_effect2;
@@ -1030,17 +1033,6 @@ begin
    end;
 end;
 
-{
-procedure gfx_SaveUnitIcons;
-var u:byte;
-begin
-   for u:=0 to 255 do
-     with g_uids[u] do
-       if(length(uid_str_name)>0)then
-         with uid_BTNBig do
-           if(surf<>nil)and(surf<>spr_empty)then
-             save_surf(b2s(u)+'_'+uid_str_name,surf);
-end; }
 
 procedure map_Decals_Create;
 var i,ix,iy,rn:integer;
@@ -1259,7 +1251,7 @@ begin
    ui_cam_hw:=ui_cam_w div 2;
    ui_cam_hh:=ui_cam_h div 2;
 
-   if(ui_ControlPanelPos<2)then // left-right
+   if(ui_ControlPanelPos<2)then // left-right, vertical
    begin
       ui_UIPanelW :=ui_CtrlPanelWb;
       ui_UIPanelH :=ui_CtrlPanelH;

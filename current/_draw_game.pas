@@ -380,10 +380,7 @@ begin
    with uid^  do
    with usmodel^ do
    begin
-      acolor:=PlayerGetColorCur(playeri,false);
-
-      choosen:=(ui_blink1_colorb)and((m_UnitTargetN=unum)or(ui_umark_u=unum));
-
+      choosen:=(m_UnitTargetN=unum)or(ui_umark_u=unum);
       srect  :=((isselected)and(playeri=UIPlayer))
              or(InputAction(iact_Alt))
              or(choosen);
@@ -400,11 +397,15 @@ begin
       if(srect)then
         with g_unitsVis[unum] do
         begin
+           if(ui_blink1_colorb)and(choosen)
+           then acolor:=0
+           else acolor:=PlayerColorsSchemeCurNormal[playeri];
            if(playeri=UIPlayer)
            then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
            else UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
            UnitsInfo_AddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
         end;
+      acolor:=PlayerColorsSchemeCurNormal[playeri];
       if(hbar )then UnitsInfo_Progressbar(vx-sm_SelectionHW,vy-sm_SelectionHH-4,vx+sm_SelectionHW,vy-sm_SelectionHH,hits/uid_MaxHits1,acolor);
 
       if(ui_DrawEdges)then
@@ -487,7 +488,6 @@ begin
       if(buffs[ub_SphereTurbo  ]>0)then buffx+=1;
       if(buffs[ub_SphereSoul   ]>0)then buffx+=1;
       if(buffs[ub_Heroic       ]>0)then buffx+=1;
-      if(pain                     )then buffx+=1;
 
       if(buffx=0)then exit;
 
@@ -513,7 +513,8 @@ procedure draw_LayerUnitsInfo(tar:pSDL_Surface);
 var t:integer;
 begin
    case map_scenario of
-   mc_royale: circleColor(tar,map_Sizeh-ui_cam_x,map_Sizeh-ui_cam_y,g_royal_RCur,ui_max_color[ui_blink1_colorb]);
+   mc_royale: circleColor(tar,g_royal_Rx-ui_cam_x,
+                              g_royal_Ry-ui_cam_y,g_royal_RCur,ui_max_color[ui_blink1_colorb]);
    end;
 
    while(vid_PrimitivesS>0)do
@@ -660,18 +661,15 @@ begin
           if(kp_Energy>0)then
           begin
              SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG  ,255);
-             if(kp_Energy=map_generators_EnergyS)
-             then i:=1
-             else i:=0;
-             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y+1,0     ,@spr_kp_gen[i],255);
-             for i:=1 to 6 do
+             SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y+1,0     ,@spr_kp_genT[byte(kp_Energy=map_generators_EnergyS)],255);
+             {for i:=1 to 6 do
              begin
                 ddir:=(i*60)*degtorad;
                 SpriteList_AddEffect(
                 kp_x+round(kp_RCapture*cos(ddir)),
                 kp_y+round(kp_RCapture*sin(ddir)),
-                sd_fly+kp_y,0,@spr_kp_koth,255);
-             end;
+                sd_fly+kp_y,0,@spr_kp_gen,255);
+             end; }
           end
           else
             if(t=0)and(map_scenario=mc_KotH)then
@@ -693,19 +691,20 @@ begin
                   SpriteList_AddEffect(
                   kp_x+round(kp_RCapture*cos(ddir)),
                   kp_y+round(kp_RCapture*sin(ddir)),
-                  sd_fly+kp_y,0,@spr_kp_koth,255);
+                  sd_fly+kp_y,colorS,@spr_kp_key[i mod 2],255);
                end;
                SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y,colorS,@spr_kp_out,255);
+               UnitsInfo_AddText(kp_x,kp_y-txt_line_h1 ,'#'+i2s(t+1)      ,c_ltgray);
             end;
 
           if(kptd_VisTimer>0)then
           begin
-             if(kp_Energy    >0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1*2,i2s(kp_Energy)                 ,c_aqua );
+             if(kp_Energy    >0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1*2,i2s(kp_Energy)                ,c_aqua );
              if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1 ,cr2s(kptd_lifeTime            ),c_white);
              if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y             ,ir2s(kp_CaptureTime-kptd_Timer),colorN );
 
              y:=0;
-             if(kp_Energy>0)then
+             if(kp_Energy>0)and(kp_CaptureLimit>ul1)then
                if(UIPlayer<=LastPlayer)
                then addLimitLine(UIPlayer,true)
                else

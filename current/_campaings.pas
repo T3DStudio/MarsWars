@@ -45,7 +45,7 @@ begin
    map_PlayerStartX[p]:=px;
    map_PlayerStartY[p]:=py;
 end;
-procedure camp_SetPStartMir(p1,p2:byte);
+procedure camp_SetPStartMirror(p1,p2:byte);
 begin
    map_PlayerStartX[p1]:=map_Size1-map_PlayerStartX[p2];
    map_PlayerStartY[p1]:=map_Size1-map_PlayerStartY[p2];
@@ -69,13 +69,15 @@ begin
       if(pstart>LastPlayer)then break;
    end;
 end;
-procedure camp_SetPlayer(p,r,t:byte);
+procedure camp_SetPlayer(p,r,t:byte;pname:shortstring);
 begin
    with g_PlayersGame[p] do
    begin
       state:=t;
       race :=r;
-      if(p=LocalPlayer)then name:=PlayerName;
+      isdefeated:=false;
+      isobserver:=false;
+      name:=pname;
    end;
 end;
 procedure camp_CreateUnit(playeri:byte;ux,uy:integer;uuid:byte);
@@ -85,29 +87,27 @@ end;
 
 procedure cmp_StartMission;
 begin
-   FillChar(camp_data,SizeOf(camp_data),0);
-
    g_NewObservers:=false;
    case camp_sel of
    0 : case camp_mis_sel of
        0 : begin
-              map_scenario  :=mc_ffa8;
+              FillChar(camp_data,SizeOf(camp_data),0);
+
+              map_scenario  :=mc_1x1;
               map_GeneratorT:=0;
-              map_seed      :=666;
               map_Size1     :=4000;
               map_Template  :=mapt_cave;
               map_Symmetry  :=maps_none;
-              map_BaseVars;
 
               LocalPlayer:=0;
               UIPlayer   :=0;
 
-              camp_SetPlayer(LocalPlayer,r_hell,ps_human);
-              camp_SetPlayer(4          ,r_uac ,ps_AI   );
+              camp_SetPlayer(LocalPlayer,r_hell,ps_human,PlayerName);
+              camp_SetPlayer(7          ,r_hell,ps_AI   ,''        ); // str_ from lang
 
               camp_ClearPStarts;
               camp_SetPStart(1,map_Size1 div 4,map_Size1 div 3);
-              camp_SetPStartMir(4,1);
+              camp_SetPStartMirror(4,1);
 
               camp_CreateUnit(LocalPlayer,map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer],UID_HKeep);
 
@@ -123,6 +123,7 @@ begin
 
    Map_Make;
    ui_Camera_MoveToPoint(map_PlayerStartX[LocalPlayer],map_PlayerStartY[LocalPlayer]);
+   ui_tab:=0;
 end;
 
 procedure cmp_MissionCode;

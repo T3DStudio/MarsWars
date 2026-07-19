@@ -10,6 +10,7 @@ vint2 :integer;
 begin
    svld_str_info1:='';
    svld_str_info2:='';
+   svld_str_info3:='';
 
    if(length(svld_str_fname)=0)then exit;
 
@@ -102,6 +103,7 @@ begin
       svld_str_fname:='';
       svld_str_info1:='';
       svld_str_info2:='';
+      svld_str_info3:='';
    end;
 end;
 
@@ -183,6 +185,9 @@ begin
    AddItem(@g_status            ,SizeOf(g_status           ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));
    AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen      ));
+   AddItem(@g_royal_Rx          ,SizeOf(g_royal_Rx         ));
+   AddItem(@g_royal_Ry          ,SizeOf(g_royal_Ry         ));
+   AddItem(@g_PlayersScore      ,SizeOf(g_PlayersScore     ));
    AddItem(@ai_TeamAlarms       ,SizeOf(ai_TeamAlarms      ));
    AddItem(@map_KeyPointsN      ,SizeOf(map_KeyPointsN     ));
    AddItem(@map_KeyPointsL      ,SizeOf(map_KeyPointsL     ));
@@ -196,7 +201,6 @@ begin
    AddItem(@ui_alarms           ,SizeOf(ui_alarms          ));
    AddItem(@m_brush             ,SizeOf(m_brush            ));
    AddItem(@PlayerColorsSchemeDefault,SizeOf(PlayerColorsSchemeDefault));
-   AddItem(@g_PlayersScore      ,SizeOf(g_PlayersScore     ));
 end;
 
 function saveload_Allowed:boolean;
@@ -233,7 +237,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameSaved);
+   GameLog_Chat(LocalPlayer,chat_all,str_gmsg_GameSaved);
 end;
 
 function saveload_Save(check:boolean):boolean;
@@ -278,6 +282,8 @@ begin
       exit;
    end;
 
+   if(rpls_pstate=rpls_write)then replay_Abort;
+
    assign(f,fn);
    {$I-}
    reset(f,1);
@@ -314,11 +320,13 @@ begin
          Game_DefaultAll;
          svld_str_info1:=str_FileError_Open;
          svld_str_info2:='';
+         svld_str_info3:='';
          exit;
       end;
 
       menu_mseed:=c2s(map_seed);
       map_BaseVars(false);
+      game_RoyalSetCenter(g_royal_Rx,g_royal_Ry);
       case g_type of
       gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
       gt_scirmish: map_seed2theme;
@@ -340,7 +348,7 @@ begin
 
       MenuBack(true,false);
 
-      GameLog_Chat(LocalPlayer,log_to_all,str_gmsg_GameLoaded);
+      GameLog_Chat(LocalPlayer,chat_all,str_gmsg_GameLoaded);
    end;
    close(f);
 end;

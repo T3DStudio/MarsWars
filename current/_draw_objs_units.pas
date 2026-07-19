@@ -596,7 +596,8 @@ spr        : PTMWTexture;
 spr_model  : PTMWSModel;
 spr_depth,
 spr_alphab,
-spr_alpha,t: integer;
+spr_alpha,t,
+float_y    : integer;
 ColorShadow,
 ColorAura  : TMWColor;
 begin
@@ -691,7 +692,11 @@ begin
       then ColorShadow:=PlayerGetColorCur(playeri,true)
       else ColorShadow:=c_ablack;
 
-      SpriteList_AddUnit(vx,vy,spr_depth,shadowz,ColorShadow,ColorAura,spr,spr_alpha);
+      if(isfly)and(uid_eid_SprFloating)
+      then float_y:=unit_floating_p[(g_tick+word(unum*5)) mod unit_floating_ticks]
+      else float_y:=0;
+
+      SpriteList_AddUnit(vx,vy+float_y,spr_depth,shadowz-float_y,ColorShadow,ColorAura,spr,spr_alpha);
    end;
 end;
 

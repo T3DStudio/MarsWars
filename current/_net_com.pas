@@ -225,9 +225,32 @@ begin
     +'.'+b2s((c and $FF000000) shr 24);
 end;
 
-// menu_ClientAddress,@net_cl_svip,@net_cl_svport
-//
-//
+function DNSCache_Find(dns:shortstring;pip:pcardinal):boolean;
+var t:word;
+begin
+   DNSCache_Find:=false;
+   if(net_DNSCache_n>0)then
+     for t:=0 to net_DNSCache_n-1 do
+       if(dns=net_DNSCache_dns[t])then
+       begin
+          if(pip<>nil)then pip^:=net_DNSCache_ip[t];
+          DNSCache_Find:=true;
+          break;
+       end;
+end;
+procedure DNSCache_Add(dns:shortstring;ip:cardinal);
+begin
+   if(net_DNSCache_n=net_DNSCache_n.MaxValue)then exit;
+
+   if(DNSCache_Find(dns,nil))then exit;
+
+   net_DNSCache_n+=1;
+   setlength(net_DNSCache_dns,net_DNSCache_n);
+   setlength(net_DNSCache_ip ,net_DNSCache_n);
+   net_DNSCache_dns[net_DNSCache_n-1]:=dns;
+   net_DNSCache_ip [net_DNSCache_n-1]:=ip;
+end;
+
 function menu_GetClientAddress(addr_line:shortstring;pip:pcardinal;pport:pword):shortstring;
 var
 addr_str,
@@ -265,24 +288,36 @@ begin
    else
    begin
       menu_GetClientAddress:=addr_str+':'+port_str;
-      addr_str+=#0;
-      pstr:=@addr_str[1];
-      if(SDLNet_ResolveHost(ipstruct,pstr,pport^)=0)
-      then pip^:=ipstruct.host
-      else pip^:=0;
+      if(not DNSCache_Find(addr_str,pip))then
+      begin
+         addr_str+=#0;
+         pstr:=@addr_str[1];
+         if(SDLNet_ResolveHost(ipstruct,pstr,pport^)=0)
+         then pip^:=ipstruct.host
+         else pip^:=0;
+         setlength(addr_str,length(addr_str)-1);
+         if(pip^>0)then
+           DNSCache_Add(addr_str,pip^);
+      end;
    end;
 end;
 
-procedure net_ServerListParseAddr;
+procedure net_ServerListParseAddrs;
 var i:integer;
 begin
    if(net_SvList_Size>0)then
-     for i:=0 to net_SvList_Size-1 do
-       with net_SvList_listi[i] do
-         menu_GetClientAddress(si_line,@si_ip,@si_port);
+   begin
+      draw_LoadingScreen(@str_loading_netdns,c_blue);
+      for i:=0 to net_SvList_Size-1 do
+        with net_SvList_listi[i] do
+        begin
+           si_line:=menu_GetClientAddress(si_line,@si_ip,@si_port);
+           net_SvList_lists[i]:=si_line;
+        end;
+   end;
 end;
 
-function net_ServerListAdd(addr:shortstring;check:boolean):boolean;
+function net_ServerListAdd(addr:shortstring;check:boolean;resolve:boolean=true):boolean;
 var i:integer;
 begin
    net_ServerListAdd:=false;
@@ -290,6 +325,7 @@ begin
    if(net_SvList_Size=net_SvList_Size.MaxValue)
    or(length(addr)=0)then exit;
 
+   // check existed
    if(net_SvList_Size>0)then
      for i:=0 to net_SvList_Size-1 do
        with net_SvList_listi[i] do
@@ -306,7 +342,9 @@ begin
    with net_SvList_listi[net_SvList_Size-1] do
    begin
       si_ping  :=9999;
-      si_line  :=addr;
+      if(resolve)
+      then si_line:=menu_GetClientAddress(addr,@si_ip,@si_port)
+      else si_line:=addr;
       si_manual:=true;
       net_SvList_lists[net_SvList_Size-1]:=si_line;
    end;

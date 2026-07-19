@@ -30,8 +30,10 @@
       </Unit>
       <Unit>
         <Filename Value="_ai_common.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <CursorPos X="44" Y="32"/>
+        <TopLine Value="1262"/>
+        <CursorPos X="14" Y="1287"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit>
@@ -57,10 +59,9 @@
       </Unit>
       <Unit>
         <Filename Value="_ded.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="115"/>
-        <CursorPos X="101" Y="139"/>
+        <TopLine Value="111"/>
+        <CursorPos X="80" Y="130"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit>
@@ -231,7 +232,7 @@
       </Position>
       <Position>
         <Filename Value="_ded.pas"/>
-        <Caret Line="103" Column="75" TopLine="111"/>
+        <Caret Line="130" Column="80" TopLine="111"/>
       </Position>
     </JumpHistory>
     <RunParams>

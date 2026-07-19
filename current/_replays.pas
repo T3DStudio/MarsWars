@@ -1,6 +1,4 @@
 
-const camXYt1b = 5;
-
 procedure replay_MenuSelectedInfo;
 var  f: file;
     fn: shortstring;
@@ -9,6 +7,7 @@ ioer  : word;
 begin
    rpls_str_info1:='';
    rpls_str_info2:='';
+   rpls_str_info3:='';
 
    if(rpls_list_sel<0)
    or(rpls_list_sel>=rpls_list_size)then exit;
@@ -127,6 +126,8 @@ begin
      with g_PlayersGame[p] do
        AddItem(@race,SizeOf(race));
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
+   AddItem(@g_royal_Rx      ,SizeOf(g_royal_Rx      ));
+   AddItem(@g_royal_Ry      ,SizeOf(g_royal_Ry      ));
 end;
 
 function replay_GetProgress:single;
@@ -325,8 +326,8 @@ i,gs,
 camx,
 camy: byte;
 begin
-   camx:=byte(ui_cam_cx shr camXYt1b);
-   camy:=byte(ui_cam_cy shr camXYt1b);
+   camx:=byte(ui_cam_cx shr rpls_UIcamXYt1b);
+   camy:=byte(ui_cam_cy shr rpls_UIcamXYt1b);
 
    gs:=g_status and %00011111;
    i :=gs;
@@ -383,6 +384,7 @@ begin
       g_started     :=false;
       rpls_str_info1:='';
       rpls_str_info2:='';
+      rpls_str_info3:='';
       exit;
    end;
 
@@ -393,6 +395,7 @@ begin
       g_started     :=false;
       rpls_str_info1:=str_FileError_NExists;
       rpls_str_info2:='';
+      rpls_str_info3:='';
       exit;
    end;
 
@@ -409,6 +412,7 @@ begin
       menu_page     :=mi_replays;
       rpls_str_info1:=str_FileError_Open+'('+w2s(ioerr)+')';
       rpls_str_info2:='';
+      rpls_str_info3:='';
    end
    else
    begin
@@ -424,6 +428,7 @@ begin
          menu_page     :=mi_replays;
          rpls_str_info1:=str_FileError_WData;
          rpls_str_info2:='';
+         rpls_str_info3:='';
          exit;
       end;
 
@@ -437,6 +442,7 @@ begin
          menu_page     :=mi_replays;
          rpls_str_info1:=str_FileError_WVer;
          rpls_str_info2:='';
+         rpls_str_info3:='';
       end
       else
       begin
@@ -454,6 +460,7 @@ begin
             menu_page     :=mi_replays;
             rpls_str_info1:=str_FileError_WVer+rpls_file_LastErrS;
             rpls_str_info2:='';
+            rpls_str_info3:='';
             Game_DefaultAll;
             exit;
          end;
@@ -469,6 +476,7 @@ begin
             menu_page     :=mi_replays;
             rpls_str_info1:=str_FileError_WVer;
             rpls_str_info2:='';
+            rpls_str_info3:='';
             Game_DefaultAll;
             exit;
          end;
@@ -485,6 +493,7 @@ begin
                 menu_page     :=mi_replays;
                 rpls_str_info1:=str_FileError_WVer;
                 rpls_str_info2:='';
+                rpls_str_info3:='';
                 Game_DefaultAll;
                 exit;
              end;
@@ -571,8 +580,8 @@ begin
 
    if(ui_playerPOV)then
    begin
-      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl camXYt1b)-ui_cam_hw) div 2;
-      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl camXYt1b)-ui_cam_hh) div 2;
+      ui_cam_x:=(ui_cam_x+integer(rpls_vidx shl rpls_UIcamXYt1b)-ui_cam_hw) div 2;
+      ui_cam_y:=(ui_cam_y+integer(rpls_vidy shl rpls_UIcamXYt1b)-ui_cam_hh) div 2;
       ui_Camera_Bounds;
    end;
 
@@ -623,6 +632,7 @@ begin
      begin
         rpls_str_info1:='';
         rpls_str_info2:='';
+        rpls_str_info3:='';
      end;
 end;
 

@@ -321,6 +321,7 @@ TUnitAbility = record
    ua_btn         : pSDl_Surface;
    ua_str_name,
    ua_str_Reqs,
+   ua_str_ReqsUHint,
    ua_str_Common,
    ua_str_ReloadFactors,
    ua_str_Descript: shortstring;
@@ -442,7 +443,8 @@ TUID = record
    uid_LimitUse,
    uid_LevelBonusDamage,
    uid_LevelBonusArmor,
-   uid_LevelBonusPainC   : integer;
+   uid_LevelBonusPainC,
+   uid_LevelBonusRegen   : integer;
    uid_LevelUpTimeTicks,
    uid_LevelUpTimeSecs   : cardinal;
 
@@ -451,7 +453,9 @@ TUID = record
    uid_ZombieHits        : integer;
    uid_ZombieUID         : byte;
 
+   uid_TargetWeight,
    uid_AI_TargetWeight   : byte;
+   uid_AI_GenAssaultGroup,
    uid_AI_Melee,
    uid_AI_Healer,
    uid_AI_Siedge         : boolean;
@@ -570,7 +574,8 @@ TUID = record
    uid_HintInGame,
    uid_HintDoc           : TUIStringList;
 
-   uid_eid_BuildHellType
+   uid_eid_BuildHellType,
+   uid_eid_SprFloating
                          : boolean;
    uid_eid_bcrater
                          : byte;
@@ -579,9 +584,9 @@ TUID = record
    uid_eid_SummonSpr     : array[0..LastUnitLevel] of PTMWTexture;
    uid_eid_Summon,
    uid_eid_DeathSlow,
-   uid_eid_DeathFast,
-   uid_eid_Pain
-                         : array[0..LastUnitLevel] of byte;
+   uid_eid_DeathFast     : array[0..LastUnitLevel] of byte;
+   uid_eid_Pain          : byte;
+
 
    uid_snd_Foot,
    uid_snd_Summon,
@@ -740,6 +745,7 @@ TPlayerDataGame = record
 
                    // units by isbuilding [building]
    units_bld_e,    // existed
+   units_bld_lc,
    units_bld_s     : array[false..true] of integer; // selected
    units_bld_l     : array[false..true] of longint; // limit
 
@@ -793,6 +799,7 @@ TPlayerDataGame = record
    aip_MinTowers,
    aip_MaxTowers,
    aip_MaxSuper        : integer;
+   aip_MaxAttackLimit,
    aip_MaxUnitLimit,
    aip_MaxUnitMinPart
                        : longint;
@@ -910,7 +917,7 @@ TKeyPoint = record
    kp_x,kp_y,
    kp_RCapture,
    kp_RNoBuild,
-   kp_ToCenterD,
+   kp_ToRoyalCD,
    kp_Energy,
    kp_CaptureTime : integer;
    kp_CaptureLimit: longint;

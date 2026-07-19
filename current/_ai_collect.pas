@@ -143,8 +143,8 @@ begin
       if(tu^.aiu_alarm_d<NOTSET)
       and(tu^.mapZone=tu^.aiu_alarm_zone)
       and(tu^.mapZone<>mapZone)
-      and(not map_IsObstacleZone(tu^.aiu_alarm_zone))
-      and(not map_IsObstacleZone(tu^.mapZone))then
+      and(tu^.aiu_alarm_zone<>zone_solid)
+      and(tu^.mapZone<>zone_solid)then
         setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for KOTH
@@ -152,7 +152,7 @@ begin
         with map_KeyPointsL[0] do
           if (tu^.mapZone=kp_Zone)
           and(tu^.mapZone<>mapZone)
-          and(not map_IsObstacleZone(kp_Zone))then
+          and(kp_Zone<>zone_solid)then
             setNearestTarget(@ai_HTeleportTarKOTH_u,@ai_HTeleportTarKOTH_d,ud,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for generator capture
@@ -233,7 +233,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      if(ai_VisionOnUnit(pu,tu,ai_AvailableDetectors>0))then  // enemy in vision
+      if(ai_VisionOnUnit(pu,tu,(ai_AvailableDetectors>0)or(uid_isbuilding)))then  // enemy in vision
       begin
          if(tu^.buffs[ub_SphereInvuln]<=0)then
          begin
@@ -265,10 +265,6 @@ begin
             // uac strike target
             if(uidi=UID_URMStation)then
               ai_SetTarget_Strike(tu);
-
-            // Primary Target
-            if(ud<=srange)and(uid_CanAttack)then
-              if(isattackable)and(tu^.uid^.uid_AI_TargetWeight>0)then ai_SetPrimaryTarget(tu);
          end;
 
          if(tu^.uid^.uid_isbuilding)then
@@ -391,8 +387,6 @@ begin
       then ai_energy_future+=g_uids[tu^.uid^.uid_AI_NextFormUID].uid_gen_EnergyLevel
       else ai_energy_future+=tu^.uid^.uid_gen_EnergyLevel;
 
-      ai_energy_current+=tu^.uid^.uid_gen_EnergyLevel;
-
       if(tu^.iscomplete)then
       begin
          if (not tu^.uid^.uid_isbuilding)
@@ -424,9 +418,19 @@ begin
               ai_transport_need+=tu^.uid^.uid_TransportSize;
          end;
 
-         if(tu^.transformTimer>0)then ai_UnitsInTransform+=1;
+         if(tu^.transformTimer>0)then
+           if(g_uids[tu^.transformUID].uid_req_EnergyLevel>0)then
+           begin
+              ai_UnitsInTransform+=1;
+              if(tu^.uid^.uid_isbuilder)then ai_BuildersInTransform+=1;
+           end;
+      end
+      else
+      begin
+         if(tu^.uid^.uid_isbuilder)and(tu^.uid^.uid_req_EnergyLevel>0)then
+           ai_BuildersInConstruction+=1;
+         if(uidi=tu^.uidi)then ai_selfUID_nocomplete+=1;
       end;
-
       // armylimit
       {if(tu^.uid^.uid_isbuilding)
       then ai_armylimit_alive_b+=tu^.uid^.uid_LimitUse
@@ -451,8 +455,11 @@ begin
          end;
 
          // limit of generator guards near
-         if(ud<srange)and(tu^.group=aic_group_GenGuard)then
-           ai_nearGenGuards+=tu^.uid^.uid_LimitUse;
+         if(ud<srange)then
+           if(tu^.group=aic_group_GenGuard  )
+           or(tu^.group=aic_group_GenAssault)
+           or(tu^.group=aic_group_GenWait   )
+           then ai_nearGenDudesLimit+=tu^.uid^.uid_LimitUse;
       end;
    end;
 end;
@@ -461,7 +468,7 @@ begin
    with uid^    do
    with player^ do
    begin
-      pfcheck   :=(isfly)or((mapZone=tu^.mapZone)and not map_IsObstacleZone(mapZone));
+      pfcheck   :=(isfly)or((mapZone=tu^.mapZone)and (mapZone<>zone_solid));
       busyHealer:=false;
       if(tu^.uid^.uid_AI_healer)and(isUnitRange(tu^.a_tar,@tmpu))then
         if(tmpu^.player^.team=team)then busyHealer:=true;

@@ -475,7 +475,6 @@ begin
    drawmenu_ItemTextC(tar,mi_Players_CColor,ta_MM,str_PT_Color ,c_ltgray);
    drawmenu_ItemTextC(tar,mi_Players_CPing ,ta_MM,str_PT_Ping  ,c_ltgray);
 
-
    for p:=0 to LastPlayer do
      with g_PlayersGame[p] do
        if(state<>ps_None)then
@@ -533,18 +532,22 @@ begin
      with g_PlayersGame[p] do
      with menu_items[mi_Players_Ping0+p] do
        if(mi_state>as_off)then
-         if(net_status=ns_none)or(state<>ps_Human)
-         then boxColor(tar,mi_x0+font_wh,mi_y0+font_wh,
-                           mi_x1-font_wh,mi_y1-font_wh,PlayerGetColorDef(p))
-         else
-           with g_PlayersTemp[p] do
-             if((net_status<>ns_client)and(p=LocalPlayer  ))
-             or((net_status= ns_client)and(p=net_cl_Hoster))
-             then draw_text(tar,mi_xc,mi_yc,str_ps_Host,ta_MM,255,PlayerGetColorDef(p))
-             else
-               if(net_ping<=999)
-               then draw_text(tar,mi_xc,mi_yc,w2s(net_ping),ta_MM,255,PlayerGetColorDef(p))
-               else draw_text(tar,mi_xc,mi_yc,'999'        ,ta_MM,255,PlayerGetColorDef(p));
+       begin
+          //layerGetColorDef(p)
+          color:=PlayerGetColorCur(p,false);
+          if(net_status=ns_none)or(state<>ps_Human)
+          then boxColor(tar,mi_x0+font_wh,mi_y0+font_wh,
+                            mi_x1-font_wh,mi_y1-font_wh,color)
+          else
+            with g_PlayersTemp[p] do
+              if((net_status<>ns_client)and(p=LocalPlayer  ))
+              or((net_status= ns_client)and(p=net_cl_Hoster))
+              then draw_text(tar,mi_xc,mi_yc,str_ps_Host,ta_MM,255,color)
+              else
+                if(net_ping<=999)
+                then draw_text(tar,mi_xc,mi_yc,w2s(net_ping),ta_MM,255,color)
+                else draw_text(tar,mi_xc,mi_yc,'999'        ,ta_MM,255,color);
+       end;
 
    // SCIRMISH MAP
    drawmenu_ItemCaption(tar,mi_Map_Panel,str_Caption_Map);

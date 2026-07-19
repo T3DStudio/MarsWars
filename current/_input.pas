@@ -44,7 +44,7 @@ begin
    input_SetAction(iAct_LastEvent         ,ikt_keyboard,0           ,SDLK_Space       );
 
    input_SetAction(iAct_ToggleWindowed    ,ikt_keyboard,iAct_Alt    ,SDLK_RETURN      );
-
+   input_SetAction(iAct_TogglePlayersColor,ikt_keyboard,0           ,SDLK_F11         );
 
    input_SetAction(iAct_USetGroup0        ,ikt_keyboard,iAct_control,SDLK_0           );
    input_SetAction(iAct_USetGroup1        ,ikt_keyboard,iAct_control,SDLK_1           );
@@ -103,7 +103,6 @@ begin
    input_SetAction(iAct_Control_MarkLook  ,ikt_keyboard,0           ,SDLK_F5          );
    input_SetAction(iAct_Control_MarkAttack,ikt_keyboard,0           ,SDLK_F6          );
    input_SetAction(iAct_Control_ToggleRec ,ikt_keyboard,0           ,SDLK_F10         );
-
 
    input_SetAction(iAct_SProd1            ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_SProd2            ,ikt_keyboard,0           ,SDLK_T           );
@@ -906,7 +905,7 @@ begin
                                       if(not GameLog_ReqMsg(LocalPlayer,uid_ability1,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability1,false),x,y,false))then
                                         if(ua_type=uat_notarget)
                                         then PlayerSendOrder(co_ability,0,ui_cam_cx,ui_cam_cy,uid_ability1,uo_corder,LocalPlayer)
-                                        else m_brush:=-uid_ability1;
+                                        else begin m_brush:=-uid_ability1;clickSound^:=snd_select_target[uid_race];end;
    iAct_Control_UAbility2 : if(click_type=pct_left)and(ui_CommandercpU<>nil)then
                               with ui_CommandercpU^ do
                               with uid^ do
@@ -916,7 +915,7 @@ begin
                                       if(not GameLog_ReqMsg(LocalPlayer,uid_ability2,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability2,false),x,y,false))then
                                         if(ua_type=uat_notarget)
                                         then PlayerSendOrder(co_ability,0,ui_cam_cx,ui_cam_cy,uid_ability2,uo_corder,LocalPlayer)
-                                        else m_brush:=-uid_ability2;
+                                        else begin m_brush:=-uid_ability2;clickSound^:=snd_select_target[uid_race];end;
    iAct_Control_UAbility3 : if(click_type=pct_left)and(ui_CommandercpU<>nil)then
                               with ui_CommandercpU^ do
                               with uid^ do
@@ -926,7 +925,7 @@ begin
                                       if(not GameLog_ReqMsg(LocalPlayer,uid_ability3,lmt_argt_ability,unit_AbilityCheck(ui_CommandercPU,uid_ability3,false),x,y,false))then
                                         if(ua_type=uat_notarget)
                                         then PlayerSendOrder(co_ability,0,ui_cam_cx,ui_cam_cy,uid_ability3,uo_corder,LocalPlayer)
-                                        else m_brush:=-uid_ability3;
+                                        else begin m_brush:=-uid_ability3;clickSound^:=snd_select_target[uid_race];end;
 
    iAct_Control_UAMove    : if(SoundEnabledLeft)then m_brush :=co_amove;
    iAct_Control_UAPatrol  : if(SoundEnabledLeft)then m_brush :=co_apatrol;
@@ -1019,8 +1018,6 @@ begin
                                  ui_cam_y-=sys_EVENT^.motion.y-mouse_y;
                                  ui_Camera_Bounds;
                               end;
-                              mouse_prev_x:=mouse_x;
-                              mouse_prev_y:=mouse_y;
                               mouse_x:=sys_EVENT^.motion.x;
                               mouse_y:=sys_EVENT^.motion.y;
                            end;
@@ -1215,7 +1212,7 @@ begin
 
    if(InputActionPressed(iact_MMB))then            // MMB down
      case m_uifocus of
-     mf_map      : m_DragCamMove:=true;
+     mf_map      : if(not ui_playerPOV)then m_DragCamMove:=true;
      mf_minimap  : ;
      mf_CtrlPanel: ;
      end;
@@ -1252,9 +1249,9 @@ procedure GameControlsKeyboard;
 var
 ctab :TTabControlContent;
 act,k:byte;
-clickSound:boolean;
+clickSound:pTSoundSet;
 begin
-   clickSound:=false;
+   clickSound:=nil;
    if(not m_DragCamMove)and(not ui_playerPOV)then GameControlsCameraMove;
 
    // Chat
@@ -1303,7 +1300,7 @@ begin
    begin
       ui_tab+=1;
       ui_tab:=ui_tab mod 4;
-      clickSound:=true;
+      clickSound:=snd_click;
    end;
 
    // Menu
@@ -1339,9 +1336,6 @@ begin
          if(InputActionPressed(iAct_test_BePlayer7   ))then LocalPlayer:=7;
          if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersGame[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
          if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersGame[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
-
-        // if(InputActionPressed(iAct_test_debug0      ))then net_debug:= not net_debug;
-         if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
       end;
       {$ENDIF}
 
@@ -1349,7 +1343,7 @@ begin
       if(InputActionPressed(iAct_LastEvent))then
       begin
          ui_Camera_ToLastEvent;
-         clickSound:=true;
+         clickSound:=snd_click;
       end;
 
       // Controls tab actions
@@ -1360,13 +1354,21 @@ begin
         for k:=0 to ui_ButtonsNum do
         begin
            act:=ui_panel_CTabIActs[ctab,k];
+           //or((ctab=tcc_controls)and(g_status=gs_running)and(InputActionStuckP(act)))
            if(InputActionPressed(act))then
              ui_ExecInGameAction(act,pct_left,@clickSound);
         end;
 
       // Record toggle
-      if(ctab=tcc_controls)then
-        if(InputActionPressed(iAct_Control_ToggleRec))then menu_ToggleRecord;
+      if(ctab=tcc_controls)
+      or(ctab=tcc_observer)then
+        if(InputActionPressed(iAct_Control_ToggleRec))then
+        begin
+           menu_ToggleRecord;
+           clickSound:=snd_click;
+        end;
+
+      if(InputActionPressed(iAct_TogglePlayersColor))then menu_ScrollPlayersColor(true);
 
       if(g_status=gs_running)then
       begin
@@ -1376,27 +1378,34 @@ begin
          for k:=iAct_UASlGroup1 to iAct_UASlGroup9 do if(InputActionPressed(k))then units_SelectGroup(true ,k-iAct_UASlGroup1+1);
          for k:=iAct_USelGroup1 to iAct_USelGroup9 do
            if(InputActionDPressed(k))
+           or(InputActionStuck(k))
            then ui_Camera_MoveToGroup(@ui_group_d[k-iAct_USelGroup1+1])
            else
              if(InputActionPressed(k))
              then units_SelectGroup(false,k-iAct_USelGroup1+1);
 
          // unit common controls
-         if(InputActionDPressed(iAct_Control_USelBase))then ui_Camera_MoveToGroup(@ui_group_f1);
-         if(InputActionDPressed(iAct_Control_USelArmy))then ui_Camera_MoveToGroup(@ui_group_f2);
+         if(InputActionDPressed(iAct_Control_USelBase))
+         or(InputActionStuck   (iAct_Control_USelBase))then ui_Camera_MoveToGroup(@ui_group_f1);
+         if(InputActionDPressed(iAct_Control_USelArmy))
+         or(InputActionStuck   (iAct_Control_USelArmy))then ui_Camera_MoveToGroup(@ui_group_f2);
 
          // Production hotkeys
          case ui_tab of
          tab_buildings,
          tab_units,
          tab_upgrades : for k:=0 to ui_ButtonsNum do
-                          if(InputActionPressed(iAct_SProd1+k))then
-                            ui_ExecInGameAction(iAct_SProd1+k,pct_left,@clickSound);
+                        begin
+                           act:=iAct_SProd1+k;
+                           if(InputActionPressed(act))
+                           or(InputActionStuckP (act))then
+                             ui_ExecInGameAction(act,pct_left,@clickSound);
+                        end;
          end;
       end;
    end;
 
-   if(clickSound)then snd_SoundPlayUI(snd_click);
+   if(clickSound<>nil)then snd_SoundPlayUI(clickSound);
 end;
 
 
@@ -1407,16 +1416,27 @@ begin
    if(InputActionReleased(iact_Screenshot))then gfx_MakeScreenshot;
    if(InputActionPressed(iAct_ToggleWindowed))then menu_ToggleFullScreen;
 
+   {// Test mode
+   {$IFDEF TESTMODE}
+   if(TestMode>0)then
+   begin
+      if(InputActionPressed(iAct_test_debug0      ))then net_debug_resolv;
+      if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
+   end;
+   {$ENDIF} }
+
    if(MainMenu)then
    begin
       menu_Controls;
    end
    else
    begin
+      ui_ControlTabType:=ui_ControlTabTypeF;
       GameControlsKeyboard;
       GameControlsMouse;
       unit_UICountersAll;
       ui_EnableControlActs;
+      ui_ControlTabType:=ui_ControlTabTypeF;
    end;
 
    // rebuild menu

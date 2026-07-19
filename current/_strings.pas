@@ -623,8 +623,8 @@ begin
    str_DamageMod:='';
    for i:=0 to LastDamageModFactor do
     with g_DamageMods[dmod][i] do
-     if(dm_Factor<>100)and(dm_TargetFlags>0)then
-      STRADD(@str_DamageMod,'x'+limit2s(dm_Factor,100)+' '+str_BaseFlags2Str(dm_TargetFlags),sep_comma);
+     if(dm_Factor<>100)and(dm_TargetFlags>0)then //limit2s(dm_Factor,100)
+      STRADD(@str_DamageMod,i2s(dm_Factor)+'% '+str_BaseFlags2Str(dm_TargetFlags),sep_comma);
 end;
 
 function str_ReqNum2s(basename:shortstring;reqn:byte):shortstring;
@@ -1038,6 +1038,8 @@ begin
         AddLineUnitGameHint(uid_str_CostLimit   );
         AddLineUnitGameHint(uid_str_DefaultAttr );
         AddLineUnitGameHint(uid_str_1LineDescript);
+        AddLineUnitGameHint(uid_str_Reqs);
+        AddLineUnitGameHint(uid_str_Prod);
         if(uid_CanAttack)then
         begin
            AddLineUnitGameHint(str_hint_UnitArming);
@@ -1048,18 +1050,20 @@ begin
         if(uid_HaveAbility)then
         begin
            AddLineUnitGameHint(str_hint_Abilities);
-           if(uid_ability1>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability1,255));AddLineUnitGameHint(g_aids[uid_ability1].ua_str_Descript); end;
-           if(uid_ability2>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));AddLineUnitGameHint(g_aids[uid_ability2].ua_str_Descript); end;
-           if(uid_ability3>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));AddLineUnitGameHint(g_aids[uid_ability3].ua_str_Descript); end;
+           if(uid_ability1>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability1,255));AddLineUnitGameHint(g_aids[uid_ability1].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability1].ua_str_ReqsUHint);end;
+           if(uid_ability2>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));AddLineUnitGameHint(g_aids[uid_ability2].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability2].ua_str_ReqsUHint);end;
+           if(uid_ability3>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));AddLineUnitGameHint(g_aids[uid_ability3].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability3].ua_str_ReqsUHint);end;
         end;
-        AddLineUnitGameHint(uid_str_Reqs);
-        AddLineUnitGameHint(uid_str_Prod);
+
 
         // Basic Doc hint //////////////////////////////////////////////////////
         AddLineUnitDocHint(str_doc_HotKey         +uid_str_HK        );
         AddLineUnitDocHint(str_doc_Attributes     );
         AddLineUnitDocHint(uid_str_DefaultAttr    );
+        AddLineUnitDocHint(str_PT_Race            +': '+str_race[uid_race]);
+
         AddLineUnitDocHint(str_doc_MaxHits        +li2s(uid_MaxHits1));
+        AddLineUnitDocHint(str_doc_FastDeath      +str_YesNoG[(uid_FastDeathHits>=0)or(uid_isbuilding)]);
         if(uid_Regen_Base<0)then
         AddLineUnitDocHint(str_doc_LifeTime       +i2s(round(uid_MaxHits1/-uid_Regen_Base*regen_period1))+' '+str_hint_sec );
         if(uid_req_EnergyLevel>0)then
@@ -1087,6 +1091,8 @@ begin
            AddLineUnitDocHint(str_doc_LevelArmorBonus +DocValI(uid_LevelBonusArmor  ));
            if(uid_PainState_Base>0)then
            AddLineUnitDocHint(str_doc_LevelPainSBonus +DocValI(uid_LevelBonusPainC  ));
+           if(uid_LevelBonusRegen>0)then
+           AddLineUnitDocHint(str_doc_LevelRegenBonus +DocValI(uid_LevelBonusRegen  ));
         end;
         if(uid_TransportMax_Base>0)then
         AddLineUnitDocHint(str_doc_TransportCpst     +DocValI(uid_TransportMax_Base));
@@ -1160,7 +1166,12 @@ begin
           if(ua_req_uid >0)then STRADD(@ITEMP,str_ReqNum2s(g_uids [ua_req_uid ].uid_str_name ,1),sep_comma);
           if(ua_req_upgr>0)then STRADD(@ITEMP,str_ReqNum2s(str_UpgradeNameForReq(ua_req_upgr),1),sep_comma);
           ua_str_Reqs:='';
-          if(length(ITEMP)>0)then ua_str_Reqs+=tc_yellow+str_hint_requirements+tc_default+ITEMP;
+          ua_str_ReqsUHint:='';
+          if(length(ITEMP)>0)then
+          begin
+             ua_str_Reqs+=tc_yellow+str_hint_requirements+tc_default+ITEMP;
+             ua_str_ReqsUHint+='{'+tc_yellow+str_hint_req+tc_default+ITEMP+'}';
+          end;
 
           ua_str_Common:='';
           ua_str_ReloadFactors:='';

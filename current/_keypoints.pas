@@ -51,6 +51,47 @@ begin
      end;
 end;
 
+procedure Scenario_KeyPointVision(kpi:byte);
+var
+p    :byte;
+pkptv:PTKeyPointTeamData;
+begin
+   with map_KeyPointsL[kpi] do
+   begin
+      pkptv:=@kp_TeamData[MaxPlayers];
+      for p:=0 to LastPlayer do
+        with kp_TeamData[p] do
+        begin
+           if((map_scenario=mc_koth     )and(kpi=0))
+           or((map_scenario=mc_KeyPoints)and(kpi<keyPoint_mcN))
+           //or(not ui_fog)
+           or(pkptv^.kptd_TimerOwnerTeam=p)
+           or(pkptv^.kptd_OwnerTeam     =p)
+           then kptd_VisTimer:=MinVisionTime;
+
+           if(kptd_VisTimer>0)then
+           begin
+              kptd_VisTimer-=1;
+              kptd_Active          :=pkptv^.kptd_Active;
+              kptd_TimerOwnerTeam  :=pkptv^.kptd_TimerOwnerTeam;
+              kptd_TimerOwnerPlayer:=pkptv^.kptd_TimerOwnerPlayer;
+              kptd_OwnerPlayer     :=pkptv^.kptd_OwnerPlayer;
+              kptd_OwnerTeam       :=pkptv^.kptd_OwnerTeam;
+              kptd_Timer           :=pkptv^.kptd_Timer;
+              kptd_lifeTime        :=pkptv^.kptd_lifeTime;
+           end;
+        end;
+   end;
+end;
+
+procedure Scenario_KeyPointVisionAll;
+var
+kpi:byte;
+begin
+   for kpi:=0 to LastKeyPoint do
+     Scenario_KeyPointVision(kpi);
+end;
+
 procedure KeyPoint_ChangeOwner(kpi,newOwnerPlayer:byte;log:boolean=true);
 begin
    with map_KeyPointsL[kpi] do
@@ -64,7 +105,9 @@ begin
               res_energyl_cur-=kp_Energy;
               res_energyl_max-=kp_Energy;
            end;
-           if(log)then GameLog_KeyPointLost(kptd_OwnerPlayer,kpi);
+           if(log)then
+             if(kp_Energy>0)then
+               GameLog_GeneratorLost(kptd_OwnerPlayer,kpi);
         end;
 
         kptd_OwnerPlayer:=newOwnerPlayer;
@@ -79,50 +122,21 @@ begin
               res_energyl_cur+=kp_Energy;
               res_energyl_max+=kp_Energy;
            end;
-           if(log)and(g_tick>=fr_fps1)then GameLog_KeyPointCaptured(kptd_OwnerPlayer,kpi);
+           Scenario_KeyPointVision(kpi);
+           if(log)and(g_tick>=fr_fps1)then
+             if(kp_Energy>0)
+             then GameLog_GeneratorCaptured(kptd_OwnerPlayer,kpi)
+             else GameLog_KeyPointCaptured (kpi);
         end;
      end;
 end;
 
-procedure Scenario_KeyPointsTeam;
-var
-kpi,p:byte;
-pkptv:PTKeyPointTeamData;
-begin
-   for kpi:=0 to LastKeyPoint do
-     with map_KeyPointsL[kpi] do
-     begin
-        pkptv:=@kp_TeamData[MaxPlayers];
-        for p:=0 to LastPlayer do
-          with kp_TeamData[p] do
-          begin
-             if((map_scenario=mc_koth     )and(kpi=0))
-             or((map_scenario=mc_KeyPoints)and(kpi<keyPoint_mcN))
-             //or(not ui_fog)
-             or(pkptv^.kptd_TimerOwnerTeam=p)
-             or(pkptv^.kptd_OwnerTeam     =p)
-             then kptd_VisTimer:=MinVisionTime;
-
-             if(kptd_VisTimer>0)then
-             begin
-                kptd_VisTimer-=1;
-                kptd_Active          :=pkptv^.kptd_Active;
-                kptd_TimerOwnerTeam  :=pkptv^.kptd_TimerOwnerTeam;
-                kptd_TimerOwnerPlayer:=pkptv^.kptd_TimerOwnerPlayer;
-                kptd_OwnerPlayer     :=pkptv^.kptd_OwnerPlayer;
-                kptd_OwnerTeam       :=pkptv^.kptd_OwnerTeam;
-                kptd_Timer           :=pkptv^.kptd_Timer;
-                kptd_lifeTime        :=pkptv^.kptd_lifeTime;
-             end;
-          end;
-     end;
-end;
 
 {$IFDEF _FULLGAME}
 procedure Scenario_KeyPointsCodeClient;
 var i:byte;
 begin
-   Scenario_KeyPointsTeam;
+   Scenario_KeyPointVisionAll;
    for i:=0 to LastKeyPoint do
      with map_KeyPointsL[i] do
      with kp_TeamData[MaxPlayers] do
@@ -143,14 +157,14 @@ tCapturingPlayer,
 tPlayers,
 tTeams  : integer;
 begin
-   Scenario_KeyPointsTeam;
+   Scenario_KeyPointVisionAll;
 
    for i:=0 to LastKeyPoint do
      with map_KeyPointsL[i] do
      with kp_TeamData[MaxPlayers] do
        if(kptd_Active)then
        begin
-          if(map_scenario=mc_royale)and(g_royal_RCur<kp_ToCenterD)then
+          if(map_scenario=mc_royale)and(g_royal_RCur<kp_ToRoyalCD)then
           begin
              kptd_Active:=false;
              for p:=0 to LastPlayer do
@@ -165,7 +179,7 @@ begin
 
           if(not kptd_Active)then
           begin
-             GameLog_NgenExh(kptd_OwnerPlayer,i);
+             GameLog_GeneratorExh(kptd_OwnerPlayer,i);
              KeyPoint_ChangeOwner(i,255,false);
              {$IFDEF _FULLGAME}
              KeyPoints_Explode(i,true);
@@ -194,10 +208,11 @@ begin
           for p:=0 to LastPlayer do
           begin
              if(kp_LimitPlayerC[p]>=kp_CaptureLimit)and(p<>kptd_OwnerPlayer)and(p<>kptd_TimerOwnerPlayer)then
-             begin
-                if(tPlayers=0)then tCapturingPlayer:=p;
-                tPlayers+=1;
-             end;
+               if(kptd_OwnerTeam<>g_PlayersGame[p].team)then
+               begin
+                  if(tPlayers=0)then tCapturingPlayer:=p;
+                  tPlayers+=1;
+               end;
              if(kp_LimitTeamC  [p]>=kp_CaptureLimit)then
                tTeams+=1;
 
@@ -234,13 +249,26 @@ begin
                     if(kptd_TimerOwnerPlayer<=LastPlayer)
                     then kptd_TimerOwnerTeam:=g_PlayersGame[kptd_TimerOwnerPlayer].team
                     else kptd_TimerOwnerTeam:=255;
-                    if(i=0)and(map_scenario=mc_KotH)then GameLog_KotHControl;
                     kptd_Timer:=0;
                  end;
                  if(kptd_Timer<kp_CaptureTime)then
-                   if(g_tick<fr_fps1)
-                   then kptd_Timer:=kp_CaptureTime
-                   else kptd_Timer+=1
+                 begin
+                    if(g_tick<fr_fps1)
+                    then kptd_Timer:=kp_CaptureTime
+                    else
+                    begin
+                       kptd_Timer+=1;
+                       if(i=0)and(map_scenario=mc_KotH)then
+                         GameLog_KothCountDown;
+                    end;
+                    if(kptd_Timer=1)then
+                      if(kp_Energy>0)
+                      then GameLog_GeneratorAlarm(kptd_OwnerPlayer,i)
+                      else
+                        if(map_scenario=mc_KotH)and(i=0)
+                        then GameLog_KotHControl
+                        else GameLog_KeyPointCaptureStart(i);
+                 end
                  else
                  begin
                     kptd_Timer:=0;

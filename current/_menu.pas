@@ -128,6 +128,15 @@ end;
 procedure menu_ToggleRecord;
 begin
    rpls_Record:=not rpls_Record;
+   if(not MainMenu)then
+     GameLog_Chat(255,LocalPlayer,str_SR_RecordGames+': '+str_YesNoG[rpls_Record]);
+end;
+
+procedure menu_ScrollPlayersColor(forward:boolean);
+begin
+   ScrollByte(@ui_PlayersColor  ,forward,0,ui_MaxPlayersColor);
+   if(not MainMenu)then
+     GameLog_Chat(255,LocalPlayer,str_SG_PlayersColor+': '+str_SG_PlayersColorL[ui_PlayersColor]);
 end;
 
 procedure menu_ControlPanelPosScroll(forward:boolean);
@@ -972,8 +981,8 @@ mi_MP_ChatList     : if(EnterKey)then
                      begin
                         if(length(net_chat_str)>0)then
                           if(net_status=ns_client)
-                          then net_send_chat(            255,net_chat_str)
-                          else GameLog_Chat (LocalPlayer,255,net_chat_str);
+                          then net_send_chat(            chat_all,net_chat_str)
+                          else GameLog_Chat (LocalPlayer,chat_all,net_chat_str);
                         net_chat_str:='';
                      end;
    else
@@ -1113,7 +1122,7 @@ mi_settings_Sound      : if(not check)then menu_SettingsPage:=item;
 
 // SETTINGS GAME
 mi_SG_ColoredShadows   : if(not check)then ui_ColoredShadow:=not ui_ColoredShadow;
-mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor,true,0,ui_MaxPlayersColor);
+mi_SG_PlayersColor     : if(not check)then menu_ScrollPlayersColor(true);
 mi_SG_ShowAPM          : if(not check)then ui_ShowAPM      :=not ui_ShowAPM;
 mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars,true,0,ui_MaxHealthBars);
 mi_SG_RightClickAction : if(not check)then m_RightClickAct :=not m_RightClickAct;
@@ -1322,7 +1331,7 @@ function menu_Controls_MRB(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MRB:=true;
    case item of
-mi_SG_PlayersColor     : if(not check)then ScrollByte(@ui_PlayersColor  ,false,0,ui_MaxPlayersColor);
+mi_SG_PlayersColor     : if(not check)then menu_ScrollPlayersColor(false);
 mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars    ,false,0,ui_MaxHealthBars  );
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(false);
 mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality     ,false,0,rpls_MaxQuality    );
@@ -1538,6 +1547,7 @@ begin
          menu_image:=nil;
          clickSound:=true;
          changed:=true;
+         menu_update:=true;
       end;
       mouse_x:=mnx;
       mouse_y:=mny;

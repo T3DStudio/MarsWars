@@ -56,6 +56,39 @@ begin
        end;
 end;
 
+function map_GetZone(mx,my:integer;mr:integer=0):word;
+var
+i    :word;
+d,orm,
+dx,dy:integer;
+begin
+   map_GetZone:=0;
+
+   dx:=mx div MapObstaclesGridW;
+   dy:=my div MapObstaclesGridW;
+   orm:=orm.MaxValue;
+
+   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
+     with map_ObstaclesGrid[dx,dy] do
+       if(oc_n>0)then
+         for i:=0 to oc_n-1 do
+           with oc_l[i]^ do
+             if(o_rO>0)and(mr<=o_rO)then
+             begin
+                d:=point_dist_int(mx,my,o_x,o_y);
+                if(d>o_rO)then continue;
+                if(o_rI<d)and(d<o_rO)then
+                begin
+                   map_GetZone:=zone_solid;
+                   exit;
+                end;
+
+                if(o_rO>=orm)then continue;
+                orm:=o_rO;
+                map_GetZone:=o_zone;
+             end;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   COMMON
@@ -127,44 +160,6 @@ begin
      end;
 end;
 
-function map_IsObstacleZone(zone:word):boolean;
-begin
-   map_IsObstacleZone:=(zone=zone_solid);
-end;
-
-function map_GetZone(mx,my:integer;mr:integer=0):word;
-var
-i    :word;
-d,orm,
-dx,dy:integer;
-begin
-   map_GetZone:=0;
-
-   dx:=mx div MapObstaclesGridW;
-   dy:=my div MapObstaclesGridW;
-   orm:=orm.MaxValue;
-
-   if(0<=dx)and(dx<=MapObstaclesGridN)and(0<=dy)and(dy<=MapObstaclesGridN)then
-     with map_ObstaclesGrid[dx,dy] do
-       if(oc_n>0)then
-         for i:=0 to oc_n-1 do
-           with oc_l[i]^ do
-             if(o_rO>0)and(mr<=o_rO)then
-             begin
-                d:=point_dist_int(mx,my,o_x,o_y);
-                if(d>o_rO)then continue;
-                if(o_rI<d)and(d<o_rO)then
-                begin
-                   map_GetZone:=zone_solid;
-                   exit;
-                end;
-
-                if(o_rO>=orm)then continue;
-                orm:=o_rO;
-                map_GetZone:=o_zone;
-             end;
-end;
-
 procedure map_DataForAI;
 var d:integer;
 begin
@@ -177,7 +172,7 @@ begin
           exit;
        end;
 
-   map_BusyCenter:=map_IsObstacleZone(map_GetZone(map_SizeH,map_SizeH));
+   map_BusyCenter:=map_GetZone(map_SizeH,map_SizeH)=zone_solid;
 end;
 
 function map_ObstacleR(obs_f:byte):integer;
@@ -200,7 +195,7 @@ begin
    g_random_p:= byte(map_seed);
 end;
 
-procedure map_BaseVars(setRandom:boolean=true);
+procedure map_BaseVars(setRandom:boolean);
 begin
    if(setRandom)then
      map_Seed2RandomBase;
@@ -208,7 +203,13 @@ begin
    map_Size1   := mm3i(map_MinSize,map_Size1,map_MaxSize);
    map_Sizeh   := map_Size1 div 2;
    map_SizeKPCR:= map_Sizeh-(map_Sizeh div 3);
-   g_royal_Rmax:= round(map_SizeH*1.41);
+
+
+   g_royal_Rmax:= round(max2i(max2i(point_dist_int(g_royal_Rx,g_royal_Ry,0        ,0        ),
+                                    point_dist_int(g_royal_Rx,g_royal_Ry,0        ,map_Size1)),
+                              max2i(point_dist_int(g_royal_Rx,g_royal_Ry,map_Size1,0        ),
+                                    point_dist_int(g_royal_Rx,g_royal_Ry,map_Size1,map_Size1))));
+
    case map_symmetry of
    maps_lineV: if((map_seed mod 2)=0)
                then map_SymmetryDir:=90
@@ -273,11 +274,11 @@ end;
 procedure map_CalcLakeR(ro,ri:pinteger);
 var t0,t1:integer;
 begin
-   t0:=round(map_size1/3.3);
-   t1:=round(map_size1/2.6);
-   ro^:=t1;//t0+g_random(t1-t0);
-   t0:=round(map_size1/5  );
-   t1:=round(map_size1/3.6);
+   t1:=round(map_SizeH/1.3);
+   if(t1>(map_SizeH-base_r1h))then t1:=map_SizeH-base_r1h;
+   ro^:=t1;
+   t0:=round(map_SizeH/2.5);
+   t1:=round(map_SizeH/1.8);
    ri^:=t0+g_random(t1-t0);
 end;
 
@@ -490,7 +491,7 @@ begin
      begin
         kp_x           :=akpx;
         kp_y           :=akpy;
-        kp_ToCenterD   :=point_dist_int(kp_x,kp_y,map_Sizeh,map_Sizeh);
+        kp_ToRoyalCD   :=point_dist_int(kp_x,kp_y,g_royal_Rx,g_royal_Ry);
         kp_RNoBuild    :=aNoBuildR;
         kp_Energy      :=aEnergy;
         kp_RCapture    :=aCaptureR;
@@ -589,6 +590,9 @@ begin
            if(not map_KeyPoints_Add(sx,sy,aCaptureR,aNoBuildR,Aenergy,aCaptureTime,aLifeTime,aCaptureLimit))
            then exit;
 
+         if(sx<>NOTSET)then
+           if((map_KeyPointsN+2)>LastKeyPoint)then exit;
+
          break;
       end;
    end;
@@ -612,6 +616,14 @@ mc_KeyPoints: begin
        map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i],true)*map_Start2GeneratorStep),
                          map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i],true)*map_Start2GeneratorStep),
                          keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyS,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitS);
+
+   // center generator
+   if(map_scenario<>mc_KotH)then
+     case map_template of
+     mapt_lake,
+     mapt_island,
+     mapt_temple: map_KeyPoints_Add(map_SizeH,map_SizeH,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
+     end;
 
    map_KeyPoints_Random(map_MaxPlayers*2,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
 
@@ -800,7 +812,7 @@ begin
    map_Starts_Random:=success<=0;
 end;
 
-procedure map_PlayersStarts;
+procedure map_ScirmishPlayersStarts;
 var p,
 io,ii:integer;
 begin
@@ -918,12 +930,12 @@ begin
       else
         if(irO>=(dR div 3))then continue;
 
-      if(map_IfObstacleHere(ix,iy,irO+map_ObstaclesGap,irI))then continue;
-      if(map_IfPlayerStartHere(ix,iy,irO+map_ObstaclesGap,irI,map_PStartsGap))then continue;
+      if(map_IfObstacleHere(ix,iy,irO+map_ObstaclesGap,irI-map_ObstaclesGap))then continue;
+      if(map_IfPlayerStartHere(ix,iy,irO+map_ObstaclesGap,irI-map_ObstaclesGap,map_PStartsGap))then continue;
       if(sx<>NOTSET)then
       begin
-         if(map_IfObstacleHere(sx,sy,irO+map_ObstaclesGap,irI))then continue;
-         if(map_IfPlayerStartHere(sx,sy,irO+map_ObstaclesGap,irI,map_PStartsGap))then continue;
+         if(map_IfObstacleHere(sx,sy,irO+map_ObstaclesGap,irI-map_ObstaclesGap))then continue;
+         if(map_IfPlayerStartHere(sx,sy,irO+map_ObstaclesGap,irI-map_ObstaclesGap,map_PStartsGap))then continue;
        end;
 
       map_Obstacle_Add(ix,iy,irO,irI);
@@ -1093,7 +1105,7 @@ begin
    map_RefreshObstaclesGrid;
 end;
 
-procedure map_CreateObjects;
+procedure map_ScirmishCreateObjects;
 var i:byte;
 begin
    map_Seed2RandomBase;
@@ -1109,10 +1121,6 @@ begin
    map_KeyPoints_UpdateZone;
 
    map_DataForAI;
-   {$IFDEF _FULLGAME}
-   map_Obstacles_SetDrawData;
-   map_Decals_Create;
-   {$ENDIF}
 end;
 
 procedure map_RandomSeed;
@@ -1123,7 +1131,7 @@ begin
    {$ENDIF}
 end;
 
-procedure Map_randommap(minMapSize:integer=map_MinSize;maxMapSize:integer=map_MaxSize);
+procedure map_RandomMap(minMapSize:integer=map_MinSize;maxMapSize:integer=map_MaxSize);
 begin
    map_RandomSeed;
 
@@ -1132,7 +1140,7 @@ begin
    map_Symmetry:=random(maps_last+1);
 end;
 
-procedure Map_SetScenarioMaxPlayers;
+procedure map_SetScenarioMaxPlayers;
 begin
    case map_scenario of
    mc_ffa3   : map_MaxPlayers:=3;
@@ -1158,25 +1166,33 @@ gt_none,
 gt_scirmish: begin
    {$ENDIF}
              Game_ShuffleAINames;
-             map_BaseVars;
+
+             map_BaseVars(true);
 
              map_ObstaclesGap:= 50;
              map_PStartsGap  := base_r1;
-             Map_SetScenarioMaxPlayers;
+             map_SetScenarioMaxPlayers;
              Game_RemoveAIObservers;
+             game_RoyalSetCenter(map_SizeH,map_SizeH);
 
-             map_PlayersStarts;
-             {$IFDEF _FULLGAME}
+             map_ScirmishPlayersStarts;
+
+   {$IFDEF _FULLGAME}
              map_seed2theme;
              end;
-gt_campaing: SetThemeCampaign(camp_sel,camp_mis_sel);
+gt_campaing: begin
+             map_BaseVars(true);
+             SetThemeCampaign(camp_sel,camp_mis_sel);
+             end;
    end;
-
-   map_MakeThemeSprites;
    {$ENDIF}
-   map_CreateObjects;
+   map_ScirmishCreateObjects;
+
    {$IFDEF _FULLGAME}
-    map_RedrawMenuMinimap;
+   map_MakeThemeSprites;
+   map_Obstacles_SetDrawData;
+   map_Decals_Create;
+   map_RedrawMenuMinimap;
    {$ENDIF}
 end;
 

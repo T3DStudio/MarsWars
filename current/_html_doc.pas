@@ -79,6 +79,7 @@ var
 i,l  :byte;
 c    :char;
 tag_b,
+tag_m,
 tag_c:boolean;
 procedure TagColor(c:TMWColor);
 begin
@@ -92,6 +93,12 @@ begin
    //tstr :='';
    tag_b:=false;
    tag_c:=false;
+   tag_m:=false;
+   if(pos(tc_doccnt,line)>0)then
+   begin
+      tag_m:=true;
+      write(html_f,'<center>');
+   end;
    if(pos(tc_doccpt,line)>0)then
    begin
       tag_b:=true;
@@ -127,8 +134,9 @@ begin
       else write(html_f,c);
       end;
    end;
-   if(tag_c)then write(html_f,'</font>');
-   if(tag_b)then write(html_f,'</b>');
+   if(tag_c)then write(html_f,'</font>'  );
+   if(tag_b)then write(html_f,'</b>'     );
+   if(tag_m)then write(html_f,'</center>');
    writeln(html_f);
 end;
 

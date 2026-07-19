@@ -102,7 +102,7 @@ begin
 
    if not(InitNET)then exit;
 
-   Map_randommap;
+   map_RandomMap;
    Game_DefaultAll;
 
    NEW(sys_EVENT);
@@ -110,7 +110,7 @@ begin
    GameCycle:=true;
 
    {$IFDEF _FULLGAME}
-   net_ServerListParseAddr;
+   net_ServerListParseAddrs;
    {$ELSE}
    Dedicated_Init;
    {$ENDIF}

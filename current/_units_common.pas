@@ -154,7 +154,9 @@ begin
       else
         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
-      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_Pain[level]);
+      if(uid_eid_Pain>0)then
+        effect_add(vx-random(uid_missileR)+random(uid_missileR),
+                   vy-random(uid_missileR)+random(uid_missileR),draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_Pain);
       snd_SoundPlayUnit(uid_snd_Pain,nil,nil);
    end;
 end;
@@ -251,9 +253,12 @@ begin
       or(not uid_CanAttack)then exit;
 
       if(check_buffs)then
-        if(not uid_isbuilding)then
-          if(buffs[ub_PainState]>0)
-          or(buffs[ub_Cast]>0)then exit;
+      begin
+         if(buffs[ub_SpecPause]>0)then exit;
+         if(not uid_isbuilding)then
+           if(buffs[ub_PainState]>0)
+           or(buffs[ub_Cast]>0)then exit;
+      end;
 
       if(IsUnitRange(transportU,nil))then exit;
    end;
@@ -835,7 +840,7 @@ begin
       or(pTBeacon^.hits<=0)then exit;
 
       if(isfly=uf_ground)then
-        if(map_IsObstacleZone(pTBeacon^.mapZone))then exit;
+        if(pTBeacon^.mapZone=zone_solid)then exit;
 
       pTeleporter^.rpoint_x:=pTBeacon^.x;
       pTeleporter^.rpoint_y:=pTBeacon^.y;
@@ -856,6 +861,7 @@ begin
 end;
 
 function unit_ability_UACScan(pRadar:PTUnit;x0,y0:integer;check:boolean):byte;
+var u:integer;
 begin
    with pRadar^ do
    begin
@@ -1823,6 +1829,7 @@ begin
       if(units_ucl_u[uid_isbuilding,uid_uibtn]<=0)then units_ucl_u[uid_isbuilding,uid_uibtn]:=unum;
       units_ucl_c[uid_isbuilding,uid_uibtn]+=1;
       units_uid_c[uidi                    ]+=1;
+      units_bld_lc[uid_isbuilding         ]+=uid_LimitUse;
       units_all_c+=1;
       res_energyl_max +=uid_gen_EnergyLevel;
       res_energyl_cur +=uid_gen_EnergyLevel;
@@ -2479,8 +2486,9 @@ begin
          unit_ProdStopUpgrade(pu,255,true,true,false);
          unit_TransformStop  (pu,false);
 
-         units_ucl_c[uid_isbuilding,uid_uibtn]-=1;
-         units_uid_c[uidi                    ]-=1;
+         units_ucl_c [uid_isbuilding,uid_uibtn]-=1;
+         units_uid_c [uidi                    ]-=1;
+         units_bld_lc[uid_isbuilding          ]-=uid_LimitUse;
          units_all_c-=1;
          res_energyl_max-=uid_gen_EnergyLevel;
          res_energyl_cur-=uid_gen_EnergyLevel;

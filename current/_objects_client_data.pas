@@ -73,7 +73,7 @@ begin
             uid_eid_Summon   [aa]:=aeid_summon;
             uid_eid_DeathSlow[aa]:=aeid_deathSlow;
             uid_eid_DeathFast[aa]:=aeid_deathFast;
-            uid_eid_Pain     [aa]:=aeid_pain;
+            uid_eid_Pain         :=aeid_pain;
          end;
 end;
 procedure setEffectEID2(aa:byte;summonspr:PTMWTexture);
@@ -394,11 +394,12 @@ begin
 end;
 UID_ZFPlasmagunner:
 begin
+   uid_eid_SprFloating:=true;
    uid_AnimStepWalk :=14;
    uid_AnimStepDeath:=8;
    setMWSModel  (0,@spr_ZPlasmagunner);
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
-   setEffectEID (0,0  ,EID_Exp,EID_Exp,0  );
+   setEffectEID (0,0  ,EID_Exp1,EID_Exp1,0  );
    setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,nil);
    setWeaponESND(0    ,nil,snd_shot_plasma,0,0);
    setWeaponTEID(0    ,nil,0,[0..255]);
@@ -504,6 +505,7 @@ begin
 end;
 UID_HCommandCenter:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_HCommandCenter);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,0       ,EID_BBExp           ,EID_BBExp           ,0  );
@@ -513,6 +515,7 @@ begin
 end;
 UID_HACommandCenter:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_HACommandCenter);
    setBuildingSND(snd_hell_hbuild);
    setEffectEID(0,0       ,EID_BBExp           ,EID_BBExp           ,0  );
@@ -540,8 +543,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Engineer);
    setCommandSND(snd_engineer_ready   ,snd_engineer_move   ,snd_engineer_move     ,snd_engineer_select  ,snd_engineer_select   );
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain4);
    setWeaponESND(0,nil,snd_repairing,0,0);
    setWeaponESND(1,nil,snd_shot_pistol ,0,0);
    with uid_arms[0] do begin aw_eid_target:=MID_BPlasma;aw_eid_target_onshot:=true;end;
@@ -552,8 +555,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Medic);
    setCommandSND(snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs       ,snd_uac_inf_pain4);
    setWeaponESND(0,nil,snd_Healing,0,0);
    setWeaponESND(1,nil,snd_shot_pistol,0,0);
    with uid_arms[0] do begin aw_eid_target:=MID_YPlasma;aw_eid_target_onshot:=true;end;
@@ -564,8 +567,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Shotgunner);
    setCommandSND(snd_shotgunner_ready,snd_shotgunner_move,snd_shotgunner_attack,snd_shotgunner_annoy,snd_shotgunner_select);
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain1);
    setWeaponESND(0,nil,snd_shot_shotgun ,0,0);
 end;
 UID_SSergant:
@@ -574,8 +577,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_SSGunner);
    setCommandSND(snd_ssg_ready       ,snd_ssg_move       ,snd_ssg_attack       ,snd_ssg_annoy       ,snd_ssg_select       );
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain1);
    setWeaponESND(0,nil,snd_shot_ssg    ,0,0);
 end;
 UID_Commando:
@@ -584,8 +587,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Commando);
    setCommandSND(snd_commando_ready,snd_commando_move,snd_commando_attack,snd_commando_annoy,snd_commando_select);
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain2);
    setWeaponESND(0,nil,snd_shot_pistol,0,0);
 end;
 UID_SiegeMarine:
@@ -594,8 +597,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Siege);
    setCommandSND(snd_rocketmarine_ready,snd_rocketmarine_move,snd_rocketmarine_attack,snd_rocketmarine_annoy,snd_rocketmarine_select);
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain3);
    setWeaponESND(0,nil,snd_shot_rocket,0,0);
 end;
 UID_Antiaircrafter:
@@ -604,17 +607,18 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Antiaircrafter);
    setCommandSND(snd_aairmarine_ready,snd_aairmarine_move,snd_aairmarine_attack,snd_aairmarine_annoy,snd_aairmarine_select);
-   setEffectEID (0,0  ,0           ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain3);
    setWeaponESND(0,nil,snd_shot_rocket,0,0);
 end;
 UID_FPlasmagunner:
 begin
+   uid_eid_SprFloating:=true;
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Plasmagunner);
    setCommandSND(snd_plasmamarine_ready,snd_plasmamarine_move,snd_plasmamarine_attack,snd_plasmamarine_annoy,snd_plasmamarine_select);
-   setEffectEID (0,0         ,EID_Exp,EID_Exp,0  );
-   setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,nil);
+   setEffectEID (0,0            ,EID_Exp1   ,EID_Exp1   ,0  );
+   setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,snd_uac_inf_pain2);
    setWeaponESND(0    ,nil,snd_shot_plasma,0,0);
    //setWeaponTEID(0    ,nil,0,[0..255]);
 end;
@@ -624,8 +628,8 @@ begin
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_BFG);
    setCommandSND(snd_bfgmarine_ready,snd_bfgmarine_move,snd_bfgmarine_attack,snd_bfgmarine_annoy,snd_bfgmarine_select);
-   setEffectEID (0,0  ,0             ,EID_InfantryGibs,0  );
-   setEffectSND (  nil,snd_uac_hdeath,snd_Gibs ,nil);
+   setEffectEID (0,0  ,0                ,EID_InfantryGibs,0  );
+   setEffectSND (  nil,snd_uac_inf_death,snd_Gibs        ,snd_uac_inf_pain3);
    setWeaponESND(0,snd_shot_bfg,nil,0,0);
    setWeaponTEID(0,nil,0,[fr_fps1-10..255]);
 end;
@@ -641,8 +645,8 @@ UID_UACDron:
 begin
    setMWSModel(0,@spr_UACDron);
    setCommandSND(snd_uacbot_move,snd_uacbot_move,snd_uacbot_attack,snd_uacbot_annoy,snd_uacbot_select);
-   setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (  nil,snd_explode ,snd_explode ,nil);
+   setEffectEID (0,0  ,EID_Exp2    ,EID_Exp2    ,MID_SSShot  );
+   setEffectSND (  nil,snd_explode ,snd_explode ,snd_uac_mec_pain1);
    setWeaponESND(0    ,nil,snd_shot_plasma,0,0);
    uid_eid_bcrater:=UID_UGturret;
    uid_eid_BuildHellType:=true;
@@ -653,7 +657,7 @@ begin
    setMWSModel(0,@spr_Terminator);
    setCommandSND(snd_terminator_ready,snd_terminator_move,snd_terminator_attack,snd_terminator_annoy,snd_terminator_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (  nil,snd_explode ,snd_explode ,nil);
+   setEffectSND (  nil,snd_explode ,snd_explode ,snd_uac_mec_pain3);
 
    setWeaponESND(0,nil,snd_shot_shotgun,0,0);
    setWeaponESND(1,nil,snd_revenant_attack,0,0);
@@ -673,28 +677,31 @@ begin
    setMWSModel(0,@spr_Tank);
    setCommandSND(snd_tank_ready,snd_tank_move,snd_tank_attack,snd_tank_annoy,snd_tank_select);
    setEffectEID (0,0  ,EID_BExp,EID_BExp,0  );
-   setEffectSND (  nil,snd_explode ,snd_explode ,nil);
+   setEffectSND (  nil,snd_explode ,snd_explode ,snd_uac_mec_pain2);
    setWeaponESND(0    ,nil,snd_explode,0,0);
    setWeaponTEID(0    ,nil,0,[fr_fpsh..255]);
 end;
 UID_Flyer:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_Flyer);
    setCommandSND(snd_uacfighter_ready,snd_uacfighter_move,snd_uacfighter_attack,snd_uacfighter_annoy,snd_uacfighter_select);
    setEffectEID (0,0  ,EID_Exp2,EID_Exp2,0  );
-   setEffectSND (nil,snd_explode ,snd_explode ,nil);
+   setEffectSND (nil,snd_explode ,snd_explode ,snd_uac_mec_pain3);
    setWeaponESND(0  ,nil,snd_shot_flyer,0,0);
 end;
 
 
 UID_UCommandCenter:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_UCommandCenter);
    setBuildingSND(snd_uac_cc);
    setWeaponESND(0    ,nil,snd_shot_flyer,0,0);
 end;
 UID_UACommandCenter:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_UACommandCenter);
    setBuildingSND(snd_uac_cc);
    setWeaponESND(0    ,nil,snd_shot_flyer,0,0);
@@ -874,6 +881,9 @@ end;
    u:=UID_HBarracks;       setEffectEID2(0,gfx_uid2spr(UID_UBarracks       ,0,0));
                            setEffectEID2(1,gfx_uid2spr(UID_UBarracks       ,0,1));
 
+   for u:=0 to unit_floating_ticks-1 do
+     unit_floating_p[u]:=round(cos(u*unit_floating_ticks2dir*DEGTORAD)*unit_floating_h);
+
    // ui panel
    for r:=1 to r_count do
    begin
@@ -901,6 +911,7 @@ upgr_hell_BuildArmor    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,2 ]; end;
 upgr_hell_MeleeDamage   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,3 ]; end;
 upgr_hell_Regeneration  : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,4 ]; end;
 upgr_hell_PainFactor    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,5 ]; end;
+upgr_hell_ADetection    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,22]; end;
 upgr_hell_BuilderR      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,11]; end;
 upgr_hell_HKeepShift    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,9 ]; end;
 upgr_hell_DecayAura     : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,10]; end;
@@ -924,6 +935,7 @@ upgr_uac_BuildArmor     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,2 ]; end;
 upgr_uac_RepairTools    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,3 ]; end;
 upgr_uac_BioSpeed       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,4 ]; end;
 upgr_uac_SSMWeapon      : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,14]; end;
+upgr_uac_ADetection     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,21]; end;
 upgr_uac_BuilderR       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,11]; end;
 upgr_uac_CCFly          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,9 ]; end;
 upgr_uac_CCAttack       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,10]; end;
@@ -957,10 +969,14 @@ begin
       ua_mbrush_hint:= 0;
 
       case a of
+uab_HSpecter         : ua_btn     :=spr_uibtn_Upgrades[r_hell,19].surf;
+uab_HHTShroud        : ua_btn     :=spr_uibtn_Upgrades[r_hell,16].surf;
+uab_HStealth         : ua_btn     :=spr_uibtn_Upgrades[r_uac ,19].surf;
+
 uab_Teleport         : ua_btn     :=spr_uibtn_Upgrades[r_hell,8 ].surf;
 uab_Recall           : ua_btn     :=spr_uibtn_Upgrades[r_hell,14].surf;
 uab_UACScan          : begin
-                       ua_btn     :=spr_uibtn_AbilityUACScan;
+                       ua_btn     :=spr_uibtn_Upgrades[r_uac ,21].surf;
                        ua_mbrush_r:=uambt_SightR;
                        end;
 uab_UACStrike        : begin
@@ -977,7 +993,7 @@ uab_UACCCLandTo      : begin
                        ua_btn     :=spr_uibtn_AbilityCCLandTo;
                        ua_mbrush_r:=uambt_Self;
                        end;
-uab_HEyeVision       : ua_btn     :=spr_uibtn_AbilityHVision;
+uab_HEyeVision       : ua_btn     :=spr_uibtn_Upgrades[r_hell,22].surf;
 uab_HEyeSpawn        : ua_mbrush_r:=-UID_HEye;
 
 uab_HTowerBlink      : begin

@@ -55,7 +55,7 @@ begin
         if(g_FixedPositions)then
         begin
            if(g_PlayersGame[p].state=ps_none)and(g_AISlots=0)then continue;
-           color:=PlayerGetColorDef(p);
+           color:=PlayerGetColorCur(p,false);
            pc:=b2s(p+1)[1];
         end
         else
@@ -86,8 +86,9 @@ begin
                   c:=KeyPoint_GetColor(i,false);
                end;
         false: begin
+                  if(kp_Energy=map_generators_EnergyS)then continue;
                   with kp_TeamData[MaxPlayers] do
-                    if(not kptd_Active)then continue;
+                    if(kp_Energy<=0)and(kp_RCapture<=0)then continue;
                   c:=c_white;
                end;
         end;
@@ -105,6 +106,7 @@ end;
 
 procedure map_RedrawMenuMinimap;
 begin
+   PlayersUpdateColorSchema(LocalPlayer);
    sdl_FillRect(ui_minimap,nil,0);
    map_MiniMap_UpdateBackground;
    draw_sdlsurface(ui_minimap ,0,0,ui_bminimap);
@@ -290,7 +292,7 @@ begin
          end;
 
    if(map_scenario=mc_royale)then
-     draw_FilledRing(map_sizeh,map_sizeh,map_size1,g_royal_RCur,sd_decals,sd_decals-2,
+     draw_FilledRing(g_royal_Rx,g_royal_Ry,map_size1*2,g_royal_RCur,sd_decals,sd_decals-2,
                      animStep,
                      @spr_fireblueFront,
                      @spr_fireblueBack);

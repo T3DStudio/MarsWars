@@ -382,15 +382,17 @@ begin
    str_warn_MaxBuildersReached   := 'Maximum number of builders has been reached';
    str_warn_MarkLook             := ': look here!';
    str_warn_MarkAttack           := ': attack here!';
-   str_warn_kpoint_captured      := 'The Key point was captured';
-   str_warn_kpoint_lost          := 'The Key point was lost';
-   str_warn_koth_control         := ' team starts controlling the center';
-   str_warn_ngen_captured        := 'The Neutral Generator was captured';
-   str_warn_ngen_lost            := 'The Neutral Generator was lost';
-   str_warn_ngen_exh             := 'The Neutral Generator was exhausted';
+   str_warn_kpoint_Captured      := ' was captured Key Point #';
+   str_warn_kpoint_CaptureStart  := ' captures Key Point #';
+   str_warn_koth_CaptureStart    := ' starts controlling the center';
+   str_warn_koth_Alarm           := 'the center timer alarm: ';
+   str_warn_ngen_captured        := 'Generator was captured';
+   str_warn_ngen_alarm           := 'Generator alarm!';
+   str_warn_ngen_lost            := 'Generator was lost';
+   str_warn_ngen_exh             := 'Generator was exhausted';
    str_warn_Invalid_Target       := 'Invalid target';
    str_warn_Invalid_Order        := 'Invalid order';
-   str_warn_AbilityReload        := 'The ability is on cooldown';
+   str_warn_AbilityReload        := 'Ability is on cooldown';
    str_warn_AbilityCasting       := 'Unit is in ability-casting state';
    str_warn_AbilityReqUACNear    := 'Need an allied unit of UAC nearby';
    str_warn_AbilityReqHelNear    := 'Need an allied unit of Hell nearby';
@@ -401,7 +403,7 @@ begin
    str_ui_UnitGroups             := 'Unit groups:';
    str_ui_KothTime               := 'Center capture time left: ';
    str_ui_KotHTime_act           := 'Time left until center area is active: ';
-   str_ui_KotHWinner             := ' is King of the Hill!';
+   str_ui_KotHWinner             := ' - King of the Hill!';
    str_ui_ChatAll                := 'ALL';
    str_ui_ChatAllies             := 'ALLIES';
    str_ui_Tab[tab_Buildings]     := 'Buildings';
@@ -418,7 +420,8 @@ begin
    str_ui_SelectTarget           := 'Select target for ';
    str_ui_SelectBPlace           := 'Choose a location to build ';
    str_ui_BuildHint              := 'Hold "'+input_actions[iAct_Control].ik_str_HK+'" to disable position pushing from obstacles.';
-   str_ui_RightClickCancel       := '"'+input_actions[iAct_mrb].ik_str_HK+'" to cancel.';
+   str_ui_BuildTip               := 'TIP: build buildings close to each other - units will not get stuck between them.';
+   str_ui_RightClickCancel       := 'Press "'+input_actions[iAct_mrb].ik_str_HK+'" to cancel.';
 
    str_hint_upgrade              := 'upgrade';
    str_hint_sec                  := 'sec.';
@@ -529,6 +532,7 @@ begin
    str_doc_ProdTime              := 'Build time: ';
    str_doc_Limit                 := 'Limit used: ';
    str_doc_MaxHits               := 'Max hits: ';
+   str_doc_FastDeath             := 'Always fast death: ';
    str_doc_Hits                  := 'Hits: ';
    str_doc_LifeTime              := 'Lifetime: ';
    str_doc_BaseRegen             := 'Base regeneration: ';
@@ -544,6 +548,7 @@ begin
    str_doc_LevelArmorBonus       := 'Bonus to armor per level: ';
    str_doc_LevelDamageBonus      := 'Bonus to impact per level: ';
    str_doc_LevelPainSBonus       := 'Bonus to PainState threshold per level: ';
+   str_doc_LevelRegenBonus       := 'Bonus to regeneration per level: ';
    str_doc_BountyHellPower       := 'Hell Power bounty: ';
    str_doc_BountyUACLoot         := 'UAC Loot bounty: ';
    str_doc_ZombieUID             := 'Zombie: ';
@@ -572,7 +577,7 @@ begin
    str_SetAbilityBaseHint(uab_Recall             ,'Recall'                   ,'Transfers target unit to the Teleport. '+t1);
    str_SetAbilityBaseHint(uab_UACScan            ,'Scan'                     ,'Reveals units (including invisible ones) in the target area for '+i2s(detection_time_sec)+' seconds');
    with g_mids[MID_Blizzard] do
-   str_SetAbilityBaseHint(uab_UACStrike          ,'Missile strike'           ,'Strikes a taktical rocket missile that deal '+tc_red+i2s(mid_base_damage)+tc_default+' damage('+str_uarm_SplashDamageR+i2s(mid_base_SplashR)+')'+str_uarm_Factor+str_DamageMod(dm_RSMShot)+'. Note: launching a missile reveals the building to all players for '+i2s(UACStrike_Revealing_sec)+' seconds');
+   str_SetAbilityBaseHint(uab_UACStrike          ,'Missile strike'           ,'Strikes a taktical rocket missile that deal '+tc_red+i2s(mid_base_damage)+tc_default+' damage(explode size: '+i2s(mid_size)+','+str_uarm_SplashDamageR+i2s(mid_base_SplashR)+')'+str_uarm_Factor+str_DamageMod(dm_RSMShot)+'. Note: launching a missile reveals the building to all players for '+i2s(UACStrike_Revealing_sec)+' seconds');
    str_SetAbilityBaseHint(uab_HEyeSpawn          ,'Spawn '                   ,'Spawns the Evil Eye at target point. There must be at least one Hell unit allied with you around the point target');
    str_SetAbilityBaseHint(uab_HEyeVision         ,'Hell Vision'              ,'Gives allied target ability to detect invisible units for '+i2s(detection_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_HTowerBlink        ,'Planar Jump'              ,'Short-range teleportation');
@@ -595,6 +600,10 @@ begin
    str_SetAbilityBaseHint(uab_HellCCLandTo       ,'Land/Take-off to point'   ,'');
    str_SetAbilityBaseHint(uab_Unload             ,'Unload'                   ,'');
    str_SetAbilityBaseHint(uab_UnloadTo           ,'Unload to point'          ,'');
+   str_SetAbilityBaseHint(uab_HSpecter           ,'Specter'                  ,'Permanent invisibility');
+   str_SetAbilityBaseHint(uab_HStealth           ,'Stealth Technology'       ,'Permanent invisibility');
+   str_SetAbilityBaseHint(uab_HHTShroud          ,'Shroud of Horror'         ,'Permanent invisibility');
+
    t1:='Transform to ';
    str_SetAbilityBaseHint(uab_ToHAKeep           ,t1                         ,'');
    str_SetAbilityBaseHint(uab_ToHACommandCenter  ,t1                         ,'');
@@ -701,18 +710,19 @@ begin
    str_SetUpgrBaseHint(upgr_hell_MeleeDamage ,'Claws and Teeth'                  ,'Increases the damage of melee attacks'                                   );
    str_SetUpgrBaseHint(upgr_hell_Regeneration,'Flesh Regeneration'               ,'Health regeneration for all Hell units'                                  );
    str_SetUpgrBaseHint(upgr_hell_PainFactor  ,'Pain Threshold'                   ,'Hell units can take more hits before being stunned by pain'              );
+   str_SetUpgrBaseHint(upgr_hell_ADetection  ,'Evil Eye Magic'                   ,'Unlocks "'+g_aids[uab_HEyeSpawn].ua_str_name+'" and "'+g_aids[uab_HEyeVision].ua_str_name+'" abilities for '+g_uids[UID_HEyeNest].uid_str_name);
    t1:=str_UnitsNamesList([UID_HKeep,UID_HAKeep]);
    str_SetUpgrBaseHint(upgr_hell_HKeepShift  ,g_aids[uab_HKeepShift].ua_str_name ,'Charge of "'+g_aids[uab_HKeepShift].ua_str_name+'" ability for '+t1     );
    str_SetUpgrBaseHint(upgr_hell_DecayAura   ,g_aids[uab_HKeepAura].ua_str_name  ,'Unlocks "'+g_aids[uab_HKeepAura].ua_str_name+'" ability for '+t1);
    str_SetUpgrBaseHint(upgr_hell_BuilderR    ,'Builder Range Upgrade'            ,'Increases range of sight for '+t1                                );
-   str_SetUpgrBaseHint(upgr_hell_Spectre     ,'Specters'                         ,'Pinky Demon becomes invisible'                                   );
+   str_SetUpgrBaseHint(upgr_hell_Spectre     ,g_aids[uab_HSpecter].ua_str_name   ,'Pinky Demon becomes invisible'                                   );
    str_SetUpgrBaseHint(upgr_hell_UnitSightR  ,'Hell Sight'                       ,'Increases the sight range of all Hell units'                     );
    str_SetUpgrBaseHint(upgr_hell_Phantoms    ,'Phantoms'                         ,'Pain Elemental spawns Phantoms instead of Lost Soul'             );
    str_SetUpgrBaseHint(upgr_hell_DistDamage2 ,'Demon`s Weapons'                  ,'Increases the damage of ranged attacks for '+str_UnitsNamesList(UIDsArmsImpactUpgr(upgr_hell_DistDamage2)));
    str_SetUpgrBaseHint(upgr_hell_TeleportCD  ,'Teleport Upgrade'                 ,'Reduces the cooldown of the Teleport ability'                    );
-   str_SetUpgrBaseHint(upgr_hell_T2TNoCD     ,'Portal link'                      ,'If the destination is another Teleport, the teleportation occurs without cooldown.'  );
+   str_SetUpgrBaseHint(upgr_hell_T2TNoCD     ,'Portal link'                      ,'If the destination is another Teleport, the teleportation occurs without cooldown' );
    str_SetUpgrBaseHint(upgr_hell_EvilEyeR    ,'Evil Eye Upgrade'                 ,'Increases the sight range of Evil Eye'                           );
-   str_SetUpgrBaseHint(upgr_hell_TotemInvis  ,'Totem of Horror Invisibility'     ,'Totem of Horror becomes invisible'                               );
+   str_SetUpgrBaseHint(upgr_hell_TotemInvis  ,g_aids[uab_HHTShroud].ua_str_name  ,'Totem of Horror becomes invisible'                               );
    str_SetUpgrBaseHint(upgr_hell_BuildRestore,'Building Restoration'             ,'Health regeneration upgrade for all Hell buildings'              );
    t1:=str_UnitsNamesList([UID_HFTower,UID_HTotem]);
    str_SetUpgrBaseHint(upgr_hell_TowerR      ,'Demonic Spirits'                  ,'Increases the range for '+t1                             );
@@ -727,15 +737,16 @@ begin
    str_SetUpgrBaseHint(upgr_uac_RepairTools  ,'Advanced Tools'                   ,'Increases repair/healing efficiency for '+str_UnitsNamesList([UID_Medic,UID_Engineer]) );
    str_SetUpgrBaseHint(upgr_uac_BioSpeed     ,'Lightweight Armor'                ,'Increases the movement speed of all Barrack`s units'            );
    str_SetUpgrBaseHint(upgr_uac_SSMWeapon    ,'Surface to Surface Missiles'      ,'Anti-ground weapon for '+g_uids[UID_Antiaircrafter].uid_str_name);
+   str_SetUpgrBaseHint(upgr_uac_ADetection   ,g_aids[uab_UACScan].ua_str_name    ,'Unlocks "'+g_aids[uab_UACScan].ua_str_name+'" ability for '+g_uids[UID_URadar].uid_str_name);
    t1:=str_UnitsNamesList([UID_UCommandCenter,UID_UACommandCenter]);
    str_SetUpgrBaseHint(upgr_uac_CCFly        ,'Flight Engines'                   ,t1+' gains ability to fly'                           );
    str_SetUpgrBaseHint(upgr_uac_CCAttack     ,'Built-in Plasma Turret'           ,'Plasma turret for '+t1                              );
    str_SetUpgrBaseHint(upgr_uac_BuilderR     ,'Builder Range Upgrade'            ,'Increases range of sight for '+t1                    );
    str_SetUpgrBaseHint(upgr_uac_DronTurret   ,'Drone Transformation Protocol'    ,'Drone can rebuild to '+str_UnitsNamesList([UID_UATurret,UID_UGTurret])+'; turrets can transform to Drone'    );
    str_SetUpgrBaseHint(upgr_uac_UnitSightR   ,'Light Amplification Visors'       ,'Increases the sight range of all UAC units'  );
-   str_SetUpgrBaseHint(upgr_uac_CommandoInvis,'Stealth Technology'               ,'Commando becomes invisible'                 );
+   str_SetUpgrBaseHint(upgr_uac_CommandoInvis,g_aids[uab_HStealth].ua_str_name   ,'Commando becomes invisible'                  );
    str_SetUpgrBaseHint(upgr_uac_AASplash     ,'Fragmentation Missiles'           ,'Anti-air missiles do extra damage around the target'     );
-   str_SetUpgrBaseHint(upgr_uac_MechSpeed    ,'Advanced Engines'                 ,'Increases the movement speed of all Factory`s units'      );
+   str_SetUpgrBaseHint(upgr_uac_MechSpeed    ,'Advanced Fuel'                   ,'Increases the movement speed of all Factory`s units'      );
    str_SetUpgrBaseHint(upgr_uac_MechArmor    ,'Mech Combat Armor Upgrade'        ,'Increases the armor of all Factory`s units'               );
    str_SetUpgrBaseHint(upgr_uac_TerAAWeapon  ,'Anti-air Weapon'                  ,'Anti-air weapon for Terminator'                          );
    str_SetUpgrBaseHint(upgr_uac_Transport    ,'Dropship Upgrade'                 ,'Increases the capacity of Dropship'                       );
@@ -750,12 +761,12 @@ begin
 
    t1:='attack enemies';
    str_SetActionBaseHint(iAct_Control_UAMove     ,'Attack/Move, '+t1);
-   str_SetActionBaseHint(iAct_Control_UAStop     ,'Stop, '  +t1);
-   str_SetActionBaseHint(iAct_Control_UAPatrol   ,'Patrol, '+t1);
+   str_SetActionBaseHint(iAct_Control_UAStop     ,'Stop, '       +t1);
+   str_SetActionBaseHint(iAct_Control_UAPatrol   ,'Patrol, '     +t1);
    t1:='ignore enemies';
-   str_SetActionBaseHint(iAct_Control_UMove      ,'Move, '  +t1);
-   str_SetActionBaseHint(iAct_Control_UStop      ,'Stop, '  +t1);
-   str_SetActionBaseHint(iAct_Control_UPatrol    ,'Patrol, '+t1);
+   str_SetActionBaseHint(iAct_Control_UMove      ,'Move, '       +t1);
+   str_SetActionBaseHint(iAct_Control_UStop      ,'Stop, '       +t1);
+   str_SetActionBaseHint(iAct_Control_UPatrol    ,'Patrol, '     +t1);
 
    str_SetActionBaseHint(iAct_Control_UProdCncl  ,'Cancel production');
    str_SetActionBaseHint(iAct_Control_UDestroy   ,'Destroy');
@@ -911,6 +922,8 @@ begin
    DocHelp_AddBaseControls(str_ui_BuildHint);
    DocHelp_AddBaseControls('To cancel the construction of a building, select it and issue the "'+str_action_hint[iAct_Control_UProdCncl]+'" or "'+str_action_hint[iAct_Control_UDestroy]+'" order.');
    DocHelp_AddBaseControls(str_doc_NoteMaxBuilders+'.');
+   DocHelp_AddBaseControls(tc_docbr+'NOTE: losing your buildings affect your construction system into short cooldown effect.');
+   DocHelp_AddBaseControls(tc_docbr+str_ui_BuildTip);
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_orange+'UNIT PRODUCTION'+tc_default+tc_doccpt);
@@ -943,7 +956,7 @@ begin
    DocHelp_AddHotKeyAction([iAct_InGameMenu        ],'toggle menu');
    DocHelp_AddHotKeyAction([iAct_Tab               ],'switch control panel tab' );
    DocHelp_AddHotKeyAction([iAct_ScreenShot        ],'make *.bmp screenshot'    );
-   DocHelp_AddHotKeyAction([iAct_ToggleWindowed    ],'toggle fullscreen'        );
+   DocHelp_AddHotKeyAction([iAct_ToggleWindowed    ],'toggle "'+str_SV_Windowed+'" option');
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([],tc_orange+'GAME HOTKEYS'+tc_default+tc_doccpt);
@@ -980,7 +993,8 @@ begin
    DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark(multiplayer): "look here"'  );
    DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark(multiplayer): "attack here"');
    DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Control_ToggleRec ],'toggle replay recording');
+   DocHelp_AddHotKeyAction([iAct_Control_ToggleRec ],'toggle "'+str_SR_RecordGames+'" option');
+   DocHelp_AddHotKeyAction([iAct_TogglePlayersColor],'toggle "'+str_SG_PlayersColor+'" option');
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_SProd1..
                             iAct_SProd24           ],'production hotkeys');
@@ -1044,7 +1058,7 @@ begin
    str_StringListClear(@str_doc_GameUI);
    DocHelp_AddGamUI(tc_orange+'COMMON'+tc_default+tc_doccpt);
    DocHelp_AddGamUI(tc_docbr);
-   DocHelp_AddGamUI(tc_docbr+'See "image #1":');
+   DocHelp_AddGamUI('See "image #1":');
    DocHelp_AddGamUI(tc_docbr+'1) game timer;');
    DocHelp_AddGamUI(tc_docbr+'2) objectives and information, specific to current scenario;');
    DocHelp_AddGamUI(tc_docbr+'3) player resources;');
@@ -1058,13 +1072,15 @@ begin
    DocHelp_AddGamUI(tc_docbr);
    DocHelp_AddGamUI(tc_orange+'CONTROL PANEL'+tc_default+tc_doccpt);
    DocHelp_AddGamUI(tc_docbr);
-   DocHelp_AddGamUI(tc_docbr+'Minimap marks:'+tc_doccpt);
+   DocHelp_AddGamUI('Minimap marks:'+tc_doccpt);
    DocHelp_AddGamUI(tc_docbr+'- pulsating red rectangle - base is under attack;');
    DocHelp_AddGamUI(tc_docbr+'- pulsating red circle - unit is under attack;');
    DocHelp_AddGamUI(tc_docbr+'- pulsating lime circle - unit ready;');
    DocHelp_AddGamUI(tc_docbr+'- pulsating lime rectangle - construction complete;');
-   DocHelp_AddGamUI(tc_docbr+'- pulsating aqua circle - unit promoted;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating blue circle - unit promoted;');
    DocHelp_AddGamUI(tc_docbr+'- pulsating yellow rectangle - upgrade complete;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating aqua circle - generator event;');
+   DocHelp_AddGamUI(tc_docbr+'- pulsating dark-yellow circle - key point event;');
    DocHelp_AddGamUI(tc_docbr+'- pulsating light-gray circle - "look here" mark;');
    DocHelp_AddGamUI(tc_docbr+'- pulsating light-red circle - "attack here" mark;');
    DocHelp_AddGamUI(tc_docbr);
@@ -1087,35 +1103,25 @@ begin
    //  Help docs  GAME Mechanics
    str_StringListClear(@str_doc_BaseMechanics);
 
-   {
-   str_map_ScenarioL[     ]:= tc_aqua  +'KotH'        +tc_default;
-   := tc_red   +'Royal Battle'+tc_default;
-
-   DocHelp_AddBaseMchanics(str_ui_objectives+str_objective_Scirmish);
-   }
-
    DocHelp_AddBaseMchanics(tc_orange+'MAP SCENARIOS'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics(tc_docbr+str_map_ScenarioL[mc_ffa3   ]+'-'+str_map_ScenarioL[mc_ffa8]+' - are several free-for-all scenarios for different numbers of players; players team numbers can be changed.');
-   DocHelp_AddBaseMchanics(tc_docbr+str_map_ScenarioL[mc_1x1    ]+' - is a classic 1x1 scenario;');
-   DocHelp_AddBaseMchanics(tc_docbr+str_map_ScenarioL[mc_2x2    ]+','
-                                   +str_map_ScenarioL[mc_3x3    ]+','
-                                   +str_map_ScenarioL[mc_4x4    ]+','
-                                   +str_map_ScenarioL[mc_2x2x2  ]+','
-                                   +str_map_ScenarioL[mc_2x2x2x2]+' - are various team skirmish; players team numbers cannot be changed;');
+   DocHelp_AddBaseMchanics('* '+str_map_ScenarioL[mc_ffa3   ]+'-'+str_map_ScenarioL[mc_ffa8]+' - are several free-for-all scenarios for different numbers of players; players team numbers can be changed.');
+   DocHelp_AddBaseMchanics(tc_docbr+'* '+str_map_ScenarioL[mc_1x1    ]+' - is a classic 1x1 scenario;');
+   DocHelp_AddBaseMchanics(tc_docbr+'* '+str_map_ScenarioL[mc_2x2    ]+','
+                                        +str_map_ScenarioL[mc_3x3    ]+','
+                                        +str_map_ScenarioL[mc_4x4    ]+','
+                                        +str_map_ScenarioL[mc_2x2x2  ]+','
+                                        +str_map_ScenarioL[mc_2x2x2x2]+' - are various team skirmish; players team numbers cannot be changed;');
    DocHelp_AddBaseMchanics(tc_docbr+str_ui_objectives);
    DocHelp_AddBaseMchanics(tc_docbr+str_objective_Scirmish);
-   DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics(tc_docbr+str_map_ScenarioL[mc_KeyPoints]+' - is a tactical scenario in which players must capture '+i2s(keyPoint_mcN)+' moving key points. To capture a point, a player must have at least one unit inside it. Capturing a key point takes '+i2s(keyPoint_CTime_Def_Sec)+' seconds.');
+   DocHelp_AddBaseMchanics(tc_docbr+'* '+str_map_ScenarioL[mc_KeyPoints]+' - is a tactical scenario in which players must capture '+i2s(keyPoint_mcN)+' moving key points(see "image #3"). To capture a point, a player must have at least one unit inside it. Capturing a key point takes '+i2s(keyPoint_CTime_Def_Sec)+' seconds.');
    DocHelp_AddBaseMchanics(tc_docbr+'After capturing it, there is no requirement to keep units inside it.');
    DocHelp_AddBaseMchanics(tc_docbr+str_ui_objectives);
    DocHelp_AddBaseMchanics(tc_docbr+str_objective_KeyPoints);
-   DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics(tc_docbr+str_map_ScenarioL[mc_KotH     ]+' - is a tactical scenario in which players must hold the central area of the map for '+i2s(keyPoint_CTime_KotH_Sec)+' seconds. There is a '+i2s(keyPoint_KotH_pause_sec)+'-seconds cooldown before capturing the central area.');
+   DocHelp_AddBaseMchanics(tc_docbr+'* '+str_map_ScenarioL[mc_KotH     ]+' (King of the Hill) - is a tactical scenario in which players must hold the central area of the map(see "image #4") for '+i2s(keyPoint_CTime_KotH_Sec)+' seconds. There is a '+i2s(keyPoint_KotH_pause_sec)+'-seconds cooldown before capturing the central area.');
    DocHelp_AddBaseMchanics(tc_docbr+str_ui_objectives);
    DocHelp_AddBaseMchanics(tc_docbr+str_objective_KotH);
-   DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics(tc_docbr+str_map_ScenarioL[mc_royale   ]+' - a variant of free-for-all scenario, where the death circle gradually narrows the available space on the map.');
+   DocHelp_AddBaseMchanics(tc_docbr+'* '+str_map_ScenarioL[mc_royale   ]+' - a variant of free-for-all scenario, where the death circle gradually narrows the available space on the map.');
    DocHelp_AddBaseMchanics(tc_docbr+str_ui_objectives);
    DocHelp_AddBaseMchanics(tc_docbr+str_objective_RoyalBattle);
    DocHelp_AddBaseMchanics(tc_docbr+str_or);
@@ -1124,12 +1130,15 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'SPECIAL MAP OBJECTS'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics('Neutral generators - see image #2 - ');
+   DocHelp_AddBaseMchanics('Neutral generators (see "image #2") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of neutral generators:');
+   DocHelp_AddBaseMchanics(tc_docbr+'- "Starter" generator - appears at players base. Required at least '+limit2s(map_generators_LimitS,ul1)+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+i2s(map_generators_EnergyS)+'.');
+   DocHelp_AddBaseMchanics(tc_docbr+'- "Normal" generator - appears at any map locations. Required at least '+limit2s(map_generators_LimitO,ul1)+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+i2s(map_generators_EnergyO)+'.');
+   DocHelp_AddBaseMchanics(tc_docbr+'Both types of neutral generators requires holding units inside it, otherwise generator become back to neutral state.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'RESOURCES'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics(' ');
-   DocHelp_AddBaseMchanics(tc_docbr+'There are 3 types of resources in the game:');
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics('There are 3 types of resources in the game:');
    DocHelp_AddBaseMchanics(tc_docbr+'- The main resource of the game is the "'+str_ui_EnergyLevel+'". Almost all production (building construction, unit creation, or upgrade research) in the game consumes this resource.');
    DocHelp_AddBaseMchanics('In the user interface, it is displayed as two numbers: the level of free energy and the '+tc_aqua+'maximum energy level'+tc_default+'.');
    DocHelp_AddBaseMchanics('When a player starts any production that requires this resource, the game reduces the free energy level by the production cost and restores this amount after the production is completed.');
@@ -1149,8 +1158,8 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'UNIT ATTRIBUTES'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics(' ');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_alive   +' or '+str_attr_dead    +';');
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics('- '+str_attr_alive   +' or '+str_attr_dead    +';');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_unit    +' or '+str_attr_building+';');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_mech    +' or '+str_attr_bio     +';');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_light   +' or '+str_attr_heavy   +';');
@@ -1159,8 +1168,8 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'UNIT EFFECTS'+tc_default+tc_doccpt);
-   DocHelp_AddBaseMchanics(' ');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_stuned  +' - unit is stuned and can`t attack or move;');
+   DocHelp_AddBaseMchanics(tc_docbr);
+   DocHelp_AddBaseMchanics('- '+str_attr_stuned  +' - unit is stuned and can`t attack or move;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and takes a third less damage;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;');
@@ -1169,7 +1178,7 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SSoul   +' - unit is under "Soul Sphere" effect; it`s regaining it health;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SInvuln +' - unit is under "Invulnerability Sphere" effect; it is immune to any damage;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SInvis  +' - unit is under "Invisibility Sphere" effect; it invisibile;');
-   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage;');
+   DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage and resist to "pain state" effect;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_SDDamage+' - unit is under "Double Damage Sphere" effect; it deals double damage;');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_attr_STurbo  +' - unit is under "Turbo Sphere" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.');
    DocHelp_AddBaseMchanics(tc_docbr);
@@ -1187,7 +1196,7 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics(tc_docbr+'1) The game takes the attacking unit`s base damage and adds bonuses from upgrades and veteran level;');
+   DocHelp_AddBaseMchanics('1) The game takes the attacking unit`s base damage and adds bonuses from upgrades and veteran level;');
    DocHelp_AddBaseMchanics(tc_docbr+'2) Special effects of the attacking unit that affect its damage amount are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SDDamage+'" effect);');
    DocHelp_AddBaseMchanics(tc_docbr+'3) A damage modifier for the attacking unit is applied to the resulting value;');
    DocHelp_AddBaseMchanics(tc_docbr+'4) Special effects reducing the received damage by the target unit are applied ("'+str_attr_Heroic+'" attribute and "'+str_attr_SRDamage+'" effect);');
@@ -1201,7 +1210,7 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_orange+'OTHER'+tc_default+tc_doccpt);
    DocHelp_AddBaseMchanics(tc_docbr);
-   DocHelp_AddBaseMchanics(tc_docbr+'If a player loses all his builders - all his units revealed on the map.');
+   DocHelp_AddBaseMchanics('If a player loses all his builders - all his units revealed on the map.');
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr+'Unit hits regeneration period is 1 second.');
 
@@ -1213,7 +1222,7 @@ begin
    DocHelp_AddOther(tc_docbr);
    DocHelp_AddOther(tc_docbr+'Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:');
    DocHelp_AddOther(tc_docbr);
-   DocHelp_AddOther('   MarsWars_ded.exe [X] [Y]');
+   DocHelp_AddOther(tc_doccnt+'MarsWars_ded.exe [X] [Y]');
    DocHelp_AddOther(tc_docbr);
    DocHelp_AddOther('where X - UDP port (optional argument, default value - '+w2s(net_DefaultPort)+'); Y - LAN Advertise (optional argument, default value - 1 (true)).');
    DocHelp_AddOther(tc_docbr+'Any connected player can change the game settings in a dedicated server`s lobby.');
@@ -1587,7 +1596,7 @@ begin
   str_warn_MaxCountReached    := 'Достигнут максимум';
   str_warn_kpoint_captured   := 'Ключевая точка захвачена!';
   str_warn_kpoint_lost       := 'Ключевая точка потеряна!';
-  str_warn_koth_control      := ' команда контролирует центр!';
+  str_warn_koth_CaptureStart      := ' команда контролирует центр!';
   str_warn_ngen_captured     := 'Нейтральный генератор захвачен!';
   str_warn_ngen_lost         := 'Нейтральный генератор потерян!';
   str_warn_ngen_exh          := 'Нейтральный генератор истощился!';

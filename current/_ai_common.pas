@@ -7,6 +7,7 @@ aic_keyPoint_LimitMax      = aic_keyPoint_LimitMin*2;
 aic_MaxLimitBorder         = MaxPlayerLimit-aic_keyPoint_LimitMin;
 
 aic_TowerLifeTime          = fr_fps1*60;
+ai_DetectionBuildDelay     = fr_fps1*60*4;
 
 aic_BaseIdle_r             = 50;
 
@@ -65,7 +66,7 @@ ai_need_detect,
 ai_transport_cur,
 ai_transport_need,
 
-ai_nearGenGuards
+ai_nearGenDudesLimit
 
                      : longint;
 
@@ -100,9 +101,7 @@ ai_ZombieTarget_d,
 ai_need_heye_d,
 
 ai_energy_future,
-ai_energy_current,
 
-ai_curr_Builders,
 ai_curr_UnitProds,
 ai_curr_UpgrProds,
 ai_curr_Towers,
@@ -131,7 +130,9 @@ ai_TransportTar_GenTeam_d,
 ai_selfUID_nocomplete,
 ai_selfUID_minLevel,
 
-ai_UnitsInTransform
+ai_UnitsInTransform,
+ai_BuildersInTransform,
+ai_BuildersInConstruction
                      : integer;
 
 ai_MinBuildAttempts:byte;
@@ -183,9 +184,7 @@ ai_ScoutCandidate_u,
 
 ai_TransportTar_Attack_u,
 ai_TransportTar_BDefend_u,
-ai_TransportTar_GenTeam_u,
-
-ai_PrimaryTarget_u
+ai_TransportTar_GenTeam_u
 
                   : PTUnit;
 
@@ -299,7 +298,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure  ai_PlayerSetSkirmishSettings(p:byte);
-procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxSuper,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
+procedure SetBaseOpt(aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxSuper,aMaxAttackLimit,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
 begin
    with g_PlayersGame[p] do
    begin
@@ -311,11 +310,15 @@ begin
       aip_MinTowers        :=aMinTowers;
       aip_MaxTowers        :=aMaxTowers;
       aip_MaxSuper         :=random(aMaxSuper+1);
+      aip_MaxAttackLimit   :=aMaxAttackLimit*ul1;
       aip_MaxUnitLimit     :=aMaxArmyLimit*ul1;
-      aip_pause_attack     :=max2i(fr_fps1,fr_fps1*aAttackPause   );
+      aip_pause_attack     :=fr_fps1*aAttackPause;
       aip_pause_detection  :=max2i(fr_fps1,fr_fps1*aDetectionPause);
       aip_pause_magic      :=max2i(fr_fps1,fr_fps1*aSpecialPause  );
       aip_pause_superweapon:=max2i(fr_fps1,fr_fps1*aSpecialPause  );
+
+      if(aip_MaxAttackLimit<aic_keyPoint_LimitMin)then aip_MaxAttackLimit:=aic_keyPoint_LimitMin;
+      if(aip_MaxUnitLimit  <aic_keyPoint_LimitMax)then aip_MaxUnitLimit  :=aic_keyPoint_LimitMax;
 
       aip_MaxUnitMinPart   :=mm3i(aic_keyPoint_LimitMin,aip_MaxUnitLimit div 4,aic_keyPoint_LimitMax);
    end;
@@ -324,14 +327,14 @@ begin
    with g_PlayersGame[p] do
    begin
       case aip_skill of
-      //              energy buil bar   forges dete  min   max            pause
-      //                     ders racks        ctors tower tower     army  atta det  spec
-      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0   ,0   ,0   );
-      1  : SetBaseOpt(600   ,1   ,1    ,0     ,0    ,1    ,1    ,0  ,10   ,150 ,90  ,240 );
-      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,30   ,100 ,60  ,180 );
-      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,55   ,50  ,30  ,120 );
-      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,0   ,10  ,80  );
-      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,0   ,0   ,0   );
+      //              energy buil bar   forges dete  min   max       army        pause
+      //                     ders racks        ctors tower tower     atta  max   atta det  spec
+      0  : SetBaseOpt(0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0    ,0   ,0   ,0   );
+      1  : SetBaseOpt(1000  ,1   ,2    ,0     ,0    ,2    ,2    ,0  ,5    ,15   ,240 ,120 ,240 );
+      2  : SetBaseOpt(3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,15   ,35   ,180 ,90  ,180 );
+      3  : SetBaseOpt(6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,50   ,55   ,60  ,30  ,120 );
+      4  : SetBaseOpt(7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,70   ,0   ,10  ,80  );
+      else SetBaseOpt(9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,125  ,0   ,0   ,0   );
       end;
 
       if(aip_skill>1)
@@ -543,7 +546,7 @@ begin
    ai_armylimit_alive_b    := 0;
    ai_armylimit_fly        := 0;
 
-   ai_nearGenGuards        := 0;
+   ai_nearGenDudesLimit    := 0;
 
    ai_AttackGroupFlyLimit  := 0;
 
@@ -607,8 +610,6 @@ begin
    ai_enemy_battle_u := nil;
    ai_enemy_battle_d := NOTSET;
 
-   ai_PrimaryTarget_u:= nil;
-
    // repair/heal target
    ai_HealTar_u      := nil;
    ai_HealTar_d      := NOTSET;
@@ -627,7 +628,6 @@ begin
 
    // energy
    ai_energy_future  := 0;
-   ai_energy_current := 0;
 
    ai_generators_limit:=0;
    // generators limit
@@ -652,27 +652,55 @@ begin
                 if(kp_Energy>0)then
                 begin
                    ai_energy_future +=kp_Energy;
-                   ai_energy_current+=kp_Energy;
                    ai_generator_n   +=1;
                 end
                 else ai_keypoint_n+=1;
              end;
+             {else
+               if(kptd_TimerOwnerPlayer=playeri)and(kp_Energy>0)
+               then ai_energy_future +=kp_Energy;}
 
              if(map_scenario=mc_royale)then
-               if(g_royal_RCur<(kp_ToCenterD+kp_RCapture))then continue;
+               if(g_royal_RCur<(kp_ToRoyalCD+kp_RCapture))then continue;
              if(kp_x<=0)
              or(kp_y<=0)
              or(kp_x>=map_Size1)
              or(kp_y>=map_Size1)then continue;
 
+             if(kp_Energy>0)and(uid_isbuilding)then
+             begin
+                d:=point_dist_int(kp_x,kp_y,x,y);
+                if(uid_CanAttack)then
+                begin
+                   if(d<ai_generator_d)then
+                   begin
+                      ai_generator_d :=d;
+                      ai_generator_kp:=@map_KeyPointsL[i];
+                   end;
+                end
+                else
+                  if(kptd_OwnerTeam<>team)and(uid_ability_isradar)then
+                    if((group=8)and(kptd_OwnerPlayer> LastPlayer))
+                    or((group=9)and(kptd_OwnerPlayer<=LastPlayer))then
+                      if(d<ai_generator_d)then
+                      begin
+                         ai_generator_d :=d;
+                         ai_generator_kp:=@map_KeyPointsL[i];
+                      end;
+
+                continue;
+             end;
+
+             if(ai_earlyAttack)and(kp_Energy=map_generators_EnergyS)then continue;
+
              if(transportM>0)
              or(not isfly)then
-               if(map_IsObstacleZone(kp_zone))then continue;
+               if(kp_zone=zone_solid)then continue;
 
              if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
              or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
                if(isfly)
-               or(kp_zone=mapZone)then
+               or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
                  ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,point_dist_int(kp_x,kp_y,x,y),kp_zone);
 
              koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_tick>=keyPoint_KotH_pause);
@@ -688,7 +716,7 @@ begin
              d:=point_dist_int(kp_x,kp_y,x,y);
 
              if(not koth_point)then
-               if((kp_LimitPlayerP[playeri]>=(aic_keyPoint_LimitMin+uid_LimitUse))and(d> kp_RCapture))
+               if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit      +uid_LimitUse))and(d> kp_RCapture))
                or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
 
              if(kptd_OwnerTeam<=LastPlayer)
@@ -772,7 +800,6 @@ begin
    ai_HEyeNest_u            := nil;
 
    // build needs
-   ai_curr_Builders         := pu^.player^.units_builders_e;
 
    ai_curr_UnitProds        := 0;  // unit production
    ai_need_UnitProds        := 0;
@@ -802,11 +829,14 @@ begin
    ai_MinBuildAttempts      := 255;
 
    ai_UnitsInTransform      := 0;
+   ai_BuildersInTransform   := 0;
+   ai_BuildersInConstruction:= 0;
 
-   ai_selfUID_minLevel:=LastUnitLevel;
-   with pu^ do
+   ai_selfUID_minLevel      :=LastUnitLevel;
+   ai_selfUID_nocomplete    :=0;
+   {with pu^ do
    with player^ do
-     ai_selfUID_nocomplete  := units_uid_e[uidi]-units_uid_c[uidi];
+     ai_selfUID_nocomplete  := units_uid_e[uidi]-units_uid_c[uidi]; }
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1130,24 +1160,6 @@ begin
    ai_SphereTurbo_u:=newu;
 end;
 
-procedure ai_SetPrimaryTarget(newu:PTUnit);
-begin
-   if(ai_PrimaryTarget_u=nil)
-   then
-   else
-     if(newu^.uid^.uid_AI_TargetWeight>ai_PrimaryTarget_u^.uid^.uid_AI_TargetWeight)
-     then
-     else
-     if(newu^.uid^.uid_AI_TargetWeight<ai_PrimaryTarget_u^.uid^.uid_AI_TargetWeight)
-     then exit
-     else
-       if(newu^.hits<ai_PrimaryTarget_u^.hits)
-       then
-       else exit;
-
-   ai_PrimaryTarget_u:=newu;
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 procedure ai_SetTarget_Scout(newu:PTUnit);
@@ -1259,7 +1271,7 @@ var
 u:integer;
 limit_AGroup,
 limit_Attack,
-limit_Base:longint;
+limit_Home:longint;
 begin
    with g_PlayersGame[playerN] do
    begin
@@ -1267,12 +1279,12 @@ begin
       if(aip_timer_magic      >0)then aip_timer_magic      -=1;
       if(aip_timer_superweapon>0)then aip_timer_superweapon-=1;
 
-      {if(g_cycle_order=playerN)and(playerN=LocalPlayer)then
-      begin
-         writeln(playerN,' ',aip_pause_attack,' ',aip_timer_attack,' - ',armylimit,' ',aic_MaxLimitBorder,' : ',units_bld_l[false]+prod_unit_Limit,' ',aip_MaxUnitLimit,' ',units_bld_l[false],' ',units_bld_l[true]);
+     { if(g_cycle_order=playerN)and(playerN=UIPlayer)then
+      begin                                                                                                                                                                    //,' ',aip_MaxUnitLimit,' ',units_bld_l[false],' ',units_bld_l[true]
+         //writeln(playerN,' pause=',aip_pause_attack,' timer=',aip_timer_attack,' - armyL=',armylimit,' maxLimitB=',aic_MaxLimitBorder,' : curLimitC=',units_bld_lc[false],' MaxUnitLimit=',aip_MaxUnitLimit);
          //writeln(aip_timer_detection);
          //writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
-      end; }
+      end;  }
 
       if(aip_timer_attack<0)then
       begin
@@ -1280,32 +1292,40 @@ begin
          if(aip_timer_attack>=0)then
          begin
             limit_Attack:=0;
-            limit_Base  :=0;
+            limit_Home  :=0;
             for u:=1 to MaxUnits do
               with g_punits[u]^ do
               with uid^ do
                 if(hits>0)and(playerN=playeri)and(not uid_isbuilding)then
                   case group of
-                  aic_group_Home      : limit_Base  +=uid_LimitUse;
+                  aic_group_Home      : limit_Home  +=uid_LimitUse;
                   aic_group_AttackNow,
                   aic_group_AttackWait: limit_Attack+=uid_LimitUse;
                   end;
 
-            if(limit_Attack<=aip_MaxUnitMinPart)or(limit_Attack<limit_Base)
+            if(limit_Attack<=aip_MaxUnitMinPart)
+            or((limit_Attack<limit_Home)and(aip_pause_attack<=0))
             then aip_timer_attack:=0
-            else aip_timer_attack:=hits_ndead
+            else aip_timer_attack:=-fr_fps5;
          end;
       end
       else
         if(aip_timer_attack=0)then
         begin
-           if(((aip_flags and aif_army_early_attack0)>0)and(units_bld_l[false]>=ul1))
-           or(((aip_flags and aif_army_early_attack1)>0)and(units_bld_l[false]>=aip_MaxUnitMinPart))
+           if(((aip_flags and aif_army_early_attack0)>0)and(units_bld_lc[false]>=ul1))
+           or(((aip_flags and aif_army_early_attack1)>0)and(units_bld_lc[false]>=aip_MaxUnitMinPart))
            then aip_timer_attack:=1
            else
-             if((armylimit+prod_unit_Limit)>=aic_MaxLimitBorder)
-             or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxUnitLimit)
-             then aip_timer_attack:=aip_pause_attack+1;
+             if(aip_pause_attack>0)then
+             begin
+                if(units_all_c>=aic_MaxLimitBorder)
+                or(units_bld_lc[false]>=aip_MaxAttackLimit)
+                then aip_timer_attack:=aip_pause_attack;
+             end
+             else
+               if((armylimit+prod_unit_Limit)>=aic_MaxLimitBorder)
+               or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxAttackLimit)
+               then aip_timer_attack:=1;
         end
         else
         begin
@@ -1317,7 +1337,7 @@ begin
               else
                 if((aip_flags and aif_army_early_attack1)>0)
                 then limit_AGroup:=aip_MaxUnitMinPart
-                else limit_AGroup:=aip_MaxUnitLimit;
+                else limit_AGroup:=aip_MaxAttackLimit;
               limit_Attack:=0;
               for u:=1 to MaxUnits do
                 with g_punits[u]^ do
@@ -1328,7 +1348,9 @@ begin
                      group:=aic_group_AttackNow;
                      if(limit_Attack>=limit_AGroup)then break;
                   end;
-              aip_timer_attack:=hits_ndead;
+
+              aip_timer_attack:=-fr_fps5;
+
               if(limit_Attack>0)then
                 if((aip_flags and aif_army_early_attack0)>0)
                 then aip_flags:=aip_flags xor aif_army_early_attack0

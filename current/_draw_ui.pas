@@ -62,14 +62,20 @@ begin
        al_v :=av;
        al_t :=ui_alarm_time;
        case al_v of
-aummat_attacked_u,
-aummat_attacked_b : al_c:=c_red;
-aummat_created_u,
-aummat_created_b  : al_c:=c_lime;
-aummat_advance    : al_c:=c_aqua;
-aummat_upgrade    : al_c:=c_yellow;
-aummat_markLook   : al_c:=c_ltgray;
-aummat_markAttack : al_c:=c_ltred;
+lmt_unit_attackedU,
+lmt_unit_attackedB     : al_c:=c_red;
+lmt_unit_readyU,
+lmt_unit_readyB        : al_c:=c_lime;
+lmt_unit_LevelUp       : al_c:=c_blue;
+lmt_upgrade_complete   : al_c:=c_yellow;
+lmt_markLook           : al_c:=c_ltgray;
+lmt_markAttack         : al_c:=c_ltred;
+lmt_ngen_exh,
+lmt_ngen_Captured,
+lmt_ngen_Alarm,
+lmt_ngen_lost          : al_c:=c_aqua;
+lmt_kpoint_CaptureStart,
+lmt_kpoint_Captured    : al_c:=c_dyellow;
        end;
        ui_AddMarker:=true;
     end;
@@ -84,18 +90,24 @@ begin
      with g_PlayersGame[POVPlayer] do
        with log_l[log_i] do
          case lm_type of
-lmt_unit_LevelUp    :      ui_AddMarker(lm_x,lm_y,aummat_advance   ,true);
-lmt_unit_ready       : if(g_uids[lm_data_u].uid_isbuilding)
-                       then ui_AddMarker(lm_x,lm_y,aummat_created_b ,true)
-                       else ui_AddMarker(lm_x,lm_y,aummat_created_u ,true);
-lmt_upgrade_complete :      ui_AddMarker(lm_x,lm_y,aummat_upgrade   ,true);
-lmt_markLook         :      ui_AddMarker(lm_x,lm_y,aummat_markLook  ,true);
-lmt_markAttack       :      ui_AddMarker(lm_x,lm_y,aummat_markAttack,true);
-lmt_allies_attacked,
-lmt_unit_attacked    : begin
-                       if(g_uids[lm_data_u].uid_isbuilding)
-                       then ui_AddMarker(lm_x,lm_y,aummat_attacked_b,false)
-                       else ui_AddMarker(lm_x,lm_y,aummat_attacked_u,false);
+lmt_unit_LevelUp,
+lmt_unit_readyU,
+lmt_unit_readyB,
+lmt_upgrade_complete,
+lmt_ngen_exh,
+lmt_ngen_Captured,
+lmt_ngen_Alarm,
+lmt_ngen_lost,
+lmt_kpoint_CaptureStart,
+lmt_kpoint_Captured,
+lmt_markLook,
+lmt_markAttack       : ui_AddMarker(lm_x,lm_y,lm_type   ,true);
+
+lmt_allies_attackedU,
+lmt_allies_attackedB,
+lmt_unit_attackedU,
+lmt_unit_attackedB   : begin
+                       ui_AddMarker(lm_x,lm_y,lm_type,false);
 
                        LogMes2UIAlarm:=not PointInCam(lm_x,lm_y);
                        end;
@@ -147,14 +159,10 @@ begin
           r:=(g_tick+cardinal(i+al_t)) mod ui_alarm_time;
 
           case al_v of
-aummat_attacked_b,
-aummat_created_b,
-aummat_upgrade    : RectangleColor(ui_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
-aummat_advance,
-aummat_attacked_u,
-aummat_created_u,
-aummat_markLook,
-aummat_markAttack : CircleColor   (ui_minimap,al_mx  ,al_my  ,              r, al_c);
+lmt_unit_readyB,
+lmt_allies_attackedB,
+lmt_upgrade_complete: RectangleColor(ui_minimap,al_mx-r,al_my-r,al_mx+r,al_my+r, al_c);
+          else        CircleColor   (ui_minimap,al_mx  ,al_my  ,              r, al_c);
           end;
 
           al_t-=2;
@@ -183,22 +191,31 @@ begin
 
    map_MiniMap_KeyPoints(ui_minimap,true);
    case map_scenario of
-   mc_royale: circleColor(ui_minimap,ui_hwp,ui_hwp,trunc(g_royal_RCur*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
+   mc_royale: circleColor(ui_minimap,g_royal_RMMx,g_royal_RMMy,trunc(g_royal_RCur*map_MiniMap_cx)+1,ui_max_color[ui_mm_ScanBlink]);
    end;
 
+   //rpls_vidx
    if(ui_PlayersScreens)then
-     for i:=0 to LastPlayer do
-       with g_PlayersGame[i] do
-       with g_PlayersTemp[i] do
-         if(cam_w>0)then
-           if(i<>LocalPlayer)or(net_status<>ns_server)then
-           if(state=ps_Human)or(net_status<>ns_server)then
-             if(g_PlayersGame[LocalPlayer].isobserver)
-             or(g_PlayersGame[LocalPlayer].team=team)then
-               rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
-                                         round( cam_y       *map_MiniMap_cx),
-                                         round((cam_x+cam_w)*map_MiniMap_cx),
-                                         round((cam_y+cam_h)*map_MiniMap_cx), PlayerGetColorDef(i));
+     if(rpls_pstate=rpls_read)
+     then rectangleColor(ui_minimap,round((rpls_vidx shl rpls_UIcamXYt1b)*map_MiniMap_cx)-(map_MiniMap_CamW div 2),
+                                    round((rpls_vidy shl rpls_UIcamXYt1b)*map_MiniMap_cx)-(map_MiniMap_CamH div 2),
+                                    round((rpls_vidx shl rpls_UIcamXYt1b)*map_MiniMap_cx)+(map_MiniMap_CamW div 2),
+                                    round((rpls_vidy shl rpls_UIcamXYt1b)*map_MiniMap_cx)+(map_MiniMap_CamH div 2), PlayerGetColorDef(rpls_player))
+     else
+       if(net_status<>ns_none)then
+         for i:=0 to LastPlayer do
+           with g_PlayersGame[i] do
+           with g_PlayersTemp[i] do
+             if(cam_w>0)then
+               if(i<>LocalPlayer)or(net_status<>ns_server)then
+               if(state=ps_Human)or(net_status<>ns_server)then
+                 if(g_PlayersGame[LocalPlayer].isobserver)
+                 or(g_PlayersGame[LocalPlayer].team=team)then
+                   rectangleColor(ui_minimap,round( cam_x       *map_MiniMap_cx),
+                                             round( cam_y       *map_MiniMap_cx),
+                                             round((cam_x+cam_w)*map_MiniMap_cx),
+                                             round((cam_y+cam_h)*map_MiniMap_cx), PlayerGetColorDef(i));
+
 
    ui_mm_ScanBlink:=not ui_mm_ScanBlink;
 end;
@@ -594,8 +611,8 @@ begin
        if(al_t>0)then
        begin
           case al_v of
-          aummat_markLook,
-          aummat_markAttack:;
+          lmt_markLook,
+          lmt_markAttack:;
           else continue;
           end;
 
@@ -654,6 +671,7 @@ begin
                                 AddLine(nil);
                                 AddLine(@str_ui_BuildHint);
                                 AddLine(@str_ui_RightClickCancel);
+                                AddLine(@str_ui_BuildTip);
                              end;
                  -255..-1  : with g_aids[-m_brush] do
                              begin
@@ -665,6 +683,9 @@ begin
                                 uat_UnitOwn,
                                 uat_UnitAlly,
                                 uat_UnitEnemy: BrushUnitTargetHint;
+                                uat_Point    : if(ui_CommandercPU<>nil)then
+                                                 if(unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi)>0)then
+                                                   AddLine(@str_ui_BuildHint);
                                 end;
                                 AddLine(@str_ui_RightClickCancel);
                              end
@@ -765,11 +786,11 @@ begin
    cx:=replay_GetProgress;
    w :=round(cx*ui_ReplayBarW);
 
-   boxColor (tar,ui_ReplayBarX,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+w,ui_ReplayBarY,c_yellow);
-   draw_text(tar,ui_ReplayBarX,ui_ReplayBarY-font_wh,i2s(round(cx*100))+'%',ta_LB,255,c_white);
+   boxColor (tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+w,ui_ReplayBarY,c_violet);
+   draw_text(tar,ui_ReplayBarX+2,ui_ReplayBarY-font_wh,i2s(round(cx*100))+'%',ta_LB,255,c_white);
 
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then
-     draw_text(tar,ui_ReplayBarWh,ui_ReplayBarY-font_wh,rpls_list[rpls_list_sel],ta_MB,255,c_white);
+     draw_text(tar,ui_ReplayBarX+ui_ReplayBarWh,ui_ReplayBarY-font_wh,rpls_list[rpls_list_sel],ta_MB,255,c_white);
 end;
 
 procedure draw_UILog(tar:pSDL_Surface;x,y:integer;logAlign,POVPlayer,LogLineLen,LogListH:byte;LogSet:TSob);

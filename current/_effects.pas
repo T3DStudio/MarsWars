@@ -18,36 +18,37 @@ begin
       anim_smstate:=sms_death;
       smodel:=spr_pdmodel;
       case x of
-        UID_Pain          : setEID(@spr_pain          ,sms_death);
-        UID_Phantom       : setEID(@spr_Phantom       ,sms_death);
-        UID_LostSoul      : setEID(@spr_lostsoul      ,sms_death);
-        UID_HEye          : setEID(@spr_h_p2          ,sms_death);
+        UID_Pain          : setEID(@spr_pain           ,sms_death);
+        UID_Phantom       : setEID(@spr_Phantom        ,sms_death);
+        UID_LostSoul      : setEID(@spr_lostsoul       ,sms_death);
+        UID_HEye          : setEID(@spr_h_p2           ,sms_death);
 
-        MID_BPlasma       : setEID(@spr_u_p0          ,sms_death);
+        MID_BPlasma       : setEID(@spr_u_p0           ,sms_death);
         MID_SShot,
         MID_SSShot,
         MID_Bullet,
         MID_SChaingun,
-        MID_Chaingun      : setEID(@spr_u_p1          ,sms_death);
-        MID_BFG           : setEID(@spr_u_p2          ,sms_death);
-        MID_Flyer         : setEID(@spr_u_p3          ,sms_death);
+        MID_Chaingun      : setEID(@spr_u_p1           ,sms_death);
+        MID_BFG           : setEID(@spr_u_p2           ,sms_death);
+        MID_Flyer         : setEID(@spr_u_p3           ,sms_death);
 
-        MID_Imp           : setEID(@spr_h_p0          ,sms_death);
-        MID_Cacodemon     : setEID(@spr_h_p1          ,sms_death);
-        MID_Baron         : setEID(@spr_h_p2          ,sms_death);
+        MID_Imp           : setEID(@spr_h_p0           ,sms_death);
+        MID_Cacodemon     : setEID(@spr_h_p1           ,sms_death);
+        MID_Baron         : setEID(@spr_h_p2           ,sms_death);
         MID_URocketS,
         MID_URocket,
-        MID_Revenant      : setEID(@spr_h_p4          ,sms_death);
-        MID_YPlasma       : setEID(@spr_h_p7          ,sms_death);
+        MID_Revenant      : setEID(@spr_h_p4           ,sms_death);
+        MID_YPlasma       : setEID(@spr_h_p7           ,sms_death);
 
-        EID_BFG           : setEID(@spr_eff_bfg       ,sms_death);
+        EID_BFG           : setEID(@spr_eff_bfg        ,sms_death);
 
         MID_CyberRocket,
-        MID_Granade,
         MID_Tank,
         MID_Mancubus,
-        EID_Exp           : setEID(@spr_eff_exp        ,sms_death);
+        EID_Exp1          : setEID(@spr_eff_exp1       ,sms_death);
         EID_Exp2          : setEID(@spr_eff_exp2       ,sms_death);
+        MID_Granade,
+        EID_Exp3          : setEID(@spr_eff_exp3       ,sms_death);
 
         EID_Blood         : setEID(@spr_blood          ,sms_death);
 
@@ -189,7 +190,8 @@ MID_CyberRocket,
 MID_Granade,
 MID_Tank,
 MID_Mancubus,
-EID_Exp           : setEff(7 ,0 ,-1 ,-1       ,true ,0 );
+EID_Exp3,
+EID_Exp1          : setEff(7 ,0 ,-1 ,-1       ,true ,0 );
 EID_Exp2          : setEff(7 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_Blood         : setEff(6 ,0 ,-1 ,-1       ,true ,15);

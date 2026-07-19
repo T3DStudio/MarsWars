@@ -539,7 +539,7 @@ begin
    new_map    :=false;
 
    if(nrByte(@map_scenario    ))then begin redraw_menu:=true;new_map:=true;end;
-   if(nrByte(@map_GeneratorT  ))then ;//begin redraw_menu:=true;new_map:=true;end;
+   if(nrByte(@map_GeneratorT  ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrInt (@map_Size1       ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrByte(@map_Template    ))then begin redraw_menu:=true;new_map:=true;end;
    if(nrCard(@map_seed        ))then begin redraw_menu:=true;new_map:=true;end;
@@ -893,7 +893,7 @@ begin
        with net_SvList_listi[i] do
        begin
           if(si_ttl<si_ttl.MaxValue)then si_ttl+=1;
-          if(si_ttl=net_SendTimePing)then net_ServerList_ItemUpdate(si_ip,si_port,si_info,999);
+          if(si_ttl=net_ServerListTTL)then net_ServerList_ItemUpdate(si_ip,si_port,si_info,999);
 
           if(net_TimerBase=2)then
           begin

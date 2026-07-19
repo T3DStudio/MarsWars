@@ -225,7 +225,6 @@ begin
    g_cycle_regen := 0;
    g_LobbyTimer  := 0;
 
-   Map_Make;
    {$IFDEF DEBUG0}
    test_InstaProd:=false;
    {$ENDIF}
@@ -270,7 +269,11 @@ begin
    rpls_pnu    :=0;
    ui_playerPOV:=false;
    rpls_pstate :=rpls_none;
+
+   PlayersUpdateColorSchema(LocalPlayer);
    {$ENDIF}
+
+   Map_Make;
 end;
 
 {$IFDEF _FULLGAME}
@@ -766,15 +769,15 @@ begin
 
    case map_scenario of
    mc_1x1,
-   mc_ffa3 : Map_randommap(3000,4000);
-   mc_ffa4 : Map_randommap(3500,5000);
-   else      Map_randommap(4000);
+   mc_ffa3 : map_RandomMap(3000,4000);
+   mc_ffa4 : map_RandomMap(3500,5000);
+   else      map_RandomMap(4000);
    end;
    Game_ShuffleAINames;
 
    map_GeneratorT:=random(mapg_Last)+1;
 
-   Map_SetScenarioMaxPlayers;
+   map_SetScenarioMaxPlayers;
 
    {$IFDEF _FULLGAME}
    for p:=0 to LastPlayer do
@@ -971,42 +974,50 @@ begin
              if(net_TimerLogSend>0)then net_TimerLogSend-=1;
           end;
 
-          if{$IFDEF _FULLGAME}(ServerSide)and{$ENDIF}(g_started)and(g_status=gs_running)and(not isobserver)and(not isdefeated)then
+          if(g_started)and(g_status=gs_running)and(not isobserver)and(not isdefeated)then
           begin
-             if(build_cd>0)then build_cd-=1;
-             if(race=r_hell)and(res_HellPower<HellPower_Max)then
-               if((g_tick mod HellPower_AddPeriod)=p)then
-                 if(units_uid_c[UID_HAltar]>0)then
-                   case units_uid_c[UID_HAltar] of
-                   1  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add1);
-                   2  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add2);
-                   else res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add3);
-                   end;
+             {$IFDEF _FULLGAME}
+             if(ServerSide)or(ui_ControlTabType in [tcc_observer,tcc_replay])then
+             {$ENDIF}
+               if(build_cd>0)then build_cd-=1;
 
-             trevealed:=(units_builders_e=0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF};
-             if(not isrevealed)and(trevealed)then
+             {$IFDEF _FULLGAME}
+             if(ServerSide)then
+             {$ENDIF}
              begin
-                GameLog_PlayerRevealed(p);
-                isrevealed:=trevealed;
+                if(race=r_hell)and(res_HellPower<HellPower_Max)then
+                  if((g_tick mod HellPower_AddPeriod)=p)then
+                    if(units_uid_c[UID_HAltar]>0)then
+                      case units_uid_c[UID_HAltar] of
+                      1  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add1);
+                      2  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add2);
+                      else res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add3);
+                      end;
+
+                trevealed:=(units_builders_e=0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF};
+                if(not isrevealed)and(trevealed)then
+                begin
+                   GameLog_PlayerRevealed(p);
+                   isrevealed:=trevealed;
+                end;
+
+                game_PlayerExecuteOrder(p);
+
+                if(state=ps_AI)
+                then ai_player_code(p)
+                else
+                  if(log_EnergyCheckTimer>0)
+                  then log_EnergyCheckTimer-=1
+                  else
+                    if(res_energyl_cur>=0)
+                    then log_EnergyCheckTimer:=1
+                    else
+                    begin
+                       log_EnergyCheckTimer:=fr_fps6;
+                       PlayersAddToLog(p,0,lmt_Req_Energy,0,0,'',-1,-1);
+                    end;
              end;
-
-             game_PlayerExecuteOrder(p);
-
-             if(state=ps_AI)
-             then ai_player_code(p)
-             else
-               if(log_EnergyCheckTimer>0)
-               then log_EnergyCheckTimer-=1
-               else
-                 if(res_energyl_cur>=0)
-                 then log_EnergyCheckTimer:=1
-                 else
-                 begin
-                    log_EnergyCheckTimer:=fr_fps6;
-                    PlayersAddToLog(p,0,lmt_Req_Energy,0,0,'',-1,-1);
-                 end;
           end;
-
        end;
 
    {c:=0;
@@ -1024,6 +1035,7 @@ begin
    //writeln(pnum,' ',units_all_c);
 
 
+   // remove alarms outside the map in royal battle
    if(g_cycle_order=0)and(map_scenario=mc_royale)then
      for t:=0 to LastPlayer do
        for p:=0 to ai_LastAlarm do
@@ -1366,7 +1378,7 @@ begin
 
    case param_type of
    nmid_lobby_MScenario      : begin ScrollByteSet(@map_scenario,forward,@allmapscenarios);PlayersValidateTeam;Map_Make;end;
-   nmid_lobby_MGenerators    : begin ScrollByte   (@map_GeneratorT,forward,0,mapg_Last);end;
+   nmid_lobby_MGenerators    : begin ScrollByte   (@map_GeneratorT,forward,0,mapg_Last);Map_Make;end;
    nmid_lobby_MSize          : begin
                                   case forward of
                                   true : ScrollInt(@map_Size1, map_SizeMenuStep,map_MinSize,map_MaxSize);
@@ -1376,7 +1388,7 @@ begin
                                end;
    nmid_lobby_MTemplate      : begin ScrollByte(@map_Template,forward,0,mapt_Last); Map_Make; end;
    nmid_lobby_MSymmetry      : begin ScrollByte(@map_Symmetry,forward,0,maps_Last); Map_Make; end;
-   nmid_lobby_MRandom        : begin Map_randommap; Map_Make;end;
+   nmid_lobby_MRandom        : begin map_RandomMap; Map_Make;end;
    nmid_lobby_GFixedPositions: begin
                                   g_FixedPositions:=not g_FixedPositions;
                                   {$IFDEF _FULLGAME}
@@ -1403,6 +1415,16 @@ begin
    if(gtick>g_royal_RMax)
    then g_royal_RCur:=0
    else g_royal_RCur:=g_royal_Rmax-gtick;
+end;
+
+procedure game_RoyalSetCenter(rx,ry:integer);
+begin
+   g_royal_Rx  := rx;
+   g_royal_Ry  := ry;
+   {$IFDEF _FULLGAME}
+   g_royal_RMMx:= round(g_royal_Rx*map_MiniMap_cx);
+   g_royal_RMMy:= round(g_royal_Ry*map_MiniMap_cx);
+   {$ENDIF}
 end;
 
 procedure GameMain;

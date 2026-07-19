@@ -109,6 +109,7 @@ begin
          case charc of
          tc_docbr,
          tc_doccpt,
+         tc_doccnt,
          tc_nl1..
          tc_nl3      : ;
          tc_RankUAC  : begin

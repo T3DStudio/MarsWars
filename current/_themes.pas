@@ -260,7 +260,7 @@ begin
 
    // SHADOW                            SHADOW
    theme_SetObstaclesData(NOTSET,NOTSET,1     ,NOTSET,'0_53,125,126'  );
-   theme_SetObstaclesData(NOTSET,NOTSET,-32000,NOTSET,'24_27,54_124'  );
+   theme_SetObstaclesData(NOTSET,NOTSET,-32000,NOTSET,'24_27,54_124,127_130'  );
 
    // X Y offset          X      Y
    theme_SetObstaclesData(NOTSET,-3    ,NOTSET,NOTSET,'13,35'         );
@@ -287,7 +287,7 @@ begin
 
    // DEPTH
    theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_ground    ,'all' );
-   theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_Obstacles2,'54_75,117_124' );
+   theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_Obstacles2,'54_75,117_124,127_130' );
    theme_SetObstaclesData(NOTSET,NOTSET,NOTSET,sd_Obstacles1,'76_105,107_116');
 
 
@@ -454,7 +454,7 @@ begin
           SetThemeLiquidsB('17,26'        );
           SetThemeLiquidsF('14'           );
           SetThemeObs0    ('19,22_27,35,41,52_53');
-          SetThemeObs1    ('81_82'      );
+          SetThemeObs1    ('81_82,127_130'       );
           SetThemeObs2    ('58,121_124' );
 
           theme_liquid_style:=tcs_smooth;
@@ -466,8 +466,8 @@ begin
           SetThemeTerrains('12,25'      );
           SetThemeLiquidsB('12,25,20,2' );
           SetThemeLiquidsF('16'        );
-          SetThemeObs0    ('29_32,125' );
-          SetThemeObs1    ('33,34,126,77,88,89,90' );
+          SetThemeObs0    ('29_32,3,125,3,125,3,125' );
+          SetThemeObs1    ('33,34,126,77,88,89,90,77,88,89,90,77,88,89,90' );
           SetThemeObs2    ('55,66');
 
           theme_liquid_style:=tcs_default;
