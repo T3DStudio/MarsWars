@@ -45,6 +45,8 @@ procedure snd_StopSoundSourceAll;forward;
 
 procedure unit_UICountersAll; forward;
 
+procedure ability_UACStrike_missile(playeri:byte;fromx,fromy,tox,toy:integer);forward;
+
 function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function gfx_ShadowColor(c:TMWColor):TMWColor;forward;
 
@@ -71,7 +73,7 @@ function saveload_DeleteInit(check:boolean):boolean;forward;
 procedure replay_SavePlayPosition; forward;
 function replay_DeleteInit(check:boolean):boolean;forward;
 function replay_Play  (check:boolean):boolean;forward;
-function replay_Pause (check:boolean):boolean;forward;
+function replay_TogglePause (check:boolean):boolean;forward;
 function replay_IsPaused:boolean;  forward;
 function replay_GetProgress:single;forward;
 procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
@@ -79,6 +81,7 @@ function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 
 procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);forward;
 function map_ObstacleR(obs_f:byte):integer;forward;
+procedure map_RedrawMenuMinimap;forward;
 
 function Float2Str(s:single):shortstring;
 var l:byte;
@@ -220,6 +223,16 @@ function min2c(x1,x2   :cardinal):cardinal;begin if(x1<x2)then min2c:=x1 else mi
 function min3c(x1,x2,x3:cardinal):cardinal;begin min3c:=min2c(min2c(x1,x2),x3);end;
 
 function mm3i(mnx,x,mxx:longint ):integer;begin mm3i:=min2i(mxx,max2i(x,mnx)); end;
+
+function i2c(i:integer):string4;
+begin
+   i2c:=#0#0;
+   move(i,i2c[1],2);
+end;
+function c2i(cc:string4):integer;
+begin
+   move(cc[1],c2i,2);
+end;
 
 function GetBBit(pb:pbyte;nb:byte):boolean;
 begin
@@ -486,32 +499,6 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//   APM Counter
-//
-
-{procedure PlayerAPMInc(player:byte);
-begin
-   _playerAPM[player].APM_New+=1;
-end;
-
-procedure PlayerAPMUpdate(player:byte);
-begin
-   with _playerAPM[player] do
-   begin
-      if(APM_Time>0)
-      then APM_Time-=1
-      else
-      begin
-         APM_Time   :=APM_UPDPeriod;
-         APM_Current:=(APM_Current+round((APM_1Period/APM_Time)*APM_New)) div 2;
-         APM_Str    :=c2s(APM_Current);
-         APM_New    :=0;
-      end;
-   end;
-end;
-       }
-////////////////////////////////////////////////////////////////////////////////
-//
 //   PLAYERS LOG
 //
 
@@ -605,6 +592,8 @@ lmt_ngen_lost,
 lmt_ngen_Alarm,
 lmt_koth_CaptureStart,
 lmt_koth_Alarm,
+lmt_other_UACStrike,
+lmt_other_UACScan,
 lmt_game_end,
 lmt_game_message,
 lmt_game_ReadyToStart,
@@ -622,10 +611,10 @@ lmt_allies_attackedB : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[lmt_uni
                                                                          lmt_unit_attackedB,
                                                                          lmt_allies_attackedU,
                                                                          lmt_allies_attackedB]))then exit;
-lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[amtype]))then exit;
+lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[amtype              ]))then exit;
 
 lmt_markLook,
-lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]))then exit;
+lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype              ]))then exit;
         else
            with log_l[log_i] do
              if(lm_tick<=g_tick)then
@@ -673,6 +662,9 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype]
                                               state     :=ps_human;
                                               isobserver:=true;
                                            end;
+                   lmt_other_UACStrike : with log_l[log_i] do
+                                           ability_UACStrike_missile(lm_data_u,c2i(lm_string[1]+lm_string[2]),
+                                                                               c2i(lm_string[3]+lm_string[4]),lm_x,lm_y);
                    end;
           end;
 
@@ -763,8 +755,10 @@ begin
 end;
 procedure GameLog_PlayerRevealed(player:byte);
 begin
-   if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_revealed,0,player,g_PlayersGame[player].name,0,0);
+   if(player>LastPlayer)then exit;
+
+   with g_PlayersGame[player] do
+   PlayersAddToLog(player,log_to_all,lmt_player_revealed,byte(isrevealed),player,name,0,0);
 end;
 
 procedure GameLog_PlayerSurrender(player:byte);
@@ -811,10 +805,12 @@ procedure GameLog_StartsIn(seconds:integer);
 begin
    PlayersAddToLog(255,log_to_all,lmt_game_StartsIn,0,byte(seconds),'',0,0)
 end;
+{$IFNDEF _FULLGAME}
 procedure GameLog_EndsIn(seconds:integer);
 begin
    PlayersAddToLog(255,log_to_all,lmt_game_ResetIn ,0,byte(seconds),'',0,0)
 end;
+{$ENDIF}
 procedure GameLog_EndGame(wteam:byte);
 begin
    PlayersAddToLog(255,log_to_all,lmt_game_end,0,wteam,'',0,0);
@@ -857,6 +853,20 @@ begin
      co_markLook  : PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_markLook  ,0,0,name,x,y);
      co_markAttack: PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_markAttack,0,0,name,x,y);
      end;
+end;
+
+procedure GameLog_UACStrike(playeri:byte;fromx,fromy,tox,toy:integer);
+begin
+   if(playeri>LastPlayer)then exit;
+
+   PlayersAddToLog(playeri,log_to_all,lmt_other_UACStrike,0,playeri,i2c(fromx)+i2c(fromy),tox,toy);
+end;
+procedure GameLog_UACScan(playeri,scanedPlayers:byte;tox,toy:integer);
+begin
+   if(playeri>LastPlayer)
+   or(scanedPlayers=0)then exit;
+
+   PlayersAddToLog(playeri,scanedPlayers,lmt_other_UACScan,0,playeri,'',tox,toy);
 end;
 
 // UNITS
@@ -1237,8 +1247,95 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//   UID/UPID Checks
+//   Unit/Upgrades Checks
 //
+
+function upgrade_GetAffectedUIDs(upgr:byte):TSoB;
+var u,a:byte;
+begin
+   upgrade_GetAffectedUIDs:=[];
+   for u:=1 to 255 do
+     with g_uids[u] do
+     begin
+        if(upgr=uid_Armor_upgr1   )
+        or(upgr=uid_Armor_upgr2   )
+        or(upgr=uid_Regen_upgr    )
+        or(upgr=uid_MSpeed_upgr   )
+        or(upgr=uid_PainState_upgr)
+        or(upgr=uid_SightR_upgr      )
+        or(upgr=uid_TransportMax_upgr)
+        or(upgr=g_aids[uid_ability1].ua_req_upgr   )
+        or(upgr=g_aids[uid_ability1].ua_rldDec_upgr)
+        or(upgr=g_aids[uid_ability2].ua_req_upgr   )
+        or(upgr=g_aids[uid_ability2].ua_rldDec_upgr)
+        or(upgr=g_aids[uid_ability3].ua_req_upgr   )
+        or(upgr=g_aids[uid_ability3].ua_rldDec_upgr)
+        then upgrade_GetAffectedUIDs+=[u];
+
+        for a:=0 to LastUnitArms  do
+          with uid_arms[a] do
+            if(upgr=aw_req_upgr)
+            or(upgr=aw_impact_upgr)then upgrade_GetAffectedUIDs+=[u];
+     end;
+end;
+
+function upgrade_GetEnergy(upgr,lvl:byte):integer;
+begin
+   upgrade_GetEnergy:=0;
+   with g_upgrs[upgr] do
+     if(0<lvl)and(lvl<=upgr_max)then
+       if(upgr_renerg_xpl<=0)and(upgr_renerg_apl<=0)
+       then upgrade_GetEnergy:=upgr_renerg
+       else
+       begin
+          lvl-=1;
+          upgrade_GetEnergy:=(upgr_renerg*ipower(upgr_renerg_xpl,lvl))+(upgr_renerg_apl*lvl);
+       end;
+end;
+function upgrade_GetTime(upgr,lvl:byte):integer;
+const upgr_max_time = fr_fps1*255;
+begin
+   upgrade_GetTime:=0;
+   with g_upgrs[upgr] do
+     if(0<lvl)and(lvl<=upgr_max)then
+       if(upgr_time_xpl<=0)and(upgr_time_apl<=0)
+       then upgrade_GetTime:=upgr_time
+       else
+       begin
+          lvl-=1;
+          upgrade_GetTime:=min2i(upgr_max_time,upgr_time*ipower(upgr_time_xpl,lvl)+(upgr_time_apl*lvl));
+       end;
+end;
+
+function upgrade_CheckReqs(player:PTPlayerGameData;upgr:byte):byte;
+begin
+   upgrade_CheckReqs:=0;
+   with player^ do
+   with g_upgrs[upgr] do
+   begin
+      if(units_upgrProds_c<=0)then
+      begin upgrade_CheckReqs:=lmt_unit_NeedProdUnit;exit;end;
+
+      if(upgrs_max[upgr]<=0)then
+      begin upgrade_CheckReqs:=lmt_prod_Unavailable;exit;end;
+
+      if((upgrs_cur[upgr]+prod_upgr_upid[upgr])>=upgrs_max[upgr] )then  //min2i(upgr_max,)
+      begin upgrade_CheckReqs:=lmt_Req_MaxCount;exit;end;
+
+      if(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)
+      or(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)then
+      begin upgrade_CheckReqs:=lmt_Req_Common;exit;end;
+
+      if(prod_upgr_upid[upgr]>0)then
+      begin upgrade_CheckReqs:=lmt_upgrade_InProgress;exit;end;
+
+      if(upgr_time<=0)then
+      begin upgrade_CheckReqs:=lmt_prod_BadOrder;exit;end;
+
+      if(res_energyl_cur<upgrade_GetEnergy(upgr,upgrs_cur[upgr]+1))then
+      begin upgrade_CheckReqs:=lmt_Req_Energy;exit;end;
+   end;
+end;
 
 function player_UIDLimitCheck(player:PTPlayerGameData;uid:byte):boolean;
 begin
@@ -1251,113 +1348,68 @@ begin
                             and((armylimit+prod_unit_Limit+uid_LimitUse)<=MaxPlayerLimit);
 end;
 
-function CheckUnitReqs(player:PTPlayerGameData;uid:byte;checkExtraEnergy:integer=0):byte;
+function unit_CheckReqs(player:PTPlayerGameData;uid:byte;checkExtraEnergy:integer=0):byte;
 begin
-   CheckUnitReqs:=0;
+   unit_CheckReqs:=0;
    with player^ do
    with g_uids[uid] do
    begin
       case uid_isbuilding of
 true  : begin
-           if(units_builders_c<=0)then begin CheckUnitReqs:=lmt_unit_NeedBuilder;exit;end;
-           if(build_cd        > 0)then begin CheckUnitReqs:=lmt_prod_CD;         exit;end;
+           if(units_builders_c<=0)then begin unit_CheckReqs:=lmt_unit_NeedBuilder;exit;end;
+           if(build_cd        > 0)then begin unit_CheckReqs:=lmt_prod_CD;         exit;end;
         end;
-false : if(units_unitProds_c<=0)then begin CheckUnitReqs:=lmt_NeedProdUnit;exit;end;
+false : if(units_unitProds_c<=0)then begin unit_CheckReqs:=lmt_unit_NeedProdUnit;exit;end;
       end;
 
-      if(uid_MaxHits1<=0)then begin CheckUnitReqs:=lmt_prod_BadOrder;exit;end;
+      if(uid_MaxHits1<=0)then begin unit_CheckReqs:=lmt_prod_BadOrder;exit;end;
 
-      if(units_uid_m[uid]<=0)then begin CheckUnitReqs:=lmt_prod_Unavailable;exit;end;
+      if(units_uid_m[uid]<=0)then begin unit_CheckReqs:=lmt_prod_Unavailable;exit;end;
 
       if((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders))then
-      begin CheckUnitReqs:=lmt_Req_MaxBuilders;exit;end;
+      begin unit_CheckReqs:=lmt_Req_MaxBuilders;exit;end;
 
       if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])then
-      begin CheckUnitReqs:=lmt_Req_MaxCount;exit;end;
+      begin unit_CheckReqs:=lmt_Req_MaxCount;exit;end;
 
       if((uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n))
       or((uid_req_uid2>0)and(units_uid_c[uid_req_uid2]<uid_req_uid2n))
       or((uid_req_uid3>0)and(units_uid_c[uid_req_uid3]<uid_req_uid3n))
       or((uid_req_upgr>0)and(upgrs_cur  [uid_req_upgr]=0            ))then
-      begin CheckUnitReqs:=lmt_Req_Common;exit;end;
+      begin unit_CheckReqs:=lmt_Req_Common;exit;end;
 
       if((units_all_e+prod_unit_Now             )>=MaxPlayerUnits)
       or((armylimit+prod_unit_Limit+uid_LimitUse)> MaxPlayerLimit)then
-      begin CheckUnitReqs:=lmt_Req_Limit;exit;end;
+      begin unit_CheckReqs:=lmt_Req_Limit;exit;end;
 
-      if(uid_req_HellPower>0)and(res_HellPower<uid_req_HellPower)then begin CheckUnitReqs:=lmt_Req_HellPower;exit;end;
-      if(uid_req_UACLoot  >0)and(res_UACLoot  <uid_req_UACLoot  )then begin CheckUnitReqs:=lmt_Req_UACLoot;  exit;end;
+      if(uid_req_HellPower>0)and(res_HellPower<uid_req_HellPower)then begin unit_CheckReqs:=lmt_Req_HellPower;exit;end;
+      if(uid_req_UACLoot  >0)and(res_UACLoot  <uid_req_UACLoot  )then begin unit_CheckReqs:=lmt_Req_UACLoot;  exit;end;
 
       if(uid_isbuilding and(res_energyl_max<=0))
-      or(res_energyl_cur<0)then begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
+      or(res_energyl_cur<0)then begin unit_CheckReqs:=lmt_Req_Energy;exit;end;
 
       if(uid_req_EnergyLevel>0)then
         case(state=ps_AI)and(uid_isbuilder)of
         false: if(res_energyl_cur<(uid_req_EnergyLevel+checkExtraEnergy))then
-               begin CheckUnitReqs:=lmt_Req_Energy;exit;end;   //energyCur_BldGens    energyCur_transforms
+               begin unit_CheckReqs:=lmt_Req_Energy;exit;end;   //energyCur_BldGens    energyCur_transforms
         true : if((res_energyl_cur+energyCur_units+energyCur_upgrades+energyCur_BldOther-checkExtraEnergy)<uid_req_EnergyLevel)
                or(res_energyl_max<(uid_req_EnergyLevel+checkExtraEnergy))then
-               begin CheckUnitReqs:=lmt_Req_Energy;exit;end;
+               begin unit_CheckReqs:=lmt_Req_Energy;exit;end;
         end;
    end;
 end;
 
-function GetUpgradeEnergy(upgr,lvl:byte):integer;
+function unit_PossibleTransports(uid:byte):boolean;
+var u:byte;
 begin
-   GetUpgradeEnergy:=0;
-   with g_upgrs[upgr] do
-     if(0<lvl)and(lvl<=upgr_max)then
-       if(upgr_renerg_xpl<=0)and(upgr_renerg_apl<=0)
-       then GetUpgradeEnergy:=upgr_renerg
-       else
+   unit_PossibleTransports:=false;
+   for u:=1 to 255 do
+     with g_uids[u] do
+       if(uid in ups_TransportUIDs)then
        begin
-          lvl-=1;
-          GetUpgradeEnergy:=(upgr_renerg*ipower(upgr_renerg_xpl,lvl))+(upgr_renerg_apl*lvl);
+          unit_PossibleTransports:=true;
+          break;
        end;
-end;
-function GetUpgradeTime(upgr,lvl:byte):integer;
-const upgr_max_time = fr_fps1*255;
-begin
-   GetUpgradeTime:=0;
-   with g_upgrs[upgr] do
-     if(0<lvl)and(lvl<=upgr_max)then
-       if(upgr_time_xpl<=0)and(upgr_time_apl<=0)
-       then GetUpgradeTime:=upgr_time
-       else
-       begin
-          lvl-=1;
-          GetUpgradeTime:=min2i(upgr_max_time,upgr_time*ipower(upgr_time_xpl,lvl)+(upgr_time_apl*lvl));
-       end;
-end;
-
-function CheckUpgradeReqs(player:PTPlayerGameData;upgr:byte):byte;
-begin
-   CheckUpgradeReqs:=0;
-   with player^ do
-   with g_upgrs[upgr] do
-   begin
-      if(units_upgrProds_c<=0)then
-      begin CheckUpgradeReqs:=lmt_NeedProdUnit;exit;end;
-
-      if(upgrs_max[upgr]<=0)then
-      begin CheckUpgradeReqs:=lmt_prod_Unavailable;exit;end;
-
-      if((upgrs_cur[upgr]+prod_upgr_upid[upgr])>=upgrs_max[upgr] )then  //min2i(upgr_max,)
-      begin CheckUpgradeReqs:=lmt_Req_MaxCount;exit;end;
-
-      if(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)
-      or(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)then
-      begin CheckUpgradeReqs:=lmt_Req_Common;exit;end;
-
-      if(prod_upgr_upid[upgr]>0)then
-      begin CheckUpgradeReqs:=lmt_upgrade_InProgress;exit;end;
-
-      if(upgr_time<=0)then
-      begin CheckUpgradeReqs:=lmt_prod_BadOrder;exit;end;
-
-      if(res_energyl_cur<GetUpgradeEnergy(upgr,upgrs_cur[upgr]+1))then
-      begin CheckUpgradeReqs:=lmt_Req_Energy;exit;end;
-   end;
 end;
 
 function unit_IsProducting(pu:PTUnit):boolean;
@@ -1554,6 +1606,7 @@ begin
    ability_CheckTarget:=true;
 end;
 
+
 {$IFDEF _FULLGAME}
 
 procedure WriteLog(mess:shortstring);
@@ -1629,7 +1682,7 @@ begin
    if(period>0)then
      with input_actions[iact] do
        InputActionStuckP:=(ik_kstate=ks_hold)
-                      and (ik_timer_pressed>period)
+                      and (ik_timer_pressed>k_LastCharStuckDelay)
                       and((ik_timer_pressed mod period)=0);
 end;
 function InputActionReleased(iact:byte):boolean;
@@ -1832,49 +1885,61 @@ end;
 
 procedure PlayersUpdateColorSchema(POVPlayer:byte);
 var p,t:byte;
+function PlayerGetCurrentTeam(player:byte):byte;
+begin
+   if(player>LastPlayer)
+   then PlayerGetCurrentTeam:=LastPlayer
+   else
+     if(map_scenario in mc_fixed_teams)
+     then PlayerGetCurrentTeam:=PlayerGetFixedTeams(map_scenario,player)
+     else
+       with g_PlayersGame[player] do
+         if(g_Started)or(state>ps_none)
+         then PlayerGetCurrentTeam:=team
+         else PlayerGetCurrentTeam:=player;
+end;
 begin
    for p:=0 to LastPlayer do
    begin
-      if(POVPlayer>LastPlayer)
-      then PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[p]
-      else
-        case ui_PlayersColor of
-        1,
-        2,
-        3: if(p=POVPlayer)then
-             case ui_PlayersColor of
-             1: PlayerColorsSchemeCurNormal[p]:=c_lime;
-             2,
-             3: PlayerColorsSchemeCurNormal[p]:=c_white;
-             end
-           else
-                if(PlayerGetFixedTeams(map_scenario,POVPlayer)<>PlayerGetFixedTeams(map_scenario,p))
-                then PlayerColorsSchemeCurNormal[p]:=c_red
-                else
-                  case ui_PlayersColor of
-                  1,
-                  2: PlayerColorsSchemeCurNormal[p]:=c_yellow;
-                  3: PlayerColorsSchemeCurNormal[p]:=c_aqua;
-                  end;
-        4,
-        5: if(p=POVPlayer)and(ui_PlayersColor=5)
-           then PlayerColorsSchemeCurNormal[p]:=c_white
-           else
-           begin
-              t:=PlayerGetFixedTeams(map_scenario,p);
-              case t of
-              0,2,4,6: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[(t+6) mod MaxPlayers];
-              1,3,5,7: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[ t   mod MaxPlayers];
+      {
+      0
+      1 tc_lime  +'own ' +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+      2 tc_white +'own ' +tc_yellow+'ally '+tc_red+'enemy'+tc_default;
+      3 tc_white +'own ' +tc_aqua  +'ally '+tc_red+'enemy'+tc_default;
+      4 tc_purple+'teams'+tc_default;
+      5 tc_white +'own ' +tc_purple+'teams'+tc_default;
+      }
+      case ui_PlayersColor of
+      1,
+      2,
+      3 : if(p=POVPlayer)then
+            case ui_PlayersColor of
+            1: PlayerColorsSchemeCurNormal[p]:=c_lime;
+            2,
+            3: PlayerColorsSchemeCurNormal[p]:=c_white;
+            end
+          else
+            if(PlayerGetCurrentTeam(POVPlayer)<>PlayerGetCurrentTeam(p))
+            then PlayerColorsSchemeCurNormal[p]:=c_red
+            else
+              case ui_PlayersColor of
+              1,
+              2: PlayerColorsSchemeCurNormal[p]:=c_yellow;
+              3: PlayerColorsSchemeCurNormal[p]:=c_aqua;
               end;
-           end
-
-        {4: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[g_PlayersGame[p].team];
-        5: if(p=POVPlayer)
-           then PlayerColorsSchemeCurNormal[p]:=c_white
-           else PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[g_PlayersGame[p].team]; }
-        else    PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[p];
-        end;
-
+      4,
+      5: if(p=POVPlayer)and(ui_PlayersColor=5)
+         then PlayerColorsSchemeCurNormal[p]:=c_white
+         else
+         begin
+            t:=PlayerGetCurrentTeam(p);
+            case t of
+            0,2,4,6: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[(t+6) mod MaxPlayers];
+            1,3,5,7: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[ t   mod MaxPlayers];
+            end;
+         end;
+      else PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[p];
+      end;
       PlayerColorsSchemeCurShadow[p]:=gfx_ShadowColor(PlayerColorsSchemeCurNormal[p]);
    end;
 end;
@@ -2291,7 +2356,9 @@ lmt_player_leave      : ParseLogMessage:=lm_string+str_gmsg_PlayerLeave;
 lmt_player_timeout    : ParseLogMessage:=lm_string+str_gmsg_PlayerTimeOut;
 lmt_player_surrender  : ParseLogMessage:=lm_string+str_gmsg_PlayerSurrender;
 lmt_player_defeated   : ParseLogMessage:=lm_string+str_gmsg_PlayerDefeat;
-lmt_player_revealed   : ParseLogMessage:=lm_string+str_gmsg_PlayerRevealed;
+lmt_player_revealed   : if(lm_data_t>0)
+                        then ParseLogMessage:=lm_string+str_gmsg_PlayerRevealed
+                        else ParseLogMessage:=lm_string+str_gmsg_PlayerNoRevealed;
 lmt_player_ready,
 lmt_player_nready     : ParseLogMessage:=lm_string+str_lobby_PlayerReady[lm_type=lmt_player_ready];
 lmt_game_Paused       : ParseLogMessage:=lm_string+str_gmsg_PlayerPaused;
@@ -2387,7 +2454,7 @@ lmt_ngen_lost         : begin
                            mcolor^:=c_aqua;
                         end;
 lmt_Invalid_Order,
-lmt_NeedProdUnit,
+lmt_unit_NeedProdUnit,
 lmt_unit_NeedBuilder,
 lmt_ability_BadPlace,
 lmt_ability_reload,
@@ -2397,7 +2464,7 @@ lmt_ability_ReqHelNear,
 lmt_ability_Tar2Close : begin
                            case lm_type of
                            lmt_Invalid_Order     : ParseLogMessage:=str_warn_Invalid_Order;
-                           lmt_NeedProdUnit      : ParseLogMessage:=str_warn_NeedProdUnit;
+                           lmt_unit_NeedProdUnit : ParseLogMessage:=str_warn_NeedProdUnit;
                            lmt_unit_NeedBuilder  : ParseLogMessage:=str_warn_NeedBuilder;
                            lmt_ability_BadPlace  : ParseLogMessage:=str_warn_AbilityBadPlace;
                            lmt_ability_reload    : ParseLogMessage:=str_warn_AbilityReload;
@@ -2416,6 +2483,20 @@ lmt_markLook          : begin
 lmt_markAttack        : begin
                            mcolor^:=c_ltred;
                            ParseLogMessage:=lm_string+str_warn_markAttack;
+                        end;
+lmt_other_UACStrike   : begin
+                           if(lm_data_u<=LastPlayer)
+                           then ParseLogMessage:=g_PlayersGame[lm_data_u].name
+                           else ParseLogMessage:='???';
+                           ParseLogMessage+=str_warn_UACStrike;
+                           mcolor^:=c_dred;
+                        end;
+lmt_other_UACScan     : begin
+                           ParseLogMessage:=str_warn_UACScan;
+                           if(lm_data_u<=LastPlayer)
+                           then ParseLogMessage+=g_PlayersGame[lm_data_u].name
+                           else ParseLogMessage+='???';
+                           mcolor^:=c_lime;
                         end;
 lmt_replay_RecStart,
 lmt_replay_RecStop,
@@ -2619,9 +2700,9 @@ begin
    end;
 end;
 
-function IsUIDValidForHelpTable(uid:byte;forBalance:boolean):boolean;
+function menudoc_ValidForTableUnit(uid:byte;forBalance:boolean):boolean;
 begin
-   IsUIDValidForHelpTable:=false;
+   menudoc_ValidForTableUnit:=false;
    with g_uids[uid] do
      if(uid_r>0)then
      begin
@@ -2632,8 +2713,16 @@ begin
            and(uid_balance_Useless=[])then exit;
            if(not uid_CanAttack)then exit;
         end;
-        IsUIDValidForHelpTable:=true;
+        menudoc_ValidForTableUnit:=true;
      end;
+end;
+function menudoc_ValidForTableUpgrade(upid:byte):boolean;
+begin
+   menudoc_ValidForTableUpgrade:=false;
+   with g_upgrs[upid] do
+     if (upgr_time>0)
+     and(upgr_max >0)then
+       menudoc_ValidForTableUpgrade:=true;
 end;
 
 function hits_si2li(sh:shortint;mh:integer;s:single):longint;

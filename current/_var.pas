@@ -397,12 +397,15 @@ ui_log_LastTimer  : integer = 0;
 //  MENU
 //
 
-menu_SurfaceSC,
-menu_Surface      : pSDL_SURFACE;
+menu_BackgroundSC    : pSDL_SURFACE = nil;
+menu_Surface      : pSDL_SURFACE = nil;
+menu_Background   : pSDL_SURFACE = nil;
 
-menu_sc_x,
-menu_sc_y         : integer;
-menu_sc_cx        : single;
+menu_Background_x,
+menu_Background_y,
+menu_Surface_x,
+menu_Surface_y    : integer;
+menu_Surface_sc   : single;
 
 MainMenu          : boolean = true;
 
@@ -411,7 +414,9 @@ menu_Page         : byte = 0;
 menu_SettingsPage : byte = mi_settings_Game;
 menu_HelpPage     : byte = mi_help_Credits;
 menu_HelpUID      : byte = UID_HKeep;
-menu_HelpScroll   : integer = 0;
+menu_HelpUIDH     : integer = 0;
+menu_HelpUIDScroll: integer = 0;
+menu_HelpILScroll : integer = 0;
 menu_HelpIList    : PTUIStringList = nil;
 menu_ItemActs     : byte = 0;
 menu_ItemTarget   : byte = 0;
@@ -437,7 +442,6 @@ menu_ServerPort   : shortstring = '10666';
 menu_ClientAddress: shortstring = '127.0.0.1:10666';
 
 menu_scale        : boolean = true;
-menu_ScaleSmooth  : boolean = false;
 
 menu_ChatListH    : integer = 0;
 menu_ChatScroll   : integer = 0;
@@ -630,6 +634,7 @@ c_iblack,
 c_mablack,
 c_purple,
 c_violet,
+c_menuback,
 c_black           : TMWColor;
 
 PlayerColorsSchemeDefault,
@@ -643,26 +648,26 @@ PlayerColorDefaultShadow   : TMWColor = 0;
 //  THEMES
 //
 
-theme_n              : integer = 0;
-theme_i              : integer = 0;
+theme_n                 : integer = 0;
+theme_i                 : integer = 0;
 
-theme_liquid_animStyle: TThemeAnimStyle;
-theme_liquid_animTime : byte;
-theme_liquid_color    : TMWColor = 0;
+theme_liquid_animStyle  : TThemeAnimStyle;
+theme_liquid_animTime   : byte;
+theme_liquid_color      : TMWColor = 0;
 
 theme_liquid_style,
-theme_crater_style   : TThemeCircleStyle;
+theme_crater_style      : TThemeCircleStyle;
 
-theme_map_Terrain    : integer = 0;
-theme_map_pTerrain   : integer = -1;
-theme_map_Crater     : integer = 0;
-theme_map_pCrater    : integer = -1;
-theme_map_LiquidFront: integer = 0;
-theme_map_pLiquidFront:integer = -1;
-theme_map_LiquidBack : integer = 0;
-theme_map_pLiquidBack: integer = -1;
-theme_map_RBattleFront: integer = 0;
-theme_map_pRBattleFront:integer = -1;
+theme_map_Terrain       : integer = 0;
+theme_map_pTerrain      : integer = -1;
+theme_map_Crater        : integer = 0;
+theme_map_pCrater       : integer = -1;
+theme_map_LiquidFront   : integer = 0;
+theme_map_pLiquidFront  : integer = -1;
+theme_map_LiquidBack    : integer = 0;
+theme_map_pLiquidBack   : integer = -1;
+theme_map_RBattleFront  : integer = 0;
+theme_map_pRBattleFront : integer = -1;
 
 
 
@@ -900,6 +905,7 @@ spr_uibtn_AbilityUACGeneral,
 spr_uibtn_AbilityBribe,
 spr_uibtn_AbilityHack,
 spr_uibtn_AbilityUACStrike,
+spr_uibtn_AbilityRecall,
 spr_uibtn_AbilitySpawnLost,
 spr_uibtn_AbilitySpawnLostTo,
 spr_uibtn_AbilityUnload,
@@ -917,6 +923,7 @@ spr_uibtn_F2,
 spr_uibtn_ProdCancel,
 spr_uibtn_Delete,
 spr_doc_ui,
+spr_doc_Upgrades,
 spr_doc_Generators,
 spr_doc_KeyPoint,
 spr_doc_koth,
@@ -935,7 +942,7 @@ spr_cursor_movex,
 spr_cursor_movey     : array[0..8] of integer;
 spr_RaceRank,
 spr_uipanel_EmptyBTN : array[1..r_count] of pSDL_Surface;
-spr_uibtn_Upgrades   : array[1..r_count,0..spr_upgrade_icons] of TMWTexture;
+spr_uibtn_UpgradesBig: array[1..r_count,0..spr_upgrade_icons] of TMWTexture;
 spr_uibtn_Tabs       : array[0..3] of pSDL_Surface;
 spr_kp_koth,
 spr_kp_out,
@@ -945,9 +952,6 @@ spr_kp_genT          : array[0..1] of TMWTexture;
 
 spr_cursorWh,
 spr_cursorHh         : integer;
-
-//spr_ui_oico        : array[1..r_count,false..true,byte] of pSDL_Surface;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -987,12 +991,14 @@ str_help_GameUI,
 str_help_GameMechanics,
 str_help_UnitsInfo,
 str_help_BalanceTable,
+str_help_UpgradesInfo,
 str_help_Other,
 
-str_help_GameUIImg1,
-str_help_GameUIImg2,
-str_help_GameUIImg3,
-str_help_GameUIImg4,
+str_help_ImgUI,
+str_help_ImgUUpgrade,
+str_help_ImgGenerators,
+str_help_ImgKeyPoints,
+str_help_ImgKotH,
 
 str_doc_HotKey,
 str_doc_Attributes,
@@ -1014,6 +1020,8 @@ str_doc_Description,
 str_doc_PainC,
 str_doc_TransportSize,
 str_doc_TransportCpst,
+str_doc_UpgrLevels,
+str_doc_UpgrAffectedUIDs,
 str_doc_LevelUpTime,
 str_doc_LevelArmorBonus,
 str_doc_LevelDamageBonus,
@@ -1096,7 +1104,6 @@ str_SV_ResolutionH,
 str_SV_ResolutionApply,
 str_SV_Windowed,
 str_SV_MenuScale,
-str_SV_MenuScaleSmooth,
 str_SV_ShowFPS,
 
 str_SS_NextTrack,
@@ -1129,6 +1136,7 @@ str_hint_upgrade,
 str_hint_sec,
 str_hint_UpgradesLvl,
 str_hint_Demons,
+str_hint_Zombies,
 str_hint_Except,
 str_hint_UnitArming,
 str_hint_Abilities,
@@ -1186,6 +1194,7 @@ str_gmsg_PlayerTimeOut,
 str_gmsg_PlayerSurrender,
 str_gmsg_PlayerDefeat,
 str_gmsg_PlayerRevealed,
+str_gmsg_PlayerNoRevealed,
 str_gmsg_GameSaved,
 str_gmsg_GameLoaded,
 str_gmsg_WrongVersion,
@@ -1274,6 +1283,8 @@ str_warn_upgrade_InProgress,
 str_warn_NeedProdUnit,
 str_warn_MaxCountReached,
 str_warn_MaxBuildersReached,
+str_warn_UACStrike,
+str_warn_UACScan,
 
 str_map,
 str_map_Scenario,

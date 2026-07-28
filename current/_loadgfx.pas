@@ -14,7 +14,7 @@ begin
    i:=0;
    repeat
       i+=1;
-      s:=str_ScreenShotPrefix+i2s(i)+'.bmp';
+      s:=str_ScreenShotPrefix+i2s(i)+fileExt_Scrshot;
    until not FileExists(s);
    s:=s+#0;
    sdl_saveBMP(vid_screen,@s[1]);
@@ -62,6 +62,7 @@ begin
    c_dgray   :=gfx_TMWColor(70 ,70 ,70 ,255);
    c_agray   :=gfx_TMWColor(80 ,80 ,80 ,128);
    c_black   :=gfx_TMWColor(0  ,0  ,0  ,255);
+   c_menuback:=gfx_TMWColor(0  ,0  ,1  ,255);
    c_ablack  :=gfx_TMWColor(0  ,0  ,0  ,128);
    c_iblack  :=gfx_TMWColor(0  ,0  ,0  ,210);
    c_mablack :=gfx_TMWColor(0  ,0  ,0  ,96 );
@@ -689,7 +690,7 @@ begin
       gfx_SetTransparent(surf);
    end;
 
-
+   // menu surfaces
    spr_MenuBackgroundL:=gfx_LoadSDLSurface('mback',false,true);
    spr_MenuBackgroundD:=gfx_CreateSDLSurface(spr_MenuBackgroundL^.w,spr_MenuBackgroundL^.h);
    tst:= gfx_LoadSDLSurface('mlogo',false,true);
@@ -698,18 +699,21 @@ begin
    begin
    boxColor(spr_MenuBackgroundD,0,0,w,h,c_mablack);
    draw_sdlsurface(spr_MenuBackgroundD,(w div 2)-(tst^.w div 2),0,tst);
-   draw_text(spr_MenuBackgroundD,w      ,h,str_ver ,ta_RB,255,c_white);
-   draw_text(spr_MenuBackgroundD,w div 2,h,str_cprt,ta_MB,255,c_white);
+   draw_text(spr_MenuBackgroundD,w      ,h,str_version  ,ta_RB,255,c_white);
+   draw_text(spr_MenuBackgroundD,w div 2,h,str_copyright,ta_MB,255,c_white);
    end;
    with spr_MenuBackgroundL^ do
    begin
    draw_sdlsurface(spr_MenuBackgroundL,(w div 2)-(tst^.w div 2),0,tst);
-   draw_text(spr_MenuBackgroundL,w      ,h,str_ver ,ta_RB,255,c_white);
-   draw_text(spr_MenuBackgroundL,w div 2,h,str_cprt,ta_MB,255,c_white);
+   draw_text(spr_MenuBackgroundL,w      ,h,str_version  ,ta_RB,255,c_white);
+   draw_text(spr_MenuBackgroundL,w div 2,h,str_copyright,ta_MB,255,c_white);
    end;
    gfx_FreeSDLSurface(tst);
 
-   menu_Surface:=gfx_CreateSDLSurface(menu_w, menu_h);
+   menu_Background:=gfx_CreateSDLSurface(spr_MenuBackgroundL^.w,spr_MenuBackgroundL^.h);
+   menu_Surface   :=gfx_CreateSDLSurface(menu_w, menu_h);
+   boxColor(menu_Surface,0,0,menu_w,menu_h,c_menuback);
+   SDL_SetColorKey(menu_Surface,SDL_SRCCOLORKEY,sdl_getpixel(menu_Surface,0,0));
 
    spr_uibtn_Delete            := gfx_ButtonLoad(folder_ui+'b_destroy'         ,ui_ButtonW1);
    spr_uibtn_Attack            := gfx_ButtonLoad(folder_ui+'b_attack'          ,ui_ButtonW1);
@@ -740,6 +744,7 @@ begin
    spr_uibtn_AbilityUACStrike  := gfx_ButtonLoad(folder_ui+'b_rstrike'         ,ui_ButtonW1);
    spr_uibtn_AbilitySpawnLost  := gfx_ButtonLoad(folder_ui+'b_SpawnLost'       ,ui_ButtonW1);
    spr_uibtn_AbilitySpawnLostTo:= gfx_ButtonLoad(folder_ui+'b_SpawnLostTo'     ,ui_ButtonW1);
+   spr_uibtn_AbilityRecall     := gfx_ButtonLoad(folder_ui+'b_recall'          ,ui_ButtonW1);
    spr_uibtn_AbilityUnload     := gfx_ButtonLoad(folder_ui+'b_unload'          ,ui_ButtonW1);
    spr_uibtn_AbilityUnloadTo   := gfx_ButtonLoad(folder_ui+'b_unloadto'        ,ui_ButtonW1);
    spr_uibtn_AbilityCCLand     := gfx_ButtonLoad(folder_ui+'b_CCland'          ,ui_ButtonW1);
@@ -757,6 +762,7 @@ begin
    spr_uibtn_Tabs[3]           := gfx_ButtonLoad(folder_ui+'tab_controls'      ,ui_TabButtonW-2,false);
 
    spr_doc_ui                  := gfx_LoadSDLSurface('doc_ui'        ,false,true);
+   spr_doc_Upgrades            := gfx_LoadSDLSurface('doc_upgrades'  ,false,true);
    spr_doc_Generators          := gfx_LoadSDLSurface('doc_Generators',false,true);
    spr_doc_KeyPoint            := gfx_LoadSDLSurface('doc_KeyPoint'  ,false,true);
    spr_doc_koth                := gfx_LoadSDLSurface('doc_koth'      ,false,true);
@@ -986,7 +992,7 @@ begin
 
    for x:=0 to spr_upgrade_icons do
    for r:=1 to r_count do
-     with spr_uibtn_Upgrades[r,x] do
+     with spr_uibtn_UpgradesBig[r,x] do
      begin
         surf:= gfx_ButtonLoad(folder_RaceUpgrades[r]+'b_up'+b2s(x),ui_ButtonW1);
         w   := surf^.w;h := w;
@@ -1183,7 +1189,7 @@ begin
    ui_EnergyY   := ui_timerY;
    ui_HellPowerY:= ui_EnergyY+txt_line_h2;
    ui_UACLootY  := ui_HellPowerY+txt_line_h2; ;
-   ui_ArmyX     := ui_EnergyX+font_w2;
+   ui_ArmyX     := ui_EnergyX+font_w1h;
    ui_ArmyY0    := ui_timerY;
    ui_ArmyY1    := ui_ArmyY0+txt_line_h2;
    ui_ArmyY2    := ui_ArmyY1+txt_line_h2;

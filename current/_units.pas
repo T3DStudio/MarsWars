@@ -865,31 +865,31 @@ end;
 procedure unit_CaptureKeyPoint(pu:PTUnit);
 var
 kpi:byte;
-d  :integer;
+du :integer;
 begin
    if(map_KeyPointsN>0)then
      with pu^ do
+     with uid^ do
        for kpi:=0 to map_KeyPointsN-1 do
          with map_KeyPointsL[kpi] do
          begin
-            d:=point_dist_int(x,y,kp_x,kp_y);
+            du:=point_dist_int(x,y,kp_x,kp_y)-uid_r;
             with player^ do
               with kp_TeamData[MaxPlayers] do
                 if(kptd_Active)and(kp_RCapture>0)then
-                  with uid^ do
-                    if(d<=(kp_RCapture+uid_r))then
-                    begin
-                       kp_LimitPlayerC[playeri     ]+=uid_LimitUse;
-                       kp_LimitTeamC  [player^.team]+=uid_LimitUse;
-                    end;
+                  if(du<=kp_RCapture)then
+                  begin
+                     kp_LimitPlayerC[playeri     ]+=uid_LimitUse;
+                     kp_LimitTeamC  [player^.team]+=uid_LimitUse;
+                  end;
 
             // update team vision data
             with uid^ do
               if(uid_ability_isradar)and(iscomplete)and(transformTimer<=0)then
                 if(buffs[ub_Cast]>0)then
-                  d:=min2i(d,point_dist_int(uo_x,uo_y,kp_x,kp_y));
+                  du:=min2i(du,point_dist_int(uo_x,uo_y,kp_x,kp_y));
             with kp_TeamData[pu^.player^.team] do
-              if(d<=(kp_RCapture+srange))then
+              if(du<=(kp_RCapture+srange))then
                 kptd_VisTimer:=MinVisionTime;
          end;
 end;
@@ -906,7 +906,7 @@ isattackable,
 aiSmartTarget,
 pushout         : boolean;
 t_weap          : byte;
-NearTeleport    : boolean;
+NearTeleport    : boolean; // autopick other teleport
 NearTeleport_tu : PTUnit;
 teleport_NewTaru,
 teleport_NewTard: integer;
@@ -932,10 +932,11 @@ begin
       aiCode         := (state=ps_AI)and(not isdefeated);
       aiSmartTarget  := aiCode and((aip_flags and aif_army_smart_Target)>0);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
+      // autopick other teleport
       NearTeleport   := false;
       NearTeleport_tu:= nil;
       if(IsUnitRange(uo_tar,@NearTeleport_tu))and(not aiCode)then
-        if (NearTeleport_tu^.player=player)
+        if (NearTeleport_tu^.playeri=playeri)
         and(NearTeleport_tu^.hits>0)
         and(NearTeleport_tu^.uid^.uid_ability_isteleport)then
           if(NearTeleport_tu^.rld>0)
@@ -989,25 +990,24 @@ begin
                      if(tu^.uid^.uid_issolid)and(isfly=tu^.isfly)then unit_PushFromUnit(pu,tu,uds);
 
                  if(NearTeleport)then
-                   if (udi<srange)
+                   if (udi<base_r1)
                    and(tu^.playeri=playeri)
                    and(tu^.uidi=NearTeleport_tu^.uidi)
                    and(tu^.rld<NearTeleport_tu^.rld)
                    and(tu^.iscomplete)
                    and(tu^.transformTimer<=0)then
-                     if((0<tu^.uo_tar)and(tu^.uo_tar<=MaxUnits)and(tu^.uo_tar=NearTeleport_tu^.uo_tar))
+                     if((0<tu^.rpoint_tar)and(tu^.rpoint_tar<=MaxUnits)and(tu^.rpoint_tar=NearTeleport_tu^.rpoint_tar))
                      or((tu^.rpoint_x=NearTeleport_tu^.rpoint_x)and(tu^.rpoint_y=NearTeleport_tu^.rpoint_y))
                      then uo_tar:=tu^.unum;
 
                  if(teleport_NewTar)then
                  begin
                     udi:=point_dist_int(rpoint_x,rpoint_y,tu^.x,tu^.y)-tu^.uid^.uid_r;
-                    if(udi<srange)and(udi<teleport_NewTard)then
-                      if(team=tu^.player^.team)then
-                      begin
-                         teleport_NewTaru:=uc;
-                         teleport_NewTard:=udi;
-                      end;
+                    if(udi<srange)and(udi<teleport_NewTard)and(team=tu^.player^.team)then
+                    begin
+                       teleport_NewTaru:=uc;
+                       teleport_NewTard:=udi;
+                    end;
                  end;
               end;
            end;
@@ -1169,14 +1169,11 @@ begin
 end;
 
 function unit_TryZombification(pPhantom,pTarget:PTUnit):boolean;
-var _h:single;
-    _l,
-    _o:byte;
-    _f:boolean;
-    _d,
-    _z:integer;
- _zuid:PTUID;
-_ppla:PTPlayerGameData;
+var
+hit_prcnt: single;
+old_u    : TUnit;
+ _zuid   : PTUID;
+_ppla    : PTPlayerGameData;
     {$IFDEF _FULLGAME}
     _s:integer;
     {$ENDIF}
@@ -1207,35 +1204,31 @@ begin
    if(ServerSide)then
    {$ENDIF}
    begin
-      _h:=pTarget^.hits/pTarget^.uid^.uid_MaxHits1;
-      _d:=pTarget^.dir;
-      _o:=pPhantom^.group;
-      _f:=pTarget^.isfly;
-      _z:=pTarget^.zfall;
-      _l:=pTarget^.level;
-      {$IFDEF _FULLGAME}
-      _s:=g_unitsVis[pTarget^.unum].shadowz;
-      {$ENDIF}
+      old_u:=pTarget^;
+      old_u.group:=pPhantom^.group;
+      hit_prcnt:=pTarget^.hits/pTarget^.uid^.uid_MaxHits1;
+
       _ppla:=pPhantom^.player;
       _ppla^.units_all_e+=1;
       _ppla^.units_all_c+=1;
       unit_kill(pPhantom,true,true,false,false,true);
       _ppla^.units_all_e-=1;
       _ppla^.units_all_c-=1;
-      unit_add(pTarget^.x,pTarget^.y,pPhantom^.unum,pTarget^.uid^.uid_ZombieUID,pPhantom^.playeri,true,true,_l);
+      unit_add(pTarget^.x,pTarget^.y,pPhantom^.unum,pTarget^.uid^.uid_ZombieUID,pPhantom^.playeri,true,true,old_u.level);
       unit_kill(pTarget,true,true,false,false,true);
 
       if(LastCreatedUnit>0)then
       with LastCreatedUnitP^ do
       begin
-         group:=_o;
-         dir  :=_d;
-         isfly:=_f;
-         hits := trunc(uid^.uid_MaxHits1*_h);
-         zfall:=_z;
+         group:=old_u.group;
+         dir  :=old_u.dir;
+         isfly:=old_u.isfly;
+         hits := trunc(uid^.uid_MaxHits1*hit_prcnt);
+         zfall:=old_u.zfall;
+         buffs[ub_Altmode]:=old_u.buffs[ub_Altmode];
          {$IFDEF _FULLGAME}
          with g_unitsVis[unum] do
-           shadowz:=_s;
+           shadowz:=g_unitsVis[old_u.unum].shadowz;
          {$ENDIF}
          if(hits<=0)then
          begin
@@ -2218,7 +2211,7 @@ begin
         else
         begin
            tu:=nil;
-           if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_SpecPause]:=fr_fpsh;
+           if(IsUnitRange(a_tar,@tu))and(a_rld>0)then buffs[ub_SpecPause]:=fr_fps1;
            if(buffs[ub_PainState]<=0)then
              if(buffs[ub_SpecPause]>0)and(tu<>nil)then isfly:=tu^.isfly else isfly:=uid_isfly;
         end;

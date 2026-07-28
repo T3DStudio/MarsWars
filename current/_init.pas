@@ -91,6 +91,7 @@ begin
    InitRX2Y;
    lng_eng;
    InitClientDataGame;
+   InitClientDataUpgrades;
    InitClientDataMissiles;
    gfx_MakeUnitIcons;
    InitClientDataAbilities;

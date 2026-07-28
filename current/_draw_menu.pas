@@ -22,26 +22,29 @@ procedure drawmenu_MakeBig;
 var
 cx,cy:single;
 begin
-   if(menu_SurfaceSC<>nil)and(menu_SurfaceSC<>menu_Surface)then sdl_FreeSurface(menu_SurfaceSC);
+   if(menu_BackgroundSC<>nil)and(menu_BackgroundSC<>menu_Background)then sdl_FreeSurface(menu_BackgroundSC);
 
    if(menu_scale)then
    begin
       cx:=vid_vw/menu_Surface^.w;
       cy:=vid_vh/menu_Surface^.h;
       if(cx>cy)
-      then menu_sc_cx:=cy
-      else menu_sc_cx:=cx;
-      menu_SurfaceSC :=zoomSurface(menu_Surface,menu_sc_cx,menu_sc_cx,byte(menu_ScaleSmooth));
-      menu_sc_cx:=1/menu_sc_cx;
+      then menu_Surface_sc:=cy
+      else menu_Surface_sc:=cx;
+      menu_Surface_x   :=(vid_vw-round(menu_w*menu_Surface_sc)) div 2;
+      menu_Surface_y   :=(vid_vh-round(menu_h*menu_Surface_sc)) div 2;
+      menu_BackgroundSC:=zoomSurface(menu_Background,menu_Surface_sc,menu_Surface_sc,0);
+      menu_Surface_sc  :=1/menu_Surface_sc;
    end
    else
    begin
-      menu_sc_cx:=1;
-      menu_SurfaceSC  :=menu_Surface;
+      menu_Surface_sc:=1;
+      menu_Surface_x   :=(vid_vw-menu_w) div 2;
+      menu_Surface_y   :=(vid_vh-menu_h) div 2;
+      menu_BackgroundSC:=menu_Background;
    end;
-
-   menu_sc_x:=(vid_vw-menu_SurfaceSC^.w) div 2;
-   menu_sc_y:=(vid_vh-menu_SurfaceSC^.h) div 2;
+   menu_Background_x:=(vid_vw-menu_BackgroundSC^.w) div 2;
+   menu_Background_y:=(vid_vh-menu_BackgroundSC^.h) div 2;
 end;
 
 procedure drawmenu_ItemPanel(tar:pSDL_Surface;mi,border:byte);
@@ -167,7 +170,7 @@ begin
         as_enabled : color:=c_white;
         end;
 
-        draw_text(tar,mi_x0+font_wh,mi_y0+menu_BigButtonH,text1,ta_LU,mi_charw,color,@y);
+        draw_text(tar,mi_x0+font_wh,mi_y0+menu_BigButtonH1,text1,ta_LU,mi_charw,color,@y);
         if(length(text2)>0)then
         draw_text(tar,mi_x0+font_wh,y                    ,text2,ta_LU,mi_charw,color,@y);
         if(length(text3)>0)then
@@ -291,7 +294,6 @@ begin
    drawmenu_ItemText2(tar,mi_SV_Windowed        ,str_SV_Windowed        ,str_YesNoC[vid_windowed]    ,0);
    drawmenu_ItemText2(tar,mi_SV_ShowFPS         ,str_SV_ShowFPS         ,str_YesNoC[vid_ShowFPS ]    ,0);
    drawmenu_ItemText2(tar,mi_SV_MenuScaling     ,str_SV_MenuScale       ,str_YesNoC[menu_scale  ]    ,0);
-   drawmenu_ItemText2(tar,mi_SV_SmoothScaled    ,str_SV_MenuScaleSmooth ,str_YesNoC[menu_ScaleSmooth],0);
 
    // SETTINGS  SOUNDS
    drawmenu_ItemTextBar(tar,mi_SS_SoundVolume   ,str_SS_SoundVolume     ,snd_SoundVolume,0,snd_MaxSoundVolume,0);
@@ -339,47 +341,60 @@ procedure drawmenu_BlockHelpInfo(tar:pSDL_Surface);   // HELP INFO
 begin
    if(menu_HelpIList<>nil)then
      with menu_HelpIList^ do
-       drawmenu_StringArray(tar,mi_help_InfoList,@slist_l,slist_n,menu_HelpScroll,-1,txt_line_h1,-1,ui_DocListH,false,true);
+       drawmenu_StringArray(tar,mi_help_InfoList,@slist_l,slist_n,menu_HelpILScroll,-1,txt_line_h1,-1,ui_DocListH,false,true);
    if(menu_HelpPage=mi_help_GameUI)then
-     drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg1,0);
-   case menu_HelpPage of
-   mi_help_GameUI       : drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg1,0);
-   mi_help_GameMechanics: begin
-                          drawmenu_ItemText1(tar,mi_help_GameUIImg1,str_help_GameUIImg2,0);
-                          drawmenu_ItemText1(tar,mi_help_GameUIImg2,str_help_GameUIImg3,0);
-                          drawmenu_ItemText1(tar,mi_help_GameUIImg3,str_help_GameUIImg4,0);
-                          end;
-   end;
+     drawmenu_ItemText1(tar,mi_help_ImgUI,str_help_ImgUI,0);
+
+   drawmenu_ItemText1(tar,mi_help_ImgUI        ,str_help_ImgUI        ,0);
+   drawmenu_ItemText1(tar,mi_help_ImgUUpgrade  ,str_help_ImgUUpgrade  ,0);
+   drawmenu_ItemText1(tar,mi_help_ImgGenerators,str_help_ImgGenerators,0);
+   drawmenu_ItemText1(tar,mi_help_ImgKeyPoints ,str_help_ImgKeyPoints ,0);
+   drawmenu_ItemText1(tar,mi_help_ImgKotH      ,str_help_ImgKotH      ,0);
 end;
 
-procedure drawmenu_BlockHelpUnitsInfo(tar:pSDL_Surface;forBalance:boolean=false);  // HELP UNITS TABLE
+procedure drawmenu_BlockHelpObjInfo(tar:pSDL_Surface);  // HELP UNITS TABLE
 var
 tx,ty:integer;
 u    :byte;
 begin
    if(menu_HelpUID>0)then
-     with g_uids[menu_HelpUID] do
-       drawmenu_ItemTextC(tar,mi_help_InfoList,ta_MA,uid_str_name,c_white);
+     case menu_HelpPage of
+     mi_help_UnitsInfo,
+     mi_help_UnitsBalance: with g_uids [menu_HelpUID] do drawmenu_ItemTextC(tar,mi_help_InfoList,ta_MA,uid_str_name ,c_white);
+     mi_help_UpgradesInfo: with g_upgrs[menu_HelpUID] do drawmenu_ItemTextC(tar,mi_help_InfoList,ta_MA,upgr_str_name,c_white);
+     end;
 
    with menu_items[mi_help_InfoPanel] do
    begin
       tx:=mi_x0;
-      ty:=mi_y0;
+      ty:=mi_y0-menu_HelpUIDScroll;
       for u:=1 to 255 do
-        with g_uids[u] do
-          if(IsUIDValidForHelpTable(u,forBalance))then
-          begin
-             draw_sdlsurface(tar,tx,ty,uid_BTNDoc.surf);
-             if(u=menu_HelpUID)then
-             rectangleColor(tar,tx+1,ty+1,tx+ui_ButtonWh-1,ty+ui_ButtonWh-1,c_lime);
+      begin
+         case menu_HelpPage of
+         mi_help_UnitsInfo,
+         mi_help_UnitsBalance: with g_uids[u] do
+                                 if(not menudoc_ValidForTableUnit(u,mi_help_UnitsBalance=menu_HelpPage))
+                                 then continue
+                                 else
+                                   if(ty>=mi_y0)then draw_sdlsurface(tar,tx,ty,uid_BTNBig.surf);
+         mi_help_UpgradesInfo: with g_upgrs[u] do
+                                 if(not menudoc_ValidForTableUpgrade(u))
+                                 then continue
+                                 else
+                                   if(ty>=mi_y0)then draw_sdlsurface(tar,tx,ty,upgr_BTNBig.surf);
+         end;
 
-             tx+=ui_ButtonWh;
-             if(tx>=mi_x1)then
-             begin
-                tx:=mi_x0;
-                ty+=ui_ButtonWh;
-             end;
-          end;
+         if(u=menu_HelpUID)and(ty>=mi_y0)then
+           rectangleColor(tar,tx+1,ty+1,tx+menu_HelpIDBTNw-1,ty+menu_HelpIDBTNw-1,c_lime);
+
+         tx+=menu_HelpIDBTNw;
+         if(tx>=mi_x1)then
+         begin
+            tx:=mi_x0;
+            ty+=menu_HelpIDBTNw;
+            if(ty>=mi_y1)then exit;
+         end;
+      end;
    end;
 end;
 
@@ -488,10 +503,14 @@ begin
      else drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,PlayerStateString(p),color);
 
           drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name                ,color);
-          if(g_started)and(isdefeated)and(length(name)>0)then
+          if(g_started)and(length(name)>0)then
             with menu_items[mi_Players_AIskil0+p] do
               if(mi_state>as_off)then
-                hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
+                if(isdefeated)
+                then hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red)
+                else   
+                  if(isrevealed)
+                  then hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_ltgray);
 
           drawmenu_ItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[mrace],mic( menu_items[mi_Players_Race0+p].mi_state=as_enabled,false));
           drawmenu_ItemTextC(tar,mi_Players_Team0+p,ta_MM,TeamChar(p)    ,mic( menu_items[mi_Players_Team0+p].mi_state=as_enabled,false));
@@ -519,10 +538,14 @@ begin
           if(g_started)then
           begin
              drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name,c_gray);
-             if(isdefeated)and(length(name)>0)then
+             if(length(name)>0)then
                with menu_items[mi_Players_AIskil0+p] do
                  if(mi_state>as_off)then
-                   hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red);
+                   if(isdefeated)
+                   then hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_red)
+                   else
+                     if(isrevealed)
+                     then hlineColor(tar,mi_x0+2,mi_x1-2,mi_yc,c_gray);
           end;
           if(p>=map_MaxPlayers)then
           drawmenu_ItemTextC(tar,mi_Players_Obs0+p,ta_MM,str_YesNoG[true],c_gray);
@@ -649,14 +672,30 @@ if(GetBBit(@menu_ItemActs,miat_TextEdit))then
 }
 end;
 
+procedure drawmenu_SvList(tar:pSDL_Surface);
+begin
+   drawmenu_ItemText1(tar,mi_caption_SVSearch   ,str_Caption_NetSvList,255);
+   // Net search
+   with menu_items[mi_NetServers_List] do
+   drawmenu_StringArray(tar,mi_NetServers_List ,@net_SvList_lists,net_SvList_Size,net_SvList_scroll,net_SvList_sel,menu_ServerLineH,mi_charw*2,menu_ServerListH,true);
+
+   drawmenu_ItemText1(tar,mi_NetServers_Connect,str_net_Connect      ,0);
+   drawmenu_ItemText1(tar,mi_NetServers_Add    ,str_net_ServerListAdd,0);
+   drawmenu_ItemText1(tar,mi_NetServers_Delete ,str_FileDelete       ,0);
+
+   drawmenu_ItemText2(tar,mi_MP_ClientAddress,menu_ClientAddress+vc(mi_MP_ClientAddress),'',menu_ItemSelected);
+end;
+
 procedure drawmenu_Update(tar:pSDL_Surface); //////////////////////////////////////
 var i:byte;
 ix,iy:integer;
 begin
    // COMMON
-   if(menu_DarkBack)
-   then draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundD)
-   else draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundL);
+   //if(menu_DarkBack)
+   //then draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundD)
+   //else draw_sdlsurface(tar,(tar^.w div 2)-(spr_MenuBackgroundL^.w div 2),0,spr_MenuBackgroundL);
+
+   boxColor(tar,0,0,spr_MenuBackgroundL^.w,spr_MenuBackgroundL^.h,c_menuback);
 
    //vlineColor(tar,0     ,0,menu_h,c_white);
    //vlineColor(tar,menu_w-1,0,menu_h,c_white);
@@ -719,19 +758,8 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
    drawmenu_ItemText1(tar,mi_StopTimer          ,str_menu_Cancel       ,0);
 
    // MAIN BLOCKs
-   if(net_SvList)then
-   begin
-      drawmenu_ItemText1(tar,mi_caption_SVSearch   ,str_Caption_NetSvList,255);
-      // Net search
-      with menu_items[mi_NetServers_List] do
-      drawmenu_StringArray(tar,mi_NetServers_List ,@net_SvList_lists,net_SvList_Size,net_SvList_scroll,net_SvList_sel,menu_ServerLineH,mi_charw*2,menu_ServerListH,true);
-
-      drawmenu_ItemText1(tar,mi_NetServers_Connect,str_net_Connect      ,0);
-      drawmenu_ItemText1(tar,mi_NetServers_Add    ,str_net_ServerListAdd,0);
-      drawmenu_ItemText1(tar,mi_NetServers_Delete ,str_FileDelete       ,0);
-
-      drawmenu_ItemText2(tar,mi_MP_ClientAddress,menu_ClientAddress+vc(mi_MP_ClientAddress),'',menu_ItemSelected);
-   end
+   if(net_SvList)
+   then drawmenu_SvList(tar)
    else
      case menu_page of
      mi_SaveLoad  : drawmenu_BlockSaveLoad(tar);
@@ -747,6 +775,7 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
                        drawmenu_ItemText1(tar,mi_help_GameMechanics,str_help_GameMechanics,menu_HelpPage);
                        drawmenu_ItemText1(tar,mi_help_UnitsInfo    ,str_help_UnitsInfo    ,menu_HelpPage);
                        drawmenu_ItemText1(tar,mi_help_UnitsBalance ,str_help_BalanceTable ,menu_HelpPage);
+                       drawmenu_ItemText1(tar,mi_help_UpgradesInfo ,str_help_UpgradesInfo ,menu_HelpPage);
                        drawmenu_ItemText1(tar,mi_help_Other        ,str_help_Other        ,menu_HelpPage);
 
                        case menu_HelpPage of
@@ -756,13 +785,16 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
                        mi_help_GameUI,
                        mi_help_Other,
                        mi_help_Credits     : drawmenu_BlockHelpInfo(tar);
+                       mi_help_UpgradesInfo,
                        mi_help_UnitsInfo   : begin
-                                             drawmenu_BlockHelpUnitsInfo(tar);
+                                             drawmenu_BlockHelpObjInfo(tar);
                                              drawmenu_BlockHelpInfo(tar);
+                                             drawmenu_ScrollBar(tar,mi_help_InfoPanel,menu_HelpUIDScroll,menu_HelpIDBlockH,menu_HelpUIDH+menu_HelpIDBlockH);
                                              end;
                        mi_help_UnitsBalance: begin
-                                             drawmenu_BlockHelpUnitsInfo(tar,true);
+                                             drawmenu_BlockHelpObjInfo(tar);
                                              drawmenu_BlockHelpUnitsBalance(tar);
+                                             drawmenu_ScrollBar(tar,mi_help_InfoPanel,menu_HelpUIDScroll,menu_HelpIDBlockH,menu_HelpUIDH+menu_HelpIDBlockH);
                                              end;
                        end;
                     end;
@@ -820,15 +852,6 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
                           end;
       end;
    end;
-    {
-   // replays
-   draw_text(tar,ui_menu_csm_xt1, y, str_replay             , ta_LU  ,255, c_white);
-   draw_text(tar,ui_menu_csm_xt2, y, str_rstatus[rpls_pstate], ta_RU ,255, mic( menu_ReplayStatusToggleEnabled ,rpls_pstate>rpls_none));
-
-   // replay data units
-   if(rpls_pstate>rpls_none)and(g_cl_units>0)then
-   draw_text(tar,ui_menu_csm_xt2, y, i2s(min2(_cl_pnua[rpls_pnui]*4,g_cl_units))+'/'+i2s(g_cl_units), ta_RU,255, c_white);
- }
 end;
 
 procedure draw_Menu;
@@ -838,18 +861,22 @@ begin
    if(menu_redraw)and(menu_redraw_pause=0)then
    begin
       PlayersUpdateColorSchema(LocalPlayer);
+      if(g_FixedPositions)and(not g_Started)and(menu_items[mi_Map_Map].mi_state>as_off)then
+        map_RedrawMenuMinimap;
       drawmenu_Update(menu_Surface);
 
-      {draw_text(menu_Surface,0,0,
-      str_gcaption+' - is a real-time strategy game set in the Doom 2 universe. Current version is '+str_ver+'.',
-      ta_LU,76,c_white,nil,32000); }
+      if(menu_DarkBack)
+      then draw_sdlsurface(menu_Background,0,0,spr_MenuBackgroundD)
+      else draw_sdlsurface(menu_Background,0,0,spr_MenuBackgroundL);
+      draw_sdlsurface(menu_Background,(menu_Background^.w div 2)-menu_hw,
+                                      (menu_Background^.h div 2)-menu_hh,menu_Surface);
 
       drawmenu_MakeBig;
       menu_redraw:=false;
       menu_redraw_pause:=fr_fpsd10;
    end;
 
-   draw_sdlsurface(vid_screen,menu_sc_x,menu_sc_y,menu_SurfaceSC);
+   draw_sdlsurface(vid_screen,menu_Background_x,menu_Background_y,menu_BackgroundSC);
 
    if(vid_ShowFPS)then draw_text(vid_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_RU,255,c_white);
 

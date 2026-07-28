@@ -6,6 +6,7 @@ str_htmldoc_folder   = 'docs';
 str_htmldoc_imgsGame = 'imgs\';
 str_htmldoc_unitFront= str_htmldoc_imgsGame+'unitFront';
 str_htmldoc_unitBTN  = str_htmldoc_imgsGame+'unitBTN';
+str_htmldoc_upgrBTN  = str_htmldoc_imgsGame+'upgrBTN';
 str_htmldoc_img_ext  = '.bmp';
 str_htmldoc_fname    = str_htmldoc_folder+'\MarsWars_';
 str_htmldoc_ext      = '.html';
@@ -52,7 +53,11 @@ begin
 end;
 function htmldoc_UIDBTN(uid:byte):shortstring;
 begin
-   htmldoc_UIDBTN:='<img src="'+str_htmldoc_unitBTN+b2s(uid)+str_htmldoc_img_ext+'" title="'+g_uids[uid].uid_str_name+'">';
+   htmldoc_UIDBTN :='<img style="border:1px solid #666666" src="'+str_htmldoc_unitBTN+b2s(uid)+str_htmldoc_img_ext+'" title="'+g_uids [uid].uid_str_name +'">';
+end;
+function htmldoc_UpgrBTN(uid:byte):shortstring;
+begin
+   htmldoc_UpgrBTN:='<img style="border:1px solid #666666" src="'+str_htmldoc_upgrBTN+b2s(uid)+str_htmldoc_img_ext+'" title="'+g_upgrs[uid].upgr_str_name+'">';
 end;
 
 function htmldoc_color2hex(color:TMWColor):shortstring;
@@ -153,8 +158,9 @@ var
 uid,i:byte;
 begin
    for uid:=0 to 255 do
-     with g_uids[uid] do
-       if(uid_r>0)then
+   begin
+      with g_uids[uid] do
+        if(uid_r>0)then
         begin
            if(htmldoc_UID1Spr(uid))
            then htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitFront+b2s(uid)+str_htmldoc_img_ext,gfx_uid2spr(uid,270,0)^.surf )
@@ -164,6 +170,10 @@ begin
 
            htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_unitBTN  +b2s(uid)+str_htmldoc_img_ext,uid_BTNDoc.surf );
         end;
+      with g_upgrs[uid] do
+        if(upgr_max>0)then
+          htmldoc_sdlsurf(str_htmldoc_folder+'\'+str_htmldoc_upgrBTN  +b2s(uid)+str_htmldoc_img_ext,upgr_btnBig.surf );
+   end;
 end;
 
 procedure htmldoc_make;
@@ -191,6 +201,7 @@ begin
    htmldoc_WriteLinkToCapt(str_help_GameMechanics);
    htmldoc_WriteLinkToCapt(str_help_UnitsInfo);
    htmldoc_WriteLinkToCapt(str_help_BalanceTable);
+   htmldoc_WriteLinkToCapt(str_help_UpgradesInfo);
    htmldoc_WriteLinkToCapt(str_help_Other);
 
    /////////////////////////////////////////////////////////////////////////////
@@ -214,16 +225,17 @@ begin
    /////////////////////////////////////////////////////////////////////////////
    //  GAME UI
    htmldoc_WriteCaption(str_help_GameUI);
-   writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_ui.png" title="'+str_help_GameUIImg1+'"><br>'+str_help_GameUIImg1+'</center>');
+   writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_ui.png" title="'+str_help_ImgUI      +'"><br>'+str_help_ImgUI      ,'<br><br>');
+   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_ui.png" title="'+str_help_ImgUUpgrade+'"><br>'+str_help_ImgUUpgrade+'</center>');
    with str_doc_GameUI do
    htmldoc_WriteStringArray(@slist_l,slist_n);
 
    /////////////////////////////////////////////////////////////////////////////
    //  GAME MECHANICS
    htmldoc_WriteCaption(str_help_GameMechanics);
-   writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_Generators.png" title="'+str_help_GameUIImg2+'"><br>'+str_help_GameUIImg2,'<br><br>');
-   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_KeyPoint.png" title="'  +str_help_GameUIImg3+'"><br>'+str_help_GameUIImg3,'<br><br>');
-   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_koth.png" title="'      +str_help_GameUIImg4+'"><br>'+str_help_GameUIImg4+'</center>');
+   writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_Generators.png" title="',str_help_ImgGenerators,'"><br>',str_help_ImgGenerators,'<br><br>');
+   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_KeyPoint.png" title="'  ,str_help_ImgKeyPoints ,'"><br>',str_help_ImgKeyPoints ,'<br><br>');
+   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_koth.png" title="'      ,str_help_ImgKotH      ,'"><br>',str_help_ImgKotH      ,'</center>');
    with str_doc_BaseMechanics do
    htmldoc_WriteStringArray(@slist_l,slist_n);
 
@@ -255,7 +267,7 @@ begin
    writeln(html_f,'<center><table bgcolor="#000000" width="900" border="1" bordercolor="#ffffff">');
    for uid:=0 to 255 do
      with g_uids[uid] do
-       if(IsUIDValidForHelpTable(uid,true))then
+       if(menudoc_ValidForTableUnit(uid,true))then
        begin
           writeln(html_f,'<tr><td align="center" style="width: 100px;">');
           //writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
@@ -281,6 +293,26 @@ begin
 
           writeln(html_f,'</td></tr>');
        end;
+   writeln(html_f,'</table></center>');
+
+   /////////////////////////////////////////////////////////////////////////////
+   //  UPGRADES INFO
+   htmldoc_WriteCaption(str_help_UpgradesInfo);
+   writeln(html_f,'<center><table bgcolor="#000000" width="900" border="1" bordercolor="#ffffff">');
+   for uid:=0 to 255 do
+     with g_upgrs[uid] do
+       if(upgr_max>0)then
+       begin
+           writeln(html_f,'<tr><td align="center" style="width: 100px;">');
+           writeln(html_f,htmldoc_UpgrBTN(uid));
+           writeln(html_f,'</td><td>');
+
+           writeln(html_f,'<center><b>',upgr_str_name,'</b></center>');
+           with upgr_HintDoc do
+           htmldoc_WriteStringArray(@slist_l,slist_n);
+
+           writeln(html_f,'</td></tr>');
+        end;
    writeln(html_f,'</table></center>');
 
    /////////////////////////////////////////////////////////////////////////////

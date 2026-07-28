@@ -37,7 +37,7 @@ fr_fps5                = fr_fps1*5;
 fr_fps6                = fr_fps1*6;
 fr_fps10               = fr_fps1*10;
 fr_fpst2               = fr_fpst*2; //2/3
-fr_fps60               = fr_fps1*60;
+//fr_fps60               = fr_fps1*60;
 fr_fpsd15              = fr_fps1 div 15;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,12 +126,12 @@ gt_campaing            = 2;
 
 // game status
 gs_paused0             = 0;
-gs_paused1             = 1;
+{gs_paused1             = 1;
 gs_paused2             = 2;
 gs_paused3             = 3;
 gs_paused4             = 4;
 gs_paused5             = 5;
-gs_paused6             = 6;
+gs_paused6             = 6;   }
 gs_paused7             = 7;
 gs_replayend           = 10;
 gs_replayerror         = 11;
@@ -139,12 +139,12 @@ gs_replaypause         = 12;
 gs_waitserver          = 13;
 gs_waitplayers         = 14;
 gs_win_team0           = 20; // 0
-gs_win_team1           = 21;
+{gs_win_team1           = 21;
 gs_win_team2           = 22;
 gs_win_team3           = 23;
 gs_win_team4           = 24;
 gs_win_team5           = 25;
-gs_win_team6           = 26;
+gs_win_team6           = 26;  }
 gs_win_team7           = 27;
 gs_running             = 31; // last status can't be more than 31 (%00011111)
 
@@ -168,10 +168,10 @@ g_GameStartTime        = fr_fps1*5+fr_fps1-1;
 //  BASE STRINGS
 //
 
-str_ver                = 'v54';
+str_version            = 'v54';
 str_gcaption           = 'MarsWars: HELL & UAC';
-str_wcaption           : shortstring = str_gcaption+', '+str_ver+#0;
-str_cprt               : shortstring = 'TGA[T3DStudio] (c) 2016-2026';
+str_wcaption           : shortstring = str_gcaption+', '+str_version+#0;
+str_copyright          : shortstring = 'TGA[T3DStudio] (c) 2016-2026';
 str_ps_ttl             : char = '?';
 str_ps_Me              : char = '>';
 b2c                    : array[false..true] of char = ('-','+');
@@ -227,22 +227,22 @@ lmt_unit_LevelUp       = 35;
 lmt_unit_attackedU     = 36;
 lmt_unit_attackedB     = 37;
 lmt_unit_NeedBuilder   = 38;
-lmt_unit_resurrected   = 39;
-lmt_unit_MaxLevel      = 40;
-lmt_upgrade_InProgress = 41;
-lmt_upgrade_complete   = 42;
-lmt_Req_Energy         = 43;
-lmt_Req_HellPower      = 44;
-lmt_Req_UACLoot        = 45;
-lmt_Req_Common         = 46;
-lmt_Req_Limit          = 47;
-lmt_Req_MaxCount       = 48;
-lmt_Req_MaxBuilders    = 49;
-lmt_markLook           = 50;
-lmt_markAttack         = 51;
-lmt_allies_attackedU   = 52;
-lmt_allies_attackedB   = 53;
-lmt_NeedProdUnit       = 54;
+lmt_unit_NeedProdUnit  = 39;
+lmt_unit_resurrected   = 40;
+lmt_unit_MaxLevel      = 41;
+lmt_upgrade_InProgress = 42;
+lmt_upgrade_complete   = 43;
+lmt_Req_Energy         = 44;
+lmt_Req_HellPower      = 45;
+lmt_Req_UACLoot        = 46;
+lmt_Req_Common         = 47;
+lmt_Req_Limit          = 48;
+lmt_Req_MaxCount       = 49;
+lmt_Req_MaxBuilders    = 50;
+lmt_markLook           = 51;
+lmt_markAttack         = 52;
+lmt_allies_attackedU   = 53;
+lmt_allies_attackedB   = 54;
 lmt_ability_reload     = 55;
 lmt_ability_Casting    = 56;
 lmt_ability_BadPlace   = 57;
@@ -259,9 +259,11 @@ lmt_koth_CaptureStart  = 67;
 lmt_koth_Alarm         = 68;
 lmt_invalid_Target     = 69;
 lmt_Invalid_Order      = 70;
-lmt_replay_RecStart    = 71;
-lmt_replay_RecStop     = 72;
-lmt_replay_RecError    = 73;
+lmt_other_UACStrike    = 71;
+lmt_other_UACScan      = 72;
+lmt_replay_RecStart    = 73;
+lmt_replay_RecStop     = 74;
+lmt_replay_RecError    = 75;
 
 lmts_menu_chat         = [
                           lmt_chat_player0..
@@ -672,14 +674,14 @@ dm_AntiHeavy2          = 14; //   2*[unit heavy]
 
 // LIMIT
 ul1                    = MinUnitLimit;
-ul1q                   = MinUnitLimit+(MinUnitLimit div 4);
+//ul1q                   = MinUnitLimit+(MinUnitLimit div 4);
 ul1h                   = MinUnitLimit+(MinUnitLimit div 2);
 ul2                    = MinUnitLimit*2;
 ul3                    = MinUnitLimit*3;
 ul4                    = MinUnitLimit*4;
 ul5                    = MinUnitLimit*5;
-ul6                    = MinUnitLimit*6;
-ul8                    = MinUnitLimit*8;
+//ul6                    = MinUnitLimit*6;
+//ul8                    = MinUnitLimit*8;
 ul10                   = MinUnitLimit*10;
 ul12                   = MinUnitLimit*12;
 ul15                   = MinUnitLimit*15;
@@ -692,7 +694,7 @@ ptimeh                 = ptime1 div 2;
 ptimeq                 = ptimeh div 2;
 ptime1h                = ptime1+ptimeh;
 ptime1q                = ptime1+ptimeq;
-ptimeq3                = ptime1-ptimeq;
+//ptimeq3                = ptime1-ptimeq;
 ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
@@ -709,14 +711,14 @@ mvxy_strict            = 2;
 BaseDamage1            = 45;
 BaseDamageh            = BaseDamage1 div 2;
 BaseDamaget            = BaseDamage1 div 3;
-BaseDamageq            = BaseDamage1 div 4;
+//BaseDamageq            = BaseDamage1 div 4;
 BaseDamage1h           = BaseDamage1+BaseDamageh;
 BaseDamage2            = BaseDamage1*2;
 BaseDamage3            = BaseDamage1*3;
 BaseDamage4            = BaseDamage1*4;
 BaseDamage5            = BaseDamage1*5;
 BaseDamage6            = BaseDamage1*6;
-BaseDamage8            = BaseDamage1*8;
+//BaseDamage8            = BaseDamage1*8;
 BaseDamage10           = BaseDamage1*10;
 
 BaseRegen1             = 5;
@@ -909,6 +911,8 @@ uab_LvlUpURMStation    = 53;
 uab_HSpecter           = 55;
 uab_HStealth           = 56;
 uab_HHTShroud          = 57;
+uab_HT2TNoCD           = 58;
+uab_UAASplash          = 59;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -979,7 +983,7 @@ base_r1h               = base_r1+(base_r1 div 2);
 base_r2                = base_r1*2;
 base_r3                = base_r1*3;
 base_r4                = base_r1*4;
-base_r5                = base_r1*5;
+//base_r5                = base_r1*5;
 base_r6                = base_r1*6;
 
 scirmish_MaxLost       = 20;
@@ -1444,9 +1448,9 @@ font_w1                = 8;
 font_wh                = font_w1 div 2;
 font_wq                = font_w1 div 4;
 font_w2                = font_w1*2;
-font_w3                = font_w1*3;
+//font_w3                = font_w1*3;
 font_w5                = font_w1*5;
-font_w6                = font_w1*6;
+//font_w6                = font_w1*6;
 font_wi                = font_w1-1;
 font_w1h               = font_w1+(font_w1 div 2);
 
@@ -1509,7 +1513,7 @@ ui_GroupIcoW1h         = ui_GroupIcoW1+(ui_GroupIcoW1 div 2);
 ui_GroupIcoWq3         = ui_GroupIcoW1-(ui_GroupIcoW1 div 4);
 ui_GroupIcoW2q3        = 2*ui_GroupIcoW1+ui_GroupIcoWq3;
 
-ui_max_alarms          = 12;
+ui_max_alarms          = 32;
 
 ui_hwp                 = ui_CtrlPanelW div 2;
 ui_ButtonsNum          = (ui_CtrlPanelBH-ui_CtrlPanelBW-2)*ui_CtrlPanelBW-1;
@@ -1627,7 +1631,6 @@ mi_SV_ResolutionApply  = 62;
 mi_SV_Windowed         = 63;
 mi_SV_ShowFPS          = 64;
 mi_SV_MenuScaling      = 65;
-mi_SV_SmoothScaled     = 66;
 
 mi_SS_SoundVolume      = 70;
 mi_SS_MusicVolume      = 71;
@@ -1662,66 +1665,66 @@ mi_Players_CObs        = 107;
 mi_Players_Ready       = 108;
 
 mi_Players_AIskil0     = 110;
-mi_Players_AIskil1     = 111;
+{mi_Players_AIskil1     = 111;
 mi_Players_AIskil2     = 112;
 mi_Players_AIskil3     = 113;
 mi_Players_AIskil4     = 114;
 mi_Players_AIskil5     = 115;
-mi_Players_AIskil6     = 116;
+mi_Players_AIskil6     = 116; }
 mi_Players_AIskil7     = 117;
 
 mi_Players_Slot0       = 120;
-mi_Players_Slot1       = 121;
+{mi_Players_Slot1       = 121;
 mi_Players_Slot2       = 122;
 mi_Players_Slot3       = 123;
 mi_Players_Slot4       = 124;
 mi_Players_Slot5       = 125;
-mi_Players_Slot6       = 126;
+mi_Players_Slot6       = 126;}
 mi_Players_Slot7       = 127;
 
 mi_Players_State0      = 130;
-mi_Players_State1      = 131;
+{mi_Players_State1      = 131;
 mi_Players_State2      = 132;
 mi_Players_State3      = 133;
 mi_Players_State4      = 134;
 mi_Players_State5      = 135;
-mi_Players_State6      = 136;
+mi_Players_State6      = 136; }
 mi_Players_State7      = 137;
 
 mi_Players_Race0       = 140;
-mi_Players_Race1       = 141;
+{mi_Players_Race1       = 141;
 mi_Players_Race2       = 142;
 mi_Players_Race3       = 143;
 mi_Players_Race4       = 144;
 mi_Players_Race5       = 145;
-mi_Players_Race6       = 146;
+mi_Players_Race6       = 146;   }
 mi_Players_Race7       = 147;
 
 mi_Players_Team0       = 150;
-mi_Players_Team1       = 151;
+{mi_Players_Team1       = 151;
 mi_Players_Team2       = 152;
 mi_Players_Team3       = 153;
 mi_Players_Team4       = 154;
 mi_Players_Team5       = 155;
-mi_Players_Team6       = 156;
+mi_Players_Team6       = 156;  }
 mi_Players_Team7       = 157;
 
 mi_Players_Ping0       = 160;
-mi_Players_Ping1       = 161;
+{mi_Players_Ping1       = 161;
 mi_Players_Ping2       = 162;
 mi_Players_Ping3       = 163;
 mi_Players_Ping4       = 164;
 mi_Players_Ping5       = 165;
 mi_Players_Ping6       = 166;
-mi_Players_Ping7       = 167;
+mi_Players_Ping7       = 167; }
 
 mi_Players_Obs0        = 170;
-mi_Players_Obs1        = 171;
+{mi_Players_Obs1        = 171;
 mi_Players_Obs2        = 172;
 mi_Players_Obs3        = 173;
 mi_Players_Obs4        = 174;
 mi_Players_Obs5        = 175;
-mi_Players_Obs6        = 176;
+mi_Players_Obs6        = 176;}
 mi_Players_Obs7        = 177;
 
 //// SCIRMISH MAP BLOCK
@@ -1774,20 +1777,23 @@ mi_help_GameUI         = 233;
 mi_help_GameMechanics  = 234;
 mi_help_UnitsInfo      = 235;
 mi_help_UnitsBalance   = 236;
-mi_help_Other          = 237;
+mi_help_UpgradesInfo   = 237;
+mi_help_Other          = 238;
 
 mi_help_InfoPanel      = 240;
 mi_help_InfoList       = 241;
-mi_help_GameUIImg1     = 242;
-mi_help_GameUIImg2     = 243;
-mi_help_GameUIImg3     = 244;
+mi_help_ImgUI          = 242;
+mi_help_ImgUUpgrade    = 243;
+mi_help_ImgGenerators  = 244;
+mi_help_ImgKeyPoints   = 245;
+mi_help_ImgKotH        = 246;
 
 //// CAMPAIGNs
 
-mi_camp_Difficulty     = 245;
-mi_camp_Campaigns      = 246;
-mi_camp_Missions       = 247;
-mi_camp_MissionInfo    = 248;
+mi_camp_Difficulty     = 250;
+mi_camp_Campaigns      = 251;
+mi_camp_Missions       = 252;
+mi_camp_MissionInfo    = 253;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1815,12 +1821,13 @@ menu_PListLineH        = menu_ListLineH-2;
 menu_ListLinehH        = menu_ListLineH div 2;
 
 menu_CaptionhW         = menu_BaseW1*3;
-menu_BigButtonW        = menu_BaseW1*3+menu_BaseWh;
-menu_BigButtonH        = menu_BaseW1;
-menu_BigButtonHh       = menu_BigButtonH div 2;
+menu_BigButtonW1       = menu_BaseW1*3+menu_BaseWh;
+menu_BigButtonWImg     = menu_BigButtonW1+(menu_BigButtonW1 div 4)*3;
+menu_BigButtonH1       = menu_BaseW1;
+menu_BigButtonHh       = menu_BigButtonH1 div 2;
 menu_StepFromBottom    = menu_BaseW1+menu_BasehW;
 menu_ItemCaptionhW     = menu_BaseW1*3;
-menu_LowerBorderY      = menu_h-menu_StepFromBottom-menu_BigButtonH;
+menu_LowerBorderY      = menu_h-menu_StepFromBottom-menu_BigButtonH1;
 //
 
 menu_underLogoY        = menu_logoh+menu_BaseW1;
@@ -1832,7 +1839,7 @@ menu_BarStepX          = font_w1h;
 
 menu_AddressLen        = 30;
 
-menu_BaseList1H        = 16;
+menu_BaseList1H        = 18;
 menu_ServerListH       = 9;
 menu_ServerLineH       = menu_ListLineH*2;
 menu_ServerListAddrW1  = font_w2+font_w1*menu_AddressLen;
@@ -1843,11 +1850,11 @@ menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
 menu_ListWh            = menu_ListW1 div 2;
 
 menu_CampListW         = menu_ListWh;
-menu_CampLineH         = menu_BaseList1H;
+menu_CampLineH         = 16;
 menu_CampListSize      = 5;
 menu_CampListH         = menu_CampLineH*menu_CampListSize;
-menu_MissLineH         = menu_BaseList1H;
-menu_MissListSize      = 11;
+menu_MissLineH         = 16;
+menu_MissListSize      = 10;
 menu_MissListH         = menu_BaseList1H*menu_MissListSize;
 
 
@@ -1876,7 +1883,11 @@ menu_msg_btn2x0        = menu_msg_btn1x1;
 menu_msg_btn2x1        = menu_msg_x1;
 menu_msg_btn2tx        =(menu_msg_btn2x0+menu_msg_btn2x1)div 2;
 
-menu_HelpUnitsBTNsL    = 6;
+menu_HelpIDBTNw        = ui_ButtonW1;
+menu_HelpIDBlockBTNW   = 3;
+menu_HelpIDBlockBTNH   = 7;
+menu_HelpIDBlockW      = menu_HelpIDBlockBTNW*menu_HelpIDBTNw;
+menu_HelpIDBlockH      = menu_HelpIDBlockBTNH*menu_HelpIDBTNw;
 ui_DocLineLen1         = 56;//(menu_w-(menu_BaseW1*3+menu_BigButtonW)) div font_w1; //56;
 ui_DocLineLen2         = 76;
 ui_DocListH            = 35;
@@ -1898,6 +1909,7 @@ str_ScreenShotPrefix   : shortstring = 'MWSCR_';
 
 fileExt_save           : shortstring = '.mws';
 fileExt_Replay         : shortstring = '.mwr';
+fileExt_Scrshot        : shortstring = '.bmp';
 
 folder_Race            : array[1..r_count] of shortstring = ('hell\'          ,'uac\'          );
 folder_RaceUI          : array[1..r_count] of shortstring = ('hell\ui\'       ,'uac\ui\'       );

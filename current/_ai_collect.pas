@@ -290,11 +290,6 @@ begin
            true : if(ability_CheckTarget_Bribe(team,tu,true ))then ai_SetTarget_Hack (tu);
            false: if(ability_CheckTarget_Bribe(team,tu,false))then ai_SetTarget_Bribe(tu);
            end;
-
-         {// nearest phantom
-         if(not ai_PhantomWantZombieMe)and(uid_ZombieUID>0)then
-           if(tu^.uidi=UID_Phantom)and(tu^.a_tar=unum)then
-             if((ud-uid_r-tu^.uid^.uid_r)<=melee_r)then ai_PhantomWantZombieMe:=true;  }
       end;
    end;
 end;
@@ -386,6 +381,11 @@ begin
       if(tu^.uid^.uid_AI_NextFormUID>0)and(not tu^.uid^.uid_isbuilder)and(ai_flags_BaseAOther)
       then ai_energy_future+=g_uids[tu^.uid^.uid_AI_NextFormUID].uid_gen_EnergyLevel
       else ai_energy_future+=tu^.uid^.uid_gen_EnergyLevel;
+
+      if (tu^.uid^.uid_isbuilding)
+      and(tu^.uid^.uid_CanAttack)
+      and(not tu^.uid^.uid_isbuilder)then
+        ai_curr_Towers+=1;
 
       if(tu^.iscomplete)then
       begin

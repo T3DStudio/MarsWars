@@ -460,7 +460,7 @@ begin
                            for t:=0 to LastUnitLevel do
                              if(pprod_r[t]>0)then
                              begin
-                                UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btn  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
+                                UnitsInfo_AddUSprite(vx-buffx,vy-buffy,c_yellow,@g_upgrs[pprod_u[t]].upgr_btnBig  ,i2s(it2s(pprod_r[t])),'','','','',c_black);
                                 buffx+=ui_ButtonW1;
                              end;
                         end;
@@ -662,14 +662,6 @@ begin
           begin
              SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG  ,255);
              SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y+1,0     ,@spr_kp_genT[byte(kp_Energy=map_generators_EnergyS)],255);
-             {for i:=1 to 6 do
-             begin
-                ddir:=(i*60)*degtorad;
-                SpriteList_AddEffect(
-                kp_x+round(kp_RCapture*cos(ddir)),
-                kp_y+round(kp_RCapture*sin(ddir)),
-                sd_fly+kp_y,0,@spr_kp_gen,255);
-             end; }
           end
           else
             if(t=0)and(map_scenario=mc_KotH)then

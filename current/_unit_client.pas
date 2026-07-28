@@ -229,39 +229,49 @@ begin
      end;
 end;
 
+procedure wudata_UnitTar(tar,x,y:pinteger;rpl:boolean);
+begin
+   if(IsUnitRange(tar^,nil))
+   then wudata_int(-tar^,rpl)
+   else
+   begin
+      wudata_int(x^,rpl);
+      wudata_int(y^,rpl);
+   end;
+end;
+
 procedure wudata_UnitOrderTar(pu:PTUnit;uo:byte;rpl:boolean);
 begin
    with pu^ do
    with uid^ do
-   begin
-      if(uid_client_WCastTarget)then
-        if(buffs[ub_Cast]>0)then exit;
-
-      case uo of
-      ua_move,
-      ua_amove,
-      ua_patrol,
-      ua_apatrol : begin
-                      wudata_int(uo_x,rpl);
-                      wudata_int(uo_y,rpl);
-                   end;
-      ua_ability1,
-      ua_ability2,
-      ua_ability3: with g_aids[unit_UO2Ability(pu,uo)] do
-                     if(ua_type=uat_point)then
-                     begin
+     if(uid_MSpeed_Base>0)
+     or(uid_CanAttack)then
+     begin
+        case uo of
+        ua_move,
+        ua_amove   : wudata_UnitTar(@uo_tar,@uo_x,@uo_y,rpl);
+        ua_patrol,
+        ua_apatrol : begin
                         wudata_int(uo_x,rpl);
                         wudata_int(uo_y,rpl);
                      end;
-      end;
-      case uo of
-      ua_patrol,
-      ua_apatrol : begin
-                      wudata_int(uo_bx,rpl);
-                      wudata_int(uo_by,rpl);
-                   end;
-      end;
-   end;
+        ua_ability1,
+        ua_ability2,
+        ua_ability3: with g_aids[unit_UO2Ability(pu,uo)] do
+                       if(ua_type=uat_point)then
+                       begin
+                          wudata_int(uo_x,rpl);
+                          wudata_int(uo_y,rpl);
+                       end;
+        end;
+        case uo of
+        ua_patrol,
+        ua_apatrol : begin
+                        wudata_int(uo_bx,rpl);
+                        wudata_int(uo_by,rpl);
+                     end;
+        end;
+     end;
 end;
 
 procedure wudata_OwnerUData(pu:PTUnit;POVPlayer:byte;rpl:boolean);
@@ -331,13 +341,7 @@ begin
 
       if(uid_HaveRallyPoint)then
         if(not rpl or isselected)then
-          if(IsUnitRange(rpoint_tar,nil))
-          then wudata_int(-rpoint_tar,rpl)
-          else
-          begin
-             wudata_int(rpoint_x,rpl);
-             wudata_int(rpoint_y,rpl);
-          end;
+          wudata_UnitTar(@rpoint_tar,@rpoint_x,@rpoint_y,rpl);
    end;
 end;
 
@@ -392,13 +396,11 @@ begin
                     wt:=wt or ((word(a_weap_cl) shl 10) and %1111110000000000);
                     wudata_word(wt,rpl);
                  end;
-
-                 if(uid_client_WCastTarget)then
-                   if(buffs[ub_Cast]>0)then
-                   begin
-                      wudata_byte(byte(uo_x shr 5),rpl);
-                      wudata_byte(byte(uo_y shr 5),rpl);
-                   end;
+                 if(uid_ability_isradar)and(buffs[ub_Cast]>0)then
+                 begin
+                    wudata_byte(byte(uo_x shr 5),rpl);
+                    wudata_byte(byte(uo_y shr 5),rpl);
+                 end;
               end;
 
             if(playeri=POVPlayer)
@@ -732,7 +734,7 @@ begin
 
                    prod_upgr_Now+=1;
                    prod_upgr_upid[_puid]+=1;
-                   pprod_e[i]:=GetUpgradeEnergy(_puid,upgrs_cur[_puid]+1);
+                   pprod_e[i]:=upgrade_GetEnergy(_puid,upgrs_cur[_puid]+1);
                    res_energyl_cur-=pprod_e[i];
                 end;
          end;
@@ -798,7 +800,7 @@ begin
 
                    prod_upgr_Now-=1;
                    prod_upgr_upid[_puid]-=1;
-                   //pprod_e[i]:=GetUpgradeEnergy(_puid,upgrs_cur[_puid]+1);
+                   //pprod_e[i]:=upgrade_GetEnergy(_puid,upgrs_cur[_puid]+1);
                    res_energyl_cur+=pprod_e[i];
                 end;
          end;
@@ -897,6 +899,17 @@ begin
 
            if(playeri=UIPlayer)and(not iscomplete)then
              with uid^ do snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
+
+           if(iscomplete)and(buffs[ub_Cast]>0)then
+             case uidi of
+             UID_URadar    : effect_ScanSound(pu_cur);
+             UID_Pain      : if(upgrs_cur[upgr_hell_Phantoms]>0)
+                              then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
+                              else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
+             end;
+
+           with g_unitsVis[unum] do
+             shadowz:= unit_CalcShadowZ(pu_cur,true);
         end;
 
         missiles_clear_tar(unum,true);
@@ -908,8 +921,6 @@ begin
        if(pu_prev^.hits>hits_dead)and(hits<=hits_dead)then // remove unit
        begin
           unit_Bonuses(pu_prev);
-
-          //if (playeri=6)then writeln('remove unit  ',unum);
 
           vx:=x;
           vy:=y;
@@ -985,10 +996,9 @@ begin
                   if(pu_prev^.buffs[ub_Cast]<=0)and(buffs[ub_Cast]>0)then
                     case uidi of
                     UID_URadar    : effect_ScanSound(pu_cur);
-                    UID_URMStation: ability_UACStrike_missile(pu_cur);
                     UID_Pain      : if(upgrs_cur[upgr_hell_Phantoms]>0)
-                                     then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
-                                     else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
+                                    then unit_ArmSpawnUnit(pu_cur,UID_Phantom )
+                                    else unit_ArmSpawnUnit(pu_cur,UID_LostSoul);
                     end;
                   if (pu_prev^.transformTimer<=0)
                   and(pu_prev^.level<level)then effect_Common(pu_cur,0,@vis);
@@ -1237,6 +1247,10 @@ begin
          transformTimer         :=0;
       end;
 
+      if(uidi=UID_URMStation)and(buffs[ub_Cast]>0)then
+        for byte1:=0 to LastPlayer do
+          AddToInt(@TeamVision[byte1],MinVisionTime);
+
       if(not rpl)and(not g_PlayersGame[POVPlayer].isobserver)then
         with g_PlayersGame[POVPlayer] do
           AddToInt(@TeamVision[team],MinVisionTime);
@@ -1272,42 +1286,67 @@ begin
          end;
 end;
 
+function rudata_UnitTar(tar,x,y:pinteger;rpl:boolean):boolean;
+var
+i : integer;
+tu: PTUnit;
+begin
+   rudata_UnitTar:=false;
+   i:=x^;
+   x^:=rudata_int(rpl,0);
+   if(i<>x^)then rudata_UnitTar:=true;
+   if(IsUnitRange(-x^,@tu))then
+   begin
+      tar^:=-x^;
+      x^  :=tu^.vx;
+      y^  :=tu^.vy;
+   end
+   else
+   begin
+      i:=y^;
+      tar^:=0;
+      y^  :=rudata_int(rpl,0);
+      if(i<>y^)then rudata_UnitTar:=true;
+   end;
+end;
+
 procedure rudata_UnitOrderTar(pu:PTUnit;uo:byte;rpl:boolean);
 begin
    with pu^ do
    with uid^ do
    begin
-      if(uid_client_WCastTarget)then
-        if(buffs[ub_Cast]>0)then exit;
+      if(uid_MSpeed_Base>0)
+      or(uid_CanAttack)then
+      begin
+         uo_x :=x;
+         uo_y :=y;
+         uo_bx:=-1;
+         uo_by:=-1;
 
-      uo_x :=x;
-      uo_y :=y;
-      uo_bx:=-1;
-      uo_by:=-1;
-
-      case uo of
-      ua_move,
-      ua_amove,
-      ua_patrol,
-      ua_apatrol : begin
-                      uo_x:=rudata_int(rpl,x);
-                      uo_y:=rudata_int(rpl,y);
-                   end;
-      ua_ability1,
-      ua_ability2,
-      ua_ability3: with g_aids[unit_UO2Ability(pu,uo)] do
-                     if(ua_type=uat_point)then
-                     begin
-                        uo_x:=rudata_int(rpl,x);
-                        uo_y:=rudata_int(rpl,y);
-                     end;
-      end;
-      case uo of
-      ua_patrol,
-      ua_apatrol : begin
-                      uo_bx:=rudata_int(rpl,-1);
-                      uo_by:=rudata_int(rpl,-1);
-                   end;
+         case uo of
+         ua_move,
+         ua_amove   : rudata_UnitTar(@uo_tar,@uo_x,@uo_y,rpl);
+         ua_patrol,
+         ua_apatrol : begin
+                         uo_x:=rudata_int(rpl,x);
+                         uo_y:=rudata_int(rpl,y);
+                      end;
+         ua_ability1,
+         ua_ability2,
+         ua_ability3: with g_aids[unit_UO2Ability(pu,uo)] do
+                        if(ua_type=uat_point)then
+                        begin
+                           uo_x:=rudata_int(rpl,x);
+                           uo_y:=rudata_int(rpl,y);
+                        end;
+         end;
+         case uo of
+         ua_patrol,
+         ua_apatrol : begin
+                         uo_bx:=rudata_int(rpl,-1);
+                         uo_by:=rudata_int(rpl,-1);
+                      end;
+         end;
       end;
       case uo of
       ua_patrol  : uo_id:=ua_move;
@@ -1321,8 +1360,6 @@ procedure rudata_OwnerUData(uu:PTUnit;POVPlayer:byte;rpl:boolean);
 var
 uo,
 b : byte;
-i : integer;
-tu: PTUnit;
 begin
    with uu^  do
    with uid^ do
@@ -1348,24 +1385,7 @@ begin
 
       if(uid_HaveRallyPoint)then
         if(not rpl or isselected)then
-        begin
-           i:=rpoint_x;
-           rpoint_x:=rudata_int(rpl,0);
-           if(i<>rpoint_x)and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
-           if(IsUnitRange(-rpoint_x,@tu))then
-           begin
-              rpoint_tar:=-rpoint_x;
-              rpoint_x  :=tu^.vx;
-              rpoint_y  :=tu^.vy;
-           end
-           else
-           begin
-              i:=rpoint_y;
-              rpoint_tar:=0;
-              rpoint_y  :=rudata_int(rpl,0);
-              if(i<>rpoint_y)and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
-           end;
-        end;
+          if(rudata_UnitTar(@rpoint_tar,@rpoint_x,@rpoint_y,rpl))and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
    end;
 end;
 
@@ -1402,7 +1422,7 @@ begin
          if(i<>uidi)then
          begin
             unit_SetDefaults(uu,false);
-            unit_ApplyUID(uu,true);
+            unit_ApplyUID(uu);
             FillChar(buffs,SizeOf(buffs),0);
          end;
          hits:=hits_si2li(sh,uid^.uid_MaxHits1,uid^.uid_hits_li2si);
@@ -1441,13 +1461,11 @@ begin
                     a_tar :=integer(wt and %0000001111111111);
                     a_weap:=(wt and %1111110000000000) shr 10;
                  end;
-
-                 if(uid^.uid_client_WCastTarget)then
-                   if(buffs[ub_Cast]>0)then
-                   begin
-                      uo_x:=integer(rudata_byte(rpl,0) shl 5);
-                      uo_y:=integer(rudata_byte(rpl,0) shl 5);
-                   end;
+                 if(uid^.uid_ability_isradar)and(buffs[ub_Cast]>0)then
+                 begin
+                    uo_x:=integer(rudata_byte(rpl,0) shl 5);
+                    uo_y:=integer(rudata_byte(rpl,0) shl 5);
+                 end;
               end;
 
             if(playeri=POVPlayer)

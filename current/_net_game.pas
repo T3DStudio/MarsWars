@@ -668,7 +668,6 @@ nmid_LobbyInfo    : begin
                               PlayerSetSkirmishTech(i);
                            end
                            else race:=mrace;
-
                         end;
 
                       i:=LocalPlayer;

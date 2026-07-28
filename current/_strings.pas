@@ -453,15 +453,15 @@ begin
       str_EndDot(@uid_str_BaseDescript);
    end;
 end;
-procedure str_SetUnitBalanceHint(uids:TSoB;hintG,hintB,hintU:shortstring);
+procedure str_SetUnitBalanceHint(uids:TSoB;hintG,hintB,hintU:shortstring;force:boolean);
 var u:byte;
 begin
    for u in uids do
      with g_uids[u] do
      begin
-        if(length(hintG)>0)then uid_str_balance_Good   :=hintG;
-        if(length(hintB)>0)then uid_str_balance_Bad    :=hintB;
-        if(length(hintU)>0)then uid_str_balance_Useless:=hintU;
+        if(length(hintG)>0)or(force)then uid_str_balance_Good   :=hintG;
+        if(length(hintB)>0)or(force)then uid_str_balance_Bad    :=hintB;
+        if(length(hintU)>0)or(force)then uid_str_balance_Useless:=hintU;
      end;
 end;
 
@@ -504,22 +504,36 @@ begin
 end;
 
 function str_UnitsNamesList(list:TSoB):shortstring;
-var i,c:byte;
+var
+i,c:byte;
+zombies:boolean;
+procedure AddResult(s:shortstring);
+begin
+   if(length(str_UnitsNamesList)=0)
+   then str_UnitsNamesList:=s
+   else
+     if(c=1)
+     then str_UnitsNamesList+=' '+str_and+' '+s
+     else str_UnitsNamesList+=', '           +s;
+end;
 begin
    str_UnitsNamesList:='';
    if(list=[])then exit;
    c:=0;
+   if(uids_zimbas<=list)then
+   begin
+      c+=1;
+      zombies:=true;
+      list-=uids_zimbas;
+   end
+   else zombies:=false;
    for i in list do c+=1;
    for i in list do
    begin
-      if(length(str_UnitsNamesList)=0)
-      then str_UnitsNamesList:=g_uids[i].uid_str_name
-      else
-        if(c=1)
-        then str_UnitsNamesList+=' '+str_and+' '+g_uids[i].uid_str_name
-        else str_UnitsNamesList+=', '           +g_uids[i].uid_str_name;
+      AddResult(g_uids[i].uid_str_name);
       c-=1;
    end;
+   if(zombies)then AddResult(str_hint_Zombies);
 end;
 
 function str_UnitProductBy(uid:byte):shortstring;
@@ -881,20 +895,20 @@ begin
 
       if(upgr_renerg>0)then
         if(curlvl<255)
-        then ENRG:=tc_aqua +i2s(GetUpgradeEnergy(upid,curlvl))+tc_default
+        then ENRG:=tc_aqua +i2s(upgrade_GetEnergy(upid,curlvl))+tc_default
         else
           if(upgr_max>0)then
           begin
-             for i:=1 to upgr_max do STRADD(@ENRG,i2s(GetUpgradeEnergy(upid,i)),'/');
+             for i:=1 to upgr_max do STRADD(@ENRG,i2s(upgrade_GetEnergy(upid,i)),'/');
              ENRG:=tc_aqua+ENRG+tc_default;
           end;
       if(upgr_time  >0)then
         if(curlvl<255)
-        then TIME:=tc_white+i2s(GetUpgradeTime(upid,curlvl)div fr_fps1)+tc_default
+        then TIME:=tc_white+i2s(upgrade_GetTime(upid,curlvl)div fr_fps1)+tc_default
         else
           if(upgr_max>0)then
           begin
-             for i:=1 to upgr_max do STRADD(@TIME,i2s(GetUpgradeTime(upid,i)div fr_fps1),'/');
+             for i:=1 to upgr_max do STRADD(@TIME,i2s(upgrade_GetTime(upid,i)div fr_fps1),'/');
              TIME:=tc_white+TIME+tc_default;
           end;
       if(length(ENRG)>0)then STRADD(@INFO,ENRG,sep_comma);
@@ -968,6 +982,12 @@ begin
      with g_uids[uid] do
        str_AddToStrList(@uid_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
 end;
+procedure AddLineUpgradeDocHint(line1:shortstring);
+begin
+   if(length(line1)>0)then
+     with g_upgrs[uid] do
+       str_AddToStrList(@upgr_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
+end;
 procedure AddLineAbilityGameHint(line:shortstring);
 begin
    if(length(line)>0)then
@@ -996,7 +1016,7 @@ begin
         ITEMP :='';
 
         uid_str_NameHK:=uid_str_Name;
-        uid_str_HK:=str_ProductionHotKey(uid_uibtn);
+        uid_str_HK    :=str_ProductionHotKey(uid_uibtn);
         if(length(uid_str_HK)>0)then
           uid_str_NameHK+=' ('+uid_str_HK+')';
 
@@ -1034,9 +1054,9 @@ begin
         str_StringListClear(@uid_HintDoc    );
 
         // Basic Game hint
-        AddLineUnitGameHint(uid_str_NameHK      );
-        AddLineUnitGameHint(uid_str_CostLimit   );
-        AddLineUnitGameHint(uid_str_DefaultAttr );
+        AddLineUnitGameHint(uid_str_NameHK       );
+        AddLineUnitGameHint(uid_str_CostLimit    );
+        AddLineUnitGameHint(uid_str_DefaultAttr  );
         AddLineUnitGameHint(uid_str_1LineDescript);
         AddLineUnitGameHint(uid_str_Reqs);
         AddLineUnitGameHint(uid_str_Prod);
@@ -1054,7 +1074,6 @@ begin
            if(uid_ability2>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));AddLineUnitGameHint(g_aids[uid_ability2].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability2].ua_str_ReqsUHint);end;
            if(uid_ability3>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));AddLineUnitGameHint(g_aids[uid_ability3].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability3].ua_str_ReqsUHint);end;
         end;
-
 
         // Basic Doc hint //////////////////////////////////////////////////////
         AddLineUnitDocHint(str_doc_HotKey         +uid_str_HK        );
@@ -1083,6 +1102,7 @@ begin
         if(not uid_isbuilding)then
         begin
            AddLineUnitDocHint(str_doc_PainC           +DocValI(uid_PainState_Base   ));
+           if(unit_PossibleTransports(uid))then
            AddLineUnitDocHint(str_doc_TransportSize   +DocValI(uid_TransportSize    ));
            AddLineUnitDocHint(str_doc_LevelUpTime     +DocValI(uid_LevelUpTimeSecs  ));
            if(uid_LevelBonusDamage>0)then
@@ -1153,6 +1173,50 @@ begin
         if(length(ITEMP)>0)
         then upgr_str_Reqs:=tc_yellow+str_hint_requirements+tc_default+ITEMP
         else upgr_str_Reqs:='';
+
+        // Basic Doc hint //////////////////////////////////////////////////////
+        str_StringListClear(@upgr_HintDoc);
+
+        if(upgr_max=0)
+        or(upgr_time<=0)then continue;
+
+        ITEMP:=str_ProductionHotKey(upgr_btni);
+        if(length(ITEMP)>0)then
+        AddLineUpgradeDocHint(str_doc_HotKey     +ITEMP);
+        AddLineUpgradeDocHint(str_PT_Race+   ': '+str_race[upgr_race]);
+
+        AddLineUpgradeDocHint(str_doc_UpgrLevels +b2s(upgr_max));
+
+        ITEMP:='';
+        for arm:=1 to upgr_max do STRADD(@ITEMP,tc_aqua+i2s(upgrade_GetEnergy(uid,arm))+tc_default,sep_slash);
+        if(length(ITEMP)>0)then
+        AddLineUpgradeDocHint(str_doc_ReqEnergy  +ITEMP);
+        ITEMP:='';
+        for arm:=1 to upgr_max do STRADD(@ITEMP,ir2s(upgrade_GetTime(uid,arm)),sep_slash);
+        if(length(ITEMP)>0)then
+        AddLineUpgradeDocHint(str_doc_ProdTime   +ITEMP);
+
+        AddLineUpgradeDocHint(upgr_str_Reqs);
+        AddLineUpgradeDocHint(tc_docbr);
+
+        if(length(str_doc_Description)>0)then
+        begin
+        AddLineUpgradeDocHint(str_doc_Description+upgr_str_Descript);
+        AddLineUpgradeDocHint(tc_docbr);
+        end;
+
+        AddLineUpgradeDocHint(str_doc_UpgrAffectedUIDs);
+        ITEMP:='';
+        for arm in upgrade_GetAffectedUIDs(uid) do
+          if((length(ITEMP)+length(g_uids[arm].uid_str_name))<254)
+          then STRADD(@ITEMP,g_uids[arm].uid_str_name,sep_scomma)
+          else
+          begin
+             AddLineUpgradeDocHint(ITEMP);
+             ITEMP:='';
+          end;
+        if(length(ITEMP)>0)then
+        AddLineUpgradeDocHint(ITEMP);
      end;
 
    /////////////////////////////////////////////////////////////////////////////
@@ -1232,7 +1296,7 @@ begin
            if(uid_ability1>0)then
              with g_aids[uid_ability1] do
              begin
-                AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability1,255)+': '+ua_str_Descript);
+                AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability1,0)+': '+ua_str_Descript);
                 AddLineUnitDocHint(ua_str_Common       );
                 AddLineUnitDocHint(ua_str_ReloadFactors);
                 AddLineUnitDocHint(ua_str_Reqs         );
@@ -1240,7 +1304,7 @@ begin
            if(uid_ability2>0)then
              with g_aids[uid_ability2] do
              begin
-                AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability2,255)+': '+ua_str_Descript);
+                AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability2,1)+': '+ua_str_Descript);
                 AddLineUnitDocHint(ua_str_Common       );
                 AddLineUnitDocHint(ua_str_ReloadFactors);
                 AddLineUnitDocHint(ua_str_Reqs         );
@@ -1248,7 +1312,7 @@ begin
            if(uid_ability3>0)then
              with g_aids[uid_ability3] do
              begin
-                AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability3,255)+': '+ua_str_Descript);
+                AddLineUnitDocHint('- '+str_AbilityHintName(uid_ability3,2)+': '+ua_str_Descript);
                 AddLineUnitDocHint(ua_str_Common       );
                 AddLineUnitDocHint(ua_str_ReloadFactors);
                 AddLineUnitDocHint(ua_str_Reqs         );

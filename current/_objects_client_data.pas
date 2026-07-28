@@ -400,7 +400,7 @@ begin
    setMWSModel  (0,@spr_ZPlasmagunner);
    setCommandSND(snd_zimba_ready,snd_zimba_move,snd_zimba_move,snd_zimba_pain,snd_zimba_move);
    setEffectEID (0,0  ,EID_Exp1,EID_Exp1,0  );
-   setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,nil);
+   setEffectSND (  snd_JetPackOn,snd_explode,snd_explode,snd_zimba_pain);
    setWeaponESND(0    ,nil,snd_shot_plasma,0,0);
    setWeaponTEID(0    ,nil,0,[0..255]);
 end;
@@ -635,6 +635,7 @@ begin
 end;
 UID_UTransport:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_Transport);
    setMWSModel(1,@spr_ATransport);
    setCommandSND(snd_transport_ready,snd_transport_move,snd_transport_move,snd_transport_annoy,snd_transport_select);
@@ -643,6 +644,7 @@ begin
 end;
 UID_UACDron:
 begin
+   uid_eid_SprFloating:=true;
    setMWSModel(0,@spr_UACDron);
    setCommandSND(snd_uacbot_move,snd_uacbot_move,snd_uacbot_attack,snd_uacbot_annoy,snd_uacbot_select);
    setEffectEID (0,0  ,EID_Exp2    ,EID_Exp2    ,MID_SSShot  );
@@ -897,64 +899,66 @@ end;
              if(i>ui_ButtonsNum)then break;
           end;
    end;
+end;
 
-   // upgrades
+procedure InitClientDataUpgrades;
+var u:integer;
+procedure setBTN(upid,race,ucl:byte);
+begin
+   with g_upgrs[upid] do
+     upgr_btnBig:=spr_uibtn_UpgradesBig[race,ucl];
+end;
+begin
    for u:=0 to 255 do
      with g_upgrs[u] do
-     begin
-        upgr_btn:=spr_dummy;
+       upgr_btnBig:=spr_dummy;
 
-        case u of
-upgr_hell_DistDamage1   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,0 ]; end;
-upgr_hell_UnitArmor     : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,1 ]; end;
-upgr_hell_BuildArmor    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,2 ]; end;
-upgr_hell_MeleeDamage   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,3 ]; end;
-upgr_hell_Regeneration  : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,4 ]; end;
-upgr_hell_PainFactor    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,5 ]; end;
-upgr_hell_ADetection    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,22]; end;
-upgr_hell_BuilderR      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,11]; end;
-upgr_hell_HKeepShift    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,9 ]; end;
-upgr_hell_DecayAura     : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,10]; end;
-upgr_hell_TowerR        : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,7 ]; end;
-upgr_hell_Spectre       : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,19]; end;
-upgr_hell_UnitSightR    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,13]; end;
-upgr_hell_Phantoms      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,15]; end;
-upgr_hell_DistDamage2   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,20]; end;
-upgr_hell_Resurrect     : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,12]; end;
-upgr_hell_TeleportCD    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,8 ]; end;
-upgr_hell_T2TNoCD       : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,14]; end;
-upgr_hell_EvilEyeR      : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,6 ]; end;
-upgr_hell_TotemInvis    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,16]; end;
-upgr_hell_BuildRestore  : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,17]; end;
-upgr_hell_TowerBlink    : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,18]; end;
-upgr_hell_FTowerAMech   : begin upgr_btn:=spr_uibtn_Upgrades[r_hell,21]; end;
+   setBTN(upgr_hell_DistDamage1 ,r_hell,0 );
+   setBTN(upgr_hell_UnitArmor   ,r_hell,1 );
+   setBTN(upgr_hell_BuildArmor  ,r_hell,2 );
+   setBTN(upgr_hell_MeleeDamage ,r_hell,3 );
+   setBTN(upgr_hell_Regeneration,r_hell,4 );
+   setBTN(upgr_hell_PainFactor  ,r_hell,5 );
+   setBTN(upgr_hell_ADetection  ,r_hell,22);
+   setBTN(upgr_hell_BuilderR    ,r_hell,11);
+   setBTN(upgr_hell_HKeepShift  ,r_hell,9 );
+   setBTN(upgr_hell_DecayAura   ,r_hell,10);
+   setBTN(upgr_hell_TowerR      ,r_hell,7 );
+   setBTN(upgr_hell_Spectre     ,r_hell,19);
+   setBTN(upgr_hell_UnitSightR  ,r_hell,13);
+   setBTN(upgr_hell_Phantoms    ,r_hell,15);
+   setBTN(upgr_hell_DistDamage2 ,r_hell,20);
+   setBTN(upgr_hell_Resurrect   ,r_hell,12);
+   setBTN(upgr_hell_TeleportCD  ,r_hell,8 );
+   setBTN(upgr_hell_T2TNoCD     ,r_hell,14);
+   setBTN(upgr_hell_EvilEyeR    ,r_hell,6 );
+   setBTN(upgr_hell_TotemInvis  ,r_hell,16);
+   setBTN(upgr_hell_BuildRestore,r_hell,17);
+   setBTN(upgr_hell_TowerBlink  ,r_hell,18);
+   setBTN(upgr_hell_FTowerAMech ,r_hell,21);
 
-upgr_uac_DistDamage     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,0 ]; end;
-upgr_uac_BioArmor       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,1 ]; end;
-upgr_uac_BuildArmor     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,2 ]; end;
-upgr_uac_RepairTools    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,3 ]; end;
-upgr_uac_BioSpeed       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,4 ]; end;
-upgr_uac_SSMWeapon      : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,14]; end;
-upgr_uac_ADetection     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,21]; end;
-upgr_uac_BuilderR       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,11]; end;
-upgr_uac_CCFly          : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,9 ]; end;
-upgr_uac_CCAttack       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,10]; end;
-upgr_uac_TowerR         : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,7 ]; end;
-upgr_uac_DronTurret     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,20]; end;
-upgr_uac_UnitSightR     : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,12]; end;
-upgr_uac_CommandoInvis  : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,19]; end;
-upgr_uac_AASplash       : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,13]; end;
-upgr_uac_MechSpeed      : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,15]; end;
-upgr_uac_MechArmor      : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,16]; end;
-upgr_uac_TerAAWeapon    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,17]; end;
-upgr_uac_Transport      : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,6 ]; end;
-upgr_uac_RadarR         : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,8 ]; end;
-upgr_uac_TurretPlasma   : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,5 ]; end;
-upgr_uac_TurretArmor    : begin upgr_btn:=spr_uibtn_Upgrades[r_uac ,18]; end;
-
-
-        end;
-     end;
+   setBTN(upgr_uac_DistDamage   ,r_uac ,0 );
+   setBTN(upgr_uac_BioArmor     ,r_uac ,1 );
+   setBTN(upgr_uac_BuildArmor   ,r_uac ,2 );
+   setBTN(upgr_uac_RepairTools  ,r_uac ,3 );
+   setBTN(upgr_uac_BioSpeed     ,r_uac ,4 );
+   setBTN(upgr_uac_SSMWeapon    ,r_uac ,14);
+   setBTN(upgr_uac_ADetection   ,r_uac ,21);
+   setBTN(upgr_uac_BuilderR     ,r_uac ,11);
+   setBTN(upgr_uac_CCFly        ,r_uac ,9 );
+   setBTN(upgr_uac_CCAttack     ,r_uac ,10);
+   setBTN(upgr_uac_TowerR       ,r_uac ,7 );
+   setBTN(upgr_uac_DronTurret   ,r_uac ,20);
+   setBTN(upgr_uac_UnitSightR   ,r_uac ,12);
+   setBTN(upgr_uac_CommandoInvis,r_uac ,19);
+   setBTN(upgr_uac_AASplash     ,r_uac ,13);
+   setBTN(upgr_uac_MechSpeed    ,r_uac ,15);
+   setBTN(upgr_uac_MechArmor    ,r_uac ,16);
+   setBTN(upgr_uac_TerAAWeapon  ,r_uac ,17);
+   setBTN(upgr_uac_Transport    ,r_uac ,6 );
+   setBTN(upgr_uac_RadarR       ,r_uac ,8 );
+   setBTN(upgr_uac_TurretPlasma ,r_uac ,5 );
+   setBTN(upgr_uac_TurretArmor  ,r_uac ,18);
 end;
 
 procedure InitClientDataAbilities;
@@ -969,14 +973,16 @@ begin
       ua_mbrush_hint:= 0;
 
       case a of
-uab_HSpecter         : ua_btn     :=spr_uibtn_Upgrades[r_hell,19].surf;
-uab_HHTShroud        : ua_btn     :=spr_uibtn_Upgrades[r_hell,16].surf;
-uab_HStealth         : ua_btn     :=spr_uibtn_Upgrades[r_uac ,19].surf;
+uab_HSpecter         : ua_btn     :=g_upgrs[upgr_hell_Spectre     ].upgr_btnBig.surf;
+uab_HHTShroud        : ua_btn     :=g_upgrs[upgr_hell_TotemInvis  ].upgr_btnBig.surf;
+uab_HStealth         : ua_btn     :=g_upgrs[upgr_uac_CommandoInvis].upgr_btnBig.surf;
+uab_UAASplash        : ua_btn     :=g_upgrs[upgr_uac_AASplash     ].upgr_btnBig.surf;
+uab_HT2TNoCD         : ua_btn     :=g_upgrs[upgr_hell_T2TNoCD     ].upgr_btnBig.surf;
 
-uab_Teleport         : ua_btn     :=spr_uibtn_Upgrades[r_hell,8 ].surf;
-uab_Recall           : ua_btn     :=spr_uibtn_Upgrades[r_hell,14].surf;
+uab_Teleport         : ua_btn     :=g_upgrs[upgr_hell_TeleportCD  ].upgr_btnBig.surf;
+uab_Recall           : ua_btn     :=spr_uibtn_AbilityRecall;
 uab_UACScan          : begin
-                       ua_btn     :=spr_uibtn_Upgrades[r_uac ,21].surf;
+                       ua_btn     :=g_upgrs[upgr_uac_ADetection   ].upgr_btnBig.surf;
                        ua_mbrush_r:=uambt_SightR;
                        end;
 uab_UACStrike        : begin
@@ -993,19 +999,19 @@ uab_UACCCLandTo      : begin
                        ua_btn     :=spr_uibtn_AbilityCCLandTo;
                        ua_mbrush_r:=uambt_Self;
                        end;
-uab_HEyeVision       : ua_btn     :=spr_uibtn_Upgrades[r_hell,22].surf;
+uab_HEyeVision       : ua_btn     :=g_upgrs[upgr_hell_ADetection  ].upgr_btnBig.surf;
 uab_HEyeSpawn        : ua_mbrush_r:=-UID_HEye;
 
 uab_HTowerBlink      : begin
-                       ua_btn     :=spr_uibtn_Upgrades[r_hell,18].surf;
+                       ua_btn     :=g_upgrs[upgr_hell_TowerBlink  ].upgr_btnBig.surf;
                        ua_mbrush_r:=uambt_Self;
                        end;
 
 uab_HKeepShift       : begin
-                       ua_btn     :=spr_uibtn_Upgrades[r_hell,9 ].surf;
+                       ua_btn     :=g_upgrs[upgr_hell_HKeepShift  ].upgr_btnBig.surf;
                        ua_mbrush_r:=uambt_Self;
                        end;
-uab_HKeepAura        : ua_btn     :=spr_uibtn_Upgrades[r_hell,10].surf;
+uab_HKeepAura        : ua_btn     :=g_upgrs[upgr_hell_DecayAura   ].upgr_btnBig.surf;
 
 uab_SphereSoul       : ua_btn     :=spr_uibtn_AbilitySSoul;
 uab_SphereInvis      : ua_btn     :=spr_uibtn_AbilitySInvis;

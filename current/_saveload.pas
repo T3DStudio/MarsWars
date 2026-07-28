@@ -225,6 +225,9 @@ begin
    {$I+}
    if(ioresult<>0)then exit;
 
+   ui_cam_x+=ui_cam_w div 2;
+   ui_cam_y+=ui_cam_h div 2;
+
    {$I-}
    if(svld_itemn>0)then
      for i:=0 to svld_itemn-1 do
@@ -232,6 +235,9 @@ begin
          BlockWrite(f,data_p^,data_s);
    {$I+}
    close(f);
+
+   ui_cam_x-=ui_cam_w div 2;
+   ui_cam_y-=ui_cam_h div 2;
 
    MenuBack(true,false);
 
@@ -332,7 +338,7 @@ begin
       gt_scirmish: map_seed2theme;
       end;
 
-      GameRoyalUpdateR;
+      game_RoyalUpdateR;
       KeyPoints_UpdateVisData;
       units_DefaultVisData;
       map_MakeThemeSprites;
@@ -342,6 +348,9 @@ begin
       map_Obstacles_SetDrawData;
       map_RedrawMenuMinimap;
       map_Decals_Create;
+
+      ui_cam_x-=ui_cam_w div 2;
+      ui_cam_y-=ui_cam_h div 2;
       ui_Camera_Bounds;
 
       g_started:=true;

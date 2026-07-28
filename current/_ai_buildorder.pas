@@ -161,7 +161,7 @@ begin
    if(build_uid=0)then
      if(pBuilder^.player^.units_uid_e[buid]<count)then
        if(buid in pBuilder^.uid^.uid_prod_Buildings)then
-         if(CheckUnitReqs(pBuilder^.player,buid,checkExtraEnergy)=0)then
+         if(unit_CheckReqs(pBuilder^.player,buid,checkExtraEnergy)=0)then
          begin
             if(pBuilder^.player^.res_UACLoot<600)and(g_uids[buid].uid_req_UACLoot>0)then exit;
 
@@ -232,7 +232,6 @@ begin
              build_dirs:=22;
              build_step:=srange-g_random(g_uids[build_uid].uid_r);
           end;
-
    end;
 end;
 
@@ -373,7 +372,7 @@ end;
 function NeedMaxTowers:boolean;
 begin
    with pBuilder^  do
-     NeedMaxTowers:=((aiu_alarm_d<base_r2)and(aiu_limitaround_ally<aiu_limitaround_enemy))
+     NeedMaxTowers:=((ai_enemy_d<base_r2)and(aiu_limitaround_ally<aiu_limitaround_enemy))
                   or((map_scenario=mc_koth) and(ai_keypoint_d<=keyPoint_KotR))
                   or((map_scenario=mc_royale)and(u_royal_cd<base_r1h));
 end;
@@ -389,7 +388,6 @@ begin
    with player^ do
    begin
       // Define UID to build
-
       if((aip_flags and aif_base_smart_order)>0)then
       begin
          if(NeedMaxTowers)then
@@ -640,8 +638,7 @@ uprod_base       : begin
                       begin
                          if(ai_Barrack(pBarrack,uprod_Transport))then exit;
 
-
-                         if(ai_armylimit_siedge<=ul10)and(ai_BaseDef_d=NOTSET)then
+                         if(ai_armylimit_siedge<=ul10)and(ai_BaseDef_d=NOTSET)and(map_scenario<>mc_koth)then
                            if(ai_Barrack(pBarrack,uprod_Sidge))then exit;
 
                          if(ai_Barrack(pBarrack,uprod_Special))then exit;

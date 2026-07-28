@@ -538,11 +538,15 @@ lmt_player_nready       : ;
 lmt_player_defeated     : if(lm_data_u<=LastPlayer)and(g_status=gs_running)then
                           snd_SoundPlayAnoncer(snd_player_defeated[race],true,false);
 lmt_unit_LevelUp        : snd_SoundPlayAnoncer(snd_unit_promoted  [race],true,false);
-lmt_unit_resurrected,
-lmt_unit_captured,
 lmt_unit_readyU,
 lmt_unit_readyB         : with g_uids[lm_data_u] do
                           snd_SoundPlayUnitCommand(uid_snd_ready);
+lmt_unit_resurrected,
+lmt_unit_captured       : with g_uids[lm_data_u] do
+                          if(uid_isbuilding)
+                          then snd_SoundPlayUnitCommand(uid_snd_select)
+                          else snd_SoundPlayUnitCommand(uid_snd_ready );
+
 lmt_upgrade_complete    : snd_SoundPlayAnoncer(snd_upgrade_complete[race],true ,false);
 lmt_prod_BadPlace       : snd_SoundPlayAnoncer(snd_cannot_build    [race],true ,false);
 
@@ -552,6 +556,7 @@ lmt_allies_attackedB    : snd_SoundPlayMMapAlarm(snd_mapmark,false);
 lmt_unit_attackedU,
 lmt_unit_attackedB      : with g_uids[lm_data_u] do
                           snd_SoundPlayMMapAlarm(snd_under_attack[uid_isbuilding,race],true);
+lmt_other_UACScan,
 lmt_markAttack          : snd_SoundPlayMMapAlarm(snd_mapmark,false);
 lmt_markLook            : snd_SoundPlayMMapAlarm(snd_Stink  ,false);
 
@@ -581,7 +586,7 @@ lmt_ability_ReqHelNear,
 lmt_ability_Tar2Close,
 lmt_unit_NeedBuilder,
 lmt_unit_lost,
-lmt_NeedProdUnit,
+lmt_unit_NeedProdUnit,
 lmt_Req_MaxCount,
 lmt_Req_MaxBuilders,
 lmt_Req_Limit,

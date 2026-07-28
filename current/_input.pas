@@ -428,9 +428,9 @@ begin
         begin
            uid:=ui_panel_uids[race,ui_tab,act-iAct_SProd1];
            case ui_tab of
-           tab_buildings: if(ui_PanelBTNUnit   (POVPlayer,uid))then iActSetDisabled(act,not g_control or(CheckUnitReqs   (POVPlayer,uid)>0)or not(uid in ui_bprod_possible));
-           tab_units    : if(ui_PanelBTNUnit   (POVPlayer,uid))then iActSetDisabled(act,not g_control or(CheckUnitReqs   (POVPlayer,uid)>0)or(prod_unit_Now>=prod_unit_Max)or(ui_uprod_cur>=ui_uprod_max)or(ui_uprod_uid_max[uid]<=0));
-           tab_upgrades : if(ui_PanelBTNUpgrade(POVPlayer,uid))then iActSetDisabled(act,not g_control or(CheckUpgradeReqs(POVPlayer,uid)>0)or(prod_upgr_Now>=prod_upgr_Max)or(prod_upgr_upid[uid]>=ui_pprod_upg_max[uid]));
+           tab_buildings: if(ui_PanelBTNUnit   (POVPlayer,uid))then iActSetDisabled(act,not g_control or(unit_CheckReqs   (POVPlayer,uid)>0)or not(uid in ui_bprod_possible));
+           tab_units    : if(ui_PanelBTNUnit   (POVPlayer,uid))then iActSetDisabled(act,not g_control or(unit_CheckReqs   (POVPlayer,uid)>0)or(prod_unit_Now>=prod_unit_Max)or(ui_uprod_cur>=ui_uprod_max)or(ui_uprod_uid_max[uid]<=0));
+           tab_upgrades : if(ui_PanelBTNUpgrade(POVPlayer,uid))then iActSetDisabled(act,not g_control or(upgrade_CheckReqs(POVPlayer,uid)>0)or(prod_upgr_Now>=prod_upgr_Max)or(prod_upgr_upid[uid]>=ui_pprod_upg_max[uid]));
            end;
         end;
    end;
@@ -474,7 +474,7 @@ begin
 
    // replay controls
    iActSetOnEnabled(iAct_Replay_Fast         ,ctabType=tcc_Replay,g_status=gs_running);
-   iActSetOnEnabled(iAct_Replay_Pause        ,ctabType=tcc_Replay,replay_Pause(true));
+   iActSetOnEnabled(iAct_Replay_Pause        ,ctabType=tcc_Replay,replay_TogglePause(true));
    iActSetOnEnabled(iAct_Replay_Back2        ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
    iActSetOnEnabled(iAct_Replay_Back10       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
    iActSetOnEnabled(iAct_Replay_Back60       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     ,true));
@@ -527,7 +527,7 @@ begin
    with uid^ do
    if(uid_HaveRallypoint)then
    begin
-      snd_SoundPlayUnitCommand(snd_rally_point[ui_CommandercPU^.player^.race]);
+      snd_SoundPlayAnoncer(snd_rally_point[ui_CommandercPU^.player^.race],false,true);
       exit;
    end
    else
@@ -722,7 +722,7 @@ begin
                                       end
                                       else
                                       begin
-                                         ReqBits:=CheckUnitReqs(@g_PlayersGame[LocalPlayer],m_brush);
+                                         ReqBits:=unit_CheckReqs(@g_PlayersGame[LocalPlayer],m_brush);
                                          if(ReqBits>0)then
                                          begin
                                             if(logErrors)then GameLog_ReqMsg(LocalPlayer,byte(m_brush),lmt_argt_unit,ReqBits,-1,-1);
@@ -945,7 +945,7 @@ begin
    iAct_InGameMenu        : if(SoundEnabledLeft)then GameOpenMenu;
 
    iAct_Replay_Fast       : if(SoundEnabledLeft)then sys_uncappedFPS:=not sys_uncappedFPS;
-   iAct_Replay_Pause      : if(SoundEnabledLeft)then replay_Pause(false);
+   iAct_Replay_Pause      : if(SoundEnabledLeft)then replay_TogglePause(false);
    iAct_Replay_Back2      : if(SoundEnabledLeft)then replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,false);
    iAct_Replay_Back10     : if(SoundEnabledLeft)then replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,false);
    iAct_Replay_Back60     : if(SoundEnabledLeft)then replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     ,false);
@@ -1043,16 +1043,17 @@ begin
      end;
 
    if (nvid_vw>0)
-   and(nvid_vh>0)then
-   begin
+   and(nvid_vh>0)then menu_ApplyResolution(nvid_vw,nvid_vh);
+   {begin
       vid_vw:=nvid_vw;menu_ResolutionWi:=vid_vw;
       vid_vh:=nvid_vh;menu_ResolutionHi:=vid_vh;
 
       vid_MakeScreen;
       theme_map_pTerrain:=255;
       gfx_MapMakeTerrain;
+      gfx_UpdateScaledMenuBackground;
       menu_update:=true;
-   end;
+   end; }
 end;
 
 procedure GameControlsMouse;
@@ -1416,14 +1417,14 @@ begin
    if(InputActionReleased(iact_Screenshot))then gfx_MakeScreenshot;
    if(InputActionPressed(iAct_ToggleWindowed))then menu_ToggleFullScreen;
 
-   {// Test mode
+   // Test mode
    {$IFDEF TESTMODE}
    if(TestMode>0)then
    begin
-      if(InputActionPressed(iAct_test_debug0      ))then net_debug_resolv;
+      //if(InputActionPressed(iAct_test_debug0      ))then net_debug_resolv;
       if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
    end;
-   {$ENDIF} }
+   {$ENDIF}
 
    if(MainMenu)then
    begin

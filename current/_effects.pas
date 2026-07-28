@@ -241,7 +241,7 @@ var i,o,r:byte;
 begin
    with g_missiles[m] do
    with g_mids[m_mid] do
-     if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then
+     if(ui_CheckMapPointFogVision(m_x,m_y,true))then
      begin
         o:=mid_eid_DeathN[m_eid_DeathType];
         r:=mid_eid_DeathR[m_eid_DeathType];
@@ -250,10 +250,10 @@ begin
            r:=0;
            o:=1;
         end;
-        for i:=1 to o do effect_add(m_vx-random(r)+random(r),
-                                    m_vy-random(r)+random(r),draw_DefaultSpriteDepth(m_vy,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
+        for i:=1 to o do effect_add(m_x-random(r)+random(r),
+                                    m_y-random(r)+random(r),draw_DefaultSpriteDepth(m_y,m_mfs)+100,mid_eid_death[m_eid_DeathType]);
 
-        if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_vx,m_vy,sd_liquidFront+m_vy,mid_eid_Decal);
+        if(m_mfe=uf_ground)and(mid_eid_Decal>0)then effect_add(m_x,m_y,sd_liquidFront+m_y,mid_eid_Decal);
 
         if(mid_snd_DeathSkip[m_eid_DeathType]>0)then
           if(random(mid_snd_DeathSkip[m_eid_DeathType])>0)then exit;
@@ -268,12 +268,12 @@ var  m:integer;
 begin
    for m:=0 to MaxMissiles do
      with g_missiles[m] do
-       if(ui_CheckMapPointFogVision(m_vx,m_vy,true))then
+       if(ui_CheckMapPointFogVision(m_x,m_y,true))then
          with g_mids[m_mid] do
            if(m_vstep>0)then
            begin
               spr:=SpriteModel2Sprite(mid_SpriteModel,sms_stand,m_dir,0,nil);
-              SpriteList_AddEffect(m_vx,m_vy,draw_DefaultSpriteDepth(m_vy,m_mfs)+100,0,spr,255);
+              SpriteList_AddEffect(m_x,m_y,draw_DefaultSpriteDepth(m_y,m_mfs)+100,0,spr,255);
            end;
 end;
 

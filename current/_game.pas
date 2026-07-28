@@ -918,9 +918,9 @@ begin
                           end
                       else
                         case o_x0 of
-                        co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_NeedProdUnit ,-1,-1);
+                        co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_unit_NeedProdUnit ,-1,-1);
                         co_cupgrade: ;
-                        co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_NeedProdUnit ,-1,-1);
+                        co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_unit_NeedProdUnit ,-1,-1);
                         co_cunit   : ;
                         co_pcancle : GameLog_ReqMsg(tPlayer,0   ,255             ,lmt_Invalid_Order,-1,-1);
                         co_ability : if(toall_n=0)and(toall_msg>0)then
@@ -997,9 +997,16 @@ begin
                 trevealed:=(units_builders_e=0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF};
                 if(not isrevealed)and(trevealed)then
                 begin
-                   GameLog_PlayerRevealed(p);
                    isrevealed:=trevealed;
-                end;
+                   GameLog_PlayerRevealed(p);
+                end
+                else
+                  if(isrevealed)and(not trevealed)then
+                  begin
+                     isrevealed:=trevealed;
+                     GameLog_PlayerRevealed(p);
+                  end;
+
 
                 game_PlayerExecuteOrder(p);
 
@@ -1408,7 +1415,7 @@ end;
 
 {$include _net_game.pas}
 
-procedure GameRoyalUpdateR;
+procedure game_RoyalUpdateR;
 var gtick:longint;
 begin
    gtick:=longint(g_tick) div fr_fpsh;
@@ -1425,6 +1432,10 @@ begin
    g_royal_RMMx:= round(g_royal_Rx*map_MiniMap_cx);
    g_royal_RMMy:= round(g_royal_Ry*map_MiniMap_cx);
    {$ENDIF}
+   g_royal_Rmax:= round(max2i(max2i(point_dist_int(g_royal_Rx,g_royal_Ry,0        ,0        ),
+                                    point_dist_int(g_royal_Rx,g_royal_Ry,0        ,map_Size1)),
+                              max2i(point_dist_int(g_royal_Rx,g_royal_Ry,map_Size1,0        ),
+                                    point_dist_int(g_royal_Rx,g_royal_Ry,map_Size1,map_Size1))));
 end;
 
 procedure GameMain;
@@ -1476,7 +1487,7 @@ begin
 
       case map_scenario of
       mc_KeyPoints: map_KeyPoints_UpdatePos;
-      mc_royale   : GameRoyalUpdateR;
+      mc_royale   : game_RoyalUpdateR;
       end;
 
       {$IFDEF _FULLGAME}

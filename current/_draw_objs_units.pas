@@ -419,6 +419,15 @@ end;
 //    UI LAYER UNIT MARKS
 //
 
+{procedure unit_DebugMark(pu:PTUnit);
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+     if(m_UnitTargetN=unum)then
+       UnitsInfo_AddLine(x,y,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
+end;  }
+
 procedure unit_UIMarks(pu:PTUnit);
 var
 i:byte;
@@ -649,9 +658,13 @@ begin
       if(buffs[ub_SphereDDamage]>0)then ColorAura:=c_ared;
       if(buffs[ub_SphereTurbo  ]>0)then ColorAura:=c_aorange;
 
+      if(isfly or not uid_isbuilding)and(uid_eid_SprFloating)and(iscomplete)and(transformTimer<=0)
+      then float_y:=unit_floating_p[(g_tick+word(unum*5)) mod unit_floating_ticks]
+      else float_y:=0;
+
       if(uid_eid_SummonSpr[level]<>nil)then
         if(buffs[ub_Summoned]>0)then
-          SpriteList_AddUnit(vx,vy,spr_depth+1,0,0,ColorAura,uid_eid_SummonSpr[level],mm3i(0,buffs[ub_Summoned]*4,255));
+          SpriteList_AddUnit(vx,vy+float_y,spr_depth+1,0,0,ColorAura,uid_eid_SummonSpr[level],mm3i(0,buffs[ub_Summoned]*4,255));
 
       if(iscomplete)and(transformTimer<=0)then
       begin
@@ -664,6 +677,7 @@ begin
                          end;
            end;
 
+         vy+=float_y;
          case uidi of
          UID_UGTurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then
                                if(upgrs_cur[upgr_uac_TurretPlasma]>0)
@@ -674,9 +688,11 @@ begin
          UID_UACommandCenter,
          UID_UCommandCenter: if(upgrs_cur[upgr_uac_CCAttack]>0)then
                                with uid_arms[0] do
-                                    SpriteList_AddUnit(vx+aw_offset_x,vy+aw_offset_y,
-                                                                spr_depth,0,0,0,@spr_ptur,spr_alpha);
+                                    SpriteList_AddUnit(vx+aw_offset_x,
+                                                       vy+aw_offset_y,
+                                                       spr_depth,0,0,0,@spr_ptur,spr_alpha);
          end;
+         vy-=float_y;
       end
       else
         if(uid_eid_bcrater>0)and(uid_eid_BuildHellType)then
@@ -691,10 +707,6 @@ begin
       if(ui_ColoredShadow)
       then ColorShadow:=PlayerGetColorCur(playeri,true)
       else ColorShadow:=c_ablack;
-
-      if(isfly)and(uid_eid_SprFloating)
-      then float_y:=unit_floating_p[(g_tick+word(unum*5)) mod unit_floating_ticks]
-      else float_y:=0;
 
       SpriteList_AddUnit(vx,vy+float_y,spr_depth,shadowz-float_y,ColorShadow,ColorAura,spr,spr_alpha);
    end;
@@ -733,6 +745,7 @@ begin
           begin
              if(playeri=UIPlayer)then unit_UIMarks(pu);
              unit_AddSpriteAlive(pu,noanim);
+             //unit_DebugMark(pu);
           end;
    end;
 

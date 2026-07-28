@@ -725,15 +725,15 @@ begin
    replay_IsPaused:=(g_status=gs_replaypause)or((gs_paused0<=g_status)and(g_status<=gs_paused7));
 end;
 
-function replay_Pause(check:boolean):boolean;
+function replay_TogglePause(check:boolean):boolean;
 begin
-   replay_Pause:=false;
+   replay_TogglePause:=false;
 
    if(rpls_file_pos>=rpls_file_size)then exit;
 
    if(g_status=gs_running)then
    begin
-      replay_Pause:=true;
+      replay_TogglePause:=true;
       if(check)then exit;
 
       g_status:=gs_replaypause;
@@ -742,7 +742,7 @@ begin
    else
      if(replay_IsPaused)then
      begin
-        replay_Pause:=true;
+        replay_TogglePause:=true;
         if(check)then exit;
 
         g_status:=gs_running;

@@ -360,8 +360,8 @@ TMID = record
 end;
 
 TMissile = record
+   m_tox,m_toy,
    m_x,m_y,
-   m_vx,m_vy,
    m_damage,
    m_vstep,m_hvstep,
    m_tar,
@@ -520,7 +520,6 @@ TUID = record
                          : boolean;
 
    uid_client_WReload,
-   uid_client_WCastTarget,
    uid_NoOrderWhenCast,
    uid_FlyLevelLikeTarget,
    uid_HaveRallyPoint,
@@ -616,12 +615,14 @@ TUpgrade = record  // upgrade
    upgr_max      : byte;
 
    {$IFDEF _FULLGAME}
-   upgr_btn      : TMWTexture;
+   upgr_btnBig   : TMWTexture;
 
    upgr_str_Name,
    upgr_str_NameHK,
    upgr_str_Descript,
    upgr_str_Reqs : shortstring;
+
+   upgr_HintDoc  : TUIStringList;
    {$ENDIF}
 end;
 

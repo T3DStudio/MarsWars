@@ -73,35 +73,61 @@ begin
            menu_MouseXY2Item:=i;
 end;
 
-function menu_HelpSelectUID(mi:byte;forBalance:boolean=false):byte;
+function menu_HelpIDScrollSize(mi_page:byte):integer;
+var
+u,i:byte;
+begin
+   menu_HelpIDScrollSize:=0;
+   i:=0;
+   for u:=1 to 255 do
+   begin
+      case mi_page of
+      mi_help_UnitsBalance,
+      mi_help_UnitsInfo   : if(not menudoc_ValidForTableUnit(u,mi_page=mi_help_UnitsBalance))then continue;
+      mi_help_UpgradesInfo: if(not menudoc_ValidForTableUpgrade(u))then continue;
+      end;
+      i+=1;
+   end;
+   if((i mod menu_HelpIDBlockBTNW)>0)then i+=menu_HelpIDBlockBTNW;
+   i+=menu_HelpIDBlockBTNW;
+   menu_HelpIDScrollSize:=(i div menu_HelpIDBlockBTNW)*menu_HelpIDBTNw;
+end;
+
+function menu_HelpSelectID(mi,mi_page:byte):byte;
 var
 tx,ty:integer;
 u    :byte;
 begin
-   menu_HelpSelectUID:=0;
-   menu_HelpScroll:=0;
+   menu_HelpSelectID:=0;
+   menu_HelpILScroll:=0;
    with menu_items[mi] do
    begin
       tx:=mi_x0;
-      ty:=mi_y0;
+      ty:=mi_y0-menu_HelpUIDScroll;
       for u:=1 to 255 do
-        with g_uids[u] do
-          if(IsUIDValidForHelpTable(u,forBalance))then
-          begin
-             if (tx<=mouse_x)and(mouse_x<=(tx+ui_ButtonWh))
-             and(ty<=mouse_y)and(mouse_y<=(ty+ui_ButtonWh))then
-             begin
-                menu_HelpSelectUID:=u;
-                exit;
-             end;
+      begin
+         case mi_page of
+         mi_help_UnitsBalance,
+         mi_help_UnitsInfo   : if(not menudoc_ValidForTableUnit(u,mi_page=mi_help_UnitsBalance))then continue;
+         mi_help_UpgradesInfo: if(not menudoc_ValidForTableUpgrade(u))then continue;
+         end;
 
-             tx+=ui_ButtonWh;
-             if(tx>=mi_x1)then
-             begin
-                tx:=mi_x0;
-                ty+=ui_ButtonWh;
-             end;
-          end;
+         if(ty>=mi_y0)then
+           if (tx<=mouse_x)and(mouse_x<=(tx+menu_HelpIDBTNw))
+           and(ty<=mouse_y)and(mouse_y<=(ty+menu_HelpIDBTNw))then
+           begin
+              menu_HelpSelectID:=u;
+              exit;
+           end;
+
+         tx+=menu_HelpIDBTNw;
+         if(tx>=mi_x1)then
+         begin
+            tx:=mi_x0;
+            ty+=menu_HelpIDBTNw;
+            if(ty>=mi_y1)then exit;
+         end;
+      end;
    end;
 end;
 
@@ -123,6 +149,17 @@ procedure menu_ToggleFullScreen;
 begin
    vid_windowed:=not vid_windowed;
    vid_MakeScreen;
+end;
+
+procedure menu_ApplyResolution(nw,nh:integer);
+begin
+   vid_vw:=max2i(vid_minw,nw);menu_ResolutionWi:=vid_vw;
+   vid_vh:=max2i(vid_minh,nh);menu_ResolutionHi:=vid_vh;
+
+   vid_MakeScreen;
+   theme_map_pTerrain:=255;
+   gfx_MapMakeTerrain;
+   menu_update:=true;
 end;
 
 procedure menu_ToggleRecord;
@@ -471,19 +508,19 @@ begin
    gapX:=0;
    if(n>1)then
    begin
-      gapX:=(menu_w-menu_BaseW1-(menu_BigButtonW*n)) div (n-1);
+      gapX:=(menu_w-menu_BaseW1-(menu_BigButtonW1*n)) div (n-1);
       if(gapX>menu_BaseW1)then gapX:=menu_BaseW1;
-      mtx0  :=menu_hw-((menu_BigButtonW*n)+gapX*(n-1)) div 2;
+      mtx0  :=menu_hw-((menu_BigButtonW1*n)+gapX*(n-1)) div 2;
    end
-   else mtx0:=menu_hw-(menu_BigButtonW div 2);
+   else mtx0:=menu_hw-(menu_BigButtonW1 div 2);
 
-   if(b1>0)then begin menu_Item_Set(b1,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b2>0)then begin menu_Item_Set(b2,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b3>0)then begin menu_Item_Set(b3,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b4>0)then begin menu_Item_Set(b4,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b5>0)then begin menu_Item_Set(b5,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b6>0)then begin menu_Item_Set(b6,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mtx0+=menu_BigButtonW+gapX;end;
-   if(b7>0)then begin menu_Item_Set(b7,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);                           end;
+   if(b1>0)then begin menu_Item_Set(b1,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
+   if(b2>0)then begin menu_Item_Set(b2,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
+   if(b3>0)then begin menu_Item_Set(b3,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
+   if(b4>0)then begin menu_Item_Set(b4,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
+   if(b5>0)then begin menu_Item_Set(b5,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
+   if(b6>0)then begin menu_Item_Set(b6,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
+   if(b7>0)then begin menu_Item_Set(b7,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);                           end;
 end;
 
 procedure menu_page_TopCaption(mi:byte);
@@ -506,7 +543,7 @@ begin
 
    mtx0:=mtx1+menu_BaseW1;
    mtx1:=menu_w-menu_BaseW1;
-   menu_Item_Set(mi_SaveLoad_info   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
+   menu_Item_Set(mi_SaveLoad_info   ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0-menu_ListLineH*2,true,255);
 
    with menu_items[mi_SaveLoad_list] do
    menu_Item_Set(mi_SaveLoad_fname  ,mi_x0,mi_y1,mi_x1,mi_y1+menu_ListLineH,true);
@@ -533,7 +570,7 @@ begin
 
    mtx0:=mtx1+menu_BaseW1;
    mtx1:=menu_w-menu_BaseW1;
-   menu_Item_Set(mi_Replays_info    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0,true,255);
+   menu_Item_Set(mi_Replays_info    ,mtx0,menu_underCaptionY,mtx1,menu_underCaptionY+mty0-menu_ListLineH*2,true,255);
 
    menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0,0);
 
@@ -548,12 +585,12 @@ begin
 
    mtx0:=menu_border1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_settings_Game   ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
-   menu_Item_Set(mi_settings_Record ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
-   menu_Item_Set(mi_settings_Video  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BaseW1;
-   menu_Item_Set(mi_settings_Sound  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);
+   menu_Item_Set(mi_settings_Game   ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BaseW1;
+   menu_Item_Set(mi_settings_Record ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BaseW1;
+   menu_Item_Set(mi_settings_Video  ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BaseW1;
+   menu_Item_Set(mi_settings_Sound  ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);
 
-   mtx0:=menu_border1+menu_BigButtonW+menu_BaseW1;
+   mtx0:=menu_border1+menu_BigButtonW1+menu_BaseW1;
    mtx1:=menu_w-menu_border1;
    mty0:=menu_underCaptionY;
 
@@ -589,8 +626,7 @@ begin
                           menu_Item_Set(mi_SV_Windowed        ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                                                                                                      mty0+=menu_SmallW;
                           menu_Item_Set(mi_SV_ShowFPS         ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SV_MenuScaling     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
-                          menu_Item_Set(mi_SV_SmoothScaled    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);
+                          menu_Item_Set(mi_SV_MenuScaling     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);
                        end;
    mi_settings_Sound : begin
                           menu_Item_Set(mi_SS_SoundVolume     ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
@@ -614,14 +650,15 @@ begin
 
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
-   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW,mty0+menu_BigButtonH,true);mty0+=menu_BigButtonH+menu_BigButtonHh;
+   menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_UpgradesInfo ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_Other        ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
 
    case menu_HelpPage of
    mi_help_GameControls,
@@ -630,32 +667,36 @@ begin
    mi_help_GameUI,
    mi_help_Other,
    mi_help_Credits     : begin
-                            tx:=mtx0+menu_BigButtonW+menu_BaseW1;
+                            tx:=mtx0+menu_BigButtonW1+menu_BaseW1;
                             menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
-                                                           tx+(ui_DocLineLen2*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH,true);
-                            //
+                                                           tx+(ui_DocLineLen2*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH1,true);
                             case menu_HelpPage of
-                            mi_help_GameUI       : menu_Item_Set(mi_help_GameUIImg1,tx                ,menu_underCaptionY-menu_BigButtonHh,
-                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);
+                            mi_help_GameUI       : begin
+                                                   menu_Item_Set(mi_help_ImgUI        ,tx                   ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                       tx+menu_BigButtonWImg,menu_underCaptionY                 ,true);tx+=menu_BigButtonWImg;
+                                                   menu_Item_Set(mi_help_ImgUUpgrade  ,tx                   ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                       tx+menu_BigButtonWImg,menu_underCaptionY                 ,true);
+                                                   end;
                             mi_help_GameMechanics: begin
-                                                   menu_Item_Set(mi_help_GameUIImg1,tx                ,menu_underCaptionY-menu_BigButtonHh,
-                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);tx+=menu_BigButtonW;
-                                                   menu_Item_Set(mi_help_GameUIImg2,tx                ,menu_underCaptionY-menu_BigButtonHh,
-                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);tx+=menu_BigButtonW;
-                                                   menu_Item_Set(mi_help_GameUIImg3,tx                ,menu_underCaptionY-menu_BigButtonHh,
-                                                                                    tx+menu_BigButtonW,menu_underCaptionY                 ,true);
+                                                   menu_Item_Set(mi_help_ImgGenerators,tx                   ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                       tx+menu_BigButtonWImg,menu_underCaptionY                 ,true);tx+=menu_BigButtonWImg;
+                                                   menu_Item_Set(mi_help_ImgKeyPoints ,tx                   ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                       tx+menu_BigButtonWImg,menu_underCaptionY                 ,true);tx+=menu_BigButtonWImg;
+                                                   menu_Item_Set(mi_help_ImgKotH      ,tx                   ,menu_underCaptionY-menu_BigButtonHh,
+                                                                                       tx+menu_BigButtonWImg,menu_underCaptionY                 ,true);
                                                    end;
                             end;
                          end;
+   mi_help_UpgradesInfo,
    mi_help_UnitsBalance,
    mi_help_UnitsInfo   : begin
-                            tx:=mtx0+menu_BigButtonW+menu_BaseW1;
+                            tx:=mtx0+menu_BigButtonW1+menu_BaseW1;
                             menu_Item_Set(mi_help_InfoPanel,tx,menu_underCaptionY,
-                                                            tx+ui_ButtonWh*menu_HelpUnitsBTNsL,menu_underCaptionY+ui_ButtonWh*15,true);
+                                                            tx+menu_HelpIDBlockW,menu_underCaptionY+menu_HelpIDBlockH,true);
 
                             tx:=menu_items[mi_help_InfoPanel].mi_x1+menu_BaseWh;
                             menu_Item_Set(mi_help_InfoList,tx,menu_underCaptionY,
-                                                           tx+(ui_DocLineLen1*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH,true);
+                                                           tx+(ui_DocLineLen1*font_w1)+font_w1,menu_LowerBorderY-menu_BigButtonH1,true);
                          end;
    end;
 
@@ -753,13 +794,13 @@ begin
 
    menu_Item_Set(mi_Game_FixedPositions,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Game_AISlots       ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
-   menu_Item_Set(mi_Game_NewObservers   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
-                                                                       mty0+=menu_ListLineH;
+   menu_Item_Set(mi_Game_NewObservers  ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
+                                                                                 mty0+=menu_ListLineH;
    menu_Item_Set(mi_Game_Random        ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);
 
    menu_items[mi_Game_FixedPositions].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Game_AISlots       ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
-   menu_items[mi_Game_NewObservers   ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
+   menu_items[mi_Game_NewObservers  ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Game_Random        ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
 end;
 
@@ -849,8 +890,8 @@ begin
 
    menu_page_BottomButtons(btns[0],btns[1],btns[2],btns[3],btns[4],btns[5],btns[6]);
 
-   menu_Item_Set(mi_UnderBottomInfoLine,0     ,menu_h-menu_StepFromBottom-menu_BigButtonH*2,
-                                        menu_w,menu_h-menu_StepFromBottom-menu_BigButtonH  ,true);
+   menu_Item_Set(mi_UnderBottomInfoLine,0     ,menu_h-menu_StepFromBottom-menu_BigButtonH1*2,
+                                        menu_w,menu_h-menu_StepFromBottom-menu_BigButtonH1  ,true);
 
    // PLAYERS BLOCK
    menu_page_Scirmish_Players (menu_BaseW1h              -font_w1h,
@@ -877,11 +918,11 @@ begin
 
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
-   menu_Item_Set(mi_camp_Difficulty ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_BigButtonH,not g_started);mty0+=menu_BigButtonH+menu_BigButtonH;
-   menu_Item_Set(mi_camp_Campaigns  ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_CampListH ,not g_started);mty0+=menu_BigButtonH+menu_CampListH;
-   menu_Item_Set(mi_camp_Missions   ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_MissListH ,not g_started);//mty0+=menu_BigButtonH+menu_MissListH;
+   menu_Item_Set(mi_camp_Difficulty ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_BigButtonH1,not g_started);mty0+=menu_BigButtonH1+menu_BigButtonH1;
+   menu_Item_Set(mi_camp_Campaigns  ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_CampListH  ,not g_started);mty0+=menu_BigButtonH1+menu_CampListH;
+   menu_Item_Set(mi_camp_Missions   ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_MissListH  ,not g_started);//mty0+=menu_BigButtonH1+menu_MissListH;
    mtx0:=menu_BaseW2+menu_CampListW;
-   menu_Item_Set(mi_camp_MissionInfo,mtx0,menu_underCaptionY,menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH,not g_started);
+   menu_Item_Set(mi_camp_MissionInfo,mtx0,menu_underCaptionY,menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH1,not g_started);
 
    if(g_started)
    then menu_page_BottomButtons(mi_back,mi_SaveLoad,mi_Settings,mi_Help,mi_Break   ,0,0)
@@ -1144,19 +1185,10 @@ mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality,true,0,rpls_
 
 mi_SV_ResolutionW      :;
 mi_SV_ResolutionH      :;
-mi_SV_ResolutionApply  : if(not check)then
-                         begin
-                            vid_vw:=max2i(vid_minw,menu_ResolutionWi);menu_ResolutionWi:=vid_vw;
-                            vid_vh:=max2i(vid_minh,menu_ResolutionHi);menu_ResolutionHi:=vid_vh;
-
-                            vid_MakeScreen;
-                            theme_map_pTerrain:=255;
-                            gfx_MapMakeTerrain;
-                         end;
+mi_SV_ResolutionApply  : if(not check)then menu_ApplyResolution(menu_ResolutionWi,menu_ResolutionHi);
 mi_SV_Windowed         : if(not check)then menu_ToggleFullScreen;
 mi_SV_ShowFPS          : if(not check)then vid_ShowFPS:=not vid_ShowFPS;
-mi_SV_MenuScaling      : if(not check)then menu_scale:=not menu_scale;
-mi_SV_SmoothScaled     : if(not check)then menu_ScaleSmooth:=not menu_ScaleSmooth;
+mi_SV_MenuScaling      : if(not check)then menu_scale :=not menu_scale;
 
 // SETTINGS SOUND
 
@@ -1225,7 +1257,7 @@ mi_Map_Random          : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_
 
 mi_Game_FixedPositions : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GFixedPositions,true,false);
 mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots       ,true,false);
-mi_Game_NewObservers    : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GNewObservers   ,true,false);
+mi_Game_NewObservers   : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GNewObservers   ,true,false);
 mi_Game_Random         : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GRandomScirmish,true,false);
 
 // SCIRMISH MULTIPLAYER
@@ -1251,58 +1283,72 @@ mi_help_GameHotKeys,
 mi_help_GameUI,
 mi_help_UnitsInfo,
 mi_help_UnitsBalance,
+mi_help_UpgradesInfo,
 mi_help_Other,
 mi_help_Credits
                        : if(not check)then
                          begin
-                            menu_HelpPage  :=item;
-                            menu_HelpScroll:=0;
-                            menu_HelpIList :=nil;
+                            menu_HelpPage     :=item;
+                            menu_HelpUIDH     :=0;
+                            menu_HelpUIDScroll:=0;
+                            menu_HelpILScroll :=0;
+                            menu_HelpIList    :=nil;
                             case menu_HelpPage of
                             mi_help_GameControls : menu_HelpIList:=@str_doc_BaseControls;
                             mi_help_GameMechanics: menu_HelpIList:=@str_doc_BaseMechanics;
                             mi_help_GameHotKeys  : menu_HelpIList:=@str_doc_HotKeys;
                             mi_help_GameUI       : menu_HelpIList:=@str_doc_GameUI;
-                            mi_help_UnitsBalance : if(not IsUIDValidForHelpTable(menu_HelpUID,true))then menu_HelpUID:=0;
-                            mi_help_UnitsInfo    : menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
+                            mi_help_UnitsBalance : if(menudoc_ValidForTableUnit(menu_HelpUID,true))
+                                                   then menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc
+                                                   else menu_HelpUID:=0;
+                            mi_help_UnitsInfo    : if(menudoc_ValidForTableUnit(menu_HelpUID,false))
+                                                   then menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc
+                                                   else menu_HelpUID:=0;
+                            mi_help_UpgradesInfo : if(menudoc_ValidForTableUpgrade(menu_HelpUID))
+                                                   then menu_HelpIList:=@g_upgrs[menu_HelpUID].upgr_HintDoc
+                                                   else menu_HelpUID:=0;
                             mi_help_Other        : menu_HelpIList:=@str_doc_Other;
                             mi_help_Credits      : menu_HelpIList:=@str_doc_Credits;
+                            end;
+
+                            case menu_HelpPage of
+                            mi_help_UnitsBalance,
+                            mi_help_UnitsInfo,
+                            mi_help_UpgradesInfo : menu_HelpUIDH:=menu_HelpIDScrollSize(menu_HelpPage)-menu_HelpIDBlockH;
                             end;
                          end;
 mi_help_InfoPanel      : case menu_HelpPage of
                          mi_help_UnitsBalance,
-                         mi_help_UnitsInfo : if(not check)then
-                                             begin
-                                                menu_HelpUID  :=menu_HelpSelectUID(item,menu_HelpPage=mi_help_UnitsBalance);
-                                                menu_HelpIList:=@g_uids[menu_HelpUID].uid_HintDoc;
-                                             end;
+                         mi_help_UnitsInfo,
+                         mi_help_UpgradesInfo: if(not check)then
+                                               begin
+                                                  menu_HelpUID:=menu_HelpSelectID(item,menu_HelpPage);
+                                                  if(menu_HelpPage=mi_help_UpgradesInfo)
+                                                  then menu_HelpIList:=@g_upgrs[menu_HelpUID].upgr_HintDoc
+                                                  else menu_HelpIList:=@g_uids [menu_HelpUID].uid_HintDoc;
+                                               end;
                          else menu_Controls_MLB:=false;
                          end;
-mi_help_GameUIImg1     : if(not check)then
-                           case menu_HelpPage of
-                           mi_help_GameUI       : begin
-                                                  menu_image        :=spr_doc_ui;
-                                                  menu_image_caption:=str_help_GameUIImg1;
-                                                  end;
-                           mi_help_GameMechanics: begin
-                                                  menu_image        :=spr_doc_Generators;
-                                                  menu_image_caption:=str_help_GameUIImg2;
-                                                  end;
-                           end;
-mi_help_GameUIImg2     : if(not check)then
-                           case menu_HelpPage of
-                           mi_help_GameMechanics: begin
-                                                  menu_image        :=spr_doc_KeyPoint;
-                                                  menu_image_caption:=str_help_GameUIImg3;
-                                                  end;
-                           end;
-mi_help_GameUIImg3     : if(not check)then
-                           case menu_HelpPage of
-                           mi_help_GameMechanics: begin
-                                                  menu_image        :=spr_doc_koth;
-                                                  menu_image_caption:=str_help_GameUIImg4;
-                                                  end;
-                           end;
+mi_help_ImgUI          : if(not check)then begin
+                                           menu_image        :=spr_doc_ui;
+                                           menu_image_caption:=str_help_ImgUI;
+                                           end;
+mi_help_ImgUUpgrade    : if(not check)then begin
+                                           menu_image        :=spr_doc_upgrades;
+                                           menu_image_caption:=str_help_ImgUUpgrade;
+                                           end;
+mi_help_ImgGenerators  : if(not check)then begin
+                                           menu_image        :=spr_doc_Generators;
+                                           menu_image_caption:=str_help_ImgGenerators;
+                                           end;
+mi_help_ImgKeyPoints   : if(not check)then begin
+                                           menu_image        :=spr_doc_KeyPoint;
+                                           menu_image_caption:=str_help_ImgKeyPoints;
+                                           end;
+mi_help_ImgKotH        : if(not check)then begin
+                                           menu_image        :=spr_doc_koth;
+                                           menu_image_caption:=str_help_ImgKotH;
+                                           end;
 // CAMPAIGNS
 mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,true,0,camp_Maxdiff);
 mi_camp_Campaigns      : if(not check)then menu_ListMouseXY2Line(item,@camp_sel    ,camp_scroll    ,menu_CampLineH);
@@ -1377,8 +1423,8 @@ mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll , 10,0,rp
 mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll  ,-2 ,0,menu_ChatSize  -menu_ChatListH  ,false);
 mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
                                            with menu_HelpIList^ do
-                                           ScrollInt(@menu_HelpScroll  , 2 ,0,slist_n        -ui_DocListH     ,false);
-
+                                           ScrollInt(@menu_HelpILScroll, 2 ,0,slist_n        -ui_DocListH     ,false);
+mi_help_InfoPanel      : if(not check)then ScrollInt(@menu_HelpUIDScroll,menu_HelpIDBTNw,0,menu_HelpUIDH      ,false);
 mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,false,1,ui_MaxCamSpeed,false);
 mi_SS_SoundVolume      : if(not check)then
                          begin
@@ -1412,7 +1458,9 @@ mi_Replays_list        : if(not check)then ScrollInt(@rpls_list_scroll ,-10,0,rp
 mi_MP_ChatList         : if(not check)then ScrollInt(@menu_ChatScroll  , 2 ,0,menu_ChatSize  -menu_ChatListH  ,false);
 mi_help_InfoList       : if(not check)then if(menu_HelpIList<>nil)then
                                            with menu_HelpIList^ do
-                                           ScrollInt(@menu_HelpScroll  ,-2 ,0,slist_n        -ui_DocListH     ,false);
+                                           ScrollInt(@menu_HelpILScroll,-2 ,0,slist_n        -ui_DocListH     ,false);
+
+mi_help_InfoPanel      : if(not check)then ScrollInt(@menu_HelpUIDScroll,-menu_HelpIDBTNw,0,menu_HelpUIDH     ,false);
 
 mi_SG_ScrollSpeed      : if(not check)then ScrollByte(@ui_CamSpeed,true,1,ui_MaxCamSpeed,false);
 mi_SS_SoundVolume      : if(not check)then
@@ -1520,8 +1568,8 @@ end;
 begin
    mnx:=mouse_x;
    mny:=mouse_y;
-   mouse_x:=round((mouse_x-menu_sc_x)*menu_sc_cx);
-   mouse_y:=round((mouse_y-menu_sc_y)*menu_sc_cx);
+   mouse_x:=round((mouse_x-menu_Surface_x)*menu_Surface_sc);
+   mouse_y:=round((mouse_y-menu_Surface_y)*menu_Surface_sc);
 
    clickSound:=false;
    changed:=false;
@@ -1624,7 +1672,8 @@ begin
              SetSelectedItem(mi_SaveLoad_list  );
              SetSelectedItem(mi_Replays_list   );
              SetSelectedItem(mi_MP_ChatList    );
-             SetSelectedItem(mi_help_InfoList  );
+             SetSelectedItem(mi_help_InfoList ,true);
+             SetSelectedItem(mi_help_InfoPanel,true);
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);
@@ -1648,7 +1697,8 @@ begin
              SetSelectedItem(mi_SaveLoad_list  );
              SetSelectedItem(mi_Replays_list   );
              SetSelectedItem(mi_MP_ChatList    );
-             SetSelectedItem(mi_help_InfoList  );
+             SetSelectedItem(mi_help_InfoList ,true);
+             SetSelectedItem(mi_help_InfoPanel,true);
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);

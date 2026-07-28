@@ -42,7 +42,6 @@ ai_HaveTransport
 ai_generator_kp,
 ai_keypoint_kp       : pTKeyPoint;
 
-ai_generators_limit,
 ai_enemylimit_baseR2_grd,
 ai_enemylimit_baseR2_fly,
 
@@ -74,9 +73,7 @@ ai_UpgradesLeft,
 ai_AvailableDetectors,
 ai_generator_d,
 ai_generator_w,
-ai_generator_n,
 ai_keypoint_d,
-ai_keypoint_n,
 
 
 ai_commander_grd_d,
@@ -200,7 +197,7 @@ ai_Strike_w
 
 function ai_IsAvailableUID(player:PTPlayerGameData;uid:byte):boolean;
 begin
-   case CheckUnitReqs(player,uid) of
+   case unit_CheckReqs(player,uid) of
    0,
    lmt_Req_Limit,
    lmt_Req_HellPower,
@@ -510,6 +507,22 @@ var
 i,d,w     :integer;
 l         :longint;
 koth_point:boolean;
+procedure setNearestGen;
+begin
+   if(d<ai_generator_d)then
+   begin
+      ai_generator_d :=d;
+      ai_generator_kp:=@map_KeyPointsL[i];
+   end;
+end;
+procedure setNearestKP;
+begin
+   if(d<ai_keypoint_d)then
+   begin
+      ai_keypoint_d :=d;
+      ai_keypoint_kp:=@map_KeyPointsL[i];
+   end;
+end;
 begin
    with pu^ do
    with uid^ do
@@ -619,122 +632,15 @@ begin
    // key points
    ai_keypoint_kp    := nil;
    ai_keypoint_d     := NOTSET;
-   ai_keypoint_n     := 0;
 
    ai_generator_kp   := nil;
    ai_generator_d    := NOTSET;
    ai_generator_w    := NOTSET;
-   ai_generator_n    := 0;
 
    // energy
    ai_energy_future  := 0;
 
-   ai_generators_limit:=0;
-   // generators limit
-   with pu^.player^ do
-     for i:=1 to 255 do
-       with g_uids[i] do
-         if(not uid_isbuilder)and(uid_gen_EnergyLevel>0)then
-           ai_generators_limit+=units_uid_e[i]*uid_LimitUse;
-
-   // nearest point/generator
-   with pu^ do
-   with uid^ do
-   with player^ do
-     if(map_KeyPointsN>0)then
-       for i:=0 to map_KeyPointsN-1 do
-         with map_KeyPointsL[i] do
-         with kp_TeamData[team] do
-          if(kptd_Active)then
-          begin
-             if(kptd_OwnerPlayer=playeri)then
-             begin
-                if(kp_Energy>0)then
-                begin
-                   ai_energy_future +=kp_Energy;
-                   ai_generator_n   +=1;
-                end
-                else ai_keypoint_n+=1;
-             end;
-             {else
-               if(kptd_TimerOwnerPlayer=playeri)and(kp_Energy>0)
-               then ai_energy_future +=kp_Energy;}
-
-             if(map_scenario=mc_royale)then
-               if(g_royal_RCur<(kp_ToRoyalCD+kp_RCapture))then continue;
-             if(kp_x<=0)
-             or(kp_y<=0)
-             or(kp_x>=map_Size1)
-             or(kp_y>=map_Size1)then continue;
-
-             if(kp_Energy>0)and(uid_isbuilding)then
-             begin
-                d:=point_dist_int(kp_x,kp_y,x,y);
-                if(uid_CanAttack)then
-                begin
-                   if(d<ai_generator_d)then
-                   begin
-                      ai_generator_d :=d;
-                      ai_generator_kp:=@map_KeyPointsL[i];
-                   end;
-                end
-                else
-                  if(kptd_OwnerTeam<>team)and(uid_ability_isradar)then
-                    if((group=8)and(kptd_OwnerPlayer> LastPlayer))
-                    or((group=9)and(kptd_OwnerPlayer<=LastPlayer))then
-                      if(d<ai_generator_d)then
-                      begin
-                         ai_generator_d :=d;
-                         ai_generator_kp:=@map_KeyPointsL[i];
-                      end;
-
-                continue;
-             end;
-
-             if(ai_earlyAttack)and(kp_Energy=map_generators_EnergyS)then continue;
-
-             if(transportM>0)
-             or(not isfly)then
-               if(kp_zone=zone_solid)then continue;
-
-             if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
-             or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
-               if(isfly)
-               or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
-                 ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,point_dist_int(kp_x,kp_y,x,y),kp_zone);
-
-             koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_tick>=keyPoint_KotH_pause);
-
-             if(not koth_point)then
-             begin
-                if(kptd_OwnerTeam=team)and(kptd_OwnerPlayer<>playeri)then continue;
-                if(kptd_Timer>0)then
-                  if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
-                if(kp_LimitTeamP[team]>0)and(kp_LimitPlayerP[playeri]=0)then continue;
-             end;
-
-             d:=point_dist_int(kp_x,kp_y,x,y);
-
-             if(not koth_point)then
-               if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit      +uid_LimitUse))and(d> kp_RCapture))
-               or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
-
-             if(kptd_OwnerTeam<=LastPlayer)
-             or(kp_Energy<=0)
-             then w:=d
-             else
-               if(kp_Energy>map_generators_EnergyS)
-               then w:=d div 3
-               else w:=d div 2;
-
-             case(kp_Energy>0)and(not koth_point)of
-             true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_w,@ai_generator_d,@map_KeyPointsL[i],w,d,pu);
-             false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@ai_keypoint_d ,@map_KeyPointsL[i],w,d,pu);
-             end;
-          end;
-
-  { ai_PhantomWantZombieMe:=false; }
-
+   // zombie
    ai_ZombieTarget_d        := NOTSET;
    ai_ZombieTarget_u        := nil;
 
@@ -808,11 +714,6 @@ begin
    ai_need_UpgrProds        := 0;
 
    ai_curr_Towers           := 0;  // towers
-   with pu^.player^ do
-     for i:=1 to 255 do
-       with g_uids[i] do
-         if(uid_isbuilding)and(uid_CanAttack)and(not uid_isbuilder)then
-           ai_curr_Towers+=units_uid_e[i];
 
    ai_towers_near_AG        := 0;
    ai_towers_near_AA        := 0;
@@ -834,9 +735,150 @@ begin
 
    ai_selfUID_minLevel      :=LastUnitLevel;
    ai_selfUID_nocomplete    :=0;
-   {with pu^ do
+
+   // nearest key point/generator
+   with pu^ do
+   with uid^ do
    with player^ do
-     ai_selfUID_nocomplete  := units_uid_e[uidi]-units_uid_c[uidi]; }
+     if(map_KeyPointsN>0)then
+       for i:=0 to map_KeyPointsN-1 do
+         with map_KeyPointsL[i] do
+         with kp_TeamData[team] do
+          if(kptd_Active)then
+          begin
+             if(kptd_OwnerPlayer=playeri)and(kp_Energy>0)then
+               ai_energy_future +=kp_Energy;
+
+             if(map_scenario=mc_royale)then
+               if(g_royal_RCur<(kp_ToRoyalCD+kp_RCapture))then continue;
+             if(kp_x<=0)
+             or(kp_y<=0)
+             or(kp_x>=map_Size1)
+             or(kp_y>=map_Size1)then continue;
+
+             d:=point_dist_int(kp_x,kp_y,x,y);
+
+             koth_point:=(i=0)and(map_scenario=mc_KotH)and(g_tick>=keyPoint_KotH_pause);
+
+             if(uid_ability_isradar)then
+             begin
+                if(kptd_OwnerTeam=team)then continue;
+
+                if((group=8)and(kptd_OwnerPlayer> LastPlayer))
+                or((group=9)and(kptd_OwnerPlayer<=LastPlayer))then
+                  setNearestGen;
+             end
+             else
+               if(uid_isbuilding)then
+               begin
+                  if (not uid_isbuilder)
+                  and(not uid_isbarrack)
+                  and(not uid_CanAttack)then continue;
+
+                  if(not koth_point)then
+                  begin
+                     if(kp_LimitPlayerP[playeri]>=kp_CaptureLimit)then continue;
+                     if(uid_CanAttack)and(kp_Energy>0)then
+                       if(d<=kp_RCapture)
+                       or((d>kp_RCapture)and(kp_LimitPlayerP[playeri]<kp_CaptureLimit))
+                       then
+                       else continue;
+                  end;
+
+                  case(kp_Energy>0)of
+                  true : setNearestGen;
+                  false: setNearestKP;
+                  end;
+               end
+               else
+               begin
+                  if(ai_earlyAttack)and(kp_Energy=map_generators_EnergyS)then continue;
+
+                  if(transportM>0)
+                  or(not isfly)then
+                    if(kp_zone=zone_solid)then continue;
+
+
+
+                  {
+                  aic_group_Home             = 0;
+                  aic_group_AttackNow        = 1;
+                  aic_group_AttackWait       = 2;
+                  aic_group_Scout            = 3;
+                  aic_group_Transport        = 4;
+                  aic_group_GenAssault       = 5;
+                  aic_group_GenGuard         = 6;
+                  aic_group_GenWait          = 7;
+                  }
+
+                  case group of
+                  aic_group_GenGuard  : setNearestGen;
+                  else
+                    if(not koth_point)then
+                    begin
+                       if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
+                       or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
+                         if(isfly)
+                         or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
+                           ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,d,kp_zone);
+
+                       if(kptd_OwnerTeam=team)then
+                         if(kptd_OwnerPlayer<>playeri)
+                         or(kp_Energy<=0)then continue;
+                       if(kptd_Timer>0)then
+                         if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
+                       if(kp_LimitTeamP[team]>0)and(kp_LimitPlayerP[playeri]=0)then continue;
+                    end;
+
+                    if(not koth_point)and(kp_Energy>0)then
+                      case (transportM>0)or(uid_isbuilder) of
+                      true : begin
+                             l:=kp_LimitPlayerP[playeri]-kp_CaptureLimit;
+                             if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
+                             if(l>=0)then continue;
+                             end;
+                      false: if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit      +uid_LimitUse))and(d> kp_RCapture))
+                             or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
+                      end;
+
+                    if(kptd_OwnerTeam<=LastPlayer)
+                    or(kp_Energy<=0)
+                    then w:=d
+                    else
+                      if(kp_Energy>map_generators_EnergyS)
+                      then w:=d div 3
+                      else w:=d div 2;
+
+                  end;
+               end;
+
+
+             {
+
+             if(not koth_point)and(kp_Energy>0)then
+               case (transportM>0)or(uid_isbuilder) of
+               true : begin
+                      l:=kp_LimitPlayerP[playeri]-kp_CaptureLimit;
+                      if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
+                      if(l>=0)then continue;
+                      end;
+               false: if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit      +uid_LimitUse))and(d> kp_RCapture))
+                      or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
+               end;
+
+             if(kptd_OwnerTeam<=LastPlayer)
+             or(kp_Energy<=0)
+             then w:=d
+             else
+               if(kp_Energy>map_generators_EnergyS)
+               then w:=d div 3
+               else w:=d div 2;
+
+             case(kp_Energy>0)and(not koth_point)of
+             true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_w,@ai_generator_d,@map_KeyPointsL[i],w,d,pu);
+             false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@ai_keypoint_d ,@map_KeyPointsL[i],w,d,pu);
+             end;  }
+          end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

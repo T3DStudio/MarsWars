@@ -85,15 +85,6 @@ begin
      end;
 end;
 
-procedure effect_RStationShot(pu:PTUnit);
-begin
-   with pu^ do
-   begin
-      effect_add(vx,vy-15,draw_DefaultSpriteDepth(vy+10,isfly),EID_Exp2);
-      snd_SoundPlayUnit(snd_bomblaunch,nil,nil)
-   end;
-end;
-
 procedure effect_UnitSummon(pu:PTUnit;pUIVision:pboolean);
 begin
    with pu^ do
@@ -253,12 +244,11 @@ begin
       or(not uid_CanAttack)then exit;
 
       if(check_buffs)then
-      begin
-         if(buffs[ub_SpecPause]>0)then exit;
-         if(not uid_isbuilding)then
-           if(buffs[ub_PainState]>0)
-           or(buffs[ub_Cast]>0)then exit;
-      end;
+        case uid_isbuilding of
+        true : if(buffs[ub_SpecPause]>0)then exit;
+        false: if(buffs[ub_PainState]>0)
+               or(buffs[ub_Cast]>0)then exit;
+        end;
 
       if(IsUnitRange(transportU,nil))then exit;
    end;
@@ -386,8 +376,8 @@ begin
           m_tar:=0;
           if(stop)then
           begin
-             m_x:=m_vx;
-             m_y:=m_vy;
+             m_tox:=m_x;
+             m_toy:=m_y;
              m_vstep:=1;
           end;
        end;
@@ -690,15 +680,13 @@ begin
    ability_CheckTarget_Recall:=true;
 end;
 
-procedure ability_UACStrike_missile(pu:PTUnit);
+procedure ability_UACStrike_missile(playeri:byte;fromx,fromy,tox,toy:integer);
 begin
-   with pu^ do
-   begin
-      missile_add(uo_x,uo_y,vx,vy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
-      {$IFDEF _FULLGAME}
-      effect_RStationShot(pu);
-      {$ENDIF}
-   end;
+   missile_add(tox,toy,fromx,fromy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
+   {$IFDEF _FULLGAME}
+   effect_add(fromx,fromy-15,draw_DefaultSpriteDepth(fromy+10,false),EID_Exp2);
+   snd_SoundPlayUnit(snd_bomblaunch,nil,nil);
+   {$ENDIF}
 end;
 
 procedure unit_ability_spawn(pSpawner:PTUnit;tx,ty:integer;auid:byte);
@@ -861,7 +849,10 @@ begin
 end;
 
 function unit_ability_UACScan(pRadar:PTUnit;x0,y0:integer;check:boolean):byte;
-var u:integer;
+var
+u:integer;
+scanedPlayers:byte;
+tu:PTUnit;
 begin
    with pRadar^ do
    begin
@@ -880,6 +871,19 @@ begin
       uo_x:=x0;
       uo_y:=y0;
       buffs[ub_Cast]:=detection_time;
+
+      scanedPlayers:=0;
+      for u:=1 to MaxUnits do
+      begin
+         tu:=g_punits[u];
+          if(tu^.hits>0)and(tu^.player^.team<>player^.team)and(not IsUnitRange(tu^.transportU,nil))then
+            if(point_dist_int(tu^.x,tu^.y,uo_x,uo_y)<=srange)then
+            begin
+               scanedPlayers:=scanedPlayers or (1 shl tu^.playeri);
+               if(scanedPlayers=255)then break;
+            end;
+      end;
+      GameLog_UACScan(255,scanedPlayers,uo_x,uo_y);
 
       {$IFDEF _FULLGAME}
       effect_ScanSound(pRadar);
@@ -1146,11 +1150,10 @@ begin
       if(check)then exit;
 
       unit_OrderClear(pu,ua_amove);
-      uo_x:=x0;
-      uo_y:=y0;
       buffs[ub_Cast]:=UACStrike_Revealing;
       for p:=0 to LastPlayer do AddToInt(@TeamVision[p],buffs[ub_Cast]);
-      ability_UACStrike_missile(pu);
+      ability_UACStrike_missile(playeri,x,y,x0,y0);
+      GameLog_UACStrike(playeri,x,y,x0,y0);
    end;
 end;
 
@@ -1900,9 +1903,24 @@ begin
    end;
 end;
 
+procedure player_UpgradeFromPlayer(toPlayer,fromPlayer,upgr:byte;x,y:integer);
+var pstate:byte;
+begin
+   with g_PlayersGame[toPlayer] do
+   begin
+      pstate:=upgrs_cur[upgr];
+      upgrs_cur[upgr]:=max2b(upgrs_cur[upgr],g_PlayersGame[fromPlayer].upgrs_cur[upgr]);
+      if(pstate<upgrs_cur[upgr])then GameLog_UpgradeComplete(toPlayer,upgr,x,y);
+   end;
+end;
+
 function unit_TryChangeOwner(pTarget:PTUnit;newOwner:PTPlayerGameData;log,check:boolean):byte;
 var
 newPos:integer;
+old_u :TUnit;
+{$IFDEF _FULLGAME}
+old_uv:TUnitVis;
+{$ENDIF}
 begin
    with pTarget^ do
    with uid^ do
@@ -1921,15 +1939,15 @@ begin
 
    if(log)then GameLog_UnitLost(pTarget);
 
-   g_units   [0]:=pTarget^;
+   old_u :=pTarget^;
    {$IFDEF _FULLGAME}
-   g_unitsVis[0]:=g_unitsVis[pTarget^.unum];
+   old_uv:=g_unitsVis[pTarget^.unum];
    {$ENDIF}
    unit_kill(pTarget,true,false,false,true,false);
 
-   g_units   [newPos]:=g_units[0];
+   g_units   [newPos]:=old_u;
    {$IFDEF _FULLGAME}
-   g_unitsVis[newPos]:=g_unitsVis[0];
+   g_unitsVis[newPos]:=old_uv;
    {$ENDIF}
    with g_units[newPos] do
    begin
@@ -1941,6 +1959,13 @@ begin
 
       unit_TeamReveal (g_punits[newPos],true);
       unit_IncCounters(g_punits[newPos],iscomplete,false);
+
+      with player^ do
+      begin
+         if(UIDHaveAbility(old_u.uidi,uab_UACCCLand  ))
+         or(UIDHaveAbility(old_u.uidi,uab_UACCCLandTo))then player_UpgradeFromPlayer(playeri,old_u.playeri,g_aids[uab_UACCCLandTo].ua_req_upgr,x,y);
+         if(old_u.uidi=UID_UTransport)then player_UpgradeFromPlayer(playeri,old_u.playeri,g_uids[old_u.uidi].uid_TransportMax_upgr,x,y);
+      end;
    end;
    if(log)then
    begin
@@ -2027,7 +2052,7 @@ function unit_start_build(bx,by:integer;buid,bplayer:byte;skipReqCheck:boolean=f
 begin
    if(skipReqCheck)
    then unit_start_build:=0
-   else unit_start_build:=CheckUnitReqs(@g_PlayersGame[bplayer],buid);
+   else unit_start_build:=unit_CheckReqs(@g_PlayersGame[bplayer],buid);
    if(unit_start_build=0)then
      with g_PlayersGame[bplayer] do
        if(CheckBuildPlace(bx,by,0,0,bplayer,buid)=cbp_good)then
@@ -2121,7 +2146,7 @@ begin
      with uid^ do
      with player^ do
      begin
-        unit_ProdStartUnitLine:=CheckUnitReqs(player,puid);
+        unit_ProdStartUnitLine:=unit_CheckReqs(player,puid);
         if(unit_ProdStartUnitLine=0)then
           if(uprod_r[pn]>0)
           then unit_ProdStartUnitLine:=lmt_prod_AllBusy
@@ -2158,7 +2183,7 @@ begin
       or(not uid_isbarrack)
       or(not uid_isbuilding)then exit;
 
-      unit_ProdStartUnit:=lmt_NeedProdUnit;
+      unit_ProdStartUnit:=lmt_unit_NeedProdUnit;
       if not(puid in uid_prod_Units)
       then exit;
    end;
@@ -2236,7 +2261,7 @@ begin
      with uid^ do
      with player^ do
      begin
-        unit_ProdStartUpgradeLine:=CheckUpgradeReqs(player,upid);
+        unit_ProdStartUpgradeLine:=upgrade_CheckReqs(player,upid);
         if(unit_ProdStartUpgradeLine=0)then
           if(pprod_r[pn]>0)
           then unit_ProdStartUpgradeLine:=lmt_prod_AllBusy
@@ -2248,10 +2273,10 @@ begin
 
                prod_upgr_Now+=1;
                prod_upgr_upid[upid]+=1;
-               pprod_e[pn]:=GetUpgradeEnergy(upid,upgrs_cur[upid]+1);
+               pprod_e[pn]:=upgrade_GetEnergy(upid,upgrs_cur[upid]+1);
                energyCur_upgrades+=pprod_e[pn];
                res_energyl_cur   -=pprod_e[pn];
-               pprod_r[pn]:=GetUpgradeTime(upid,upgrs_cur[upid]+1);
+               pprod_r[pn]:=upgrade_GetTime(upid,upgrs_cur[upid]+1);
                pprod_u[pn]:=upid;
             end;
      end;
@@ -2271,7 +2296,7 @@ begin
       or(not uid_isforge)
       or(not uid_isbuilding)then exit;
 
-      unit_ProdStartUpgrade:=lmt_NeedProdUnit;
+      unit_ProdStartUpgrade:=lmt_unit_NeedProdUnit;
       if not(upid in uid_prod_Upgrades)
       then exit;
    end;
@@ -2566,9 +2591,14 @@ begin
          if(pprod_r[i]>0)then
          begin
             tuid:=pprod_u[i];
+            if(upgrs_cur[tuid]>=g_upgrs[tuid].upgr_max)
+            or(upgrs_cur[tuid]>=upgrs_max[tuid])then
+            begin
+               unit_ProdStopUpgradeLine(pu,255,i,false);
+               continue;
+            end;
+
             if(res_energyl_cur<0)
-            or(upgrs_cur[tuid]>=g_upgrs[tuid].upgr_max)
-            or(upgrs_cur[tuid]>=upgrs_max[tuid])
             then
             else
               if(pprod_r[i]=1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF}then

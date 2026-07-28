@@ -77,7 +77,7 @@ begin
              begin
                 d:=point_dist_int(mx,my,o_x,o_y);
                 if(d>o_rO)then continue;
-                if(o_rI<d)and(d<o_rO)then
+                if(o_rI<=d)and(d<o_rO)then
                 begin
                    map_GetZone:=zone_solid;
                    exit;
@@ -203,12 +203,6 @@ begin
    map_Size1   := mm3i(map_MinSize,map_Size1,map_MaxSize);
    map_Sizeh   := map_Size1 div 2;
    map_SizeKPCR:= map_Sizeh-(map_Sizeh div 3);
-
-
-   g_royal_Rmax:= round(max2i(max2i(point_dist_int(g_royal_Rx,g_royal_Ry,0        ,0        ),
-                                    point_dist_int(g_royal_Rx,g_royal_Ry,0        ,map_Size1)),
-                              max2i(point_dist_int(g_royal_Rx,g_royal_Ry,map_Size1,0        ),
-                                    point_dist_int(g_royal_Rx,g_royal_Ry,map_Size1,map_Size1))));
 
    case map_symmetry of
    maps_lineV: if((map_seed mod 2)=0)

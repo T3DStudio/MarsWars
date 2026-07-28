@@ -70,10 +70,8 @@ uses SysUtils, SDL, SDL_Net,crt
 begin
    {st:=st.NegativeInfinity;
    writeln((st<=0),' ',st.IsNan,' ',st.IsNegativeInfinity,' ',st.IsPositiveInfinity,' ',st.IsInfinity);
-
-
    readln;
-   halt;   }
+   halt;}
 
    GameInit;
 

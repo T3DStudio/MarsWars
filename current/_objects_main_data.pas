@@ -287,6 +287,7 @@ begin
    uid_LimitUse        := ul3;
    uid_ability1        := uab_Teleport;
    uid_ability2        := uab_Recall;
+   uid_ability3        := uab_HT2TNoCD;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_issolid         := false;
@@ -353,7 +354,7 @@ begin
    uid_Regen_Base      := BaseRegenh;
    uid_Regen_upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
-   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,0,0,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,dm_AntiHeavy2);
+   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,dm_AntiHeavy2);
 end;
 
 
@@ -809,6 +810,7 @@ UID_Antiaircrafter : begin
                      uid_SightR_upgr    := upgr_uac_UnitSightR;
                      uid_ZombieUID      := UID_ZAntiaircrafter;
                      uid_islight        := false;
+                     uid_ability3       := uab_UAASplash;
                      SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps1,MID_URocket ,0,0                 ,upgr_uac_DistDamage  ,UpgradeDamageBonus1,wtrset_enemy_alive_fly   ,wpr_any,uids_all,[],0,-4,0,dm_AntiFly2);
                      SetWeapon(1,wpt_missle,aw_srange,0,0,fr_fps1,MID_URocket ,0,upgr_uac_SSMWeapon,upgr_uac_DistDamage  ,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,-4,0,dm_AntiUnitBioLight2);
                      end;
@@ -1310,6 +1312,7 @@ begin
    uid_ismech          := true;
    uid_islight         := true;
    uid_ability1        := uab_ToUAGTurret;
+   uid_ability2        := uab_UAASplash;
    uid_ability3        := uab_ToUACDron;
    SetWeapon(0,wpt_missle,aw_fsr+(uid_r*2),0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,0,dm_AntiFly2);
 end;
@@ -1376,6 +1379,7 @@ begin
    uid_req_uid1        := UID_UScienceCenter;
    uid_FastDeathHits   := 1;
    uid_islight         := false;
+   uid_ability3        := uab_UAASplash;
    uid_arms_BonusAntiFlyRange :=-50;
    uid_arms_BonusAntiUnitRange:=50;
    SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fpsq ,MID_SShot  ,0,0                   ,upgr_uac_DistDamage,UpgradeDamageBonus1 ,wtrset_enemy_alive_ground,wpr_any,uids_all,[],0,0,0,dm_AntiUnitBio2);
@@ -1615,8 +1619,6 @@ end;
       uid_client_WReload     :=(g_aids[uid_ability1].ua_reload>0)
                              or(g_aids[uid_ability2].ua_reload>0)
                              or(g_aids[uid_ability3].ua_reload>0);
-      uid_client_WCastTarget :=UIDHaveAbility(i,uab_UACScan     )
-                            or UIDHaveAbility(i,uab_UACStrike   );
 
       uid_AI_GenAssaultGroup :=(uid_AI_TargetWeight<=DefaultTargetWeight)
                             and(uid_TargetWeight   <=DefaultTargetWeight)
@@ -1887,179 +1889,188 @@ begin
 
       case a of
 uab_Teleport        : begin
-                         ua_type        := uat_passive;
-                         ua_reload      := 5*fr_fps1;
-                         ua_rldDec_upgr := upgr_hell_TeleportCD;
-                         ua_rldDec_upgrS:= fr_fps1;
+                         ua_type         := uat_passive;
+                         ua_reload       := 5*fr_fps1;
+                         ua_rldDec_upgr  := upgr_hell_TeleportCD;
+                         ua_rldDec_upgrS := fr_fps1;
                       end;
 uab_Recall          : begin
-                         ua_type        := uat_UnitOwn;
-                         ua_reload      := 5*fr_fps1;
-                         ua_rldDec_upgr := upgr_hell_TeleportCD;
-                         ua_rldDec_upgrS:= fr_fps1;
+                         ua_type         := uat_UnitOwn;
+                         ua_reload       := 5*fr_fps1;
+                         ua_rldDec_upgr  := upgr_hell_TeleportCD;
+                         ua_rldDec_upgrS := fr_fps1;
                       end;
 uab_UACScan         : begin
-                         ua_type        := uat_Point;
-                         ua_reload      := 60*fr_fps1;
-                         ua_rldDec_level:= 5*fr_fps1;
-                         ua_req_upgr    := upgr_uac_ADetection;
+                         ua_type         := uat_Point;
+                         ua_reload       := 60*fr_fps1;
+                         ua_rldDec_level := 5*fr_fps1;
+                         ua_req_upgr     := upgr_uac_ADetection;
                       end;
 uab_UACStrike       : begin
-                         ua_type        := uat_Point;
-                         ua_reload      := 60*fr_fps1;
-                         ua_rldDec_level:= 5*fr_fps1;
+                         ua_type         := uat_Point;
+                         ua_reload       := 60*fr_fps1;
+                         ua_rldDec_level := 5*fr_fps1;
                       end;
 
 uab_HEyeVision      : begin
-                         ua_type        := uat_UnitAlly;
-                         ua_reload      := 60*fr_fps1;
-                         ua_req_upgr    := upgr_hell_ADetection;
+                         ua_type         := uat_UnitAlly;
+                         ua_reload       := 60*fr_fps1;
+                         ua_req_upgr     := upgr_hell_ADetection;
                       end;
 uab_HEyeSpawn       : begin
-                         ua_type        := uat_Point;
-                         ua_reload      := 60*fr_fps1;
-                         ua_req_upgr    := upgr_hell_ADetection;
+                         ua_type         := uat_Point;
+                         ua_reload       := 60*fr_fps1;
+                         ua_req_upgr     := upgr_hell_ADetection;
                       end;
 uab_HTowerBlink     : begin
-                         ua_type        := uat_Point;
-                         ua_reload      := 30*fr_fps1;
-                         ua_req_upgr    := upgr_hell_TowerBlink;
+                         ua_type         := uat_Point;
+                         ua_reload       := 30*fr_fps1;
+                         ua_req_upgr     := upgr_hell_TowerBlink;
                       end;
 uab_HKeepAura       : begin
-                         ua_type        := uat_Passive;
-                         ua_req_upgr    := upgr_hell_DecayAura;
+                         ua_type         := uat_Passive;
+                         ua_req_upgr     := upgr_hell_DecayAura;
                       end;
 uab_HKeepShift      : begin
-                         ua_type        := uat_Point;
-                         ua_req_upgr    := upgr_hell_HKeepShift;
+                         ua_type         := uat_Point;
+                         ua_req_upgr     := upgr_hell_HKeepShift;
                       end;
 
 uab_SphereSoul      : begin
-                         ua_type        := uat_UnitAlly;
+                         ua_type         := uat_UnitAlly;
                          ua_req_HellPower:= 1000;
                       end;
 uab_SphereInvis     : begin
-                         ua_type        := uat_UnitAlly;
+                         ua_type         := uat_UnitAlly;
                          ua_req_HellPower:= 2000;
                       end;
 uab_SphereInvuln    : begin
-                         ua_type        := uat_UnitAlly;
+                         ua_type         := uat_UnitAlly;
                          ua_req_HellPower:= 9000;
                       end;
 uab_SphereRDamage   : begin
-                         ua_type        := uat_UnitAlly;
+                         ua_type         := uat_UnitAlly;
                          ua_req_HellPower:= 6000;
                       end;
 uab_SphereDDamage   : begin
-                         ua_type        := uat_UnitAlly;
+                         ua_type         := uat_UnitAlly;
                          ua_req_HellPower:= 9000;
                       end;
 uab_SphereTurbo     : begin
-                         ua_type        := uat_UnitAlly;
+                         ua_type         := uat_UnitAlly;
                          ua_req_HellPower:= 12000;
                       end;
 
 uab_Bribe           : begin
-                         ua_type        := uat_UnitEnemy;
-                         ua_req_UACLoot := 5000;
+                         ua_type         := uat_UnitEnemy;
+                         ua_req_UACLoot  := 5000;
                       end;
 uab_Hack            : begin
-                         ua_type        := uat_UnitEnemy;
-                         ua_req_UACLoot := 7500;
+                         ua_type         := uat_UnitEnemy;
+                         ua_req_UACLoot  := 7500;
                       end;
 uab_UACGeneral         : begin
-                         ua_type        := uat_UnitAlly;
-                         ua_req_UACLoot := 15000;
+                         ua_type         := uat_UnitAlly;
+                         ua_req_UACLoot  := 10000;
                       end;
 
 uab_SpawnLost       : begin
-                         ua_type        := uat_NoTarget;
-                         ua_OrderToAll  := true;
+                         ua_type         := uat_NoTarget;
+                         ua_OrderToAll   := true;
                       end;
 uab_SpawnLostTo     : begin
-                         ua_type        := uat_Point;
+                         ua_type         := uat_Point;
                       end;
 
 uab_UACCCLand       : begin
-                         ua_type        := uat_NoTarget;
-                         ua_req_upgr    := upgr_uac_CCFly;
-                         ua_OrderToAll  := true;
+                         ua_type         := uat_NoTarget;
+                         ua_req_upgr     := upgr_uac_CCFly;
+                         ua_OrderToAll   := true;
                       end;
 uab_UACCCLandTo     : begin
-                         ua_type        := uat_Point;
-                         ua_req_upgr    := upgr_uac_CCFly;
+                         ua_type         := uat_Point;
+                         ua_req_upgr     := upgr_uac_CCFly;
                       end;
 
 uab_HellCCLand      : begin
-                         ua_type        := uat_NoTarget;
-                         ua_OrderToAll  := true;
+                         ua_type         := uat_NoTarget;
+                         ua_OrderToAll   := true;
                       end;
 uab_HellCCLandTo    : begin
-                         ua_type        := uat_Point;
+                         ua_type         := uat_Point;
                       end;
 
 
 uab_Unload          : begin
-                         ua_type        := uat_NoTarget;
-                         ua_OrderToAll  := true;
+                         ua_type         := uat_NoTarget;
+                         ua_OrderToAll   := true;
                       end;
 uab_UnloadTo        : begin
-                         ua_type        := uat_Point;
+                         ua_type         := uat_Point;
                       end;
 
 uab_ToUGTurretTo    : begin
-                         ua_type        := uat_Point;
-                         ua_req_upgr    := upgr_uac_DronTurret;
+                         ua_type         := uat_Point;
+                         ua_req_upgr     := upgr_uac_DronTurret;
                       end;
 uab_ToUATurretTo    : begin
-                         ua_type        := uat_Point;
-                         ua_req_upgr    := upgr_uac_DronTurret;
+                         ua_type         := uat_Point;
+                         ua_req_upgr     := upgr_uac_DronTurret;
                       end;
 uab_ToUACDron       : begin
-                         ua_type        := uat_NoTarget;
-                         ua_req_upgr    := upgr_uac_DronTurret;
+                         ua_type         := uat_NoTarget;
+                         ua_req_upgr     := upgr_uac_DronTurret;
                       end;
 uab_ToHAKeep,
-uab_ToHACommandCenter: ua_type        := uat_NoTarget;
+uab_ToHACommandCenter
+                    : ua_type            := uat_NoTarget;
 
 uab_ToHGate,
 uab_ToHPools,
 uab_ToHBarracks     : begin
-                         ua_type     := uat_NoTarget;
-                         ua_req_uid  := UID_HFortress;
+                         ua_type         := uat_NoTarget;
+                         ua_req_uid      := UID_HFortress;
                       end;
 
 uab_ToUACommandCenter,
 uab_ToUAGTurret,
-uab_ToUAATurret     : ua_type        := uat_NoTarget;
+uab_ToUAATurret     : ua_type            := uat_NoTarget;
 
 uab_ToUBarracks,
 uab_ToUFactory,
 uab_ToUWeaponFactory: begin
-                         ua_type     := uat_NoTarget;
-                         ua_req_uid  := UID_UComputerStation;
+                         ua_type         := uat_NoTarget;
+                         ua_req_uid      := UID_UComputerStation;
                       end;
 uab_LvlUpURadar     : begin
-                         ua_type     := uat_NoTarget;
-                         ua_req_uid  := UID_UACommandCenter;
-                         ua_req_UACLoot:=2000;
+                         ua_type         := uat_NoTarget;
+                         ua_req_uid      := UID_UACommandCenter;
+                         ua_req_UACLoot  := 2000;
                       end;
 uab_LvlUpURMStation : begin
-                         ua_type     := uat_NoTarget;
-                         ua_req_uid  := UID_UComputerStation;
-                         ua_req_UACLoot:=3000;
+                         ua_type         := uat_NoTarget;
+                         ua_req_uid      := UID_UComputerStation;
+                         ua_req_UACLoot  := 3000;
                       end;
 uab_HSpecter        : begin
-                         ua_type     := uat_Passive;
-                         ua_req_upgr := upgr_hell_Spectre;
+                         ua_type         := uat_Passive;
+                         ua_req_upgr     := upgr_hell_Spectre;
                       end;
 uab_HHTShroud       : begin
-                         ua_type     := uat_Passive;
-                         ua_req_upgr := upgr_hell_TotemInvis;
+                         ua_type         := uat_Passive;
+                         ua_req_upgr     := upgr_hell_TotemInvis;
                       end;
 uab_HStealth        : begin
-                         ua_type     := uat_Passive;
-                         ua_req_upgr := upgr_uac_CommandoInvis;
+                         ua_type         := uat_Passive;
+                         ua_req_upgr     := upgr_uac_CommandoInvis;
+                      end;
+uab_HT2TNoCD        : begin
+                         ua_type         := uat_Passive;
+                         ua_req_upgr     := upgr_hell_T2TNoCD;
+                      end;
+uab_UAASplash       : begin
+                         ua_type         := uat_Passive;
+                         ua_req_upgr     := upgr_uac_AASplash;
                       end;
       end;
    end;

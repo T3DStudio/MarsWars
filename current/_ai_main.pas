@@ -173,7 +173,6 @@ begin
        UID_HCommandCenter,
        UID_HACommandCenter: if ((units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])>=PlayerMaxBuilders)
                             and(ai_available_HKeep)then ai_NeedSuicide:=true;
-
        UID_UWeaponFactory,
        UID_HPools,
        UID_UBarracks,
@@ -198,9 +197,6 @@ begin
        UID_UGTurret,
        UID_UATurret       : if (upgrs_cur[upgr_uac_DronTurret]=0)
                             and(not ai_IsTowerUsefull(pu))then ai_NeedSuicide:=true;
-       else
-          //if(not uid_isbuilding)then
-          //  if((MaxPlayerLimit-armylimit-prod_unit_Limit-ai_ownDead_limit)<ai_NeedFreeLimit)and(ai_enemy_d>base_r2)and(a_rld=0)then ai_NeedSuicide:=true;
        end;
 end;
 
@@ -860,21 +856,22 @@ begin
       begin
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);
          //writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
-         if(ai_generator_d<NOTSET)then
+         {if(ai_generator_d<NOTSET)then
            with ai_generator_kp^ do
            begin
               UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
               //writeln( kp_LimitPlayerP[playeri],' ',(keyPoint_MinLimit  +uid_LimitUse),' ',ai_generator_d,' ',kp_RCapture);
-           end;
-         {if(ai_keypoint_d<NOTSET)then
+           end;  }
+         if(ai_keypoint_d<NOTSET)then
            with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
-         //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime); }
+
+         //if(ai_BaseOwn_d<NOTSET)then UnitsInfo_AddLine(x,y,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,c_lime);
 
 
-         //writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
-         //if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
-         //if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua);
-      end;}
+         {writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
+         if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
+         if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua); }
+      end; }
      { if(isselected)then
       with player^ do
       begin

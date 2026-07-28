@@ -34,34 +34,35 @@ begin
    my:=trunc(ay*map_MiniMap_cx);
 
    if(not new)then
-    for i:=0 to ui_max_alarms do
-     with ui_alarms[i] do
-      if(al_t>0)and(al_v=av)then
-       if(point_dist_rint(al_mx,al_my,mx,my)<=ui_alarm_time)then
-       begin
-          al_x :=(al_x +ax) div 2;
-          al_y :=(al_y +ay) div 2;
-          al_mx:=(al_mx+mx) div 2;
-          al_my:=(al_my+my) div 2;
-          al_t :=ui_alarm_time;
-          exit;
-       end;
+     for i:=0 to ui_max_alarms do
+       with ui_alarms[i] do
+         if(al_t>0)and(al_v=av)then
+           if(point_dist_rint(al_mx,al_my,mx,my)<=ui_alarm_time)then
+           begin
+              al_x :=(al_x +ax) div 2;
+              al_y :=(al_y +ay) div 2;
+              al_mx:=(al_mx+mx) div 2;
+              al_my:=(al_my+my) div 2;
+              al_t := ui_alarm_time;
+              exit;
+           end;
 
    ni:=0;
    for i:=0 to ui_max_alarms do
-    if(ui_alarms[i].al_t<ui_alarms[ni].al_t)
-    then ni:=i;
+     if(ui_alarms[i].al_t<ui_alarms[ni].al_t)
+     then ni:=i;
 
    with ui_alarms[ni] do
-    if(al_t<=0)or(not new)then
-    begin
-       al_x :=ax;
-       al_y :=ay;
-       al_mx:=mx;
-       al_my:=my;
-       al_v :=av;
-       al_t :=ui_alarm_time;
-       case al_v of
+     if(al_t<=0)or(not new)then
+     begin
+        al_x :=ax;
+        al_y :=ay;
+        al_mx:=mx;
+        al_my:=my;
+        al_v :=av;
+        al_t :=ui_alarm_time;
+        case al_v of
+lmt_other_UACScan      : al_c:=c_lime;
 lmt_unit_attackedU,
 lmt_unit_attackedB     : al_c:=c_red;
 lmt_unit_readyU,
@@ -76,9 +77,9 @@ lmt_ngen_Alarm,
 lmt_ngen_lost          : al_c:=c_aqua;
 lmt_kpoint_CaptureStart,
 lmt_kpoint_Captured    : al_c:=c_dyellow;
-       end;
-       ui_AddMarker:=true;
-    end;
+        end;
+        ui_AddMarker:=true;
+     end;
 end;
 
 function LogMes2UIAlarm(POVPlayer:byte):boolean;
@@ -101,7 +102,8 @@ lmt_ngen_lost,
 lmt_kpoint_CaptureStart,
 lmt_kpoint_Captured,
 lmt_markLook,
-lmt_markAttack       : ui_AddMarker(lm_x,lm_y,lm_type   ,true);
+lmt_markAttack       : ui_AddMarker(lm_x,lm_y,lm_type,true );
+lmt_other_UACScan    : ui_AddMarker(lm_x,lm_y,lm_type,true );
 
 lmt_allies_attackedU,
 lmt_allies_attackedB,
@@ -508,7 +510,7 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                               ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
                                            end;
                             tab_upgrades : begin
-                                              draw_UIButtonS(tar,ux,uy,g_upgrs[uid].upgr_btn.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
+                                              draw_UIButtonS(tar,ux,uy,g_upgrs[uid].upgr_btnBig.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
                                               ir2s(ui_pprod_upg_time[uid])      ,i2s(ui_pprod_upg_cur[uid])  ,'',b2s(upgrs_cur[uid])                                 ,'',
                                               ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,0 ,ui_max_color[upgrs_cur[uid]>=upgrs_max[uid]] ,0 ,'');
@@ -803,6 +805,31 @@ begin
          draw_text(tar,x,y-txt_line_h2*i,ui_log_lines[i],logAlign,255,ui_log_color[i]);
 end;
 
+procedure draw_UITextKeyPoint(tar:pSDL_Surface;x,y:integer;kpi:byte);
+var
+kpcolor:cardinal;
+kpowner:shortstring;
+begin
+   with map_KeyPointsL[kpi] do
+   with kp_TeamData[MaxPlayers] do
+   begin
+      if(kptd_OwnerPlayer<=LastPlayer)
+      then kpowner:=g_PlayersGame[kptd_OwnerPlayer].name
+      else kpowner:='---';
+
+      if(kptd_Timer<=0)or(ui_blink2_colorb)
+      then kpcolor:=PlayerGetColorCur(kptd_OwnerPlayer     ,false)
+      else
+      begin
+         kpcolor:=PlayerGetColorCur(kptd_TimerOwnerPlayer,false);
+         if(kptd_TimerOwnerPlayer<=LastPlayer)
+         then kpowner:=g_PlayersGame[kptd_TimerOwnerPlayer].name;
+      end;
+
+      draw_text(tar,x,y,'#'+b2s(kpi+1)+': '+kpowner,ta_LU,ui_Objectives_LineLen,kpcolor);
+   end;
+end;
+
 procedure draw_UIText(tar:pSDL_Surface);
 var i,x,y,
 limit :integer;
@@ -906,7 +933,14 @@ begin
                                        then draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
                                        else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColorCur(kptd_TimerOwnerPlayer,false),@y);
                               end;
-                mc_KeyPoints: draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white);
+                mc_KeyPoints: begin
+                              draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white,@y);
+                              y+=txt_line_h2;
+                              draw_UITextKeyPoint(tar,ui_objectivesx,y,0);y+=txt_line_h2;
+                              draw_UITextKeyPoint(tar,ui_objectivesx,y,1);y+=txt_line_h2;
+                              draw_UITextKeyPoint(tar,ui_objectivesx,y,2);y+=txt_line_h2;
+                              draw_UITextKeyPoint(tar,ui_objectivesx,y,3);
+                              end;
                 mc_royale   : begin
                               draw_text(tar,ui_objectivesx,y,str_objective_RoyalBattle,ta_LU,ui_Objectives_LineLen,c_white);y+=txt_line_h2;
                               draw_text(tar,ui_objectivesx,y,str_or                   ,ta_LU,ui_Objectives_LineLen,c_white);y+=txt_line_h2;
@@ -937,11 +971,9 @@ begin
    if(TestMode>0)then draw_text(tar,ui_cam_hw,ui_cam_hh,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
    {$ENDIF}
 
-
    if(vid_ShowFPS           )then draw_text(tar,ui_FPSx,ui_FPSy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
 
    if(rpls_pstate=rpls_write)then draw_text(tar,ui_RECx,ui_RECy,'*REC',ta_RU,255,c_red);
-//
 end;
 
 procedure draw_UIMouseCursor(tar:pSDL_Surface);   //cursor/brash
@@ -983,14 +1015,17 @@ begin
      if(not UIMouseEdgeCursor)then
        draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
 
-   case m_brush of
-   co_empty  :;
-   co_move,
-   co_patrol : draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubG);
-   co_markAttack,
-   co_amove,
-   co_apatrol: draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubR);
-   else        draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubA);
+   case m_uifocus of
+   mf_minimap,
+   mf_map    : case m_brush of
+               co_empty  :;
+               co_move,
+               co_patrol : draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubG);
+               co_markAttack,
+               co_amove,
+               co_apatrol: draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubR);
+               else        draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubA);
+               end;
    end;
 end;
 

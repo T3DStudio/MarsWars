@@ -408,7 +408,7 @@ begin
           theme_liquid_style:=tcs_smooth;
           theme_crater_style:=tcs_square;
        end;
-   1 : begin  // ICE CAVES
+   1 : begin  // EARTH POLE
           SetThemeDecals  ('-1_-4,1,4_20,23_25,28,30,33,34');
           SetThemeCraters ('0,2,13,20,28');
           SetThemeTerrains('0,2,13,20');
@@ -476,9 +476,9 @@ begin
    6 : begin  // PHOBOS
           SetThemeDecals  ('-1_-4,4_8,10_14,16,17,23_25');
           SetThemeCraters ('3,4,5'   );
-          SetThemeTerrains('3,4,5,8'     );
-          SetThemeLiquidsB('16,21_23' );
-          SetThemeLiquidsF('0,6,13'        );
+          SetThemeTerrains('3,4,5,8' );
+          SetThemeLiquidsB('16,21_23');
+          SetThemeLiquidsF('0,6,13'  );
           SetThemeObs0    ('0_12,0_12,0_12,28_32,125' );
           SetThemeObs1    ('33,34,77,88_92,77,88_92,96_101,96_101' );
           SetThemeObs2    ('69,70');
