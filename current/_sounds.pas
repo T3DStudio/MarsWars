@@ -94,6 +94,7 @@ begin
    begin
       new(snd_LoadSound);
       snd_LoadSound^.oal_sound:=t;
+      snd_LoadSound^.oal_fname:=ExtractFileName(fn);
    end;
 end;
 
@@ -175,7 +176,7 @@ begin
    with snd_MusicSetLoad^ do
    begin
       snd_sset_c:=0;
-      snd_sset_n :=0;
+      snd_sset_n:=0;
       setlength(snd_sset_l,snd_sset_n);
 
       while(count>0)do
@@ -245,9 +246,14 @@ function snd_SoundSetGetChunk(ss:PTSoundSet;NewChunk:boolean):PTMWSound;
 begin
    snd_SoundSetGetChunk:=nil;
    with ss^ do
-     if(snd_sset_n>0)then
-       if(snd_sset_n=1)
-       then snd_SoundSetGetChunk:=snd_sset_l[0]
+     if(snd_sset_n<=0)
+     then snd_sset_c:=-1
+     else
+       if(snd_sset_n=1)then
+       begin
+          snd_SoundSetGetChunk:=snd_sset_l[0];
+          snd_sset_c:=0;
+       end
        else
        begin
           if(NewChunk)then snd_sset_c+=1;

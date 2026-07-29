@@ -1044,16 +1044,6 @@ begin
 
    if (nvid_vw>0)
    and(nvid_vh>0)then menu_ApplyResolution(nvid_vw,nvid_vh);
-   {begin
-      vid_vw:=nvid_vw;menu_ResolutionWi:=vid_vw;
-      vid_vh:=nvid_vh;menu_ResolutionHi:=vid_vh;
-
-      vid_MakeScreen;
-      theme_map_pTerrain:=255;
-      gfx_MapMakeTerrain;
-      gfx_UpdateScaledMenuBackground;
-      menu_update:=true;
-   end; }
 end;
 
 procedure GameControlsMouse;

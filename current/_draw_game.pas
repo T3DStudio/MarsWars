@@ -575,8 +575,7 @@ procedure draw_LayerTerrain(tar:pSDL_Surface);
 var
 i,t,s,
 ix,iy,
-cx,cy,
-vx,vy:integer;
+cx,cy:integer;
 spr  :PTMWTexture;
 begin
    cx:=-ui_cam_x mod map_ter_w;
@@ -587,34 +586,32 @@ begin
 
    draw_sdlsurface(tar,cx,cy,map_terrain);
 
-   // decals
-   vx:=ui_cam_x-vid_ab;
-   vy:=ui_cam_y-vid_ab;
-
+   // map terrain decals
    if(theme_decalN>0)then
-     for i:=0 to map_ter_decaln-1 do
-       with map_ter_decalL[i] do
+     for i:=0 to map_Decals_Max do
+       with map_Decals[i] do
        begin
-          ix:=decal_x-vx+ui_mwa;
-          iy:=decal_y-vy+ui_mha;
+          ix:=decal_x;
+          while(ix<map_size1)do
+          begin
+             iy:=decal_y;
+             while(iy<map_size1)do
+             begin
 
-          s:=abs(i+(iy div ui_mha)+(ix div ui_mwa)) mod theme_decalN;
+                s:=abs(i+(ix div map_Decals_w)+(iy div map_Decals_h)) mod theme_decalN;
+                t:=theme_decalL[s];
+                if(t<0)
+                then spr:=@spr_crater[-t]
+                else spr:=@theme_spr_decalL[t];
 
-          t:=theme_decalL[s];
-          if(t<0)
-          then spr:=@spr_crater[-t]
-          else spr:=@theme_spr_decalL[t];
+                with spr^ do
+                  if(RectInCam(ix,iy,hw,hh,0))then
+                    draw_sdlsurface(tar,ix-hw-ui_cam_x,iy-hh-ui_cam_y,surf);
 
-          ix:=ix mod ui_mwa;
-          iy:=iy mod ui_mha;
-
-          if(ix<0)then ix:=ui_mwa+ix;
-          if(iy<0)then iy:=ui_mha+iy;
-
-          ix-=vid_ab;
-          iy-=vid_ab;
-
-          with spr^ do draw_sdlsurface(tar,ix-hw,iy-hh,surf);
+                iy+=map_Decals_h;
+             end;
+             ix+=map_Decals_w;
+          end;
        end;
 end;
 

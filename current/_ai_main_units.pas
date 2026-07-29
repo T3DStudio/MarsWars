@@ -333,9 +333,9 @@ begin
    with player^ do
      if (ai_generator_d<srange)
      and(uid_AI_GenAssaultGroup)
-     and(ai_nearGenDudesLimit<aic_keyPoint_LimitMin)
      and(ai_energy_future<aip_MaxEnergy)then
-       if(ai_generator_kp^.kp_LimitPlayerP[playeri]<ai_generator_kp^.kp_CaptureLimit)then
+       if (ai_generator_kp^.kp_LimitPlayerP[playeri]<ai_generator_kp^.kp_CaptureLimit)
+       and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit) then
        begin
           group:=aic_group_GenGuard;
           CheckSetGeneratorGuard:=true;
@@ -510,7 +510,7 @@ begin
                                       aic_group_GenGuard  : if(tar_dist<=srange)
                                                             then MainTargetGo(tar_r)
                                                             else group:=aic_group_GenAssault;
-                                      aic_group_GenAssault: if(tar_dist<tar_r)
+                                      aic_group_GenAssault: if (tar_dist<tar_r)
                                                             then group:=aic_group_GenGuard
                                                             else
                                                               if(not FollowCommander)

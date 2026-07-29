@@ -1039,32 +1039,6 @@ begin
    end;
 end;
 
-
-procedure map_Decals_Create;
-var i,ix,iy,rn:integer;
-begin
-   map_ter_decaln:=(ui_cam_w*ui_cam_h) div 25000;
-   setlength(map_ter_decalL,map_ter_decaln);
-
-   ui_mwa:= ui_cam_w+vid_ab*2;
-   ui_mha:= ui_cam_h+vid_ab*2;
-
-   ix:=longint(map_seed) mod ui_mwa;
-   iy:=longint(map_seed) mod ui_mha;
-   rn:=ix*iy;
-   for i:=1 to map_ter_decaln do
-    with map_ter_decalL[i-1] do
-    begin
-       rn+=17;
-       ix+=ix+rn;
-       iy+=iy+sqr(ix*i);
-       ix:=abs(ix) mod ui_mwa;
-       iy:=abs(iy) mod ui_mha;
-       decal_x :=ix;
-       decal_y :=iy;
-    end;
-end;
-
 procedure vid_CommonVars;
 var
 ui_UIPanelY1:integer;
@@ -1202,8 +1176,6 @@ begin
    map_MiniMap_CamW     := round(ui_cam_w*map_MiniMap_cx);
    map_MiniMap_CamH     := round(ui_cam_h*map_MiniMap_cx);
    ui_Camera_Bounds;
-
-   map_Decals_Create;
 end;
 
 procedure vid_RemakeScreenSurfaces;

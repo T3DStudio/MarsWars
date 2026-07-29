@@ -7,6 +7,7 @@
   //{$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
+
 {$ENDIF}
 
 uses SysUtils, SDL, SDL_Net,crt

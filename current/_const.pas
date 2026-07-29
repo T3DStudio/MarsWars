@@ -1076,7 +1076,7 @@ rpls_WriteTimeServer   = fr_fps1 div 30;
 //  SOUND
 //
 
-snd_MaxMusicListSize   = 10;
+snd_MaxMusicListSize   = 15;
 snd_MaxSoundVolume     = 200;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1468,7 +1468,6 @@ vid_bpp                = 32;
 vid_minw               = 800;
 vid_minh               = 600;
 
-vid_ab                 = 128;
 vid_MaxScreenSprites   = 2000; // max vis sprites;
 
 cpp_left               = 0;
@@ -1515,7 +1514,6 @@ ui_GroupIcoW2q3        = 2*ui_GroupIcoW1+ui_GroupIcoWq3;
 
 ui_max_alarms          = 32;
 
-ui_hwp                 = ui_CtrlPanelW div 2;
 ui_ButtonsNum          = (ui_CtrlPanelBH-ui_CtrlPanelBW-2)*ui_CtrlPanelBW-1;
 
 chat_type              : array[false..true] of char = ('|',' ');
@@ -1560,6 +1558,15 @@ rpls_write             = 1;
 rpls_read              = 2;
 
 MaxReplayPrefixLen     = 20;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  MAP
+//
+
+map_Decals_Max          = 117;
+map_Decals_w            = 2000;
+map_Decals_h            = 2000;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1638,6 +1645,7 @@ mi_SS_PlayerNext       = 72;
 mi_SS_PlaylistSize     = 73;
 mi_SS_ReloadPlaylist   = 74;
 mi_SS_RenewPlaylist    = 75;
+mi_SS_Playlist         = 76;
 
 ////  REPLAYS
 mi_Replays_list        = 80;
@@ -1848,6 +1856,9 @@ menu_ListLineWChars1   = 60;
 menu_ListLineWCharsh   = menu_ListLineWChars1 div 2;
 menu_ListW1            = menu_ListLineWChars1*font_w1+font_w1;
 menu_ListWh            = menu_ListW1 div 2;
+
+menu_PlayListLine1H    = menu_ListLineH;
+menu_PlayListH         = 10;
 
 menu_CampListW         = menu_ListWh;
 menu_CampLineH         = 16;

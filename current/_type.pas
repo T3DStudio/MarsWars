@@ -198,6 +198,7 @@ PTMWSoundSourceSet = ^TMWSoundSourceSet;
 
 TMWSound = record
    oal_sound: TALuint;
+   oal_fname: shortstring;
 end;
 PTMWSound = ^TMWSound;
 

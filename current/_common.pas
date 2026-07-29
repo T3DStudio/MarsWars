@@ -1033,12 +1033,13 @@ begin
    end;
 end;
 
+{$IFDEF _FULLGAME}
 procedure PlayersClearLog;
 var p:byte;
 begin
    for p:=0 to LastPlayer do PlayerClearLog(p);
 end;
-
+{$ENDIF}
 // OTHER
 
 function PlayersAllReady:boolean;

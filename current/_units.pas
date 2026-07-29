@@ -1,5 +1,4 @@
 
-
 procedure unit_death(pu:PTUnit);
 var tu  : PTUnit;
     uc  : integer;
@@ -1174,9 +1173,6 @@ hit_prcnt: single;
 old_u    : TUnit;
  _zuid   : PTUID;
 _ppla    : PTPlayerGameData;
-    {$IFDEF _FULLGAME}
-    _s:integer;
-    {$ENDIF}
 begin
    unit_TryZombification:=false;
 
@@ -2380,14 +2376,13 @@ begin
            {$IFDEF _FULLGAME}
            if(ServerSide)then
            {$ENDIF}
-             //if(hits>0)then
-               with player^ do
-                 if(isdefeated)
-                 or(isobserver)then
-                 begin
-                    unit_kill(pu,true,true,false,true,true);
-                    continue;
-                 end;
+             with player^ do
+               if(isdefeated)
+               or(isobserver)then
+               begin
+                  unit_kill(pu,true,true,false,true,true);
+                  continue;
+               end;
 
            if(cycle_order=g_cycle_order)then
              unit_TeamReveal(pu,false);

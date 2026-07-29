@@ -19,6 +19,26 @@ begin
    -((map_seed and $F0000000) shr 28));  // crater
 end;
 
+procedure map_Decals_Create;
+var
+i ,rn,
+ix,iy:integer;
+begin
+   ix:=longint(map_seed) mod map_Decals_w;
+   iy:=longint(map_seed) mod map_Decals_h;
+   rn:=ix*iy;
+
+   for i:=0 to map_Decals_Max do
+     with map_Decals[i] do
+     begin
+        rn+=17;
+        ix+=ix+rn;
+        iy+=iy+sqr(ix*i);
+        decal_x:=abs(ix) mod map_Decals_w;
+        decal_y:=abs(iy) mod map_Decals_h;
+     end;
+end;
+
 {$ENDIF}
 
 procedure map_RefreshObstaclesGrid;

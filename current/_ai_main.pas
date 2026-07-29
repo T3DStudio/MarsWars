@@ -659,7 +659,10 @@ begin
                                    else
                                       if(ai_BaseOwn_d<NOTSET)
                                       then setLandingPlace(ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,ai_BaseOwn_d,base_r1)
-                                      else setLandingPlace(x,y,0,base_r1h);
+                                      else
+                                        if(ai_BaseAlly_d<NOTSET)
+                                        then setLandingPlace(ai_BaseAlly_u^.x,ai_BaseAlly_u^.y,ai_BaseAlly_d,base_r1)
+                                        else setLandingPlace(x,y,0,base_r1h);
                                    end;
                             false: if(alarmType>0)then ai_ability_CCLift(pBuilder);
                             end;

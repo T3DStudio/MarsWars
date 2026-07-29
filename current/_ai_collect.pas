@@ -313,7 +313,8 @@ begin
          // target for hteleport recall
          if (not tu^.isfly)
          and(not tu^.uid^.uid_isbuilding)
-         and(tu^.uid^.uid_CanAttack)then
+         and(tu^.uid^.uid_CanAttack)
+         and(tu^.group<>aic_group_GenGuard)then
            if(ai_HTeleportRecall_d=NOTSET)
            or(ai_HTeleportRecall_d>tu^.aiu_alarm_d)then
            begin
@@ -457,8 +458,8 @@ begin
          // limit of generator guards near
          if(ud<srange)then
            if(tu^.group=aic_group_GenGuard  )
-           or(tu^.group=aic_group_GenAssault)
-           or(tu^.group=aic_group_GenWait   )
+           //or(tu^.group=aic_group_GenAssault)
+           //or(tu^.group=aic_group_GenWait   )
            then ai_nearGenDudesLimit+=tu^.uid^.uid_LimitUse;
       end;
    end;

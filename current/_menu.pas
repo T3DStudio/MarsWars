@@ -636,6 +636,8 @@ begin
                           menu_Item_Set(mi_SS_PlaylistSize    ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_RenewPlaylist   ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
                           menu_Item_Set(mi_SS_ReloadPlaylist  ,mtx0,mty0,mtx1,mty0+menu_SmallW,true);mty0+=menu_SmallW;
+                                                                                                     mty0+=menu_SmallW;
+                          menu_Item_Set(mi_SS_Playlist        ,mtx0,mty0,mtx1,mty0+menu_PlayListLine1H*menu_PlayListH,true);
                        end;
    end;
 
@@ -1207,7 +1209,7 @@ mi_SS_MusicVolume      : if(not check)then
 mi_SS_PlayerNext       : if(not check)then snd_SoundMusicControll(true);
 mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,true,1,snd_MaxMusicListSize);
 mi_SS_RenewPlaylist    : if(not check)then snd_RenewMusicList:=not snd_RenewMusicList;
-mi_SS_ReloadPlaylist   : if(not check)then snd_GameMusicReLoad;
+mi_SS_ReloadPlaylist   : if(not check)then begin snd_GameMusicReLoad;menu_PlayListScroll:=0; end;
 
 // SAVE LOAD
 mi_SaveLoad_list       : if(not check)then
@@ -1217,8 +1219,8 @@ mi_SaveLoad_list       : if(not check)then
                          end;
 //mi_SaveLoad_info       :;
 mi_SaveLoad_fname      :;
-mi_SaveLoad_save       : if(not check)then saveload_Save  (false);
-mi_SaveLoad_load       : if(not check)then saveload_Load  (false);
+mi_SaveLoad_save       : if(not check)then saveload_Save      (false);
+mi_SaveLoad_load       : if(not check)then saveload_Load      (false);
 mi_SaveLoad_delete     : if(not check)then saveload_DeleteInit(false);
 
 // REPLAYS
@@ -1438,10 +1440,12 @@ mi_SS_MusicVolume      : if(not check)then
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
                             snd_SoundSourceUpdateGainAll;
                          end;
-mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll    , 1,0,camp_size              -menu_CampListSize,false);
+mi_SS_Playlist         : if(not check)then with snd_music_game^ do
+                                           ScrollInt(@menu_PlayListScroll, 1,0,snd_sset_n             -menu_PlayListH   ,false);
+mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll        , 1,0,camp_size              -menu_CampListSize,false);
 mi_camp_Missions       : if(not check)then
                            if(0<=camp_sel)and(camp_sel<camp_size)then
-                                           ScrollInt(@camp_mis_scroll, 1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
+                                           ScrollInt(@camp_mis_scroll    , 1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
 
    else
       menu_Controls_MWD:=false;
@@ -1475,10 +1479,12 @@ mi_SS_MusicVolume      : if(not check)then
                             snd_mvolume1:=snd_MusicVolume/snd_MaxSoundVolume;
                             snd_SoundSourceUpdateGainAll;
                          end;
-mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll    ,-1,0,camp_size              -menu_CampListSize,false);
+mi_SS_Playlist         : if(not check)then with snd_music_game^ do
+                                           ScrollInt(@menu_PlayListScroll,-1,0,snd_sset_n             -menu_PlayListH   ,false);
+mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll        ,-1,0,camp_size              -menu_CampListSize,false);
 mi_camp_Missions       : if(not check)then
                            if(0<=camp_sel)and(camp_sel<camp_size)then
-                                           ScrollInt(@camp_mis_scroll,-1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
+                                           ScrollInt(@camp_mis_scroll    ,-1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
    else
       menu_Controls_MWU:=false;
    end;
@@ -1676,6 +1682,7 @@ begin
              SetSelectedItem(mi_help_InfoPanel,true);
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
+             SetSelectedItem(mi_SS_Playlist   ,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);
              SetSelectedItem(mi_camp_Campaigns,true);
              SetSelectedItem(mi_camp_Missions ,true);
@@ -1701,6 +1708,7 @@ begin
              SetSelectedItem(mi_help_InfoPanel,true);
              SetSelectedItem(mi_SS_SoundVolume,true);
              SetSelectedItem(mi_SS_MusicVolume,true);
+             SetSelectedItem(mi_SS_Playlist   ,true);
              SetSelectedItem(mi_SG_ScrollSpeed,true);
              SetSelectedItem(mi_camp_Campaigns,true);
              SetSelectedItem(mi_camp_Missions ,true);

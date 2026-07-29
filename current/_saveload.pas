@@ -331,6 +331,7 @@ begin
       end;
 
       menu_mseed:=c2s(map_seed);
+      map_SetScenarioMaxPlayers;
       map_BaseVars(false);
       game_RoyalSetCenter(g_royal_Rx,g_royal_Ry);
       case g_type of

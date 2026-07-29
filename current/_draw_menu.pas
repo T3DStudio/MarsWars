@@ -256,6 +256,8 @@ end;
 //
 
 procedure drawmenu_BlockSettings(tar:pSDL_Surface); // SETTINGS
+var
+i,t,y:integer;
 begin
    drawmenu_ItemText1(tar,mi_caption_Settings   ,str_menu_Settings      ,255);
 
@@ -304,6 +306,26 @@ begin
 
    drawmenu_ItemText2(tar,mi_SS_RenewPlaylist   ,str_SS_RenewMusicList  ,str_YesNoC[snd_RenewMusicList],0);
    drawmenu_ItemText2(tar,mi_SS_PlaylistSize    ,str_SS_MusicListSize   ,b2s(snd_musicListSize),0);
+
+   with snd_music_game^ do
+   begin
+      drawmenu_ItemTextC(tar,mi_SS_Playlist  ,ta_MA,str_SS_Playlist+'('+i2s(snd_sset_n)+')',c_white);
+      if(snd_sset_n>0)then
+        with menu_items[mi_SS_Playlist] do
+          if(mi_state>as_off)then
+          begin
+             y:=mi_y0;
+             for t:=0 to menu_PlayListH-1 do
+             begin
+                i:=t+menu_PlayListScroll;
+                if(0<=i)and(i<snd_sset_n)then
+                  with snd_sset_l[i]^ do
+                    draw_text(tar,mi_x0+font_wh,y+font_wh,oal_fname,ta_LU,255,mic(true,(snd_sset_c=i)and g_started));
+                y+=menu_PlayListLine1H;
+             end;
+             drawmenu_ScrollBar(tar,mi_SS_Playlist,menu_PlayListScroll,menu_PlayListH,snd_sset_n);
+          end;
+   end;
 end;
 
 procedure drawmenu_BlockSaveLoad(tar:pSDL_Surface); // SAVE LOAD

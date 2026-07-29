@@ -246,8 +246,6 @@ ui_vmb_x0         : integer = 6;
 ui_vmb_y0         : integer = 6;
 ui_vmb_x1         : integer = 794;
 ui_vmb_y1         : integer = 594;
-ui_mwa            : integer = 0;
-ui_mha            : integer = 0;
 
 ui_cam_x          : integer = 0;
 ui_cam_y          : integer = 0;
@@ -446,6 +444,8 @@ menu_scale        : boolean = true;
 menu_ChatListH    : integer = 0;
 menu_ChatScroll   : integer = 0;
 
+menu_PlayListScroll: integer = 0;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -464,8 +464,7 @@ map_terrain       : pSDL_SURFACE;
 map_ter_w,
 map_ter_h         : integer;
 
-map_ter_decaln    : integer = 0;
-map_ter_decalL    : array of TDecal;
+map_Decals        : array[0..map_Decals_Max] of TDecal;
 
 map_ObstaclesVis  : array[0..MaxObstacles] of TObstacleVis;
 map_KeyPointsVis  : array[0..LastKeyPoint] of TKeyPointVis;
@@ -1112,6 +1111,7 @@ str_SS_ReloadMusic,
 str_SS_RenewMusicList,
 str_SS_SoundVolume,
 str_SS_MusicVolume,
+str_SS_Playlist,
 
 str_FilePlay,
 str_FileInfo,

@@ -205,6 +205,7 @@ begin
    str_SS_ReloadMusic            := 'Load new playlist';
    str_SS_RenewMusicList         := 'Renew playlist on start';
    str_SS_MusicListSize          := 'Music playlist size';
+   str_SS_Playlist               := 'Current game playlist';
 
    str_GO_AISlots                := 'Fill empty slots';
    str_GO_FixedStarts            := 'Fixed player starts';
@@ -306,7 +307,7 @@ begin
    str_all                       := 'All';
 
    str_themes[0]                 :=tc_lime  +'UAC BASE';
-   str_themes[1]                 :=tc_aqua  +'EARTH POLE';
+   str_themes[1]                 :=tc_aqua  +'ICE CAVE';
    str_themes[2]                 :=tc_yellow+'HELL CAVES';
    str_themes[3]                 :=tc_red   +'HELL CITY';
    str_themes[4]                 :=tc_blue  +'EARTH CITY';

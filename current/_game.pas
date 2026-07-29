@@ -186,7 +186,7 @@ begin
    ai_names_l:=ai_names_o;
    for u:=0 to ai_names_max-1 do
    for i:=0 to ai_names_max-1 do
-     if(u<>i)and(((map_seed+u*i) mod 3)=0)then
+     if(u<>i)and( (map_seed and (1 shl ((map_seed+byte(u*3)+i) mod 32)))>0 )then
      begin
         ts:=ai_names_l[i];
         ai_names_l[i]:=ai_names_l[u];
@@ -1027,21 +1027,6 @@ begin
           end;
        end;
 
-   {c:=0;
-   e:=0;
-   if(InputAction(iact_Control))then
-     with g_PlayersGame[LocalPlayer] do
-     begin
-        for p:=1 to 255 do
-        begin
-           e+=units_uid_e[p];
-           c+=units_uid_c[p];
-        end;
-        writeln(LocalPlayer,' e=',e,' c=',c,' units_all_e=',units_all_e,' units_all_c=',units_all_c);
-     end; }
-   //writeln(pnum,' ',units_all_c);
-
-
    // remove alarms outside the map in royal battle
    if(g_cycle_order=0)and(map_scenario=mc_royale)then
      for t:=0 to LastPlayer do
@@ -1398,9 +1383,7 @@ begin
    nmid_lobby_MRandom        : begin map_RandomMap; Map_Make;end;
    nmid_lobby_GFixedPositions: begin
                                   g_FixedPositions:=not g_FixedPositions;
-                                  {$IFDEF _FULLGAME}
-                                  map_RedrawMenuMinimap;
-                                  {$ENDIF}
+                                  Map_Make;
                                end;
    nmid_lobby_GAISlots       : begin
                                   ScrollByte(@g_AISlots  ,forward,0,g_MaxAISlots  );
@@ -1511,8 +1494,8 @@ begin
          gt_campaing: cmp_MissionCode;
          end;
       end
-      else Scenario_KeyPointsCodeClient
-      {$ENDIF};
+      else Scenario_KeyPointsCodeClient;
+      {$ENDIF}
       GameObjectsCode;
    end;
 

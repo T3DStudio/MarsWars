@@ -30,7 +30,6 @@ cfg_key_GAISlots        = 'g_AI_slots';
 cfg_key_GRecord         = 'g_record';
 cfg_key_GRecordQuality  = 'g_record_quality';
 cfg_key_menuScalse      = 'menu_scale';
-cfg_key_menuScaleSmooth = 'menu_scale_smooth';
 
 
 procedure cfg_setval(vr,vl:shortstring);
@@ -70,8 +69,6 @@ cfg_key_MapGenerators   : map_GeneratorT     := vlw;
 cfg_key_GRecord         : rpls_Record        :=(vl=b2c[true]);
 cfg_key_GRecordQuality  : rpls_Quality       := vlw;
 cfg_key_menuScalse      : menu_scale         :=(vl=b2c[true]);
-cfg_key_menuScaleSmooth : menu_ScaleSmooth   :=(vl=b2c[true]);
-
    end;
 
 end;
@@ -167,7 +164,7 @@ begin
    writeln(f,cfg_key_UIHealthBars    ,'=',ui_HealthBars         );
    writeln(f,cfg_key_UIPlayersColor  ,'=',ui_PlayersColor       );
    writeln(f,cfg_key_UIShowAPM       ,'=',b2c[ui_ShowAPM]       );
-   writeln(f,cfg_key_UIShowAPM       ,'=',b2c[ui_PlayersScreens]);
+   writeln(f,cfg_key_UIShowPScreens  ,'=',b2c[ui_PlayersScreens]);
    writeln(f,cfg_key_VidResolutionW  ,'=',vid_vw                );
    writeln(f,cfg_key_VidResolutionH  ,'=',vid_vh                );
    writeln(f,cfg_key_VidWindowed     ,'=',b2c[vid_windowed]     );
@@ -178,7 +175,6 @@ begin
    writeln(f,cfg_key_GFixedSpawns    ,'=',b2c[g_FixedPositions] );
    writeln(f,cfg_key_GAISlots        ,'=',g_AISlots             );
    writeln(f,cfg_key_menuScalse      ,'=',b2c[menu_scale]       );
-   writeln(f,cfg_key_menuScaleSmooth ,'=',b2c[menu_ScaleSmooth] );
    writeln(f,cfg_key_NetServerAddr   ,'=',menu_ClientAddress    );
    writeln(f,cfg_key_NetServerPort   ,'=',menu_ServerPort       );
    writeln(f,cfg_key_NetQuality      ,'=',net_cl_Quality        );

@@ -25,7 +25,7 @@ begin
             if(g_started)
             or(g_LobbyTimer>0)then isobserver:=true;
             {$IFNDEF _FULLGAME}
-            GameLog_Chat(p,0,'MarsWars dedicated server, '+str_ver);
+            GameLog_Chat(p,0,'MarsWars dedicated server, '+str_version);
             {$ENDIF}
             menu_update:=true;
             break;
@@ -321,10 +321,11 @@ begin
 
                                           for u:=1 to MaxUnits do
                                             with g_punits[u]^ do
-                                            begin
-                                               if(hits>0)and(pid=playeri)then unit_UnSelect(g_punits[u]);
-                                               group:=0;
-                                            end;
+                                              if(hits>0)and(pid=playeri)then
+                                              begin
+                                                 unit_UnSelect(g_punits[u]);
+                                                 group:=0;
+                                              end;
                                           n:=net_readint;
                                           while(n>0)do
                                           begin
@@ -332,10 +333,11 @@ begin
                                              i:=net_readbyte;
                                              if(IsUnitRange(u,@pu))then
                                                with pu^ do
-                                               begin
-                                                  if(hits>0)and(pid=playeri)and(not IsUnitRange(transportU,nil))then unit_Select(pu);
-                                                  group:=i;
-                                               end;
+                                                 if(hits>0)and(pid=playeri)and(not IsUnitRange(transportU,nil))then
+                                                 begin
+                                                    unit_Select(pu);
+                                                    group:=i;
+                                                 end;
                                              n-=1;
                                           end;
                                        end;

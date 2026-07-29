@@ -762,7 +762,8 @@ begin
 
              if(uid_ability_isradar)then
              begin
-                if(kptd_OwnerTeam=team)then continue;
+                if(kptd_OwnerTeam=team)
+                or(kp_Energy<=0)then continue;
 
                 if((group=8)and(kptd_OwnerPlayer> LastPlayer))
                 or((group=9)and(kptd_OwnerPlayer<=LastPlayer))then
@@ -778,7 +779,7 @@ begin
                   if(not koth_point)then
                   begin
                      if(kp_LimitPlayerP[playeri]>=kp_CaptureLimit)then continue;
-                     if(uid_CanAttack)and(kp_Energy>0)then
+                     if(uid_CanAttack)and(not uid_isbuilder)and(kp_Energy>0)then  // towers to generators
                        if(d<=kp_RCapture)
                        or((d>kp_RCapture)and(kp_LimitPlayerP[playeri]<kp_CaptureLimit))
                        then
@@ -797,9 +798,6 @@ begin
                   if(transportM>0)
                   or(not isfly)then
                     if(kp_zone=zone_solid)then continue;
-
-
-
                   {
                   aic_group_Home             = 0;
                   aic_group_AttackNow        = 1;
@@ -811,73 +809,55 @@ begin
                   aic_group_GenWait          = 7;
                   }
 
-                  case group of
-                  aic_group_GenGuard  : setNearestGen;
-                  else
-                    if(not koth_point)then
-                    begin
-                       if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
-                       or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
-                         if(isfly)
-                         or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
-                           ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,d,kp_zone);
+                  if(group=aic_group_GenGuard)then
+                  begin
+                     if(kp_Energy<=0)then continue;
+                     if((kptd_OwnerTeam=team)and(kptd_OwnerPlayer<>playeri))
+                     or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)and(kptd_Timer>0))then continue;
+                     setNearestGen;
+                     continue;
+                  end;
 
-                       if(kptd_OwnerTeam=team)then
-                         if(kptd_OwnerPlayer<>playeri)
-                         or(kp_Energy<=0)then continue;
-                       if(kptd_Timer>0)then
-                         if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
-                       if(kp_LimitTeamP[team]>0)and(kp_LimitPlayerP[playeri]=0)then continue;
+                  if(not koth_point)then
+                  begin
+                     if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
+                     or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
+                       if(isfly)
+                       or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
+                         ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,d,kp_zone);
+
+                     if(kptd_OwnerTeam=team)then
+                       if(kptd_OwnerPlayer<>playeri)
+                       or(kp_Energy<=0)then continue;
+                     if(kptd_Timer>0)then
+                       if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
+                     if(kp_LimitTeamP[team]>0)and(kp_LimitPlayerP[playeri]=0)then continue;
+                  end;
+
+                  if(not koth_point)and(kp_Energy>0)then
+                    case(transportM>0)of
+                    true : begin
+                           l:=kp_LimitPlayerP[playeri]-kp_CaptureLimit;
+                           if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
+                           if(l>=0)then continue;
+                           end;
+                    false: if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit  +uid_LimitUse))and(d> kp_RCapture))
+                           or((kp_LimitPlayerP[playeri]> (kp_CaptureLimit*2+uid_LimitUse))and(d<=kp_RCapture))then continue;
                     end;
 
-                    if(not koth_point)and(kp_Energy>0)then
-                      case (transportM>0)or(uid_isbuilder) of
-                      true : begin
-                             l:=kp_LimitPlayerP[playeri]-kp_CaptureLimit;
-                             if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
-                             if(l>=0)then continue;
-                             end;
-                      false: if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit      +uid_LimitUse))and(d> kp_RCapture))
-                             or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
-                      end;
+                  if(kptd_OwnerTeam<=LastPlayer)
+                  or(kp_Energy<=0)
+                  then w:=d
+                  else
+                    if(kp_Energy>map_generators_EnergyS)
+                    then w:=d div 3
+                    else w:=d div 2;
 
-                    if(kptd_OwnerTeam<=LastPlayer)
-                    or(kp_Energy<=0)
-                    then w:=d
-                    else
-                      if(kp_Energy>map_generators_EnergyS)
-                      then w:=d div 3
-                      else w:=d div 2;
-
+                  case(kp_Energy>0)and(not koth_point)of
+                  true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_w,@ai_generator_d,@map_KeyPointsL[i],w,d,pu);
+                  false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@ai_keypoint_d ,@map_KeyPointsL[i],w,d,pu);
                   end;
                end;
-
-
-             {
-
-             if(not koth_point)and(kp_Energy>0)then
-               case (transportM>0)or(uid_isbuilder) of
-               true : begin
-                      l:=kp_LimitPlayerP[playeri]-kp_CaptureLimit;
-                      if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
-                      if(l>=0)then continue;
-                      end;
-               false: if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit      +uid_LimitUse))and(d> kp_RCapture))
-                      or((kp_LimitPlayerP[playeri]> (aic_keyPoint_LimitMax+uid_LimitUse))and(d<=kp_RCapture))then continue;
-               end;
-
-             if(kptd_OwnerTeam<=LastPlayer)
-             or(kp_Energy<=0)
-             then w:=d
-             else
-               if(kp_Energy>map_generators_EnergyS)
-               then w:=d div 3
-               else w:=d div 2;
-
-             case(kp_Energy>0)and(not koth_point)of
-             true : ai_SetKeyPoint(@ai_generator_kp,@ai_generator_w,@ai_generator_d,@map_KeyPointsL[i],w,d,pu);
-             false: ai_SetKeyPoint(@ai_keypoint_kp ,@ai_keypoint_d ,@ai_keypoint_d ,@map_KeyPointsL[i],w,d,pu);
-             end;  }
           end;
 end;
 

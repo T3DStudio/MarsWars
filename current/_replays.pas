@@ -597,7 +597,7 @@ begin
       else
       begin
          if(g_started)and(not Game_IsEnded)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
-         rpls_RecordTryPause:=fr_fps2;
+         rpls_RecordTryPause:=fr_fps1;
       end;
    end
    else

@@ -128,7 +128,7 @@ begin
    if(console_y<=ded_ScreenUpdatePause)then
    begin
       case console_y of
-      0 : writeln(str_wcaption,' ',str_cprt,str_UDPPort,net_ServerPort);
+      0 : writeln(str_wcaption,' ',str_copyright,str_UDPPort,net_ServerPort);
       2 : writeln(str_GameStatus, Dedicated_GameStatusStr);
       4 : writeln(str_GameOptions);
       6 : Dedicated_screenLine(str_game_FixedPositions,1, str_game_AISlots,25, str_game_NoNewObservers,50, '' ,1,'',55,'',70);
