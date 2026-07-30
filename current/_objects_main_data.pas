@@ -4,7 +4,7 @@
 //   UNITS CONSTANT DATA FUNCTIONS
 //
 
-procedure unit_ApplyUID(pu:PTUnit;clientSwitch:boolean=false);
+procedure unit_ApplyUID(pu:PTUnit{$IFDEF _FULLGAME};clientSwitch:boolean=false{$ENDIF});
 begin
    with pu^ do
    begin
@@ -25,8 +25,7 @@ begin
            with g_unitsVis[unum] do
            begin
               animw  := uid_AnimStepWalk;
-              shadowz:= unit_CalcShadowZ(pu,not clientSwitch);   //;shadowOpt:boolean=true
-              //fly_height[false]    unit_BehaviorSpecial      clientSwitch
+              shadowz:= unit_CalcShadowZ(pu,not clientSwitch);
               unit_CalcFogR(pu);
            end;
          {$ENDIF}
@@ -1413,16 +1412,22 @@ begin
 end;
 UID_Flyer:
 begin
+   {
+   3  20 600
+      30 500
+      40 400 +
+      60 200
+   }
    uid_MaxHits1        := 2000;
-   uid_req_EnergyLevel := 500;
+   uid_req_EnergyLevel := 400;
    uid_r               := 18;
-   uid_MSpeed_Base     := 20;
+   uid_MSpeed_Base     := 18;
    uid_MSpeed_Upgr     := upgr_uac_MechSpeed;
    uid_Armor_upgr1     := upgr_uac_MechArmor;
    uid_SightR_upgr     := upgr_uac_UnitSightR;
    uid_SightR_Base     := 275;
    uid_uibtn           := 13;
-   uid_ProdTimeSec     := ptime1h;
+   uid_ProdTimeSec     := ptime2;
    uid_isfly           := uf_fly;
    uid_LimitUse        := ul3;
    uid_CanAttack       := true;
@@ -2174,25 +2179,25 @@ begin
    // weapon target requirements set
    //                                      wtr_owner_p wtr_owner_a wtr_owner_e wtr_hits_h wtr_hits_d wtr_hits_a wtr_bio wtr_mech wtr_unit wtr_building wtr_complete wtr_ncomplete wtr_ground wtr_fly wtr_light wtr_heavy;
    wtrset_all                            :=wtr_owner_p+wtr_owner_a+wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy                          :=                        wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+ //wtrset_enemy                          :=                        wtr_owner_e+wtr_hits_h+wtr_hits_d+wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
    wtrset_enemy_alive                    :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy_alive_light              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
+ //wtrset_enemy_alive_light              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
    wtrset_enemy_alive_ground             :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
-   wtrset_enemy_alive_ground_light       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light          ;
-   wtrset_enemy_alive_ground_heavy       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy;
-   wtrset_enemy_alive_ground_heavy_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio         +wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy;
+ //wtrset_enemy_alive_ground_light       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light          ;
+ //wtrset_enemy_alive_ground_heavy       :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy;
+ //wtrset_enemy_alive_ground_heavy_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio         +wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground        +          wtr_heavy;
    wtrset_enemy_alive_ground_mech        :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
    wtrset_enemy_alive_fly                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy_alive_fly_mech           :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy;
+ //wtrset_enemy_alive_fly_mech           :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+           wtr_fly+wtr_light+wtr_heavy;
    wtrset_enemy_alive_mech               :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+        wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy_alive_buildings          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy_alive_units              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy_alive_ground_buildings   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
-   wtrset_enemy_alive_bio                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
-   wtrset_enemy_alive_bio_light          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
-   wtrset_enemy_alive_heavy_bio          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
-   wtrset_enemy_alive_ground_bio         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light+wtr_heavy;
-   wtrset_enemy_alive_ground_light_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light          ;
+ //wtrset_enemy_alive_buildings          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+ //wtrset_enemy_alive_units              :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+wtr_mech+wtr_unit             +wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+ //wtrset_enemy_alive_ground_buildings   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+                 wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground        +wtr_light+wtr_heavy;
+ //wtrset_enemy_alive_bio                :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
+ //wtrset_enemy_alive_bio_light          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
+ //wtrset_enemy_alive_heavy_bio          :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light          ;
+ //wtrset_enemy_alive_ground_bio         :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light+wtr_heavy;
+ //wtrset_enemy_alive_ground_light_bio   :=                        wtr_owner_e+wtr_hits_h           +wtr_hits_a+wtr_bio+         wtr_unit+             wtr_complete+wtr_ncomplete+wtr_ground+        wtr_light          ;
    wtrset_heal                           :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                      +wtr_bio+         wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
    wtrset_repair                         :=wtr_owner_p+wtr_owner_a            +wtr_hits_h                              +wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;
    wtrset_resurect                       :=wtr_owner_p+wtr_owner_a+wtr_owner_e+           wtr_hits_d           +wtr_bio+wtr_mech+wtr_unit+wtr_building+wtr_complete+wtr_ncomplete+wtr_ground+wtr_fly+wtr_light+wtr_heavy;

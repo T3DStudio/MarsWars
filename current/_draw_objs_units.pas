@@ -361,9 +361,10 @@ end;
 
 procedure unit_UICountersAll;
 var
-u :integer;
+u   : integer;
 tu,
-pu:PTUnit;
+pu  : PTUnit;
+ctab: TTabControlContent;
 begin
    for u:=0 to 255 do
    begin
@@ -401,6 +402,8 @@ begin
 
    ui_CommanderClear;
 
+   ctab:=ui_ControlTabType;
+
    for u:=1 to MaxUnits do
    begin
       pu:=@g_units[u];
@@ -408,7 +411,8 @@ begin
         if(playeri=UIPlayer)and(hits>0)then
           if(IsUnitRange(transportU,@tu))then
           begin
-             if(tu^.isselected)then ui_units_inapc[uidi]+=1;
+             if(tu^.isselected)
+             or((ctab in [tcc_replay,tcc_observer])and(m_UnitTargetN=tu^.unum))then ui_units_inapc[uidi]+=1;
           end
           else unit_UICounters(pu);
    end;

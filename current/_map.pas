@@ -525,9 +525,13 @@ end;
 
 function map_KeyPoints_CheckPos(ix,iy,aCaptureR:integer):boolean;
 begin
-   map_KeyPoints_CheckPos:=(map_IfPlayerStartHere (ix,iy,base_r1,0,map_PStartsGap))
-                         or(map_IfKeyPointHere    (ix,iy,base_r1  ))
-                         or(map_DistToObstacleEdge(ix,iy,aCaptureR,ObstacleMinInnerR)<aCaptureR);
+   map_KeyPoints_CheckPos:=(map_IfPlayerStartHere(ix,iy,base_r1h,0,map_PStartsGap))
+                         or(map_IfKeyPointHere   (ix,iy,base_r1h  ));
+   if(not map_KeyPoints_CheckPos)then
+     case map_GenOnObstacle of
+     true : map_KeyPoints_CheckPos:=map_DistToObstacleEdge(ix,iy,aCaptureR,ObstacleMinInnerR)<aCaptureR;
+     false: map_KeyPoints_CheckPos:=map_IfObstacleHere(ix,iy,aCaptureR,0);
+     end;
 end;
 
 {procedure map_KeyPoints_Rect(cx,cy,cr,cdir,acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal);
@@ -632,7 +636,7 @@ mc_KeyPoints: begin
                          keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyS,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitS);
 
    // center generator
-   if(map_scenario<>mc_KotH)then
+   if(map_scenario<>mc_KotH){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF}then
      case map_template of
      mapt_lake,
      mapt_island,
@@ -1179,6 +1183,7 @@ begin
 gt_none,
 gt_scirmish: begin
    {$ENDIF}
+             map_GenOnObstacle:=true;
              Game_ShuffleAINames;
 
              map_BaseVars(true);

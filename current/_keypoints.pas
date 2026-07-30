@@ -148,6 +148,25 @@ begin
           FillChar(kp_LimitTeamC  ,SizeOf(kp_LimitTeamC  ),0);
        end;
 end;
+
+procedure Scenario_KeyPointsEndGameClientFix;
+var i:byte;
+begin
+   writeln('Scenario_KeyPointsEndGameClientFix');
+   for i:=0 to LastKeyPoint do
+     with map_KeyPointsL[i] do
+     with kp_TeamData[MaxPlayers] do
+       if(kptd_Active)and(kp_Energy<=0)then
+       begin
+          if(kptd_TimerOwnerPlayer<=LastPlayer)and(kptd_TimerOwnerPlayer<>kptd_OwnerPlayer)then
+          begin
+             KeyPoint_ChangeOwner(i,kptd_TimerOwnerPlayer,false);
+             kptd_Timer:=0;
+          end;
+       end;
+   Scenario_KeyPointVisionAll;
+end;
+
 {$ENDIF}
 
 procedure Scenario_KeyPointsCodeServer;

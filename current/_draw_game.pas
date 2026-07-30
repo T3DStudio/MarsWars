@@ -176,7 +176,7 @@ begin
         color:=acolor;
      end;
 end;
-procedure UnitsInfo_AddRect(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
+{procedure UnitsInfo_AddRect(ax0,ay0,ax1,ay1:integer;acolor:TMWColor);
 begin
    if(UnitsInfo_New)then
      with vid_PrimitivesL[vid_PrimitivesS-1] do
@@ -188,7 +188,7 @@ begin
         y1   :=ay1;
         color:=acolor;
      end;
-end;
+end; }
 procedure UnitsInfo_AddRectText(ax0,ay0,ax1,ay1:integer;acolor:TMWColor;slt,slt2,srt,srd,sld:string6);
 begin
    if(UnitsInfo_New)then
@@ -369,7 +369,6 @@ buff_sprite_w = 18;
 var
 srect,
 choosen,
-pain,
 hbar   : boolean;
 acolor : TMWColor;
 t,
@@ -478,7 +477,6 @@ begin
       2:;
       end;
 
-      pain:=(buffs[ub_PainState]>0)and(uid_ismech)and(not uid_isbuilding);
       buffx:=0;
       if(buffs[ub_HellVision   ]>0)then buffx+=1;
       if(buffs[ub_SphereInvuln ]>0)then buffx+=1;

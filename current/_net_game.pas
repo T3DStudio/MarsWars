@@ -700,11 +700,13 @@ nmid_LobbyInfo    : begin
                    end;
 nmid_GameData    : if(g_started)then
                    begin
+                      i:=g_status;
                       g_status:=net_readbyte;
                       case g_status of
                       gs_running    : rclinet_gframe(LocalPlayer,net_SendTimeServer,false,false);
                       gs_waitplayers: net_ReadPlayersDelay;
                       end;
+                      if(g_status<>i)and(game_IsEnded)then Scenario_KeyPointsEndGameClientFix;
                    end;
         end;
      end;

@@ -829,6 +829,37 @@ co_empty   : if(ui_uibtn_move  >0) // rclick
    m_brush:=co_empty;
 end;
 
+function ui_ActCanStuckPress(act:byte):boolean;
+function checkAbility(aid:byte):boolean;
+begin
+   checkAbility:=false;
+   with g_aids[aid] do
+     case ua_type of
+     uat_notarget : checkAbility:=true;
+     uat_point,
+     uat_UnitAny,
+     uat_UnitOwn,
+     uat_UnitAlly,
+     uat_UnitEnemy: checkAbility:=-m_brush<>aid;
+     end;
+end;
+
+begin
+   ui_ActCanStuckPress:=false;
+   case act of
+   iAct_Control_UAbility1..
+   iAct_Control_UAbility3  : if(ui_CommandercpU<>nil)then
+                               with ui_CommandercpU^ do
+                               with uid^ do
+                                 case act of
+                                 iAct_Control_UAbility1: ui_ActCanStuckPress:=checkAbility(uid_ability1);
+                                 iAct_Control_UAbility2: ui_ActCanStuckPress:=checkAbility(uid_ability2);
+                                 iAct_Control_UAbility3: ui_ActCanStuckPress:=checkAbility(uid_ability3);
+                                 end;
+   iAct_Control_UProdCncl  : ui_ActCanStuckPress:=true;
+   end;
+end;
+
 procedure ui_ExecInGameAction(action:byte;click_type:TTabBTNClickType;clickSound:pPTSoundSet);
 var
 u,lbrush:integer;
@@ -942,7 +973,12 @@ begin
    iAct_Control_MarkAttack: if(SoundEnabledLeft)then m_brush :=co_markAttack;
 
    iAct_InGamePause       : if(SoundEnabledLeft)then Game_PauseToggle(false);
-   iAct_InGameMenu        : if(SoundEnabledLeft)then GameOpenMenu;
+   iAct_InGameMenu        : if(SoundEnabledLeft)then
+                            begin
+                               GameOpenMenu;
+                               if(net_status=ns_none)then
+                                 clickSound^:=snd_SwitchOn;
+                            end;
 
    iAct_Replay_Fast       : if(SoundEnabledLeft)then sys_uncappedFPS:=not sys_uncappedFPS;
    iAct_Replay_Pause      : if(SoundEnabledLeft)then replay_TogglePause(false);
@@ -1345,8 +1381,8 @@ begin
         for k:=0 to ui_ButtonsNum do
         begin
            act:=ui_panel_CTabIActs[ctab,k];
-           //or((ctab=tcc_controls)and(g_status=gs_running)and(InputActionStuckP(act)))
-           if(InputActionPressed(act))then
+           if(InputActionPressed(act))
+           or((ctab=tcc_controls)and(g_status=gs_running)and(ui_ActCanStuckPress(act))and(InputActionStuckP(act)))then
              ui_ExecInGameAction(act,pct_left,@clickSound);
         end;
 

@@ -488,6 +488,7 @@ begin
    str_uarm_SplashDamageR        := 'splash damage radius: ';
    str_uarm_Upgrade              := 'upgrade: ';
    str_uarm_Factor               := ', factor: ';
+   str_uarm_ShotsPerSec          := ' hits per sec.';
 
    str_ability_passive           := 'Passive ability';
    str_ability_active            := 'Active ability';
@@ -598,7 +599,7 @@ begin
    str_SetAbilityBaseHint(uab_SphereInvuln       ,'Invulnerability Sphere'   ,'Makes target invulnerable for '+i2s(invuln_time_sec)+' seconds');
    str_SetAbilityBaseHint(uab_SphereRDamage      ,'Damage Resistance Sphere' ,'Halves damage to the target for '+i2s(rdamage_time_sec)+' seconds.');
    str_SetAbilityBaseHint(uab_SphereDDamage      ,'Double Damage Sphere'     ,'Doubles the target`s damage for '+i2s(ddamage_time_sec)+' seconds.');
-   str_SetAbilityBaseHint(uab_SphereTurbo        ,'Turbo Sphere'             ,'Increases target`s speed for '+i2s(ddamage_time_sec)+' seconds.');
+   str_SetAbilityBaseHint(uab_SphereTurbo        ,'Turbo Sphere'             ,'Speeds up all target parameters by 2 times for '+i2s(dturbo_time_sec)+' seconds.');
    str_SetAbilityBaseHint(uab_UACGeneral         ,'UAC General Rank'         ,'Valid targets: non-heroic allied UAC units. Makes the target a "heroic", which increases the damage it deal by 1.5 times and reduces the damage it take by a third. There can be a maximum of '+b2s(UACGeneralsMax)+' "heroic" units in your army.');
    str_SetAbilityBaseHint(uab_Bribe              ,'Bribe'                    ,'Valid targets: non-heroic enemy UAC units. Turns the target to your side. There must be at least one UAC unit allied with you around the target');
    str_SetAbilityBaseHint(uab_Hack               ,'System Hack'              ,'Valid targets: completed enemy UAC buildings. Turns the target to your side. There must be at least one UAC unit allied with you around the target');
@@ -1172,7 +1173,7 @@ begin
    DocHelp_AddBaseMchanics(tc_docbr);
    DocHelp_AddBaseMchanics(tc_docbr+'There are also 2 additional types of resources used for special technologies and abilities:');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_ui_HellPower+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.');
-   DocHelp_AddBaseMchanics('The replenishment rate increases with each additional "Altar of Pain", but constructing more than three "Altars of Pain" does not provide any further benefit. When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.');
+   DocHelp_AddBaseMchanics('The replenishment rate increases with each additional "Altar of Pain", but constructing more than '+i2s(scirmish_MaxHAltar)+' "Altars of Pain" does not provide any further benefit. When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.');
    DocHelp_AddBaseMchanics(str_hint_MaxQuantity+i2s(HellPower_Max)+'. ');
    DocHelp_AddBaseMchanics(tc_docbr+'- '+str_ui_UACLoot+' - this resource is acquired by both factions through the destruction of enemy UAC units and buildings. '+str_hint_MaxQuantity+i2s(UACLoot_Max)+'.');
    DocHelp_AddBaseMchanics(tc_docbr);

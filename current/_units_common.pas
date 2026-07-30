@@ -247,7 +247,7 @@ begin
         case uid_isbuilding of
         true : if(buffs[ub_SpecPause]>0)then exit;
         false: if(buffs[ub_PainState]>0)
-               or(buffs[ub_Cast]>0)then exit;
+               or(buffs[ub_Cast     ]>0)then exit;
         end;
 
       if(IsUnitRange(transportU,nil))then exit;

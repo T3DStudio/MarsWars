@@ -52,8 +52,8 @@ begin
    ui_blink1_colorb  :=ui_blink_timer1>ui_blink_periodh;
    ui_blink2_colorb  :=ui_blink_timer2>ui_blink_period1;
 
-   ui_blink1_color_BG:=ui_blink_color1[ui_blink1_colorb];
-   ui_blink1_color_BY:=ui_blink_color2[ui_blink1_colorb];
+ //ui_blink1_color_BG:=ui_blink_color1[ui_blink1_colorb];
+ //ui_blink1_color_BY:=ui_blink_color2[ui_blink1_colorb];
    ui_blink2_color_BG:=ui_blink_color1[ui_blink2_colorb];
    ui_blink2_color_BY:=ui_blink_color2[ui_blink2_colorb];
 

@@ -723,10 +723,10 @@ begin
    //vlineColor(tar,menu_w-1,0,menu_h,c_white);
    //vlineColor(tar,400,0,600,c_yellow);
 
-   {$IFDEF TESTMODE}
+  { {$IFDEF TESTMODE}
    if(TestMode>0)then
    draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
-   {$ENDIF}
+   {$ENDIF} }
 
    // MENU ITEMS
 

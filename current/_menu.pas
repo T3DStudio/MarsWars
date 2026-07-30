@@ -1129,11 +1129,11 @@ begin
    menu_update:=menu_KeyDelete or menu_update;
 end;
 
-function menu_Controls_MLB(item:byte;check:boolean):boolean;
+function menu_Controls_MLB(item:byte;check:boolean;clickSound:pPTSoundSet=nil):boolean;
 begin
    menu_Controls_MLB:=true;
    case item of
-mi_back                : if(not check)then MenuBack(false,false);
+mi_back                : if(not check)then MenuBack(false,false,clickSound);
 mi_exit                : if(not check)then GameCycle:=false;
 mi_StartTimer          : if(not check)then {$IFDEF TESTMODE}
                                            if(TestMode>0)
@@ -1559,8 +1559,8 @@ procedure menu_Controls;
 var
 mnx,
 mny       :integer;
-changed,
-clickSound:boolean;
+changed   :boolean;
+clickSound:PTSoundSet;
 procedure SetSelectedItem(newItem:byte;fromTarget:boolean=false);
 begin
    if(menu_items[newItem].mi_state>as_off)then
@@ -1577,7 +1577,7 @@ begin
    mouse_x:=round((mouse_x-menu_Surface_x)*menu_Surface_sc);
    mouse_y:=round((mouse_y-menu_Surface_y)*menu_Surface_sc);
 
-   clickSound:=false;
+   clickSound:=nil;
    changed:=false;
 
    // force menu msg box error awaiting for server
@@ -1599,7 +1599,7 @@ begin
       if(InputActionPressed(iAct_any))then
       begin
          menu_image:=nil;
-         clickSound:=true;
+         clickSound:=snd_click;
          changed:=true;
          menu_update:=true;
       end;
@@ -1638,11 +1638,12 @@ begin
 
 ///////////////////////////////////   left button pressed
    case InputActionPressed(iact_MLB) of
-   true : if(menu_Controls_MLB(menu_ItemSelected,false))then
+   true : if(menu_Controls_MLB(menu_ItemSelected,false,@clickSound))then
           begin
              if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnLeft,true);
              menu_update:=true;
-             clickSound :=true;
+             if(clickSound=nil)then
+               clickSound :=snd_click;
              if(not GetBBit(@menu_ItemActs,miat_TextEdit))
              and(not InputActionDPressed(iact_MLB))then menu_ItemSelected:=0;
           end;
@@ -1654,7 +1655,7 @@ begin
           begin
              if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
              menu_update:=true;
-             clickSound :=true;
+             clickSound :=snd_click;
           end;
    false: if(menu_Controls_DMLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
    end;
@@ -1665,7 +1666,7 @@ begin
           begin
              if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnRight,true);
              menu_update:=true;
-             clickSound :=true;
+             clickSound :=snd_click;
              menu_ItemSelected:=0;
           end;
    false: if(menu_Controls_MRB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnRight,true);
@@ -1741,7 +1742,7 @@ begin
      or(menu_hint_pos[menu_ItemTargetP]>0)then menu_update:=true;
    menu_ItemTargetP:=menu_ItemTarget;
 
-   if(clickSound)then snd_SoundPlayUI(snd_click);
+   if(clickSound<>nil)then snd_SoundPlayUI(clickSound);
 
    mouse_x:=mnx;
    mouse_y:=mny;

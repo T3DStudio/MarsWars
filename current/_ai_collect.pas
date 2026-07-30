@@ -237,30 +237,34 @@ begin
       begin
          if(tu^.buffs[ub_SphereInvuln]<=0)then
          begin
-            // enemy
-            if(not tu^.isfly)
-            or(tu^.uid^.uid_FlyLevelLikeTarget)then
+            if(tu^.iscomplete)then
             begin
-               setNearestTarget(@ai_enemy_grd_u,@ai_enemy_grd_d,ud);
-               if(tu^.uid^.uid_CanAttack)
-               and(ud<base_r2)then ai_enemylimit_baseR2_grd+=tu^.uid^.uid_LimitUse;
-            end
-            else
-            begin
-               setNearestTarget(@ai_enemy_air_u,@ai_enemy_air_d,ud);
-               if(tu^.uid^.uid_CanAttack)
-               and(ud<base_r2)then ai_enemylimit_baseR2_fly+=tu^.uid^.uid_LimitUse;
+               // enemy
+               if(not tu^.isfly)
+               or(tu^.uid^.uid_FlyLevelLikeTarget)then
+               begin
+                  setNearestTarget(@ai_enemy_grd_u,@ai_enemy_grd_d,ud);
+                  if(tu^.uid^.uid_CanAttack)
+                  and(ud<base_r2)then ai_enemylimit_baseR2_grd+=tu^.uid^.uid_LimitUse;
+               end
+               else
+               begin
+                  setNearestTarget(@ai_enemy_air_u,@ai_enemy_air_d,ud);
+                  if(tu^.uid^.uid_CanAttack)
+                  and(ud<base_r2)then ai_enemylimit_baseR2_fly+=tu^.uid^.uid_LimitUse;
+               end;
+               if(tu^.uid^.uid_isbuilding)and(pfcheck)then
+                 if(not tu^.isfly)
+                 or(isattackable)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
+               if(tu^.uid^.uid_CanAttack)then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
             end;
-            if(tu^.uid^.uid_isbuilding)and(pfcheck)then
-              if(not tu^.isfly)
-              or(isattackable)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
-            if(tu^.uid^.uid_CanAttack)then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
 
             // invis enemy in vision
             if (tu^.a_rld>0)
             and(tu^.buffs[ub_Invisibility]>0)
             and(tu^.TeamDetection[team]<=0)then
               setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
+
 
             // uac strike target
             if(uidi=UID_URMStation)then

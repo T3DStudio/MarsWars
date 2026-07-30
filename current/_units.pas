@@ -1819,10 +1819,11 @@ begin
       if(unit_AbilityCheck>0)then exit;
 
       case aid of
+      uab_HellCCLandTo,    
+      uab_UACCCLandTo      :;
       uab_HellCCLand,
-      uab_HellCCLandTo,
-      uab_UACCCLand,
-      uab_UACCCLandTo      : if(rld>0)then unit_AbilityCheck:=lmt_ability_reload;
+      uab_UACCCLand        : if(zfall<>0)
+                             or(buffs[ub_Cast]>0)then unit_AbilityCheck:=lmt_ability_Casting;
 
       uab_HEyeVision       : unit_AbilityCheck:=unit_ability_HellVision   (pCaster,0        ,true );
       uab_HEyeSpawn        : unit_AbilityCheck:=unit_ability_SpawnEvilEye (pCaster,0,0      ,true );
@@ -2134,7 +2135,6 @@ begin
       // attack
       if(uo_id=ua_amove)then
       begin
-         //buffs[ub_SpecPause]
          unit_attack(pu);
          if(StayWaitForNewTarget>0)then
          begin
@@ -2174,6 +2174,7 @@ begin
                                       zfall-=fly_hz;
 
                                       isfly:=uf_fly;
+                                      buffs[ub_Cast]:=fr_fps1;
                                    end;
                                    speed:=uid_MSpeed_Base;
                                 end
@@ -2190,6 +2191,7 @@ begin
                                          unit_OrderClear(pu,255);
                                       end;
                                       isfly:=uf_ground;
+                                      buffs[ub_Cast]:=fr_fps1;
                                    end;
                                    speed:=0;
 

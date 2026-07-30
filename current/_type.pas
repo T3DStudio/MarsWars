@@ -122,7 +122,7 @@ TThemeObstacleAnim = record
    toa_atime:integer
 end;
  TThemeObstacleAnimL = array of TThemeObstacleAnim;
-PTThemeObstacleAnimL = ^TThemeObstacleAnimL;
+//PTThemeObstacleAnimL = ^TThemeObstacleAnimL;
 
 TThemeCircleStyle = (tcs_default=0,tcs_smooth,tcs_square);
 TThemeAnimStyle   = (tas_liquid =0,tas_magma ,tas_noanim);

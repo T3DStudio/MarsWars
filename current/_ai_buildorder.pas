@@ -421,7 +421,7 @@ begin
 
       if(build_uid=0)then exit;
 
-     // if(isselected)then writeln('build_dir=',build_dir,' build_step=',build_step);
+      //if(isselected)then writeln('build_uid=',build_uid,' build_dir=',build_dir,' build_step=',build_step);
 
       // build
       if(build_x=0)then

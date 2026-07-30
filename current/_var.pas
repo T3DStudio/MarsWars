@@ -74,6 +74,7 @@ map_KeyPointsN    : byte = 0;
 map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
 map_NeedTransport : boolean = false;
 map_BusyCenter    : boolean = false;
+map_GenOnObstacle : boolean = true;
 
 map_Start2GeneratorStep: integer = 50;
 
@@ -113,26 +114,26 @@ fr_LastTicks,
 fr_BaseTicks      : cardinal;
 
 wtrset_all,
-wtrset_enemy,
+//wtrset_enemy,
 wtrset_enemy_alive,
-wtrset_enemy_alive_light,
+//wtrset_enemy_alive_light,
 wtrset_enemy_alive_ground,
-wtrset_enemy_alive_ground_light,
+//wtrset_enemy_alive_ground_light,
 wtrset_enemy_alive_ground_mech,
 wtrset_enemy_alive_fly,
-wtrset_enemy_alive_fly_mech,
-wtrset_enemy_alive_fly_buildings,
+//wtrset_enemy_alive_fly_mech,
+//wtrset_enemy_alive_fly_buildings,
 wtrset_enemy_alive_mech,
-wtrset_enemy_alive_buildings,
-wtrset_enemy_alive_units,
-wtrset_enemy_alive_ground_buildings,
-wtrset_enemy_alive_bio,
-wtrset_enemy_alive_bio_light,
-wtrset_enemy_alive_heavy_bio,
-wtrset_enemy_alive_ground_heavy,
-wtrset_enemy_alive_ground_heavy_bio,
-wtrset_enemy_alive_ground_bio,
-wtrset_enemy_alive_ground_light_bio,
+//wtrset_enemy_alive_buildings,
+//wtrset_enemy_alive_units,
+//wtrset_enemy_alive_ground_buildings,
+//wtrset_enemy_alive_bio,
+//wtrset_enemy_alive_bio_light,
+//wtrset_enemy_alive_heavy_bio,
+//wtrset_enemy_alive_ground_heavy,
+//wtrset_enemy_alive_ground_heavy_bio,
+//wtrset_enemy_alive_ground_bio,
+//wtrset_enemy_alive_ground_light_bio,
 wtrset_heal,
 wtrset_repair,
 wtrset_resurect   : cardinal;
@@ -221,8 +222,8 @@ ui_blink_timer2   : integer = 0;
 
 ui_blink1_colorb,
 ui_blink2_colorb  : boolean;
-ui_blink1_color_BG,
-ui_blink1_color_BY,
+//ui_blink1_color_BG,
+//ui_blink1_color_BY,
 ui_blink2_color_BG,
 ui_blink2_color_BY: TMWColor;
 ui_blink3         : byte;
@@ -1182,6 +1183,7 @@ str_uarm_BonusAUnitR,
 str_uarm_BonusABuildingR,
 str_uarm_Upgrade,
 str_uarm_Factor,
+str_uarm_ShotsPerSec,
 
 str_gmsg_RecordStart,
 str_gmsg_RecordError,

@@ -1014,8 +1014,6 @@ begin
             else
               if(pu_prev^.hits>0)and(hits<=0)and(buffs[ub_Resurected]=0)then  // death
               begin
-                // if (playeri=6)then writeln('kill unit  ',unum);
-
                  with uid^ do
                    if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
                  effect_UnitDeath(pu_cur,hits<=hits_fdead,@vis);

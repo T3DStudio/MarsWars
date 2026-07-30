@@ -14,8 +14,10 @@ begin
    i:=0;
    repeat
       i+=1;
-      s:=str_ScreenShotPrefix+i2s(i)+fileExt_Scrshot;
+      s:=folder_screenshots+str_ScreenShotPrefix+i2s(i)+fileExt_Scrshot;
    until not FileExists(s);
+   if(not MainMenu)then
+     GameLog_Chat(255,LocalPlayer,s);
    s:=s+#0;
    sdl_saveBMP(vid_screen,@s[1]);
 end;

@@ -897,6 +897,8 @@ begin
    case ui_ControlTabType of
    tcc_observer,
    tcc_replay  : begin
+                    //if(g_PlayersGame[LocalPlayer].isdefeated)
+                    //then
                     draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_observer+' (',ta_RU,255,c_white);
                     if(UIPlayer<=LastPlayer)
                     then str:=g_PlayersGame[UIPlayer].name+tc_white+')'
@@ -967,9 +969,9 @@ begin
         for i:=0 to slist_n-1 do
           draw_text(tar,x,y+txt_line_h2*i,slist_l[i],ta_LU,255,c_white);
      end;
-   {$IFDEF TESTMODE}
+   {{$IFDEF TESTMODE}
    if(TestMode>0)then draw_text(tar,ui_cam_hw,ui_cam_hh,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
-   {$ENDIF}
+   {$ENDIF}  }
 
    if(vid_ShowFPS           )then draw_text(tar,ui_FPSx,ui_FPSy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
 

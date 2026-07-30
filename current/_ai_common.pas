@@ -841,8 +841,8 @@ begin
                            if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
                            if(l>=0)then continue;
                            end;
-                    false: if((kp_LimitPlayerP[playeri]>=(kp_CaptureLimit  +uid_LimitUse))and(d> kp_RCapture))
-                           or((kp_LimitPlayerP[playeri]> (kp_CaptureLimit*2+uid_LimitUse))and(d<=kp_RCapture))then continue;
+                    false: if(((kp_LimitPlayerP[playeri])>=kp_CaptureLimit  )and(d> kp_RCapture))        //uid_LimitUse
+                           or(((kp_LimitPlayerP[playeri])>=kp_CaptureLimit*2)and(d<=kp_RCapture))then continue;
                     end;
 
                   if(kptd_OwnerTeam<=LastPlayer)

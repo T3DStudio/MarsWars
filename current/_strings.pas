@@ -159,7 +159,7 @@ begin
      end;
 end;
 
-function str_Center0(src:shortstring;l:byte):shortstring;
+{function str_Center0(src:shortstring;l:byte):shortstring;
 begin
   str_Center0:=src ;
    if(length(src)<l)then
@@ -173,7 +173,7 @@ begin
          l-=1;
       end;
    end;
-end;
+end; }
 
 function str_JustifyBySpaces(src:shortstring;size:byte):shortstring;
 var l,i:byte;
@@ -797,7 +797,7 @@ begin
      if(aw_FakeShotsN>0)
      then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
      else sps:=(fr_fps1*n/aw_reload);
-     STRADD(@str_UnitArmDPS,'*'+Float2Str(sps),'');
+     STRADD(@str_UnitArmDPS,Float2Str(sps)+str_uarm_ShotsPerSec,sep_scomma);
   end;
 end;
 
@@ -819,7 +819,6 @@ begin
       wpt_resurect  :      STRADD(@str_UnitArmLine,'- '+str_uarm_ressurect,sep_scomma);
       wpt_heal      :      STRADD(@str_UnitArmLine,'- '+str_uarm_heal     ,sep_scomma);
       wpt_unit      :      STRADD(@str_UnitArmLine,'- '+str_uarm_spawn+' "'+g_uids[aw_object_id].uid_str_name+'"',sep_scomma);
-      //wpt_suicide   :      STRADD(@str_UnitArmLine,'- '+str_uarm_suicide  ,sep_scomma);
       end;
 
       if(aw_min_range>0)then

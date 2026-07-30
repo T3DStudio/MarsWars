@@ -5,15 +5,15 @@ MarsWars: HELL & UAC
 <div align="center"><table bgcolor="#000000" width="1000" border="1" bordercolor="#ffffff" background="../graphic/map/terrains/ter11.png">
 <tr><td align="center" ><b><font size="66" color="#D8893A">MarsWars: HELL & UAC</font></b></td></tr>
 <tr><td align="left">
-<a href="#Credits"><u><b>1. Credits</b></u></a><br>
-<a href="#Game Controls"><u><b>2. Game Controls</b></u></a><br>
-<a href="#Game Hotkeys"><u><b>3. Game Hotkeys</b></u></a><br>
-<a href="#Game UI"><u><b>4. Game UI</b></u></a><br>
-<a href="#Game Mechanics"><u><b>5. Game Mechanics</b></u></a><br>
-<a href="#Units Info"><u><b>6. Units Info</b></u></a><br>
-<a href="#Units Balance"><u><b>7. Units Balance</b></u></a><br>
-<a href="#Upgrades Info"><u><b>8. Upgrades Info</b></u></a><br>
-<a href="#Other"><u><b>9. Other</b></u></a><br>
+<a href="#Credits"><u><b>10. Credits</b></u></a><br>
+<a href="#Game Controls"><u><b>11. Game Controls</b></u></a><br>
+<a href="#Game Hotkeys"><u><b>12. Game Hotkeys</b></u></a><br>
+<a href="#Game UI"><u><b>13. Game UI</b></u></a><br>
+<a href="#Game Mechanics"><u><b>14. Game Mechanics</b></u></a><br>
+<a href="#Units Info"><u><b>15. Units Info</b></u></a><br>
+<a href="#Units Balance"><u><b>16. Units Balance</b></u></a><br>
+<a href="#Upgrades Info"><u><b>17. Upgrades Info</b></u></a><br>
+<a href="#Other"><u><b>18. Other</b></u></a><br>
 <br><center><h2 id="Credits"><b>Credits</b></h2></center><br>
 <font color="FF8C00">MarsWars: HELL & UAC</font> - is a real-time strategy game based on Doom 2 
 universe. Current version is v54.<br>
@@ -380,7 +380,7 @@ technologies and abilities:
 <br>- <font color="FFFF00">Hell power</font><font color="FFFFFF"> - when playing as the Hell faction, this resource is </font>
 automatically replenished by the "Altar of Pain" building.
 The replenishment rate increases with each additional "Altar of Pain", but 
-constructing more than three "Altars of Pain" does not provide any further 
+constructing more than 3 "Altars of Pain" does not provide any further 
 benefit. When playing as UAC, the resource is generated from destroyed 
 enemy units and Hell structures.
 Maximum quantity: 15000. 
@@ -719,11 +719,13 @@ Center,Advanced Hell Command Center
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>,<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>] except [Cacodemon], base impact 
-<font color="FF0000">45</font>*3, upgrade: "Hell Firepower"(+7), factor: 200% 
-[<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>], {<font color="FFFF00">Req.: </font>upgrade "Cacodemon`s Nest "}
+<font color="FF0000">45</font>, 3 hits per sec., upgrade: "Hell Firepower"(+7), 
+factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>], {<font color="FFFF00">Req.: </font>upgrade 
+"Cacodemon`s Nest "}
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>*3, upgrade: "Hell 
-Firepower"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+[<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>, 3 hits per sec., 
+upgrade: "Hell Firepower"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Stone Walls"(+18)
@@ -760,8 +762,9 @@ Firepower"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>*0.5, splash damage radius: 20, 
-upgrade: "Hell Firepower"(+7), factor: 200% [<font color="009600">HEAVY</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>, 0.5 hits per sec., splash 
+damage radius: 20, upgrade: "Hell Firepower"(+7), 
+factor: 200% [<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Stone Walls"(+18)
@@ -917,8 +920,8 @@ target for 30 seconds.
 <br>- Double Damage Sphere (<font color="00FF00">W</font>): Doubles the target`s damage 
 for 20 seconds.
 <br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">9000</font>.
-<br>- Turbo Sphere (<font color="00FF00">E</font>): Increases target`s speed for 20 
-seconds.
+<br>- Turbo Sphere (<font color="00FF00">E</font>): Speeds up all target parameters by 
+2 times for 15 seconds.
 <br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">12000</font>.
 <br> 
 </td></tr>
@@ -949,9 +952,9 @@ Center,Advanced Hell Command Center
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 66, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>*2, 
-upgrade: "Hell Firepower"(+7), factor: 200% 
-[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+range, targets: [<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>, 2 
+hits per sec., upgrade: "Hell Firepower"(+7), factor: 
+200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Stone Walls"(+18)
@@ -992,9 +995,9 @@ upgrade: "Hell Firepower"(+7), factor: 200%
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 66, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>*2, 
-upgrade: "Hell Firepower"(+7), factor: 200% 
-[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+range, targets: [<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>, 2 
+hits per sec., upgrade: "Hell Firepower"(+7), factor: 
+200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Stone Walls"(+18)
@@ -1070,8 +1073,9 @@ Command Center
 <br><br>
 <br>Arming: 
 <br>- melee attack, max. range: 8, targets: [<font color="00FF00">ALIVE</font>], base 
-impact <font color="FF0000">15</font>*1, upgrade: "Claws and Teeth"(+7), factor: 
-300% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FFFF">FLYING</font>],50% [<font color="3232FF">MECHANICAL</font>]
+impact <font color="FF0000">15</font>, 1 hits per sec., upgrade: "Claws and 
+Teeth"(+7), factor: 300% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FFFF">FLYING</font>],50% [<font color="3232FF">MECHANICAL</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1109,13 +1113,14 @@ impact <font color="FF0000">15</font>*1, upgrade: "Claws and Teeth"(+7), factor:
 <br><br>
 <br>Arming: 
 <br>- melee attack, max. range: 8, +zombification, targets: 
-[<font color="00FF00">GROUND</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">15</font>*1, upgrade: "Claws and 
-Teeth"(+7), factor: 300% 
+[<font color="00FF00">GROUND</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">15</font>, 1 hits per sec., 
+upgrade: "Claws and Teeth"(+7), factor: 300% 
 [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FFFF">FLYING</font>],50% [<font color="3232FF">MECHANICAL</font>], {<font color="FFFF00">Req.: </font>
 upgrade "Phantoms"}
 <br>- melee attack, max. range: 8, targets: [<font color="00FF00">ALIVE</font>], base 
-impact <font color="FF0000">15</font>*1, upgrade: "Claws and Teeth"(+7), factor: 
-300% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FFFF">FLYING</font>],50% [<font color="3232FF">MECHANICAL</font>]
+impact <font color="FF0000">15</font>, 1 hits per sec., upgrade: "Claws and 
+Teeth"(+7), factor: 300% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FFFF">FLYING</font>],50% [<font color="3232FF">MECHANICAL</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1152,10 +1157,12 @@ impact <font color="FF0000">15</font>*1, upgrade: "Claws and Teeth"(+7), factor:
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>*1, upgrade: "Hell 
-Firepower"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+[<font color="00FF00">ALIVE</font>] except [Imp], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Hell Firepower"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br>- melee attack, max. range: 8, targets: [Imp], base 
-impact <font color="FF0000">45</font>*1, upgrade: "Claws and Teeth"(+7)
+impact <font color="FF0000">45</font>, 1 hits per sec., upgrade: "Claws and 
+Teeth"(+7)
 <br>bonus anti-fly range: -50
 <br><br>
 <br>Upgrades:
@@ -1193,8 +1200,8 @@ impact <font color="FF0000">45</font>*1, upgrade: "Claws and Teeth"(+7)
 <br><br>
 <br>Arming: 
 <br>- melee attack, max. range: 8, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], 
-base impact <font color="FF0000">45</font>*1.5, upgrade: "Claws and Teeth"(+7), 
-factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+base impact <font color="FF0000">45</font>, 1.5 hits per sec., upgrade: "Claws and 
+Teeth"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1237,10 +1244,12 @@ factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Cacodemon], base impact <font color="FF0000">45</font>*1, upgrade: 
-"Hell Firepower"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
+[<font color="00FF00">ALIVE</font>] except [Cacodemon], base impact <font color="FF0000">45</font>, 1 hits per 
+sec., upgrade: "Hell Firepower"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
 <br>- melee attack, max. range: 8, targets: [Cacodemon], 
-base impact <font color="FF0000">45</font>*1, upgrade: "Claws and Teeth"(+7)
+base impact <font color="FF0000">45</font>, 1 hits per sec., upgrade: "Claws and 
+Teeth"(+7)
 <br>bonus anti-fly range: +50
 <br><br>
 <br>Upgrades:
@@ -1279,11 +1288,12 @@ base impact <font color="FF0000">45</font>*1, upgrade: "Claws and Teeth"(+7)
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>] except [Hell Knight,Baron of Hell], base 
-impact <font color="FF0000">90</font>*1.5, upgrade: "Hell Firepower"(+7), factor: 
-200% [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
+impact <font color="FF0000">90</font>, 1.5 hits per sec., upgrade: "Hell 
+Firepower"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
 <br>- melee attack, max. range: 8, targets: [Hell 
-Knight,Baron of Hell], base impact <font color="FF0000">90</font>*1.5, upgrade: 
-"Claws and Teeth"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
+Knight,Baron of Hell], base impact <font color="FF0000">90</font>, 1.5 hits per 
+sec., upgrade: "Claws and Teeth"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
 <br>bonus anti-unit range: +25
 <br><br>
 <br>Upgrades:
@@ -1322,11 +1332,12 @@ Knight,Baron of Hell], base impact <font color="FF0000">90</font>*1.5, upgrade:
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>] except [Hell Knight,Baron of Hell], base 
-impact <font color="FF0000">90</font>*1.5, upgrade: "Hell Firepower"(+7), factor: 
-200% [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
+impact <font color="FF0000">90</font>, 1.5 hits per sec., upgrade: "Hell 
+Firepower"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
 <br>- melee attack, max. range: 8, targets: [Hell 
-Knight,Baron of Hell], base impact <font color="FF0000">90</font>*1.5, upgrade: 
-"Claws and Teeth"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
+Knight,Baron of Hell], base impact <font color="FF0000">90</font>, 1.5 hits per 
+sec., upgrade: "Claws and Teeth"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FFFF00">LIGHT</font>]
 <br>bonus anti-unit range: +50
 <br><br>
 <br>Upgrades:
@@ -1364,10 +1375,12 @@ Knight,Baron of Hell], base impact <font color="FF0000">90</font>*1.5, upgrade:
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Revenant], base impact <font color="FF0000">67</font>*1, upgrade: 
-"Demon`s Weapons"(+7), factor: 200% [<font color="00FFFF">FLYING</font>]
+[<font color="00FF00">ALIVE</font>] except [Revenant], base impact <font color="FF0000">67</font>, 1 hits per 
+sec., upgrade: "Demon`s Weapons"(+7), factor: 200% 
+[<font color="00FFFF">FLYING</font>]
 <br>- melee attack, max. range: 8, targets: [Revenant], 
-base impact <font color="FF0000">67</font>*1, upgrade: "Claws and Teeth"(+7)
+base impact <font color="FF0000">67</font>, 1 hits per sec., upgrade: "Claws and 
+Teeth"(+7)
 <br>bonus anti-fly range: +100
 <br><br>
 <br>Upgrades:
@@ -1406,9 +1419,10 @@ base impact <font color="FF0000">67</font>*1, upgrade: "Claws and Teeth"(+7)
 <br><br>
 <br>Arming: 
 <br>- spawn "Phantom", max. range: sight range+50, targets: 
-[<font color="00FF00">ALIVE</font>], base impact *0.33, {<font color="FFFF00">Req.: </font>upgrade "Phantoms"}
+[<font color="00FF00">ALIVE</font>], base impact 0.33 hits per sec., {<font color="FFFF00">Req.: </font>upgrade 
+"Phantoms"}
 <br>- spawn "Lost Soul", max. range: sight range+50, 
-targets: [<font color="00FF00">ALIVE</font>], base impact *0.33
+targets: [<font color="00FF00">ALIVE</font>], base impact 0.33 hits per sec.
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1452,8 +1466,9 @@ targets: [<font color="00FF00">ALIVE</font>], base impact *0.33
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Mancubus], base impact <font color="FF0000">45</font>x2*1.2, 
-upgrade: "Demon`s Weapons"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>] except [Mancubus], base impact <font color="FF0000">45</font>x2, 1.2 hits 
+per sec., upgrade: "Demon`s Weapons"(+7), factor: 300% 
+[<font color="FF0000">BUILDING</font>]
 <br>bonus anti-building range: +50
 <br><br>
 <br>Upgrades:
@@ -1492,8 +1507,8 @@ upgrade: "Demon`s Weapons"(+7), factor: 300% [<font color="FF0000">BUILDING</fon
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Arachnotron], base impact <font color="FF0000">90</font>*1.5, 
-upgrade: "Demon`s Weapons"(+7), factor: 200% 
+[<font color="00FF00">ALIVE</font>] except [Arachnotron], base impact <font color="FF0000">90</font>, 1.5 hits 
+per sec., upgrade: "Demon`s Weapons"(+7), factor: 200% 
 [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
 <br>bonus anti-unit range: +50
 <br><br>
@@ -1534,10 +1549,12 @@ upgrade: "Demon`s Weapons"(+7), factor: 200%
 <br>Arming: 
 <br>- resurrection, max. range: 8, targets: [<font color="464646">DEAD</font>,demons&
 zombies] except [Cyberdemon,Spider Mastermind,Arch-
-Vile], base impact *2, {<font color="FFFF00">Req.: </font>upgrade "Resurrection"}
+Vile], base impact 2 hits per sec., {<font color="FFFF00">Req.: </font>upgrade 
+"Resurrection"}
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>*0.5, splash damage radius: 20, 
-upgrade: "Hell Firepower"(+7), factor: 200% [<font color="009600">HEAVY</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>, 0.5 hits per sec., splash 
+damage radius: 20, upgrade: "Hell Firepower"(+7), 
+factor: 200% [<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1575,8 +1592,8 @@ upgrade: "Hell Firepower"(+7), factor: 200% [<font color="009600">HEAVY</font>]
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>] except [Cyberdemon], base impact <font color="FF0000">225</font>*1.25, 
-splash damage radius: 40, upgrade: "Demon`s 
+[<font color="00FF00">ALIVE</font>] except [Cyberdemon], base impact <font color="FF0000">225</font>, 1.25 hits 
+per sec., splash damage radius: 40, upgrade: "Demon`s 
 Weapons"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-building range: +50
 <br><br>
@@ -1616,8 +1633,9 @@ Weapons"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>*3.75, upgrade: "Demon`s 
-Weapons"(+7), factor: 200% [<font color="FF8C00">BIOLOGICAL</font>],50% [<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>, 3.75 hits per sec., upgrade: 
+"Demon`s Weapons"(+7), factor: 200% [<font color="FF8C00">BIOLOGICAL</font>],50% 
+[<font color="FF0000">BUILDING</font>]
 <br>bonus anti-unit range: +50
 <br><br>
 <br>Upgrades:
@@ -1656,10 +1674,10 @@ Weapons"(+7), factor: 200% [<font color="FF8C00">BIOLOGICAL</font>],50% [<font c
 <br><br>
 <br>Arming: 
 <br>- heal/repair, max. range: 64, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="FF8C00">BIOLOGICAL</font>], base impact <font color="00FF00">20</font>*2
+[<font color="00FF00">ALIVE</font>,<font color="FF8C00">BIOLOGICAL</font>], base impact <font color="00FF00">20</font>, 2 hits per sec.
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>*2, upgrade: "Demon`s 
-Weapons"(+7)
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>, 2 hits per sec., 
+upgrade: "Demon`s Weapons"(+7)
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1697,10 +1715,10 @@ Weapons"(+7)
 <br><br>
 <br>Arming: 
 <br>- heal/repair, max. range: 64, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="3232FF">MECHANICAL</font>], base impact <font color="00FF00">20</font>*2
+[<font color="00FF00">ALIVE</font>,<font color="3232FF">MECHANICAL</font>], base impact <font color="00FF00">20</font>, 2 hits per sec.
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>*2, upgrade: "Demon`s 
-Weapons"(+7)
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>, 2 hits per sec., 
+upgrade: "Demon`s Weapons"(+7)
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1737,8 +1755,9 @@ Weapons"(+7)
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Demon`s 
-Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Demon`s Weapons"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1775,9 +1794,9 @@ Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">135</font>*0.67, upgrade: "Demon`s 
-Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>],50% 
-[<font color="3232FF">MECHANICAL</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">135</font>, 0.67 hits per sec., 
+upgrade: "Demon`s Weapons"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>],50% [<font color="3232FF">MECHANICAL</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1814,8 +1833,9 @@ Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Demon`s 
-Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., upgrade: 
+"Demon`s Weapons"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>]
 <br>bonus anti-fly range: -50
 <br><br>
 <br>Upgrades:
@@ -1853,8 +1873,9 @@ Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>*1, splash damage radius: 20, 
-upgrade: "Demon`s Weapons"(+7), factor: 200% [<font color="00FFFF">FLYING</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., splash damage 
+radius: 20, upgrade: "Demon`s Weapons"(+7), factor: 
+200% [<font color="00FFFF">FLYING</font>]
 <br>bonus anti-fly range: +75
 <br><br>
 <br>Upgrades:
@@ -1892,8 +1913,9 @@ upgrade: "Demon`s Weapons"(+7), factor: 200% [<font color="00FFFF">FLYING</font>
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 40, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*1, 
-upgrade: "Demon`s Weapons"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
+range, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 1 hits 
+per sec., upgrade: "Demon`s Weapons"(+7), factor: 300% 
+[<font color="FF0000">BUILDING</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1931,8 +1953,8 @@ upgrade: "Demon`s Weapons"(+7), factor: 300% [<font color="FF0000">BUILDING</fon
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>*2, upgrade: "Demon`s 
-Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>, 2 hits per sec., upgrade: 
+"Demon`s Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
 <br>bonus anti-fly range: +50
 <br><br>
 <br>Upgrades:
@@ -1971,8 +1993,9 @@ Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>*0.5, splash damage radius: 160,
- upgrade: "Demon`s Weapons"(+7), factor: 50% [<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>, 0.5 hits per sec., splash 
+damage radius: 160, upgrade: "Demon`s Weapons"(+7), 
+factor: 50% [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-unit range: +50
 <br><br>
 <br>Upgrades:
@@ -2008,9 +2031,9 @@ Weapons"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 66, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>*1, upgrade: 
-"Weapons Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade "Built-in Plasma 
-Turret"}
+range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>, 1 hits per 
+sec., upgrade: "Weapons Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade 
+"Built-in Plasma Turret"}
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Concrete Walls"(+18)
@@ -2052,9 +2075,9 @@ Turret"}
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 66, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>*1, upgrade: 
-"Weapons Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade "Built-in Plasma 
-Turret"}
+range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>, 1 hits per 
+sec., upgrade: "Weapons Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade 
+"Built-in Plasma Turret"}
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Concrete Walls"(+18)
@@ -2228,13 +2251,14 @@ Turret"}
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*3, 
-upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="00FF00">ALIVE</font>,<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 3 hits 
+per sec., upgrade: "Weapons Upgrade"(+7), factor: 200% 
 [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>], {<font color="FFFF00">Req.: </font>upgrade "Anti-ground 
 Plasmagun"}
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*3, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 3 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Concrete Walls"(+18)
@@ -2271,8 +2295,8 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range+30, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>*3, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="00FFFF">FLYING</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>, 3 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% [<font color="00FFFF">FLYING</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Concrete Walls"(+18)
@@ -2647,11 +2671,11 @@ time.
 <br><br>
 <br>Arming: 
 <br>- heal/repair, max. range: 64, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="3232FF">MECHANICAL</font>], base impact <font color="00FF00">20</font>*2, upgrade: 
-"Advanced Tools"(+6)
+[<font color="00FF00">ALIVE</font>,<font color="3232FF">MECHANICAL</font>], base impact <font color="00FF00">20</font>, 2 hits per sec., 
+upgrade: "Advanced Tools"(+6)
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>*2, upgrade: "Weapons 
-Upgrade"(+7)
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>, 2 hits per sec., 
+upgrade: "Weapons Upgrade"(+7)
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Infantry Combat Armor Upgrade"(+7)
@@ -2690,11 +2714,11 @@ Upgrade"(+7)
 <br><br>
 <br>Arming: 
 <br>- heal/repair, max. range: 64, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="FF8C00">BIOLOGICAL</font>], base impact <font color="00FF00">20</font>*2, upgrade: 
-"Advanced Tools"(+6)
+[<font color="00FF00">ALIVE</font>,<font color="FF8C00">BIOLOGICAL</font>], base impact <font color="00FF00">20</font>, 2 hits per sec., 
+upgrade: "Advanced Tools"(+6)
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>*2, upgrade: "Weapons 
-Upgrade"(+7)
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">22</font>, 2 hits per sec., 
+upgrade: "Weapons Upgrade"(+7)
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Infantry Combat Armor Upgrade"(+7)
@@ -2732,8 +2756,9 @@ Upgrade"(+7)
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Infantry Combat Armor Upgrade"(+7)
@@ -2771,9 +2796,9 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">135</font>*0.67, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>],50% 
-[<font color="3232FF">MECHANICAL</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">135</font>, 0.67 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>],50% [<font color="3232FF">MECHANICAL</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Infantry Combat Armor Upgrade"(+7)
@@ -2811,8 +2836,9 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., upgrade: 
+"Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>]
 <br>bonus anti-fly range: -50
 <br><br>
 <br>Upgrades:
@@ -2856,12 +2882,13 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="00FFFF">FLYING</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% [<font color="00FFFF">FLYING</font>]
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>], 
-{<font color="FFFF00">Req.: </font>upgrade "Surface to Surface Missiles"}
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>], {<font color="FFFF00">Req.: </font>upgrade "Surface to 
+Surface Missiles"}
 <br>bonus anti-fly range: +75
 <br><br>
 <br>Upgrades:
@@ -2907,8 +2934,9 @@ do extra damage around the target.
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 40, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*1, 
-upgrade: "Weapons Upgrade"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
+range, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 1 hits 
+per sec., upgrade: "Weapons Upgrade"(+7), factor: 300% 
+[<font color="FF0000">BUILDING</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Infantry Combat Armor Upgrade"(+7)
@@ -2947,8 +2975,8 @@ upgrade: "Weapons Upgrade"(+7), factor: 300% [<font color="FF0000">BUILDING</fon
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>*2, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">45</font>, 2 hits per sec., upgrade: 
+"Weapons Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
 <br>bonus anti-fly range: +50
 <br><br>
 <br>Upgrades:
@@ -2988,8 +3016,9 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>*0.5, splash damage radius: 160,
- upgrade: "Weapons Upgrade"(+7), factor: 50% [<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>, 0.5 hits per sec., splash 
+damage radius: 160, upgrade: "Weapons Upgrade"(+7), 
+factor: 50% [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-unit range: +50
 <br><br>
 <br>Upgrades:
@@ -3064,8 +3093,9 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="3232FF">MECHANICAL</font>]
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Mech Combat Armor Upgrade"(+7)
@@ -3110,12 +3140,13 @@ Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="3232FF
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>*4, upgrade: "Weapons 
-Upgrade"(+7), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>],50% 
-[<font color="FF0000">BUILDING</font>]
+[<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>, 4 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), factor: 200% 
+[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>],50% [<font color="FF0000">BUILDING</font>]
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>*1, upgrade: "Weapons 
-Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade "Anti-air Weapon"}
+[<font color="00FF00">ALIVE</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">45</font>, 1 hits per sec., 
+upgrade: "Weapons Upgrade"(+7), {<font color="FFFF00">Req.: </font>upgrade "Anti-
+air Weapon"}
 <br>bonus anti-fly range: -50, bonus anti-unit range: +50
 <br><br>
 <br>Upgrades:
@@ -3159,9 +3190,9 @@ do extra damage around the target.
 <br><br>
 <br>Arming: 
 <br>- ranged attack, min. range: 40, max. range: sight 
-range, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>x2*1.33, 
-splash damage radius: 20, upgrade: "Weapons 
-Upgrade"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
+range, targets: [<font color="00FF00">ALIVE</font>,<font color="00FF00">GROUND</font>], base impact <font color="FF0000">45</font>x2, 1.33 
+hits per sec., splash damage radius: 20, upgrade: 
+"Weapons Upgrade"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
 <br>bonus anti-building range: +50
 <br><br>
 <br>Upgrades:
@@ -3180,11 +3211,11 @@ Upgrade"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
 <br>RACE: <font color="00FF00">UAC</font>
 <br>Max hits: 2000
 <br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">500</font>
+<br>Energy required: <font color="00FFFF">400</font>
 <br>Limit used: <font color="FF8C00">3</font>
-<br>Build time: <font color="FFFFFF">30</font>
+<br>Build time: <font color="FFFFFF">40</font>
 <br>Size: 18
-<br>Base speed: 20
+<br>Base speed: 18
 <br>Base sight range: 275
 <br>PainState base threshold: 10
 <br>Time in combat to level up: 42
@@ -3198,8 +3229,8 @@ Upgrade"(+7), factor: 300% [<font color="FF0000">BUILDING</font>]
 <br><br>
 <br>Arming: 
 <br>- ranged attack, max. range: sight range, targets: 
-[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>*2, upgrade: "Weapons 
-Upgrade"(+7)
+[<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">90</font>, 2 hits per sec., upgrade: 
+"Weapons Upgrade"(+7)
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Mech Combat Armor Upgrade"(+7)

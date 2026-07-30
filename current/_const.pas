@@ -694,7 +694,6 @@ ptimeh                 = ptime1 div 2;
 ptimeq                 = ptimeh div 2;
 ptime1h                = ptime1+ptimeh;
 ptime1q                = ptime1+ptimeq;
-//ptimeq3                = ptime1-ptimeq;
 ptime2                 = ptime1*2;
 ptime3                 = ptime1*3;
 ptime4                 = ptime1*4;
@@ -1270,7 +1269,8 @@ apm_Acts               = [1..255]-[iAct_ScreenShot,
                                    iAct_InGameChatAll,
                                    iAct_InGameChatAllies,
                                    iAct_InGamePause,
-                                   iAct_InGameMenu];
+                                   iAct_InGameMenu,
+                                   iAct_Control_ToggleRec];
 
 apm_period_sec         = 10;
 apm_period_min         = 60/apm_period_sec;
@@ -1929,6 +1929,7 @@ folder_RaceBuildings   : array[1..r_count] of shortstring = ('hell\buildings\','
 folder_RaceUpgrades    : array[1..r_count] of shortstring = ('hell\upgrades\' ,'uac\upgrades\' );
 folder_RaceMissiles    : array[1..r_count] of shortstring = ('hell\missiles\' ,'uac\missiles\' );
 folder_graphic         : shortstring = 'graphic\';
+folder_screenshots     : shortstring = 'screenshots\';
 folder_map             : shortstring = 'map\';
 folder_sound           : shortstring = 'sound\';
 folder_music_menu      : shortstring = 'music\menu\';

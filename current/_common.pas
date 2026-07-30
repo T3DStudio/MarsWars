@@ -42,6 +42,7 @@ procedure ui_InitControlPanelBTNActions;forward;
 function LogMes2UIAlarm(POVPlayer:byte):boolean; forward;
 procedure snd_SoundLogUIPlayer(PListener:byte);   forward;
 procedure snd_StopSoundSourceAll;forward;
+procedure snd_SoundPlayUI(ss:PTSoundSet);forward;
 
 procedure unit_UICountersAll; forward;
 
@@ -164,13 +165,13 @@ function w2s (i:word    ):shortstring;begin str(i,w2s );end;
 function c2s (i:cardinal):shortstring;begin str(i,c2s );end;
 function i2s (i:integer ):shortstring;begin str(i,i2s );end;
 function li2s(i:longint ):shortstring;begin str(i,li2s);end;
-function si2s(i:single  ):shortstring;begin str(i,si2s);end;
+//function si2s(i:single  ):shortstring;begin str(i,si2s);end;
 // string to ...
 function s2b (str:shortstring):byte    ;var t:integer;begin val(str,s2b ,t);end;
 function s2w (str:shortstring):word    ;var t:integer;begin val(str,s2w ,t);end;
 function s2i (str:shortstring):integer ;var t:integer;begin val(str,s2i ,t);end;
 function s2c (str:shortstring):cardinal;var t:integer;begin val(str,s2c ,t);end;
-function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
+//function s2si(str:shortstring):single  ;var t:integer;begin val(str,s2si,t);end;
 
 // card ticks to secs
 function ct2s(r:cardinal):cardinal;
@@ -213,8 +214,8 @@ begin
    if(r<min2i.MinValue)then r:=min2i.MinValue;
    min2i:=r;
 end;
-function max3i(x1,x2,x3:longint):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
-function min3i(x1,x2,x3:longint):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
+//function max3i(x1,x2,x3:longint):integer;begin max3i:=max2i(max2i(x1,x2),x3);end;
+//function min3i(x1,x2,x3:longint):integer;begin min3i:=min2i(min2i(x1,x2),x3);end;
 
 function min2b(x1,x2   :byte):byte;begin if(x1<x2)then min2b:=x1 else min2b:=x2;end;
 function max2b(x1,x2   :byte):byte;begin if(x1>x2)then max2b:=x1 else max2b:=x2;end;
@@ -231,6 +232,7 @@ begin
 end;
 function c2i(cc:string4):integer;
 begin
+   c2i:=0;
    move(cc[1],c2i,2);
 end;
 
@@ -483,7 +485,7 @@ begin
           with g_upgrs[i] do upgrs_max[i]:=min2b(upgr_max,lvl);
    end;
 end;
-procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
+{procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
    with g_PlayersGame[p] do
@@ -495,7 +497,7 @@ begin
          with g_upgrs[i] do
           upgrs_cur[i]:=min3i(upgrs_max[i],upgr_max,lvl);
    end;
-end;
+end;}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1320,15 +1322,15 @@ begin
       if(upgrs_max[upgr]<=0)then
       begin upgrade_CheckReqs:=lmt_prod_Unavailable;exit;end;
 
-      if((upgrs_cur[upgr]+prod_upgr_upid[upgr])>=upgrs_max[upgr] )then  //min2i(upgr_max,)
+      if(prod_upgr_upid[upgr]>0)then
+      begin upgrade_CheckReqs:=lmt_upgrade_InProgress;exit;end;
+
+      if(upgrs_cur[upgr]>=upgrs_max[upgr] )then  //min2i(upgr_max,)   +prod_upgr_upid[upgr]
       begin upgrade_CheckReqs:=lmt_Req_MaxCount;exit;end;
 
       if(upgr_ruid >0)and(units_uid_c[upgr_ruid ]=0)
       or(upgr_rupgr>0)and(upgrs_cur  [upgr_rupgr]=0)then
       begin upgrade_CheckReqs:=lmt_Req_Common;exit;end;
-
-      if(prod_upgr_upid[upgr]>0)then
-      begin upgrade_CheckReqs:=lmt_upgrade_InProgress;exit;end;
 
       if(upgr_time<=0)then
       begin upgrade_CheckReqs:=lmt_prod_BadOrder;exit;end;
@@ -1794,13 +1796,21 @@ gs_win_team7  : if(POVPlayer>LastPlayer)then
                      SetS(str_gstat_Lose);
                      SetC(c_red);
                   end;
-        end;
+      end;
 
       if(rpls_pstate=rpls_read)and(rpls_file_pos>=rpls_file_size)then SetS(tc_nl2+tc_white+str_gstat_ReplayEnd,true);
-   end;
+   end
+   else
+     if(POVPlayer<=LastPlayer)then
+       if(g_PlayersGame[POVPlayer].isdefeated)then
+       begin
+          SetS(str_gstat_Lose);
+          SetC(c_red);
+           GameGetStatus:=true;
+       end;
 end;
 
-function MenuBack(offMenu,check:boolean):boolean;
+function MenuBack(offMenu,check:boolean;clickSound:pPTSoundSet=nil):boolean;
 begin
    MenuBack:=false;
    if(not MainMenu)then exit;
@@ -1852,6 +1862,14 @@ begin
       MainMenu     :=false;
       menu_update  :=true;
       menu_ItemSelected:=0;
+      if(net_status=ns_none)then
+        if(clickSound=nil)
+        then snd_SoundPlayUI(snd_SwitchOff)
+        else clickSound^:=snd_SwitchOff
+      else
+        if(clickSound=nil)
+        then snd_SoundPlayUI(snd_click)
+        else clickSound^:=snd_click;
    end;
 end;
 procedure GameOpenMenu(force:boolean=false);
@@ -1859,10 +1877,10 @@ begin
    if(MainMenu)
    and(not force)then exit;
 
-   MainMenu   :=true;
-   menu_update:=true;
+   MainMenu         :=true;
+   menu_update      :=true;
    menu_redraw_pause:=0;
-   ui_update_mmap:=0;
+   ui_update_mmap   :=0;
    menu_ItemSelected:=0;
    snd_StopSoundSourceAll;
 end;
@@ -2238,21 +2256,6 @@ begin
            if(log_pi=log_i)then exit;
         end;
      end;
-end;
-
-function ui_CommanderWeight(pu:PTUnit):word;
-begin
-   ui_CommanderWeight:=0;
-   with pu^ do
-   with uid^ do
-   begin
-      if(uid_HaveAbility   )then ui_CommanderWeight+=2048;
-      if(not uid_isbuilding)then ui_CommanderWeight+=1024;
-      if(not uid_isbuilder )then ui_CommanderWeight+=512;
-      if(not uid_isbarrack )then ui_CommanderWeight+=256;
-      if(not uid_isforge   )then ui_CommanderWeight+=128;
-      if(not rld        <=0)then ui_CommanderWeight+=64;
-   end;
 end;
 
 function ui_HaveAttack(pu:PTunit):boolean;

@@ -331,7 +331,7 @@ begin
    with pu^ do
    with uid^ do
    with player^ do
-     if (ai_generator_d<srange)
+     if (ai_generator_d<base_r1)
      and(uid_AI_GenAssaultGroup)
      and(ai_energy_future<aip_MaxEnergy)then
        if (ai_generator_kp^.kp_LimitPlayerP[playeri]<ai_generator_kp^.kp_CaptureLimit)

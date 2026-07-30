@@ -566,7 +566,10 @@ begin
       end;
       if((i and %00100000)>0)then ;// read players scores
 
-      if(g_status=gs_running)then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip);
+      if(g_status=gs_running)
+      then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip)
+      else
+        if(gs<>g_status)and(game_IsEnded)then Scenario_KeyPointsEndGameClientFix;
 
       if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;

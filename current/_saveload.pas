@@ -355,6 +355,7 @@ begin
       ui_Camera_Bounds;
 
       g_started:=true;
+      UIPlayer:=LocalPlayer;
 
       MenuBack(true,false);
 

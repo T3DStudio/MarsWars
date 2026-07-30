@@ -93,11 +93,11 @@ begin
    net_BufferBlock(false,SizeOf(net_readbyte),@net_readbyte);
 end;
 
-function net_readsint:shortint;
+{function net_readsint:shortint;
 begin
    net_readsint:=0;
    net_BufferBlock(false,SizeOf(net_readsint),@net_readsint);
-end;
+end;}
 
 function net_readchar:char;
 begin
@@ -127,11 +127,11 @@ begin
    net_BufferBlock(false,SizeOf(net_readcard),@net_readcard);
 end;
 
-function net_readsingle:single;
+{function net_readsingle:single;
 begin
    net_readsingle:=0;
    net_BufferBlock(false,SizeOf(net_readsingle),@net_readsingle);
-end;
+end;}
 
 function net_readstring:shortstring;
 var sl:byte;
@@ -150,13 +150,13 @@ end;
 // WRITE       /////////////////////////////////////////////////////////////////
 
 procedure net_writebyte  (b:byte    );begin net_BufferBlock(true,SizeOf(b),@b);end;
-procedure net_writesint  (b:shortint);begin net_BufferBlock(true,SizeOf(b),@b);end;
+//procedure net_writesint  (b:shortint);begin net_BufferBlock(true,SizeOf(b),@b);end;
 procedure net_writechar  (b:char    );begin net_writebyte(ord (b));end;
 procedure net_writebool  (b:boolean );begin net_writebyte(byte(b));end;
 procedure net_writeint   (b:integer );begin net_BufferBlock(true,SizeOf(b),@b);end;
 procedure net_writeword  (b:word    );begin net_BufferBlock(true,SizeOf(b),@b);end;
 procedure net_writecard  (b:cardinal);begin net_BufferBlock(true,SizeOf(b),@b);end;
-procedure net_writesingle(b:single  );begin net_BufferBlock(true,SizeOf(b),@b);end;
+//procedure net_writesingle(b:single  );begin net_BufferBlock(true,SizeOf(b),@b);end;
 
 procedure net_writestring(s:shortstring);
 var sl,x:byte;
