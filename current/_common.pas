@@ -4,7 +4,7 @@
 //   FORWARD Declarations
 //
 
-procedure unit_damage (pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);forward;
+procedure unit_damage (pTarget:PTUnit;damage:integer;playerDDealer:byte;IgnoreArmor:boolean);forward;
 procedure unit_Bonuses(pu:PTUnit);forward;
 procedure unit_kill   (pu:PTUnit;instant,fastdeath,buildcd,KillAllInside,suicide:boolean);forward;
 function unit_TryChangeOwner(pTarget:PTUnit;newOwner:PTPlayerGameData;log,check:boolean):byte;forward;
@@ -652,22 +652,21 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype 
                  lmt_game_StartsIn     : g_LobbyTimer:=adatau*fr_fps1-1;
                  lmt_game_BreakStarting: g_LobbyTimer:=0;
                  end;
-          true :
-                   case amtype of
-                   lmt_player_leave,
-                   lmt_player_timeout  : if(adatau<=LastPlayer)then
-                                           with g_PlayersGame[adatau] do state:=ps_none;
-                   lmt_player_connected: if(adatau<=LastPlayer)then
-                                           with g_PlayersGame[adatau] do
-                                           begin
-                                              name      :=astr;
-                                              state     :=ps_human;
-                                              isobserver:=true;
-                                           end;
-                   lmt_other_UACStrike : with log_l[log_i] do
-                                           ability_UACStrike_missile(lm_data_u,c2i(lm_string[1]+lm_string[2]),
-                                                                               c2i(lm_string[3]+lm_string[4]),lm_x,lm_y);
-                   end;
+          true : case amtype of
+                 lmt_player_leave,
+                 lmt_player_timeout  : if(adatau<=LastPlayer)then
+                                         with g_PlayersGame[adatau] do state:=ps_none;
+                 lmt_player_connected: if(adatau<=LastPlayer)then
+                                         with g_PlayersGame[adatau] do
+                                         begin
+                                            name      :=astr;
+                                            state     :=ps_human;
+                                            isobserver:=true;
+                                         end;
+                 lmt_other_UACStrike : with log_l[log_i] do
+                                         ability_UACStrike_missile(lm_data_u,c2i(lm_string[1]+lm_string[2]),
+                                                                             c2i(lm_string[3]+lm_string[4]),lm_x,lm_y);
+                 end;
           end;
 
         if(net_status<>ns_none)or(not g_started)
@@ -676,7 +675,7 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype 
         if(ptarget=POVPlayer)then
         begin
            if(amtype in lmts_last_events)then
-             ui_log_LastTimer :=min2i(ui_log_LastTimer +ui_log_TimeLast ,ui_log_TimeMax );
+             ui_log_LastTimer:=min2i(ui_log_LastTimer+ui_log_TimeLast,ui_log_TimeMax);
 
            menu_update:=true;
 

@@ -265,7 +265,6 @@ begin
             and(tu^.TeamDetection[team]<=0)then
               setNearestTarget(@ai_enemy_inv_u,@ai_enemy_inv_d,ud);
 
-
             // uac strike target
             if(uidi=UID_URMStation)then
               ai_SetTarget_Strike(tu);
@@ -294,6 +293,9 @@ begin
            true : if(ability_CheckTarget_Bribe(team,tu,true ))then ai_SetTarget_Hack (tu);
            false: if(ability_CheckTarget_Bribe(team,tu,false))then ai_SetTarget_Bribe(tu);
            end;
+
+         if(ud<=srange)and(isattackable)and(tu^.uid^.uid_AI_TargetWeight>DefaultTargetWeight)then
+           ai_setTarget_Primary(tu);
       end;
    end;
 end;

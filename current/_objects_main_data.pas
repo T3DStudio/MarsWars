@@ -660,14 +660,14 @@ UID_LostSoul: begin
               uid_req_EnergyLevel:= 100;
               uid_ProdTimeSec    := ptimeh;
               uid_TargetWeight   := DefaultTargetWeight-20;
-              uid_AI_TargetWeight:= DefaultTargetWeight-20;
+              //uid_AI_TargetWeight:= DefaultTargetWeight-20;
               end;
 UID_Phantom : begin
               uid_uibtn          := 13;
               uid_req_EnergyLevel:= 200;
               uid_ProdTimeSec    := ptime1;
               uid_TargetWeight   := DefaultTargetWeight-10;
-              uid_AI_TargetWeight:= DefaultTargetWeight-10;
+              //uid_AI_TargetWeight:= DefaultTargetWeight-10;
               SetWeapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamaget,fr_fps1,0,0,upgr_hell_Phantoms,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_all,wpr_any,uids_all,[],0,0,0,dm_Lost);
               end;
    end;
@@ -1574,7 +1574,7 @@ end;
            or(uid_gen_EnergyLevel>0))then
       begin
          uid_TargetWeight   -=1;
-         uid_AI_TargetWeight-=1;
+         //uid_AI_TargetWeight-=1;
       end;
 
 

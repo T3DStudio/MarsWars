@@ -36,7 +36,8 @@ ai_flags_BaseAMain,
 ai_flags_BaseAOther,
 ai_earlyAttack,
 ai_available_HKeep,
-ai_HaveTransport
+ai_HaveTransport,
+ai_SmartTarget
                      : boolean;
 
 ai_generator_kp,
@@ -150,6 +151,7 @@ ai_enemy_grd_u,
 ai_enemy_inv_u,
 ai_enemy_build_u,
 ai_enemy_battle_u,
+ai_enemy_Primary_u,
 
 ai_ZombieTarget_u,
 
@@ -539,6 +541,8 @@ begin
       ai_available_HKeep   := ai_IsAvailableUID(player,UID_HKeep);
 
       ai_HaveTransport     := (units_uid_c[UID_HTeleport]>0)or(units_uid_c[UID_UTransport]>0);
+
+      ai_SmartTarget       :=((aip_flags and aif_army_smart_Target)>0)and(uid_CanAttack);
    end;
 
    FillChar(ai_GroupAll_ucount,SizeOf(ai_GroupAll_ucount),0);
@@ -622,6 +626,7 @@ begin
    ai_enemy_build_d  := NOTSET;
    ai_enemy_battle_u := nil;
    ai_enemy_battle_d := NOTSET;
+   ai_enemy_Primary_u:= nil;
 
    // repair/heal target
    ai_HealTar_u      := nil;
@@ -778,7 +783,8 @@ begin
 
                   if(not koth_point)then
                   begin
-                     if(kp_LimitPlayerP[playeri]>=kp_CaptureLimit)then continue;
+                     if(not uid_CanAttack)then
+                       if(kp_LimitPlayerP[playeri]>=kp_CaptureLimit)then continue;
                      if(uid_CanAttack)and(not uid_isbuilder)and(kp_Energy>0)then  // towers to generators
                        if(d<=kp_RCapture)
                        or((d>kp_RCapture)and(kp_LimitPlayerP[playeri]<kp_CaptureLimit))
@@ -1181,6 +1187,30 @@ begin
 
    ai_SphereTurbo_u:=newu;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+
+procedure ai_setTarget_Primary(newu:PTUnit);
+begin
+   if(ai_enemy_Primary_u=nil)
+   then
+   else
+     if(newu^.uid^.uid_AI_TargetWeight>ai_enemy_Primary_u^.uid^.uid_AI_TargetWeight)
+     then
+     else
+     if(newu^.uid^.uid_AI_TargetWeight<ai_enemy_Primary_u^.uid^.uid_AI_TargetWeight)
+     then exit
+     else
+       if(newu^.hits<ai_enemy_Primary_u^.hits)
+       then
+       else
+       if(newu^.hits>ai_enemy_Primary_u^.hits)
+       then exit;
+
+   ai_enemy_Primary_u:=newu;
+end;
+
+//
 
 ////////////////////////////////////////////////////////////////////////////////
 

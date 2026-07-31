@@ -619,10 +619,13 @@ begin
         end;
       if(uo_id=ua_amove)then
       begin
-         if((aip_flags and aif_army_smart_Target)>0)then
+         if(ai_SmartTarget)then
          begin
             if(uid_AI_Siedge)and(ai_enemy_build_d<base_r1h)and(ai_enemy_build_d<NOTSET)
-            then uo_tar:=ai_enemy_build_u^.unum;
+            then uo_tar:=ai_enemy_build_u^.unum
+            else
+              if(ai_enemy_Primary_u<>nil)
+              then uo_tar:=ai_enemy_Primary_u^.unum;
          end;
 
          if((aip_flags and aif_ability_other)>0)then ai_AbilitiesCommon(pu);

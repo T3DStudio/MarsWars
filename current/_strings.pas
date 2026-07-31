@@ -1079,7 +1079,6 @@ begin
         AddLineUnitDocHint(str_doc_Attributes     );
         AddLineUnitDocHint(uid_str_DefaultAttr    );
         AddLineUnitDocHint(str_PT_Race            +': '+str_race[uid_race]);
-
         AddLineUnitDocHint(str_doc_MaxHits        +li2s(uid_MaxHits1));
         AddLineUnitDocHint(str_doc_FastDeath      +str_YesNoG[(uid_FastDeathHits>=0)or(uid_isbuilding)]);
         if(uid_Regen_Base<0)then

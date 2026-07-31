@@ -104,7 +104,7 @@ begin
    end;
 end;
 
-procedure unit_damage(pTarget:PTUnit;damage:integer;damagePlayer:byte;IgnoreArmor:boolean);
+procedure unit_damage(pTarget:PTUnit;damage:integer;playerDDealer:byte;IgnoreArmor:boolean);
 var armor:integer;
 begin
    with pTarget^ do
@@ -147,13 +147,14 @@ begin
          {$ENDIF}
          begin
             unit_kill(pTarget,false,(hits-damage)<=uid_FastDeathHits,true,false,false);
-            if(damagePlayer<=LastPlayer)and(iscomplete)then
-              with g_PlayersGame[damagePlayer] do
-              begin
-                 if(race<>r_hell)then
-                 res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
-                 res_UACLoot  :=min2i(UACLoot_Max  ,res_UACLoot  +uid_bounty_UACLoot  );
-              end;
+            if(playerDDealer<=LastPlayer)and(iscomplete)then
+              with g_PlayersGame[playerDDealer] do
+                if(team<>player^.team)then
+                begin
+                   if(race<>r_hell)then
+                   res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
+                   res_UACLoot  :=min2i(UACLoot_Max  ,res_UACLoot  +uid_bounty_UACLoot  );
+                end;
          end;
       end
       else
@@ -569,7 +570,6 @@ end;
 
 function unit_CheckArmForTarget(pAttacker,pTarget:PTUnit;udist:integer;armN:byte;checkVis,noSRangeCheck:boolean):byte;
 var awr:integer;
-//     au:PTUnit;
 pfcheck,
 canmove:boolean;
 begin
@@ -740,27 +740,10 @@ begin
      end;
 end;
 
-function unit_ArmTarget(pAttacker,n_tarp:PTUnit;udist:integer;a_tard:pinteger;a_arm:pbyte;a_tarp:PPTUnit;a_fac:psingle;aiSmartTarget:boolean):boolean;
+function unit_ArmTarget(pAttacker,n_tarp:PTUnit;udist:integer;a_tard:pinteger;a_arm:pbyte;a_tarp:PPTUnit;a_fac:psingle):boolean;
 var
 n_arm:byte;
 n_fac:single;
-//uid_TargetWeight
-function SpecPriority:byte;
-begin
-   SpecPriority:=1; //0 - lower, exit, 1=equal, 2 - higher
-   case(aiSmartTarget)of
-   true : if(n_tarp^.uid^.uid_AI_TargetWeight>a_tarp^^.uid^.uid_AI_TargetWeight)
-          then SpecPriority:=2
-          else
-          if(n_tarp^.uid^.uid_AI_TargetWeight<a_tarp^^.uid^.uid_AI_TargetWeight)
-          then SpecPriority:=0;
-   false: if(n_tarp^.uid^.uid_TargetWeight>a_tarp^^.uid^.uid_TargetWeight)
-          then SpecPriority:=2
-          else
-          if(n_tarp^.uid^.uid_TargetWeight<a_tarp^^.uid^.uid_TargetWeight)
-          then SpecPriority:=0;
-   end;
-end;
 begin
    // n_tarp = next target
    // a_tarp = current target
@@ -803,25 +786,27 @@ begin
                              true : if(udist<a_tard^) // melee weapon
                                     then
                                     else exit;
-                             false: if(n_fac>a_fac^)  // ranged weapon
+                             false: if(n_fac>a_fac^)
                                     then
                                     else
                                     if(n_fac<a_fac^)
                                     then exit
                                     else
-                                      case SpecPriority of
-                                      0 : exit;
-                                      1 : if(n_tarp^.hits<a_tarp^^.hits)
+                                      if(n_tarp^.uid^.uid_TargetWeight>a_tarp^^.uid^.uid_TargetWeight)
+                                      then
+                                      else
+                                      if(n_tarp^.uid^.uid_TargetWeight<a_tarp^^.uid^.uid_TargetWeight)
+                                      then exit
+                                      else
+                                        if(n_tarp^.hits<a_tarp^^.hits)
+                                        then
+                                        else
+                                        if(n_tarp^.hits>a_tarp^^.hits)
+                                        then exit
+                                        else
+                                          if(udist<a_tard^)
                                           then
-                                          else
-                                          if(n_tarp^.hits>a_tarp^^.hits)
-                                          then exit
-                                          else
-                                            if(udist<a_tard^)
-                                            then
-                                            else exit;
-                                      2 :;
-                                      end;
+                                          else exit;
 
                              end
              else
@@ -902,7 +887,6 @@ tu_transport,tu : PTUnit;
 aiCode,
 attack_target,
 isattackable,
-aiSmartTarget,
 pushout         : boolean;
 t_weap          : byte;
 NearTeleport    : boolean; // autopick other teleport
@@ -929,7 +913,6 @@ begin
       pushout        := uid_issolid and unit_canMove(pu) and ((a_rld<=0)or uid_isbuilding);
       attack_target  := unit_canAttack(pu,false)and(not isdefeated);
       aiCode         := (state=ps_AI)and(not isdefeated);
-      aiSmartTarget  := aiCode and((aip_flags and aif_army_smart_Target)>0);
       teleport_NewTar:= (not IsUnitRange(rpoint_tar,nil))and(uid_ability_isteleport);
       // autopick other teleport
       NearTeleport   := false;
@@ -944,7 +927,7 @@ begin
 
       isattackable:=false;
       if(attack_target)then
-        isattackable:=unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac,aiSmartTarget);
+        isattackable:=unit_ArmTarget(pu,pu,0,@a_tard,@t_weap,@a_tarp,@t_fac);
 
       ai_Local_InitVars(pu);
       if(aiCode)then
@@ -971,7 +954,7 @@ begin
 
               isattackable:=false;
               if(attack_target)then
-                isattackable:=unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac,aiSmartTarget);
+                isattackable:=unit_ArmTarget(pu,tu,udi,@a_tard,@t_weap,@a_tarp,@t_fac);
 
               ai_Local_CollectData(pu,tu,udi,tu_transport);
               if(aiCode)then

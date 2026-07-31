@@ -296,7 +296,6 @@ begin
                       SetBuildUID1(UID_HCommandCenter);
                     SetBuildUID1(UID_HKeep)
                  end;
-                 //SetBuildUID2(UID_HKeep,UID_HCommandCenter);
          r_uac : SetBuildUID1(UID_UCommandCenter);
          end;
          checkExtraEnergy:=0;
@@ -580,17 +579,12 @@ begin
       pBarrack^.group :=agroup;
    end;
 end;
-{function remoteKpExists:boolean;
+{function remoteGenerator:boolean;
 begin
-   remoteKpExists:=false;
-   with pBarrack^ do
-   begin
-      if(ai_generator_d<NOTSET)then
-        if(ai_generator_kp^.kp_zone<>mapZone)then remoteKpExists:=true;
-      if(ai_keypoint_d<NOTSET)then
-        if(ai_keypoint_kp^.kp_zone<>mapZone)then remoteKpExists:=true;
-   end;
-end;}
+   remoteGeneraor:=false;
+   if(ai_generator_d<NOTSET)then
+     if(ai_generator_kp^.kp_zone=zone_solid)then remoteKpExists:=true;
+end;  }
 begin
    ai_Barrack:=false;
    tuid:=0;
@@ -741,12 +735,12 @@ uprod_Special    : begin
                       exit;
                    end;
 uprod_randomFly  :    case race of
-                      r_hell: case g_random(5) of
+                      r_hell: case g_random(3) of
                               0: tuid:=UID_Cacodemon;
                               1: tuid:=UID_Pain;
                               2: tuid:=UID_ZFPlasmagunner;
-                              3: tuid:=UID_LostSoul;
-                              4: tuid:=UID_Phantom;
+                              //3: tuid:=UID_LostSoul;
+                              //4: tuid:=UID_Phantom;
                               end;
                       r_uac : case g_random(2) of
                               0: tuid:=UID_FPlasmagunner;
