@@ -8,7 +8,8 @@
       <Unit0>
         <Filename Value="MarsWarsSDL1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="19" Y="3"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="98" Y="7"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -298,7 +299,6 @@
       </Unit36>
       <Unit37>
         <Filename Value="_strings.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
         <TopLine Value="1068"/>
         <CursorPos X="54" Y="1077"/>
