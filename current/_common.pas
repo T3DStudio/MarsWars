@@ -33,6 +33,7 @@ procedure game_RoyalSetCenter(rx,ry:integer);forward;
 procedure Game_RemoveAIObservers; forward;
 procedure game_MakeRandomSkirmish; forward;
 procedure Game_ShuffleAINames; forward;
+procedure Game_DefaultAll; forward;
 
 {$IFDEF _FULLGAME}
 procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
@@ -67,7 +68,8 @@ function PlayerAIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boole
 function PlayerRaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
 function PlayerTeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;forward;
 
-function saveload_Save  (check:boolean):boolean;forward;
+procedure saveload_SaveWrite(fn:shortstring);forward;
+function saveload_SaveInit  (check:boolean):boolean;forward;
 function saveload_Load  (check:boolean):boolean;forward;
 function saveload_DeleteInit(check:boolean):boolean;forward;
 
@@ -726,7 +728,7 @@ begin
    if(chat_tar>0)then
      if(sender<=LastPlayer)
      then PlayersAddToLog(sender,chat_tar,lmt_chat_player0+sender,dt,0,g_PlayersGame[sender].name+': '+message,0,0)
-     else PlayersAddToLog(sender,chat_tar,lmt_chat_local        ,0 ,0,message                                ,0,0);
+     else PlayersAddToLog(sender,chat_tar,lmt_chat_local         ,0 ,0,message                                ,0,0);
 end;
 {procedure GameLog_Common(sender,targets:byte;message:shortstring);
 begin
@@ -2707,7 +2709,7 @@ function menudoc_ValidForTableUnit(uid:byte;forBalance:boolean):boolean;
 begin
    menudoc_ValidForTableUnit:=false;
    with g_uids[uid] do
-     if(uid_r>0)then
+     if(uid_r>0)and(not uid_ismarker)then
      begin
         if(forBalance)then
         begin

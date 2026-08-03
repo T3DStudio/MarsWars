@@ -1199,6 +1199,15 @@ begin
                    end;
      end;
 
+   case m_uifocus of
+   mf_CtrlPanel : case ui_tab of
+                  tab_Units : begin
+                                 if(InputActionPressed(iAct_mwu))then ui_ControlPanel_click(pct_left ,@clickSound); // mouse wheel up
+                                 if(InputActionPressed(iAct_mwd))then ui_ControlPanel_click(pct_right,@clickSound); // mouse wheel down
+                              end;
+                  end;
+   end;
+
    if(InputActionReleased(iact_MLB))then  // LMB up
    begin
       m_mmap_move:=false;
@@ -1218,14 +1227,6 @@ begin
       ui_Camera_MoveToPoint(trunc((mouse_x-ui_UIPanelX)/map_MiniMap_cx), trunc((mouse_y-ui_UIPanelY)/map_MiniMap_cx));
       ui_Camera_Bounds;
    end;
-
- //  if(k_mr=2)then effect_add(mouse_map_x,mouse_map_y-50,10000,UID_PainC);
-   {if(ks_mright=1)and(ks_ctrl>2)then
-   begin
-      u:=_whoInPoint(mouse_map_x,mouse_map_y,0);
-      if(u>0)then
-       with g_units[u] do hits:=hits div 2;
-   end; }
 
    if(InputActionPressed(iact_MRB))then            // RMB down
      if(m_brush<>co_empty)
@@ -1353,14 +1354,14 @@ begin
          if(InputActionPressed(iAct_test_FogToggle   ))then ui_fog  :=not ui_fog;
          if(InputActionPressed(iAct_test_DrawToggle  ))then vid_draw:=not vid_draw;
          if(InputActionPressed(iAct_test_NullUpgrades))then with g_PlayersGame[LocalPlayer] do FillChar(upgrs_cur,SizeOf(upgrs_cur),0);
-         if(InputActionPressed(iAct_test_BePlayer0   ))then LocalPlayer:=0;
-         if(InputActionPressed(iAct_test_BePlayer1   ))then LocalPlayer:=1;
-         if(InputActionPressed(iAct_test_BePlayer2   ))then LocalPlayer:=2;
-         if(InputActionPressed(iAct_test_BePlayer3   ))then LocalPlayer:=3;
-         if(InputActionPressed(iAct_test_BePlayer4   ))then LocalPlayer:=4;
-         if(InputActionPressed(iAct_test_BePlayer5   ))then LocalPlayer:=5;
-         if(InputActionPressed(iAct_test_BePlayer6   ))then LocalPlayer:=6;
-         if(InputActionPressed(iAct_test_BePlayer7   ))then LocalPlayer:=7;
+         if(InputActionPressed(iAct_test_BePlayer0   ))then begin LocalPlayer:=0;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer1   ))then begin LocalPlayer:=1;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer2   ))then begin LocalPlayer:=2;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer3   ))then begin LocalPlayer:=3;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer4   ))then begin LocalPlayer:=4;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer5   ))then begin LocalPlayer:=5;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer6   ))then begin LocalPlayer:=6;UIPlayer:=LocalPlayer;end;
+         if(InputActionPressed(iAct_test_BePlayer7   ))then begin LocalPlayer:=7;UIPlayer:=LocalPlayer;end;
          if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersGame[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
          if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersGame[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
       end;

@@ -298,9 +298,9 @@ begin
    if(theme_map_pRBattleFront=theme_map_RBattleFront)and(theme_map_RBattleFront>=0)then exit;
    theme_map_pRBattleFront:=theme_map_RBattleFront;
 
-   if(theme_map_RBattleFront<0)or(theme_map_RBattleFront>=theme_spr_terrainN)
+   if(theme_map_RBattleFront<0)or(theme_map_RBattleFront>=theme_spr_liquidN)
    then ts:=theme_DefSprite
-   else ts:=theme_spr_terrainL[theme_map_RBattleFront].surf;
+   else ts:=theme_spr_liquidL[theme_map_RBattleFront].surf;
 
    wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
    hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
@@ -823,12 +823,6 @@ begin
 
    spr_cursorWh             := (spr_cursor^.w div 2)-(spr_cursorSubR^.w div 2);
    spr_cursorHh             := (spr_cursor^.h div 2)-(spr_cursorSubR^.h div 2);
-
-   spr_camp_earth           := gfx_LoadSDLSurface('M_EARTH'  ,false,true);
-   spr_camp_mars            := gfx_LoadSDLSurface('M_MARS'   ,false,true);
-   spr_camp_hell            := gfx_LoadSDLSurface('M_HELL'   ,false,true);
-   spr_camp_phobos          := gfx_LoadSDLSurface('M_PHOBOS' ,false,true);
-   spr_camp_deimos          := gfx_LoadSDLSurface('M_DEIMOS' ,false,true);
 
    gfx_LoadMWSModel(@spr_lostsoul           ,folder_RaceUnits[r_hell]+'h_u0_'          ,smt_lost     );
    gfx_LoadMWSModel(@spr_phantom            ,folder_RaceUnits[r_hell]+'h_u0a_'         ,smt_lost     );

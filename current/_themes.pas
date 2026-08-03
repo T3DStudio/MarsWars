@@ -500,19 +500,19 @@ begin
           theme_crater_style:=tcs_default;
        end;
    end;
-   theme_map_RBattleFront:=72;
+   theme_map_RBattleFront:=38;
    SetTLBlC;
 end;
 
 procedure SetThemeCampaign(campaign,mission:byte);
 begin
    case campaign of
-   0 : case mission of
-       0 : begin  // CAMPAINGS:  HELL
+   0 : case mission of  // CAMPAINGS:  HELL
+       0 : begin
               SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
-              SetThemeObs0    ('3,9,13,14,16,20,21,28,36,42_47');
-              SetThemeObs1    ('9_12'                  );
-              SetThemeObs2    ('5_8,13,14'             );
+              SetThemeObs0    ('0_12,14,16,18,20,21,28,106,112');
+              SetThemeObs1    ('98_101,103_105,107,108');
+              SetThemeObs2    ('55,69,70'              );
 
               theme_liquid_style:=tcs_default;
               theme_crater_style:=tcs_default;
@@ -521,6 +521,22 @@ begin
               SetThemeLiquidsB('1' );
               SetThemeCraters ('27');
               SetThemeLiquidsF('4' );
+           end;
+       1 : begin
+              SetThemeDecals  ('-1_-4,1,4,9,15,18_20,23_25,28,30,33,34');
+              SetThemeObs0    ('0_12,14,16,18,20,21,28,106,112,42_47,51,36');
+              SetThemeObs1    ('98_101,103_105,107_111,113_116');
+              SetThemeObs2    ('55,69,70,117_118'              );
+
+              theme_liquid_style:=tcs_default;
+              theme_crater_style:=tcs_default;
+
+              SetThemeTerrains('16');
+              SetThemeLiquidsB('14' );
+              SetThemeCraters ('29');
+              SetThemeLiquidsF('9' );
+
+              theme_map_RBattleFront:=8;
            end;
        end;
    end;

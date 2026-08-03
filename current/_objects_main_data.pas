@@ -356,6 +356,16 @@ begin
    SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,dm_AntiHeavy2);
 end;
 
+UID_HMarker:
+begin
+   uid_MaxHits1        := uid_MaxHits1.MaxValue;
+   uid_req_EnergyLevel := 0;
+   uid_r               := 10;
+   uid_SightR_Base     := 300;
+   uid_uibtn           := 255;
+   uid_isbuilding      := true;
+   uid_ismarker        := true;
+end;
 
 //////////////////////////////
 
@@ -2146,10 +2156,12 @@ uid_tar   :byte;
 armfactor1,
 armfactor2:single;
 begin
-   for uid_src in [1..255] do
-     if(g_uids[uid_src].uid_r>0)then
-       for uid_tar in [1..255] do
-         if(g_uids[uid_tar].uid_r>0)then
+   for uid_src:=1 to 255 do
+     if (g_uids[uid_src].uid_r>0)
+     and(not g_uids[uid_src].uid_ismarker)then
+       for uid_tar:=1 to 255 do
+         if (g_uids[uid_tar].uid_r>0)
+         and(not g_uids[uid_tar].uid_ismarker)then
          begin
             armfactor1:=DamageFactor_UID2UID(uid_src,uid_tar);
             armfactor2:=DamageFactor_UID2UID(uid_tar,uid_src);

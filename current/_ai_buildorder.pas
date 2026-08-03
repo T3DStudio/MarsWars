@@ -37,7 +37,9 @@ begin
       end;
 
       // teleport
-      ai_need_Teleports:=(ai_armylimit_ForTeleport div ul12)+3;
+      if(map_NeedTransport)
+      then ai_need_Teleports:=(ai_armylimit_ForTeleport div ul12)+3
+      else ai_need_Teleports:=0;
 
       // DETECTORS
       ai_need_detect:=0;
@@ -138,7 +140,7 @@ end;}
 //
 
 procedure ai_Builder(pBuilder:PTUnit);
-var
+var i,
 build_uid : byte;
 build_x,
 build_y,
@@ -336,15 +338,14 @@ begin
              end;
      end;
 end;
-procedure SetTeleport;
+procedure SetTeleport(need:integer);
 begin
-   if(build_uid>0)
-   or(not map_NeedTransport)then exit;
+   if(build_uid>0)then exit;
 
-   with pBuilder^  do
+   with pBuilder^ do
    with player^ do
      case race of
-     r_hell: if(units_uid_e[UID_HTeleport]<ai_need_Teleports)then
+     r_hell: if(units_uid_e[UID_HTeleport]<need)then
                if(SetBuildUID1(UID_HTeleport))then
                  if(ai_HTeleportNearest_d<base_r3)then
                  begin
@@ -393,35 +394,38 @@ begin
            SetTowers(aip_MaxTowers);
          SetDetectors(ai_need_detect);
          if(aiu_alarm_d=NOTSET)then
-           SetTeleport;
+           SetTeleport(ai_need_Teleports);
          SetBarracks  (1);
          SetBuilders  (aip_MaxBuilders  );
-         SetTeleport;
+         SetTeleport  (ai_need_Teleports);
          SetTech;
          SetSpecial;
          SetForges    (ai_need_UpgrProds);
          SetBarracks  (ai_need_UnitProds);
          SetTowers    (aip_MinTowers    );
-         //SetDetectors (aip_MaxDetectors );
       end
       else
         case g_random(8) of
-        0 : if(NeedMaxTowers)
-            then SetTowers(aip_MaxTowers)
-            else SetTowers(aip_MinTowers);
-        1 : SetBarracks  (ai_need_UnitProds);
-        2 : SetForges    (ai_need_UpgrProds);
-        3 : SetBuilders  (aip_MaxBuilders  );
-        4 : SetTeleport;
+        0 : SetTowers     (aip_MaxTowers   );
+        1 : SetBarracks   (aip_MaxBarracks );
+        2 : SetForges     (aip_MaxForges   );
+        3 : SetBuilders   (aip_MaxBuilders );
+        4 : SetTeleport   (3);
         5 : SetTech;
         6 : SetSpecial;
-        7 : SetDetectors (ai_need_Detect   );
+        7 : SetDetectors  (aip_MaxDetectors);
         end;
 
       if(build_uid=0)then exit;
 
-      //if(isselected)then writeln('build_uid=',build_uid,' build_dir=',build_dir,' build_step=',build_step);
-
+      {if(isselected)then
+      writeln('build_uid='     ,build_uid,
+             ' build_dir='     ,build_dir,
+             ' build_step='    ,build_step,
+             ' BuildAttempts=' ,aiu_BuildAttempts,
+             ' need_UnitProds=',ai_need_UnitProds,
+             ' MaxBarracks='   ,aip_MaxBarracks);
+                                                   }
       // build
       if(build_x=0)then
       begin
@@ -437,13 +441,15 @@ begin
       end;
       BuildingFindNewPlace(build_x,build_y,build_uid,playeri,@build_x,@build_y);
 
-      {if(isselected)then
+      i:=unit_start_build(build_x,build_y,build_uid,playeri,true);
+
+     { if(isselected)then
       begin
-         writeln('build_uid=',build_uid,' build_step=',build_step,' build_dir=',build_dir,' aiu_BuildAttempts=',aiu_BuildAttempts);
+         writeln('build_uid=',build_uid,' build_step=',build_step,' build_dir=',build_dir,' aiu_BuildAttempts=',aiu_BuildAttempts,' i=',i);
          UnitsInfo_AddLine(x,y,build_x,build_y,c_orange);
       end;  }
 
-      if(unit_start_build(build_x,build_y,build_uid,playeri,true)<>lmt_prod_BadPlace)then
+      if(i<>lmt_prod_BadPlace)then
       begin
          if(ai_MinBuildAttempts=aiu_BuildAttempts)
          then ai_MinBuildAttempts:=0;

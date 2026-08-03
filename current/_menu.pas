@@ -194,11 +194,11 @@ procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBox
 begin
    if(menu_msg_type<>mtype)then
    begin
-      menu_update     :=true;
-      menu_msg_type   :=mtype;
-      menu_msg_Caption:=str_caption;
-      menu_msg_Body   :=str_body;
-      menu_ItemActs   :=0;
+      menu_update      :=true;
+      menu_msg_type    :=mtype;
+      menu_msg_Caption :=str_caption;
+      menu_msg_Body    :=str_body;
+      ui_CursorItemActs:=0;
    end;
 end;
 
@@ -552,8 +552,8 @@ begin
    then menu_page_BottomButtons(mi_back,mi_SaveLoad_save,mi_SaveLoad_load,mi_SaveLoad_delete  ,0,0,0)
    else menu_page_BottomButtons(mi_back,                 mi_SaveLoad_load,mi_SaveLoad_delete,0,0,0,0);
 
-   menu_item_setEnabled(mi_SaveLoad_save  ,saveload_Save  (true));
-   menu_item_setEnabled(mi_SaveLoad_load  ,saveload_Load  (true));
+   menu_item_setEnabled(mi_SaveLoad_save  ,saveload_SaveInit  (true));
+   menu_item_setEnabled(mi_SaveLoad_load  ,saveload_Load      (true));
    menu_item_setEnabled(mi_SaveLoad_delete,saveload_DeleteInit(true));
 end;
 
@@ -574,7 +574,7 @@ begin
 
    menu_page_BottomButtons(mi_back,mi_Replays_play,mi_Replays_delete,0,0,0,0);
 
-   menu_item_setEnabled(mi_Replays_play  ,replay_Play  (true));
+   menu_item_setEnabled(mi_Replays_play  ,replay_Play      (true));
    menu_item_setEnabled(mi_Replays_delete,replay_DeleteInit(true));
 end;
 
@@ -922,9 +922,13 @@ begin
    mty0:=menu_underCaptionY;
    menu_Item_Set(mi_camp_Difficulty ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_BigButtonH1,not g_started);mty0+=menu_BigButtonH1+menu_BigButtonH1;
    menu_Item_Set(mi_camp_Campaigns  ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_CampListH  ,not g_started);mty0+=menu_BigButtonH1+menu_CampListH;
-   menu_Item_Set(mi_camp_Missions   ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_MissListH  ,not g_started);//mty0+=menu_BigButtonH1+menu_MissListH;
+   menu_Item_Set(mi_camp_Missions   ,mtx0,mty0,mtx0+menu_CampListW,mty0+menu_MissListH  ,not g_started);
    mtx0:=menu_BaseW2+menu_CampListW;
-   menu_Item_Set(mi_camp_MissionInfo,mtx0,menu_underCaptionY,menu_w-menu_BaseW1,menu_LowerBorderY-menu_BigButtonH1,not g_started);
+   menu_Item_Set(mi_camp_MissionInfo,mtx0,menu_underCaptionY,mtx0+menu_InfoLineW,menu_underCaptionY+menu_infoListH,true);
+   mty0:=menu_underCaptionY+menu_infoListH+menu_BaseW1;
+   menu_Item_Set(mi_camp_MissionObj ,mtx0,mty0,mtx0+menu_ObjLineW ,mty0+menu_objListH,true);
+   mtx0+=menu_ObjLineW+menu_BaseW1;
+   menu_Item_Set(mi_camp_MissionLoc ,mtx0,mty0,mtx0+menu_LocLineW ,mty0+menu_objListH,true);
 
    if(g_started)
    then menu_page_BottomButtons(mi_back,mi_SaveLoad,mi_Settings,mi_Help,mi_Break   ,0,0)
@@ -1150,7 +1154,10 @@ mi_Surrender           : if(not check)then
                              if(MainMenu)then MenuBack(true,false);
 
 mi_Campaings           : if(not check)then g_type:=gt_campaing;
-mi_Scirmish            : if(not check)then g_type:=gt_scirmish;
+mi_Scirmish            : if(not check)then begin
+                                           g_type:=gt_scirmish;
+                                           map_make;
+                                           end;
 
 mi_SaveLoad            : if(not check)then begin menu_page:=item;saveload_MakeFolderList;end;
 mi_Replays             : if(not check)then begin menu_page:=item;  replay_MakeFolderList;end;
@@ -1217,9 +1224,9 @@ mi_SaveLoad_list       : if(not check)then
                             menu_ListMouseXY2Line(item,@svld_list_sel,svld_list_scroll,menu_ListLineH);
                             saveload_Select;
                          end;
-//mi_SaveLoad_info       :;
-mi_SaveLoad_fname      :;
-mi_SaveLoad_save       : if(not check)then saveload_Save      (false);
+//mi_SaveLoad_info
+mi_SaveLoad_fname      : ;
+mi_SaveLoad_save       : if(not check)then saveload_SaveInit      (false);
 mi_SaveLoad_load       : if(not check)then saveload_Load      (false);
 mi_SaveLoad_delete     : if(not check)then saveload_DeleteInit(false);
 
@@ -1229,7 +1236,7 @@ mi_Replays_list        : if(not check)then
                             menu_ListMouseXY2Line(item,@rpls_list_sel,rpls_list_scroll,menu_ListLineH);
                             replay_Select;
                          end;
-//mi_Replays_info        : ;
+//mi_Replays_info
 mi_Replays_play        : if(not check)then replay_Play  (false);
 mi_Replays_delete      : if(not check)then replay_DeleteInit(false);
 
@@ -1446,7 +1453,10 @@ mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll        , 1,0,c
 mi_camp_Missions       : if(not check)then
                            if(0<=camp_sel)and(camp_sel<camp_size)then
                                            ScrollInt(@camp_mis_scroll    , 1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
-
+mi_camp_MissionInfo    : if(not check)then
+                           if(0<=camp_sel)and(camp_sel<camp_size)then
+                           if(0<=camp_mis_sel)and(camp_mis_sel<camp_mis_size[camp_sel])then
+                                           ScrollInt(@camp_obj_scroll    , 1,0,camp_obj_size[camp_sel][camp_mis_sel]-menu_infoListSize ,false);
    else
       menu_Controls_MWD:=false;
    end;
@@ -1485,6 +1495,10 @@ mi_camp_Campaigns      : if(not check)then ScrollInt(@camp_scroll        ,-1,0,c
 mi_camp_Missions       : if(not check)then
                            if(0<=camp_sel)and(camp_sel<camp_size)then
                                            ScrollInt(@camp_mis_scroll    ,-1,0,camp_mis_size[camp_sel]-menu_MissListSize,false);
+mi_camp_MissionInfo    : if(not check)then
+                           if(0<=camp_sel)and(camp_sel<camp_size)then
+                           if(0<=camp_mis_sel)and(camp_mis_sel<camp_mis_size[camp_sel])then
+                                           ScrollInt(@camp_obj_scroll    ,-1,0,camp_obj_size[camp_sel][camp_mis_sel]-menu_infoListSize ,false);
    else
       menu_Controls_MWU:=false;
    end;
@@ -1618,7 +1632,7 @@ begin
       menu_ItemSelected:=menu_ItemTarget;
    end;
 
-   menu_ItemActs:=0;
+   ui_CursorItemActs:=0;
 
 ///////////////////////////////////   text input
   case(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))or(InputActionStuck(iAct_backspace))of
@@ -1629,99 +1643,102 @@ begin
 
             if(menu_Controls_Text(menu_ItemSelected,false,@changed))then
             begin
-               if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_TextEdit,true);
+               if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@ui_CursorItemActs,miat_TextEdit,true);
                menu_update:=menu_update or changed;
             end;
          end;
-  false: if(menu_Controls_Text(menu_ItemTarget  ,true ,nil))then SetBBit(@menu_ItemActs,miat_TextEdit,true);
+  false: if(menu_Controls_Text(menu_ItemTarget  ,true ,nil))then SetBBit(@ui_CursorItemActs,miat_TextEdit,true);
   end;
 
 ///////////////////////////////////   left button pressed
    case InputActionPressed(iact_MLB) of
    true : if(menu_Controls_MLB(menu_ItemSelected,false,@clickSound))then
           begin
-             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnLeft,true);
+             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
              menu_update:=true;
              if(clickSound=nil)then
                clickSound :=snd_click;
-             if(not GetBBit(@menu_ItemActs,miat_TextEdit))
+             if(not GetBBit(@ui_CursorItemActs,miat_TextEdit))
              and(not InputActionDPressed(iact_MLB))then menu_ItemSelected:=0;
           end;
-   false: if(menu_Controls_MLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnLeft,true);
+   false: if(menu_Controls_MLB(menu_ItemTarget  ,true ))then SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
    end;
 ///////////////////////////////////  double  left button pressed
    case InputActionDPressed(iact_MLB) of
    true : if(menu_Controls_DMLB(menu_ItemSelected,false))then
           begin
-             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
+             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@ui_CursorItemActs,miat_BtnDLeft,true);
              menu_update:=true;
              clickSound :=snd_click;
           end;
-   false: if(menu_Controls_DMLB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnDLeft,true);
+   false: if(menu_Controls_DMLB(menu_ItemTarget  ,true ))then SetBBit(@ui_CursorItemActs,miat_BtnDLeft,true);
    end;
 
 ///////////////////////////////////   right button pressed
    case InputActionPressed(iact_MRB) of
    true : if(menu_Controls_MRB(menu_ItemSelected,false))then
           begin
-             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_BtnRight,true);
+             if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
              menu_update:=true;
              clickSound :=snd_click;
              menu_ItemSelected:=0;
           end;
-   false: if(menu_Controls_MRB(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_BtnRight,true);
+   false: if(menu_Controls_MRB(menu_ItemTarget  ,true ))then SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
    end;
 
 ///////////////////////////////////   mouse wheel down
    case InputActionPressed(iact_MWD) of
    true : begin
-             SetSelectedItem(mi_NetServers_List);
-             SetSelectedItem(mi_SaveLoad_list  );
-             SetSelectedItem(mi_Replays_list   );
-             SetSelectedItem(mi_MP_ChatList    );
-             SetSelectedItem(mi_help_InfoList ,true);
-             SetSelectedItem(mi_help_InfoPanel,true);
-             SetSelectedItem(mi_SS_SoundVolume,true);
-             SetSelectedItem(mi_SS_MusicVolume,true);
-             SetSelectedItem(mi_SS_Playlist   ,true);
-             SetSelectedItem(mi_SG_ScrollSpeed,true);
-             SetSelectedItem(mi_camp_Campaigns,true);
-             SetSelectedItem(mi_camp_Missions ,true);
+             SetSelectedItem(mi_NetServers_List );
+             SetSelectedItem(mi_SaveLoad_list   );
+             SetSelectedItem(mi_Replays_list    );
+             SetSelectedItem(mi_MP_ChatList     );
+             SetSelectedItem(mi_help_InfoList   ,true);
+             SetSelectedItem(mi_help_InfoPanel  ,true);
+             SetSelectedItem(mi_SS_SoundVolume  ,true);
+             SetSelectedItem(mi_SS_MusicVolume  ,true);
+             SetSelectedItem(mi_SS_Playlist     ,true);
+             SetSelectedItem(mi_SG_ScrollSpeed  ,true);
+             SetSelectedItem(mi_camp_Campaigns  ,true);
+             SetSelectedItem(mi_camp_Missions   ,true);
+             SetSelectedItem(mi_camp_MissionInfo,true);
+
 
              if(menu_Controls_MWD(menu_ItemSelected,false))then
              begin
-                if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_MWhell,true);
+                if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@ui_CursorItemActs,miat_MWhell,true);
                 menu_update:=true;
                 menu_ItemSelected:=0;
              end;
           end;
-   false: if(menu_Controls_MWD(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_MWhell,true);
+   false: if(menu_Controls_MWD(menu_ItemTarget  ,true ))then SetBBit(@ui_CursorItemActs,miat_MWhell,true);
    end;
 
 ///////////////////////////////////   mouse wheel up
    case InputActionPressed(iact_MWU) of
    true : begin
-             SetSelectedItem(mi_NetServers_List);
-             SetSelectedItem(mi_SaveLoad_list  );
-             SetSelectedItem(mi_Replays_list   );
-             SetSelectedItem(mi_MP_ChatList    );
-             SetSelectedItem(mi_help_InfoList ,true);
-             SetSelectedItem(mi_help_InfoPanel,true);
-             SetSelectedItem(mi_SS_SoundVolume,true);
-             SetSelectedItem(mi_SS_MusicVolume,true);
-             SetSelectedItem(mi_SS_Playlist   ,true);
-             SetSelectedItem(mi_SG_ScrollSpeed,true);
-             SetSelectedItem(mi_camp_Campaigns,true);
-             SetSelectedItem(mi_camp_Missions ,true);
+             SetSelectedItem(mi_NetServers_List );
+             SetSelectedItem(mi_SaveLoad_list   );
+             SetSelectedItem(mi_Replays_list    );
+             SetSelectedItem(mi_MP_ChatList     );
+             SetSelectedItem(mi_help_InfoList   ,true);
+             SetSelectedItem(mi_help_InfoPanel  ,true);
+             SetSelectedItem(mi_SS_SoundVolume  ,true);
+             SetSelectedItem(mi_SS_MusicVolume  ,true);
+             SetSelectedItem(mi_SS_Playlist     ,true);
+             SetSelectedItem(mi_SG_ScrollSpeed  ,true);
+             SetSelectedItem(mi_camp_Campaigns  ,true);
+             SetSelectedItem(mi_camp_Missions   ,true);
+             SetSelectedItem(mi_camp_MissionInfo,true);
 
              if(menu_Controls_MWU(menu_ItemSelected,false))then
              begin
-                if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@menu_ItemActs,miat_MWhell,true);
+                if(menu_ItemTarget=menu_ItemSelected)then SetBBit(@ui_CursorItemActs,miat_MWhell,true);
                 menu_update:=true;
                 menu_ItemSelected:=0;
              end;
           end;
-   false: if(menu_Controls_MWU(menu_ItemTarget  ,true ))then SetBBit(@menu_ItemActs,miat_MWhell,true);
+   false: if(menu_Controls_MWU(menu_ItemTarget  ,true ))then SetBBit(@ui_CursorItemActs,miat_MWhell,true);
    end;
 
 ///////////////////////////////////   other keyboards keys

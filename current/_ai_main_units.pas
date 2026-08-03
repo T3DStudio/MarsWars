@@ -461,9 +461,12 @@ begin
           aic_group_GenGuard       : if(ai_generator_d=NOTSET)
                                      then group:=aic_group_Home
                                      else
-                                       if(ai_generator_d>srange)
-                                       or((ai_generator_kp^.kp_Zone<>mapZone)and(not isfly))
-                                       then group:=aic_group_GenAssault;
+                                       if(ai_energy_future>=aip_MaxEnergy)and(ai_generator_d<=ai_generator_kp^.kp_RCapture)and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit)
+                                       then group:=aic_group_Home
+                                       else
+                                         if(ai_generator_d>srange)
+                                         or((ai_generator_kp^.kp_Zone<>mapZone)and(not isfly))
+                                         then group:=aic_group_GenAssault;
           aic_group_Transport      : if(transportM<=0)then group:=aic_group_Home;
           else group:= aic_group_Home;
           end;

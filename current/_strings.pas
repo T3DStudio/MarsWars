@@ -308,33 +308,42 @@ begin
    ptextH^  +=plines_n^*font_w1;
 end;
 
-procedure str_AddToStrList(pslist:PTUIStringList;lineLen:integer;newPara,Justify:boolean;newstr:shortstring);
+procedure str_AddToStringArray(psarray:PTStringArray;psize:pinteger;slist_w:pbyte;lineLen:integer;newPara,Justify:boolean;newstr:shortstring);
 var
-lines_n,line :byte;
+lines_n,i :byte;
 lines_spos,
 lines_epos,
 lines_endc,
 lines_len :shortstring;
 procedure AddToList(s:shortstring);
 begin
-   with pslist^ do
-   begin
-      slist_n+=1;
-      setlength(slist_l,slist_n);
-      slist_l[slist_n-1]:=s;
-   end;
+   psize^+=1;
+   setlength(psarray^,psize^);
+   psarray^[psize^-1]:=s;
 end;
 begin
-   if(pslist^.slist_n>0)and(newPara)then AddToList('');
-   str_Trim(@newPara);
+   if(psize^>0)and(newPara)then AddToList('');
+   str_Trim(@newstr);
 
-   str_analize(@newstr,@lines_spos,@lines_epos,@lines_endc,@lines_len,nil,@lines_n,@pslist^.slist_w,lineLen);
+   str_analize(@newstr,@lines_spos,@lines_epos,@lines_endc,@lines_len,nil,@lines_n,slist_w,lineLen);
+
+   if(length(newstr)>0)then
+     for i:=1 to length(newstr) do
+       if(newstr[i]=tc_nl1)
+       or(newstr[i]=tc_nl2)
+       or(newstr[i]=tc_nl3)then newstr[i]:=' ';
 
    if(lines_n>0)then
-     for line:=1 to lines_n do
+     for i:=1 to lines_n do
        if(Justify)
-       then AddToList(str_JustifyBySpaces(copy(newstr,ord(lines_spos[line]),ord(lines_epos[line])-ord(lines_spos[line])+1 ),lineLen))
-       else AddToList(                    copy(newstr,ord(lines_spos[line]),ord(lines_epos[line])-ord(lines_spos[line])+1          ));
+       then AddToList(str_JustifyBySpaces(copy(newstr,ord(lines_spos[i]),ord(lines_epos[i])-ord(lines_spos[i])+1 ),lineLen))
+       else AddToList(                    copy(newstr,ord(lines_spos[i]),ord(lines_epos[i])-ord(lines_spos[i])+1          ));
+end;
+
+procedure str_AddToUIStringList(pslist:PTUIStringList;lineLen:integer;newPara,Justify:boolean;newstr:shortstring);
+begin
+   with pslist^ do
+     str_AddToStringArray(@slist_l,@slist_n,@slist_w,lineLen,newPara,Justify,newstr);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -427,7 +436,7 @@ end;
 function str_ProductionHotKey(uid:byte):shortstring;
 begin
    if(uid<=ui_ButtonsNum)
-   then str_ProductionHotKey:=input_actions[byte(iAct_SProd1+uid)].ik_str_HK
+   then str_ProductionHotKey:=input_actions[iAct_SProd1+uid].ik_str_HK
    else str_ProductionHotKey:='';
 end;
 
@@ -973,25 +982,25 @@ procedure AddLineUnitGameHint(line:shortstring);
 begin
    if(length(line)>0)then
      with g_uids[uid] do
-       str_AddToStrList(@uid_HintInGame,ui_HintLineLenUnit,false,false,line); //
+       str_AddToUIStringList(@uid_HintInGame,ui_HintLineLenUnit,false,false,line); //
 end;
 procedure AddLineUnitDocHint(line1:shortstring);
 begin
    if(length(line1)>0)then
      with g_uids[uid] do
-       str_AddToStrList(@uid_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
+       str_AddToUIStringList(@uid_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
 end;
 procedure AddLineUpgradeDocHint(line1:shortstring);
 begin
    if(length(line1)>0)then
      with g_upgrs[uid] do
-       str_AddToStrList(@upgr_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
+       str_AddToUIStringList(@upgr_HintDoc,ui_DocLineLen1,false,false,tc_docbr+line1);
 end;
 procedure AddLineAbilityGameHint(line:shortstring);
 begin
    if(length(line)>0)then
      with g_aids[uid] do
-       str_AddToStrList(@ua_HintInGame,ui_HintLineLenUnit,false,false,tc_docbr+line); //
+       str_AddToUIStringList(@ua_HintInGame,ui_HintLineLenUnit,false,false,tc_docbr+line); //
 end;
 function DocValI(val:integer;cchar:char=#0):shortstring;
 begin
@@ -1009,7 +1018,8 @@ begin
    //   UNITS
    for uid:=0 to 255 do
      with g_uids[uid] do
-     if(uid_r>0)then
+     if (uid_r>0)
+     and(not uid_ismarker)then
      begin
         // Basics
         ITEMP :='';
@@ -1285,7 +1295,7 @@ begin
    //   UNITS ABITIES (DOC)
    for uid:=0 to 255 do
      with g_uids[uid] do
-     if(uid_r>0)then
+     if(uid_r>0)and(not uid_ismarker)then
      begin
         if(uid_HaveAbility)then
         begin
@@ -1318,21 +1328,6 @@ begin
         end;
         AddLineUnitDocHint(' ');
      end;
-end;
-
-procedure str_camp_SetMissionPlot(mission:byte;newPara:boolean;text:shortstring);
-begin
-   //str_AddToStrList(@str_camp_MissionInfo[mission],37,newPara,true,text);
-end;
-
-function str_camp_SetMapInfo(date,location,area:shortstring):shortstring;
-begin
-   str_camp_SetMapInfo:='';{str_cmp_Date    +tc_nl3+
-                          str_Center0(date    ,14)+tc_nl3+
-                        str_cmp_Location+tc_nl3+
-                          str_Center0(location,14)+tc_nl3+
-                        str_cmp_Area    +tc_nl3+
-                          str_Center0(area    ,14)};
 end;
 
 procedure menu_set_hint(item,itemPos:byte;itemHint:shortstring);

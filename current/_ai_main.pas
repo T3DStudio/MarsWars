@@ -213,6 +213,23 @@ begin
 end;
 
 procedure ai_AbilitiesTransform(pu:PTUnit);
+function ai_CheckEarlyUpgrade:boolean;
+begin
+   ai_CheckEarlyUpgrade:=false;
+   with pu^     do
+   with uid^    do
+   with player^ do
+   begin
+      if(ai_generator_d<NOTSET)and(pu^.player^.res_energyl_max<=1500)then
+        if(ai_generator_kp^.kp_Zone=mapZone)then exit;
+      if(aiu_alarm_d<NOTSET)then
+        if(aiu_alarm_d<base_r2)
+        then exit
+        else
+          if(aiu_alarm_zone=mapZone)then exit;
+   end;
+   ai_CheckEarlyUpgrade:=true;
+end;
 begin
    with pu^     do
    with uid^    do
@@ -220,12 +237,13 @@ begin
      case uidi of
 UID_HKeep,
 UID_HCommandCenter,
-UID_UCommandCenter: if(u_royal_d>base_r3)
+UID_UCommandCenter: if(u_royal_d>base_r2)
                     or(map_scenario<>mc_royale)then
-                      if(ai_curr_UnitProds>1)
+                      if((ai_curr_UnitProds>1)
                       and(ai_BuildersInConstruction<units_builders_e)
                       and((aip_flags and aif_army_early_attack0)=0)
-                      and(units_bld_l[false]>=aip_MaxUnitMinPart)
+                      and(units_bld_l[false]>=aip_MaxUnitMinPart))
+                      or(ai_CheckEarlyUpgrade)
                       then
                         case uidi of
                         UID_HKeep         : ai_UnitAbility(pu,uab_ToHAKeep         ,0,0,0);
@@ -825,8 +843,7 @@ begin
       for i:=0 to ai_LastAlarm do
         with ai_TeamAlarms[team,i] do
           if(aia_limit>0)then
-            if(uid_isfly)
-            or(isfly)
+            if(isfly)
             or(aia_zone=mapZone)
             or(uid_isbarrack)
             or(uid_ability_isradar)then
@@ -856,7 +873,7 @@ begin
       //if(isselected)then
       //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
       //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-      if(isselected)or(m_UnitTargetN=unum)then
+      {if(isselected)or(m_UnitTargetN=unum)then
       begin
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);
          //writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
@@ -866,6 +883,11 @@ begin
               UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
               //writeln( kp_LimitPlayerP[playeri],' ',(keyPoint_MinLimit  +uid_LimitUse),' ',ai_generator_d,' ',kp_RCapture);
            end;
+         if(aiu_alarm_d<NOTSET)then
+           UnitsInfo_AddLine(x+1,y+1,aiu_alarm_x,aiu_alarm_y,c_red);
+
+         writeln(TeamVision[g_PlayersGame[LocalPlayer].team]);
+
          //if(ai_keypoint_d<NOTSET)then
          //  with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
 
@@ -875,7 +897,7 @@ begin
          {writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
          if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
          if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua); }
-      end;
+      end;}
      { if(isselected)then
       with player^ do
       begin

@@ -445,7 +445,7 @@ begin
                 then exit
                 else
                   if(camp_mis_sel<0)
-                  or(camp_mis_size[camp_sel]<=camp_mis_sel)
+                  or(min2i(camp_data.cd_lastm,camp_mis_size[camp_sel])<=camp_mis_sel)
                   then exit;
    gt_scirmish: if(not PlayersAllReady)
                 or(PlayersNonObserversCount<2)

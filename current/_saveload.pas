@@ -66,7 +66,9 @@ begin
                              BlockRead(f,vbyte1,sizeof(camp_diff));
                              if(camp_MaxDiff<vbyte1)
                              then svld_str_info1:=str_FileError_WVer
-                             else svld_str_info1:=camp_list[vint1]+tc_nl1+camp_mis_list[vint1,vint2]+tc_nl1+str_Camp_Difficulty+tc_nl1+str_Camp_DifficultyL[vbyte1];
+                             else svld_str_info1:=str_Camp_Campaign  +tc_nl1+' '+camp_list[vint1]+tc_nl1+tc_nl1+
+                                                  str_Camp_Mission   +tc_nl1+' '+camp_mis_list[vint1,vint2]+tc_nl1+tc_nl1+
+                                                  str_Camp_Difficulty+tc_nl1+' '+str_Camp_DifficultyL[vbyte1];
 
                              BlockRead(f,vcdata,sizeof(camp_data));
                           end;
@@ -246,16 +248,16 @@ begin
    GameLog_Chat(LocalPlayer,chat_all,str_gmsg_GameSaved);
 end;
 
-function saveload_Save(check:boolean):boolean;
+function saveload_SaveInit(check:boolean):boolean;
 begin
-   saveload_Save:=false;
+   saveload_SaveInit:=false;
 
    if(not g_started)
    or(not saveload_Allowed)
    or(length(svld_str_fname)=0)
    or(menu_msg_type<>mmbt_none)then exit;
 
-   saveload_Save:=true;
+   saveload_SaveInit:=true;
 
    if(check)then exit;
 

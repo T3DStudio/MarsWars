@@ -112,6 +112,7 @@ begin
    begin
       if(buffs[ub_SphereInvuln]>0)
       or(hits<=0)
+      or(uid_ismarker)
       then exit;
 
       if(damage<=0)then
@@ -581,7 +582,8 @@ begin
    if(checkVis)then
      if(not CheckUnitTeamVision(pAttacker^.player^.team,pTarget,false))then exit;
    if(armN>LastUnitArms)then exit;
-   if(pTarget^.hits<=hits_fdead)then exit;
+   if(pTarget^.hits<=hits_fdead)
+   or(pTarget^.uid^.uid_ismarker)then exit;
    if(udist<0)then udist:=point_dist_int(pAttacker^.x,pAttacker^.y,pTarget^.x,pTarget^.y);
 
    with pAttacker^ do
@@ -706,7 +708,8 @@ begin
    if(not CheckUnitTeamVision(pAttacker^.player^.team,pTarget,false))then exit;
 
    if(pTarget^.hits<=hits_fdead)
-   or(pTarget^.buffs[ub_SphereInvuln]>0)then exit;
+   or(pTarget^.buffs[ub_SphereInvuln]>0)
+   or(pTarget^.uid^.uid_ismarker)then exit;
 
    if(udist<0)then udist:=point_dist_int(pAttacker^.x,pAttacker^.y,pTarget^.x,pTarget^.y);
    if(LastArm>LastUnitArms)then LastArm:=LastUnitArms;
@@ -835,6 +838,7 @@ begin
 UID_HAKeep,
 UID_HKeep     : if(udist<srange)
                and(not pTarget^.uid^.uid_isbuilding)
+               and(not pTarget^.uid^.uid_ismarker)
                and(pTarget^.iscomplete)
                and(team<>pTarget^.player^.team)then
                   if(pTarget^.buffs[ub_DecayAura]<=fr_fpsh)and(upgrs_cur[upgr_hell_DecayAura]>0)then
@@ -951,6 +955,8 @@ begin
               IsUnitRange(tu^.transportU,@tu_transport);
 
               if(tu_transport=nil)then unit_detect(pu,tu,udi);
+
+              if(tu^.uid^.uid_ismarker)then continue;
 
               isattackable:=false;
               if(attack_target)then
@@ -2272,8 +2278,6 @@ begin
             end
             else
             begin
-               //if(state=ps_AI)then ai_Global_ScoutPick(pu);
-
                // unit&upgrades production
                unit_Production(pu);
 
@@ -2374,11 +2378,13 @@ begin
 
            unit_BaseTimers(pu);
 
+
            if(hits>0)then
            begin
               if(cycle_order=g_cycle_order)then
                 unit_Bonuses(pu);
-              unit_BehaviorBase(pu);
+              if(not uid^.uid_ismarker)then
+                unit_BehaviorBase(pu);
            end
            else unit_death(pu);
 

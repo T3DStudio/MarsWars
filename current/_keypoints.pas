@@ -152,7 +152,6 @@ end;
 procedure Scenario_KeyPointsEndGameClientFix;
 var i:byte;
 begin
-   writeln('Scenario_KeyPointsEndGameClientFix');
    for i:=0 to LastKeyPoint do
      with map_KeyPointsL[i] do
      with kp_TeamData[MaxPlayers] do

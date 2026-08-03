@@ -134,7 +134,8 @@ begin
    if(uid=0)
    or(POVPlayer=nil)then exit;
    with POVPlayer^ do
-     if(upgrs_max[uid]<=0)then exit;
+     if (upgrs_max[uid]<=0)
+     and(upgrs_cur[uid]<=0)then exit;
    ui_PanelBTNUpgrade:=true;
 end;
 function ui_PanelBTNAbility(pu:PTUnit;abilityN:byte):boolean;
@@ -635,8 +636,8 @@ s1  :shortstring;
 procedure AddLine(pstr:pshortstring);
 begin
    if(pstr=nil)
-   then str_AddToStrList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,tc_docbr)
-   else str_AddToStrList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,pstr^);
+   then str_AddToUIStringList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,tc_docbr)
+   else str_AddToUIStringList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,pstr^);
 end;
 procedure BrushUnitTargetHint;
 begin
@@ -644,27 +645,48 @@ begin
      with m_UnitTargetP^ do
      if(hits>0)then
        with uid^ do
-       with g_unitsVis[unum] do
-       with player^ do
-       begin
-          AddLine(@uid_str_name);
-          s1:=str_UnitAttributes(m_UnitTargetP,0);
-          AddLine(@s1);
-          s1:='';
-          STRADD(@s1,lvlstr_w,sep_wdash);
-          STRADD(@s1,lvlstr_a,sep_wdash);
-          STRADD(@s1,lvlstr_s,sep_wdash);
-          if(length(s1)>0)then s1:=str_hint_UpgradesLvl+s1+tc_default;
-          STRADD(@s1,str_doc_Hits+li2s(hits),sep_scomma);
-          if(uid_gen_EnergyLevel>0)then
-            STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_scomma);
-          AddLine(@s1);
-          s1:=tc_white+'('+tc_default+chr(playeri)+name+tc_white+')';
-          AddLine(@s1);
-       end;
+         if(uid_ismarker)
+         then AddLine(@uid_str_name)
+         else
+           with g_unitsVis[unum] do
+           with player^ do
+           begin
+              AddLine(@uid_str_name);
+              s1:=str_UnitAttributes(m_UnitTargetP,0);
+              AddLine(@s1);
+              s1:='';
+              STRADD(@s1,lvlstr_w,sep_wdash);
+              STRADD(@s1,lvlstr_a,sep_wdash);
+              STRADD(@s1,lvlstr_s,sep_wdash);
+              if(length(s1)>0)then s1:=str_hint_UpgradesLvl+s1+tc_default;
+              STRADD(@s1,str_doc_Hits+li2s(hits),sep_scomma);
+              if(uid_gen_EnergyLevel>0)then
+                STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_scomma);
+              AddLine(@s1);
+              s1:=tc_white+'('+tc_default+chr(playeri)+name+tc_white+')';
+              AddLine(@s1);
+           end;
 end;
 begin
+   {
+   {case m_uifocus of
+   mf_CtrlPanel  : begin
+                      SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);//m_btnN
+                      case ui_tab of
+                      tab_Units   : begin
+                                       SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
+                                       SetBBit(@ui_CursorItemActs,miat_MWhell  ,true);
+                                       if(InputActionPressed(iAct_mwu))then ui_ControlPanel_click(pct_left ,@clickSound); // mouse wheel up
+                                       if(InputActionPressed(iAct_mwd))then ui_ControlPanel_click(pct_right,@clickSound); // mouse wheel down
+                                    end;
+                      tab_Upgrades: SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
+                      end;
+                   end;
+   end;}
+   }
+
    case m_uifocus of
+   mf_MiniMap  : SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
    mf_map      : case m_brush of
                  1..255    : begin
                                 with g_uids[ m_brush] do
@@ -716,7 +738,11 @@ begin
                    end;
                  end;
 
-   mf_Tabs     : if(0<=m_btnN)and(m_btnN<4)then AddLine(@str_ui_Tab[m_BtnN]);
+   mf_Tabs     : if(0<=m_btnN)and(m_btnN<4)then
+                 begin
+                    AddLine(@str_ui_Tab[m_BtnN]);
+                    SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
+                 end;
    mf_CtrlPanel: if(0<=m_btnN)and(m_btnN<=ui_ButtonsNum)then
                    case ui_tab of
                    tab_Buildings,
@@ -727,55 +753,71 @@ begin
                                        taid:=ui_panel_PTabIActs[m_btnN];
                                        tuid:=ui_panel_uids[race,ui_tab,taid-iAct_SProd1];
                                        if(iActOn(taid))then
-                                         case ui_tab of
-                                         tab_Buildings,
-                                         tab_Units    : with g_uids[tuid] do str_StringListCopy(@uid_HintInGame,@ui_MouseHintL);
-                                         tab_Upgrades : with g_upgrs[tuid] do
-                                                        begin
-                                                           AddLine(@upgr_str_NameHK);
-                                                           s1:=str_UpgradeCost(tuid,upgrs_cur[tuid]+1);
-                                                           AddLine(@s1);
-                                                           AddLine(@upgr_str_Descript);
-                                                           AddLine(@upgr_str_Reqs);
-                                                        end;
-                                         end;
+                                       begin
+                                          if(ui_ControlTabType=tcc_controls)then SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
+                                          case ui_tab of
+                                          tab_Buildings,
+                                          tab_Units    : begin
+                                                            with g_uids[tuid] do str_StringListCopy(@uid_HintInGame,@ui_MouseHintL);
+                                                            if(ui_tab=tab_Units)then
+                                                              if(ui_ControlTabType=tcc_controls)then
+                                                              begin
+                                                                 SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
+                                                                 SetBBit(@ui_CursorItemActs,miat_MWhell  ,true);
+                                                              end;
+                                                         end;
+                                          tab_Upgrades : with g_upgrs[tuid] do
+                                                         begin
+                                                            if(ui_ControlTabType=tcc_controls)then
+                                                              SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
+                                                            AddLine(@upgr_str_NameHK);
+                                                            s1:=str_UpgradeCost(tuid,upgrs_cur[tuid]+1);
+                                                            AddLine(@s1);
+                                                            AddLine(@upgr_str_Descript);
+                                                            AddLine(@upgr_str_Reqs);
+                                                         end;
+                                          end;
+                                       end;
                                     end;
                    tab_Controls : begin
                                      tuid:=ui_panel_CTabIActs[ui_ControlTabType,m_BtnN];
                                      if(iActOn(tuid))then
-                                       case tuid of
-                                       0                     : ;
-                                       iAct_Control_UAbility1,
-                                       iAct_Control_UAbility2,
-                                       iAct_Control_UAbility3: if(ui_CommandercPU<>nil)then
-                                                                 with ui_CommandercPU^  do
-                                                                 begin
-                                                                    taid:=0;
-                                                                    case tuid of
-                                                                    iAct_Control_UAbility1: taid:=uid^.uid_ability1;
-                                                                    iAct_Control_UAbility2: taid:=uid^.uid_ability2;
-                                                                    iAct_Control_UAbility3: taid:=uid^.uid_ability3;
-                                                                    end;
-                                                                    if(taid>0)then
-                                                                      with g_aids[taid] do
-                                                                      begin
-                                                                         s1:='';
-                                                                         case tuid of
-                                                                         iAct_Control_UAbility1: s1:=str_AbilityHintName(taid,0);
-                                                                         iAct_Control_UAbility2: s1:=str_AbilityHintName(taid,1);
-                                                                         iAct_Control_UAbility3: s1:=str_AbilityHintName(taid,2);
-                                                                         end;
-                                                                         AddLine(@s1);
-                                                                         str_StringListCopy(@ua_HintInGame,@ui_MouseHintL,true);
-                                                                      end;
-                                                                 end;
-                                       else                    AddLine(@str_action_hint[tuid]);
-                                       end;
+                                     begin
+                                        SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
+                                        case tuid of
+                                        0                     : ;
+                                        iAct_Control_UAbility1,
+                                        iAct_Control_UAbility2,
+                                        iAct_Control_UAbility3: if(ui_CommandercPU<>nil)then
+                                                                  with ui_CommandercPU^  do
+                                                                  begin
+                                                                     taid:=0;
+                                                                     case tuid of
+                                                                     iAct_Control_UAbility1: taid:=uid^.uid_ability1;
+                                                                     iAct_Control_UAbility2: taid:=uid^.uid_ability2;
+                                                                     iAct_Control_UAbility3: taid:=uid^.uid_ability3;
+                                                                     end;
+                                                                     if(taid>0)then
+                                                                       with g_aids[taid] do
+                                                                       begin
+                                                                          s1:='';
+                                                                          case tuid of
+                                                                          iAct_Control_UAbility1: s1:=str_AbilityHintName(taid,0);
+                                                                          iAct_Control_UAbility2: s1:=str_AbilityHintName(taid,1);
+                                                                          iAct_Control_UAbility3: s1:=str_AbilityHintName(taid,2);
+                                                                          end;
+                                                                          AddLine(@s1);
+                                                                          str_StringListCopy(@ua_HintInGame,@ui_MouseHintL,true);
+                                                                       end;
+                                                                  end;
+                                        else                    AddLine(@str_action_hint[tuid]);
+                                        end;
+                                     end;
                                   end;
                     end;
    mf_MenuPause: case m_btnN of
-                 0 : if(iActOn(iAct_InGameMenu ))then AddLine(@str_action_hint[iAct_InGameMenu ]);
-                 2 : if(iActOn(iAct_InGamePause))then AddLine(@str_action_hint[iAct_InGamePause]);
+                 0 : if(iActOn(iAct_InGameMenu ))then begin AddLine(@str_action_hint[iAct_InGameMenu ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 2 : if(iActOn(iAct_InGamePause))then begin AddLine(@str_action_hint[iAct_InGamePause]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
                  end;
    end;
 end;
@@ -950,6 +992,9 @@ begin
                               end;
                 else          draw_text(tar,ui_objectivesx,y,str_objective_Scirmish   ,ta_LU,ui_Objectives_LineLen,c_white);
                 end;
+   gt_campaing: if(0<=camp_sel)and(camp_sel<camp_size)then
+                if(0<=camp_mis_sel)and(camp_mis_sel<camp_mis_size[camp_sel])then
+                draw_text(tar,ui_objectivesx,y,camp_obj_object[camp_sel][camp_mis_sel],ta_LU,ui_Objectives_LineLen,c_white,@y);
    end;
 
    // MOUSE CURSOR TARGET HINT
@@ -976,6 +1021,27 @@ begin
    if(vid_ShowFPS           )then draw_text(tar,ui_FPSx,ui_FPSy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
 
    if(rpls_pstate=rpls_write)then draw_text(tar,ui_RECx,ui_RECy,'*REC',ta_RU,255,c_red);
+end;
+
+procedure draw_UIMouseActHint;
+var tx,ty:integer;
+begin
+   if(ui_CursorItemActs>0)then
+   begin
+      tx:=mouse_x+(spr_cursor^.w div 2);
+      ty:=mouse_y+(spr_cursor^.w div 2);
+      if GetBBit(@ui_CursorItemActs,miat_BtnLeft )
+      or GetBBit(@ui_CursorItemActs,miat_MWhell  )
+      or GetBBit(@ui_CursorItemActs,miat_BtnRight)then
+      begin
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MLB[GetBBit(@ui_CursorItemActs,miat_BtnLeft )]);
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MMB[GetBBit(@ui_CursorItemActs,miat_MWhell  )]);
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MRB[GetBBit(@ui_CursorItemActs,miat_BtnRight)]);
+         tx+=spr_CursorHint_MLB[true]^.w;
+      end;
+      if(GetBBit(@ui_CursorItemActs,miat_TextEdit))then
+         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_Edit);
+   end;
 end;
 
 procedure draw_UIMouseCursor(tar:pSDL_Surface);   //cursor/brash
@@ -1015,7 +1081,10 @@ begin
    then draw_sdlsurface(tar,mouse_x-spr_cursor_movex[0],mouse_y-spr_cursor_movey[0],spr_cursor_move[0])
    else
      if(not UIMouseEdgeCursor)then
-       draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
+     begin
+        draw_sdlsurface(tar,mouse_x,mouse_y,spr_cursor);
+        draw_UIMouseActHint;
+     end;
 
    case m_uifocus of
    mf_minimap,
@@ -1036,6 +1105,8 @@ var
 ux,uy:integer;
 PVisPlayer:PTPlayerGameData;
 begin
+   ui_CursorItemActs:=0;
+
    if(ui_update_mmap>0)
    then ui_update_mmap-=1
    else ui_update_mmap:=ui_update_period1;

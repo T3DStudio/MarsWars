@@ -762,6 +762,7 @@ UID_HAltar             = 13;
 UID_HCommandCenter     = 14;
 UID_HACommandCenter    = 15;
 UID_HBarracks          = 16;
+UID_HMarker            = 17;
 
 UID_LostSoul           = 20;
 UID_Phantom            = 21;
@@ -1259,6 +1260,10 @@ iAct_test_debug1       = 228;
 apm_Acts               = [1..255]-[iAct_ScreenShot,
                                    iAct_mwu,iAct_mwd,
                                    iAct_mmb,iAct_esc,
+                                   iAct_left,
+                                   iAct_right,
+                                   iAct_up,
+                                   iAct_down,
                                    iAct_return,
                                    iAct_control,
                                    iAct_alt,
@@ -1270,7 +1275,8 @@ apm_Acts               = [1..255]-[iAct_ScreenShot,
                                    iAct_InGameChatAllies,
                                    iAct_InGamePause,
                                    iAct_InGameMenu,
-                                   iAct_Control_ToggleRec];
+                                   iAct_Control_ToggleRec
+                                   ];
 
 apm_period_sec         = 10;
 apm_period_min         = 60/apm_period_sec;
@@ -1802,6 +1808,8 @@ mi_camp_Difficulty     = 250;
 mi_camp_Campaigns      = 251;
 mi_camp_Missions       = 252;
 mi_camp_MissionInfo    = 253;
+mi_camp_MissionObj     = 254;
+mi_camp_MissionLoc     = 255;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1836,7 +1844,6 @@ menu_BigButtonHh       = menu_BigButtonH1 div 2;
 menu_StepFromBottom    = menu_BaseW1+menu_BasehW;
 menu_ItemCaptionhW     = menu_BaseW1*3;
 menu_LowerBorderY      = menu_h-menu_StepFromBottom-menu_BigButtonH1;
-//
 
 menu_underLogoY        = menu_logoh+menu_BaseW1;
 menu_CaptionH          = menu_BaseW1;
@@ -1860,14 +1867,21 @@ menu_ListWh            = menu_ListW1 div 2;
 menu_PlayListLine1H    = menu_ListLineH;
 menu_PlayListH         = 10;
 
-menu_CampListW         = menu_ListWh;
+menu_CampListW         = (menu_ListWh div 4)*3;
 menu_CampLineH         = 16;
 menu_CampListSize      = 5;
 menu_CampListH         = menu_CampLineH*menu_CampListSize;
 menu_MissLineH         = 16;
 menu_MissListSize      = 10;
 menu_MissListH         = menu_BaseList1H*menu_MissListSize;
-
+menu_InfoLineH         = 12;
+menu_infoListSize      = 20;
+menu_infoListH         = menu_infoListSize*menu_InfoLineH+font_wh;
+menu_infoLineSize      = 64;
+menu_InfoLineW         = font_w2+menu_infoLineSize*font_w1;
+menu_ObjLineW          = ((menu_InfoLineW-menu_BaseW1) div 5)*3;
+menu_objListH          = 6*menu_InfoLineH;
+menu_LocLineW          = menu_InfoLineW-menu_ObjLineW-menu_BaseW1;
 
 menu_PlayersStateW     = font_w1h+menu_ListLineH;
 menu_PlayersNameW      = font_w2+MaxPlayerNameLen*font_w1;
@@ -1904,7 +1918,6 @@ ui_DocLineLen2         = 76;
 ui_DocListH            = 35;
 
 camp_MaxDiff           = 4;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  BASE STRING/TEXT

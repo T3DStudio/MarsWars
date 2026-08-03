@@ -27,8 +27,6 @@ end;
 PTUIStringList = ^TUIStringList;
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   GRAPHIC
@@ -281,7 +279,8 @@ TServerInfo = record
 end;
 
 TCampaignData = record
-   cd_byte1:byte;
+   cd_lastm : integer;
+   cd_NMTime: cardinal;
 end;
 
 TAPMData = record
@@ -526,6 +525,7 @@ TUID = record
    uid_HaveRallyPoint,
    uid_HaveAbility,
    uid_OutUnitsTeleBuff,
+   uid_ismarker,
    uid_isbuilding,
    uid_ismech,
    uid_islight,
@@ -808,6 +808,7 @@ TPlayerDataGame = record
    aip_MaxUpgradeLevel
                        : byte;
 
+   aip_delay_attack,
    aip_pause_attack,
    aip_pause_detection,
    aip_pause_magic,

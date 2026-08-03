@@ -40,7 +40,7 @@ begin
            begin
               if((ud<srange)and not uid_AI_Melee)
               or(isfly)
-              or(uid_isfly)
+              //or(uid_isfly)
               or(mapZone=tu^.mapZone)then
                 if(ud<ai_enemy_d)then
                 begin

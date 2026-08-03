@@ -494,6 +494,7 @@ begin
    //setEffectEID(0,EID_Teleport  ,0,0,0  );
    //setEffectSND(  snd_Teleport,nil,nil,nil);
 end;
+UID_HMarker,
 UID_HEye:
 begin
    setMWSModel(0,@spr_HEye);

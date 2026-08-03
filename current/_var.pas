@@ -391,6 +391,8 @@ ui_log_color      : array of TMWColor;
 ui_log_n          : integer = 0;
 ui_log_LastTimer  : integer = 0;
 
+ui_CursorItemActs : byte = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  MENU
@@ -417,7 +419,6 @@ menu_HelpUIDH     : integer = 0;
 menu_HelpUIDScroll: integer = 0;
 menu_HelpILScroll : integer = 0;
 menu_HelpIList    : PTUIStringList = nil;
-menu_ItemActs     : byte = 0;
 menu_ItemTarget   : byte = 0;
 menu_ItemTargetP  : byte = 0; // previous
 menu_ItemSelected : byte = 0;
@@ -480,13 +481,19 @@ camp_diff      : byte = 1;
 camp_data      : TCampaignData;
 camp_size      : integer = 0;
 camp_scroll    : integer = 0;
-camp_list      : TStringArray;
+camp_list      : TStringArray;                   // [campaing num] = camp name
 camp_sel       : integer = 0;
 
 camp_mis_sel   : integer = 0;
-camp_mis_scroll:integer = 0;
-camp_mis_list  : array of TStringArray;
-camp_mis_size  : array of integer;
+camp_mis_scroll: integer = 0;
+camp_mis_list  : array of TStringArray;          // [campaing num][mission num] = mission name
+camp_mis_size  : array of integer;               // [campaing num] = mission count
+
+camp_obj_main  : array of array of TStringArray; // [campaing num][mission num][line num] = objective line
+camp_obj_object: array of array of shortstring;  // [campaing num][mission num][line num] = objective line
+camp_obj_loc   : array of array of shortstring;  // [campaing num][mission num][line num] = objective line
+camp_obj_size  : array of array of integer;      // [campaing num][mission num] = lines count
+camp_obj_scroll: integer;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -877,11 +884,6 @@ spr_buff_HellVision,
 spr_buff_Heroic      : TMWTexture;
 
 
-spr_camp_mars,
-spr_camp_hell,
-spr_camp_earth,
-spr_camp_phobos,
-spr_camp_deimos ,
 spr_uibtn_markLook,
 spr_uibtn_markAttack,
 spr_uibtn_ReplayFast,
@@ -1326,6 +1328,12 @@ str_objective_KeyPoints,
 str_Camp_Difficulty,
 str_Camp_Campaign,
 str_Camp_Mission,
+str_Camp_Info,
+str_Camp_Location,
+str_Camp_NewUnits,
+str_Camp_HE_CoB,
+str_Camp_HE_ToE,
+str_Camp_HE_HN,
 
 str_all,
 str_Players,

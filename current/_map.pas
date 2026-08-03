@@ -629,7 +629,7 @@ mc_KeyPoints: begin
               end;
    end;
 
-   if(map_MaxPlayers>0)then
+   if(map_MaxPlayers>0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF}then
      for i:=0 to map_MaxPlayers-1 do
        map_KeyPoints_Add(map_PlayerStartX[i]+(sign(map_sizeh-map_PlayerStartX[i],true)*map_Start2GeneratorStep),
                          map_PlayerStartY[i]+(sign(map_sizeh-map_PlayerStartY[i],true)*map_Start2GeneratorStep),
@@ -640,7 +640,8 @@ mc_KeyPoints: begin
      case map_template of
      mapt_lake,
      mapt_island,
-     mapt_temple: map_KeyPoints_Add(map_SizeH,map_SizeH,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
+     mapt_temple: if(not map_KeyPoints_CheckPos(map_SizeH,map_SizeH,keyPoint_GenR))then
+                    map_KeyPoints_Add(map_SizeH,map_SizeH,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
      end;
 
    map_KeyPoints_Random(map_MaxPlayers*2,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
@@ -1201,6 +1202,7 @@ gt_scirmish: begin
              end;
 gt_campaing: begin
              map_BaseVars(true);
+             game_RoyalSetCenter(g_royal_Rx,g_royal_Ry);
              SetThemeCampaign(camp_sel,camp_mis_sel);
              end;
    end;

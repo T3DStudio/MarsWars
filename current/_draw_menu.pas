@@ -88,7 +88,7 @@ begin
          then posCY:=mi_y1-round((mi_y1-mi_y0-barh)*(scrolli/(listSize-listH)))-barh
          else posCY:=mi_y0+round((mi_y1-mi_y0-barh)*(scrolli/(listSize-listH)));
       end
-      else posCY:=mi_y0;
+      else exit;//posCY:=mi_y0;
       rectangleColor(tar,mi_x1-1,posCY,mi_x1-3,posCY+barh,c_aqua);
    end;
 end;
@@ -662,35 +662,39 @@ end;
 
 procedure drawmenu_BlockCampaings(tar:pSDL_Surface);
 begin
-   drawmenu_ItemText1(tar,mi_caption_Campaings  ,str_menu_Campaings     ,255);
+   drawmenu_ItemText1(tar,mi_caption_Campaings  ,str_menu_Campaings               ,255);
 
-   drawmenu_ItemTextC(tar,mi_camp_Difficulty,ta_LA,str_Camp_Difficulty            ,c_white);
-   drawmenu_ItemTextC(tar,mi_camp_Difficulty,ta_MM,str_Camp_DifficultyL[camp_diff],c_white);
+   drawmenu_ItemTextC(tar,mi_camp_Difficulty ,ta_LA,str_Camp_Difficulty            ,c_white);
+   drawmenu_ItemTextC(tar,mi_camp_Difficulty ,ta_MM,str_Camp_DifficultyL[camp_diff],c_white);
 
-   drawmenu_ItemTextC(tar,mi_camp_Campaigns ,ta_LA,str_Camp_Campaign              ,c_white);
-   drawmenu_ItemTextC(tar,mi_camp_Missions  ,ta_LA,str_Camp_Mission               ,c_white);
+   drawmenu_ItemTextC(tar,mi_camp_Campaigns  ,ta_LA,str_Camp_Campaign              ,c_white);
+   drawmenu_ItemTextC(tar,mi_camp_Missions   ,ta_LA,str_Camp_Mission               ,c_white);
 
-   drawmenu_ItemCaption(tar,mi_camp_MissionInfo,str_ui_objectives);
-
+   drawmenu_ItemTextC(tar,mi_camp_MissionInfo,ta_MA,str_Camp_Info                  ,c_white);
+   drawmenu_ItemTextC(tar,mi_camp_MissionObj ,ta_MA,str_ui_objectives              ,c_white);
+   drawmenu_ItemTextC(tar,mi_camp_MissionLoc ,ta_MA,str_Camp_Location              ,c_white);
 
    drawmenu_StringArray(tar,mi_camp_Campaigns,@camp_list,camp_size,camp_scroll,camp_sel,menu_CampLineH,-1,menu_CampListSize,false);
-
    if(0<=camp_sel)and(camp_sel<camp_size)then
-     drawmenu_StringArray(tar,mi_camp_Missions,@camp_mis_list[camp_sel],camp_mis_size[camp_sel],camp_mis_scroll,camp_mis_sel,menu_MissLineH,-1,menu_MissListSize,false);
-
-   {
-   mi_camp_MissionInfo    = 248;
-   }
+   begin
+      drawmenu_StringArray(tar,mi_camp_Missions,@camp_mis_list[camp_sel],min2i(camp_data.cd_lastm,camp_mis_size[camp_sel]),camp_mis_scroll,camp_mis_sel,menu_MissLineH,-1,menu_MissListSize,false);
+      if(0<=camp_mis_sel)and(camp_mis_sel<min2i(camp_data.cd_lastm,camp_mis_size[camp_sel]))then
+      begin
+         drawmenu_StringArray(tar,mi_camp_MissionInfo,@camp_obj_main[camp_sel][camp_mis_sel],camp_obj_size[camp_sel][camp_mis_sel],camp_obj_scroll,-1,menu_InfoLineH,-1,menu_infoListSize,false,true);
+         drawmenu_ItemTextC(tar,mi_camp_MissionObj,ta_LU,camp_obj_object[camp_sel][camp_mis_sel],c_white);
+         drawmenu_ItemTextC(tar,mi_camp_MissionLoc,ta_LU,camp_obj_loc   [camp_sel][camp_mis_sel],c_white);
+      end;
+   end;
 end;
 
 function drawmenu_ItemActsStr:shortstring;
 begin
    drawmenu_ItemActsStr:='';
-   if(GetBBit(@menu_ItemActs,miat_BtnLeft ))then STRADD(@drawmenu_ItemActsStr,str_doc_LMB,sep_slash);
-   if(GetBBit(@menu_ItemActs,miat_BtnRight))then STRADD(@drawmenu_ItemActsStr,str_doc_RMB,sep_slash);
-   if(GetBBit(@menu_ItemActs,miat_MWhell  ))then STRADD(@drawmenu_ItemActsStr,str_doc_MWH,sep_slash);
+   if(GetBBit(@ui_CursorItemActs,miat_BtnLeft ))then STRADD(@drawmenu_ItemActsStr,str_doc_LMB,sep_slash);
+   if(GetBBit(@ui_CursorItemActs,miat_BtnRight))then STRADD(@drawmenu_ItemActsStr,str_doc_RMB,sep_slash);
+   if(GetBBit(@ui_CursorItemActs,miat_MWhell  ))then STRADD(@drawmenu_ItemActsStr,str_doc_MWH,sep_slash);
 {
-if(GetBBit(@menu_ItemActs,miat_TextEdit))then
+if(GetBBit(@ui_CursorItemActs,miat_TextEdit))then
 }
 end;
 
@@ -903,22 +907,7 @@ begin
    if(vid_ShowFPS)then draw_text(vid_screen,vid_vw,2,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_RU,255,c_white);
 
    draw_sdlsurface(vid_screen,mouse_x,mouse_y,spr_cursor);
-   if(menu_ItemActs>0)then
-   begin
-      tx:=mouse_x+(spr_cursor^.w div 2);
-      ty:=mouse_y+(spr_cursor^.w div 2);
-      if GetBBit(@menu_ItemActs,miat_BtnLeft )
-      or GetBBit(@menu_ItemActs,miat_MWhell  )
-      or GetBBit(@menu_ItemActs,miat_BtnRight)then
-      begin
-         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MLB[GetBBit(@menu_ItemActs,miat_BtnLeft )]);
-         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MMB[GetBBit(@menu_ItemActs,miat_MWhell  )]);
-         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_MRB[GetBBit(@menu_ItemActs,miat_BtnRight)]);
-         tx+=spr_CursorHint_MLB[true]^.w;
-      end;
-      if(GetBBit(@menu_ItemActs,miat_TextEdit))then
-         draw_sdlsurface(vid_screen,tx,ty,spr_CursorHint_Edit);
-   end;
+   draw_UIMouseActHint;
 end;
 
 
