@@ -472,6 +472,7 @@ begin
           unit_AddExp:=0;
           if(check)then exit;
 
+          game_ScoresAddC(playeri,psc_units_ExpTotal,exp);
           a_exp+=exp;
           if(a_exp>=uid_LevelUpTimeTicks)or(forceUp)then
           begin
@@ -712,7 +713,8 @@ begin
         then LastCreatedUnit:=1
         else
         {$ENDIF}
-          unit_add(tx,ty,-1,auid,playeri,true,true,0);
+          if(unit_add(tx,ty,-1,auid,playeri,true,true,0))then
+            game_ScoresAddC(playeri,psc_units_summoned);
 
       if(LastCreatedUnit>0)then
       begin
@@ -1688,6 +1690,7 @@ begin
 end;
 
 function unit_ability_SpawnEvilEye(pCaster:PTUnit;tx,ty:integer;check:boolean):byte;
+const SpawnUID = UID_HEye;
 var u:integer;
 begin
    // pCaster - caster
@@ -1701,18 +1704,18 @@ begin
 
       unit_ability_SpawnEvilEye:=lmt_Req_Limit;
       with player^ do
-        if((armylimit+g_uids[UID_HEye].uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
+        if((armylimit+g_uids[SpawnUID].uid_LimitUse+prod_unit_Limit)>MaxPlayerLimit)then exit;
 
       unit_ability_SpawnEvilEye:=0;
       if(check)then exit;
 
       unit_ability_SpawnEvilEye:=lmt_Invalid_Order;
 
-      math_push_out(tx,ty,g_uids[UID_HEye].uid_r,0,@tx,@ty,true,playeri);
+      math_push_out(tx,ty,g_uids[SpawnUID].uid_r,0,@tx,@ty,true,playeri);
       tx:=mm3i(1,tx,map_Size1);
       ty:=mm3i(1,ty,map_Size1);
 
-      with g_uids[UID_HEye] do
+      with g_uids[SpawnUID] do
         if(CheckCollisionR(tx,ty,uid_r,0,uid_isbuilding,true,255,pCaster)<>cbr_no)then
         begin
            unit_ability_SpawnEvilEye:=lmt_ability_BadPlace;
@@ -1732,7 +1735,10 @@ begin
    if(unit_ability_SpawnEvilEye>0)then exit;
 
    unit_ability_SpawnEvilEye:=0;
-   unit_add(tx,ty,0,UID_HEye,pCaster^.playeri,true,true,0);
+   if(unit_add(tx,ty,0,SpawnUID,pCaster^.playeri,true,true,0))then
+     if(g_uids[SpawnUID].uid_isbuilding)
+     then game_ScoresAddC(pCaster^.playeri,psc_builds_summoned)
+     else game_ScoresAddC(pCaster^.playeri,psc_units_summoned );
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2080,21 +2086,19 @@ begin
    else barrack_out_r:=pu^.uid^.uid_r;
 end;
 
-function barrack_out(pu:PTUnit;_uid:byte;_sstep,_dir:integer):boolean;
+function barrack_out(pBarrack:PTUnit;_uid:byte;_sstep,_dir:integer):boolean;
 var
 cd    :single;
 begin
    barrack_out:=false;
-   with pu^ do
+   with pBarrack^ do
    with uid^ do
    with player^ do
    begin
-      //if(armylimit+ _uid)
-
       cd:=_dir*degtorad;
 
       if(_sstep<0)
-      then _sstep:=barrack_out_r(pu,_uid);
+      then _sstep:=barrack_out_r(pBarrack,_uid);
 
       if(_sstep=0)
       then unit_add(x,y,-1,_uid,playeri,true,false,0)
@@ -2103,6 +2107,8 @@ begin
 
       if(LastCreatedUnit>0)then
       begin
+         game_ScoresAddC(playeri,psc_units_created);
+
          LastCreatedUnitP^.uo_x  :=rpoint_x;
          LastCreatedUnitP^.uo_y  :=rpoint_y;
          LastCreatedUnitP^.uo_tar:=rpoint_tar;
@@ -2113,7 +2119,7 @@ begin
          begin
             LastCreatedUnitP^.buffs[ub_Teleported]:=fr_fps1;
             {$IFDEF _FULLGAME}
-            if(snd_SoundPlayUnit(snd_Teleport,pu,nil))
+            if(snd_SoundPlayUnit(snd_Teleport,pBarrack,nil))
             then effect_add(LastCreatedUnitP^.vx,
                             LastCreatedUnitP^.vy,draw_DefaultSpriteDepth(LastCreatedUnitP^.vy+1,LastCreatedUnitP^.isfly),EID_Teleport);
             {$ENDIF}
@@ -2632,6 +2638,7 @@ begin
                  upgrs_cur[tuid]+=1;
                  unit_ProdStopUpgradeLine(pu,255,i,false);
                  GameLog_UpgradeComplete(playeri,tuid,x,y);
+                 game_ScoresAddC(playeri,psc_upgrades_level);
               end
               else
               begin
@@ -2772,6 +2779,10 @@ begin
 
         with uid^ do
         begin
+           if(uid_isbuilding)
+           then game_ScoresAddC(playeri,psc_builds_lost)
+           else game_ScoresAddC(playeri,psc_units_lost );
+
            if(uid_isbuilding)and(buildcd)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
            zfall:=uid_zfall;
         end;
@@ -2833,7 +2844,8 @@ begin
              if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
                for i:=1 to uid_DeathUIDn do
                  if(player_UIDLimitCheck(player,uid_DeathUID))then
-                   unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0);
+                   if(unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0))then
+                     game_ScoresAddC(playeri,psc_units_summoned);
 
            if(units_all_c<=0)then player_SetDefeat(player);
         end;

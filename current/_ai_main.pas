@@ -53,7 +53,7 @@ begin
       if(point_dist_rint(x,y,uo_x,uo_y)<srange)
       or(force)
       or(not isfly and (mapZone<>map_GetZone(uo_x,uo_y)))
-      or(g_CheckRoyalBattlePoint(uo_x,uo_y,base_r1))
+      or(game_CheckRoyalBattlePoint(uo_x,uo_y,base_r1))
       then ai_RunTo(pu,nil,g_random(map_Size1),
                            g_random(map_Size1),NOTSET,0);
    end;
@@ -846,7 +846,8 @@ begin
             if(isfly)
             or(aia_zone=mapZone)
             or(uid_isbarrack)
-            or(uid_ability_isradar)then
+            or(uid_ability_isradar)
+            or((uid_race=r_hell)and(uid_isbuilding)and(uid_CanAttack)and((map_template=mapt_canyon)or(map_template=mapt_temple)))then
               ai_Local_SetCurrentAlarm(pu,nil,aia_x,aia_y,point_dist_int(aia_x,aia_y,x,y),aia_zone);
 
       case(aiu_alarm_d<base_r2)of
@@ -921,6 +922,9 @@ begin
                  );}
       end;  }
       {$ENDIF}
+      uo_bx:=-1;
+      uo_by:=-1;
+
       if(uid_isbuilding)
       then ai_Global_Buildings(pu)
       else ai_Global_Units    (pu);

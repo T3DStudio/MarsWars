@@ -8,22 +8,21 @@
       <Unit>
         <Filename Value="MarsWars_ded.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="3" Y="5"/>
         <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_common.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="1764"/>
-        <CursorPos X="18" Y="1613"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="802"/>
+        <CursorPos X="18" Y="821"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_var.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="1053"/>
         <CursorPos X="20" Y="1069"/>
         <UsageCount Value="12"/>
@@ -31,7 +30,7 @@
       </Unit>
       <Unit>
         <Filename Value="_ai_common.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="1263"/>
         <CursorPos X="56" Y="1279"/>
         <UsageCount Value="12"/>
@@ -51,7 +50,7 @@
       </Unit>
       <Unit>
         <Filename Value="_ai_collect.pas"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="465"/>
         <CursorPos X="38" Y="479"/>
         <UsageCount Value="12"/>
@@ -59,30 +58,31 @@
       </Unit>
       <Unit>
         <Filename Value="_ded.pas"/>
-        <EditorIndex Value="11"/>
-        <TopLine Value="10"/>
-        <CursorPos X="11" Y="15"/>
+        <EditorIndex Value="12"/>
+        <TopLine Value="69"/>
+        <CursorPos X="55" Y="92"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_lang.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="163"/>
-        <CursorPos X="64" Y="184"/>
+        <CursorPos X="64" Y="174"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_net_game.pas"/>
-        <EditorIndex Value="5"/>
-        <CursorPos X="86" Y="29"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="378"/>
+        <CursorPos X="54" Y="407"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_unit_client.pas"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="627"/>
         <CursorPos X="95" Y="636"/>
         <UsageCount Value="12"/>
@@ -90,21 +90,25 @@
       </Unit>
       <Unit>
         <Filename Value="_units.pas"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="13"/>
         <CursorPos Y="2"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_game.pas"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="14"/>
+        <TopLine Value="426"/>
+        <CursorPos X="15" Y="445"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="_main.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="20" Y="4"/>
+        <TopLine Value="79"/>
+        <CursorPos X="11" Y="77"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit>
@@ -116,40 +120,16 @@
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="_init.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="47"/>
+        <CursorPos X="20" Y="66"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="28">
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1423" Column="31" TopLine="1404"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1432" Column="28" TopLine="1419"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1441" Column="31" TopLine="1419"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1485" Column="35" TopLine="1472"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1562" Column="27" TopLine="1546"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="1563" Column="25" TopLine="1546"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="2172" Column="57" TopLine="2168"/>
-      </Position>
-      <Position>
-        <Filename Value="_units.pas"/>
-        <Caret Line="2186" Column="57" TopLine="2174"/>
-      </Position>
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="_units.pas"/>
         <Caret Line="2198" Column="56" TopLine="2183"/>
@@ -165,10 +145,6 @@
       <Position>
         <Filename Value="_common.pas"/>
         <Caret Line="142" Column="21" TopLine="126"/>
-      </Position>
-      <Position>
-        <Filename Value="_common.pas"/>
-        <Caret Line="564" Column="18" TopLine="634"/>
       </Position>
       <Position>
         <Filename Value="_common.pas"/>
@@ -233,6 +209,45 @@
       <Position>
         <Filename Value="_unit_client.pas"/>
         <Caret Line="84" Column="21" TopLine="51"/>
+      </Position>
+      <Position>
+        <Filename Value="_const.pas"/>
+        <Caret Line="365" Column="5"/>
+      </Position>
+      <Position>
+        <Filename Value="_common.pas"/>
+        <Caret Line="821" Column="18" TopLine="802"/>
+      </Position>
+      <Position>
+        <Filename Value="_game.pas"/>
+        <Caret Line="445" Column="15" TopLine="426"/>
+      </Position>
+      <Position>
+        <Filename Value="_ded.pas"/>
+        <Caret Line="7" Column="26"/>
+      </Position>
+      <Position>
+        <Filename Value="_ded.pas"/>
+        <Caret Line="20" Column="38"/>
+      </Position>
+      <Position>
+        <Filename Value="_ded.pas"/>
+        <Caret Line="92" Column="55" TopLine="69"/>
+      </Position>
+      <Position>
+        <Filename Value="_net_game.pas"/>
+        <Caret Line="396" Column="56" TopLine="367"/>
+      </Position>
+      <Position>
+        <Filename Value="_net_game.pas"/>
+        <Caret Line="407" Column="54" TopLine="378"/>
+      </Position>
+      <Position>
+        <Filename Value="_init.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="_main.pas"/>
+        <Caret Line="77" Column="13" TopLine="55"/>
       </Position>
     </JumpHistory>
     <RunParams>

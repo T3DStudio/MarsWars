@@ -34,7 +34,8 @@ begin
    str_menu_Start                := 'START';
    str_menu_Cancel               := 'CANCEL';
    str_menu_Surrender            := 'SURRENDER';
-   str_menu_Abort                := 'ABORT MISSION';
+   str_menu_MissionAbort         := 'ABORT MISSION';
+   str_menu_MissionEnd           := 'END MISSION';
    str_menu_PlaybackStop         := 'STOP PLAYBACK';
    str_menu_Exit                 := 'EXIT';
    str_menu_Back                 := 'BACK';
@@ -486,6 +487,26 @@ begin
    str_doc_NoteUnitBalance       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.';
    str_doc_NoteMaxBuilders       := 'Note: each player cannot have more than '+i2s(PlayerMaxBuilders)+' builders';
 
+   str_ScoreScreen_Caption       := 'Players stats';
+   str_ScoreScreenC[psc_units_created   ]:= 'Units created';
+   str_ScoreScreenC[psc_units_summoned  ]:= 'Units summoned';
+   str_ScoreScreenC[psc_units_resurected]:= 'Units resurrected';
+   str_ScoreScreenC[psc_units_captured  ]:= 'Units captured';
+   str_ScoreScreenC[psc_units_lost      ]:= 'Units lost';
+   str_ScoreScreenC[psc_units_destroyed ]:= 'Units destroyed';
+   str_ScoreScreenC[psc_units_ExpTotal  ]:= 'Total unit experience';
+   str_ScoreScreenC[psc_builds_created  ]:= 'Buildings created';
+   str_ScoreScreenC[psc_builds_summoned ]:= 'Buildings summoned';
+   str_ScoreScreenC[psc_builds_captured ]:= 'Buildings captured';
+   str_ScoreScreenC[psc_builds_lost     ]:= 'Buildings lost';
+   str_ScoreScreenC[psc_builds_destroyed]:= 'Buildings destroyed';
+   str_ScoreScreenC[psc_upgrades_level  ]:= 'Completed upgrades';
+
+   str_ScoreScreenI[psi_res_energy_max  ]:= 'Max energy level';
+   str_ScoreScreenI[psi_res_UACLoot     ]:= 'Collected '+str_ui_UACLoot;
+   str_ScoreScreenI[psi_res_HellPower   ]:= 'Collected '+str_ui_HellPower;
+
+
    /////////////////////////////////////////////////////////////////////////////
    //  ABILITIES
 
@@ -704,9 +725,9 @@ begin
                                                   '- no order to use an ability;'+tc_nl1+
                                                   '- no order to teleport or transport;'+tc_nl1);
 
-   str_SetActionBaseHint(iAct_Control_MarkLook   ,'Map mark: look here');
+   str_SetActionBaseHint(iAct_Control_MarkLook   ,'Map mark: look here'  );
    str_SetActionBaseHint(iAct_Control_MarkAttack ,'Map mark: attack here');
-
+   str_SetActionBaseHint(iAct_Control_ShowScores ,'Toggle scoreboard display');
 
    str_SetActionBaseHint(iAct_InGamePause        ,'Pause');
    str_SetActionBaseHint(iAct_InGameMenu         ,'Menu' );
@@ -854,7 +875,8 @@ begin
    DocHelp_AddBaseControls(tc_docbr);
    DocHelp_AddBaseControls(tc_orange+'UNIT PRODUCTION'+tc_default+tc_doccpt);
    DocHelp_AddBaseControls(tc_docbr);
-   DocHelp_AddBaseControls('Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met. Switch the control panel to "'+str_ui_Tab[tab_Units]+'" tab and click on the unit icon(or press the associated hotkey).');
+   DocHelp_AddBaseControls('Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met.');
+   DocHelp_AddBaseControls('Switch the control panel to "'+str_ui_Tab[tab_Units]+'" tab and click on the unit icon(or press the associated hotkey or hover your mouse over the unit icon and scroll the "'+input_actions[iAct_mwu].ik_str_HK+'").');
    DocHelp_AddBaseControls('If the requirements for the selected unit type are not met, the game will display an error message.');
    DocHelp_AddBaseControls('If no unit production building is selected - the game sends the production order to nearest unbusy production building, otherwise it sends the order to nearest unbusy selected production buildings.');
    DocHelp_AddBaseControls('It is impossible to create a unit production queue.');
@@ -918,6 +940,9 @@ begin
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark(multiplayer): "look here"'  );
    DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark(multiplayer): "attack here"');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Control_ShowScores],'toggle scoreboard display');
+
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_Control_ToggleRec ],'toggle "'+str_SR_RecordGames+'" option');
    DocHelp_AddHotKeyAction([iAct_TogglePlayersColor],'toggle "'+str_SG_PlayersColor+'" option');

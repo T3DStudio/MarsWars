@@ -1,8 +1,8 @@
 {$IFDEF _FULLGAME}
 
-function InitVideo:boolean;
+function video_Init:boolean;
 begin
-   InitVideo:=false;
+   video_Init:=false;
 
    if(SDL_Init(SDL_INIT_VIDEO)<>0)then begin WriteSDLError; exit; end;
 
@@ -21,7 +21,7 @@ begin
    gfx_LoadAll;
    camp_Init;
 
-   InitVideo:=true;
+   video_Init:=true;
 end;
 
 procedure StartParams;
@@ -63,16 +63,16 @@ end;
 
 {$ENDIF}
 
-procedure GameInit;
+procedure game_Init;
 begin
-   GameCycle:=false;
+   game_Cycle:=false;
 
    fr_init;
 
    StartParams;
    randomize;
 
-   GameObjectsInit;
+   game_InitGameDataAll;
 
    {$IFDEF _FULLGAME}
 
@@ -85,8 +85,8 @@ begin
    saveload_MakeSaveData;
    replay_MakeReplayHeaderData;
 
-   if not(InitVideo)then exit;
-   if not(InitSound)then exit;
+   if not(video_Init)then exit;
+   if not(sound_Init)then exit;
 
    InitRX2Y;
    lng_eng;
@@ -101,18 +101,18 @@ begin
 
    {$ENDIF}
 
-   if not(InitNET)then exit;
+   if not(net_Init)then exit;
 
    map_RandomMap;
-   Game_DefaultAll;
+   game_DefaultAll;
 
    NEW(sys_EVENT);
 
-   GameCycle:=true;
+   game_Cycle:=true;
 
    {$IFDEF _FULLGAME}
    net_ServerListParseAddrs;
    {$ELSE}
-   Dedicated_Init;
+   dedicated_Init;
    {$ENDIF}
 end;

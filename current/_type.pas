@@ -213,7 +213,7 @@ PPTSoundSet = ^PTSoundSet;
 //   OTHER
 //
 
-TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_CtrlPanel,mf_MenuPause);
+TMouseFocus = (mf_map=0,mf_MiniMap,mf_Tabs,mf_CtrlPanel,mf_MenuPause,mf_Scores);
 
 TTabControlContent = (tcc_none=0,tcc_controls,tcc_observer,tcc_replay);
 
@@ -646,25 +646,14 @@ TLogMes = record
 end;
 PTLogMes = ^TLogMes;
 
+
 TPlayerDataScore = record
+   // data on start
    ps_name      : shortstring;
    ps_state     : byte;
 
-   ps_units_created,
-   ps_units_summoned,
-   ps_units_resurected,
-   ps_units_lost,
-   ps_units_destroyed,
-
-   ps_builds_created,
-   ps_builds_lost,
-   ps_builds_destroyed,
-
-   ps_res_energy_max,
-   ps_res_UACLoot,
-   ps_res_HellPower
-
-                : longint;
+   ps_data_c    : array[0..psc_Last] of cardinal;
+   ps_data_i    : array[0..psi_Last] of longint;
 end;
 
 TPlayerDataTemp = record

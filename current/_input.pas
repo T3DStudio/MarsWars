@@ -103,6 +103,8 @@ begin
    input_SetAction(iAct_Control_MarkLook  ,ikt_keyboard,0           ,SDLK_F5          );
    input_SetAction(iAct_Control_MarkAttack,ikt_keyboard,0           ,SDLK_F6          );
    input_SetAction(iAct_Control_ToggleRec ,ikt_keyboard,0           ,SDLK_F10         );
+   input_SetAction(iAct_Control_ShowScores,ikt_keyboard,0           ,SDLK_F7          );
+
 
    input_SetAction(iAct_SProd1            ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_SProd2            ,ikt_keyboard,0           ,SDLK_T           );
@@ -320,6 +322,7 @@ begin
    ui_panel_CTabIActs[tcc_controls,MPos(13)]:=iAct_Control_USelArmy;
    ui_panel_CTabIActs[tcc_controls,MPos(15)]:=iAct_Control_MarkLook;
    ui_panel_CTabIActs[tcc_controls,MPos(16)]:=iAct_Control_MarkAttack;
+   ui_panel_CTabIActs[tcc_controls,MPos(22)]:=iAct_Control_ShowScores;
 
    ui_panel_CTabIActs[tcc_replay  ,MPos(0 )]:=iAct_Replay_Fast;
    ui_panel_CTabIActs[tcc_replay  ,MPos(1 )]:=iAct_Replay_Pause;
@@ -341,6 +344,7 @@ begin
    ui_panel_CTabIActs[tcc_replay  ,MPos(18)]:=iAct_Replay_Player5;
    ui_panel_CTabIActs[tcc_replay  ,MPos(19)]:=iAct_Replay_Player6;
    ui_panel_CTabIActs[tcc_replay  ,MPos(20)]:=iAct_Replay_Player7;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(22)]:=iAct_Control_ShowScores;
 
    ui_panel_CTabIActs[tcc_observer,MPos(0 )]:=iAct_Observer_Fog;
    ui_panel_CTabIActs[tcc_observer,MPos(1 )]:=iAct_Observer_POV;
@@ -355,6 +359,8 @@ begin
    ui_panel_CTabIActs[tcc_observer,MPos(10)]:=iAct_Observer_Player7;
    ui_panel_CTabIActs[tcc_observer,MPos(12)]:=iAct_Control_MarkLook;
    ui_panel_CTabIActs[tcc_observer,MPos(13)]:=iAct_Control_MarkAttack;
+
+   ui_panel_CTabIActs[tcc_observer,MPos(22)]:=iAct_Control_ShowScores;
 
 end;
 
@@ -390,16 +396,14 @@ ucl,act,
 uid      :byte;
 POVPlayer:PTPlayerGameData;
 g_control:boolean;
-ctabType :TTabControlContent;
 begin
    g_control:=ui_GameControlsEnabled;
-   ctabType :=ui_ControlTabType;
 
    if(UIPlayer<=LastPlayer)
    then POVPlayer:=@g_PlayersGame[UIPlayer]
    else POVPlayer:=nil;
 
-   iActSetOnEnabled(iAct_InGamePause,Game_PauseToggle(true),true);
+   iActSetOnEnabled(iAct_InGamePause,game_PauseToggle(true),true);
    iActSetOnEnabled(iAct_InGameMenu ,true                 ,true);
 
    // production actions
@@ -416,7 +420,8 @@ begin
                iAct_Control_USelBase,
                iAct_Control_USelArmy,
                iAct_Control_MarkLook,
-               iAct_Control_MarkAttack] do
+               iAct_Control_MarkAttack,
+               iAct_Control_ShowScores] do
      input_actions[ucl].ik_astate:=as_off;
 
    for ucl:=0 to ui_ButtonsNum do
@@ -436,10 +441,15 @@ begin
    end;
 
    // unit controls
-   iActSetOnEnabled(iAct_Control_MarkLook  ,((ctabType=tcc_Controls)or(ctabType=tcc_Observer))and(net_status<>ns_none), true );
-   iActSetOnEnabled(iAct_Control_MarkAttack,((ctabType=tcc_Controls)or(ctabType=tcc_Observer))and(net_status<>ns_none), true );
+   iActSetOnEnabled(iAct_Control_MarkLook  ,((ui_ControlTabType=tcc_Controls)or(ui_ControlTabType=tcc_Observer))and(net_status<>ns_none), true );
+   iActSetOnEnabled(iAct_Control_MarkAttack,((ui_ControlTabType=tcc_Controls)or(ui_ControlTabType=tcc_Observer))and(net_status<>ns_none), true );
 
-   if(ctabType=tcc_Controls)and(g_control)then
+   // scores
+   iActSetOnEnabled(iAct_Control_ShowScores,game_IsEnded, true );
+   if(ui_ShowScores)then
+     if(not iActOn(iAct_Control_ShowScores))then ui_ToggleShowScores;
+
+   if(ui_ControlTabType=tcc_Controls)and(g_control)then
    begin
       if(iActIfOn(iAct_Control_UAbility1,ui_PanelBTNAbility(ui_CommandercPU,1)))then
         with ui_CommandercPU^ do
@@ -473,28 +483,28 @@ begin
    end;
 
    // replay controls
-   iActSetOnEnabled(iAct_Replay_Fast         ,ctabType=tcc_Replay,g_status=gs_running);
-   iActSetOnEnabled(iAct_Replay_Pause        ,ctabType=tcc_Replay,replay_TogglePause(true));
-   iActSetOnEnabled(iAct_Replay_Back2        ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
-   iActSetOnEnabled(iAct_Replay_Back10       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
-   iActSetOnEnabled(iAct_Replay_Back60       ,ctabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     ,true));
-   iActSetOnEnabled(iAct_Replay_Forward2     ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_Forward10    ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_Forward60    ,ctabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_POV          ,ctabType=tcc_Replay,true);
-   iActSetOnEnabled(iAct_Replay_Log          ,ctabType=tcc_Replay,true);
-   iActSetOnEnabled(iAct_Replay_Fog          ,ctabType=tcc_Replay,true);
-   iActSetOnEnabled(iAct_Replay_PlayerAll    ,ctabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Fast         ,ui_ControlTabType=tcc_Replay,g_status=gs_running);
+   iActSetOnEnabled(iAct_Replay_Pause        ,ui_ControlTabType=tcc_Replay,replay_TogglePause(true));
+   iActSetOnEnabled(iAct_Replay_Back2        ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*2 )+1,-1     ,true));
+   iActSetOnEnabled(iAct_Replay_Back10       ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*10)+1,-1     ,true));
+   iActSetOnEnabled(iAct_Replay_Back60       ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(      g_tick -(fr_fps1*60)+1,-1     ,true));
+   iActSetOnEnabled(iAct_Replay_Forward2     ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1,true));
+   iActSetOnEnabled(iAct_Replay_Forward10    ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1,true));
+   iActSetOnEnabled(iAct_Replay_Forward60    ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1,true));
+   iActSetOnEnabled(iAct_Replay_POV          ,ui_ControlTabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Log          ,ui_ControlTabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_Fog          ,ui_ControlTabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_PlayerAll    ,ui_ControlTabType=tcc_Replay,true);
 
    for ucl:=0 to LastPlayer do
-   iActSetOnEnabled(iAct_Replay_Player0+ucl  ,ctabType=tcc_Replay,ui_SetUIPlayer(ucl,true));
+   iActSetOnEnabled(iAct_Replay_Player0+ucl  ,ui_ControlTabType=tcc_Replay,ui_SetUIPlayer(ucl,true));
 
    // observer controls
-   iActSetOnEnabled(iAct_Observer_Fog        , ctabType=tcc_Observer,true);
-   iActSetOnEnabled(iAct_Observer_POV        ,(ctabType=tcc_Observer)and(net_status<>ns_none),ui_ObserverPov(UIPlayer));
-   iActSetOnEnabled(iAct_Observer_PlayerAll  , ctabType=tcc_Observer,true);
+   iActSetOnEnabled(iAct_Observer_Fog        , ui_ControlTabType=tcc_Observer,true);
+   iActSetOnEnabled(iAct_Observer_POV        ,(ui_ControlTabType=tcc_Observer)and(net_status<>ns_none),ui_ObserverPov(UIPlayer));
+   iActSetOnEnabled(iAct_Observer_PlayerAll  , ui_ControlTabType=tcc_Observer,true);
    for ucl:=0 to LastPlayer do
-   iActSetOnEnabled(iAct_Observer_Player0+ucl,ctabType=tcc_Observer,ui_SetUIPlayer(ucl,true));
+   iActSetOnEnabled(iAct_Observer_Player0+ucl,ui_ControlTabType=tcc_Observer,ui_SetUIPlayer(ucl,true));
 end;
 
 procedure MapMarker(x,y,mType:integer);
@@ -712,6 +722,8 @@ tuid   :byte;
 begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
+
+   if(ui_ShowScores)then m_brush:=co_empty;
 
    case ui_ControlTabType of
    tcc_controls: case m_brush of
@@ -972,7 +984,9 @@ begin
    iAct_Control_MarkLook  : if(SoundEnabledLeft)then m_brush :=co_markLook;
    iAct_Control_MarkAttack: if(SoundEnabledLeft)then m_brush :=co_markAttack;
 
-   iAct_InGamePause       : if(SoundEnabledLeft)then Game_PauseToggle(false);
+   iAct_Control_ShowScores: if(SoundEnabledLeft)then ui_ToggleShowScores;
+
+   iAct_InGamePause       : if(SoundEnabledLeft)then game_PauseToggle(false);
    iAct_InGameMenu        : if(SoundEnabledLeft)then
                             begin
                                GameOpenMenu;
@@ -1041,7 +1055,7 @@ begin
 
    while (SDL_PollEvent(sys_EVENT)>0) do
      case (sys_EVENT^.type_) of
-      SDL_QUITEV         : GameCycle:=false;
+      SDL_QUITEV         : game_Cycle:=false;
       //SDL_ACTIVEEVENT    : sys_WindowFocus:=not sys_WindowFocus;
       SDL_VIDEORESIZE    : begin
                               nvid_vw:=max2i(vid_minw,sys_EVENT^.resize.w);
@@ -1082,6 +1096,37 @@ begin
    and(nvid_vh>0)then menu_ApplyResolution(nvid_vw,nvid_vh);
 end;
 
+procedure input_SingleClickLMB;
+begin
+   if(InputAction(iact_Control))then
+   begin
+      if(m_UnitTargetP<>nil)then
+        if(m_UnitTargetP^.playeri=UIPlayer)then
+        begin
+           units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi);
+           exit;
+        end;
+   end
+   else
+     if(InputActionDPressed(iact_MLB))then
+     begin
+        if(m_UnitTargetP<>nil)then
+          if (m_UnitTargetP^.playeri=UIPlayer)
+          and(m_UnitTargetPrev=m_UnitTargetN)then
+          begin
+             units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi);
+             exit;
+          end;
+     end
+     else
+     begin
+        if(m_UnitTargetP<>nil)then
+          if(ui_UpdateUIPlayer(m_UnitTargetN))then exit;
+     end;
+   mouse_select_xs0:=mouse_map_x;
+   mouse_select_ys0:=mouse_map_y;
+end;
+
 procedure GameControlsMouse;
 var
    u,bx,by:integer;
@@ -1102,18 +1147,23 @@ begin
    end;
 
    // mouse focus
-   m_uifocus:=mf_map;
-   if (0<=bx)and(bx<ui_CtrlPanelBW)
-   and(0<=by)and(by<=ui_CtrlPanelBL)then
-     if(by<ui_CtrlPanelBW)
-     then m_uifocus:=mf_MiniMap
-     else
-       if(by=ui_CtrlPanelBW)
-       then m_uifocus:=mf_Tabs
-       else
-         if(by=ui_CtrlPanelBL)
-         then m_uifocus:=mf_MenuPause
-         else m_uifocus:=mf_CtrlPanel;
+   if(ui_ShowScores)
+   then m_uifocus:=mf_Scores
+   else
+   begin
+      m_uifocus:=mf_map;
+      if (0<=bx)and(bx<ui_CtrlPanelBW)
+      and(0<=by)and(by<=ui_CtrlPanelBL)then
+        if(by<ui_CtrlPanelBW)
+        then m_uifocus:=mf_MiniMap
+        else
+          if(by=ui_CtrlPanelBW)
+          then m_uifocus:=mf_Tabs
+          else
+            if(by=ui_CtrlPanelBL)
+            then m_uifocus:=mf_MenuPause
+            else m_uifocus:=mf_CtrlPanel;
+   end;
    case m_uifocus of
    mf_Map,
    mf_MiniMap  : m_btnN:=-1;
@@ -1152,52 +1202,47 @@ begin
      end;
 
    if(InputActionPressed(iact_MLB))then                // LMB down
-     case m_uifocus of
-     mf_map      : case m_brush of
-                   co_empty     : if(m_UnitTargetP<>nil)and( InputAction(iact_Control)or InputActionDPressed(iact_MLB) )then
-                                  begin
-                                     if(m_UnitTargetP^.playeri=UIPlayer)then
-                                       units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi);
-                                  end
-                                  else
-                                  begin
-                                     if(m_UnitTargetP<>nil)then
-                                       if(ui_UpdateUIPlayer(m_UnitTargetN))then exit;
-                                     mouse_select_xs0:=mouse_map_x;
-                                     mouse_select_ys0:=mouse_map_y;
-                                  end;
-                   1..255,
+   begin
+      case m_uifocus of
+      mf_Scores   : ;
+      mf_map      : case m_brush of
+                    co_empty     : input_SingleClickLMB;
+                    1..255,
+                    -255..-1,
+                    co_move,
+                    co_amove,
+                    co_patrol,
+                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
+                    co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
+                    co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
+                    end;
+      mf_minimap  : case m_brush of
                    -255..-1,
-                   co_move,
-                   co_amove,
-                   co_patrol,
-                   co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
-                   co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
-                   co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
-                   end;
-     mf_minimap  : case m_brush of
-                   -255..-1,
-                   co_move,
-                   co_amove,
-                   co_patrol,
-                   co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
-                   co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
-                   co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
-                   else           if(not ui_playerPOV)then m_mmap_move:=true;
-                   end;
-     mf_tabs     : if(0<=m_btnN)and(m_btnN<4)then
-                   begin
-                      u:=ui_tab;
-                      ui_tab:=byte(m_btnN);
-                      clickSound:=snd_click;
-                      if(u<>ui_tab)then ui_EnableControlActs;
-                   end;
-     mf_CtrlPanel: ui_ControlPanel_click(pct_left,@clickSound);     // panel
-     mf_MenuPause: case m_btnN of
-                   0 : ui_ExecInGameAction(iAct_InGameMenu ,pct_left,@clickSound);
-                   2 : ui_ExecInGameAction(iAct_InGamePause,pct_left,@clickSound);
-                   end;
-     end;
+                    co_move,
+                    co_amove,
+                    co_patrol,
+                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
+                    co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
+                    co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
+                    else           if(not ui_playerPOV)then m_mmap_move:=true;
+                    end;
+      mf_tabs     : if(0<=m_btnN)and(m_btnN<4)then
+                    begin
+                       u:=ui_tab;
+                       ui_tab:=byte(m_btnN);
+                       clickSound:=snd_click;
+                       if(u<>ui_tab)then ui_EnableControlActs;
+                    end;
+      mf_CtrlPanel: ui_ControlPanel_click(pct_left,@clickSound);     // panel
+      mf_MenuPause: case m_btnN of
+                    0 : ui_ExecInGameAction(iAct_InGameMenu ,pct_left,@clickSound);
+                    2 : ui_ExecInGameAction(iAct_InGamePause,pct_left,@clickSound);
+                    end;
+      end;
+      if(m_UnitTargetP<>nil)
+      then m_UnitTargetPrev:=m_UnitTargetN
+      else m_UnitTargetPrev:=0;
+   end;
 
    case m_uifocus of
    mf_CtrlPanel : case ui_tab of
@@ -1280,7 +1325,17 @@ act,k:byte;
 clickSound:pTSoundSet;
 begin
    clickSound:=nil;
-   if(not m_DragCamMove)and(not ui_playerPOV)then GameControlsCameraMove;
+
+   if(ui_ShowScores)then
+     if(InputActionPressed(iAct_Any))then
+     begin
+        ui_ToggleShowScores;
+        exit;
+     end;
+
+   if (not m_DragCamMove)
+   and(not ui_playerPOV)
+   and(not ui_ShowScores)then GameControlsCameraMove;
 
    // Chat
    if(rpls_pstate=rpls_read)or(net_status=ns_none)
@@ -1301,12 +1356,12 @@ begin
            ui_InGameChat:=0;
         end
         else
-          if(PlayerGetAlliesByte(LocalPlayer,false)>0)
+          if(player_GetAlliesBits(LocalPlayer,false)>0)
           then ui_InGameChat:=chat_allies
           else ui_InGameChat:=chat_all;
       if(InputActionPressed(iAct_InGameChatAllies))then
         if(ui_InGameChat=0)then
-          if(PlayerGetAlliesByte(LocalPlayer,false)>0)then ui_InGameChat:=chat_allies;
+          if(player_GetAlliesBits(LocalPlayer,false)>0)then ui_InGameChat:=chat_allies;
       if(InputActionPressed(iAct_InGameChatAll   ))then
         if(ui_InGameChat=0)then ui_InGameChat:=chat_all;
       // Chat text input
@@ -1314,14 +1369,6 @@ begin
         if(length(k_KeyboardString)>0)or(InputActionPressed(iAct_backspace))then
           net_chat_str:=StringApplyInput(net_chat_str,CharSetCommon,MaxChatStringLength,nil);
    end;
-
-   // Escape (cancel chat)
-   if(InputActionPressed(iact_Esc))then
-     if(ui_InGameChat>0)then
-     begin
-        ui_InGameChat :=0;
-        net_chat_str:='';
-     end;
 
    // tab
    if(InputActionPressed(iAct_Tab  ))then
@@ -1335,6 +1382,14 @@ begin
    if(ui_InGameChat=0)then
      if(InputActionPressed(iAct_InGameMenu))then
        ui_ExecInGameAction(iAct_InGameMenu,pct_left,@clickSound);
+
+   // Escape (cancel chat)
+   if(InputActionPressed(iact_Esc))then
+     if(ui_InGameChat>0)then
+     begin
+        ui_InGameChat:=0;
+        net_chat_str :='';
+     end;
 
    // pause
    if(InputActionPressed(iAct_InGamePause))then
@@ -1437,7 +1492,7 @@ begin
 end;
 
 
-procedure GameInput;
+procedure game_Input;
 begin
    WindowEvents;
 

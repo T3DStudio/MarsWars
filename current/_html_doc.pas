@@ -226,7 +226,7 @@ begin
    //  GAME UI
    htmldoc_WriteCaption(str_help_GameUI);
    writeln(html_f,'<center><img style="border:1px solid #BBBBBB" src="..\graphic\doc_ui.png" title="'+str_help_ImgUI      +'"><br>'+str_help_ImgUI      ,'<br><br>');
-   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_ui.png" title="'+str_help_ImgUUpgrade+'"><br>'+str_help_ImgUUpgrade+'</center>');
+   writeln(html_f,        '<img style="border:1px solid #BBBBBB" src="..\graphic\doc_upgrades.png" title="'+str_help_ImgUUpgrade+'"><br>'+str_help_ImgUUpgrade+'</center>');
    with str_doc_GameUI do
    htmldoc_WriteStringArray(@slist_l,slist_n);
 

@@ -236,7 +236,7 @@ begin
              if(net_UpSocket(net_ServerPort))then
              begin
                 net_status:=ns_server;
-                PlayersSetDefault;
+                players_SetDefaults;
              end
              else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Server+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
@@ -282,7 +282,7 @@ begin
                 net_cl_log_n :=net_cl_log_n.MaxValue;
                 PlayerReady  :=false;
                 menu_msgBox_Set(str_Caption_Multiplayer,menu_ClientAddress+' - '+str_gstat_WaitForServer,mmbt_netWaitServer);
-                PlayersClearLog;
+                players_ClearLog;
              end
              else menu_msgBox_Set(str_Caption_Multiplayer,str_Caption_Client+': '+str_gmsg_PortBlocked,mmbt_netPortBlock);
           end;
@@ -296,9 +296,9 @@ begin
           end;
    end;
 end;
-function GameNetServerList(start,check:boolean):boolean;
+function game_NetServerList(start,check:boolean):boolean;
 begin
-   GameNetServerList:=false;
+   game_NetServerList:=false;
 
    if(rpls_pstate<>rpls_none)
    or(g_started)
@@ -316,7 +316,7 @@ begin
              {$ENDIF}
              then exit;
 
-             GameNetServerList:=true;
+             game_NetServerList:=true;
              if(check)then exit;
 
              if(net_UpSocket(net_svLanAdv_port))then
@@ -330,7 +330,7 @@ begin
    false: begin
              if(not net_SvList)
              or(net_status<>ns_client)then exit;
-             GameNetServerList:=true;
+             game_NetServerList:=true;
              if(check)then exit;
 
              net_dispose;
@@ -729,19 +729,19 @@ begin
    begin
       mtx0:=menu_items[mi_Players_Panel].mi_x0;
       if(p<map_MaxPlayers)or(g_PlayersGame[p].state=ps_Human)then
-      menu_Item_Set(mi_Players_State0   +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,PlayerAIToggle      (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
+      menu_Item_Set(mi_Players_State0   +p,mtx0,mty0,mtx0+menu_PlayersStateW,mty0+menu_PListLineH,player_AIToggle      (p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersStateW;
 
       if(g_PlayersGame[p].state=ps_None)and(not g_started)then
-      menu_Item_Set(mi_Players_Slot0    +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayersSwap         (p,LocalPlayer,true))
+      menu_Item_Set(mi_Players_Slot0    +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,players_Swap         (p,LocalPlayer,true))
       else
-      menu_Item_Set(mi_Players_AIskil0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,PlayerAILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
+      menu_Item_Set(mi_Players_AIskil0  +p,mtx0,mty0,mtx0+menu_PlayersNameW ,mty0+menu_PListLineH,player_AILevelScroll (p,LocalPlayer,true,true));mtx0+=menu_PlayersNameW;
 
       if(p<map_MaxPlayers)and(not g_PlayersGame[p].isobserver)then
-      menu_Item_Set(mi_Players_Race0    +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,PlayerRaceScroll    (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
+      menu_Item_Set(mi_Players_Race0    +p,mtx0,mty0,mtx0+menu_PlayersRaceW ,mty0+menu_PListLineH,player_RaceScroll    (p,LocalPlayer,true)     );mtx0+=menu_PlayersRaceW;
       if(p<map_MaxPlayers)and(not g_PlayersGame[p].isobserver)then
-      menu_Item_Set(mi_Players_Team0    +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,PlayerTeamScroll    (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
+      menu_Item_Set(mi_Players_Team0    +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,player_TeamScroll    (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
 
-      menu_Item_Set(mi_Players_Obs0     +p,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_PListLineH,PlayerToggleObserver(p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersObsW;
+      menu_Item_Set(mi_Players_Obs0     +p,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_PListLineH,player_ToggleObserver(p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersObsW;
       menu_Item_Set(mi_Players_Ping0    +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true                                       ,9);mtx0+=menu_PlayersPingW;
 
       mty0+=menu_PListLineH;
@@ -774,7 +774,7 @@ begin
    menu_Item_Set(mi_Map_Theme     ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
    menu_Item_Set(mi_Map_Random    ,mtx0,mty0,mtx1,mty0+menu_ListLineH,true);mty0+=menu_ListLineH;
 
-   menu_item_setEnabled(mi_Map_Scenario,GameSetOption(LocalPlayer,0,true,true));
+   menu_item_setEnabled(mi_Map_Scenario,game_SetOption(LocalPlayer,0,true,true));
    menu_items[mi_Map_Generators].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Map_Seed      ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
    menu_items[mi_Map_Size      ].mi_state:=menu_items[mi_Map_Scenario].mi_state;
@@ -827,7 +827,7 @@ begin
                                                                                                                             mty0+=menu_ListLineH;
                    menu_Item_Set(mi_MP_Connect         ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
                    menu_Item_Set(mi_MP_ClientAddress   ,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetClient      (true ,true));mty0+=menu_ListLineH;
-                   menu_Item_Set(mi_MP_ClientServerList,mtx0,mty0,mtx1,mty0+menu_ListLineH,GameNetServerList(true ,true));mty0+=menu_ListLineH;
+                   menu_Item_Set(mi_MP_ClientServerList,mtx0,mty0,mtx1,mty0+menu_ListLineH,game_NetServerList(true ,true));mty0+=menu_ListLineH;
                 end;
    ns_server  : begin
                    mty0-=menu_ListLineH;
@@ -876,7 +876,7 @@ begin
       btns[2]:=mi_Settings;
       btns[3]:=mi_Help;
 
-      if(PlayerSurrender(LocalPlayer,true))then btns[4]:=mi_Surrender;
+      if(player_Surrender(LocalPlayer,true))then btns[4]:=mi_Surrender;
 
       case net_status of
       ns_none,
@@ -975,11 +975,11 @@ begin
        gt_campaing : menu_page_Campaing;
        else menu_page_BottomButtons(mi_Campaings,mi_Scirmish,mi_SaveLoad,mi_Replays,mi_Settings,mi_Help,mi_Exit);
        end;
-       menu_item_setEnabled(mi_Break        ,Game_Break(true ));
-       menu_item_setEnabled(mi_StartNow     ,Game_Start(true ));
-       menu_item_setEnabled(mi_StartTimer   ,Game_Start(true )and(g_LobbyTimer<=0));
+       menu_item_setEnabled(mi_Break        ,game_Break(true ));
+       menu_item_setEnabled(mi_StartNow     ,game_Start(true ));
+       menu_item_setEnabled(mi_StartTimer   ,game_Start(true )and(g_LobbyTimer<=0));
        menu_item_setEnabled(mi_StopTimer    ,g_LobbyTimer>0);
-       menu_item_setEnabled(mi_Surrender    ,PlayerSurrender(LocalPlayer,true ));
+       menu_item_setEnabled(mi_Surrender    ,player_Surrender(LocalPlayer,true ));
        menu_item_setEnabled(mi_MP_Disconnect,GameNetClient(false,true));
      end;
    menu_item_setEnabled(mi_SaveLoad        ,saveload_Allowed);
@@ -1018,9 +1018,9 @@ begin
    menu_EndEdition:=true;
    case menu_ItemSelected of
 mi_SG_PlayerName   : g_PlayersGame[LocalPlayer].name:=PlayerName;
-mi_Map_Seed        : if(not GameMapSetSeed(LocalPlayer,0,true))
+mi_Map_Seed        : if(not game_MapSetSeed(LocalPlayer,0,true))
                      then menu_mseed:=c2s(map_seed)
-                     else GameMapSetSeed(LocalPlayer,s2c(menu_mseed),false);
+                     else game_MapSetSeed(LocalPlayer,s2c(menu_mseed),false);
 mi_MP_ServerPort   : menu_GetServerPort;
 mi_MP_ClientAddress: menu_ClientAddress:=menu_GetClientAddress(menu_ClientAddress,@net_cl_svip,@net_cl_svport);
 mi_MP_ChatLine,
@@ -1138,7 +1138,7 @@ begin
    menu_Controls_MLB:=true;
    case item of
 mi_back                : if(not check)then MenuBack(false,false,clickSound);
-mi_exit                : if(not check)then GameCycle:=false;
+mi_exit                : if(not check)then game_Cycle:=false;
 mi_StartTimer          : if(not check)then {$IFDEF TESTMODE}
                                            if(TestMode>0)
                                            then g_LobbyTimer:=2
@@ -1147,10 +1147,10 @@ mi_StopTimer           : if(not check)then begin
                                            g_LobbyTimer:=0;
                                            GameLog_BreakStarting;
                                            end;
-mi_StartNow            : if(not check)then Game_Start(false);
-mi_Break               : if(not check)then Game_Break(false);
+mi_StartNow            : if(not check)then game_Start(false);
+mi_Break               : if(not check)then game_Break(false);
 mi_Surrender           : if(not check)then
-                           if(PlayerSurrender(LocalPlayer,false))then
+                           if(player_Surrender(LocalPlayer,false))then
                              if(MainMenu)then MenuBack(true,false);
 
 mi_Campaings           : if(not check)then g_type:=gt_campaing;
@@ -1242,32 +1242,32 @@ mi_Replays_delete      : if(not check)then replay_DeleteInit(false);
 
 // SCIRMISH PLAYERS
 mi_Players_State0..
-mi_Players_State7      : if(not check)then PlayerAIToggle     (item-mi_Players_State0 ,LocalPlayer     ,false);
+mi_Players_State7      : if(not check)then player_AIToggle     (item-mi_Players_State0 ,LocalPlayer     ,false);
 mi_Players_AIskil0..
-mi_Players_AIskil7     : if(not check)then PlayerAILevelScroll(item-mi_Players_AIskil0,LocalPlayer,true,false);
+mi_Players_AIskil7     : if(not check)then player_AILevelScroll(item-mi_Players_AIskil0,LocalPlayer,true,false);
 mi_Players_Slot0..
-mi_Players_Slot7       : if(not check)then PlayersSwap        (item-mi_Players_Slot0  ,LocalPlayer     ,false);
+mi_Players_Slot7       : if(not check)then players_Swap        (item-mi_Players_Slot0  ,LocalPlayer     ,false);
 mi_Players_Race0..
-mi_Players_Race7       : if(not check)then PlayerRaceScroll   (item-mi_Players_Race0  ,LocalPlayer     ,false);
+mi_Players_Race7       : if(not check)then player_RaceScroll   (item-mi_Players_Race0  ,LocalPlayer     ,false);
 mi_Players_Team0..
-mi_Players_Team7       : if(not check)then PlayerTeamScroll   (item-mi_Players_Team0  ,LocalPlayer,true,false);
+mi_Players_Team7       : if(not check)then player_TeamScroll   (item-mi_Players_Team0  ,LocalPlayer,true,false);
 mi_Players_Obs0..
-mi_Players_Obs7        : if(not check)then PlayerToggleObserver(item-mi_Players_Obs0  ,LocalPlayer     ,false);
+mi_Players_Obs7        : if(not check)then player_ToggleObserver(item-mi_Players_Obs0  ,LocalPlayer     ,false);
 mi_Players_Ready       : if(not check)then PlayerReady:=not PlayerReady;
 
 // SCIRMISH MAP
-mi_Map_Scenario        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MScenario      ,true,false);
-mi_Map_Generators      : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MGenerators    ,true,false);
+mi_Map_Scenario        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MScenario      ,true,false);
+mi_Map_Generators      : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MGenerators    ,true,false);
 mi_Map_Seed            : ;
-mi_Map_Size            : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSize          ,true,false);
-mi_Map_Template        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MTemplate      ,true,false);
-mi_Map_Symmetry        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSymmetry      ,true,false);
-mi_Map_Random          : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MRandom        ,true,false);
+mi_Map_Size            : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MSize          ,true,false);
+mi_Map_Template        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MTemplate      ,true,false);
+mi_Map_Symmetry        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MSymmetry      ,true,false);
+mi_Map_Random          : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MRandom        ,true,false);
 
-mi_Game_FixedPositions : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GFixedPositions,true,false);
-mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots       ,true,false);
-mi_Game_NewObservers   : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GNewObservers   ,true,false);
-mi_Game_Random         : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GRandomScirmish,true,false);
+mi_Game_FixedPositions : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_GFixedPositions,true,false);
+mi_Game_AISlots        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_GAISlots       ,true,false);
+mi_Game_NewObservers   : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_GNewObservers   ,true,false);
+mi_Game_Random         : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_GRandomScirmish,true,false);
 
 // SCIRMISH MULTIPLAYER
 mi_MP_ServerToggle     : if(not check)then GameNetServer(net_status<>ns_server,false);
@@ -1277,7 +1277,7 @@ mi_MP_Connect          : if(not check)then GameNetClient(true ,false);
 mi_MP_Disconnect       : if(not check)then GameNetClient(false,false);
 mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,true,0,net_MaxQuality);
 mi_MP_ClientAddress    : ;
-mi_MP_ClientServerList : if(not check)then GameNetServerList(true,false);
+mi_MP_ClientServerList : if(not check)then game_NetServerList(true,false);
 
 // Net Server List MULTIPLAYER
 mi_NetServers_List      : if(not check)then GameNetServerListSelect    (item);
@@ -1393,18 +1393,18 @@ mi_SR_RecordQuality    : if(not check)then ScrollByte(@rpls_Quality     ,false,0
 mi_SS_PlaylistSize     : if(not check)then ScrollByte(@snd_musicListSize,false,1,snd_MaxMusicListSize);
 
 mi_Players_AIskil0..
-mi_Players_AIskil7     : if(not check)then PlayerAILevelScroll(item-mi_Players_AIskil0,LocalPlayer,false,false);
+mi_Players_AIskil7     : if(not check)then player_AILevelScroll(item-mi_Players_AIskil0,LocalPlayer,false,false);
 mi_Players_Team0..
-mi_Players_Team7       : if(not check)then PlayerTeamScroll   (item-mi_Players_Team0  ,LocalPlayer,false,false);
+mi_Players_Team7       : if(not check)then player_TeamScroll   (item-mi_Players_Team0  ,LocalPlayer,false,false);
 
-mi_Map_Seed            : if(not check)then GameMapSetSeed(LocalPlayer,random(map_seed.MaxValue)  ,false);
-mi_Map_Scenario        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MScenario  ,false,false);
-mi_Map_Generators      : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MGenerators,false,false);
-mi_Map_Size            : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSize      ,false,false);
-mi_Map_Template        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MTemplate  ,false,false);
-mi_Map_Symmetry        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_MSymmetry  ,false,false);
+mi_Map_Seed            : if(not check)then game_MapSetSeed(LocalPlayer,random(map_seed.MaxValue)  ,false);
+mi_Map_Scenario        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MScenario  ,false,false);
+mi_Map_Generators      : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MGenerators,false,false);
+mi_Map_Size            : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MSize      ,false,false);
+mi_Map_Template        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MTemplate  ,false,false);
+mi_Map_Symmetry        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_MSymmetry  ,false,false);
 
-mi_Game_AISlots        : if(not check)then GameSetOption(LocalPlayer,nmid_lobby_GAISlots   ,false,false);
+mi_Game_AISlots        : if(not check)then game_SetOption(LocalPlayer,nmid_lobby_GAISlots   ,false,false);
 
 mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,false,0,net_MaxQuality);
 

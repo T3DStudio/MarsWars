@@ -1,23 +1,23 @@
 
-procedure Dedicated_Init;
+procedure dedicated_Init;
 begin
    if(net_UpSocket(net_ServerPort))then
    begin
       net_status:=ns_server;
-      PlayersSetDefault;
+      Players_SetDefaults;
       //game_MakeRandomSkirmish;
    end
-   else GameCycle :=false;
+   else game_Cycle :=false;
 
    menu_update:=true;
 end;
 
-procedure Dedicated_Code;
+procedure dedicated_Code;
 var GameEnded:boolean;
 begin
    case G_Started of
    false: if(g_LobbyTimer<=0)then
-            if(PlayersAllReady)and(PlayersNonObserversCount>1)then
+            if(players_AllReady)and(players_NonObserversCount>1)then
               g_LobbyTimer:=g_GameStartTime;
    true : begin
              GameEnded:=Game_IsEnded;
@@ -41,7 +41,7 @@ begin
    end;
 end;
 
-procedure Dedicated_screenLine(s1:shortstring;x1:byte;
+procedure dedicated_screenLine(s1:shortstring;x1:byte;
                                s2:shortstring;x2:byte;
                                s3:shortstring;x3:byte;
                                s4:shortstring;x4:byte;
@@ -85,11 +85,11 @@ end;
 begin
    with g_PlayersGame[p] do
      if(state=ps_none)
-     then   Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,'',29,'',39,'',49)
+     then   Dedicated_screenLine(b2s(p+1),1,player_GetStateString(p),3,name,11,'',29,'',39,'',49)
      else
        if(isobserver)
-       then Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,str_observer   ,29, ''         ,39, PlayerGetPINGStr,49)
-       else Dedicated_screenLine(b2s(p+1),1,PlayerStateString(p),3,name,11,str_race[mrace],29, b2s(team+1),39, PlayerGetPINGStr,49);
+       then Dedicated_screenLine(b2s(p+1),1,player_GetStateString(p),3,name,11,str_observer   ,29, ''         ,39, PlayerGetPINGStr,49)
+       else Dedicated_screenLine(b2s(p+1),1,player_GetStateString(p),3,name,11,str_race[mrace],29, b2s(team+1),39, PlayerGetPINGStr,49);
 end;
 
 function Dedicated_GameStatusStr:shortstring;

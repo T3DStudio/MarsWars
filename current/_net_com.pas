@@ -47,10 +47,10 @@ begin
    net_UpSocket:=true;
 end;
 
-function InitNET:boolean;
+function net_Init:boolean;
 begin
-   InitNET:=(SDLNet_Init=0);
-   if(not InitNET)then WriteSDLError;
+   net_Init:=(SDLNet_Init=0);
+   if(not net_Init)then WriteSDLError;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -7,7 +7,6 @@
   //{$APPTYPE GUI}
 {$ELSE}              // DED SERVER
   {$APPTYPE CONSOLE}
-
 {$ENDIF}
 
 uses SysUtils, SDL, SDL_Net,crt
@@ -74,7 +73,7 @@ begin
    readln;
    halt;}
 
-   GameInit;
+   game_Init;
 
    {$IFDEF _FULLGAME}
    {$IFDEF DOCGEN}
@@ -86,21 +85,21 @@ begin
    {$ENDIF}
    {$ENDIF}
 
-   while(GameCycle)do
+   while(game_Cycle)do
    begin
       fr_FPSSecondD:=SDL_GetTicks;
 
       {$IFDEF _FULLGAME}
-      GameInput;
-      GameMain;
+      game_Input;
+      game_Main;
       if(vid_draw)then
-      GameDraw;
+      game_Draw;
       {$ELSE}
       while(SDL_PollEvent(sys_EVENT)>0)do
         case(sys_EVENT^.type_)of
         SDL_QUITEV  : break;
         end;
-      GameMain;
+      game_Main;
       {$ENDIF}
 
       fr_FPSSecondU:=SDL_GetTicks-fr_FPSSecondD;

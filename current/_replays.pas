@@ -354,7 +354,7 @@ begin
       if((i and %00100000)>0)then
       begin
          rpls_PlayersScore:=true;
-         //g_PlayersScore
+         wudata_PlayersScores(true);
       end;
       rpls_GameStatus:=gs;
 
@@ -446,7 +446,7 @@ begin
       end
       else
       begin
-         Game_DefaultAll;
+         game_DefaultAll;
 
          if(rpls_head_itemn>1)then
           for p:=1 to rpls_head_itemn-1 do
@@ -461,7 +461,7 @@ begin
             rpls_str_info1:=str_FileError_WVer+rpls_file_LastErrS;
             rpls_str_info2:='';
             rpls_str_info3:='';
-            Game_DefaultAll;
+            game_DefaultAll;
             exit;
          end;
 
@@ -477,7 +477,7 @@ begin
             rpls_str_info1:=str_FileError_WVer;
             rpls_str_info2:='';
             rpls_str_info3:='';
-            Game_DefaultAll;
+            game_DefaultAll;
             exit;
          end;
 
@@ -494,7 +494,7 @@ begin
                 rpls_str_info1:=str_FileError_WVer;
                 rpls_str_info2:='';
                 rpls_str_info3:='';
-                Game_DefaultAll;
+                game_DefaultAll;
                 exit;
              end;
 
@@ -564,12 +564,17 @@ begin
          rpls_vidx:=rudata_byte(true,0);
          rpls_vidy:=rudata_byte(true,0);
       end;
-      if((i and %00100000)>0)then ;// read players scores
+      if((i and %00100000)>0)then rudata_PlayersScores(true);
 
       if(g_status=gs_running)
       then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip)
       else
-        if(gs<>g_status)and(game_IsEnded)then Scenario_KeyPointsEndGameClientFix;
+        if(gs<>g_status)and(game_IsEnded)then
+        begin
+           Scenario_KeyPointsEndGameClientFix;
+           if(not ui_ShowScores)then
+             ui_ToggleShowScores;
+        end;
 
       if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;

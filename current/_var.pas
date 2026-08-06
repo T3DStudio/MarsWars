@@ -1,7 +1,7 @@
 
 var
 
-GameCycle         : boolean = false;
+game_Cycle        : boolean = false;
 sys_EVENT         : pSDL_EVENT;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,8 +106,8 @@ rpls_kpoints_kpi  : byte = 0;
 
 fr_FPSSecond,
 fr_FPSSecondD,
-fr_FPSSecondU,
 fr_FPSSecondN,
+fr_FPSSecondU,
 fr_FPSSecondC,
 fr_FrameCount,
 fr_LastTicks,
@@ -211,7 +211,7 @@ vid_ShowFPS         : boolean = true;
 
 ui_ControlTabType : TTabControlContent = tcc_none;
 
-UIPlayer          : byte = 1;
+UIPlayer          : byte = 0;
 
 ui_InGameChat     : byte = 0;
 
@@ -266,10 +266,10 @@ ui_ColoredShadow  : boolean = true;
 ui_ControlPanelPos: byte = 0;
 ui_PlayersScreens : boolean = true;
 
-ui_UIPanelX         : integer = 0;
-ui_UIPanelY         : integer = 0;
-ui_UIPanelW         : integer = 0;
-ui_UIPanelH         : integer = 0;
+ui_UIPanelX       : integer = 0;
+ui_UIPanelY       : integer = 0;
+ui_UIPanelW       : integer = 0;
+ui_UIPanelH       : integer = 0;
 ui_UIPortX0,
 ui_UIPortY0,
 ui_UIPortX1,
@@ -288,6 +288,8 @@ ui_fog_ey         : integer = 0;
 
 ui_language       : boolean = false;
 ui_tab_Auto       : boolean = true;
+
+ui_ShowScores     : boolean = true;
 
 ui_CommandercPU   : PTUnit = nil;
 ui_CommandercD    : integer = 0;
@@ -398,7 +400,7 @@ ui_CursorItemActs : byte = 0;
 //  MENU
 //
 
-menu_BackgroundSC    : pSDL_SURFACE = nil;
+menu_BackgroundSC : pSDL_SURFACE = nil;
 menu_Surface      : pSDL_SURFACE = nil;
 menu_Background   : pSDL_SURFACE = nil;
 
@@ -599,6 +601,7 @@ m_mmap_move       : boolean = false;
 
 m_UnitTargetN     : integer = 0;
 m_UnitTargetP     : PTUnit = nil;
+m_UnitTargetPrev  : integer = 0;
 
 
 input_actions     : array[byte] of TInputKey;
@@ -886,6 +889,7 @@ spr_buff_Heroic      : TMWTexture;
 
 spr_uibtn_markLook,
 spr_uibtn_markAttack,
+spr_uibtn_ShowScores,
 spr_uibtn_ReplayFast,
 spr_uibtn_ReplayForw1,
 spr_uibtn_ReplayForw2,
@@ -1061,7 +1065,8 @@ str_menu_Help,
 str_menu_Start,
 str_menu_Cancel,
 str_menu_Surrender,
-str_menu_Abort,
+str_menu_MissionAbort,
+str_menu_MissionEnd,
 str_menu_PlaybackStop,
 str_menu_Exit,
 str_menu_Back,
@@ -1354,6 +1359,8 @@ str_PT_Color,
 str_PT_Ping,
 str_PT_Obs,
 
+str_ScoreScreen_Caption,
+
 str_Caption_Server,
 str_Caption_Client,
 str_Caption_GOptions,
@@ -1362,6 +1369,9 @@ str_Caption_Multiplayer,
 str_Caption_NetSvList,
 str_Caption_Map,
 str_Caption_Players      : shortstring;
+
+str_ScoreScreenC         : array[0..psc_Last] of shortstring;
+str_ScoreScreenI         : array[0..psi_Last] of shortstring;
 
 str_NetQualityL,
 str_ReplayQualityL       : array[0..net_MaxQuality] of shortstring;

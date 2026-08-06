@@ -951,6 +951,36 @@ keyPoint_mcDirStep     = 360 div keyPoint_mcN;
 keyPoint_KotH_pause_sec= 60*5;
 keyPoint_KotH_pause    = fr_fps1*keyPoint_KotH_pause_sec;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  PLAYER SCORE
+//
+
+
+psc_units_created      = 0;
+psc_units_summoned     = 1;
+psc_units_resurected   = 2;
+psc_units_captured     = 3;
+psc_units_lost         = 4;
+psc_units_destroyed    = 5;
+psc_builds_created     = 6;
+psc_builds_summoned    = 7;
+psc_builds_captured    = 8;
+psc_builds_lost        = 9;
+psc_builds_destroyed   = 10;
+psc_upgrades_level     = 11;
+psc_units_ExpTotal     = 12;
+
+psc_Last               = 12;
+
+psi_res_energy_max     = 0;
+psi_res_UACLoot        = 1;
+psi_res_HellPower      = 2;
+
+psi_Last               = 2;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  OTHER
@@ -1167,6 +1197,7 @@ iAct_Control_USelArmy  = 73;
 iAct_Control_MarkLook  = 74;
 iAct_Control_MarkAttack= 75;
 iAct_Control_ToggleRec = 76;
+iAct_Control_ShowScores= 77;
 
 iAct_Replay_Fast       = 110;
 iAct_Replay_Back2      = 111;
@@ -1275,7 +1306,8 @@ apm_Acts               = [1..255]-[iAct_ScreenShot,
                                    iAct_InGameChatAllies,
                                    iAct_InGamePause,
                                    iAct_InGameMenu,
-                                   iAct_Control_ToggleRec
+                                   iAct_Control_ToggleRec,
+                                   iAct_Control_ShowScores
                                    ];
 
 apm_period_sec         = 10;
@@ -1917,7 +1949,15 @@ ui_DocLineLen1         = 56;//(menu_w-(menu_BaseW1*3+menu_BigButtonW)) div font_
 ui_DocLineLen2         = 76;
 ui_DocListH            = 35;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//  CAMPAING
+//
+
 camp_MaxDiff           = 4;
+
+camp_BattleRoyaleS     = fr_fpsh-4;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  BASE STRING/TEXT

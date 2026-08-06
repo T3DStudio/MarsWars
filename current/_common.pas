@@ -30,14 +30,15 @@ function point_dist_rint(dx0,dy0,dx1,dy1:integer):integer;  forward;
 procedure KeyPoints_Clear;   forward;
 
 procedure game_RoyalSetCenter(rx,ry:integer);forward;
-procedure Game_RemoveAIObservers; forward;
+procedure game_RemoveAIObservers; forward;
 procedure game_MakeRandomSkirmish; forward;
-procedure Game_ShuffleAINames; forward;
-procedure Game_DefaultAll; forward;
+procedure game_ShuffleAINames; forward;
+procedure game_DefaultAll; forward;
 
 {$IFDEF _FULLGAME}
 procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
+procedure ui_ToggleShowScores;  forward;
 procedure ui_EnableControlActs;forward;
 procedure ui_InitControlPanelBTNActions;forward;
 function LogMes2UIAlarm(POVPlayer:byte):boolean; forward;
@@ -52,8 +53,8 @@ procedure ability_UACStrike_missile(playeri:byte;fromx,fromy,tox,toy:integer);fo
 function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function gfx_ShadowColor(c:TMWColor):TMWColor;forward;
 
-function Game_PauseToggle(check:boolean):boolean;forward;
-function GameNetServerList(start,check:boolean):boolean;forward;
+function game_PauseToggle(check:boolean):boolean;forward;
+function game_NetServerList(start,check:boolean):boolean;forward;
 
 procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);forward;
 function menu_MouseXY2Item:byte; forward;
@@ -64,9 +65,9 @@ function PlayerNameChangeble  :boolean;forward;
 
 function PlayerGetColorCur(player:byte;shadow:boolean):TMWColor;  forward;
 function PlayerGetColorDef(player:byte):TMWColor; forward;
-function PlayerAIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
-function PlayerRaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
-function PlayerTeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;forward;
+function player_AIToggle  (PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
+function player_RaceScroll(PlayerTarget,PlayerRequestor:byte;check:boolean):boolean;forward;
+function player_TeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boolean):boolean;forward;
 
 procedure saveload_SaveWrite(fn:shortstring);forward;
 function saveload_SaveInit  (check:boolean):boolean;forward;
@@ -465,7 +466,7 @@ end;
 //   COMMON Players funcs
 //
 
-procedure PlayerSetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);    // allowed units  (by uids)
+procedure player_SetAllowedUnits(p:byte;g:TSob;max:integer;new:boolean);    // allowed units  (by uids)
 var i:byte;
 begin
    with g_PlayersGame[p] do
@@ -476,7 +477,7 @@ begin
           units_uid_m[i]:=max;
    end;
 end;
-procedure PlayerSetAllowedUpgrades(p:byte;g:TSob;lvl:byte;new:boolean);  // allowed upgrades
+procedure player_SetAllowedUpgrades(p:byte;g:TSob;lvl:byte;new:boolean);  // allowed upgrades
 var i:byte;
 begin
    with g_PlayersGame[p] do
@@ -506,14 +507,14 @@ end;}
 //   PLAYERS LOG
 //
 
-function PlayerGetAlliesByte(playeri:byte;AddSelf:boolean):byte;
+function player_GetAlliesBits(playeri:byte;AddSelf:boolean):byte;
 var p:byte;
 begin
    if(playeri>LastPlayer)
-   then PlayerGetAlliesByte:=255
+   then player_GetAlliesBits:=255
    else
    begin
-      PlayerGetAlliesByte:=0;
+      player_GetAlliesBits:=0;
       for p:=0 to LastPlayer do
         with g_PlayersGame[p] do
           if(state>ps_None)then
@@ -526,15 +527,15 @@ begin
                     or(isdefeated)then continue;
              true : if(not isobserver)then continue;
              end;
-             SetBBit(@PlayerGetAlliesByte,p,true);
+             SetBBit(@player_GetAlliesBits,p,true);
           end;
    end;
 end;
 
-function PlayerLogCheckNearEvent(playeri:byte;tickDiff:cardinal;x,y:integer;mtypes:TSoB):boolean;
+function player_LogCheckNearEvent(playeri:byte;tickDiff:cardinal;x,y:integer;mtypes:TSoB):boolean;
 var ln,li:cardinal;
 begin
-   PlayerLogCheckNearEvent:=true;
+   player_LogCheckNearEvent:=true;
    with g_PlayersGame[playeri] do
    begin
       li:=log_i;
@@ -559,10 +560,10 @@ begin
                    if(point_dist_rint(lm_x,lm_y,x,y)<base_r2)then exit;
       end;
    end;
-   PlayerLogCheckNearEvent:=false;
+   player_LogCheckNearEvent:=false;
 end;
 
-procedure PlayerAddLog(ptarget,amtype,adatat,adatau:byte;astr:shortstring;ax,ay:integer);
+procedure player_LogAdd(ptarget,amtype,adatat,adatau:byte;astr:shortstring;ax,ay:integer);
 {$IFDEF _FULLGAME}
 var POVPlayer:byte;
 {$ENDIF}
@@ -611,14 +612,14 @@ lmt_game_Resumed
 lmt_unit_attackedU,
 lmt_unit_attackedB,
 lmt_allies_attackedU,
-lmt_allies_attackedB : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[lmt_unit_attackedU,
+lmt_allies_attackedB : if(player_LogCheckNearEvent(ptarget,fr_fps6,ax,ay,[lmt_unit_attackedU,
                                                                          lmt_unit_attackedB,
                                                                          lmt_allies_attackedU,
                                                                          lmt_allies_attackedB]))then exit;
-lmt_unit_LevelUp     : if(PlayerLogCheckNearEvent(ptarget,fr_fps6,ax,ay,[amtype              ]))then exit;
+lmt_unit_LevelUp     : if(player_LogCheckNearEvent(ptarget,fr_fps6,ax,ay,[amtype              ]))then exit;
 
 lmt_markLook,
-lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype              ]))then exit;
+lmt_markAttack       : if(player_LogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype              ]))then exit;
         else
            with log_l[log_i] do
              if(lm_tick<=g_tick)then
@@ -695,12 +696,12 @@ lmt_markAttack       : if(PlayerLogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype 
      end;
 end;
 
-procedure PlayersAddToLog(from_player,to_players,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer);
+procedure players_LogAdd(from_player,to_players,amtype,auidt,auid:byte;astr:shortstring;ax,ay:integer);
 var p:byte;
 begin
    for p:=0 to LastPlayer do
      if(GetBBit(@to_players,p))
-     or(p=from_player)then PlayerAddLog(p,amtype,auidt,auid,astr,ax,ay);
+     or(p=from_player)then player_LogAdd(p,amtype,auidt,auid,astr,ax,ay);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -717,7 +718,7 @@ begin
                      dt:=0;
                   end;
    chat_allies  : begin
-                     chat_tar:=PlayerGetAlliesByte(sender,true);
+                     chat_tar:=player_GetAlliesBits(sender,true);
                      dt:=1;
                   end;
    0..LastPlayer: chat_tar:=1 shl chat_tar;
@@ -727,8 +728,8 @@ begin
 
    if(chat_tar>0)then
      if(sender<=LastPlayer)
-     then PlayersAddToLog(sender,chat_tar,lmt_chat_player0+sender,dt,0,g_PlayersGame[sender].name+': '+message,0,0)
-     else PlayersAddToLog(sender,chat_tar,lmt_chat_local         ,0 ,0,message                                ,0,0);
+     then players_LogAdd(sender,chat_tar,lmt_chat_player0+sender,dt,0,g_PlayersGame[sender].name+': '+message,0,0)
+     else players_LogAdd(sender,chat_tar,lmt_chat_local         ,0 ,0,message                                ,0,0);
 end;
 {procedure GameLog_Common(sender,targets:byte;message:shortstring);
 begin
@@ -739,35 +740,35 @@ end;  }
 procedure GameLog_PlayerConnected(player:byte);
 begin
    if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_connected,0,player,g_PlayersGame[player].name,0,0);
+   players_LogAdd(player,log_to_all,lmt_player_connected,0,player,g_PlayersGame[player].name,0,0);
 end;
 procedure GameLog_PlayerLeave(player:byte);
 begin
    if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_leave,0,player,g_PlayersGame[player].name,0,0);
+   players_LogAdd(player,log_to_all,lmt_player_leave,0,player,g_PlayersGame[player].name,0,0);
 end;
 procedure GameLog_PlayerTimeOut(player:byte);
 begin
    if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_timeout,0,player,g_PlayersGame[player].name,0,0);
+   players_LogAdd(player,log_to_all,lmt_player_timeout,0,player,g_PlayersGame[player].name,0,0);
 end;
 procedure GameLog_PlayerDefeated(player:byte);
 begin
    if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_defeated,0,player,g_PlayersGame[player].name,0,0);
+   players_LogAdd(player,log_to_all,lmt_player_defeated,0,player,g_PlayersGame[player].name,0,0);
 end;
 procedure GameLog_PlayerRevealed(player:byte);
 begin
    if(player>LastPlayer)then exit;
 
    with g_PlayersGame[player] do
-   PlayersAddToLog(player,log_to_all,lmt_player_revealed,byte(isrevealed),player,name,0,0);
+   players_LogAdd(player,log_to_all,lmt_player_revealed,byte(isrevealed),player,name,0,0);
 end;
 
 procedure GameLog_PlayerSurrender(player:byte);
 begin
    if(player<=LastPlayer)then
-   PlayersAddToLog(player,log_to_all,lmt_player_surrender,0,player,g_PlayersGame[player].name,0,0);
+   players_LogAdd(player,log_to_all,lmt_player_surrender,0,player,g_PlayersGame[player].name,0,0);
 end;
 
 procedure GameLog_PlayerReadyStat(player:byte);
@@ -775,60 +776,67 @@ begin
    if(player<=LastPlayer)then
      with g_PlayersGame[player] do
        if(isready)
-       then PlayersAddToLog(255,log_to_all,lmt_player_ready ,0,0,name,0,0)
-       else PlayersAddToLog(255,log_to_all,lmt_player_nready,0,0,name,0,0)
+       then players_LogAdd(255,log_to_all,lmt_player_ready ,0,0,name,0,0)
+       else players_LogAdd(255,log_to_all,lmt_player_nready,0,0,name,0,0)
 end;
 
 {$IFDEF _FULLGAME}
 // RECORDS
 procedure GameLogRecStart(fname:shortstring);
 begin
-   PlayersAddToLog(LocalPlayer,0,lmt_replay_RecStart,0,0,fname,0,0)
+   players_LogAdd(LocalPlayer,0,lmt_replay_RecStart,0,0,fname,0,0)
 end;
 procedure GameLogRecStop (fname:shortstring);
 begin
-   PlayersAddToLog(LocalPlayer,0,lmt_replay_RecStop,0,0,fname,0,0)
+   players_LogAdd(LocalPlayer,0,lmt_replay_RecStop,0,0,fname,0,0)
 end;
 procedure GameLogRecError(errorStr:shortstring);
 begin
-   PlayersAddToLog(LocalPlayer,0,lmt_replay_RecError,0,0,errorStr,0,0)
+   players_LogAdd(LocalPlayer,0,lmt_replay_RecError,0,0,errorStr,0,0)
 end;
+
+// SYSTEM INFO
+procedure GameLogCommon(errorStr:shortstring);
+begin
+   //players_LogAdd(LocalPlayer,0,lmt_replay_RecError,0,0,errorStr,0,0)
+end;
+
 {$ENDIF}
 
 // GAME
 procedure GameLog_ReadyToStart;
 begin
-   PlayersAddToLog(255,log_to_all,lmt_game_ReadyToStart,0,0,'',0,0)
+   players_LogAdd(255,log_to_all,lmt_game_ReadyToStart,0,0,'',0,0)
 end;
 procedure GameLog_BreakStarting;
 begin
-   PlayersAddToLog(255,log_to_all,lmt_game_BreakStarting,0,0,'',0,0)
+   players_LogAdd(255,log_to_all,lmt_game_BreakStarting,0,0,'',0,0)
 end;
 procedure GameLog_StartsIn(seconds:integer);
 begin
-   PlayersAddToLog(255,log_to_all,lmt_game_StartsIn,0,byte(seconds),'',0,0)
+   players_LogAdd(255,log_to_all,lmt_game_StartsIn,0,byte(seconds),'',0,0)
 end;
 {$IFNDEF _FULLGAME}
 procedure GameLog_EndsIn(seconds:integer);
 begin
-   PlayersAddToLog(255,log_to_all,lmt_game_ResetIn ,0,byte(seconds),'',0,0)
+   players_LogAdd(255,log_to_all,lmt_game_ResetIn ,0,byte(seconds),'',0,0)
 end;
 {$ENDIF}
 procedure GameLog_EndGame(wteam:byte);
 begin
-   PlayersAddToLog(255,log_to_all,lmt_game_end,0,wteam,'',0,0);
+   players_LogAdd(255,log_to_all,lmt_game_end,0,wteam,'',0,0);
 end;
 procedure GameLog_Paused(playerN:byte);
 begin
    if(playerN<=LastPlayer)then
      with g_PlayersGame[playerN] do
-   PlayersAddToLog(playerN,log_to_all,lmt_game_Paused,0,0,name,0,0);
+   players_LogAdd(playerN,log_to_all,lmt_game_Paused,0,0,name,0,0);
 end;
 procedure GameLog_Resumed(playerN:byte);
 begin
    if(playerN<=LastPlayer)then
      with g_PlayersGame[playerN] do
-   PlayersAddToLog(playerN,log_to_all,lmt_game_Resumed,0,0,name,0,0);
+   players_LogAdd(playerN,log_to_all,lmt_game_Resumed,0,0,name,0,0);
 end;
 
 function GameLog_ReqMsg(playerN,auid,atype,amsgid:byte;x,y:integer;check:boolean=false):boolean;
@@ -845,7 +853,7 @@ begin
       or(state=ps_AI)then exit;
    end;
 
-   PlayersAddToLog(playerN,0,amsgid,atype,auid,'',x,y);
+   players_LogAdd(playerN,0,amsgid,atype,auid,'',x,y);
 end;
 procedure GameLog_MapMark(playeri:byte;x,y,mType:integer);
 begin
@@ -853,8 +861,8 @@ begin
 
    with g_PlayersGame[playeri] do
      case mType of
-     co_markLook  : PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_markLook  ,0,0,name,x,y);
-     co_markAttack: PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,true),lmt_markAttack,0,0,name,x,y);
+     co_markLook  : players_LogAdd(playeri,player_GetAlliesBits(playeri,true),lmt_markLook  ,0,0,name,x,y);
+     co_markAttack: players_LogAdd(playeri,player_GetAlliesBits(playeri,true),lmt_markAttack,0,0,name,x,y);
      end;
 end;
 
@@ -862,14 +870,14 @@ procedure GameLog_UACStrike(playeri:byte;fromx,fromy,tox,toy:integer);
 begin
    if(playeri>LastPlayer)then exit;
 
-   PlayersAddToLog(playeri,log_to_all,lmt_other_UACStrike,0,playeri,i2c(fromx)+i2c(fromy),tox,toy);
+   players_LogAdd(playeri,log_to_all,lmt_other_UACStrike,0,playeri,i2c(fromx)+i2c(fromy),tox,toy);
 end;
 procedure GameLog_UACScan(playeri,scanedPlayers:byte;tox,toy:integer);
 begin
    if(playeri>LastPlayer)
    or(scanedPlayers=0)then exit;
 
-   PlayersAddToLog(playeri,scanedPlayers,lmt_other_UACScan,0,playeri,'',tox,toy);
+   players_LogAdd(playeri,scanedPlayers,lmt_other_UACScan,0,playeri,'',tox,toy);
 end;
 
 // UNITS
@@ -878,34 +886,34 @@ begin
    if(pu<>nil)then
    with pu^ do
      if(uid^.uid_isbuilding)
-     then PlayersAddToLog(playeri,0,lmt_unit_readyB,lmt_argt_unit ,uidi,'',x,y)
-     else PlayersAddToLog(playeri,0,lmt_unit_readyU,lmt_argt_unit ,uidi,'',x,y);
+     then players_LogAdd(playeri,0,lmt_unit_readyB,lmt_argt_unit ,uidi,'',x,y)
+     else players_LogAdd(playeri,0,lmt_unit_readyU,lmt_argt_unit ,uidi,'',x,y);
 end;
 procedure GameLog_UnitCaptured(pu:PTunit);
 begin
    if(pu<>nil)then
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_captured,lmt_argt_unit ,uidi,'',x,y);
+   with pu^ do players_LogAdd(playeri,0,lmt_unit_captured,lmt_argt_unit ,uidi,'',x,y);
 end;
 procedure GameLog_UnitLost(pu:PTunit);
 begin
    if(pu<>nil)then
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_lost,lmt_argt_unit ,uidi,'',x,y);
+   with pu^ do players_LogAdd(playeri,0,lmt_unit_lost,lmt_argt_unit ,uidi,'',x,y);
 end;
 procedure GameLog_UnitResurrected(pu:PTunit);
 begin
    if(pu<>nil)then
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_resurrected,lmt_argt_unit ,uidi,'',x,y);
+   with pu^ do players_LogAdd(playeri,0,lmt_unit_resurrected,lmt_argt_unit ,uidi,'',x,y);
 end;
 procedure GameLog_UnitPromoted(pu:PTunit);
 begin
    if(pu<>nil)then
-   with pu^ do PlayersAddToLog(playeri,0,lmt_unit_LevelUp,0,uidi,'',x,y);
+   with pu^ do players_LogAdd(playeri,0,lmt_unit_LevelUp,0,uidi,'',x,y);
 end;
 procedure GameLog_UpgradeComplete(playeri,upid:byte;x,y:integer);
 begin
    if(playeri>LastPlayer)then exit;
 
-   PlayersAddToLog(playeri,0,lmt_upgrade_complete,0,upid,'',x,y);
+   players_LogAdd(playeri,0,lmt_upgrade_complete,0,upid,'',x,y);
 end;
 procedure GameLog_UnitAttacked(pu:PTunit);
 begin
@@ -914,11 +922,11 @@ begin
    with pu^ do
    begin
       if(uid^.uid_isbuilding)
-      then PlayersAddToLog(playeri,0                                 ,lmt_unit_attackedB  ,0,uidi,'',x,y)
-      else PlayersAddToLog(playeri,0                                 ,lmt_unit_attackedU  ,0,uidi,'',x,y);
+      then players_LogAdd(playeri,0                                 ,lmt_unit_attackedB  ,0,uidi,'',x,y)
+      else players_LogAdd(playeri,0                                 ,lmt_unit_attackedU  ,0,uidi,'',x,y);
       if(uid^.uid_isbuilding)
-      then PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,false),lmt_allies_attackedB,0,uidi,'',x,y)
-      else PlayersAddToLog(playeri,PlayerGetAlliesByte(playeri,false),lmt_allies_attackedU,0,uidi,'',x,y);
+      then players_LogAdd(playeri,player_GetAlliesBits(playeri,false),lmt_allies_attackedB,0,uidi,'',x,y)
+      else players_LogAdd(playeri,player_GetAlliesBits(playeri,false),lmt_allies_attackedU,0,uidi,'',x,y);
    end;
 end;
 
@@ -929,7 +937,7 @@ begin
 
    with map_KeyPointsL[kpoint] do
      with kp_TeamData[MaxPlayers] do
-       PlayersAddToLog(255,255,lmt_kpoint_CaptureStart,kpoint,kptd_TimerOwnerTeam,'',kp_x,kp_y);
+       players_LogAdd(255,255,lmt_kpoint_CaptureStart,kpoint,kptd_TimerOwnerTeam,'',kp_x,kp_y);
 end;
 procedure GameLog_KeyPointCaptured(kpoint:byte);
 begin
@@ -937,14 +945,14 @@ begin
 
    with map_KeyPointsL[kpoint] do
      with kp_TeamData[MaxPlayers] do
-       PlayersAddToLog(255,255,lmt_kpoint_Captured,kpoint,kptd_OwnerTeam,'',kp_x,kp_y);
+       players_LogAdd(255,255,lmt_kpoint_Captured,kpoint,kptd_OwnerTeam,'',kp_x,kp_y);
 end;
 // KotH
 procedure GameLog_KotHControl;
 begin
    with map_KeyPointsL[0] do
      with kp_TeamData[MaxPlayers] do
-       PlayersAddToLog(255,255,lmt_koth_CaptureStart,0,kptd_TimerOwnerTeam,'',kp_x,kp_y);
+       players_LogAdd(255,255,lmt_koth_CaptureStart,0,kptd_TimerOwnerTeam,'',kp_x,kp_y);
 end;
 procedure GameLog_KothCountDown;
 var t:integer;
@@ -963,7 +971,7 @@ begin
         else
           if((t mod fr_fps1)<>0)then exit;
 
-        PlayersAddToLog(255,255,lmt_koth_Alarm,0,kptd_TimerOwnerTeam,i2s(t div fr_fps1),kp_x,kp_y);
+        players_LogAdd(255,255,lmt_koth_Alarm,0,kptd_TimerOwnerTeam,i2s(t div fr_fps1),kp_x,kp_y);
      end;
 end;
 // Generators
@@ -977,7 +985,7 @@ begin
      or(isobserver)then exit;
 
    with map_KeyPointsL[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_captured  ,0,0,'',kp_x,kp_y);
+     players_LogAdd(from_player,0,lmt_ngen_captured  ,0,0,'',kp_x,kp_y);
 end;
 procedure GameLog_GeneratorAlarm(from_player,kpoint:byte);
 begin
@@ -989,7 +997,7 @@ begin
      or(isobserver)then exit;
 
    with map_KeyPointsL[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_Alarm  ,0,0,'',kp_x,kp_y);
+     players_LogAdd(from_player,0,lmt_ngen_Alarm  ,0,0,'',kp_x,kp_y);
 end;
 procedure GameLog_GeneratorLost(from_player,kpoint:byte);
 begin
@@ -1001,7 +1009,7 @@ begin
      or(isobserver)then exit;
 
    with map_KeyPointsL[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_lost  ,0,0,'',kp_x,kp_y);
+     players_LogAdd(from_player,0,lmt_ngen_lost  ,0,0,'',kp_x,kp_y);
 end;
 procedure GameLog_GeneratorExh(from_player,kpoint:byte);
 begin
@@ -1013,11 +1021,11 @@ begin
      or(isobserver)then exit;
 
    with map_KeyPointsL[kpoint] do
-     PlayersAddToLog(from_player,0,lmt_ngen_exh  ,0,0,'',kp_x,kp_y);
+     players_LogAdd(from_player,0,lmt_ngen_exh  ,0,0,'',kp_x,kp_y);
 end;
 
 // PLAYER LOG COMMON
-procedure PlayerClearLog(playerN:byte);
+procedure player_ClearLog(playerN:byte);
 var i:cardinal;
 begin
    if(playerN>LastPlayer)then exit;
@@ -1037,15 +1045,19 @@ begin
 end;
 
 {$IFDEF _FULLGAME}
-procedure PlayersClearLog;
+procedure players_ClearLog;
 var p:byte;
 begin
-   for p:=0 to LastPlayer do PlayerClearLog(p);
+   for p:=0 to LastPlayer do player_ClearLog(p);
 end;
 {$ENDIF}
-// OTHER
 
-function PlayersAllReady:boolean;
+////////////////////////////////////////////////////////////////////////////////
+//
+//   PLAYERS
+//
+
+function players_AllReady:boolean;
 var p,
 c_human,
 c_ready:byte;
@@ -1059,104 +1071,110 @@ begin
           c_human+=1;
           if(isready){$IFDEF _FULLGAME}or(p=LocalPlayer){$ENDIF}then c_ready+=1;
        end;
-   PlayersAllReady:=(c_ready=c_human)and(c_human>0);
+   players_AllReady:=(c_ready=c_human)and(c_human>0);
 end;
-function PlayersNonObserversCount:byte;
+function players_NonObserversCount:byte;
 var p:byte;
 begin
-   PlayersNonObserversCount:=0;
+   players_NonObserversCount:=0;
    for p:=0 to LastPlayer do
      if(p<map_MaxPlayers)then
        with g_PlayersGame[p] do
          case state of
          ps_none : if(g_AISlots>0)then
-                   PlayersNonObserversCount+=1;
-         ps_ai   : PlayersNonObserversCount+=1;
+                   players_NonObserversCount+=1;
+         ps_ai   : players_NonObserversCount+=1;
          ps_human: if(not isobserver)then
-                   PlayersNonObserversCount+=1;
+                   players_NonObserversCount+=1;
          end;
 end;
 
-function PlayerGetFixedTeams(gm,p:byte):byte;
+function player_GetScenarioFixedTeams(gm,p:byte):byte;
 begin
-   PlayerGetFixedTeams:=p;
+   player_GetScenarioFixedTeams:=p;
    if(p<=LastPlayer)then
      with g_PlayersGame[p] do
        case gm of
 mc_1x1     : case p of
-             0,1 : PlayerGetFixedTeams:=p;
+             0,1 : player_GetScenarioFixedTeams:=p;
              end;
 mc_2x2     : case p of
-             0..1: PlayerGetFixedTeams:=0;
-             2..3: PlayerGetFixedTeams:=1;
+             0..1: player_GetScenarioFixedTeams:=0;
+             2..3: player_GetScenarioFixedTeams:=1;
              end;
 mc_3x3     : case p of
-             0..2: PlayerGetFixedTeams:=0;
-             3..5: PlayerGetFixedTeams:=1;
+             0..2: player_GetScenarioFixedTeams:=0;
+             3..5: player_GetScenarioFixedTeams:=1;
              end;
 mc_4x4     : case p of
-             0..3: PlayerGetFixedTeams:=0;
-             4..7: PlayerGetFixedTeams:=1;
+             0..3: player_GetScenarioFixedTeams:=0;
+             4..7: player_GetScenarioFixedTeams:=1;
              end;
 mc_2x2x2   : case p of
-             0,1 : PlayerGetFixedTeams:=0;
-             2,3 : PlayerGetFixedTeams:=1;
-             4,5 : PlayerGetFixedTeams:=2;
+             0,1 : player_GetScenarioFixedTeams:=0;
+             2,3 : player_GetScenarioFixedTeams:=1;
+             4,5 : player_GetScenarioFixedTeams:=2;
              end;
 mc_2x2x2x2 : case p of
-             0,1 : PlayerGetFixedTeams:=0;
-             2,3 : PlayerGetFixedTeams:=1;
-             4,5 : PlayerGetFixedTeams:=2;
-             6,7 : PlayerGetFixedTeams:=3;
+             0,1 : player_GetScenarioFixedTeams:=0;
+             2,3 : player_GetScenarioFixedTeams:=1;
+             4,5 : player_GetScenarioFixedTeams:=2;
+             6,7 : player_GetScenarioFixedTeams:=3;
              end;
-       else  PlayerGetFixedTeams:=p;
+       else  player_GetScenarioFixedTeams:=p;
        end;
 end;
 
-function PlayerValidateTeam(p,nt:byte):byte;
+function player_ValidateTeam(p,nt:byte):byte;
 begin
-   PlayerValidateTeam:=0;
+   player_ValidateTeam:=0;
    if(p<=LastPlayer)then
      with g_PlayersGame[p] do
        if(map_scenario in mc_fixed_teams)
-       then PlayerValidateTeam:=PlayerGetFixedTeams(map_scenario,p)
+       then player_ValidateTeam:=player_GetScenarioFixedTeams(map_scenario,p)
        else
          case state of
-         ps_None : PlayerValidateTeam:=p;
+         ps_None : player_ValidateTeam:=p;
          ps_AI,
          ps_human: if(team>LastPlayer)
-                   then PlayerValidateTeam:=0
-                   else PlayerValidateTeam:=nt;
+                   then player_ValidateTeam:=0
+                   else player_ValidateTeam:=nt;
          end;
 end;
-procedure PlayersValidateTeam;
+procedure players_ValidateTeam;
 var p:byte;
 begin
    for p:=0 to LastPlayer do
      with g_PlayersGame[p] do
-       team:=PlayerValidateTeam(p,team);
+       team:=player_ValidateTeam(p,team);
 end;
 
-function PlayerStateString(p:byte):string4;
+function player_GetStateString(p:byte):string4;
 begin
-   PlayerStateString:='';
+   player_GetStateString:='';
    with g_PlayersGame[p] do
    with g_PlayersTemp[p] do
      case state of
-     ps_AI   : PlayerStateString:=str_ps_AI;
+     ps_AI   : player_GetStateString:=str_ps_AI;
      ps_Human: {$IFDEF _FULLGAME}
                if(LocalPlayer=p)
-               then PlayerStateString:=str_ps_Me
+               then player_GetStateString:=str_ps_Me
                else
                {$ENDIF}
                  if(net_ttl>=fr_fps1)
-                 then PlayerStateString:=str_ps_ttl
+                 then player_GetStateString:=str_ps_ttl
                  else
                    if(g_started)
-                   then PlayerStateString:=str_ps_Hum
-                   else PlayerStateString:=b2c[isready{$IFDEF _FULLGAME} or((net_status=ns_client)and(p=net_cl_Hoster)){$ENDIF}];
+                   then player_GetStateString:=str_ps_Hum
+                   else player_GetStateString:=b2c[isready{$IFDEF _FULLGAME} or((net_status=ns_client)and(p=net_cl_Hoster)){$ENDIF}];
      end;
 end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   OTHER
+//
+
 
 function KeyPoint_GetPlayerTeam(playerN:byte):byte;
 begin
@@ -1164,8 +1182,6 @@ begin
    if(playerN<MaxPlayers)then
      KeyPoint_GetPlayerTeam:=g_PlayersGame[playerN].team;
 end;
-
-////////////////////////////////////////////////////////////////////////////////
 
 function IsUnitRange(u:integer;ppu:PPTUnit):boolean;
 begin
@@ -1177,25 +1193,88 @@ begin
    end;
 end;
 
-function g_CheckRoyalBattlePoint(x,y,d:integer):boolean;
+////////////////////////////////////////////////////////////////////////////////
+//
+//   GAME COMMON
+//
+
+function game_CheckRoyalBattlePoint(x,y,sizeR:integer):boolean;
 begin
    if(map_scenario=mc_royale)
-   then g_CheckRoyalBattlePoint:=(point_dist_int(x,y,g_royal_Rx,g_royal_Ry)+d)>=g_royal_RCur
-   else g_CheckRoyalBattlePoint:=false;
-end;
-
-procedure Game_SetStatusWinnerTeam(team:byte);
-begin
-   if(team>LastPlayer)then exit;
-
-   g_status:=gs_win_team0+team;
-   GameLog_EndGame(team);
+   then game_CheckRoyalBattlePoint:=(point_dist_int(x,y,g_royal_Rx,g_royal_Ry)+sizeR)>=g_royal_RCur
+   else game_CheckRoyalBattlePoint:=false;
 end;
 
 function Game_IsEnded:boolean;
 begin
    Game_IsEnded:=(gs_win_team0<=g_status)and(g_status<=gs_win_team7);
 end;
+
+procedure game_SetStatusWinnerTeam(team:byte);
+begin
+   if(team>LastPlayer)
+   or(Game_IsEnded)then exit;
+
+   g_status:=gs_win_team0+team;
+   GameLog_EndGame(team);
+
+   {$IFDEF _FULLGAME}
+   if(not ui_ShowScores)then
+     ui_ToggleShowScores;
+   {$ENDIF}
+end;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//   GAME SCORES
+//
+
+
+procedure game_ScoresAddC(playerN,stype:byte;value:cardinal=1);
+begin
+   if(stype>psc_Last)
+   or(playerN>LastPlayer)then exit;
+
+   with g_PlayersScore[playerN] do
+     if((ps_data_c[stype]+value)<ps_data_c[stype].MaxValue)
+     then ps_data_c[stype]+=value
+     else ps_data_c[stype]:=ps_data_c[stype].MaxValue;
+end;
+
+procedure game_ScoresAddI(playerN,stype:byte;value:integer);
+begin
+   if(stype>psi_Last)
+   or(playerN>LastPlayer)then exit;
+
+   with g_PlayersScore[playerN] do
+     if(stype=psi_res_energy_max)
+     then ps_data_i[stype]:=max2i(ps_data_i[stype]      ,value)
+     else
+     begin
+        ps_data_i[stype]+=value;
+        if(ps_data_i[stype]<0)then ps_data_i[stype]:=ps_data_i[stype].MaxValue;
+     end;
+end;
+
+procedure game_ScoresInit;
+var p:byte;
+begin
+   FillChar(g_PlayersScore,SizeOf(g_PlayersScore),0);
+   for p:=0 to LastPlayer do
+     with g_PlayersGame[p] do
+       if(state>ps_none)then
+         with g_PlayersScore[p] do
+         begin
+            ps_name :=name;
+            ps_state:=state;
+
+            game_ScoresAddC(p,psc_units_created ,cardinal(units_bld_e[false]));
+            game_ScoresAddC(p,psc_builds_created,cardinal(units_bld_e[true ]));
+         end;
+end;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1254,6 +1333,7 @@ end;
 //   Unit/Upgrades Checks
 //
 
+{$IFDEF _FULLGAME}
 function upgrade_GetAffectedUIDs(upgr:byte):TSoB;
 var u,a:byte;
 begin
@@ -1282,6 +1362,7 @@ begin
             or(upgr=aw_impact_upgr)then upgrade_GetAffectedUIDs+=[u];
      end;
 end;
+{$ENDIF}
 
 function upgrade_GetEnergy(upgr,lvl:byte):integer;
 begin
@@ -1403,6 +1484,7 @@ false : if(units_unitProds_c<=0)then begin unit_CheckReqs:=lmt_unit_NeedProdUnit
    end;
 end;
 
+{$IFDEF _FULLGAME}
 function unit_PossibleTransports(uid:byte):boolean;
 var u:byte;
 begin
@@ -1415,6 +1497,7 @@ begin
           break;
        end;
 end;
+{$ENDIF}
 
 function unit_IsProducting(pu:PTUnit):boolean;
 var i:byte;
@@ -1826,7 +1909,7 @@ begin
       if(not offMenu)then exit;
    end;
 
-   if(GameNetServerList(false,check))then
+   if(game_NetServerList(false,check))then
    begin
       MenuBack:=true;
       if(check)then exit;
@@ -1911,7 +1994,7 @@ begin
    then PlayerGetCurrentTeam:=LastPlayer
    else
      if(map_scenario in mc_fixed_teams)
-     then PlayerGetCurrentTeam:=PlayerGetFixedTeams(map_scenario,player)
+     then PlayerGetCurrentTeam:=player_GetScenarioFixedTeams(map_scenario,player)
      else
        with g_PlayersGame[player] do
          if(g_Started)or(state>ps_none)
@@ -2042,7 +2125,7 @@ begin
    if(rpls_pstate>=rpls_read)
    then ui_ControlTabTypeF:=tcc_replay
    else
-     if((g_PlayersGame[LocalPlayer].isobserver)or(Game_IsEnded))and(g_type<>gt_campaing)
+     if(g_type<>gt_campaing)and((g_PlayersGame[LocalPlayer].isobserver)or(Game_IsEnded))
      then ui_ControlTabTypeF:=tcc_observer
      else ui_ControlTabTypeF:=tcc_controls;
 end;
@@ -2599,6 +2682,17 @@ begin
    while(ui_log_n<listHeight)do addLine('',0,0);
 end;
 
+procedure ui_ToggleShowScores;
+begin
+   if(not ui_ShowScores)then
+   begin
+      m_brush:=co_empty;
+      mouse_select_xs0:=NOTSET;
+      mouse_select_ys0:=NOTSET;
+   end;
+
+   ui_ShowScores:=not ui_ShowScores;
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

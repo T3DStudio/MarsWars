@@ -740,6 +740,7 @@ begin
    spr_uibtn_ReplayPOV         := gfx_ButtonLoad(folder_ui+'b_rvis'            ,ui_ButtonW1);
    spr_uibtn_markLook          := gfx_ButtonLoad(folder_ui+'b_markLook'        ,ui_ButtonW1);
    spr_uibtn_markAttack        := gfx_ButtonLoad(folder_ui+'b_markAttack'      ,ui_ButtonW1);
+   spr_uibtn_ShowScores        := gfx_ButtonLoad(folder_ui+'b_ShowScores'      ,ui_ButtonW1);
    spr_uibtn_AbilityUACGeneral := gfx_ButtonLoad(folder_ui+'b_UACGeneral'      ,ui_ButtonW1);
    spr_uibtn_AbilityBribe      := gfx_ButtonLoad(folder_ui+'b_Bribe'           ,ui_ButtonW1);
    spr_uibtn_AbilityHack       := gfx_ButtonLoad(folder_ui+'b_Hack'            ,ui_ButtonW1);

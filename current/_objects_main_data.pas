@@ -2183,7 +2183,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure GameObjectsInit;
+procedure game_InitGameDataAll;
 var u:integer;
 begin
    for u:=0 to MaxUnits do g_punits[u]:=@g_units[u];

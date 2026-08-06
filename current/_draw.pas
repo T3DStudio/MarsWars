@@ -35,7 +35,7 @@ begin
    {$ENDIF}
 end;
 
-procedure GameDraw;
+procedure game_Draw;
 var n:integer;
 begin
    ui_blink_timer1+=1;ui_blink_timer1:=ui_blink_timer1 mod ui_blink_period1;

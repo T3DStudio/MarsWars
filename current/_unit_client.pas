@@ -68,6 +68,16 @@ begin
    end;
 end;
 
+procedure wudata_lint(bt:longint;rpl:boolean);
+begin
+   case rpl of
+   {$IFDEF _FULLGAME}
+   true : replay_WriteBlock(SizeOf(bt),@bt);
+   {$ENDIF}
+   false: net_BufferBlock(true,SizeOf(bt),@bt);
+   end;
+end;
+
 procedure wudata_card(bt:cardinal;rpl:boolean);
 begin
    case rpl of
@@ -159,6 +169,31 @@ begin
         end;
      end;
    wudata_byte(0,rpl);
+end;
+
+procedure wudata_PlayersScores(rpl:boolean);
+var
+p,i,
+statb:byte;
+begin
+   statb:=0;
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+       if(ps_state>ps_none)then
+         SetBBit(@statb,p,true);
+
+   wudata_byte(statb,rpl);
+   if(statb>0)then
+     for p:=0 to LastPlayer do
+       with g_PlayersScore[p] do
+         if(ps_state>ps_none)then
+         begin
+            wudata_string(ps_name ,rpl);
+            wudata_byte  (ps_state,rpl);
+
+            for i:=0 to psc_Last do wudata_card(ps_data_c[i],rpl);
+            for i:=0 to psi_Last do wudata_lint(ps_data_i[i],rpl);
+         end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1088,6 +1123,15 @@ begin
    end;
 end;
 
+function rudata_lint(rpl:boolean;def:longint):longint;
+begin
+   rudata_lint:=def;
+   case rpl of
+   true : replay_ReadBlock(     SizeOf(rudata_lint),@rudata_lint);
+   false: net_BufferBlock(false,SizeOf(rudata_lint),@rudata_lint);
+   end;
+end;
+
 function rudata_card(rpl:boolean;def:cardinal):cardinal;
 begin
    rudata_card:=def;
@@ -1160,8 +1204,8 @@ begin
          end;
 
          if(x=255)
-         then PlayerAddLog(p,mtype,argt,argx,str,-1     ,-1     )
-         else PlayerAddLog(p,mtype,argt,argx,str,x shl 5,y shl 5);
+         then player_LogAdd(p,mtype,argt,argx,str,-1     ,-1     )
+         else player_LogAdd(p,mtype,argt,argx,str,x shl 5,y shl 5);
 
          s-=1;
       end;
@@ -1175,6 +1219,25 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+procedure rudata_PlayersScores(rpl:boolean);
+var
+p,i,
+statb:byte;
+begin
+   statb:=rudata_byte(rpl,0);
+   if(statb>0)then
+     for p:=0 to LastPlayer do
+       with g_PlayersScore[p] do
+         if(GetBBit(@statb,p))then
+         begin
+            ps_name :=rudata_string(rpl);
+            ps_state:=rudata_byte  (rpl,0);
+
+            for i:=0 to psc_Last do ps_data_c[i]:=rudata_card(rpl,0);
+            for i:=0 to psi_Last do ps_data_i[i]:=rudata_lint(rpl,0);
+         end
+         else ps_state:=ps_none;
+end;
 
 procedure rudata_bstat(uu:PTUnit;POVPlayer:byte;rpl:boolean);
 var byte1,

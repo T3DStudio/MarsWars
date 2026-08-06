@@ -307,7 +307,7 @@ begin
    {$I+}
    if(vr=g_version)then
    begin
-      Game_DefaultAll;
+      game_DefaultAll;
 
       {$I-}
       if(svld_itemn>1)then
@@ -325,7 +325,7 @@ begin
 
       if(ioresult<>0)then
       begin
-         Game_DefaultAll;
+         game_DefaultAll;
          svld_str_info1:=str_FileError_Open;
          svld_str_info2:='';
          svld_str_info3:='';
@@ -358,6 +358,8 @@ begin
 
       g_started:=true;
       UIPlayer:=LocalPlayer;
+
+      if(game_IsEnded)and(not ui_ShowScores)then ui_ToggleShowScores;
 
       MenuBack(true,false);
 

@@ -20,8 +20,8 @@ begin
             n_u          :=0;
             state        :=ps_human;
             isready      :=false;
-            PlayerClearLog(p);
-            PlayerSetDefault(p);
+            player_ClearLog(p);
+            player_SetDefaults(p);
             if(g_started)
             or(g_LobbyTimer>0)then isobserver:=true;
             {$IFNDEF _FULLGAME}
@@ -298,9 +298,9 @@ begin
             nmid_PlayerLeave     : begin
                                       GameLog_PlayerLeave(pid);
                                       case g_started of
-                                      false: PlayerSetState(pid,ps_None);
+                                      false: player_SetState(pid,ps_None);
                                       true : begin
-                                                PlayerKill(pid,true);
+                                                player_Kill(pid,true);
                                                 g_PlayersGame[pid].state:=ps_none;
                                              end;
                                       end;
@@ -369,7 +369,7 @@ begin
                                          menu_update:=true;
                                          {$ENDIF}
                                        end;
-                 nmid_PlayerSurrender: if(PlayerSurrender(pid,false))then menu_update:=true;
+                 nmid_PlayerSurrender: if(player_Surrender(pid,false))then menu_update:=true;
                  end
                else
                  case mid of
@@ -383,17 +383,17 @@ begin
                                                 i:=net_readbyte; // player-target
                                                 case mid of
                                                 {$IFNDEF _FULLGAME}
-                                                nmid_lobby_PAILevelScroll: if(PlayerAILevelScroll(i,pid,net_readbool,false))then menu_update:=true;
-                                                nmid_lobby_PAIToggle     : if(PlayerAIToggle     (i,pid             ,false))then menu_update:=true;
+                                                nmid_lobby_PAILevelScroll: if(player_AILevelScroll(i,pid,net_readbool,false))then menu_update:=true;
+                                                nmid_lobby_PAIToggle     : if(player_AIToggle     (i,pid             ,false))then menu_update:=true;
                                                 {$ENDIF}
-                                                nmid_lobby_PRace         : if(PlayerRaceScroll   (i,pid             ,false))then menu_update:=true;
-                                                nmid_lobby_PTeam         : if(PlayerTeamScroll   (i,pid,net_readbool,false))then menu_update:=true;
-                                                nmid_lobby_PJumpToSlot   : if(PlayersSwap        (i,pid             ,false))then menu_update:=true;
+                                                nmid_lobby_PRace         : if(player_RaceScroll   (i,pid             ,false))then menu_update:=true;
+                                                nmid_lobby_PTeam         : if(player_TeamScroll   (i,pid,net_readbool,false))then menu_update:=true;
+                                                nmid_lobby_PJumpToSlot   : if(players_Swap        (i,pid             ,false))then menu_update:=true;
                                                 end;
                                              end;
-                 nmid_lobby_PObserver      : if(PlayerToggleObserver(pid,pid,false))then menu_update:=true;
+                 nmid_lobby_PObserver      : if(player_ToggleObserver(pid,pid,false))then menu_update:=true;
                  {$IFNDEF _FULLGAME}
-                 nmid_lobby_MSeed          : if(GameMapSetSeed(pid,net_readcard,false))then menu_update:=true;
+                 nmid_lobby_MSeed          : if(game_MapSetSeed(pid,net_readcard,false))then menu_update:=true;
                  nmid_lobby_MScenario,
                  nmid_lobby_MGenerators,
                  nmid_lobby_MSize,
@@ -404,7 +404,7 @@ begin
                  nmid_lobby_GFixedPositions,
                  nmid_lobby_GAISlots,
                  nmid_lobby_GNewObservers,
-                 nmid_lobby_GRandomScirmish: if(GameSetOption(pid,mid,net_readbool,false))then menu_update:=true;
+                 nmid_lobby_GRandomScirmish: if(game_SetOption(pid,mid,net_readbool,false))then menu_update:=true;
                  {$ENDIF}
                  end;
             end;
@@ -450,6 +450,7 @@ begin
                gs_running    : wclinet_gframe(pid,net_SendTimeServer,false);
                gs_waitplayers: net_WritePlayersDelay;
                end;
+               if(game_IsEnded)then wudata_PlayersScores(false);
                net_send(net_ip,net_port);
             end;
 
@@ -491,7 +492,7 @@ end;
 procedure GameResetNetGame;
 begin
    net_dispose;
-   Game_DefaultAll;
+   game_DefaultAll;
    g_started :=false;
    net_status:=ns_none;
 end;
@@ -642,7 +643,7 @@ nmid_NotConnected: begin
                       g_started  :=false;
                       MainMenu   :=true;
                       PlayerReady:=false;
-                      Game_DefaultAll;
+                      game_DefaultAll;
                    end;
 nmid_LogUpdate   : begin
                       rudata_log(LocalPlayer,false);
@@ -667,7 +668,7 @@ nmid_LobbyInfo    : begin
                            if(svstarted)then
                            begin
                               race:=net_readbyte;
-                              PlayerSetSkirmishTech(i);
+                              player_SetSkirmishTech(i);
                            end
                            else race:=mrace;
                         end;
@@ -688,13 +689,13 @@ nmid_LobbyInfo    : begin
                          begin
                             MainMenu  :=false;
                             ServerSide:=false;
-                            GameLocalStart;
+                            game_LocalStart;
                          end
                          else
                          begin
                             MainMenu   :=true;
                             PlayerReady:=false;
-                            Game_DefaultAll;
+                            game_DefaultAll;
                          end;
                       end;
                    end;
@@ -706,7 +707,16 @@ nmid_GameData    : if(g_started)then
                       gs_running    : rclinet_gframe(LocalPlayer,net_SendTimeServer,false,false);
                       gs_waitplayers: net_ReadPlayersDelay;
                       end;
-                      if(g_status<>i)and(game_IsEnded)then Scenario_KeyPointsEndGameClientFix;
+                      if(game_IsEnded)then
+                      begin
+                         rudata_PlayersScores(false);
+                         if(g_status<>i)then
+                         begin
+                            Scenario_KeyPointsEndGameClientFix;
+                            if(not ui_ShowScores)then
+                              ui_ToggleShowScores;
+                         end;
+                      end;
                    end;
         end;
      end;

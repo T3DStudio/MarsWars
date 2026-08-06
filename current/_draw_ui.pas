@@ -562,6 +562,8 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,not iActEnabled(uid));
                        iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,not iActEnabled(uid));
 
+                       iAct_Control_ShowScores: draw_UIButtonS(tar,ux,uy,spr_uibtn_ShowScores,false,not iActEnabled(uid));
+
                        iAct_Replay_Fog,
                        iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog ,ui_fog,not iActEnabled(uid));
 
@@ -668,23 +670,6 @@ begin
            end;
 end;
 begin
-   {
-   {case m_uifocus of
-   mf_CtrlPanel  : begin
-                      SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);//m_btnN
-                      case ui_tab of
-                      tab_Units   : begin
-                                       SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
-                                       SetBBit(@ui_CursorItemActs,miat_MWhell  ,true);
-                                       if(InputActionPressed(iAct_mwu))then ui_ControlPanel_click(pct_left ,@clickSound); // mouse wheel up
-                                       if(InputActionPressed(iAct_mwd))then ui_ControlPanel_click(pct_right,@clickSound); // mouse wheel down
-                                    end;
-                      tab_Upgrades: SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
-                      end;
-                   end;
-   end;}
-   }
-
    case m_uifocus of
    mf_MiniMap  : SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
    mf_map      : case m_brush of
@@ -820,6 +805,144 @@ begin
                  2 : if(iActOn(iAct_InGamePause))then begin AddLine(@str_action_hint[iAct_InGamePause]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
                  end;
    end;
+end;
+
+procedure draw_PlayersScores;
+const
+ss_LeftCaptionsW = font_w1*21;
+ss_PlayerSecWh   = ((MaxPlayerNameLen+3)*font_w1) div 2;
+ss_BordersW      = font_w1;
+ss_UpCaptionH    = txt_line_h3;
+ss_LineH         = txt_line_h3;
+ss_LineHh        = txt_line_h3 div 2;
+ss_UpCaptionsH   = ss_UpCaptionH+ss_LineH;
+ss_PanelH        = ss_UpCaptionsH+(psc_Last+1)*ss_LineH+(psi_Last+1)*ss_LineH+ss_BordersW*2+font_w1;
+ss_PanelHh       = ss_PanelH div 2;
+var
+p,i,
+playerCount: byte;
+tx,ty,t,
+ss_PanelW,
+ss_PanelWh : integer;
+odd        : boolean;
+color      : cardinal;
+maxval_c,
+minval_c   : array[0..psc_Last] of cardinal;
+maxval_i,
+minval_i   : array[0..psi_Last] of longint;
+begin
+   playerCount:=0;
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+       if(ps_state>0)then
+         playerCount+=1;
+
+   for i:=0 to psc_Last do begin
+                              maxval_c[i]:=maxval_c[i].MinValue;
+                              minval_c[i]:=minval_c[i].MaxValue;
+                           end;
+   for i:=0 to psi_Last do begin
+                              maxval_i[i]:=maxval_i[i].MinValue;
+                              minval_i[i]:=minval_i[i].MaxValue;
+                           end;
+
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+     begin
+        for i:=0 to psc_Last do begin
+                                   if(ps_data_c[i]>maxval_c[i])then maxval_c[i]:=ps_data_c[i];
+                                   if(ps_data_c[i]<minval_c[i])then minval_c[i]:=ps_data_c[i];
+                                end;
+        for i:=0 to psi_Last do begin
+                                   if(ps_data_i[i]>maxval_i[i])then maxval_i[i]:=ps_data_i[i];
+                                   if(ps_data_i[i]<minval_i[i])then minval_i[i]:=ps_data_i[i];
+                                end;
+     end;
+
+
+   ss_PanelW :=ss_LeftCaptionsW+playerCount*ss_PlayerSecWh+ss_PlayerSecWh;
+   ss_PanelWh:=ss_PanelW div 2;
+
+   boxColor(vid_screen,ui_cam_hw-ss_PanelWh-ss_BordersW,
+                       ui_cam_hh-ss_PanelHh-ss_BordersW,
+                       ui_cam_hw+ss_PanelWh+ss_BordersW,
+                       ui_cam_hh+ss_PanelHh+ss_BordersW,c_black);
+   rectangleColor(vid_screen,ui_cam_hw-ss_PanelWh-ss_BordersW,
+                             ui_cam_hh-ss_PanelHh-ss_BordersW,
+                             ui_cam_hw+ss_PanelWh+ss_BordersW,
+                             ui_cam_hh+ss_PanelHh+ss_BordersW,c_ltgray);
+
+   draw_text(vid_screen,ui_cam_hw,ui_cam_hh-ss_PanelHh,str_ScoreScreen_Caption,ta_MU,255,c_white);
+   draw_text(vid_screen,ui_cam_hw,ui_cam_hh+ss_PanelHh,str_menuMsg_HintImg    ,ta_MB,255,c_white);
+
+   tx:=ui_cam_hw-ss_PanelWh+ss_LeftCaptionsW;
+   ty:=ui_cam_hh-ss_PanelHh+ss_UpCaptionsH+ss_LineHh;
+
+   for i:=0 to psc_Last do
+   begin
+      draw_text(vid_screen,tx,ty,str_ScoreScreenC[i],ta_RU,255,c_white);
+      ty+=ss_LineH;
+   end;
+   for i:=0 to psi_Last do
+   begin
+      draw_text(vid_screen,tx,ty,str_ScoreScreenI[i],ta_RU,255,c_white);
+      ty+=ss_LineH;
+   end;
+
+   odd:=true;
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+       if(ps_state>0)then
+       begin
+          tx+=ss_PlayerSecWh;
+          ty:=ui_cam_hh-ss_PanelHh+ss_UpCaptionH;
+          if(g_PlayersGame[p].isdefeated)
+          then t:=(length(ps_name)*font_w1) div 2
+          else t:=0;
+          case(odd)of
+          true : begin
+                    draw_text(vid_screen,tx,ty,ps_name,ta_MU,255,PlayerColorsSchemeCurNormal[p]);
+                    if(t>0)then
+                      lineColor(vid_screen,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
+                    ty+=ss_LineHh;
+                 end;
+          false: begin
+                    ty+=ss_LineHh;
+                    draw_text(vid_screen,tx,ty,ps_name,ta_MU,255,PlayerColorsSchemeCurNormal[p]);
+                    if(t>0)then
+                      lineColor(vid_screen,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
+                 end;
+          end;
+          ty+=ss_LineH;
+          odd:=not odd;
+
+          for i:=0 to psc_Last do
+          begin
+             color:=c_white;
+             if(maxval_c[i]<>minval_c[i])then
+               if(minval_c[i]=ps_data_c[i])
+               then color:=c_gray
+               else
+                 if(maxval_c[i]=ps_data_c[i])
+                 then color:=c_yellow;
+
+             draw_text(vid_screen,tx,ty,c2s(ps_data_c[i]),ta_MU,255,color);
+             ty+=ss_LineH;
+          end;
+          for i:=0 to psi_Last do
+          begin
+             color:=c_white;
+             if(maxval_i[i]<>minval_i[i])then
+               if(minval_i[i]=ps_data_i[i])
+               then color:=c_gray
+               else
+                 if(maxval_i[i]=ps_data_i[i])
+                 then color:=c_yellow;
+
+             draw_text(vid_screen,tx,ty,li2s(ps_data_i[i]),ta_MU,255,color);
+             ty+=ss_LineH;
+          end;
+       end;
 end;
 
 procedure draw_ReplayProgress(tar:pSDL_Surface);
@@ -1014,9 +1137,9 @@ begin
         for i:=0 to slist_n-1 do
           draw_text(tar,x,y+txt_line_h2*i,slist_l[i],ta_LU,255,c_white);
      end;
-   {{$IFDEF TESTMODE}
+   {$IFDEF TESTMODE}
    if(TestMode>0)then draw_text(tar,ui_cam_hw,ui_cam_hh,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
-   {$ENDIF}  }
+   {$ENDIF}
 
    if(vid_ShowFPS           )then draw_text(tar,ui_FPSx,ui_FPSy,'FPS: '+c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')',ta_LU,255,c_white);
 
@@ -1156,6 +1279,9 @@ begin
                         mouse_select_ys0-ui_cam_y, mouse_x, mouse_y, PlayerGetColorCur(UIPlayer,false));
 
    draw_sdlsurface(tar,ui_UIPanelX,ui_UIPanelY,ui_UIPanel);
+
+   if(ui_ShowScores)then
+     draw_PlayersScores;
 
    draw_UIMouseCursor(tar);
 end;

@@ -60,6 +60,9 @@ begin
                 {$IFDEF _FULLGAME}
                 unit_CalcFogR(pu);
                 {$ENDIF}
+                if(uid_isbuilding)
+                then //game_ScoresAddC(playeri,psc_builds_resurrected)
+                else game_ScoresAddC(playeri,psc_units_resurected);
                 GameLog_UnitResurrected(pu);
                 unit_IncCounters_Complete(pu);
              end;
@@ -148,14 +151,25 @@ begin
          {$ENDIF}
          begin
             unit_kill(pTarget,false,(hits-damage)<=uid_FastDeathHits,true,false,false);
-            if(playerDDealer<=LastPlayer)and(iscomplete)then
-              with g_PlayersGame[playerDDealer] do
-                if(team<>player^.team)then
-                begin
-                   if(race<>r_hell)then
-                   res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
-                   res_UACLoot  :=min2i(UACLoot_Max  ,res_UACLoot  +uid_bounty_UACLoot  );
-                end;
+            if(playerDDealer<=LastPlayer)then
+            begin
+               if(uid_isbuilding)
+               then game_ScoresAddC(playerDDealer,psc_builds_destroyed)
+               else game_ScoresAddC(playerDDealer,psc_units_destroyed );
+
+               if(iscomplete)then
+                 with g_PlayersGame[playerDDealer] do
+                   if(team<>player^.team)then
+                   begin
+                      if(race<>r_hell)then
+                      res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
+                      res_UACLoot  :=min2i(UACLoot_Max  ,res_UACLoot  +uid_bounty_UACLoot  );
+
+                      if(race<>r_hell)then
+                      game_ScoresAddI(playerDDealer,psi_res_HellPower,uid_bounty_HellPower);
+                      game_ScoresAddI(playerDDealer,psi_res_UACLoot  ,uid_bounty_UACLoot  );
+                   end;
+            end;
          end;
       end
       else
@@ -549,9 +563,7 @@ begin
    if(pResurrector<>nil)then
      if(pTarget^.player^.team<>pResurrector^.player^.team)then
      begin
-        unit_add(pTarget^.x,pTarget^.y,pResurrector^.unum,pTarget^.uidi,pResurrector^.playeri,true,false,pTarget^.level);
-
-        if(LastCreatedUnit>0)then
+        if(unit_add(pTarget^.x,pTarget^.y,pResurrector^.unum,pTarget^.uidi,pResurrector^.playeri,true,false,pTarget^.level))then
           with LastCreatedUnitP^ do
           begin
              hits:=pTarget^.hits;
@@ -1159,6 +1171,7 @@ end;
 function unit_TryZombification(pPhantom,pTarget:PTUnit):boolean;
 var
 hit_prcnt: single;
+phantom,
 old_u    : TUnit;
  _zuid   : PTUID;
 _ppla    : PTPlayerGameData;
@@ -1189,6 +1202,7 @@ begin
    if(ServerSide)then
    {$ENDIF}
    begin
+      phantom:=pPhantom^;
       old_u:=pTarget^;
       old_u.group:=pPhantom^.group;
       hit_prcnt:=pTarget^.hits/pTarget^.uid^.uid_MaxHits1;
@@ -1199,7 +1213,7 @@ begin
       unit_kill(pPhantom,true,true,false,false,true);
       _ppla^.units_all_e-=1;
       _ppla^.units_all_c-=1;
-      unit_add(pTarget^.x,pTarget^.y,pPhantom^.unum,pTarget^.uid^.uid_ZombieUID,pPhantom^.playeri,true,true,old_u.level);
+      unit_add(pTarget^.x,pTarget^.y,phantom.unum,pTarget^.uid^.uid_ZombieUID,phantom.playeri,true,true,old_u.level);
       unit_kill(pTarget,true,true,false,false,true);
 
       if(LastCreatedUnit>0)then
@@ -1219,7 +1233,11 @@ begin
          begin
             unit_DecCounters_Kill(LastCreatedUnitP);
             unit_StartResurrection(nil,LastCreatedUnitP,false);
-         end;
+         end
+         else
+           if(uid^.uid_isbuilding)
+           then game_ScoresAddC(phantom.playeri,psc_builds_captured)
+           else game_ScoresAddC(phantom.playeri,psc_units_captured );
       end;
    end;
    unit_TryZombification:=true;
@@ -1531,6 +1549,9 @@ begin
            else energyCur_BldOther-=uid_req_EnergyLevel;
            res_energyl_cur +=uid_req_EnergyLevel;
            GameLog_UnitReady(pu);
+           if(uid_isbuilding)
+           then game_ScoresAddC(playeri,psc_builds_created)
+           else game_ScoresAddC(playeri,psc_units_created );
         end;
      end;
 end;
@@ -2274,6 +2295,9 @@ begin
                     if(level<LastUnitLevel)then
                       unit_morph(pu,transformUID,true,integer.MaxValue,level+1,false,false);
                   GameLog_UnitReady(pu);
+                  if(uid_isbuilding)
+                  then game_ScoresAddC(playeri,psc_builds_created)
+                  else game_ScoresAddC(playeri,psc_units_created );
                end;
             end
             else

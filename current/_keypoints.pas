@@ -324,6 +324,6 @@ begin
        end;
 
    if(kp_captured_n>0)and(wteam_n=kp_captured_n)and(wteam<=LastPlayer)then
-     Game_SetStatusWinnerTeam(wteam);
+     game_SetStatusWinnerTeam(wteam);
 end;
 

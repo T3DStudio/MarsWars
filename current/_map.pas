@@ -1185,14 +1185,14 @@ gt_none,
 gt_scirmish: begin
    {$ENDIF}
              map_GenOnObstacle:=true;
-             Game_ShuffleAINames;
+             game_ShuffleAINames;
 
              map_BaseVars(true);
 
              map_ObstaclesGap:= 50;
              map_PStartsGap  := base_r1;
              map_SetScenarioMaxPlayers;
-             Game_RemoveAIObservers;
+             game_RemoveAIObservers;
              game_RoyalSetCenter(map_SizeH,map_SizeH);
 
              map_ScirmishPlayersStarts;

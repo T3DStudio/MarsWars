@@ -655,10 +655,10 @@ begin
 end;
 
 
-function InitSound:boolean;
+function sound_Init:boolean;
 var r:integer;
 begin
-   InitSound:=false;
+   sound_Init:=false;
 
    if(not InitOpenAL)then exit;
 
@@ -948,7 +948,7 @@ begin
    snd_arachno_foot         :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'arachnotron\d_ar_f');
    snd_arachno_ready        :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'arachnotron\d_ar_c');
 
-   InitSound:=true;
+   sound_Init:=true;
 end;
 
 

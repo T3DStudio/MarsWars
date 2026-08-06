@@ -477,7 +477,7 @@ color:TMWColor;
 function TeamChar(p:byte):char;
 begin
    if(map_scenario in mc_fixed_teams)
-   then TeamChar:=b2s(PlayerGetFixedTeams(map_scenario,p)+1)[1]
+   then TeamChar:=b2s(player_GetScenarioFixedTeams(map_scenario,p)+1)[1]
    else TeamChar:=b2s(g_PlayersGame[p].team+1)[1]
 end;
 function AISlotsSOpt:shortstring;
@@ -522,7 +522,7 @@ begin
 
           if(state=ps_AI)and(menu_items[mi_Players_State0 +p].mi_state=as_enabled)
      then drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,'-'+str_ps_AI       ,color)
-     else drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,PlayerStateString(p),color);
+     else drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,player_GetStateString(p),color);
 
           drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name                ,color);
           if(g_started)and(length(name)>0)then
@@ -554,7 +554,7 @@ begin
           begin
              drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,ai_name(g_AISlots,p)                      ,c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[r_random]                        ,c_gray);
-             drawmenu_ItemTextC(tar,mi_Players_Team0+p,ta_MM,b2s(PlayerGetFixedTeams(map_scenario,p)+1),c_gray);
+             drawmenu_ItemTextC(tar,mi_Players_Team0+p,ta_MM,b2s(player_GetScenarioFixedTeams(map_scenario,p)+1),c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Obs0 +p,ta_MM,str_YesNoG[false]                         ,c_gray);
           end;
           if(g_started)then
@@ -727,10 +727,10 @@ begin
    //vlineColor(tar,menu_w-1,0,menu_h,c_white);
    //vlineColor(tar,400,0,600,c_yellow);
 
-  { {$IFDEF TESTMODE}
+   {$IFDEF TESTMODE}
    if(TestMode>0)then
    draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
-   {$ENDIF} }
+   {$ENDIF}
 
    // MENU ITEMS
 
@@ -774,7 +774,10 @@ else drawmenu_ItemText1(tar,mi_SaveLoad         ,str_menu_LoadGame     ,0);
 
    if(rpls_pstate=rpls_read)
 then drawmenu_ItemText1(tar,mi_Break            ,str_menu_PlaybackStop ,0)
-else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
+else
+   if(game_IsEnded)
+   then drawmenu_ItemText1(tar,mi_Break         ,str_menu_MissionEnd   ,0)
+   else drawmenu_ItemText1(tar,mi_Break         ,str_menu_MissionAbort ,0);
 
    drawmenu_ItemText1(tar,mi_Back               ,str_menu_Back         ,0);
    drawmenu_ItemText1(tar,mi_Exit               ,str_menu_Exit         ,0);
@@ -881,7 +884,6 @@ else drawmenu_ItemText1(tar,mi_Break            ,str_menu_Abort        ,0);
 end;
 
 procedure draw_Menu;
-var tx,ty:integer;
 begin
    if(menu_redraw_pause>0)then menu_redraw_pause-=1;
    if(menu_redraw)and(menu_redraw_pause=0)then
