@@ -356,10 +356,11 @@ begin
       ui_cam_y-=ui_cam_h div 2;
       ui_Camera_Bounds;
 
+      menu_update:=true;
       g_started:=true;
       UIPlayer:=LocalPlayer;
 
-      if(game_IsEnded)and(not ui_ShowScores)then ui_ToggleShowScores;
+      if(game_IsEnded)and(not ui_ScoresShow)then ui_ToggleShowScores;
 
       MenuBack(true,false);
 

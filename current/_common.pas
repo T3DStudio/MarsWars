@@ -52,6 +52,7 @@ procedure ability_UACStrike_missile(playeri:byte;fromx,fromy,tox,toy:integer);fo
 
 function gfx_uid2spr(auid:byte;dir:integer;level:byte):PTMWTexture;forward;
 function gfx_ShadowColor(c:TMWColor):TMWColor;forward;
+procedure gfx_MakeScoreSurface;forward;
 
 function game_PauseToggle(check:boolean):boolean;forward;
 function game_NetServerList(start,check:boolean):boolean;forward;
@@ -85,7 +86,7 @@ function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 
 procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);forward;
 function map_ObstacleR(obs_f:byte):integer;forward;
-procedure map_RedrawMenuMinimap;forward;
+procedure map_RedrawMenuMinimap; forward;
 
 function Float2Str(s:single):shortstring;
 var l:byte;
@@ -1219,7 +1220,7 @@ begin
    GameLog_EndGame(team);
 
    {$IFDEF _FULLGAME}
-   if(not ui_ShowScores)then
+   if(not ui_ScoresShow)then
      ui_ToggleShowScores;
    {$ENDIF}
 end;
@@ -1261,14 +1262,18 @@ end;
 procedure game_ScoresInit;
 var p:byte;
 begin
+   {$IFDEF _FULLGAME}
+   ui_ScoresRebuild:=true;
+   {$ENDIF}
    FillChar(g_PlayersScore,SizeOf(g_PlayersScore),0);
    for p:=0 to LastPlayer do
      with g_PlayersGame[p] do
-       if(state>ps_none)then
+       if(state>ps_none)and(not isobserver)then
          with g_PlayersScore[p] do
          begin
             ps_name :=name;
             ps_state:=state;
+            ps_race :=race;
 
             game_ScoresAddC(p,psc_units_created ,cardinal(units_bld_e[false]));
             game_ScoresAddC(p,psc_builds_created,cardinal(units_bld_e[true ]));
@@ -2130,6 +2135,40 @@ begin
      else ui_ControlTabTypeF:=tcc_controls;
 end;
 
+function ui_GameControlsEnabled:boolean;
+begin
+   ui_GameControlsEnabled:=false;
+   if(MainMenu)
+   or(g_status<>gs_running)
+   or(not g_started)
+   or(UIPlayer<>LocalPlayer)
+   or(rpls_pstate=rpls_read)
+   or(ui_ScoresShow)then exit;
+   with g_PlayersGame[LocalPlayer] do
+     if(isobserver)
+     or(isdefeated)then exit;
+   ui_GameControlsEnabled:=true;
+end;
+
+procedure ui_unit2Tab(pu:PTUnit);
+begin
+   if(pu<>nil)then
+     with pu^ do
+     with uid^ do
+     begin
+        ui_tab:=3;
+        if(iscomplete)then
+          if(uid_isbuilder)
+          then ui_tab:=0
+          else
+            if(uid_isbarrack)
+            then ui_tab:=1
+            else
+              if(uid_isforge)
+              then ui_tab:=2;
+     end;
+end;
+
 function ui_UnitNeedDrawRange(pu:PTUnit):boolean;
 begin
    with pu^  do
@@ -2684,14 +2723,14 @@ end;
 
 procedure ui_ToggleShowScores;
 begin
-   if(not ui_ShowScores)then
+   if(not ui_ScoresShow)then
    begin
       m_brush:=co_empty;
       mouse_select_xs0:=NOTSET;
       mouse_select_ys0:=NOTSET;
    end;
 
-   ui_ShowScores:=not ui_ShowScores;
+   ui_ScoresShow:=not ui_ScoresShow;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

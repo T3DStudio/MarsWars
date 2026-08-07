@@ -648,9 +648,9 @@ PTLogMes = ^TLogMes;
 
 
 TPlayerDataScore = record
-   // data on start
    ps_name      : shortstring;
-   ps_state     : byte;
+   ps_state,
+   ps_race      : byte;
 
    ps_data_c    : array[0..psc_Last] of cardinal;
    ps_data_i    : array[0..psi_Last] of longint;

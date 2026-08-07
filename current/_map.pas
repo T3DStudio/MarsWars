@@ -1214,6 +1214,7 @@ gt_campaing: begin
    map_Obstacles_SetDrawData;
    map_Decals_Create;
    map_RedrawMenuMinimap;
+   menu_redraw:=true;
    {$ENDIF}
 end;
 

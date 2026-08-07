@@ -8,8 +8,9 @@ begin
 end;
 
 procedure gfx_MakeScreenshot;
-var i:integer;
-    s:shortstring;
+var   i:integer;
+      s:shortstring;
+pngsurf:pSDL_Surface;
 begin
    i:=0;
    repeat
@@ -18,8 +19,11 @@ begin
    until not FileExists(s);
    if(not MainMenu)then
      GameLog_Chat(255,LocalPlayer,s);
+   pngsurf:=SDL_PNGFormatAlpha(vid_screen);
    s:=s+#0;
-   sdl_saveBMP(vid_screen,@s[1]);
+   //sdl_saveBMP(vid_screen,@s[1]);
+   SDL_SavePNG(pngsurf,@s[1]);
+   sdl_FreeSurface(pngsurf);
 end;
 
 function gfx_ShadowColor(c:TMWColor):TMWColor;
@@ -598,6 +602,161 @@ begin
    end;
 
    gfx_FreeSDLSurface(fsurf);
+end;
+
+procedure gfx_MakeScoreSurface;
+const
+ss_LeftCaptionsW = font_w1*22;
+ss_PlayerSecWh   = ((MaxPlayerNameLen+3)*font_w1) div 2;
+ss_BordersW      = font_w1;
+ss_UpCaptionH    = txt_line_h3;
+ss_LineH         = txt_line_h3;
+ss_LineHh        = txt_line_h3 div 2;
+ss_UpCaptionsH   = ss_UpCaptionH+ss_LineH;
+ss_PanelH        = ss_UpCaptionsH+(psc_Last+1)*ss_LineH+(psi_Last+1)*ss_LineH+ss_BordersW*2+font_w1;
+ss_ScaleH        = vid_minh-ss_PanelH;
+var
+p,i,
+playerCount: byte;
+tx,ty,t,
+ss_PanelW,
+ss_PanelWh : integer;
+odd        : boolean;
+color      : cardinal;
+rchar      : char;
+tsurf      : pSDL_Surface;
+maxval_c,
+minval_c   : array[0..psc_Last] of cardinal;
+maxval_i,
+minval_i   : array[0..psi_Last] of longint;
+begin
+   gfx_FreeSDLSurface(ui_ScoresSurf);
+
+   playerCount:=0;
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+       if(ps_state>0)then
+         playerCount+=1;
+
+   for i:=0 to psc_Last do begin
+                              maxval_c[i]:=maxval_c[i].MinValue;
+                              minval_c[i]:=minval_c[i].MaxValue;
+                           end;
+   for i:=0 to psi_Last do begin
+                              maxval_i[i]:=maxval_i[i].MinValue;
+                              minval_i[i]:=minval_i[i].MaxValue;
+                           end;
+
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+       if(ps_state>0)then
+       begin
+          for i:=0 to psc_Last do begin
+                                     if(ps_data_c[i]>maxval_c[i])then maxval_c[i]:=ps_data_c[i];
+                                     if(ps_data_c[i]<minval_c[i])then minval_c[i]:=ps_data_c[i];
+                                  end;
+          for i:=0 to psi_Last do begin
+                                     if(ps_data_i[i]>maxval_i[i])then maxval_i[i]:=ps_data_i[i];
+                                     if(ps_data_i[i]<minval_i[i])then minval_i[i]:=ps_data_i[i];
+                                  end;
+       end;
+
+   ss_PanelW :=ss_LeftCaptionsW+playerCount*ss_PlayerSecWh+ss_PlayerSecWh+ss_BordersW*2;
+   ss_PanelWh:=ss_PanelW div 2;
+
+   ui_ScoresSurf:=gfx_CreateSDLSurface(ss_PanelW,
+                                       ss_PanelH);
+
+   boxColor      (ui_ScoresSurf,0,0,
+                                ss_PanelW-1,
+                                ss_PanelH-1,c_black);
+   rectangleColor(ui_ScoresSurf,0,0,
+                                ss_PanelW-1,
+                                ss_PanelH-1,c_ltgray);
+
+    draw_text(ui_ScoresSurf,ss_PanelWh,font_wh          ,str_ScoreBoard_Caption,ta_MU,255,c_white);
+    draw_text(ui_ScoresSurf,ss_PanelWh,ss_PanelH-font_wh,str_menuMsg_HintImg    ,ta_MB,255,c_white);
+
+    tx:=font_wh+ss_LeftCaptionsW;
+    ty:=font_wh+ss_UpCaptionsH+ss_LineHh;
+
+    for i:=0 to psc_Last do
+    begin
+       draw_text(ui_ScoresSurf,tx,ty,str_ScoreBoardC[i],ta_RU,255,c_white);
+       ty+=ss_LineH;
+    end;
+    for i:=0 to psi_Last do
+    begin
+       draw_text(ui_ScoresSurf,tx,ty,str_ScoreBoardI[i],ta_RU,255,c_white);
+       ty+=ss_LineH;
+    end;
+
+    odd:=true;
+    for p:=0 to LastPlayer do
+      with g_PlayersScore[p] do
+        if(ps_state>0)then
+        begin
+           tx+=ss_PlayerSecWh;
+           ty:=font_wh+ss_UpCaptionH;
+           if(g_PlayersGame[p].isdefeated)
+           then t:=(length(ps_name)*font_w1) div 2
+           else t:=0;
+           case ps_race of
+           r_hell: rchar:=tc_RankHell;
+           r_uac : rchar:=tc_RankUAC;
+           else    rchar:='?'
+           end;
+
+           case(odd)of
+           true : begin
+                     draw_text(ui_ScoresSurf,tx,ty,rchar+ps_name+' ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
+                     if(t>0)then
+                       lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
+                     ty+=ss_LineHh;
+                  end;
+           false: begin
+                     ty+=ss_LineHh;
+                     draw_text(ui_ScoresSurf,tx,ty,rchar+ps_name+' ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
+                     if(t>0)then
+                       lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
+                  end;
+           end;
+           ty+=ss_LineH;
+           odd:=not odd;
+
+           for i:=0 to psc_Last do
+           begin
+              color:=c_white;
+              if(maxval_c[i]<>minval_c[i])then
+                if(minval_c[i]=ps_data_c[i])
+                then color:=c_gray
+                else
+                  if(maxval_c[i]=ps_data_c[i])
+                  then color:=c_yellow;
+
+              draw_text(ui_ScoresSurf,tx,ty,c2s(ps_data_c[i]),ta_MU,255,color);
+              ty+=ss_LineH;
+           end;
+           for i:=0 to psi_Last do
+           begin
+              color:=c_white;
+              if(maxval_i[i]<>minval_i[i])then
+                if(minval_i[i]=ps_data_i[i])
+                then color:=c_gray
+                else
+                  if(maxval_i[i]=ps_data_i[i])
+                  then color:=c_yellow;
+
+              draw_text(ui_ScoresSurf,tx,ty,li2s(ps_data_i[i]),ta_MU,255,color);
+              ty+=ss_LineH;
+           end;
+        end;
+
+   tsurf:=ui_ScoresSurf;
+   ui_ScoresSurf:=gfx_ResizeSurface(ui_ScoresSurf,(vid_vh-ss_ScaleH)/ss_PanelH);
+   SDL_SetColorKey(ui_ScoresSurf,SDL_RLEACCEL,1);
+
+   gfx_FreeSDLSurface(tsurf);
 end;
 
 procedure gfx_LoadFont(fname:shortstring);

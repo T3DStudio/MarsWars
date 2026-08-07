@@ -289,7 +289,9 @@ ui_fog_ey         : integer = 0;
 ui_language       : boolean = false;
 ui_tab_Auto       : boolean = true;
 
-ui_ShowScores     : boolean = true;
+ui_ScoresShow     : boolean = true;
+ui_ScoresRebuild  : boolean = false;
+ui_ScoresSurf     : pSDL_Surface = nil;
 
 ui_CommandercPU   : PTUnit = nil;
 ui_CommandercD    : integer = 0;
@@ -1149,6 +1151,7 @@ str_hint_Except,
 str_hint_UnitArming,
 str_hint_Abilities,
 str_hint_SplashResist,
+str_hint_FlyLikeTarget,
 str_hint_SightR,
 str_hint_MaxQuantity,
 str_hint_builder,
@@ -1347,7 +1350,8 @@ str_observer,
 str_net_Ready,
 str_net_UDPPort,
 str_net_ServerLANAdv,
-str_net_ConnectedToDed,
+str_net_ConnectedTo,
+str_net_DedicatedServer,
 str_net_Quality,
 str_net_Address,
 
@@ -1359,7 +1363,7 @@ str_PT_Color,
 str_PT_Ping,
 str_PT_Obs,
 
-str_ScoreScreen_Caption,
+str_ScoreBoard_Caption,
 
 str_Caption_Server,
 str_Caption_Client,
@@ -1370,8 +1374,8 @@ str_Caption_NetSvList,
 str_Caption_Map,
 str_Caption_Players      : shortstring;
 
-str_ScoreScreenC         : array[0..psc_Last] of shortstring;
-str_ScoreScreenI         : array[0..psi_Last] of shortstring;
+str_ScoreBoardC          : array[0..psc_Last] of shortstring;
+str_ScoreBoardI          : array[0..psi_Last] of shortstring;
 
 str_NetQualityL,
 str_ReplayQualityL       : array[0..net_MaxQuality] of shortstring;

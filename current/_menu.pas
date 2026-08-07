@@ -160,6 +160,7 @@ begin
    theme_map_pTerrain:=255;
    gfx_MapMakeTerrain;
    menu_update:=true;
+   ui_ScoresRebuild:=true;
 end;
 
 procedure menu_ToggleRecord;
@@ -1050,7 +1051,7 @@ begin
       if(rpls_list_sel>0)then
       begin
          rpls_list_sel-=1;
-         replay_MenuSelectedInfo;
+         replay_Select;
          menu_FixScroll(@rpls_list_scroll,rpls_list_sel,menu_BaseList1H);
          menu_KeyUp:=true;
       end;
@@ -1061,7 +1062,7 @@ begin
         if(svld_list_sel>0)then
         begin
            svld_list_sel-=1;
-           saveload_MenuSelectedInfo;
+           saveload_Select;
            menu_FixScroll(@svld_list_scroll,svld_list_sel,menu_BaseList1H);
            menu_KeyUp:=true;
         end;
@@ -1088,7 +1089,7 @@ begin
       if(rpls_list_sel<(rpls_list_Size-1))then
       begin
          rpls_list_sel+=1;
-         replay_MenuSelectedInfo;
+         replay_Select;
          menu_FixScroll(@rpls_list_scroll,rpls_list_sel,menu_BaseList1H);
          menu_KeyDown:=true;
       end;
@@ -1099,7 +1100,7 @@ begin
         if(svld_list_sel<(svld_list_Size-1))then
         begin
            svld_list_sel+=1;
-           saveload_MenuSelectedInfo;
+           saveload_Select;
            menu_FixScroll(@svld_list_scroll,svld_list_sel,menu_BaseList1H);
            menu_KeyDown:=true;
         end;
@@ -1179,7 +1180,7 @@ mi_SG_RightClickAction : if(not check)then m_RightClickAct :=not m_RightClickAct
 mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(item,@ui_CamSpeed,1,ui_MaxCamSpeed);
 mi_SG_MouseScroll      : if(not check)then ui_MouseScroll  :=not ui_MouseScroll;
 mi_SG_PlayerName       : ;
-mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;end;
+mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;ui_ScoresRebuild:=true;end;
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(true);
 mi_SG_ControlPanelAuto : if(not check)then ui_tab_Auto:=not ui_tab_Auto;
 mi_SG_ShowPlayerScrns  : if(not check)then ui_PlayersScreens:=not ui_PlayersScreens;

@@ -5,15 +5,15 @@ MarsWars: HELL & UAC
 <div align="center"><table bgcolor="#000000" width="1000" border="1" bordercolor="#ffffff" background="../graphic/map/terrains/ter11.png">
 <tr><td align="center" ><b><font size="66" color="#D8893A">MarsWars: HELL & UAC</font></b></td></tr>
 <tr><td align="left">
-<a href="#Credits"><u><b>10. Credits</b></u></a><br>
-<a href="#Game Controls"><u><b>11. Game Controls</b></u></a><br>
-<a href="#Game Hotkeys"><u><b>12. Game Hotkeys</b></u></a><br>
-<a href="#Game UI"><u><b>13. Game UI</b></u></a><br>
-<a href="#Game Mechanics"><u><b>14. Game Mechanics</b></u></a><br>
-<a href="#Units Info"><u><b>15. Units Info</b></u></a><br>
-<a href="#Units Balance"><u><b>16. Units Balance</b></u></a><br>
-<a href="#Upgrades Info"><u><b>17. Upgrades Info</b></u></a><br>
-<a href="#Other"><u><b>18. Other</b></u></a><br>
+<a href="#Credits"><u><b>1. Credits</b></u></a><br>
+<a href="#Game Controls"><u><b>2. Game Controls</b></u></a><br>
+<a href="#Game Hotkeys"><u><b>3. Game Hotkeys</b></u></a><br>
+<a href="#Game UI"><u><b>4. Game UI</b></u></a><br>
+<a href="#Game Mechanics"><u><b>5. Game Mechanics</b></u></a><br>
+<a href="#Units Info"><u><b>6. Units Info</b></u></a><br>
+<a href="#Units Balance"><u><b>7. Units Balance</b></u></a><br>
+<a href="#Upgrades Info"><u><b>8. Upgrades Info</b></u></a><br>
+<a href="#Other"><u><b>9. Other</b></u></a><br>
 <br><center><h2 id="Credits"><b>Credits</b></h2></center><br>
 <font color="FF8C00">MarsWars: HELL & UAC</font> - is a real-time strategy game based on Doom 2 
 universe. Current version is v54.<br>
@@ -184,7 +184,7 @@ production (<font color="00FF00">Ctrl</font>+<font color="00FF00">C</font>)" ord
 <font color="00FF00">PAUSE</font>: toggle pause(multiplayer)<br>
 <font color="00FF00">ESCAPE</font>: toggle menu<br>
 <font color="00FF00">TAB</font>: switch control panel tab<br>
-<font color="00FF00">PRINT SCREEN</font>: make *.bmp screenshot<br>
+<font color="00FF00">PRINT SCREEN</font>: make *.png screenshot<br>
 <font color="00FF00">Alt</font>+<font color="00FF00">RETURN</font>: toggle "Windowed" option<br>
 <br>
 <br>
@@ -224,6 +224,8 @@ unit<br>
 <br>
 <font color="00FF00">R</font> <font color="00FF00">T</font> <font color="00FF00">Y</font> <font color="00FF00">F</font> <font color="00FF00">G</font> <font color="00FF00">H</font> <font color="00FF00">V</font> <font color="00FF00">B</font> <font color="00FF00">N</font> <font color="00FF00">U</font> <font color="00FF00">I</font> <font color="00FF00">O</font> <font color="00FF00">J</font> <font color="00FF00">K</font> <font color="00FF00">L</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">R</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">T</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">Y</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">F</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">G</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">H</font> 
 <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">B</font> <font color="00FF00">Ctrl</font>+<font color="00FF00">N</font>: production hotkeys<br>
+<br>
+<font color="00FF00">Alt</font>: show unit`s rects and circles<br>
 <br>
 <br>
 <b><font color="FF8C00">REPLAY PLAYBACK HOTKEYS</font></b>
@@ -1080,6 +1082,8 @@ Command Center
 <br><font color="00FF00">Produced by: </font>Zombie Barracks
 <br>Description: Maximum quantity: 20.
 <br><br>
+<br>Becomes [<font color="00FF00">GROUND</font>] when attacking [<font color="00FF00">GROUND</font>] targets
+<br><br>
 <br>Arming:
 <br>- melee attack, max. range: 8, targets: [<font color="00FF00">ALIVE</font>], base 
 impact <font color="FF0000">15</font>, 1 hits per sec., upgrade: "Claws and 
@@ -1120,6 +1124,8 @@ Teeth"(+7), factor: 300%
 <br><font color="00FF00">Produced by: </font>Zombie Barracks
 <br>Description: Maximum quantity: 20.
 <br><br>
+<br>Becomes [<font color="00FF00">GROUND</font>] when attacking [<font color="00FF00">GROUND</font>] targets
+<br><br>
 <br>Arming:
 <br>- melee attack, max. range: 8, +zombification, targets: 
 [<font color="00FF00">GROUND</font>,<font color="00FFFF">FLYING</font>], base impact <font color="FF0000">15</font>, 1 hits per sec., 
@@ -1150,7 +1156,7 @@ Teeth"(+7), factor: 300%
 <br>Always fast death: NO
 <br>Energy required: <font color="00FFFF">250</font>
 <br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">15</font>
+<br>Build time: <font color="FFFFFF">12</font>
 <br>Size: 11
 <br>Base speed: 10
 <br>Base sight range: 200
@@ -1172,7 +1178,6 @@ upgrade: "Hell Firepower"(+7), factor: 200%
 <br>- melee attack, max. range: 8, targets: [Imp], base 
 impact <font color="FF0000">45</font>, 1 hits per sec., upgrade: "Claws and 
 Teeth"(+7)
-<br>bonus anti-fly range: -50
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+7)
@@ -1746,7 +1751,7 @@ upgrade: "Demon`s Weapons"(+7)
 <br>RACE: <font color="FF8C00">HELL</font>
 <br>Max hits: 1000
 <br>Always fast death: NO
-<br>UAC Loot required: <font color="00FF00">125</font>
+<br>UAC Loot required: <font color="00FF00">100</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">12</font>
 <br>Size: 11
@@ -2665,7 +2670,7 @@ time.
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 175
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 1
 <br>Time in combat to level up: 20
 <br>Bonus to impact per level: 2
@@ -2708,7 +2713,7 @@ upgrade: "Weapons Upgrade"(+7)
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 175
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 1
 <br>Time in combat to level up: 20
 <br>Bonus to impact per level: 2
@@ -2745,13 +2750,13 @@ upgrade: "Weapons Upgrade"(+7)
 <br>RACE: <font color="00FF00">UAC</font>
 <br>Max hits: 1000
 <br>Always fast death: NO
-<br>Energy required: <font color="00FFFF">250</font>
+<br>Energy required: <font color="00FFFF">200</font>
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: <font color="FFFFFF">15</font>
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 175
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 1
 <br>Time in combat to level up: 20
 <br>Bonus to impact per level: 2
@@ -2791,7 +2796,7 @@ upgrade: "Weapons Upgrade"(+7), factor: 200%
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 175
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 2
 <br>Time in combat to level up: 33
 <br>Bonus to impact per level: 4
@@ -2831,7 +2836,7 @@ upgrade: "Weapons Upgrade"(+7), factor: 200%
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 200
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 1
 <br>Time in combat to level up: 30
 <br>Bonus to impact per level: 2
@@ -2877,7 +2882,7 @@ upgrade: "Weapons Upgrade"(+7), factor: 200%
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 175
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 1
 <br>Time in combat to level up: 30
 <br>Bonus to impact per level: 2
@@ -2928,7 +2933,7 @@ do extra damage around the target.
 <br>Size: 11
 <br>Base speed: 10
 <br>Base sight range: 175
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 1
 <br>Time in combat to level up: 30
 <br>Bonus to impact per level: 2
@@ -2969,7 +2974,7 @@ per sec., upgrade: "Weapons Upgrade"(+7), factor: 300%
 <br>Size: 11
 <br>Base speed: 12
 <br>Base sight range: 200
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 2
 <br>Time in combat to level up: 33
 <br>Bonus to impact per level: 4
@@ -3010,7 +3015,7 @@ per sec., upgrade: "Weapons Upgrade"(+7), factor: 300%
 <br>Size: 11
 <br>Base speed: 10
 <br>Base sight range: 250
-<br>PainState base threshold: 3
+<br>PainState base threshold: 5
 <br>Places in transport: 5
 <br>Time in combat to level up: 30
 <br>Bonus to impact per level: 12

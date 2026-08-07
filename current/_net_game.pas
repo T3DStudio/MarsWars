@@ -710,12 +710,7 @@ nmid_GameData    : if(g_started)then
                       if(game_IsEnded)then
                       begin
                          rudata_PlayersScores(false);
-                         if(g_status<>i)then
-                         begin
-                            Scenario_KeyPointsEndGameClientFix;
-                            if(not ui_ShowScores)then
-                              ui_ToggleShowScores;
-                         end;
+                         if(g_status<>i)then game_LocalEnd;
                       end;
                    end;
         end;

@@ -695,6 +695,9 @@ begin
        if(uid_isbuilding)
        or(uid_ismech)then STRADD(@str_Unit1LineDescript,str_hint_SplashResist,sep_sdot);
 
+       if(uid_FlyLevelLikeTarget)
+       and(uid_CanAttack)then STRADD(@str_Unit1LineDescript,str_hint_FlyLikeTarget,sep_sdot);
+
        STRADD(@str_Unit1LineDescript,basedesc,sep_sdot);
        str_EndDot(@str_Unit1LineDescript);
     end;
@@ -1147,6 +1150,11 @@ begin
 
         if(uid_CanAttack)then
         begin
+           if(uid_FlyLevelLikeTarget)and(uid_CanAttack)then
+           begin
+              AddLineUnitDocHint(tc_docbr);
+              AddLineUnitDocHint(str_hint_FlyLikeTarget);
+           end;
            AddLineUnitDocHint(tc_docbr);
            AddLineUnitDocHint(str_hint_UnitArming);
            for arm:=0 to LastUnitArms do

@@ -382,10 +382,9 @@ begin
    uid_uibtn           := 0;
    uid_PainState_Base  := 2;
    uid_PainState_upgr  := upgr_hell_PainFactor;
-   uid_ProdTimeSec     := ptime1-ptimeq;
+   uid_ProdTimeSec     := (ptime1 div 5)*3;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
-   uid_arms_BonusAntiFlyRange:=-50;
    SetWeapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1,MID_Imp,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Imp],[],0,-5,0,dm_AntiUnitBioHeavy2);
    SetWeapon(1,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fps1,0      ,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any,         [UID_Imp],[],0, 0,0,0);
 end;
@@ -701,7 +700,7 @@ begin
    case i of
 UID_Sergant : begin
               uid_uibtn          := 0;
-              uid_req_EnergyLevel:= 250;
+              uid_req_EnergyLevel:= 200;
               uid_MSpeed_Upgr    := upgr_uac_BioSpeed;
               uid_Armor_upgr1    := upgr_uac_BioArmor;
               uid_SightR_upgr    := upgr_uac_UnitSightR;
@@ -710,7 +709,7 @@ UID_Sergant : begin
               end;
 UID_ZSergant: begin
               uid_uibtn          := 14;
-              uid_req_UACLoot    := 125;
+              uid_req_UACLoot    := 100;
               uid_ProdTimeSec    -= uid_ProdTimeSec div 4;
               uid_MSpeed_Base    += UpgradeUnitSpeedBonus;
               uid_Armor_upgr1    := upgr_hell_UnitArmor;
@@ -1506,9 +1505,6 @@ end;
       if(uid_req_uid3>0)and(uid_req_uid3n=0)then uid_req_uid3n:=1;
 
       // default upgrade bonuses
-      if(uid_PainState_upgr>0)then
-        if(uid_PainState_upgrV=0)then
-          uid_PainState_upgrV:=(uid_PainState_Base div 2)+(uid_PainState_Base mod 2);
       if(uid_Armor_upgr1>0)
       or(uid_Armor_upgr2>0)then
         if(uid_Armor_upgrV=0)then
@@ -1595,7 +1591,10 @@ end;
       if(uid_race=r_uac)and(not uid_isbuilding)and(uid_CanAttack)then
         if(uid_ismech)
         then uid_PainState_Base:=10
-        else uid_PainState_Base:=3;
+        else uid_PainState_Base:=5;
+      if(uid_PainState_upgr>0)then
+        if(uid_PainState_upgrV=0)then
+          uid_PainState_upgrV:=(uid_PainState_Base div 2)+(uid_PainState_Base mod 2);
 
       if(uid_LimitUse>=MinUnitLimit)and(not uid_isbuilding)then
       begin

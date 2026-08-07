@@ -88,8 +88,8 @@ begin
    if(LocalPlayer=pTarget)then LocalPlayer:=pSlot
    else
      if(LocalPlayer=pSlot)then LocalPlayer:=pTarget;
-   if(g_FixedPositions)then
-     map_RedrawMenuMinimap;
+
+   menu_update:=true;
    {$ENDIF}
 end;
 
@@ -245,6 +245,7 @@ begin
    ui_blink_timer1:=0;
    ui_blink_timer2:=0;
    ui_tab :=0;
+   ui_ScoresRebuild:=true;
 
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
    FillChar(g_effects,SizeOf(g_effects),0);
@@ -302,6 +303,14 @@ begin
    rpls_RecordTryPause:=0;
    if(snd_RenewMusicList)then
      snd_GameMusicReLoad;
+end;
+
+procedure game_LocalEnd;
+begin
+   Scenario_KeyPointsEndGameClientFix;
+   ui_ScoresRebuild:=true;
+   if(not ui_ScoresShow)then
+     ui_ToggleShowScores;
 end;
 
 {$include _replays.pas}
@@ -546,40 +555,6 @@ begin
    CheckPointClick:=point_dist_rint(o_x0,o_y0,o_x1,o_y1)<4;
 end;
 
-function ui_GameControlsEnabled:boolean;
-begin
-   ui_GameControlsEnabled:=false;
-   if(MainMenu)
-   or(g_status<>gs_running)
-   or(not g_started)
-   or(UIPlayer<>LocalPlayer)
-   or(rpls_pstate=rpls_read)
-   or(ui_ShowScores)then exit;
-   with g_PlayersGame[LocalPlayer] do
-     if(isobserver)
-     or(isdefeated)then exit;
-   ui_GameControlsEnabled:=true;
-end;
-
-procedure ui_Commander2Tab;
-begin
-   if(ui_CommandercPU<>nil)then
-     with ui_CommandercPU^ do
-     with uid^ do
-     begin
-        ui_tab:=3;
-        if(iscomplete)then
-          if(uid_isbuilder)
-          then ui_tab:=0
-          else
-            if(uid_isbarrack)
-            then ui_tab:=1
-            else
-              if(uid_isforge)
-              then ui_tab:=2;
-     end;
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   UNIT SELECTION
@@ -639,7 +614,7 @@ begin
           end;
        end;
 
-   if(ui_tab_Auto)then ui_Commander2Tab;
+   if(ui_tab_Auto)then ui_unit2Tab(ui_CommandercPU);
 end;
 procedure units_SelectGroup(add:boolean;fgroup:byte);
 var u:integer;
@@ -676,7 +651,7 @@ begin
              ui_CommanderSet(g_punits[u]);
           end;
        end;
-   if(ui_tab_Auto)then ui_Commander2Tab;
+   if(ui_tab_Auto)then ui_unit2Tab(ui_CommandercPU);
 end;
 procedure units_SetGroup(add:boolean;fgroup:byte);
 var u:integer;
@@ -1172,7 +1147,11 @@ begin
           else player_SetState(PlayerTarget,ps_AI  );
 
           {$IFDEF _FULLGAME}
-          map_RedrawMenuMinimap;
+          if(g_FixedPositions)then
+          begin
+             map_RedrawMenuMinimap;
+             menu_redraw:=true;
+          end;
           {$ENDIF}
        end;
 end;
@@ -1388,12 +1367,7 @@ begin
                                   g_FixedPositions:=not g_FixedPositions;
                                   Map_Make;
                                end;
-   nmid_lobby_GAISlots       : begin
-                                  ScrollByte(@g_AISlots  ,forward,0,g_MaxAISlots  );
-                                  {$IFDEF _FULLGAME}
-                                  map_RedrawMenuMinimap;
-                                  {$ENDIF}
-                               end;
+   nmid_lobby_GAISlots       : ScrollByte(@g_AISlots  ,forward,0,g_MaxAISlots  );
    nmid_lobby_GNewObservers  : g_NewObservers:=not g_NewObservers;
    nmid_lobby_GRandomScirmish: if(forward)then game_MakeRandomSkirmish;
    end;

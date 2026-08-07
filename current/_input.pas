@@ -446,7 +446,7 @@ begin
 
    // scores
    iActSetOnEnabled(iAct_Control_ShowScores,game_IsEnded, true );
-   if(ui_ShowScores)then
+   if(ui_ScoresShow)then
      if(not iActOn(iAct_Control_ShowScores))then ui_ToggleShowScores;
 
    if(ui_ControlTabType=tcc_Controls)and(g_control)then
@@ -723,7 +723,7 @@ begin
    m_brushx:=mouse_map_x;
    m_brushy:=mouse_map_y;
 
-   if(ui_ShowScores)then m_brush:=co_empty;
+   if(ui_ScoresShow)then m_brush:=co_empty;
 
    case ui_ControlTabType of
    tcc_controls: case m_brush of
@@ -1053,8 +1053,8 @@ begin
    if(k_LastChar_t>k_LastCharStuckDelay)then
      if(length(k_KeyboardString)<255)then k_KeyboardString+=k_LastChar;
 
-   while (SDL_PollEvent(sys_EVENT)>0) do
-     case (sys_EVENT^.type_) of
+   while(SDL_PollEvent(sys_EVENT)>0)do
+     case(sys_EVENT^.type_)of
       SDL_QUITEV         : game_Cycle:=false;
       //SDL_ACTIVEEVENT    : sys_WindowFocus:=not sys_WindowFocus;
       SDL_VIDEORESIZE    : begin
@@ -1147,7 +1147,7 @@ begin
    end;
 
    // mouse focus
-   if(ui_ShowScores)
+   if(ui_ScoresShow)
    then m_uifocus:=mf_Scores
    else
    begin
@@ -1326,8 +1326,9 @@ clickSound:pTSoundSet;
 begin
    clickSound:=nil;
 
-   if(ui_ShowScores)then
-     if(InputActionPressed(iAct_Any))then
+   if(ui_ScoresShow)then
+     if(InputActionPressed(iAct_Any))
+     and(not InputActionReleased(iact_Screenshot))then
      begin
         ui_ToggleShowScores;
         exit;
@@ -1335,7 +1336,7 @@ begin
 
    if (not m_DragCamMove)
    and(not ui_playerPOV)
-   and(not ui_ShowScores)then GameControlsCameraMove;
+   and(not ui_ScoresShow)then GameControlsCameraMove;
 
    // Chat
    if(rpls_pstate=rpls_read)or(net_status=ns_none)

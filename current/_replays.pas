@@ -569,12 +569,7 @@ begin
       if(g_status=gs_running)
       then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip)
       else
-        if(gs<>g_status)and(game_IsEnded)then
-        begin
-           Scenario_KeyPointsEndGameClientFix;
-           if(not ui_ShowScores)then
-             ui_ToggleShowScores;
-        end;
+        if(gs<>g_status)and(game_IsEnded)then game_LocalEnd;
 
       if(rpls_FastSkip)then effects_AddSprites(false);
       rpls_ForwardSkip-=1;

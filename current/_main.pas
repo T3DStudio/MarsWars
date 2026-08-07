@@ -11,7 +11,7 @@
 
 uses SysUtils, SDL, SDL_Net,crt
 {$IFDEF _FULLGAME}
-, SDL_Image, SDL_Gfx, openal, _sound_OGGLoader
+, SDL_Image, SDL_Gfx, openal, _sound_OGGLoader,_SDL_SavePNG
 {$ENDIF};
 
 
@@ -21,6 +21,7 @@ uses SysUtils, SDL, SDL_Net,crt
 
 {$include _common.pas}
      {$IFDEF _FULLGAME}
+        //{$include .pas}
         {$include _sounds.pas}
      {$ENDIF}
 {$include _net_com.pas}
@@ -66,12 +67,10 @@ uses SysUtils, SDL, SDL_Net,crt
 
 {var
   st:single;   }
+var t:pSDL_Surface;
 
 begin
-   {st:=st.NegativeInfinity;
-   writeln((st<=0),' ',st.IsNan,' ',st.IsNegativeInfinity,' ',st.IsPositiveInfinity,' ',st.IsInfinity);
-   readln;
-   halt;}
+   //t^.format^.palette^.colors;
 
    game_Init;
 

@@ -954,7 +954,7 @@ keyPoint_KotH_pause    = fr_fps1*keyPoint_KotH_pause_sec;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  PLAYER SCORE
+//  SCOREBOARD
 //
 
 
@@ -1973,7 +1973,7 @@ str_ScreenShotPrefix   : shortstring = 'MWSCR_';
 
 fileExt_save           : shortstring = '.mws';
 fileExt_Replay         : shortstring = '.mwr';
-fileExt_Scrshot        : shortstring = '.bmp';
+fileExt_Scrshot        : shortstring = '.png';
 
 folder_Race            : array[1..r_count] of shortstring = ('hell\'          ,'uac\'          );
 folder_RaceUI          : array[1..r_count] of shortstring = ('hell\ui\'       ,'uac\ui\'       );

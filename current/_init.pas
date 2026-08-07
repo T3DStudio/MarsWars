@@ -98,7 +98,6 @@ begin
    SwitchLanguage;
 
    menu_HelpIList:=@str_doc_Credits;
-
    {$ENDIF}
 
    if not(net_Init)then exit;

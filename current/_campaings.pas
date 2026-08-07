@@ -285,7 +285,7 @@ begin
                  camp_CreateUnit(p_player,map_PlayerStartX[p_player]-80 ,map_PlayerStartY[p_player]-100,UID_HGate);
 
                  player_SetAllowedUnits   (p_player,[ UID_HGate,
-                                                     UID_Imp     ], MaxUnits,true);
+                                                      UID_Imp     ], MaxUnits,true);
                  player_SetAllowedUpgrades(p_player,[0..255       ], 0       ,true);
 
                  with g_PlayersGame[p_player] do a_ability:=[];
@@ -489,7 +489,7 @@ begin
    0 : case camp_mis_sel of
        0 : if(g_cycle_regen=0)then
            begin      //  HELL vs HELL #1
-              if(g_PlayersGame[LocalPlayer].units_bld_lc[false]>=ul20)then
+              if(g_PlayersGame[0].units_bld_lc[false]>=ul15)then
                 with g_PlayersGame[7] do
                   if(aip_MaxAttackLimit=0)then
                   begin

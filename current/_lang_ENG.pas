@@ -335,27 +335,6 @@ begin
    str_ui_BuildTip               := 'TIP: build buildings close to each other - units will not get stuck between them.';
    str_ui_RightClickCancel       := 'Press "'+input_actions[iAct_mrb].ik_str_HK+'" to cancel.';
 
-   str_hint_upgrade              := 'upgrade';
-   str_hint_sec                  := 'sec.';
-   str_hint_requirements         := 'Requirements: ';
-   str_hint_req                  := 'Req.: ';
-   str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
-   str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
-   str_hint_UpgradesLvl          := 'Upgrades: ';
-   str_hint_Demons               := 'demons&zombies';
-   str_hint_Zombies              := 'zombies';
-   str_hint_Except               := 'except';
-   str_hint_SplashResist         := 'Immune to splash damage';
-   str_hint_TargetLimit          := 'target limit';
-   str_hint_builder              := 'Builder';
-   str_hint_barrack              := 'Unit production';
-   str_hint_forge                := 'Upgrades facility';
-   str_hint_IncEnergyLevel       := 'Increase energy level: ';
-   str_hint_UnitArming           := 'Arming: ';
-   str_hint_Abilities            := 'Abilities: ';
-   str_hint_SightR               := 'sight range';
-   str_hint_MaxQuantity          := 'Maximum quantity: ';
-
    str_attr_alive                := tc_lime  +'ALIVE'+tc_default;
    str_attr_dead                 := tc_dgray +'DEAD'+tc_default;
    str_attr_unit                 := tc_gray  +'UNIT'+tc_default;
@@ -379,6 +358,28 @@ begin
    str_attr_stuned               := tc_yellow+'STUNED'+tc_default;
    str_attr_detector             := tc_purple+'DETECTOR'+tc_default;
    str_attr_heroic               := tc_red   +'HEROIC'+tc_default;
+
+   str_hint_upgrade              := 'upgrade';
+   str_hint_sec                  := 'sec.';
+   str_hint_requirements         := 'Requirements: ';
+   str_hint_req                  := 'Req.: ';
+   str_hint_uprod                := tc_lime+'Produced by: '   +tc_default;
+   str_hint_bprod                := tc_lime+'Constructed by: '+tc_default;
+   str_hint_UpgradesLvl          := 'Upgrades: ';
+   str_hint_Demons               := 'demons&zombies';
+   str_hint_Zombies              := 'zombies';
+   str_hint_Except               := 'except';
+   str_hint_SplashResist         := 'Immune to splash damage';
+   str_hint_FlyLikeTarget        := 'Becomes ['+str_attr_ground+'] when attacking ['+str_attr_ground+'] targets';
+   str_hint_TargetLimit          := 'target limit';
+   str_hint_builder              := 'Builder';
+   str_hint_barrack              := 'Unit production';
+   str_hint_forge                := 'Upgrades facility';
+   str_hint_IncEnergyLevel       := 'Increase energy level: ';
+   str_hint_UnitArming           := 'Arming: ';
+   str_hint_Abilities            := 'Abilities: ';
+   str_hint_SightR               := 'sight range';
+   str_hint_MaxQuantity          := 'Maximum quantity: ';
 
    str_uarm_melee                := 'melee attack';
    str_uarm_ranged               := 'ranged attack';
@@ -422,7 +423,8 @@ begin
    str_net_ServerList            := 'Server list';
    str_net_ServerListAdd         := 'Add';
    str_net_ServerLANAdv          := 'LAN Advertise';
-   str_net_ConnectedToDed        := '- connected to dedicated server -';
+   str_net_ConnectedTo           := '- connected to';
+   str_net_DedicatedServer       := ' dedicated server';
 
    str_help_Credits              := 'Credits';
    str_help_GameControls         := 'Game Controls';
@@ -487,24 +489,24 @@ begin
    str_doc_NoteUnitBalance       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.';
    str_doc_NoteMaxBuilders       := 'Note: each player cannot have more than '+i2s(PlayerMaxBuilders)+' builders';
 
-   str_ScoreScreen_Caption       := 'Players stats';
-   str_ScoreScreenC[psc_units_created   ]:= 'Units created';
-   str_ScoreScreenC[psc_units_summoned  ]:= 'Units summoned';
-   str_ScoreScreenC[psc_units_resurected]:= 'Units resurrected';
-   str_ScoreScreenC[psc_units_captured  ]:= 'Units captured';
-   str_ScoreScreenC[psc_units_lost      ]:= 'Units lost';
-   str_ScoreScreenC[psc_units_destroyed ]:= 'Units destroyed';
-   str_ScoreScreenC[psc_units_ExpTotal  ]:= 'Total unit experience';
-   str_ScoreScreenC[psc_builds_created  ]:= 'Buildings created';
-   str_ScoreScreenC[psc_builds_summoned ]:= 'Buildings summoned';
-   str_ScoreScreenC[psc_builds_captured ]:= 'Buildings captured';
-   str_ScoreScreenC[psc_builds_lost     ]:= 'Buildings lost';
-   str_ScoreScreenC[psc_builds_destroyed]:= 'Buildings destroyed';
-   str_ScoreScreenC[psc_upgrades_level  ]:= 'Completed upgrades';
+   str_ScoreBoard_Caption        := 'Scoreboard';
+   str_ScoreBoardC[psc_units_created   ]:= 'Units created';
+   str_ScoreBoardC[psc_units_summoned  ]:= 'Units summoned';
+   str_ScoreBoardC[psc_units_resurected]:= 'Units resurrected';
+   str_ScoreBoardC[psc_units_captured  ]:= 'Units captured';
+   str_ScoreBoardC[psc_units_lost      ]:= 'Units lost';
+   str_ScoreBoardC[psc_units_destroyed ]:= 'Units destroyed';
+   str_ScoreBoardC[psc_units_ExpTotal  ]:= 'Total unit experience';
+   str_ScoreBoardC[psc_builds_created  ]:= 'Buildings created';
+   str_ScoreBoardC[psc_builds_summoned ]:= 'Buildings summoned';
+   str_ScoreBoardC[psc_builds_captured ]:= 'Buildings captured';
+   str_ScoreBoardC[psc_builds_lost     ]:= 'Buildings lost';
+   str_ScoreBoardC[psc_builds_destroyed]:= 'Buildings destroyed';
+   str_ScoreBoardC[psc_upgrades_level  ]:= 'Completed upgrades';
 
-   str_ScoreScreenI[psi_res_energy_max  ]:= 'Max energy level';
-   str_ScoreScreenI[psi_res_UACLoot     ]:= 'Collected '+str_ui_UACLoot;
-   str_ScoreScreenI[psi_res_HellPower   ]:= 'Collected '+str_ui_HellPower;
+   str_ScoreBoardI[psi_res_energy_max  ]:= 'Max energy level';
+   str_ScoreBoardI[psi_res_UACLoot     ]:= 'Collected '+str_ui_UACLoot;
+   str_ScoreBoardI[psi_res_HellPower   ]:= 'Collected '+str_ui_HellPower;
 
 
    /////////////////////////////////////////////////////////////////////////////
@@ -949,6 +951,8 @@ begin
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_SProd1..
                             iAct_SProd24           ],'production hotkeys');
+   DocHelp_AddHotKeyAction([],tc_docbr);
+   DocHelp_AddHotKeyAction([iAct_Alt               ],'show unit`s rects and circles' );
 
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([],tc_docbr);
@@ -1230,9 +1234,7 @@ begin
    //str_camp_Add('Corporate wars');
 
    t1:=    'Hell Empire'
-   +tc_nl1+'unknown planet'
-   +tc_nl1+'unknown location'
-   +tc_nl1+'unknown date';
+   +tc_nl1;
 
    //////////     HELL VS HELL    1
    //
@@ -1249,7 +1251,7 @@ begin
                     +tc_nl1+'- Build 10 Demon`s Gates'
                     +tc_nl1+'- Summon 30 Imps'
                     +tc_nl1+'- Destroy the '+str_Camp_HE_CoB,
-                            t1);
+                            t1+'Mountain Erebus');
 
    //////////     HELL VS HELL    2
    //
@@ -1270,7 +1272,7 @@ begin
    str_camp_MissObjSet (0,1,'- At least 1 Hell Keep must survive'
                     +tc_nl1+'- Destroy the '+str_Camp_HE_ToE
                     +tc_nl1+'- Destroy the '+str_Camp_HE_HN,
-                            t1);
+                            t1+'Valley of Fear');
 
    ////////////////////////////////////////
 

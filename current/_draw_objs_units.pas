@@ -322,7 +322,7 @@ begin
       begin
          // building area and possible buildings for UI
          if(uid_isbuilder)and(not isfly)and(zfall=0)then
-           if(units_builders_s=0)or(isselected)then
+           //if(units_builders_s=0)or(isselected)then
              ui_bprod_possible+=uid_prod_Buildings;
 
          // production counters
@@ -445,7 +445,7 @@ begin
       begin
          // building areas
          if(iscomplete)and(uid_isbuilder)and(not isfly)then
-           if(units_builders_s=0)or(isselected)then
+           //if(units_builders_s=0)or(isselected)then
              case m_brush of
              1..255 : if(m_brush in uid_prod_Buildings)then
                         if(RectInCam(x,y,srange,srange,0))then

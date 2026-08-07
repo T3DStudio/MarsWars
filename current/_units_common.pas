@@ -1447,7 +1447,7 @@ begin
          and(uid_isbuilder)
          and(not isfly)
          and(zfall=0)then
-           if(player^.units_builders_s=0)or(isselected)then
+           //if(player^.units_builders_s=0)or(isselected)then
              if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
              begin
                 o:=point_dist_int(x,y,tx,ty)-srange;
@@ -1591,7 +1591,7 @@ begin
      with uid^ do
        if(hits>0)and(iscomplete)and(uid_isbuilder)and(zfall=0)and(not isfly)and(playeri=playerN)then
          if(mapZone=zone)or(player^.state<>ps_AI)then
-           if(player^.units_builders_s=0)or(isselected)then
+           //if(player^.units_builders_s=0)or(isselected)then
              if(abs(x-tx)<=srange)and(abs(y-ty)<=srange)then
                if(buid in uid_prod_Buildings)and(not IsUnitRange(transportU,nil))then
                  if(point_dist_int(x,y,tx,ty)<srange)then

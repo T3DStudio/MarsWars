@@ -641,8 +641,9 @@ begin
 
               drawmenu_ItemText2  (tar,mi_MP_ClientQuality   ,str_net_Quality        ,str_NetQualityL[net_cl_Quality],0);
 
-              if(net_cl_Hoster=255)and(net_cl_svttl<TTLServer)then
-              drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedToDed,0);
+              if(net_cl_Hoster=255)and(net_cl_svttl<TTLServer)
+              then drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedTo+str_net_DedicatedServer+': '+menu_ClientAddress,0)
+              else drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedTo+                        ': '+menu_ClientAddress,0);
               end;
    end;
 
