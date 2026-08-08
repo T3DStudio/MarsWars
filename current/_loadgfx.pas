@@ -674,8 +674,8 @@ begin
                                 ss_PanelW-1,
                                 ss_PanelH-1,c_ltgray);
 
-    draw_text(ui_ScoresSurf,ss_PanelWh,font_wh          ,str_ScoreBoard_Caption,ta_MU,255,c_white);
-    draw_text(ui_ScoresSurf,ss_PanelWh,ss_PanelH-font_wh,str_menuMsg_HintImg    ,ta_MB,255,c_white);
+    draw_text(ui_ScoresSurf,ss_PanelWh,font_wh          ,str_action_hint[iAct_Control_ScoreBoard],ta_MU,255,c_white);
+    draw_text(ui_ScoresSurf,ss_PanelWh,ss_PanelH-font_wh,str_menuMsg_HintImg                     ,ta_MB,255,c_white);
 
     tx:=font_wh+ss_LeftCaptionsW;
     ty:=font_wh+ss_UpCaptionsH+ss_LineHh;
@@ -753,10 +753,15 @@ begin
         end;
 
    tsurf:=ui_ScoresSurf;
-   ui_ScoresSurf:=gfx_ResizeSurface(ui_ScoresSurf,(vid_vh-ss_ScaleH)/ss_PanelH);
+   t:=round((vid_vh-vid_minh)*0.5);
+   ui_ScoresSurf:=gfx_ResizeSurface(ui_ScoresSurf,(vid_vh-ss_ScaleH-t)/ss_PanelH);
    SDL_SetColorKey(ui_ScoresSurf,SDL_RLEACCEL,1);
 
    gfx_FreeSDLSurface(tsurf);
+
+   ui_ScoreBoardY:=ui_GameStatusY+txt_line_h3;
+   t:=(ui_ScoreBoardY+ui_ScoresSurf^.h)-vid_vh;
+   if(t>0)then ui_ScoreBoardY-=t;
 end;
 
 procedure gfx_LoadFont(fname:shortstring);
@@ -1206,8 +1211,16 @@ begin
    ui_UIPortXC   := ui_UIPortX0+ui_cam_hw;
 
    // timer
-   ui_timerX     := ui_UIPortX0+font_wh;
-   ui_timerY     := ui_UIPortY0+font_wh;
+   if(ui_ControlPanelPos=cpp_top)and(ui_UIPanelX>(ui_UIPanelW div 2))then
+   begin
+      ui_timerX  := font_wh;
+      ui_timerY  := font_wh;
+   end
+   else
+   begin
+      ui_timerX  := ui_UIPortX0+font_wh;
+      ui_timerY  := ui_UIPortY0+font_wh;
+   end;
 
    // game status, POV player
    ui_PovPlayerY := ui_UIPortY0+txt_line_h1*5;
@@ -1316,11 +1329,11 @@ begin
    // OTHER
 
    ui_EnergyX   := ui_UIPortXC-font_w2*2;
-   ui_EnergyY   := ui_timerY;
+   ui_EnergyY   := ui_UIPortY0+font_wh;
    ui_HellPowerY:= ui_EnergyY+txt_line_h2;
    ui_UACLootY  := ui_HellPowerY+txt_line_h2; ;
    ui_ArmyX     := ui_EnergyX+font_w1h;
-   ui_ArmyY0    := ui_timerY;
+   ui_ArmyY0    := ui_UIPortY0+font_wh;
    ui_ArmyY1    := ui_ArmyY0+txt_line_h2;
    ui_ArmyY2    := ui_ArmyY1+txt_line_h2;
 

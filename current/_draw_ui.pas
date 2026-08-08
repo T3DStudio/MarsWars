@@ -560,7 +560,7 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                        iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,not iActEnabled(uid));
                        iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,not iActEnabled(uid));
 
-                       iAct_Control_ShowScores: draw_UIButtonS(tar,ux,uy,spr_uibtn_ShowScores,false,not iActEnabled(uid));
+                       iAct_Control_ScoreBoard: draw_UIButtonS(tar,ux,uy,spr_uibtn_ShowScores,false,not iActEnabled(uid));
 
                        iAct_Replay_Fog,
                        iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog ,ui_fog,not iActEnabled(uid));
@@ -815,7 +815,7 @@ begin
    end;
 
    draw_sdlsurface(vid_screen,ui_cam_hw-(ui_ScoresSurf^.w div 2),
-                              ui_cam_hh-(ui_ScoresSurf^.h div 2),ui_ScoresSurf);
+                              ui_ScoreBoardY,ui_ScoresSurf);
 end;
 
 procedure draw_ReplayProgress(tar:pSDL_Surface);
@@ -935,8 +935,6 @@ begin
    case ui_ControlTabType of
    tcc_observer,
    tcc_replay  : begin
-                    //if(g_PlayersGame[LocalPlayer].isdefeated)
-                    //then
                     draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str_observer+' (',ta_RU,255,c_white);
                     if(UIPlayer<=LastPlayer)
                     then str:=g_PlayersGame[UIPlayer].name+tc_white+')'

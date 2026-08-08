@@ -838,13 +838,24 @@ else
    if(menu_hint_pos[menu_ItemTarget]>0)then
      with menu_items[menu_hint_pos[menu_ItemTarget]] do
        draw_text(tar,mi_x1-font_w1,mi_y0-font_wh,drawmenu_ItemActsStr+str_menu_hint[menu_ItemTarget],ta_RB,255,c_white);
+end;
+
+procedure draw_MenuBoxes(tar:pSDL_surface);
+var
+ix,iy,
+cx,cy:integer;
+begin
+   cx:=tar^.w div 2;
+   cy:=tar^.h div 2;
+
+   if(menu_image<>nil)
+   or(menu_msg_type<>mmbt_none)then boxColor(tar,0,0,tar^.w,tar^.h,c_iblack);
 
    //menu_image
    if(menu_image<>nil)then
    begin
-      boxColor(tar,0,0,menu_w,menu_h,c_iblack);
-      ix:=menu_hw-(menu_image^.w div 2);
-      iy:=menu_hh-(menu_image^.h div 2);
+      ix:=cx-(menu_image^.w div 2);
+      iy:=cy-(menu_image^.h div 2);
       draw_text(tar,ix+(menu_image^.w div 2),iy                      ,menu_image_caption ,ta_MB,255,c_white);
       draw_text(tar,ix+(menu_image^.w div 2),iy+menu_image^.h+font_wh,str_menuMsg_HintImg,ta_MU,255,c_white);
       draw_sdlsurface(tar,ix,iy,menu_image);
@@ -852,33 +863,34 @@ else
                          ix+menu_image^.w,iy+menu_image^.h,c_white);
    end;
 
+   cx-=menu_hw;
+   cy-=menu_hh;
+
    // MESSAGE BOX
    if(menu_msg_type<>mmbt_none)then
    begin
-      boxColor(tar,0,0,menu_w,menu_h,c_ablack);
+      boxColor      (tar,cx+menu_msg_x0,cy+menu_msg_y0,
+                         cx+menu_msg_x1,cy+menu_msg_y1,c_black);
+      rectangleColor(tar,cx+menu_msg_x0,cy+menu_msg_y0,
+                         cx+menu_msg_x1,cy+menu_msg_y1,c_white);
 
-      boxColor      (tar,menu_msg_x0,menu_msg_y0,
-                         menu_msg_x1,menu_msg_y1,c_black);
-      rectangleColor(tar,menu_msg_x0,menu_msg_y0,
-                         menu_msg_x1,menu_msg_y1,c_white);
-
-      draw_text(tar,menu_msg_textx,menu_msg_captiony,menu_msg_Caption,ta_MU,menu_ListLineWChars1,c_red   );
-      draw_text(tar,menu_msg_textx,menu_msg_bodyy   ,menu_msg_Body   ,ta_MM,menu_ListLineWChars1,c_yellow);
+      draw_text(tar,cx+menu_msg_textx,cy+menu_msg_captiony,menu_msg_Caption,ta_MU,menu_ListLineWChars1,c_red   );
+      draw_text(tar,cx+menu_msg_textx,cy+menu_msg_bodyy   ,menu_msg_Body   ,ta_MM,menu_ListLineWChars1,c_yellow);
 
       case menu_msg_type of
       mmbt_none         :;
       mmbt_nothing,
-      mmbt_netPortBlock : draw_text(tar,menu_msg_textx,menu_msg_btny,str_menuMsg_HintDefault,ta_MB,menu_ListLineWChars1,c_gray  );
-      mmbt_netWaitServer: draw_text(tar,menu_msg_textx,menu_msg_btny,str_menuMsg_HintClient ,ta_MB,menu_ListLineWChars1,c_gray  );
+      mmbt_netPortBlock : draw_text(tar,cx+menu_msg_textx,cy+menu_msg_btny,str_menuMsg_HintDefault,ta_MB,menu_ListLineWChars1,c_gray  );
+      mmbt_netWaitServer: draw_text(tar,cx+menu_msg_textx,cy+menu_msg_btny,str_menuMsg_HintClient ,ta_MB,menu_ListLineWChars1,c_gray  );
       mmbt_SaveRewrite,
       mmbt_DeleteSave,
       mmbt_DeleteReplay,
       mmbt_DeleteServer : begin
-                             hlineColor(tar,menu_msg_x0,menu_msg_x1,menu_msg_btn1y0,c_white);
-                             vlineColor(tar,menu_msg_btn1x1,menu_msg_btn1y0,menu_msg_btn1y1,c_white);
-                             draw_text(tar,menu_msg_btn1tx,menu_msg_btny,str_YesNoC[true ]+'('+str_ActionHotKey(iAct_Return)+')'
-                                                                                          ,ta_MM,menu_ListLineWCharsh,c_gray);
-                             draw_text(tar,menu_msg_btn2tx,menu_msg_btny,str_YesNoC[false],ta_MM,menu_ListLineWCharsh,c_gray);
+                             hlineColor(tar,cx+menu_msg_x0,cx+menu_msg_x1,cy+menu_msg_btn1y0,c_white);
+                             vlineColor(tar,cx+menu_msg_btn1x1,cy+menu_msg_btn1y0,cy+menu_msg_btn1y1,c_white);
+                             draw_text(tar,cx+menu_msg_btn1tx,cy+menu_msg_btny,str_YesNoC[true ]+'('+str_ActionHotKey(iAct_Return)+')'
+                                                                                                ,ta_MM,menu_ListLineWCharsh,c_gray);
+                             draw_text(tar,cx+menu_msg_btn2tx,cy+menu_msg_btny,str_YesNoC[false],ta_MM,menu_ListLineWCharsh,c_gray);
                           end;
       end;
    end;
@@ -899,6 +911,7 @@ begin
       else draw_sdlsurface(menu_Background,0,0,spr_MenuBackgroundL);
       draw_sdlsurface(menu_Background,(menu_Background^.w div 2)-menu_hw,
                                       (menu_Background^.h div 2)-menu_hh,menu_Surface);
+      draw_MenuBoxes(menu_Background);
 
       drawmenu_MakeBig;
       menu_redraw:=false;

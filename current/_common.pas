@@ -713,14 +713,15 @@ end;
 procedure GameLog_Chat(sender,chat_tar:byte;message:shortstring);
 var dt:byte;
 begin
+   dt:=0;
    case chat_tar of
    chat_all     : begin
                      chat_tar:=255;
-                     dt:=0;
+                     dt:=1;
                   end;
    chat_allies  : begin
                      chat_tar:=player_GetAlliesBits(sender,true);
-                     dt:=1;
+                     dt:=2;
                   end;
    0..LastPlayer: chat_tar:=1 shl chat_tar;
    else
@@ -732,10 +733,6 @@ begin
      then players_LogAdd(sender,chat_tar,lmt_chat_player0+sender,dt,0,g_PlayersGame[sender].name+': '+message,0,0)
      else players_LogAdd(sender,chat_tar,lmt_chat_local         ,0 ,0,message                                ,0,0);
 end;
-{procedure GameLog_Common(sender,targets:byte;message:shortstring);
-begin
-   PlayersAddToLog(sender,targets,lmt_game_message,0,0,message,0,0);
-end;  }
 
 // PLAYERS
 procedure GameLog_PlayerConnected(player:byte);
@@ -2446,9 +2443,13 @@ lmt_chat_player0..
 lmt_chat_player7      : if(length(lm_string)>0)then
                         begin
                            mcolor^:=PlayerGetColorDef(lm_type-lmt_chat_player0);
-                           if(lm_data_t=0)
-                           then ParseLogMessage:=str_ui_ChatAll   +'> '+lm_string
-                           else ParseLogMessage:=str_ui_ChatAllies+'> '+lm_string;
+                           case lm_data_t of
+                           1:   if(MainMenu)
+                                then ParseLogMessage:=lm_string
+                                else ParseLogMessage:=str_ui_ChatAll   +'> '+lm_string;
+                           2:        ParseLogMessage:=str_ui_ChatAllies+'> '+lm_string;
+                           else      ParseLogMessage:=lm_string;
+                           end;
                         end;
 lmt_chat_local        : ParseLogMessage:=lm_string;
 lmt_Req_Limit         : ParseLogMessage:=str_warn_MaxLimitReached;

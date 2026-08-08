@@ -217,12 +217,13 @@ begin
 
    str_themes[0]                 :=tc_lime  +'UAC BASE';
    str_themes[1]                 :=tc_aqua  +'ICE CAVE';
-   str_themes[2]                 :=tc_yellow+'HELL CAVES';
+   str_themes[2]                 :=tc_purple+'HELL CAVES';
    str_themes[3]                 :=tc_red   +'HELL CITY';
    str_themes[4]                 :=tc_blue  +'EARTH CITY';
    str_themes[5]                 :=tc_white +'EARTH MOON';
-   str_themes[6]                 :=tc_orange+'PHOBOS';
-   str_themes[7]                 :=tc_gray  +'DEIMOS';
+   str_themes[6]                 :=tc_orange+'MARS';
+   str_themes[7]                 :=tc_yellow+'PHOBOS';
+   str_themes[8]                 :=tc_gray  +'DEIMOS';
 
    str_FileInfo                  := 'FILE INFO';
    str_FileSave                  := 'Save';
@@ -489,7 +490,6 @@ begin
    str_doc_NoteUnitBalance       := 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.';
    str_doc_NoteMaxBuilders       := 'Note: each player cannot have more than '+i2s(PlayerMaxBuilders)+' builders';
 
-   str_ScoreBoard_Caption        := 'Scoreboard';
    str_ScoreBoardC[psc_units_created   ]:= 'Units created';
    str_ScoreBoardC[psc_units_summoned  ]:= 'Units summoned';
    str_ScoreBoardC[psc_units_resurected]:= 'Units resurrected';
@@ -729,7 +729,7 @@ begin
 
    str_SetActionBaseHint(iAct_Control_MarkLook   ,'Map mark: look here'  );
    str_SetActionBaseHint(iAct_Control_MarkAttack ,'Map mark: attack here');
-   str_SetActionBaseHint(iAct_Control_ShowScores ,'Toggle scoreboard display');
+   str_SetActionBaseHint(iAct_Control_ScoreBoard ,'Scoreboard');
 
    str_SetActionBaseHint(iAct_InGamePause        ,'Pause');
    str_SetActionBaseHint(iAct_InGameMenu         ,'Menu' );
@@ -943,7 +943,7 @@ begin
    DocHelp_AddHotKeyAction([iAct_Control_MarkLook  ],'set map mark(multiplayer): "look here"'  );
    DocHelp_AddHotKeyAction([iAct_Control_MarkAttack],'set map mark(multiplayer): "attack here"');
    DocHelp_AddHotKeyAction([],tc_docbr);
-   DocHelp_AddHotKeyAction([iAct_Control_ShowScores],'toggle scoreboard display');
+   DocHelp_AddHotKeyAction([iAct_Control_ScoreBoard],'toggle scoreboard display');
 
    DocHelp_AddHotKeyAction([],tc_docbr);
    DocHelp_AddHotKeyAction([iAct_Control_ToggleRec ],'toggle "'+str_SR_RecordGames+'" option');

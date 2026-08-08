@@ -103,7 +103,7 @@ begin
    input_SetAction(iAct_Control_MarkLook  ,ikt_keyboard,0           ,SDLK_F5          );
    input_SetAction(iAct_Control_MarkAttack,ikt_keyboard,0           ,SDLK_F6          );
    input_SetAction(iAct_Control_ToggleRec ,ikt_keyboard,0           ,SDLK_F10         );
-   input_SetAction(iAct_Control_ShowScores,ikt_keyboard,0           ,SDLK_F7          );
+   input_SetAction(iAct_Control_ScoreBoard,ikt_keyboard,0           ,SDLK_F7          );
 
 
    input_SetAction(iAct_SProd1            ,ikt_keyboard,0           ,SDLK_R           );
@@ -322,7 +322,7 @@ begin
    ui_panel_CTabIActs[tcc_controls,MPos(13)]:=iAct_Control_USelArmy;
    ui_panel_CTabIActs[tcc_controls,MPos(15)]:=iAct_Control_MarkLook;
    ui_panel_CTabIActs[tcc_controls,MPos(16)]:=iAct_Control_MarkAttack;
-   ui_panel_CTabIActs[tcc_controls,MPos(22)]:=iAct_Control_ShowScores;
+   ui_panel_CTabIActs[tcc_controls,MPos(22)]:=iAct_Control_ScoreBoard;
 
    ui_panel_CTabIActs[tcc_replay  ,MPos(0 )]:=iAct_Replay_Fast;
    ui_panel_CTabIActs[tcc_replay  ,MPos(1 )]:=iAct_Replay_Pause;
@@ -344,7 +344,7 @@ begin
    ui_panel_CTabIActs[tcc_replay  ,MPos(18)]:=iAct_Replay_Player5;
    ui_panel_CTabIActs[tcc_replay  ,MPos(19)]:=iAct_Replay_Player6;
    ui_panel_CTabIActs[tcc_replay  ,MPos(20)]:=iAct_Replay_Player7;
-   ui_panel_CTabIActs[tcc_replay  ,MPos(22)]:=iAct_Control_ShowScores;
+   ui_panel_CTabIActs[tcc_replay  ,MPos(22)]:=iAct_Control_ScoreBoard;
 
    ui_panel_CTabIActs[tcc_observer,MPos(0 )]:=iAct_Observer_Fog;
    ui_panel_CTabIActs[tcc_observer,MPos(1 )]:=iAct_Observer_POV;
@@ -360,7 +360,7 @@ begin
    ui_panel_CTabIActs[tcc_observer,MPos(12)]:=iAct_Control_MarkLook;
    ui_panel_CTabIActs[tcc_observer,MPos(13)]:=iAct_Control_MarkAttack;
 
-   ui_panel_CTabIActs[tcc_observer,MPos(22)]:=iAct_Control_ShowScores;
+   ui_panel_CTabIActs[tcc_observer,MPos(22)]:=iAct_Control_ScoreBoard;
 
 end;
 
@@ -421,7 +421,7 @@ begin
                iAct_Control_USelArmy,
                iAct_Control_MarkLook,
                iAct_Control_MarkAttack,
-               iAct_Control_ShowScores] do
+               iAct_Control_ScoreBoard] do
      input_actions[ucl].ik_astate:=as_off;
 
    for ucl:=0 to ui_ButtonsNum do
@@ -445,9 +445,9 @@ begin
    iActSetOnEnabled(iAct_Control_MarkAttack,((ui_ControlTabType=tcc_Controls)or(ui_ControlTabType=tcc_Observer))and(net_status<>ns_none), true );
 
    // scores
-   iActSetOnEnabled(iAct_Control_ShowScores,game_IsEnded, true );
+   iActSetOnEnabled(iAct_Control_ScoreBoard,game_IsEnded, true );
    if(ui_ScoresShow)then
-     if(not iActOn(iAct_Control_ShowScores))then ui_ToggleShowScores;
+     if(not iActOn(iAct_Control_ScoreBoard))then ui_ToggleShowScores;
 
    if(ui_ControlTabType=tcc_Controls)and(g_control)then
    begin
@@ -984,7 +984,7 @@ begin
    iAct_Control_MarkLook  : if(SoundEnabledLeft)then m_brush :=co_markLook;
    iAct_Control_MarkAttack: if(SoundEnabledLeft)then m_brush :=co_markAttack;
 
-   iAct_Control_ShowScores: if(SoundEnabledLeft)then ui_ToggleShowScores;
+   iAct_Control_ScoreBoard: if(SoundEnabledLeft)then ui_ToggleShowScores;
 
    iAct_InGamePause       : if(SoundEnabledLeft)then game_PauseToggle(false);
    iAct_InGameMenu        : if(SoundEnabledLeft)then
@@ -1331,7 +1331,7 @@ begin
      and(not InputActionReleased(iact_Screenshot))then
      begin
         ui_ToggleShowScores;
-        exit;
+        //exit;
      end;
 
    if (not m_DragCamMove)

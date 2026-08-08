@@ -1197,7 +1197,7 @@ iAct_Control_USelArmy  = 73;
 iAct_Control_MarkLook  = 74;
 iAct_Control_MarkAttack= 75;
 iAct_Control_ToggleRec = 76;
-iAct_Control_ShowScores= 77;
+iAct_Control_ScoreBoard= 77;
 
 iAct_Replay_Fast       = 110;
 iAct_Replay_Back2      = 111;
@@ -1307,7 +1307,7 @@ apm_Acts               = [1..255]-[iAct_ScreenShot,
                                    iAct_InGamePause,
                                    iAct_InGameMenu,
                                    iAct_Control_ToggleRec,
-                                   iAct_Control_ShowScores
+                                   iAct_Control_ScoreBoard
                                    ];
 
 apm_period_sec         = 10;
@@ -1956,7 +1956,7 @@ ui_DocListH            = 35;
 
 camp_MaxDiff           = 4;
 
-camp_BattleRoyaleS     = fr_fpsh-4;
+camp_BattleRoyaleS     = fr_fpsh-5;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -2074,22 +2074,22 @@ str_GameStatus           : shortstring = 'Game status: ';
 str_GameOptions          : shortstring = 'Game options:';
 str_MapOptions           : shortstring = 'Map options:';
 
-str_map_GeneratorsL      : array[0..5       ] of shortstring = ('none','5 min','10 min','15 min','20 min','infinity');
-str_map_ScenarioL        : array[0..mc_Last ] of shortstring = ('FFA(3)',
-                                                                'FFA(4)',
-                                                                'FFA(5)',
-                                                                'FFA(6)',
-                                                                'FFA(7)',
-                                                                'FFA(8)',
-                                                                '1x1',
-                                                                '2x2',
-                                                                '3x3',
-                                                                '4x4',
-                                                                '2x2x2',
-                                                                '2x2x2x2',
-                                                                'key points',
-                                                                'KotH',
-                                                                'Royal Battle');
+str_map_GeneratorsL      : array[0..mapg_Last] of shortstring = ('5 min','10 min','15 min','20 min','infinity');
+str_map_ScenarioL        : array[0..mc_Last  ] of shortstring = ('FFA(3)',
+                                                                 'FFA(4)',
+                                                                 'FFA(5)',
+                                                                 'FFA(6)',
+                                                                 'FFA(7)',
+                                                                 'FFA(8)',
+                                                                 '1x1',
+                                                                 '2x2',
+                                                                 '3x3',
+                                                                 '4x4',
+                                                                 '2x2x2',
+                                                                 '2x2x2x2',
+                                                                 'key points',
+                                                                 'KotH',
+                                                                 'Royal Battle');
 str_map_SymmetryL        : array[0..maps_Last] of shortstring = ('no',
                                                                  'point',
                                                                  'line |',

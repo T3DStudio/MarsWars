@@ -24,9 +24,6 @@ begin
             player_SetDefaults(p);
             if(g_started)
             or(g_LobbyTimer>0)then isobserver:=true;
-            {$IFNDEF _FULLGAME}
-            GameLog_Chat(p,0,'MarsWars dedicated server, '+str_version);
-            {$ENDIF}
             menu_update:=true;
             break;
          end;
@@ -82,17 +79,18 @@ begin
       if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
       if(tstr<>name)then menu_update:=true;
 
-      tbool  :=isready;
-      isready:=net_readbool;
+      tbool   :=isready;
+      isready :=net_readbool;
+
+      PNU     :=net_readbyte;
+      log_n_cl:=net_readcard;
+
       if(tbool<>isready)then
         if(not g_started)and(g_LobbyTimer<=0)then
         begin
            GameLog_PlayerReadyStat(pid);
            menu_update:=true;
         end;
-
-      PNU     :=net_readbyte;
-      log_n_cl:=net_readcard;
 
       if(log_n_cl=log_n)then net_TimerLogSend:=0;
    end;
@@ -226,6 +224,9 @@ begin
         begin
            net_ServerReadPlayerData(i);
            GameLog_PlayerConnected(i);
+           {$IFNDEF _FULLGAME}
+           GameLog_Chat(255,i,'MarsWars dedicated server, '+str_version);
+           {$ENDIF};
            net_SendGameLobbyInfo(i);
         end;
      end;

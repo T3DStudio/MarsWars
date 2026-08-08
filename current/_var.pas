@@ -366,6 +366,7 @@ ui_ReplayBarX     : integer = 0;
 ui_ReplayBarY     : integer = 0;
 ui_GameStatusX    : integer = 0;
 ui_GameStatusY    : integer = 0;
+ui_ScoreBoardY    : integer = 0;
 ui_EnergyX        : integer = 0;
 ui_EnergyY        : integer = 0;
 ui_HellPowerY     : integer = 0;
@@ -1362,8 +1363,6 @@ str_PT_Team,
 str_PT_Color,
 str_PT_Ping,
 str_PT_Obs,
-
-str_ScoreBoard_Caption,
 
 str_Caption_Server,
 str_Caption_Client,

@@ -388,21 +388,20 @@ begin
                  camp_CreateUnitAreaR(p_enemy1,5,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Baron   ,60);
                  camp_CreateUnitAreaR(p_enemy1,5,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Demon   ,60);
 
-                 player_SetAllowedUnits   (p_enemy1,[ UID_HKeep,
-                                                     UID_HAKeep,
-                                                     UID_HGate,
-                                                     UID_HPools,
-                                                     UID_HFTower,
-                                                     UID_HTeleport          ], MaxUnits,true );
+                 player_SetAllowedUnits   (p_enemy1,[ UID_HAKeep,
+                                                      UID_HGate,
+                                                      UID_HPools,
+                                                      UID_HFTower,
+                                                      UID_HTeleport          ], MaxUnits,true );
                  player_SetAllowedUnits   (p_enemy1,[ UID_Demon,
-                                                     UID_Baron,
-                                                     UID_Revenant           ], 30      ,false);
+                                                      UID_Baron,
+                                                      UID_Revenant           ], 30      ,false);
                  player_SetAllowedUpgrades(p_enemy1,[ upgr_hell_DistDamage1,
-                                                     upgr_hell_UnitArmor ,
-                                                     upgr_hell_MeleeDamage,
-                                                     upgr_hell_Regeneration,
-                                                     upgr_hell_PainFactor ,
-                                                     upgr_hell_BuilderR     ], 5       ,true );
+                                                      upgr_hell_UnitArmor ,
+                                                      upgr_hell_MeleeDamage,
+                                                      upgr_hell_Regeneration,
+                                                      upgr_hell_PainFactor ,
+                                                      upgr_hell_BuilderR     ], 5       ,true );
                  with g_PlayersGame[p_enemy1] do a_ability:=[uab_ToHAKeep];
 
                  // Hell Knights
@@ -424,21 +423,20 @@ begin
                  camp_CreateUnitAreaR(p_enemy2,5,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Knight   ,60);
                  camp_CreateUnitAreaR(p_enemy2,5,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Imp      ,60);
 
-                 player_SetAllowedUnits   (p_enemy2,[ UID_HKeep,
-                                                     UID_HAKeep,
-                                                     UID_HGate,
-                                                     UID_HPools,
-                                                     UID_HFTower,
-                                                     UID_HEyeNest           ], MaxUnits,true );
+                 player_SetAllowedUnits   (p_enemy2,[ UID_HAKeep,
+                                                      UID_HGate,
+                                                      UID_HPools,
+                                                      UID_HFTower,
+                                                      UID_HEyeNest           ], MaxUnits,true );
                  player_SetAllowedUnits   (p_enemy2,[ UID_Imp,
-                                                     UID_Knight,
-                                                     UID_Cacodemon          ], 30      ,false);
+                                                      UID_Knight,
+                                                      UID_Cacodemon          ], 30      ,false);
                  player_SetAllowedUpgrades(p_enemy2,[ upgr_hell_DistDamage1,
-                                                     upgr_hell_UnitArmor ,
-                                                     upgr_hell_MeleeDamage,
-                                                     upgr_hell_Regeneration,
-                                                     upgr_hell_PainFactor ,
-                                                     upgr_hell_BuilderR     ],5        ,true );
+                                                      upgr_hell_UnitArmor ,
+                                                      upgr_hell_MeleeDamage,
+                                                      upgr_hell_Regeneration,
+                                                      upgr_hell_PainFactor ,
+                                                      upgr_hell_BuilderR     ],5        ,true );
 
                  with g_PlayersGame[p_enemy2] do a_ability:=[uab_ToHAKeep];
               end;

@@ -382,7 +382,7 @@ begin
    uid_uibtn           := 0;
    uid_PainState_Base  := 2;
    uid_PainState_upgr  := upgr_hell_PainFactor;
-   uid_ProdTimeSec     := (ptime1 div 5)*3;
+   uid_ProdTimeSec     := ptime1-ptimeq;
    uid_islight         := true;
    uid_FastDeathHits   := hits_fdead_border;
    SetWeapon(0,wpt_missle   ,aw_srange,0,0          ,fr_fps1,MID_Imp,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive       ,wpr_any,uids_all-[UID_Imp],[],0,-5,0,dm_AntiUnitBioHeavy2);
@@ -700,7 +700,7 @@ begin
    case i of
 UID_Sergant : begin
               uid_uibtn          := 0;
-              uid_req_EnergyLevel:= 200;
+              uid_req_EnergyLevel:= 250;
               uid_MSpeed_Upgr    := upgr_uac_BioSpeed;
               uid_Armor_upgr1    := upgr_uac_BioArmor;
               uid_SightR_upgr    := upgr_uac_UnitSightR;
@@ -709,7 +709,7 @@ UID_Sergant : begin
               end;
 UID_ZSergant: begin
               uid_uibtn          := 14;
-              uid_req_UACLoot    := 100;
+              uid_req_UACLoot    := 125;
               uid_ProdTimeSec    -= uid_ProdTimeSec div 4;
               uid_MSpeed_Base    += UpgradeUnitSpeedBonus;
               uid_Armor_upgr1    := upgr_hell_UnitArmor;
