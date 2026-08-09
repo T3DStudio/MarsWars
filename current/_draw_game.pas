@@ -641,9 +641,11 @@ end;
 begin
    if(map_KeyPointsN<=0)then exit;
 
-   if(map_scenario=mc_KotH)
-   then sdir:=g_tick/25
-   else sdir:=g_tick/4;
+   sdir:=0;
+   case map_scenario of
+   mc_KotH     : sdir:=g_tick/25;
+   mc_KeyPoints: sdir:=g_tick/4;
+   end;
 
    for t:=0 to map_KeyPointsN-1 do
      with map_KeyPointsL[t] do

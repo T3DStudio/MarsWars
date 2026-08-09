@@ -855,16 +855,27 @@ begin
    end;
 end;
 
-procedure cleffect_teleport(uu,pu:PTUnit);
+procedure cleffect_teleport(cur_u,prev_u:PTUnit);
+var sx,sy:integer;
 begin
-   with uu^  do
+   with cur_u^  do
    begin
       vx:=x;
       vy:=y;
+      if(prev_u<>nil)then
+      begin
+         sx:=prev_u^.vx;
+         sy:=prev_u^.vy;
+      end
+      else
+      begin
+         sx:=NOTSET;
+         sy:=NOTSET;
+      end;
       case uidi of
-      UID_HKeep : effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube,uu);
-      UID_HAKeep: effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube,uu);
-      else        effect_teleport(pu^.vx,pu^.vy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     ,uu);
+      UID_HKeep : effect_teleport(sx,sy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube,cur_u);
+      UID_HAKeep: effect_teleport(sx,sy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube,cur_u);
+      else        effect_teleport(sx,sy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     ,cur_u);
       end;
    end;
 end;
@@ -924,7 +935,7 @@ begin
         begin
            unit_CalcFogR(pu_cur);
            if(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(pu_cur,             @vis);
-           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (pu_cur,             @vis);
+           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (pu_cur,             nil );
            if(buffs[ub_HellVision   ]>0)then   effect_Common    (pu_cur,EID_HVision ,@vis);
            if(buffs[ub_Heroic       ]>0)then   effect_Common    (pu_cur,EID_PowerUp ,@vis);
            if(buffs[ub_SphereInvuln ]>0)
@@ -967,7 +978,7 @@ begin
           begin
              if(hits>hits_ndead)and(cuTransport=nil)then
              begin
-                if(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,@vis);
+                if(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev);
 
                 with uid^ do
                   if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
@@ -1002,8 +1013,9 @@ begin
             if(hits>0)then
             begin
                case(speed>0)of
-               false: if(    buffs[ub_Teleported]> 0)then if(pu_prev^.x<>x)or(pu_prev^.y<>y)then cleffect_teleport(pu_cur,pu_prev);
-               true : if(pu_prev^.buffs[ub_Teleported]<=0)  and(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev);
+               false: if(         buffs[ub_Teleported]> 0)then
+                                                   if(pu_prev^.x<>x)or(pu_prev^.y<>y)then cleffect_teleport(pu_cur,pu_prev);
+               true : if(pu_prev^.buffs[ub_Teleported]<=0)and(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev);
                end;
                if (pu_prev^.buffs[ub_Summoned     ]<=0)and(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(pu_cur,             @vis);
                if (pu_prev^.buffs[ub_PainState    ]<=0)and(buffs[ub_PainState    ]>0)then   effect_UnitPain  (pu_cur,             @vis);

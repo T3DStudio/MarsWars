@@ -23,7 +23,7 @@ end;
 
 procedure camp_Win;
 begin
-   if(not Game_IsEnded)then
+   if(not game_IsEnded)then
    begin
       camp_data.cd_lastm+=1;
       game_SetStatusWinnerTeam(g_PlayersGame[LocalPlayer].team);

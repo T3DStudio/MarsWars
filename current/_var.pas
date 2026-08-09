@@ -655,6 +655,9 @@ PlayerColorsSchemeCurNormal,
 PlayerColorsSchemeCurShadow: TPlayersColorScheme;
 PlayerColorDefaultNormal   : TMWColor = 0;
 PlayerColorDefaultShadow   : TMWColor = 0;
+KeyPointColorDefaultNormal : TMWColor = 0;
+KeyPointColorDefaultShadow : TMWColor = 0;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

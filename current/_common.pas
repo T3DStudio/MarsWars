@@ -590,12 +590,10 @@ lmt_player_nready,
 lmt_replay_RecStart,
 lmt_replay_RecStop,
 lmt_replay_RecError,
-lmt_kpoint_CaptureStart,
 lmt_kpoint_Captured,
 lmt_ngen_exh,
 lmt_ngen_captured,
 lmt_ngen_lost,
-lmt_ngen_Alarm,
 lmt_koth_CaptureStart,
 lmt_koth_Alarm,
 lmt_other_UACStrike,
@@ -609,6 +607,8 @@ lmt_game_ResetIn,
 lmt_game_Paused,
 lmt_game_Resumed
                      :;
+lmt_kpoint_CaptureStart,
+lmt_ngen_Alarm       : if(player_LogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype              ]))then exit;
 
 lmt_unit_attackedU,
 lmt_unit_attackedB,
@@ -1196,6 +1196,22 @@ end;
 //   GAME COMMON
 //
 
+procedure player_SetDefeat(player:PTPlayerGameData);
+begin
+   with player^ do
+     if(not isdefeated)and(not isobserver)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
+     begin
+        isdefeated:=true;
+        {$IFDEF _FULLGAME}
+        if(ServerSide)then
+        {$ENDIF}
+          GameLog_PlayerDefeated(pnum);
+        if(g_NewObservers)then
+          if(state=ps_human){$IFDEF TESTMODE}or(TestMode>0){$ENDIF}then isobserver:=true;
+        build_cd:=0;
+     end;
+end;
+
 function game_CheckRoyalBattlePoint(x,y,sizeR:integer):boolean;
 begin
    if(map_scenario=mc_royale)
@@ -1203,18 +1219,28 @@ begin
    else game_CheckRoyalBattlePoint:=false;
 end;
 
-function Game_IsEnded:boolean;
+function game_IsEnded:boolean;
 begin
-   Game_IsEnded:=(gs_win_team0<=g_status)and(g_status<=gs_win_team7);
+   game_IsEnded:=(gs_win_team0<=g_status)and(g_status<=gs_win_team7);
 end;
 
-procedure game_SetStatusWinnerTeam(team:byte);
+procedure game_SetStatusDefeatedNTeam(wteam:byte);
+var p:byte;
 begin
-   if(team>LastPlayer)
-   or(Game_IsEnded)then exit;
+   for p:=0 to LastPlayer do
+     with g_PlayersGame[p] do
+       if(team<>wteam)then player_SetDefeat(@g_PlayersGame[p]);
+end;
 
-   g_status:=gs_win_team0+team;
-   GameLog_EndGame(team);
+procedure game_SetStatusWinnerTeam(wteam:byte);
+begin
+   if(wteam>LastPlayer)
+   or(game_IsEnded)then exit;
+
+   g_status:=gs_win_team0+wteam;
+   GameLog_EndGame(wteam);
+
+   game_SetStatusDefeatedNTeam(wteam);
 
    {$IFDEF _FULLGAME}
    if(not ui_ScoresShow)then
@@ -2072,16 +2098,17 @@ end;
 function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):TMWColor;
 begin
    case shadow of
-   false: KeyPoint_GetColor:=PlayerColorDefaultNormal;
-   true : KeyPoint_GetColor:=PlayerColorDefaultShadow;
+   false: KeyPoint_GetColor:=KeyPointColorDefaultNormal;
+   true : KeyPoint_GetColor:=KeyPointColorDefaultShadow;
    end;
    if(keyPoint>LastKeyPoint)then exit;
    with map_KeyPointsL[keyPoint] do
      with kp_TeamData[KeyPoint_GetPlayerTeam(UIPlayer)] do
        if(kptd_Active)then
-         if(kptd_Timer>0)and(ui_blink3=0)
-         then KeyPoint_GetColor:=PlayerGetColorCur(kptd_TimerOwnerPlayer,shadow)
-         else KeyPoint_GetColor:=PlayerGetColorCur(kptd_OwnerPlayer     ,shadow);
+         case(kptd_Timer>0)and(ui_blink3=0)of
+         true : if(kptd_TimerOwnerPlayer<=LastPlayer)then KeyPoint_GetColor:=PlayerGetColorCur(kptd_TimerOwnerPlayer,shadow);
+         false: if(kptd_OwnerPlayer     <=LastPlayer)then KeyPoint_GetColor:=PlayerGetColorCur(kptd_OwnerPlayer     ,shadow);
+         end;
 end;
 
 function ui_SetUIPlayer(NewPlayerN:byte;check:boolean):boolean;
@@ -2127,7 +2154,7 @@ begin
    if(rpls_pstate>=rpls_read)
    then ui_ControlTabTypeF:=tcc_replay
    else
-     if(g_type<>gt_campaing)and((g_PlayersGame[LocalPlayer].isobserver)or(Game_IsEnded))
+     if(g_type<>gt_campaing)and((g_PlayersGame[LocalPlayer].isobserver)or(game_IsEnded))
      then ui_ControlTabTypeF:=tcc_observer
      else ui_ControlTabTypeF:=tcc_controls;
 end;

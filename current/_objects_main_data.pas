@@ -1832,8 +1832,8 @@ begin
    //                                   base X +
    //       race id                     time      lvl  enr  X +    rupgr         ruid
    u:=0;
-   setUPGR(r_hell,upgr_hell_DistDamage1 ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   );
-   setUPGR(r_hell,upgr_hell_UnitArmor   ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   );
+   setUPGR(r_hell,upgr_hell_DistDamage1 ,60 ,0,35,5   ,700 ,0,800 ,0            ,0                   );
+   setUPGR(r_hell,upgr_hell_UnitArmor   ,60 ,0,30,5   ,600 ,0,600 ,0            ,0                   );
    setUPGR(r_hell,upgr_hell_BuildArmor  ,60 ,0,20,5   ,600 ,0,800 ,0            ,0                   );
    setUPGR(r_hell,upgr_hell_MeleeDamage ,60 ,0,30,5   ,600 ,0,400 ,0            ,0                   );
    setUPGR(r_hell,upgr_hell_Regeneration,60 ,0,30,2   ,300 ,0,300 ,0            ,0                   );
@@ -1847,7 +1847,7 @@ begin
    setUPGR(r_hell,upgr_hell_Spectre     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_UnitSightR  ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_Phantoms    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
-   setUPGR(r_hell,upgr_hell_DistDamage2 ,60 ,0,35,5   ,600 ,0,700 ,0            ,UID_HMonastery      );
+   setUPGR(r_hell,upgr_hell_DistDamage2 ,60 ,0,35,5   ,700 ,0,800 ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_Resurrect   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_TeleportCD  ,60 ,0,30,2   ,400 ,0,200 ,0            ,UID_HFortress       );
    setUPGR(r_hell,upgr_hell_T2TNoCD     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress       );
@@ -1858,8 +1858,8 @@ begin
    setUPGR(r_hell,upgr_hell_FTowerAMech ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress       );
 
    u:=0;
-   setUPGR(r_uac ,upgr_uac_DistDamage   ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   );
-   setUPGR(r_uac ,upgr_uac_BioArmor     ,60 ,0,35,5   ,600 ,0,700 ,0            ,0                   );
+   setUPGR(r_uac ,upgr_uac_DistDamage   ,60 ,0,35,5   ,700 ,0,800 ,0            ,0                   );
+   setUPGR(r_uac ,upgr_uac_BioArmor     ,60 ,0,30,5   ,600 ,0,600 ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_BuildArmor   ,60 ,0,35,5   ,600 ,0,800 ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_RepairTools  ,60 ,0,30,2   ,600 ,0,400 ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_BioSpeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   );
@@ -1875,7 +1875,7 @@ begin
    setUPGR(r_uac ,upgr_uac_CommandoInvis,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_AASplash     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_MechSpeed    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UScienceCenter  );
-   setUPGR(r_uac ,upgr_uac_MechArmor    ,60 ,0,35,5   ,600 ,0,700 ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_MechArmor    ,60 ,0,30,5   ,600 ,0,600 ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_TerAAWeapon  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_Transport    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_RadarR       ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_UComputerStation);

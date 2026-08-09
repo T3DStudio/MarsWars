@@ -285,8 +285,12 @@ begin
       if(PointInCam(vx,vy))
       or(PointInCam(tx,ty))then
         snd_SoundPlayUnit(snd,nil,nil);
-      effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart,true);
-      effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  ,true);
+      if (0<vx)and(vx<map_Size1)
+      and(0<vy)and(vy<map_Size1)then
+        effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart,true);
+      if (0<tx)and(tx<map_Size1)
+      and(0<ty)and(ty<map_Size1)then
+        effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  ,true);
    end;
 end;
 

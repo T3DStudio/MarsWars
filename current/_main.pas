@@ -21,7 +21,6 @@ uses SysUtils, SDL, SDL_Net,crt
 
 {$include _common.pas}
      {$IFDEF _FULLGAME}
-        //{$include .pas}
         {$include _sounds.pas}
      {$ENDIF}
 {$include _net_com.pas}

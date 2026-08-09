@@ -251,7 +251,7 @@ begin
    str_gmsg_PlayerConnected      := ' has connected';
    str_gmsg_PlayerLeave          := ' left the game';
    str_gmsg_PlayerTimeOut        := ' was kicked due to a timeout';
-   str_gmsg_PlayerDefeat         := ' was terminated';
+   str_gmsg_PlayerDefeat         := ' was defeated';
    str_gmsg_PlayerSurrender      := ' surrenders';
    str_gmsg_PlayerPaused         := ' paused the game';
    str_gmsg_PlayerResumed        := ' resumed the game';

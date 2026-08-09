@@ -2732,19 +2732,6 @@ begin
    end;
 end;
 
-procedure player_SetDefeat(player:PTPlayerGameData);
-begin
-   with player^ do
-     if(not isdefeated)and(not isobserver)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
-     begin
-        isdefeated:=true;
-        GameLog_PlayerDefeated(pnum);
-        if(g_NewObservers)then
-          if(state=ps_human){$IFDEF TESTMODE}or(TestMode>0){$ENDIF}then isobserver:=true;
-        build_cd:=0;
-     end;
-end;
-
 procedure unit_remove(pu:PTUnit);
 begin
    with pu^ do

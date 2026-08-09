@@ -164,8 +164,11 @@ begin
       name :=PlayerName;
    end;
 
-   PlayerColorDefaultNormal:=c_white;
-   PlayerColorDefaultShadow:=gfx_ShadowColor(PlayerColorDefaultNormal);
+   KeyPointColorDefaultNormal:=c_ltgray;
+   KeyPointColorDefaultShadow:=gfx_ShadowColor(KeyPointColorDefaultNormal);
+
+   PlayerColorDefaultNormal  :=c_white;
+   PlayerColorDefaultShadow  :=gfx_ShadowColor(PlayerColorDefaultNormal);
 
    PlayerColorsSchemeDefault[0]:=c_red;
    PlayerColorsSchemeDefault[1]:=c_orange;
@@ -308,6 +311,7 @@ end;
 procedure game_LocalEnd;
 begin
    Scenario_KeyPointsEndGameClientFix;
+   game_SetStatusDefeatedNTeam(g_status-gs_win_team0);
    ui_ScoresRebuild:=true;
    if(not ui_ScoresShow)then
      ui_ToggleShowScores;
@@ -326,7 +330,7 @@ begin
    or(rpls_pstate=rpls_read)
    {$ENDIF}
    or(not g_NewObservers)
-   or(g_started and Game_IsEnded)then exit;
+   or(g_started and game_IsEnded)then exit;
 
    with g_PlayersGame[pid] do
      if(state<>ps_Human)
