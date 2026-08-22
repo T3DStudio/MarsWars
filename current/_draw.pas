@@ -78,8 +78,8 @@ begin
       end;   }
 
       //
-     // for i:=0 to fog_TileSetSize do
-      //  draw_sdlsurface(vid_screen,20+i*fog_cr*2,20,ui_fog_Tiles[i] );
+      {for n:=0 to fog_TileSetSize do
+        draw_sdlsurface(vid_screen,20+n*fog_cr*2,20,ui_fog_Tiles[n] );   }
 
    {n:=0;
    if(UIPlayer<=LastPlayer)then

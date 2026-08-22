@@ -580,7 +580,7 @@ begin
    cy:=-ui_cam_y mod map_ter_h;
 
    if(ui_cam_x<0)then cx-=map_ter_w;
-   if(ui_cam_y<0)then cy-=map_ter_w;
+   if(ui_cam_y<0)then cy-=map_ter_h;
 
    draw_sdlsurface(tar,cx,cy,map_terrain);
 
@@ -715,22 +715,89 @@ cx,cy,
 sx,sy,
 ssx,ssy,i,
 sty    : integer;
-function GV(fx,fy:integer):boolean;
+function GP(fx,fy:integer):boolean;
 begin
-   GV:=true;
+   GP:=true;
    if((ui_fog_sx+fx)<0)
    or((ui_fog_sy+fy)<0)
    or((ui_fog_sx+fx)>map_fog_ex)
    or((ui_fog_sy+fy)>map_fog_ey)then exit;
    if (0<=fx)and(fx<ui_fog_gridw)
-   and(0<=fy)and(fy<ui_fog_gridh)then GV:=not ui_fog_pgrid[fx,fy];
+   and(0<=fy)and(fy<ui_fog_gridh)then GP:=not ui_fog_pgrid[fx,fy];
 end;
+procedure drawFogGrid(step:integer);
+function fRect(check:boolean):boolean;
+var ix,iy:integer;
+begin
+   fRect:=true;
+   for ix:=cx to cx+step-1 do
+   for iy:=cy to cy+step-1 do
+     if (0<=ix)and(ix<ui_fog_gridw)
+     and(0<=iy)and(iy<ui_fog_gridh)then
+       case check of
+       false: ui_fog_fgrid[ix,iy]:=false;
+       true : if(not ui_fog_fgrid[ix,iy])
+              or((   ui_fog_pgrid[ix,iy])and(step>1))then
+              begin
+                 fRect:=false;
+                 exit;
+              end;
+       end;
+end;
+begin
+   ssx :=-ui_cam_fx;
+   sty :=-ui_cam_fy;
+
+   if(ui_cam_x>=0)then sx:=0 else begin sx:=-1;ssx-=fog_cw;end;
+   if(ui_cam_y>=0)then sy:=0 else begin sy:=-1;sty-=fog_cw;end;
+
+   cx:=sx;
+   while(cx<ui_fog_gridw)do
+   begin
+      ssy:=sty;
+      cy :=sy;
+      while(cy<ui_fog_gridh)do
+      begin
+         if(fRect(true))then
+         begin
+            case step of
+            1 : begin
+                   i:=TileSetGetN(GP(cx,cy-1),
+                      GP(cx-1,cy),GP(cx,cy  ),GP(cx+1,cy),
+                                  GP(cx,cy+1));
+                   if(0<=i)and(i<=fog_TileSetSize)then
+                     draw_sdlsurface(tar,ssx,ssy,ui_fog_Tiles[i]);
+                end;
+            4 : draw_sdlsurface(tar,ssx, ssy, ui_fog_TileFx4);
+            end;
+            fRect(false);
+         end;
+
+         ssy+=fog_cw*step;
+         cy +=step;
+      end;
+      ssx+=fog_cw*step;
+      cx +=step;
+   end;
+end;
+
 begin
    for cx:=0 to ui_fog_gridw-1 do
    for cy:=0 to ui_fog_gridh-1 do
-   ui_fog_pgrid[cx,cy]:=ui_fog_fgrid[cx,cy];
+   begin
+      ui_fog_pgrid[cx,cy]:=ui_fog_fgrid[cx,cy];
+      ui_fog_fgrid[cx,cy]:=true;
+   end;
 
-   ssx :=-ui_cam_fx;
+   drawFogGrid(4);
+   //drawFogGrid(2);
+   drawFogGrid(1);
+
+   for cx:=0 to ui_fog_gridw-1 do
+   for cy:=0 to ui_fog_gridh-1 do
+   ui_fog_fgrid[cx,cy]:=false;
+
+   {ssx :=-ui_cam_fx;
    sty :=-ui_cam_fy;
 
    if(ui_cam_x>=0)then sx:=0 else begin sx:=-1;ssx-=fog_cw;end;
@@ -741,16 +808,26 @@ begin
       ssy:=sty;
       for cy:=sy to ui_fog_gridh-1 do
       begin
-         i:=TileSetGetN(GV(cx,cy-1),
-            GV(cx-1,cy),GV(cx,cy  ),GV(cx+1,cy),
-                        GV(cx,cy+1));
+
+         if(cx>=0)and(cy>=0)then
+           if(not ui_fog_fgrid[cx,cy])then
+           begin
+              ssy+=fog_cw;
+              continue;
+           end;
+         //ui_fog_TileFx2
+
+         i:=TileSetGetN(GP(cx,cy-1),
+            GP(cx-1,cy),GP(cx,cy  ),GP(cx+1,cy),
+                        GP(cx,cy+1));
          if(0<=i)and(i<=fog_TileSetSize)then draw_sdlsurface(tar,ssx, ssy, ui_fog_Tiles[i]);
          if(cx>=0)and(cy>=0)then
-         ui_fog_fgrid[cx,cy]:=false;
-         ssy+=fog_cw;
+           ui_fog_fgrid[cx,cy]:=false;
+
+
       end;
       ssx+=fog_cw;
-   end;
+   end; }
 
    {ssx:=-ui_cam_fx;
    while(ssx<ui_cam_w)do
@@ -850,7 +927,7 @@ begin
            draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
            draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColorDef(playeri));
-           draw_text(vid_screen,ix,iy+30,i2s(aiu_NeedDetect), ta_LU,255, PlayerGetColorDef(playeri));
+           draw_text(vid_screen,ix,iy+30,i2s(buffs[ub_Cast]), ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));

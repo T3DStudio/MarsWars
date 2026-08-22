@@ -289,6 +289,12 @@ TAPMData = record
    apm_cur      : word;
 end;
 
+TSysMessage = record
+   sm_line : shortstring;
+   sm_time : integer;
+   sm_id   : byte;
+end;
+
 {$ENDIF}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,6 +318,7 @@ TUnitAbility = record
    ua_rldDec_upgr : byte;
    ua_rldDec_upgrS,
    ua_rldDec_level: integer;
+   ua_ChangeableTarget,
    ua_OrderToAll  : boolean;
    {$IFDEF _FULLGAME}
    ua_mbrush_r    : integer;
@@ -429,6 +436,7 @@ TUID = record
    uid_MaxHitsh,
    uid_MaxHitsq          : longint;
    uid_r,
+   uid_RoyalBattleAutoOutR,
    uid_missileR,
    uid_req_HellPower,
    uid_req_UACLoot,
@@ -650,6 +658,7 @@ PTLogMes = ^TLogMes;
 TPlayerDataScore = record
    ps_name      : shortstring;
    ps_state,
+   ps_team,
    ps_race      : byte;
 
    ps_data_c    : array[0..psc_Last] of cardinal;

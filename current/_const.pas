@@ -261,9 +261,6 @@ lmt_invalid_Target     = 69;
 lmt_Invalid_Order      = 70;
 lmt_other_UACStrike    = 71;
 lmt_other_UACScan      = 72;
-lmt_replay_RecStart    = 73;
-lmt_replay_RecStop     = 74;
-lmt_replay_RecError    = 75;
 
 lmts_menu_chat         = [
                           lmt_chat_player0..
@@ -284,10 +281,7 @@ lmts_menu_chat         = [
                           lmt_player_revealed,
                           lmt_player_surrender,
                           lmt_player_ready,
-                          lmt_player_nready,
-                          lmt_replay_RecStart,
-                          lmt_replay_RecStop,
-                          lmt_replay_RecError
+                          lmt_player_nready
                          ];
 lmts_last_events       = [1..255];
 
@@ -309,7 +303,7 @@ Quality2Units             : array[0..net_MaxQuality] of byte = (15,35 ,55 ,75 ,9
 
 TTLMaxClientLobby         = fr_fps1*10;
 TTLMaxClientGame          = fr_fps1*60;
-TTLServer                 = fr_fps1;
+TTLServer                 = fr_fpsh;
 
 net_MaxPing               = word.MaxValue-fr_FrameMS;
 
@@ -681,7 +675,7 @@ ul3                    = MinUnitLimit*3;
 ul4                    = MinUnitLimit*4;
 ul5                    = MinUnitLimit*5;
 //ul6                    = MinUnitLimit*6;
-//ul8                    = MinUnitLimit*8;
+ul8                    = MinUnitLimit*8;
 ul10                   = MinUnitLimit*10;
 ul12                   = MinUnitLimit*12;
 ul15                   = MinUnitLimit*15;
@@ -727,17 +721,17 @@ BaseDamageLevel1       = 2.5;
 BaseArmorLevel1        = 2.5;
 
 UpgradeUnitSpeedBonus  = 2;
-UpgradeDamageBonus1    = 7;
-UpgradeArmorBonus1     = 7;
+UpgradeDamageBonus1    = 8;
+UpgradeArmorBonus1     = 8;
 UpgradeUnitArmorBonus  = UpgradeArmorBonus1;
-UpgradeBuildArmorBonus = UpgradeArmorBonus1*2+round(UpgradeArmorBonus1/2);
+UpgradeBuildArmorBonus = UpgradeArmorBonus1*2+(UpgradeArmorBonus1 div 2);
 
 BaseHeal1              = BaseRegen1*4;
 BaseHealBonus1         = BaseHeal1 div 3;
 BaseRepair1            = BaseRegen1*4;
 BaseRepairBonus1       = BaseRepair1 div 3;
 
-DecayAuraDamage        = UpgradeDamageBonus1;
+DecayAuraDamage        = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -971,8 +965,9 @@ psc_builds_lost        = 9;
 psc_builds_destroyed   = 10;
 psc_upgrades_level     = 11;
 psc_units_ExpTotal     = 12;
+psc_InGameTime         = 13;
 
-psc_Last               = 12;
+psc_Last               = 13;
 
 psi_res_energy_max     = 0;
 psi_res_UACLoot        = 1;
@@ -1037,6 +1032,9 @@ UACLoot_Max            = 30000;
 UACStrike_Revealing_sec= 5;
 UACStrike_Revealing    = UACStrike_Revealing_sec*fr_fps1;
 
+UACStrike_t0           = fr_fps1 div 5;
+UACStrike_t1           = fr_fps1-UACStrike_t0;
+
 detection_time_sec     = 8;
 detection_time         = fr_fps1*detection_time_sec;
 
@@ -1081,14 +1079,14 @@ fly_height             : array[false..true] of integer = (1,fly_z);
 pain_time_hell         = fr_fps1;
 pain_time_uac          = fr_fpsh;
 
-ai_names_max           = 57;
+ai_names_max           = 58;
 ai_names_o             : array[0..ai_names_max-1] of shortstring = (
                          ' TGA'       ,' NRM'       ,' BFG'       ,' Dant3'    ,' marat'    ,' Notarget'  ,' Am$ek'     ,' Chainie'   ,' BND'       ,' NicoTheFug',
                          ' Mud'       ,' Aurora'    ,' Archi'     ,' print423' ,' Rising'   ,' KolyanRPG' ,' Boiec'     ,' ManWithGun',' Teran'     ,' ZZYZX'     ,
                          ' Jet'       ,' ABK'       ,' NekoRanger',' OutCast'  ,' Igara'    ,' VoZj'      ,' Raymund'   ,' Murphy'    ,' Jabberwock',' NikcGreen' ,
                          ' Zetor'     ,' Bertie'    ,' Doomersov' ,' Seifer'   ,' Mostcus'  ,' CWolf'     ,' Ipse'      ,' Sergh'     ,' cybermind' ,' Dem'       ,
                          ' Romero'    ,' Carmack'   ,' Keen'      ,' BJ'       ,' Doomguy'  ,' Slayer'    ,' Ranger'    ,' Grunt'     ,' Deimos'    ,' Phobos'    ,
-                         ' Bitterman' ,' [LeD]JakeC',' Wereknight',' ArKnife'  ,' Revento'  ,' DRON12261' ,' Krik_IDDQD');
+                         ' Bitterman' ,' [LeD]JakeC',' Wereknight',' ArKnife'  ,' Revento'  ,' DRON12261' ,' Krik_IDDQD',' Stormfire' );
 
 DefaultTargetWeight    = 100;
 
@@ -1401,6 +1399,7 @@ smt_terminat           = 23; //UID_Terminator
 smt_transport          = 24; //UID_Transport
 smt_flyer              = 25; //UID_FLyer
 smt_effect2            = 26; // simple missile or effect
+smt_rstrike            = 27; // tactikal strike UAC
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1563,6 +1562,11 @@ ui_Objectives_LineLen  = 27;
 
 ui_HintLineLenUnit     = 50;
 
+
+// System messages
+
+ui_SysMessagesMax      = 5;
+ui_SysMessagesLast     = ui_SysMessagesMax;
 
 // abilities
 

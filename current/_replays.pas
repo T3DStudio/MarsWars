@@ -254,7 +254,7 @@ begin
    if(length(rpls_str_path)>0)then
    begin
       if(rpls_pstate=rpls_write)
-      or(rpls_fstate=rpls_write)then GameLogRecStop(rpls_str_path);
+      or(rpls_fstate=rpls_write)then ui_SysMassageAdd(str_gmsg_RecordStop+rpls_str_path,0);
    end;
    if(rpls_fstate>rpls_none)then
    begin
@@ -314,9 +314,9 @@ begin
       begin
          replay_Abort;
          rpls_pstate:=rpls_none;
-         GameLogRecError(fname+rpls_file_LastErrS);
+         ui_SysMassageAdd(str_gmsg_RecordError+fname+rpls_file_LastErrS,2);
       end
-      else GameLogRecStart(fname);
+      else ui_SysMassageAdd(str_gmsg_RecordStart+fname,0);
    end;
 end;
 
@@ -366,7 +366,7 @@ begin
    begin
       replay_Abort;
       rpls_pstate:=rpls_none;
-      GameLogRecError(rpls_str_path+rpls_file_LastErrS);
+      ui_SysMassageAdd(str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS,2);
    end;
 end;
 

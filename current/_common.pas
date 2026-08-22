@@ -587,9 +587,6 @@ lmt_player_defeated,
 lmt_player_revealed,
 lmt_player_ready,
 lmt_player_nready,
-lmt_replay_RecStart,
-lmt_replay_RecStop,
-lmt_replay_RecError,
 lmt_kpoint_Captured,
 lmt_ngen_exh,
 lmt_ngen_captured,
@@ -777,29 +774,6 @@ begin
        then players_LogAdd(255,log_to_all,lmt_player_ready ,0,0,name,0,0)
        else players_LogAdd(255,log_to_all,lmt_player_nready,0,0,name,0,0)
 end;
-
-{$IFDEF _FULLGAME}
-// RECORDS
-procedure GameLogRecStart(fname:shortstring);
-begin
-   players_LogAdd(LocalPlayer,0,lmt_replay_RecStart,0,0,fname,0,0)
-end;
-procedure GameLogRecStop (fname:shortstring);
-begin
-   players_LogAdd(LocalPlayer,0,lmt_replay_RecStop,0,0,fname,0,0)
-end;
-procedure GameLogRecError(errorStr:shortstring);
-begin
-   players_LogAdd(LocalPlayer,0,lmt_replay_RecError,0,0,errorStr,0,0)
-end;
-
-// SYSTEM INFO
-procedure GameLogCommon(errorStr:shortstring);
-begin
-   //players_LogAdd(LocalPlayer,0,lmt_replay_RecError,0,0,errorStr,0,0)
-end;
-
-{$ENDIF}
 
 // GAME
 procedure GameLog_ReadyToStart;
@@ -1193,6 +1167,63 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+//   GAME SCORES
+//
+
+
+procedure game_ScoresAddC(playerN,stype:byte;value:cardinal=1);
+begin
+   if(stype>psc_Last)
+   or(playerN>LastPlayer)then exit;
+
+   with g_PlayersScore[playerN] do
+     if(stype=psc_InGameTime)
+     then ps_data_c[stype]:=value
+     else
+       if((ps_data_c[stype]+value)<ps_data_c[stype].MaxValue)
+       then ps_data_c[stype]+=value
+       else ps_data_c[stype]:=ps_data_c[stype].MaxValue;
+end;
+
+procedure game_ScoresAddI(playerN,stype:byte;value:integer);
+begin
+   if(stype>psi_Last)
+   or(playerN>LastPlayer)then exit;
+
+   with g_PlayersScore[playerN] do
+     if(stype=psi_res_energy_max)
+     then ps_data_i[stype]:=max2i(ps_data_i[stype]      ,value)
+     else
+     begin
+        ps_data_i[stype]+=value;
+        if(ps_data_i[stype]<0)then ps_data_i[stype]:=ps_data_i[stype].MaxValue;
+     end;
+end;
+
+procedure game_ScoresInit;
+var p:byte;
+begin
+   {$IFDEF _FULLGAME}
+   ui_ScoresRebuild:=true;
+   {$ENDIF}
+   FillChar(g_PlayersScore,SizeOf(g_PlayersScore),0);
+   for p:=0 to LastPlayer do
+     with g_PlayersGame[p] do
+       if(state>ps_none)and(not isobserver)then
+         with g_PlayersScore[p] do
+         begin
+            ps_name :=name;
+            ps_state:=state;
+            ps_race :=race;
+            ps_team :=team;
+
+            game_ScoresAddC(p,psc_units_created ,cardinal(units_bld_e[false]));
+            game_ScoresAddC(p,psc_builds_created,cardinal(units_bld_e[true ]));
+         end;
+end;
+
+////////////////////////////////////////////////////////////////////////////////
+//
 //   GAME COMMON
 //
 
@@ -1205,7 +1236,10 @@ begin
         {$IFDEF _FULLGAME}
         if(ServerSide)then
         {$ENDIF}
-          GameLog_PlayerDefeated(pnum);
+        begin
+           GameLog_PlayerDefeated(pnum);
+           game_ScoresAddC(pnum,psc_InGameTime,g_tick);
+        end;
         if(g_NewObservers)then
           if(state=ps_human){$IFDEF TESTMODE}or(TestMode>0){$ENDIF}then isobserver:=true;
         build_cd:=0;
@@ -1243,64 +1277,10 @@ begin
    game_SetStatusDefeatedNTeam(wteam);
 
    {$IFDEF _FULLGAME}
+   ui_ScoresRebuild:=true;
    if(not ui_ScoresShow)then
      ui_ToggleShowScores;
    {$ENDIF}
-end;
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//   GAME SCORES
-//
-
-
-procedure game_ScoresAddC(playerN,stype:byte;value:cardinal=1);
-begin
-   if(stype>psc_Last)
-   or(playerN>LastPlayer)then exit;
-
-   with g_PlayersScore[playerN] do
-     if((ps_data_c[stype]+value)<ps_data_c[stype].MaxValue)
-     then ps_data_c[stype]+=value
-     else ps_data_c[stype]:=ps_data_c[stype].MaxValue;
-end;
-
-procedure game_ScoresAddI(playerN,stype:byte;value:integer);
-begin
-   if(stype>psi_Last)
-   or(playerN>LastPlayer)then exit;
-
-   with g_PlayersScore[playerN] do
-     if(stype=psi_res_energy_max)
-     then ps_data_i[stype]:=max2i(ps_data_i[stype]      ,value)
-     else
-     begin
-        ps_data_i[stype]+=value;
-        if(ps_data_i[stype]<0)then ps_data_i[stype]:=ps_data_i[stype].MaxValue;
-     end;
-end;
-
-procedure game_ScoresInit;
-var p:byte;
-begin
-   {$IFDEF _FULLGAME}
-   ui_ScoresRebuild:=true;
-   {$ENDIF}
-   FillChar(g_PlayersScore,SizeOf(g_PlayersScore),0);
-   for p:=0 to LastPlayer do
-     with g_PlayersGame[p] do
-       if(state>ps_none)and(not isobserver)then
-         with g_PlayersScore[p] do
-         begin
-            ps_name :=name;
-            ps_state:=state;
-            ps_race :=race;
-
-            game_ScoresAddC(p,psc_units_created ,cardinal(units_bld_e[false]));
-            game_ScoresAddC(p,psc_builds_created,cardinal(units_bld_e[true ]));
-         end;
 end;
 
 
@@ -2428,6 +2408,36 @@ end;
 //   UI LOG
 //
 
+procedure ui_SysMassageAdd(mline:shortstring;mid:byte;mtime:integer=fr_fps3);
+var i,n:byte;
+begin
+   n:=255;
+   for i:=0 to ui_SysMessagesLast do
+     with ui_SysMessages[i] do
+       if(sm_time<=0)
+       or(mid=sm_id)then
+       begin
+          sm_time:=mtime;
+          sm_line:=mline;
+          sm_id  :=mid;
+          exit;
+       end
+       else
+         if(n=255)
+         then n:=i
+         else
+           if(ui_SysMessages[i].sm_time<sm_time)
+           then n:=i;
+
+   if(n<=ui_SysMessagesLast)then
+     with ui_SysMessages[n] do
+     begin
+        sm_time:=mtime;
+        sm_line:=mline;
+        sm_id  :=mid;
+     end;
+end;
+
 function ParseLogMessage(ptlog:PTLogMes;mcolor:pTMWColor):shortstring;
 procedure AddDataStr;
 begin
@@ -2644,7 +2654,7 @@ lmt_other_UACStrike   : begin
                            then ParseLogMessage:=g_PlayersGame[lm_data_u].name
                            else ParseLogMessage:='???';
                            ParseLogMessage+=str_warn_UACStrike;
-                           mcolor^:=c_dred;
+                           mcolor^:=c_brown;
                         end;
 lmt_other_UACScan     : begin
                            ParseLogMessage:=str_warn_UACScan;
@@ -2652,16 +2662,6 @@ lmt_other_UACScan     : begin
                            then ParseLogMessage+=g_PlayersGame[lm_data_u].name
                            else ParseLogMessage+='???';
                            mcolor^:=c_lime;
-                        end;
-lmt_replay_RecStart,
-lmt_replay_RecStop,
-lmt_replay_RecError   : begin
-                           case lm_type of
-                           lmt_replay_RecStart: ParseLogMessage:=str_gmsg_RecordStart+tc_white+lm_string;
-                           lmt_replay_RecStop : ParseLogMessage:=str_gmsg_RecordStop +tc_white+lm_string;
-                           lmt_replay_RecError: ParseLogMessage:=str_gmsg_RecordError+tc_white+lm_string;
-                           end;
-                           mcolor^:=c_brown;
                         end;
      else               ParseLogMessage:='UNKNOWN MESSAGE TYPE';
                         mcolor^:=c_purple;

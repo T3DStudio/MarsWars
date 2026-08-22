@@ -1,6 +1,6 @@
 const
 
-camp_MaxNMAIUpgrades = 20;
+camp_MaxNMAIUpgrades = 16;
 
 camp_AutoSavePrefix  = 'CampaignAutoSave_';
 
@@ -25,7 +25,13 @@ procedure camp_Win;
 begin
    if(not game_IsEnded)then
    begin
-      camp_data.cd_lastm+=1;
+      with camp_data do
+        if(camp_data.cd_lastm<camp_mis_sel)
+        then cd_lastm:=camp_mis_sel+1
+        else
+          if(camp_data.cd_lastm=camp_mis_sel)
+          then cd_lastm+=1;
+
       game_SetStatusWinnerTeam(g_PlayersGame[LocalPlayer].team);
       saveload_SaveWrite(camp_AutoSavePrefix+str_DateTime);
    end;
@@ -144,7 +150,8 @@ begin
    if(length(added)=0)then exit;
 
    player_SetAllowedUnits(ap,uids, MaxUnits,false);
-   GameLog_Chat(255,LocalPlayer,str_Camp_NewUnits+added);
+
+   ui_SysMassageAdd(str_Camp_NewUnits+added,50,fr_fps6);
 end;
 
 procedure camp_NightmareLvlUp(level:byte);
@@ -258,7 +265,7 @@ begin
           0 : begin ////////////////////   HELL vs HELL #1    ////////////////////////////////////////////////////////////////////////////
                  FillChar(camp_data,SizeOf(camp_data),0); // first mission of camp
                  camp_data.cd_lastm :=1;
-                 camp_data.cd_NMTime:=fr_fps1*30;
+                 camp_data.cd_NMTime:=fr_fps1*38;
 
                  map_Seed         :=777;
                  map_scenario     :=mc_1x1;
@@ -320,7 +327,7 @@ begin
               end;
 
           1 : begin ////////////////////   HELL vs HELL #2   //////////////////////////////////////////////////////////////////////////////
-                 camp_data.cd_NMTime:=fr_fps1*90;
+                 camp_data.cd_NMTime:=fr_fps1*100;
 
                  map_Seed         :=10666;
                  map_scenario     :=mc_royale;
@@ -356,17 +363,18 @@ begin
                  camp_CreateUnitAreaR(p_player,3,map_PlayerStartX[p_player],map_PlayerStartY[p_player],100,UID_Demon);
 
                  player_SetAllowedUnits   (p_player,[ UID_HKeep,
-                                                     UID_HGate,
-                                                     UID_HPools,
-                                                     UID_HFTower,
-                                                     UID_Imp,
-                                                     UID_Demon             ], MaxUnits,true);
+                                                      UID_HGate,
+                                                      UID_HPools,
+                                                      UID_HFTower,
+                                                      UID_Imp,
+                                                      UID_Demon             ], MaxUnits,true);
                  player_SetAllowedUpgrades(p_player,[ upgr_hell_DistDamage1,
-                                                     upgr_hell_UnitArmor ,
-                                                     upgr_hell_MeleeDamage,
-                                                     upgr_hell_Regeneration,
-                                                     upgr_hell_PainFactor ,
-                                                     upgr_hell_BuilderR    ], 2       ,true);
+                                                      upgr_hell_UnitArmor ,
+                                                      upgr_hell_BuildArmor,
+                                                      upgr_hell_MeleeDamage,
+                                                      upgr_hell_Regeneration,
+                                                      upgr_hell_PainFactor ,
+                                                      upgr_hell_BuilderR    ], 2       ,true);
                  with g_PlayersGame[p_player] do a_ability:=[uab_ToHAKeep];
 
                  // Tribe of Evil (green)

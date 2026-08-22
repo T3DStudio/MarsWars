@@ -172,11 +172,11 @@ begin
    if(h>0)then
    begin
       if(h<10)then hs:='0'+c2s(h) else hs:=c2s(h);
-      str:=hs+':';
+      str+=hs+':';
    end;
    if(m<10)then ms:='0'+c2s(m) else ms:=c2s(m);
    if(s<10)then ss:='0'+c2s(s) else ss:=c2s(s);
-   str:=str+ms+':'+ss;
+   str+=ms+':'+ss;
    draw_text(tar,x,y,str,talign,tlength,color,lastLineY);
 end;
 

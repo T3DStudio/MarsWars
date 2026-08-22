@@ -191,6 +191,7 @@ begin
             wudata_string(ps_name ,rpl);
             wudata_byte  (ps_state,rpl);
             wudata_byte  (ps_race ,rpl);
+            wudata_byte  (ps_team ,rpl);
 
             for i:=0 to psc_Last do wudata_card(ps_data_c[i],rpl);
             for i:=0 to psi_Last do wudata_lint(ps_data_i[i],rpl);
@@ -1246,6 +1247,7 @@ begin
             ps_name :=rudata_string(rpl);
             ps_state:=rudata_byte  (rpl,0);
             ps_race :=rudata_byte  (rpl,0);
+            ps_team :=rudata_byte  (rpl,0);
 
             for i:=0 to psc_Last do ps_data_c[i]:=rudata_card(rpl,0);
             for i:=0 to psi_Last do ps_data_i[i]:=rudata_lint(rpl,0);

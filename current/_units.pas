@@ -241,11 +241,12 @@ begin
             unit_morph:=lmt_Req_UACLoot;
             exit;
          end;
-         if(CheckCollisionR(x,y,pNewUID^.uid_r,unum,pNewUID^.uid_isbuilding,true,255)<>cbr_no)then
-         begin
-            unit_morph:=lmt_prod_BadPlace;
-            exit;
-         end;
+         if(not check)then
+           if(CheckCollisionR(x,y,pNewUID^.uid_r,unum,pNewUID^.uid_isbuilding,true,255)<>cbr_no)then
+           begin
+              unit_morph:=lmt_prod_BadPlace;
+              exit;
+           end;
       end;
 
       if(ulevel>LastUnitLevel)then
@@ -1607,49 +1608,55 @@ begin
      with g_aids[aaid] do
        case ua_type of
        uat_notarget : begin
-                      unit_SetAbilityOrder:=true;
-                      if(check)then exit;
-                      uo_id :=unit_Ability2Act(pu,aaid);
+                         unit_SetAbilityOrder:=true;
+                         if(check)then exit;
+                         uo_id :=unit_Ability2Act(pu,aaid);
                       end;
        uat_point    : begin
-                      unit_SetAbilityOrder:=true;
-                      if(check)then exit;
-                      uo_id :=unit_Ability2Act(pu,aaid);
-                      uo_tar:=0;
-                      uo_bx :=-1;
-                      uo_by :=-1;
-                      if(buffs[ub_Cast]<=0)then
-                      begin
-                         uo_x:=ax;
-                         uo_y:=ay;
-                      end;
+                         unit_SetAbilityOrder:=true;
+                         if(check)then exit;
+                         uo_id :=unit_Ability2Act(pu,aaid);
+                         uo_tar:=0;
+                         uo_bx :=-1;
+                         uo_by :=-1;
+                         if(buffs[ub_Cast]<=0)
+                         or(ua_ChangeableTarget)then
+                         begin
+                            uo_x:=ax;
+                            uo_y:=ay;
+                         end;
                       end;
        uat_UnitAny,
        uat_UnitOwn,
        uat_UnitAlly,
        uat_UnitEnemy: begin
-                      unit_SetAbilityOrder:=true;
-                      if(check)then exit;
-                      uo_id :=unit_Ability2Act(pu,aaid);
-                      uo_tar:=atar;
-                      uo_bx :=-1;
-                      uo_by :=-1;
-                      if(buffs[ub_Cast]<=0)then
-                      begin
-                         uo_x:=x;
-                         uo_y:=y;
-                      end;
+                         unit_SetAbilityOrder:=true;
+                         if(check)then exit;
+                         uo_id :=unit_Ability2Act(pu,aaid);
+                         uo_tar:=atar;
+                         uo_bx :=-1;
+                         uo_by :=-1;
+                         if(buffs[ub_Cast]<=0)
+                         or(ua_ChangeableTarget)then
+                         begin
+                            uo_x:=x;
+                            uo_y:=y;
+                         end;
                       end;
        end;
 end;
 
 function unit_SetBaseOrder(pu:PTUnit;aorder,atar,ax,ay:integer;check:boolean):boolean;
-var skipOrder:boolean;
+var
+skipOrder:boolean;
+tu       :PTUnit;
 begin
    unit_SetBaseOrder:=false;
    with pu^ do
    with uid^ do
    begin
+      tu:=nil;
+      IsUnitRange(atar,@tu);
       skipOrder:=false;
       if(uid_NoOrderWhenCast)then
         if(buffs[ub_Cast]>0)then skipOrder:=true;
@@ -1666,7 +1673,8 @@ begin
                   end
                   else
                     if(not skipOrder)then
-                      if(speed>0)or((uid_CanAttack)and(IsUnitRange(atar,nil)))then
+                      if(speed>0)
+                      or((uid_CanAttack)and(tu<>nil))then
                       begin
                          unit_SetBaseOrder:=true;
                          if(check)then exit;
@@ -1677,6 +1685,7 @@ begin
                          begin
                             uo_x:=ax;
                             uo_y:=ay;
+                            if(tu<>nil)then dir:=point_dir(x,y,tu^.x,tu^.y);
                          end
                          else
                          begin
@@ -1830,7 +1839,7 @@ begin
 
       case aid of
       uab_HellCCLandTo,    
-      uab_UACCCLandTo      :;
+      uab_UACCCLandTo      : ;//if(buffs[ub_Cast]>0)then unit_AbilityCheck:=lmt_ability_Casting;
       uab_HellCCLand,
       uab_UACCCLand        : if(zfall<>0)
                              or(buffs[ub_Cast]>0)then unit_AbilityCheck:=lmt_ability_Casting;
@@ -1877,6 +1886,13 @@ begin
       uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
       uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
       uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,true);
+
+      uab_ToUATurretTo,
+      uab_ToUGTurretTo     : if(unit_Ability2Act(pCaster,aid)<>uo_id)then
+                               case aid of
+                               uab_ToUATurretTo: unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,0    ,true,true);
+                               uab_ToUGTurretTo: unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,0    ,true,true);
+                               end;
 
       uab_LvlUpURadar      : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
       uab_LvlUpURMStation  : unit_AbilityCheck:=unit_AddExp(pCaster,0,true,true);
@@ -2104,9 +2120,9 @@ begin
                                  uab_ToUATurretTo: unit_AbilityExec:=unit_morph(pCaster,uid_UATurret,false,-2,0,false);
                                  uab_ToUGTurretTo: unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret,false,-2,0,false);
                                  end;
-                                 unit_OrderClear(pCaster,ua_amove);
                                  if(unit_AbilityExec>0)
                                  then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y);
+                                 unit_OrderClear(pCaster,ua_amove);
                               end;
                            end;
       else unit_OrderClear(pCaster,ua_amove);
@@ -2359,7 +2375,15 @@ begin
                 begin
                    unit_kill(pu,false,false,true,true,false);
                    exit;
-                end;
+                end
+                else
+                  if(u_royal_d<=uid_RoyalBattleAutoOutR)and(speed>0)and(uo_bx<=0)and(uo_x=x)and(uo_y=y)then
+                    if(uo_id=ua_move)
+                    or(uo_id=ua_amove)then
+                    begin
+                       uo_x:=x+sign(g_royal_Rx-x)*uid_RoyalBattleAutoOutR;
+                       uo_y:=y+sign(g_royal_Ry-y)*uid_RoyalBattleAutoOutR;
+                    end;
              end;
 
              if(uid_isbuilding)and(res_energyl_max<=0)then

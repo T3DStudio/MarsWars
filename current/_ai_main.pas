@@ -178,14 +178,17 @@ begin
        UID_UBarracks,
        UID_UFactory,
        UID_HBarracks,
-       UID_HGate          : if(not unit_IsProducting(pu))then
-                              if(units_uid_c[uidi]>1)and(ai_selfUID_minLevel=level)then
+       UID_HGate          : if(not unit_IsProducting(pu))and(ai_selfUID_minLevel=level)and(units_uid_c[uidi]>2)then
+                              if(uidi=UID_HBarracks)then
+                              begin
+                                 if(res_UACLoot<200)
+                                 and(units_uid_c[uidi]>4)then ai_NeedSuicide:=true;
+                              end
+                              else
                               begin
                                  case uidi of
                                  UID_UBarracks: if(units_uid_c[UID_UBarracks]<units_uid_c[UID_UFactory ])then exit;
                                  UID_UFactory : if(units_uid_c[UID_UFactory ]<units_uid_c[UID_UBarracks])then exit;
-                                 UID_HGate    : if(res_UACLoot>0)and(units_uid_c[UID_HBarracks]> 3)then exit;
-                                 UID_HBarracks: if(res_UACLoot>0)and(units_uid_c[UID_HBarracks]<=3)then exit;
                                  end;
 
                                  i:=ai_GetLevel(pu);
@@ -260,7 +263,8 @@ UID_UWeaponFactory: if(u_royal_d>base_r3)
                       if(not unit_IsProducting(pu))then
                         case uidi of
                         UID_HGate         : ai_UnitAbility(pu,uab_ToHGate         ,0,0,0);
-                        UID_HBarracks     : ai_UnitAbility(pu,uab_ToHBarracks     ,0,0,0);
+                        UID_HBarracks     : if(res_UACLoot>=aic_HBarracksUACLoot)then
+                                            ai_UnitAbility(pu,uab_ToHBarracks     ,0,0,0);
                         UID_UBarracks     : ai_UnitAbility(pu,uab_ToUBarracks     ,0,0,0);
                         UID_UFactory      : ai_UnitAbility(pu,uab_ToUFactory      ,0,0,0);
                         UID_HPools        : ai_UnitAbility(pu,uab_ToHPools        ,0,0,0);

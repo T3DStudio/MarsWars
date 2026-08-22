@@ -7,10 +7,11 @@ aic_keyPoint_LimitMax      = aic_keyPoint_LimitMin*2;
 aic_MaxLimitBorder         = MaxPlayerLimit-aic_keyPoint_LimitMin;
 
 aic_TowerLifeTime          = fr_fps1*60;
-ai_DetectionBuildDelay     = fr_fps1*60*4;
+aic_DetectionBuildDelay    = fr_fps1*60*4;
 
 aic_BaseIdle_r             = 50;
 
+aic_HBarracksUACLoot       = 2000;
 aic_max_SpecUID            = 5;
 
 aic_group_Home             = 0;

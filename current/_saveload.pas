@@ -245,7 +245,7 @@ begin
 
    saveload_MakeFolderList;
 
-   GameLog_Chat(LocalPlayer,chat_all,str_gmsg_GameSaved);
+   ui_SysMassageAdd(str_gmsg_GameSaved+' '+fn,10);
 end;
 
 function saveload_SaveInit(check:boolean):boolean;
@@ -364,7 +364,7 @@ begin
 
       MenuBack(true,false);
 
-      GameLog_Chat(LocalPlayer,chat_all,str_gmsg_GameLoaded);
+      ui_SysMassageAdd(str_gmsg_GameLoaded+' '+svld_str_fname,11);
    end;
    close(f);
 end;

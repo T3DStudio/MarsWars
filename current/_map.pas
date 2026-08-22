@@ -1087,9 +1087,11 @@ begin
    case map_template of
    mapt_lake   : begin
                     map_CalcLakeR(@io,@ii);
-                    if(map_scenario=mc_koth)
-                    then map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR)
-                    else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
+                    case map_scenario of
+                    mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR);
+                    mc_royale: map_Obstacle_Add(map_SizeH,map_SizeH,io,base_r2      );
+                    else       map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
+                    end;
                     map_Obstacles_Noise(obs_n div 3,0,2,0);
                  end;
    mapt_island   : begin
@@ -1099,9 +1101,11 @@ begin
                  end;
    mapt_temple : begin
                     io:=map_Size1 div 4;
-                    if(map_scenario=mc_koth)
-                    then map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR)
-                    else map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
+                    case map_scenario of
+                    mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR);
+                    mc_royale: map_Obstacle_Add(map_SizeH,map_SizeH,io,base_r2      );
+                    else       map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
+                    end;
 
                     map_Obstacles_Temple(io+map_obstaclesGap*2,map_sizeh+base_r1,base_r1);
                     map_Obstacles_Noise(obs_n,0,4,0);
@@ -1118,8 +1122,10 @@ begin
                  end;
    end;
 
-   if(map_scenario=mc_koth)then
-      map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotR-1,0);
+   case map_scenario of
+   mc_koth  : map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotR-1,0);
+   //mc_royale: map_Obstacle_Remove(map_SizeH,map_SizeH,base_r1        ,0,200);
+   end;
 
    map_RefreshObstaclesGrid;
 end;

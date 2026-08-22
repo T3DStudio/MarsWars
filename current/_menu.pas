@@ -167,14 +167,15 @@ procedure menu_ToggleRecord;
 begin
    rpls_Record:=not rpls_Record;
    if(not MainMenu)then
-     GameLog_Chat(255,LocalPlayer,str_SR_RecordGames+': '+str_YesNoG[rpls_Record]);
+     ui_SysMassageAdd(str_SR_RecordGames+': '+str_YesNoG[rpls_Record],20);
 end;
 
 procedure menu_ScrollPlayersColor(forward:boolean);
 begin
    ScrollByte(@ui_PlayersColor  ,forward,0,ui_MaxPlayersColor);
+   ui_ScoresRebuild:=true;
    if(not MainMenu)then
-     GameLog_Chat(255,LocalPlayer,str_SG_PlayersColor+': '+str_SG_PlayersColorL[ui_PlayersColor]);
+     ui_SysMassageAdd(str_SG_PlayersColor+': '+str_SG_PlayersColorL[ui_PlayersColor],21);
 end;
 
 procedure menu_ControlPanelPosScroll(forward:boolean);
@@ -743,7 +744,7 @@ begin
       menu_Item_Set(mi_Players_Team0    +p,mtx0,mty0,mtx0+menu_PlayersTeamW ,mty0+menu_PListLineH,player_TeamScroll    (p,LocalPlayer,true,true));mtx0+=menu_PlayersTeamW;
 
       menu_Item_Set(mi_Players_Obs0     +p,mtx0,mty0,mtx0+menu_PlayersObsW  ,mty0+menu_PListLineH,player_ToggleObserver(p,LocalPlayer,true)   ,9);mtx0+=menu_PlayersObsW;
-      menu_Item_Set(mi_Players_Ping0    +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true                                       ,9);mtx0+=menu_PlayersPingW;
+      menu_Item_Set(mi_Players_Ping0    +p,mtx0,mty0,mtx0+menu_PlayersPingW ,mty0+menu_PListLineH,true                                        ,9);mtx0+=menu_PlayersPingW;
 
       mty0+=menu_PListLineH;
    end;

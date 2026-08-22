@@ -944,6 +944,17 @@ begin
    tcc_controls: if(ui_ShowAPM)then draw_text(tar,ui_APMx,ui_APMy,'APM: '+w2s(g_PlayerAPM.apm_cur),ta_LU,255,c_white);
    end;
 
+   // system messages
+   y:=ui_SysMessageY;
+   for i:=0 to ui_SysMessagesLast do
+     with ui_SysMessages[i] do
+       if(sm_time>0)then
+       begin
+          draw_text(tar,ui_GameStatusX,y,sm_line,ta_MB,255,c_white);
+          sm_time-=1;
+          y-=txt_line_h2;
+       end;
+
    // TIMER
    draw_timer(tar,ui_timerX,ui_timerY,g_tick,ta_LU,255,str_ui_time,c_white);
 

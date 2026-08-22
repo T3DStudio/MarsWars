@@ -605,12 +605,6 @@ lmt_prod_BadOrder,
 lmt_prod_CD,
 lmt_prod_Unavailable,
 lmt_Invalid_Order       : snd_SoundPlayAnoncer(snd_cant_order[race],true,false);
-
-
-lmt_replay_RecStart,
-lmt_replay_RecStop,
-lmt_replay_RecError     :;  // no sound
-
          end;
 end;
 
@@ -626,12 +620,16 @@ begin
    then current_music_ss:=snd_music_game
    else current_music_ss:=snd_music_menu;
 
-   if(snd_music_current<>current_music_ss)or(not snd_SoundSourceSetIsPlaying(@SoundSources[sss_music]))or(ForceNextTreck)then
+   if(snd_music_current<>current_music_ss)
+   or(not snd_SoundSourceSetIsPlaying(@SoundSources[sss_music]))
+   or(ForceNextTreck)then
    begin
       if(snd_music_current<>current_music_ss)and(not ForceNextTreck)then snd_SoundShafleSoundSet(current_music_ss);
       snd_music_current:=current_music_ss;
 
       snd_SoundPlay(snd_music_current,sss_music,true);
+
+      if(MainMenu)and(menu_page=mi_Settings)and(menu_SettingsPage=mi_settings_Sound)then menu_redraw:=true;
    end;
 end;
 

@@ -18,7 +18,7 @@ begin
       s:=folder_screenshots+str_ScreenShotPrefix+i2s(i)+fileExt_Scrshot;
    until not FileExists(s);
    if(not MainMenu)then
-     GameLog_Chat(255,LocalPlayer,s);
+     ui_SysMassageAdd(s,30);
    pngsurf:=SDL_PNGFormatAlpha(vid_screen);
    s:=s+#0;
    //sdl_saveBMP(vid_screen,@s[1]);
@@ -564,7 +564,7 @@ end;
 
 procedure gfx_MakeFogTileSet;
 var
-x,y:integer;
+x,y  :integer;
 fsurf:pSDL_Surface;
 b10,
 b01,b11,b21,
@@ -602,6 +602,13 @@ begin
    end;
 
    gfx_FreeSDLSurface(fsurf);
+
+   ui_fog_TileFx4:=gfx_CreateSDLSurface(fog_cw*4,fog_cw*4);
+   boxColor(ui_fog_TileFx4,0,0,ui_fog_TileFx4^.w,ui_fog_TileFx4^.h,c_purple);
+   gfx_SetTransparent(ui_fog_TileFx4);
+   for x:=0 to 3 do
+   for y:=0 to 3 do
+     draw_sdlsurface(ui_fog_TileFx4,x*fog_cw,y*fog_cw,ui_fog_Tiles[0]);
 end;
 
 procedure gfx_MakeScoreSurface;
@@ -621,9 +628,9 @@ playerCount: byte;
 tx,ty,t,
 ss_PanelW,
 ss_PanelWh : integer;
+tstr       : shortstring;
 odd        : boolean;
 color      : cardinal;
-rchar      : char;
 tsurf      : pSDL_Surface;
 maxval_c,
 minval_c   : array[0..psc_Last] of cardinal;
@@ -701,26 +708,21 @@ begin
            if(g_PlayersGame[p].isdefeated)
            then t:=(length(ps_name)*font_w1) div 2
            else t:=0;
+           if(ps_team<=LastPlayer)
+           then tstr:=b2s(ps_team+1)
+           else tstr:='?';
            case ps_race of
-           r_hell: rchar:=tc_RankHell;
-           r_uac : rchar:=tc_RankUAC;
-           else    rchar:='?'
+           r_hell: tstr+=tc_RankHell;
+           r_uac : tstr+=tc_RankUAC;
+           else    tstr+='?'
            end;
 
-           case(odd)of
-           true : begin
-                     draw_text(ui_ScoresSurf,tx,ty,rchar+ps_name+' ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
-                     if(t>0)then
-                       lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
-                     ty+=ss_LineHh;
-                  end;
-           false: begin
-                     ty+=ss_LineHh;
-                     draw_text(ui_ScoresSurf,tx,ty,rchar+ps_name+' ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
-                     if(t>0)then
-                       lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
-                  end;
-           end;
+           if(not odd)then ty+=ss_LineHh;
+           draw_text(ui_ScoresSurf,tx,ty,tstr+ps_name+'  ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
+           if(t>0)then
+             lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
+           if(odd)then ty+=ss_LineHh;
+
            ty+=ss_LineH;
            odd:=not odd;
 
@@ -734,7 +736,12 @@ begin
                   if(maxval_c[i]=ps_data_c[i])
                   then color:=c_yellow;
 
-              draw_text(ui_ScoresSurf,tx,ty,c2s(ps_data_c[i]),ta_MU,255,color);
+              if(i<>psc_InGameTime)
+              then draw_text (ui_ScoresSurf,tx,ty,c2s(ps_data_c[i]),ta_MU,255,color)
+              else
+                if(ps_data_c[i]=0)
+                then draw_text (ui_ScoresSurf,tx,ty,'-'         ,ta_MU,255   ,color)
+                else draw_timer(ui_ScoresSurf,tx,ty,ps_data_c[i],ta_MU,255,'',color);
               ty+=ss_LineH;
            end;
            for i:=0 to psi_Last do
@@ -1110,6 +1117,7 @@ begin
    gfx_LoadMWSModel(@spr_u_p3               ,folder_RaceMissiles[r_uac ]+'u_p3_'       ,smt_effect );
    gfx_LoadMWSModel(@spr_u_p8               ,folder_RaceMissiles[r_uac ]+'u_p8_'       ,smt_missile);
    gfx_LoadMWSModel(@spr_u_p9               ,folder_RaceMissiles[r_uac ]+'b'           ,smt_missile);
+   gfx_LoadMWSModel(@spr_u_rs               ,folder_RaceMissiles[r_uac ]+'rstrike'     ,smt_rstrike);
 
    gfx_LoadMWSModel(@spr_eff_bfg            ,folder_effects+'ef_bfg_'                  ,smt_effect);
    gfx_LoadMWSModel(@spr_eff_eb             ,folder_effects+'ef_eb'                    ,smt_effect);
@@ -1226,6 +1234,9 @@ begin
    ui_PovPlayerY := ui_UIPortY0+txt_line_h1*5;
    ui_GameStatusX:= vid_vw div 2;
    ui_GameStatusY:= ui_PovPlayerY+txt_line_h3;
+
+   // sys messages
+   ui_SysMessageY:= ui_UIPortY1-txt_line_h3*2;
 
    // Objectives
    ui_objectivesx:= ui_timerX;

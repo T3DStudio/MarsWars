@@ -448,9 +448,16 @@ begin
         if(tu^.buffs[ub_Detector]>0)then ai_near_detect+=1;
 
       // unit productions available
-      if(tu^.uid^.uid_isbarrack)then ai_curr_UnitProds+=tu^.level+1;
+      if (tu^.uid^.uid_isbarrack)
+      and(tu^.uid^.uid_req_EnergyLevel>0)then
+        if(tu^.transformTimer>0)and(tu^.transformUID=tu^.uidi)
+        then ai_curr_UnitProds+=tu^.level+2
+        else ai_curr_UnitProds+=tu^.level+1;
       // upgrade productions available
-      if(tu^.uid^.uid_isforge  )then ai_curr_UpgrProds+=tu^.level+1;
+      if(tu^.uid^.uid_isforge  )then
+        if(tu^.transformTimer>0)and(tu^.transformUID=tu^.uidi)
+        then ai_curr_UpgrProds+=tu^.level+2
+        else ai_curr_UpgrProds+=tu^.level+1;
 
       if(not tu^.uid^.uid_isbuilding)then
       begin

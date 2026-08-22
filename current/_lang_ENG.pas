@@ -503,6 +503,7 @@ begin
    str_ScoreBoardC[psc_builds_lost     ]:= 'Buildings lost';
    str_ScoreBoardC[psc_builds_destroyed]:= 'Buildings destroyed';
    str_ScoreBoardC[psc_upgrades_level  ]:= 'Completed upgrades';
+   str_ScoreBoardC[psc_InGameTime      ]:= 'Defeat time';
 
    str_ScoreBoardI[psi_res_energy_max  ]:= 'Max energy level';
    str_ScoreBoardI[psi_res_UACLoot     ]:= 'Collected '+str_ui_UACLoot;

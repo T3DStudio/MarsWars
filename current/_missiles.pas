@@ -13,7 +13,7 @@ begin
 MID_Imp        : mid_SpriteModel:=@spr_h_p0;
 MID_Cacodemon  : mid_SpriteModel:=@spr_h_p1;
 MID_Baron      : mid_SpriteModel:=@spr_h_p2;
-MID_Blizzard,
+MID_Blizzard   : mid_SpriteModel:=@spr_u_rs;
 MID_CyberRocket: mid_SpriteModel:=@spr_h_p3;
 MID_Revenant   : mid_SpriteModel:=@spr_h_p4;
 MID_Mancubus   : mid_SpriteModel:=@spr_h_p5;
@@ -44,7 +44,7 @@ MID_Revenant   : begin
                  mid_eid_FlyStep :=4;
                  end;
 MID_Blizzard   : begin
-                  mid_eid_FlyTrace:=MID_Granade;
+                 mid_eid_FlyTrace:=MID_Granade;
                  mid_eid_FlyStep :=1;
                  mid_eid_Decal   :=EID_db_h1;
                  end;
@@ -293,8 +293,6 @@ begin
 end;
 
 procedure missile_Cycle;
-const  mb_s0 = fr_fps1 div 5;
-       mb_s1 = fr_fps1-mb_s0;
 var m,u:integer;
      tu:PTUnit;
 begin
@@ -309,34 +307,34 @@ begin
         if(tu^.buffs[ub_Teleported]>0)
         then m_homing:=mh_none
         else
-          if(tu^.x<>tu^.vx)
+          if{(tu^.x<>tu^.vx)
           or(tu^.y<>tu^.vy)
-          or(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
+          or}(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
             case m_homing of
 mh_magnetic : begin
-                 m_tox  +=sign(tu^.x-m_tox)*4;
-                 m_toy  +=sign(tu^.y-m_toy)*4;
+                 m_tox+=sign(tu^.x-m_tox)*5;
+                 m_toy+=sign(tu^.y-m_toy)*5;
                  m_mfe:=tu^.isfly;
               end;
 mh_homing   : begin
-                 m_tox  :=tu^.x;
-                 m_toy  :=tu^.y;
+                 m_tox:=tu^.x;
+                 m_toy:=tu^.y;
                  m_mfe:=tu^.isfly;
               end;
             end;
 
       if(m_mid=MID_Blizzard)then
       begin
-         if(m_vstep>mb_s1)
+         if(m_vstep>UACStrike_t1)
          then m_y-=fr_fps1
          else
-           if(m_vstep=mb_s1)then
+           if(m_vstep=UACStrike_t1)then
            begin
               m_x:=m_tox;
-              m_y:=m_toy-(fr_fps1*mb_s0);
+              m_y:=m_toy-(fr_fps1*UACStrike_t0);
            end
            else
-             if(m_vstep<=mb_s0)then m_y+=fr_fps1;
+             if(m_vstep<=UACStrike_t0)then m_y+=fr_fps1;
       end
       else
       begin
@@ -365,13 +363,7 @@ mh_homing   : begin
          {$IFDEF _FULLGAME}
          missile_explode_effect(m);
          {$ENDIF}
-      end
-      {$IFDEF _FULLGAME}
-      else
-        if(mid_eid_FlyStep>0)and(mid_eid_FlyTrace>0)then
-         if((m_vstep mod mid_eid_FlyStep)=0)then
-           if(ui_CheckMapPointFogVision(m_x,m_y,true))then effect_add(m_x,m_y,draw_DefaultSpriteDepth(m_y,m_mfs),mid_eid_FlyTrace);
-      {$ENDIF};
+      end;
    end;
 end;
 

@@ -521,7 +521,7 @@ begin
           else color:=mic(menu_items[mi_Players_AIskil0+p].mi_state=as_enabled,false);
 
           if(state=ps_AI)and(menu_items[mi_Players_State0 +p].mi_state=as_enabled)
-     then drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,'-'+str_ps_AI       ,color)
+     then drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,'-'+str_ps_AI           ,color)
      else drawmenu_ItemTextC(tar,mi_Players_State0 +p,ta_MM,player_GetStateString(p),color);
 
           drawmenu_ItemTextC(tar,mi_Players_AIskil0+p,ta_LM,name                ,color);
@@ -548,14 +548,15 @@ begin
        else
        begin
           if(not g_started)and(p<map_MaxPlayers)then
-            if(menu_items[mi_Players_State0+p].mi_state=as_enabled)then
-              drawmenu_ItemTextC(tar,mi_Players_State0+p,ta_MM,'+'+str_ps_AI,c_white);
+            if(menu_items[mi_Players_State0+p].mi_state=as_enabled)
+            then drawmenu_ItemTextC(tar,mi_Players_State0+p,ta_MM,'+'+str_ps_AI,c_white)
+            else drawmenu_ItemTextC(tar,mi_Players_State0+p,ta_MM,    str_ps_AI,c_gray );
           if(g_AISlots>0)and(p<map_MaxPlayers)and(not g_started)then
           begin
-             drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,ai_name(g_AISlots,p)                      ,c_gray);
-             drawmenu_ItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[r_random]                        ,c_gray);
+             drawmenu_ItemTextC(tar,mi_Players_Slot0+p,ta_LM,ai_name(g_AISlots,p)                               ,c_gray);
+             drawmenu_ItemTextC(tar,mi_Players_Race0+p,ta_MM,str_race[r_random]                                 ,c_gray);
              drawmenu_ItemTextC(tar,mi_Players_Team0+p,ta_MM,b2s(player_GetScenarioFixedTeams(map_scenario,p)+1),c_gray);
-             drawmenu_ItemTextC(tar,mi_Players_Obs0 +p,ta_MM,str_YesNoG[false]                         ,c_gray);
+             drawmenu_ItemTextC(tar,mi_Players_Obs0 +p,ta_MM,str_YesNoG[false]                                  ,c_gray);
           end;
           if(g_started)then
           begin

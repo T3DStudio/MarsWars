@@ -38,6 +38,8 @@ smt_missile : if(animk=sms_death)
               then i:=8+anim
               else i:=dd;
 
+smt_rstrike : i:=anim;
+
 smt_buiding : case animk of
         sms_transform,
         sms_build: i:=mm3i(0,anim,2);

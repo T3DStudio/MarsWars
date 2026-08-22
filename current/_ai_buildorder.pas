@@ -25,7 +25,7 @@ begin
       if(aip_MaxBarracks>0)then
       begin
          case race of
-         r_hell: ai_need_UnitProds:=(res_energyl_max div 500);
+         r_hell: ai_need_UnitProds:=(res_energyl_max div 475);
          r_uac : ai_need_UnitProds:=(res_energyl_max div 425);
          end;
 
@@ -51,7 +51,7 @@ begin
          ai_need_detect:=ai_armylimit_alive_u div 8;
          if(ai_need_detect>aip_MaxDetectors)then
            ai_need_detect:=aip_MaxDetectors;
-         if(g_tick<ai_DetectionBuildDelay)and(ai_need_detect>ul1)then ai_need_detect:=ul1;
+         if(g_tick<aic_DetectionBuildDelay)and(ai_need_detect>ul1)then ai_need_detect:=ul1;
       end;
 
       // ai_TechPriority
@@ -246,12 +246,14 @@ begin
      if (ai_curr_UnitProds<needN)
      and(ai_curr_UnitProds<aip_MaxBarracks)then
        case race of
-       r_hell: SetBuildUID2(UID_HGate    ,UID_HBarracks);
-       r_uac : SetBuildUID2(UID_UBarracks,UID_UFactory );
+       r_hell: SetBuildUID1(UID_HGate    );
+       r_uac : SetBuildUID2(UID_UBarracks,UID_UFactory);
        end
      else
        case race of
-       r_hell: if(not SetBuildUID1(UID_HGate   ,1))then SetBuildUID1(UID_HBarracks,1);
+       r_hell: if(not SetBuildUID1(UID_HGate   ,1))then
+                 if(res_UACLoot>aic_HBarracksUACLoot)then
+                   SetBuildUID1(UID_HBarracks,min2i(4,(res_UACLoot div 1000)+1));
        r_uac : if(not SetBuildUID1(UID_UFactory,1))then SetBuildUID1(UID_UBarracks,1);
        end;
 end;
@@ -270,23 +272,25 @@ begin
        end;
 end;
 procedure SetBuilders(needN:integer);
+var single_adv:boolean;
 begin
    if(build_uid>0)then exit;
 
    with pBuilder^  do
    with player^ do
    begin
+      single_adv:=(units_builders_e=1)and(res_energyl_max=1000);
       if (units_builders_e<needN)
       and(units_builders_e<aip_MaxBuilders )
       and(units_builders_e<PlayerMaxBuilders)
       and(ai_curr_UnitProds>=2)
-      and(units_bld_l[false]>=aip_MaxUnitMinPart)
+      and((units_bld_l[false]>=aip_MaxUnitMinPart)or single_adv)
       and(ai_BuildersInTransform   =0)
       and(ai_BuildersInConstruction=0)
-      and(units_bld_l[false]>=aip_MaxUnitMinPart)
       and(not ai_earlyAttack)then
       begin
-         checkExtraEnergy:=550;
+         if(not single_adv)then
+           checkExtraEnergy:=550;
          case race of
          r_hell: if(ai_available_HKeep)
                 and(units_builders_e=(aip_MaxBuilders-1))
@@ -505,7 +509,6 @@ begin
                       if(map_NeedTransport)then
                         SetUpgrade(upgr_hell_TeleportCD,i);
                       SetUpgrade(upgr_hell_PainFactor  ,i);
-                      SetUpgrade(upgr_hell_EvilEyeR    ,i);
                       SetUpgrade(upgr_hell_Regeneration,i);
                       SetUpgrade(upgr_hell_UnitSightR  ,i);
                       SetUpgrade(upgr_hell_DistDamage1 ,i);
@@ -513,6 +516,7 @@ begin
                       SetUpgrade(upgr_hell_MeleeDamage ,i);
                       SetUpgrade(upgr_hell_UnitArmor   ,i);
                       SetUpgrade(upgr_hell_BuildArmor  ,i);
+                      SetUpgrade(upgr_hell_EvilEyeR    ,i);
                      end;
                 end;
 
@@ -521,11 +525,11 @@ begin
      r_uac : begin
                 if((aip_flags and aif_upgr_smart_order)>0)then
                 begin
+                   SetUpgrade(upgr_uac_SSMWeapon    ,1);
                    SetUpgrade(upgr_uac_BuilderR     ,1);
                    SetUpgrade(upgr_uac_ADetection   ,1);
                    SetUpgrade(upgr_uac_CCFly        ,1);
                    SetUpgrade(upgr_uac_BuilderR     ,2);
-                   SetUpgrade(upgr_uac_SSMWeapon    ,1);
                    SetUpgrade(upgr_uac_CommandoInvis,1);
                    SetUpgrade(upgr_uac_CCAttack     ,1);
                    if(map_NeedTransport)then

@@ -281,6 +281,7 @@ ui_fog_gridw      : integer = 0;
 ui_fog_gridh      : integer = 0;
 ui_fog            : boolean = true;
 ui_fog_Tiles      : TFogTileSet;
+ui_fog_TileFx4    : pSDL_Surface;
 ui_fog_sx         : integer = 0;
 ui_fog_sy         : integer = 0;
 ui_fog_ex         : integer = 0;
@@ -367,6 +368,7 @@ ui_ReplayBarY     : integer = 0;
 ui_GameStatusX    : integer = 0;
 ui_GameStatusY    : integer = 0;
 ui_ScoreBoardY    : integer = 0;
+ui_SysMessageY    : integer = 0;
 ui_EnergyX        : integer = 0;
 ui_EnergyY        : integer = 0;
 ui_HellPowerY     : integer = 0;
@@ -385,6 +387,7 @@ ui_RECy           : integer = 0;
 ui_objectivesx    : integer = 0;
 ui_objectivesy    : integer = 0;
 
+ui_SysMessages    : array[0..ui_SysMessagesLast] of TSysMessage;
 
 ui_logx           : integer = 0;  // LOG screen X
 ui_logy           : integer = 0;  // LOG screen Y
@@ -867,6 +870,7 @@ spr_u_p2,
 spr_u_p3,
 spr_u_p8,
 spr_u_p9,
+spr_u_rs,
 
 spr_db_h0,
 spr_db_h1,

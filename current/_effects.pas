@@ -268,12 +268,20 @@ var  m:integer;
 begin
    for m:=0 to MaxMissiles do
      with g_missiles[m] do
-       if(ui_CheckMapPointFogVision(m_x,m_y,true))then
+       if(m_mid=MID_Blizzard)
+       or(ui_CheckMapPointFogVision(m_x,m_y,true))then
          with g_mids[m_mid] do
            if(m_vstep>0)then
            begin
-              spr:=SpriteModel2Sprite(mid_SpriteModel,sms_stand,m_dir,0,nil);
+              if(m_mid=MID_Blizzard)then
+                if(UACStrike_t0<=m_vstep)and(m_vstep<=UACStrike_t1)then continue;
+
+              spr:=SpriteModel2Sprite(mid_SpriteModel,sms_stand,m_dir,byte(m_mid=MID_Blizzard)*byte(m_vstep<=UACStrike_t1),nil);
               SpriteList_AddEffect(m_x,m_y,draw_DefaultSpriteDepth(m_y,m_mfs)+100,0,spr,255);
+
+              if(mid_eid_FlyStep>0)and(mid_eid_FlyTrace>0)then
+                if((m_vstep mod mid_eid_FlyStep)=0)then
+                  effect_add(m_x,m_y,draw_DefaultSpriteDepth(m_y,m_mfs),mid_eid_FlyTrace);
            end;
 end;
 
