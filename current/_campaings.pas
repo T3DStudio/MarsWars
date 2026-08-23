@@ -26,10 +26,10 @@ begin
    if(not game_IsEnded)then
    begin
       with camp_data do
-        if(camp_data.cd_lastm<camp_mis_sel)
+        {if(camp_data.cd_lastm<camp_mis_sel)
         then cd_lastm:=camp_mis_sel+1
-        else
-          if(camp_data.cd_lastm=camp_mis_sel)
+        else}
+          if(camp_data.cd_lastm=(camp_mis_sel+1))
           then cd_lastm+=1;
 
       game_SetStatusWinnerTeam(g_PlayersGame[LocalPlayer].team);
@@ -183,11 +183,15 @@ begin
             else aip_skill:=5;
             end;
             ai_PlayerSetSkirmishSettings(ap);
-
-            if(alevel>2)then  // UV,NM
+            if(alevel=2)then  // HMP,UV,NM
             begin
-               res_energyl_cur+=2500;
-               res_energyl_max+=2500;
+               res_energyl_cur:=1000;
+               res_energyl_max:=1000;
+            end;
+            if(alevel=3)then  // UV,NM
+            begin
+               res_energyl_cur:=3000;
+               res_energyl_max:=3000;
                upgrs_cur[upgr_fprod_build]:=1;
             end;
             if(alevel>1)then
@@ -201,7 +205,7 @@ begin
             aip_flags:=aip_flags or aif_cheat_VisBuildings;
 
             case attackPause of
-            -1 : aip_pause_attack:=-fr_fps1*max2i(1,200-55*alevel);
+            -1 : aip_pause_attack:=-fr_fps1*max2i(1,180-45*alevel); // 45 90 135 180
             1..attackPause.MaxValue
                : aip_pause_attack:=-fr_fps1*attackPause;
             end;
@@ -265,7 +269,7 @@ begin
           0 : begin ////////////////////   HELL vs HELL #1    ////////////////////////////////////////////////////////////////////////////
                  FillChar(camp_data,SizeOf(camp_data),0); // first mission of camp
                  camp_data.cd_lastm :=1;
-                 camp_data.cd_NMTime:=fr_fps1*38;
+                 camp_data.cd_NMTime:=fr_fps1*40;
 
                  map_Seed         :=777;
                  map_scenario     :=mc_1x1;
@@ -293,41 +297,43 @@ begin
 
                  player_SetAllowedUnits   (p_player,[ UID_HGate,
                                                       UID_Imp     ], MaxUnits,true);
-                 player_SetAllowedUpgrades(p_player,[0..255       ], 0       ,true);
+                 player_SetAllowedUpgrades(p_player,[ 0..255      ], 0       ,true);
 
                  with g_PlayersGame[p_player] do a_ability:=[];
-
 
                  //  Clan of Bites
 
                  camp_SetPlayer(p_enemy1,r_hell,1,ps_AI   ,str_Camp_HE_CoB);
 
-                 camp_SetAI(p_enemy1,camp_diff,0,-1);
+                 camp_SetAI(p_enemy1,camp_diff,210,-1);
                  with g_PlayersGame[p_enemy1] do
                  begin
                     aip_MaxUnitLimit  :=ul30;
-                    aip_MaxAttackLimit:=0;
+                    aip_MaxAttackLimit:=ul2+ul2*camp_diff; //ul2..ul10
                     aip_MaxTowers     :=6;
-                    aip_MaxEnergy     :=2000;
+                    aip_MaxEnergy     :=4000;
                  end;
 
                  camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]+110,map_PlayerStartY[p_enemy1]-110,UID_HKeep,60);
                  camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]-110,map_PlayerStartY[p_enemy1]+110,UID_HKeep,60);
                  camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]+110,map_PlayerStartY[p_enemy1]+110,UID_HKeep,60);
 
-                 camp_CreateUnitAreaR(p_enemy1,10,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Demon,60);
+                 camp_CreateUnitAreaR(p_enemy1,11,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Demon,60);
 
 
                  player_SetAllowedUnits   (p_enemy1,[ UID_HGate,
-                                                     UID_HPools,
-                                                     UID_HFTower,
-                                                     UID_Demon   ], MaxUnits,true);
-                 player_SetAllowedUpgrades(p_enemy1,[ 0..255      ],0        ,true);
+                                                      UID_HPools,
+                                                      UID_HFTower,
+                                                      UID_Demon   ], MaxUnits,true);
+                 player_SetAllowedUpgrades(p_enemy1,[ upgr_hell_UnitArmor ,
+                                                      upgr_hell_MeleeDamage,
+                                                      upgr_hell_Regeneration,
+                                                      upgr_hell_PainFactor       ],255,true);
                  with g_PlayersGame[p_enemy1] do a_ability:=[];
               end;
 
           1 : begin ////////////////////   HELL vs HELL #2   //////////////////////////////////////////////////////////////////////////////
-                 camp_data.cd_NMTime:=fr_fps1*100;
+                 camp_data.cd_NMTime:=fr_fps1*105;
 
                  map_Seed         :=10666;
                  map_scenario     :=mc_royale;
@@ -386,6 +392,7 @@ begin
                  begin
                     aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
                     aip_MaxTowers     :=2+camp_diff;
+                    aip_flags         :=aip_flags or aif_army_scout;
                  end;
                  camp_removeAIFlag(p_enemy1,aif_base_smart_order);
 
@@ -421,6 +428,7 @@ begin
                  begin
                     aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
                     aip_MaxTowers     :=2+camp_diff;
+                    aip_flags         :=aip_flags or aif_army_scout;
                  end;
                  camp_removeAIFlag(p_enemy1,aif_base_smart_order);
 
@@ -493,20 +501,23 @@ begin
 
    case camp_sel of
    0 : case camp_mis_sel of
+       ////////////////////   HELL vs HELL #1    ////////////////////////////////////////////////////////////////////////////
        0 : if(g_cycle_regen=0)then
            begin      //  HELL vs HELL #1
-              if(g_PlayersGame[0].units_bld_lc[false]>=ul15)then
-                with g_PlayersGame[7] do
-                  if(aip_MaxAttackLimit=0)then
-                  begin
-                     aip_MaxUnitLimit  +=ul15*camp_diff;
-                     aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
-                     upgrs_cur[upgr_fprod_unit]:=1;
-                  end;
+              with g_PlayersGame[7] do
+              begin
+                 if(g_PlayersGame[0].units_bld_lc[false]>=ul30)and(aip_MaxAttackLimit<=ul10)then
+                 begin
+                    aip_MaxUnitLimit  +=ul15*camp_diff;
+                    aip_MaxAttackLimit+=aip_MaxUnitLimit div 3;
+                    upgrs_cur[upgr_fprod_unit]:=1;
+                 end;
+                 //writeln(' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);
+              end;
 
               with g_PlayersGame[LocalPlayer] do
                 if(units_uid_c[UID_HKeep]=0)
-                then game_SetStatusWinnerTeam(7)
+                then game_SetStatusWinnerTeam(g_PlayersGame[7].team)
                 else
                   if (res_energyl_max>=2000)
                   and(g_PlayersGame[7].units_bld_lc[true]=0)
@@ -515,6 +526,7 @@ begin
                   then camp_Win;
            end;
 
+       ////////////////////   HELL vs HELL #2    ////////////////////////////////////////////////////////////////////////////
        1 : if(g_cycle_regen=0)then
            begin
               if(g_PlayersGame[3].units_bld_lc[true]=0)then
@@ -530,8 +542,12 @@ begin
                                                        UID_HEyeNest ]);
 
               if (g_PlayersGame[LocalPlayer].units_uid_c[UID_HKeep ]=0)
-              and(g_PlayersGame[LocalPlayer].units_uid_c[UID_HAKeep]=0)
-              then game_SetStatusWinnerTeam(1)
+              and(g_PlayersGame[LocalPlayer].units_uid_c[UID_HAKeep]=0)then
+              begin
+                 if(g_PlayersGame[1].units_bld_lc[false]>g_PlayersGame[3].units_bld_lc[false])
+                 then game_SetStatusWinnerTeam(g_PlayersGame[1].team)
+                 else game_SetStatusWinnerTeam(g_PlayersGame[3].team)
+              end
               else
                 if (g_PlayersGame[1].units_bld_lc[true]=0)
                 and(g_PlayersGame[3].units_bld_lc[true]=0)

@@ -856,7 +856,7 @@ begin
    end;
 end;
 
-procedure cleffect_teleport(cur_u,prev_u:PTUnit);
+procedure cleffect_teleport(cur_u,prev_u:PTUnit;UIVision:boolean);
 var sx,sy:integer;
 begin
    with cur_u^  do
@@ -874,9 +874,9 @@ begin
          sy:=NOTSET;
       end;
       case uidi of
-      UID_HKeep : effect_teleport(sx,sy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube,cur_u);
-      UID_HAKeep: effect_teleport(sx,sy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube,cur_u);
-      else        effect_teleport(sx,sy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     ,cur_u);
+      UID_HKeep : effect_teleport(sx,sy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube,@UIVision,@UIVision);
+      UID_HAKeep: effect_teleport(sx,sy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube,@UIVision,@UIVision);
+      else        effect_teleport(sx,sy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     ,@UIVision,@UIVision);
       end;
    end;
 end;
@@ -889,18 +889,24 @@ begin
        if(a_tar=tar)then a_tar:=0;
 end;
 
-procedure client_ChangeUnitState(pu_cur:PTUnit;rpl:boolean);
+procedure unit_AddNETVision(pu_cur:PTUnit;POVPlayer:byte;rpl:boolean);
+begin
+   if(not rpl)and(not g_PlayersGame[POVPlayer].isobserver)then
+     with g_PlayersGame[POVPlayer] do
+       with pu_cur^ do
+         AddToInt(@TeamVision[team],MinVisionTime);
+end;
+
+procedure client_ChangeUnitState(pu_cur:PTUnit;POVPlayer:byte;rpl:boolean);
 var
 tu,
 cuTransport:PTUnit;
-   vis:boolean;
+vis        :boolean;
 begin
    // pu_prev - previous state
    // pu_cur - current state
    cuTransport:=nil;
    IsUnitRange(pu_cur^.transportU,@cuTransport);
-
-   //if(pu_cur^.unum=755)then writeln('client_ChangeUnitState 755 ',pu_prev^.unum,' ',pu_prev^.hits,'  ',pu_cur^.unum,' ',pu_cur^.hits);
 
    if(not rpl)then
      if(pu_prev^.uidi<>pu_cur^.uidi)then
@@ -922,10 +928,14 @@ begin
      if(pu_prev^.hits<=hits_dead)and(hits>hits_dead)then // create unit
      begin
         unit_SetDefaults(pu_cur,true);
+        unit_ApplyUID(pu_cur);
         unit_TeamReveal (pu_cur,true);
+        unit_AddNETVision(pu_cur,POVPlayer,rpl);
+
         vx :=x;
         vy :=y;
-        vis:=ui_CheckUnitUIPlayerVision(pu_cur,true);
+        vis:=ui_CheckUnitUIPlayerVision(pu_cur,true)
+          or ui_CheckMapPointFogVision(x,y,false);
 
         if(cuTransport<>nil)then
           unit_InTransportCode(pu_cur,cuTransport);
@@ -936,7 +946,7 @@ begin
         begin
            unit_CalcFogR(pu_cur);
            if(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(pu_cur,             @vis);
-           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (pu_cur,             nil );
+           if(buffs[ub_Teleported   ]>0)then cleffect_teleport  (pu_cur,nil         , vis);
            if(buffs[ub_HellVision   ]>0)then   effect_Common    (pu_cur,EID_HVision ,@vis);
            if(buffs[ub_Heroic       ]>0)then   effect_Common    (pu_cur,EID_PowerUp ,@vis);
            if(buffs[ub_SphereInvuln ]>0)
@@ -952,8 +962,8 @@ begin
              case uidi of
              UID_URadar    : effect_ScanSound(pu_cur);
              UID_Pain      : if(upgrs_cur[upgr_hell_Phantoms]>0)
-                              then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
-                              else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
+                             then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
+                             else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
              end;
 
            with g_unitsVis[unum] do
@@ -979,7 +989,7 @@ begin
           begin
              if(hits>hits_ndead)and(cuTransport=nil)then
              begin
-                if(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev);
+                if(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev,vis);
 
                 with uid^ do
                   if(uid_isbuilding)then build_cd:=min2i(build_cd+step_build_reload,max_build_reload);
@@ -1015,8 +1025,8 @@ begin
             begin
                case(speed>0)of
                false: if(         buffs[ub_Teleported]> 0)then
-                                                   if(pu_prev^.x<>x)or(pu_prev^.y<>y)then cleffect_teleport(pu_cur,pu_prev);
-               true : if(pu_prev^.buffs[ub_Teleported]<=0)and(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev);
+                                                   if(pu_prev^.x<>x)or(pu_prev^.y<>y)then cleffect_teleport(pu_cur,pu_prev,vis);
+               true : if(pu_prev^.buffs[ub_Teleported]<=0)and(buffs[ub_Teleported]>0)then cleffect_teleport(pu_cur,pu_prev,vis);
                end;
                if (pu_prev^.buffs[ub_Summoned     ]<=0)and(buffs[ub_Summoned     ]>0)then cleffect_UnitSummon(pu_cur,             @vis);
                if (pu_prev^.buffs[ub_PainState    ]<=0)and(buffs[ub_PainState    ]>0)then   effect_UnitPain  (pu_cur,             @vis);
@@ -1328,9 +1338,7 @@ begin
         for byte1:=0 to LastPlayer do
           AddToInt(@TeamVision[byte1],MinVisionTime);
 
-      if(not rpl)and(not g_PlayersGame[POVPlayer].isobserver)then
-        with g_PlayersGame[POVPlayer] do
-          AddToInt(@TeamVision[team],MinVisionTime);
+      unit_AddNETVision(uu,POVPlayer,rpl);
    end;
 end;
 
@@ -1508,7 +1516,7 @@ begin
          if(transportU>0)then
          begin
             transportU:=rudata_int(rpl,0);
-            if(IsUnitRange(transportU,nil)=false)then transportU:=0;
+            if(not IsUnitRange(transportU,nil))then transportU:=0;
          end
          else
            if(sh>0)then
@@ -1571,7 +1579,7 @@ begin
       unit_UpdateXY(tmpu);
       unit_CalcFogR(tmpu);
    end
-   else client_ChangeUnitState(uu,rpl);
+   else client_ChangeUnitState(uu,POVPlayer,rpl);
 end;
 
 

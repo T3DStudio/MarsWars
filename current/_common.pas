@@ -1230,7 +1230,7 @@ end;
 procedure player_SetDefeat(player:PTPlayerGameData);
 begin
    with player^ do
-     if(not isdefeated)and(not isobserver)and(state>ps_None){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
+     if(not isdefeated)and(not isobserver)and(state>ps_None)then
      begin
         isdefeated:=true;
         {$IFDEF _FULLGAME}
@@ -1240,7 +1240,8 @@ begin
            GameLog_PlayerDefeated(pnum);
            game_ScoresAddC(pnum,psc_InGameTime,g_tick);
         end;
-        if(g_NewObservers)then
+
+        if(g_NewObservers){$IFDEF _FULLGAME}and(g_type<>gt_campaing){$ENDIF}then
           if(state=ps_human){$IFDEF TESTMODE}or(TestMode>0){$ENDIF}then isobserver:=true;
         build_cd:=0;
      end;
@@ -2263,7 +2264,7 @@ begin
       if(ui_ControlTabType in [tcc_observer,tcc_replay])then exit;
    end
    else
-      if(tu^.TeamVision[g_PlayersGame[UIplayer].team]>0)then exit;
+      if(tu^.TeamVision[g_PlayersGame[UIPlayer].team]>0)then exit;
 
    ui_CheckUnitUIPlayerVision:=false;
 end;

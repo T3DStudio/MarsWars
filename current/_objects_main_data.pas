@@ -1611,6 +1611,9 @@ end;
          or(uid_Regen_upgr>0)then
          uid_LevelBonusRegen :=round(uid_LimitUse/ul1);
       end;
+      if(uid_isbuilding)then
+        if(uid_isbarrack)
+        or(uid_isforge)then uid_LevelBonusArmor:=UpgradeArmorBonus1;
       if(uid_LevelBonusDamage<0)then uid_LevelBonusDamage:=0;
       if(uid_LevelBonusArmor <0)then uid_LevelBonusArmor :=0;
       if(uid_LevelBonusPainC <0)then uid_LevelBonusPainC :=0;

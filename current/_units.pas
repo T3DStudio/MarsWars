@@ -137,7 +137,7 @@ begin
             if(uid_Armor_upgr2>0)then armor+=integer(upgrs_cur[uid_Armor_upgr2])*uid_Armor_upgrV;
          end;
 
-         if(level>0)and(not uid_isbuilding)then armor+=level*uid_LevelBonusArmor;
+         if(level>0)then armor+=level*uid_LevelBonusArmor;
 
          damage-=armor;
       end;
@@ -162,12 +162,17 @@ begin
                    if(team<>player^.team)then
                    begin
                       if(race<>r_hell)then
-                      res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
-                      res_UACLoot  :=min2i(UACLoot_Max  ,res_UACLoot  +uid_bounty_UACLoot  );
+                      begin
+                         armor:=res_HellPower;
+                         res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
+                         if(res_HellPower>armor)then
+                           game_ScoresAddI(playerDDealer,psi_res_HellPower,res_HellPower-armor);
+                      end;
 
-                      if(race<>r_hell)then
-                      game_ScoresAddI(playerDDealer,psi_res_HellPower,uid_bounty_HellPower);
-                      game_ScoresAddI(playerDDealer,psi_res_UACLoot  ,uid_bounty_UACLoot  );
+                      armor:=res_UACLoot;
+                      res_UACLoot:=min2i(UACLoot_Max  ,res_UACLoot  +uid_bounty_UACLoot  );
+                      if(res_UACLoot>armor)then
+                        game_ScoresAddI(playerDDealer,psi_res_UACLoot,res_UACLoot-armor);
                    end;
             end;
          end;

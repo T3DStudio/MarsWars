@@ -286,20 +286,40 @@ begin
 end;
 
 
-procedure effect_teleport(vx,vy,tx,ty:integer;ukfly:boolean;eidstart,eidend:byte;snd:PTSoundSet;pUnitVis:PTUnit);
+procedure effect_teleport(sx,sy,tx,ty:integer;ukfly:boolean;seid,eeid:byte;snd:PTSoundSet;pUIVisS,pUIVisT:pboolean);
+type ppboolean = ^pboolean;
+function CheckPVis(ppvis:ppboolean):boolean;
 begin
-   if(ui_CheckUnitUIPlayerVision(pUnitVis,false))then
-   begin
-      if(PointInCam(vx,vy))
-      or(PointInCam(tx,ty))then
-        snd_SoundPlayUnit(snd,nil,nil);
-      if (0<vx)and(vx<map_Size1)
-      and(0<vy)and(vy<map_Size1)then
-        effect_add(vx,vy,draw_DefaultSpriteDepth(vy+1,ukfly),eidstart,true);
-      if (0<tx)and(tx<map_Size1)
-      and(0<ty)and(ty<map_Size1)then
-        effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eidend  ,true);
-   end;
+   CheckPVis:=false;
+   if(ppvis^<>nil)then
+     CheckPVis:=ppvis^^;
+end;
+begin
+   if (0<sx)and(sx<map_Size1)
+   and(0<sy)and(sy<map_Size1)then
+     if(CheckPVis(@pUIVisS))then
+       effect_add(sx,sy,draw_DefaultSpriteDepth(sy+1,ukfly),seid,true);
+
+   if (0<tx)and(tx<map_Size1)
+   and(0<ty)and(ty<map_Size1)then
+     if(CheckPVis(@pUIVisT))then
+       effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eeid,true);
+
+   if(CheckPVis(@pUIVisS))
+   or(CheckPVis(@pUIVisT))
+   then snd_SoundPlayUnit(snd,nil,nil);
+
+   {if(pUnitVis<>nil)then
+     if(not ui_CheckUnitUIPlayerVision(pUnitVis,false))then exit;
+
+   if(PointInCam(sx,sy))
+   or(PointInCam(tx,ty))
+   then snd_SoundPlayUnit(snd,nil,nil);
+
+   if (0<sx)and(sx<map_Size1)
+   and(0<sy)and(sy<map_Size1)then effect_add(sx,sy,draw_DefaultSpriteDepth(sy+1,ukfly),seid,true);
+   if (0<tx)and(tx<map_Size1)
+   and(0<ty)and(ty<map_Size1)then effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eeid  ,true);  }
 end;
 
 procedure effects_AddSprites(noanim:boolean);

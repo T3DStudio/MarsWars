@@ -8,6 +8,7 @@ aic_MaxLimitBorder         = MaxPlayerLimit-aic_keyPoint_LimitMin;
 
 aic_TowerLifeTime          = fr_fps1*60;
 aic_DetectionBuildDelay    = fr_fps1*60*4;
+aic_AttackCheckPause       = fr_fps5;
 
 aic_BaseIdle_r             = 50;
 
@@ -341,7 +342,7 @@ begin
       end;
 
       if(aip_skill>1)
-      then aip_MaxUpgradeLevel:=aip_skill
+      then aip_MaxUpgradeLevel:=aip_skill-1
       else aip_MaxUpgradeLevel:=0;
 
       case aip_skill of
@@ -1313,6 +1314,24 @@ begin
    writeln;
 end;  }
 
+function ai_player_SetAttackWave(playerN:byte;waveLimit:longint):longint;
+var
+u:integer;
+begin
+   ai_player_SetAttackWave:=0;
+   if(waveLimit>0)then
+     for u:=1 to MaxUnits do
+       with g_punits[u]^ do
+       with uid^ do
+         if(hits>0)and(playerN=playeri)and(not uid_isbuilding)and(group=aic_group_Home)then
+         begin
+            group:=aic_group_AttackNow;
+            ai_player_SetAttackWave+=uid_LimitUse;
+            waveLimit-=uid_LimitUse;
+            if(waveLimit<=0)then break;
+         end;
+end;
+
 procedure ai_player_code(playerN:byte);
 var
 u:integer;
@@ -1338,13 +1357,17 @@ begin
       if(aip_delay_attack>0)then
       begin
          aip_delay_attack-=1;
-         exit;
-      end;
 
+         if(aip_delay_attack>0)
+         then exit
+         else
+           if(aip_pause_attack<0)then
+             aip_timer_attack:=1;
+      end;
 
       if(aip_MaxAttackLimit<=0)then aip_timer_attack:=0;
 
-      if(aip_timer_attack<0)then
+      if(aip_timer_attack<0)then  // current wave check
       begin
          if(aip_pause_attack<0)then
          begin
@@ -1374,11 +1397,11 @@ begin
             if(limit_Attack<limit_AGroup)
             or((limit_Attack<limit_Home)and(aip_pause_attack=0))
             then aip_timer_attack:=0
-            else aip_timer_attack:=-fr_fps5;
+            else aip_timer_attack:=-aic_AttackCheckPause;
          end;
       end
       else
-        if(aip_timer_attack=0)then
+        if(aip_timer_attack=0)then // wait for attack condition
         begin
            if(aip_pause_attack<0)then
            begin
@@ -1416,22 +1439,13 @@ begin
                   then limit_AGroup:=aip_MaxUnitMinPart
                   else limit_AGroup:=aip_MaxAttackLimit;
 
-              limit_Attack:=0;
-              for u:=1 to MaxUnits do
-                with g_punits[u]^ do
-                with uid^ do
-                  if(hits>0)and(playerN=playeri)and(not uid_isbuilding)and(group=aic_group_Home)then
-                  begin
-                     limit_Attack+=uid_LimitUse;
-                     group:=aic_group_AttackNow;
-                     if(limit_Attack>=limit_AGroup)then break;
-                  end;
+              limit_Attack:=ai_player_SetAttackWave(playerN,limit_AGroup);
 
               if(aip_pause_attack<0)
               then aip_timer_attack:=-aip_pause_attack
               else
               begin
-                 aip_timer_attack:=-fr_fps5;
+                 aip_timer_attack:=-aic_AttackCheckPause;
                  if(limit_Attack>0)then
                    if((aip_flags and aif_army_early_attack0)>0)
                    then aip_flags:=aip_flags xor aif_army_early_attack0

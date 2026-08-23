@@ -2,7 +2,8 @@
 
 procedure lng_eng;
 var
-t1:shortstring;
+t1,
+t2:shortstring;
 i :byte;
 begin
    //   ACTIONS
@@ -559,12 +560,13 @@ begin
    str_SetAbilityBaseHint(uab_ToUACDron          ,t1                         ,'');
 
    t1:='Advanced ';
-   str_SetAbilityBaseHint(uab_ToHGate            ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHPools           ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToHBarracks        ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToUBarracks        ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToUFactory         ,t1                         ,'');
-   str_SetAbilityBaseHint(uab_ToUWeaponFactory   ,t1                         ,'');
+   t2:='Simultaneous multiple production and increased armor';
+   str_SetAbilityBaseHint(uab_ToHGate            ,t1                         ,t2);
+   str_SetAbilityBaseHint(uab_ToHPools           ,t1                         ,t2);
+   str_SetAbilityBaseHint(uab_ToHBarracks        ,t1                         ,t2);
+   str_SetAbilityBaseHint(uab_ToUBarracks        ,t1                         ,t2);
+   str_SetAbilityBaseHint(uab_ToUFactory         ,t1                         ,t2);
+   str_SetAbilityBaseHint(uab_ToUWeaponFactory   ,t1                         ,t2);
    str_SetAbilityBaseHint(uab_LvlUpURadar        ,t1+'"Radar"'               ,'Upgrades the Radar to lower its ability reload time');
    str_SetAbilityBaseHint(uab_LvlUpURMStation    ,t1+'"Rocket Launcher Station"','Upgrades the Rocket Launcher Station to lower its ability reload time');
 

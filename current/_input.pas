@@ -1103,7 +1103,7 @@ begin
       if(m_UnitTargetP<>nil)then
         if(m_UnitTargetP^.playeri=UIPlayer)then
         begin
-           units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi);
+           units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi,byte(unit_F2SelectFilter(m_UnitTargetP)) );
            exit;
         end;
    end
@@ -1114,7 +1114,7 @@ begin
           if (m_UnitTargetP^.playeri=UIPlayer)
           and(m_UnitTargetPrev=m_UnitTargetN)then
           begin
-             units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi);
+             units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi,byte(unit_F2SelectFilter(m_UnitTargetP)) );
              exit;
           end;
      end
@@ -1260,8 +1260,8 @@ begin
       if(mouse_select_xs0<>NOTSET)then //select
       begin
          if(m_UnitTargetP<>nil)
-         then units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,-m_UnitTargetP^.unum)
-         else units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,0);
+         then units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,-m_UnitTargetP^.unum,255)
+         else units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,0                   ,255);
 
          mouse_select_xs0:=NOTSET;
       end;
@@ -1329,9 +1329,12 @@ begin
    if(ui_ScoresShow)then
      if(InputActionPressed(iAct_Any))
      and(not InputActionReleased(iact_Screenshot))then
+     if(g_type=gt_scirmish)
+     then ui_ToggleShowScores
+     else
      begin
-        ui_ToggleShowScores;
-        //exit;
+        ui_ExecInGameAction(iAct_InGameMenu,pct_left,@clickSound);
+        exit;
      end;
 
    if (not m_DragCamMove)

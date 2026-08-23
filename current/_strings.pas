@@ -1110,21 +1110,20 @@ begin
         AddLineUnitDocHint(str_doc_BaseSightR     +i2s(uid_SightR_Base)      );
         if(uid_Regen_Base>0)then
         AddLineUnitDocHint(str_doc_BaseRegen      +DocValI(uid_Regen_Base   ));
+        if(uid_PainState_Base>0)then
+        AddLineUnitDocHint(str_doc_PainC           +DocValI(uid_PainState_Base   ));
+        if(unit_PossibleTransports(uid))then
+        AddLineUnitDocHint(str_doc_TransportSize   +DocValI(uid_TransportSize    ));
         if(not uid_isbuilding)then
-        begin
-           AddLineUnitDocHint(str_doc_PainC           +DocValI(uid_PainState_Base   ));
-           if(unit_PossibleTransports(uid))then
-           AddLineUnitDocHint(str_doc_TransportSize   +DocValI(uid_TransportSize    ));
-           AddLineUnitDocHint(str_doc_LevelUpTime     +DocValI(uid_LevelUpTimeSecs  ));
-           if(uid_LevelBonusDamage>0)then
-           AddLineUnitDocHint(str_doc_LevelDamageBonus+DocValI(uid_LevelBonusDamage ));
-           if(uid_LevelBonusArmor>0)then
-           AddLineUnitDocHint(str_doc_LevelArmorBonus +DocValI(uid_LevelBonusArmor  ));
-           if(uid_PainState_Base>0)then
-           AddLineUnitDocHint(str_doc_LevelPainSBonus +DocValI(uid_LevelBonusPainC  ));
-           if(uid_LevelBonusRegen>0)then
-           AddLineUnitDocHint(str_doc_LevelRegenBonus +DocValI(uid_LevelBonusRegen  ));
-        end;
+        AddLineUnitDocHint(str_doc_LevelUpTime     +DocValI(uid_LevelUpTimeSecs  ));
+        if(uid_LevelBonusArmor>0)then
+        AddLineUnitDocHint(str_doc_LevelArmorBonus+DocValI(uid_LevelBonusArmor));
+        if(uid_LevelBonusDamage>0)then
+        AddLineUnitDocHint(str_doc_LevelDamageBonus+DocValI(uid_LevelBonusDamage ));
+        if(uid_PainState_Base>0)then
+        AddLineUnitDocHint(str_doc_LevelPainSBonus +DocValI(uid_LevelBonusPainC  ));
+        if(uid_LevelBonusRegen>0)then
+        AddLineUnitDocHint(str_doc_LevelRegenBonus +DocValI(uid_LevelBonusRegen  ));
         if(uid_TransportMax_Base>0)then
         AddLineUnitDocHint(str_doc_TransportCpst     +DocValI(uid_TransportMax_Base));
         AddLineUnitDocHint(str_hint_SplashResist+': '+str_YesNoG[uid_isbuilding or uid_ismech]);

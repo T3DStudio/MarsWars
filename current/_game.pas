@@ -564,7 +564,7 @@ end;
 //   UNIT SELECTION
 //
 
-procedure units_SelectRect(add:boolean;x0,y0,x1,y1,sel_opt:integer);
+procedure units_SelectRect(add:boolean;x0,y0,x1,y1,sel_opt:integer;f2filter:byte);
 var
 u              : integer;
 SelectBuildings,
@@ -601,7 +601,9 @@ begin
 
           if(not add)then isselected:=false;
           if(not add)or(not wassel and add)then
-            if(sel_opt=0)or(sel_opt=uidi)or(-sel_opt=unum)then
+            if(sel_opt=0)
+            or((sel_opt=uidi)and ( (f2filter=255)or(f2filter=byte(unit_F2SelectFilter(g_punits[u]))) ) )
+            or(-sel_opt=unum)then
               with uid^ do
                 isselected:=((x0-uid_r)<=vx)and(vx<=(x1+uid_r))
                          and((y0-uid_r)<=vy)and(vy<=(y1+uid_r))

@@ -392,13 +392,20 @@ begin
 end;
 
 procedure unit_Teleport2Point(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
+var
+uivis,
+svis,
+tvis:boolean;
 begin
    with pu^ do
    begin
       tx:=mm3i(0,tx,map_Size1);
       ty:=mm3i(0,ty,map_Size1);
       {$IFDEF _FULLGAME}
-      effect_teleport(vx,vy,tx,ty,isfly,eidstart,eidend,snd,pu);
+      uivis:=ui_CheckUnitUIPlayerVision(pu,false);
+      svis :=uivis or ui_CheckMapPointFogVision(vx,vy,false);
+      tvis :=uivis or ui_CheckMapPointFogVision(tx,ty,false);
+      effect_teleport(vx,vy,tx,ty,isfly,eidstart,eidend,snd,@svis,@tvis);
       {$ENDIF}
       buffs[ub_Teleported]:=fr_fps1;
       unit_SetXY(pu,tx,ty,mvxy_strict);
@@ -1789,11 +1796,12 @@ begin
       FillChar(pprod_u,SizeOf(pprod_u),0);
 
       {$IFDEF _FULLGAME}
-      with g_unitsVis[unum] do
+      fillChar(g_unitsVis[unum],SizeOf(TUnitVis),0);
+      {with g_unitsVis[unum] do
       begin
          wanim    := false;
          anim     := 0;
-      end;
+      end;}
       unit_UpdateMiniMapXY(pu);
       unit_UpdateFogXY(pu);
       {$ENDIF}

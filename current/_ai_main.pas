@@ -878,11 +878,11 @@ begin
       //if(isselected)then
       //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
       //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-      {if(isselected)or(m_UnitTargetN=unum)then
+     { if(isselected)or(m_UnitTargetN=unum)then
       begin
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);
          //writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
-         if(ai_generator_d<NOTSET)then
+         {if(ai_generator_d<NOTSET)then
            with ai_generator_kp^ do
            begin
               UnitsInfo_AddLine(x,y,kp_x,kp_y,c_blue);
@@ -891,7 +891,8 @@ begin
          if(aiu_alarm_d<NOTSET)then
            UnitsInfo_AddLine(x+1,y+1,aiu_alarm_x,aiu_alarm_y,c_red);
 
-         writeln(TeamVision[g_PlayersGame[LocalPlayer].team]);
+         writeln(TeamVision[g_PlayersGame[LocalPlayer].team]);   }
+         writeln('energy_future=',ai_energy_future,' MaxEnergy=',player^.aip_MaxEnergy);
 
          //if(ai_keypoint_d<NOTSET)then
          //  with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
@@ -902,7 +903,7 @@ begin
          {writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
          if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
          if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua); }
-      end;}
+      end;  }
      { if(isselected)then
       with player^ do
       begin
