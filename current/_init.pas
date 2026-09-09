@@ -19,7 +19,6 @@ begin
    vid_MakeScreen;
    draw_LoadingScreen(@str_loading_gfx,c_yellow);
    gfx_LoadAll;
-   camp_Init;
 
    video_Init:=true;
 end;
@@ -75,8 +74,11 @@ begin
    game_InitGameDataAll;
 
    {$IFDEF _FULLGAME}
+   camp_Init;
 
    input_InitDefaultActionHotkeys;
+
+   lang_Init;
 
    cfg_read;
 
@@ -89,13 +91,13 @@ begin
    if not(sound_Init)then exit;
 
    InitRX2Y;
-   lng_eng;
+   lang_InitActionHotkeys;
    InitClientDataGame;
    InitClientDataUpgrades;
    InitClientDataMissiles;
    gfx_MakeUnitIcons;
    InitClientDataAbilities;
-   SwitchLanguage;
+   lang_Update;
 
    menu_HelpIList:=@str_doc_Credits;
    {$ENDIF}
@@ -111,6 +113,11 @@ begin
 
    {$IFDEF _FULLGAME}
    net_ServerListParseAddrs;
+
+   {$IFDEF DOCGEN}
+   htmldoc_Make;
+   {$ENDIF}
+
    {$ELSE}
    dedicated_Init;
    {$ENDIF}

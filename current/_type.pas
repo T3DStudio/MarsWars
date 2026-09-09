@@ -36,7 +36,6 @@ TMWColor = cardinal;
 PTMWColor = ^TMWColor;
 
 TPlayersColorScheme  = array[0..LastPlayer] of TMWColor;
-PTPlayersColorScheme = ^TPlayersColorScheme;
 
 TMWTexture = record
    surf :pSDL_Surface;

@@ -25,11 +25,12 @@ begin
            with g_unitsVis[unum] do
            begin
               animw  := uid_AnimStepWalk;
-              shadowz:= unit_CalcShadowZ(pu,not clientSwitch);
+              shadowz:= unit_CalcShadowZ(pu,true);  //not clientSwitch
               unit_CalcFogR(pu);
            end;
+         if(not clientSwitch)then
          {$ENDIF}
-         hits:=uid_MaxHits1;
+           hits:=uid_MaxHits1;
       end;
    end;
 end;
@@ -374,7 +375,7 @@ begin
    uid_MaxHits1        := 1000;
    uid_req_EnergyLevel := 250;
    uid_r               := 11;
-   uid_MSpeed_Base     := 10;
+   uid_MSpeed_Base     := 11;
    uid_Armor_upgr1     := upgr_hell_UnitArmor;
    uid_Regen_Upgr      := upgr_hell_Regeneration;
    uid_SightR_Base     := 200;
@@ -1683,7 +1684,7 @@ MID_URocketS,
 MID_URocket,
 MID_BFG,
 MID_Granade        : mid_speed       :=10;
-MID_Blizzard       : mid_speed       :=-fr_fps1; // special
+MID_UACStrike      : mid_speed       :=-fr_fps1; // special
 end;
 
 // damage
@@ -1708,12 +1709,12 @@ MID_SSShot         : mid_base_damage :=BaseDamage3;
 MID_CyberRocket    : mid_base_damage :=BaseDamage5;
 MID_BFG            : mid_base_damage :=BaseDamage6;
 MID_ArchFire       : mid_base_damage :=BaseDamage6;
-MID_Blizzard       : mid_base_damage :=BaseDamage10*4;
+MID_UACStrike      : mid_base_damage :=BaseDamage10*4;
 end;
 
 // splash R
 case m of
-MID_Blizzard       : mid_base_SplashR:=blizzard_sr;
+MID_UACStrike      : mid_base_SplashR:=blizzard_sr;
 MID_CyberRocket    : mid_base_SplashR:=rocket_sr;
 MID_URocketS,
 MID_ArchFire,
@@ -1749,7 +1750,7 @@ MID_BFG            : begin
                      mid_TeamDamage  :=false;
                      mid_noFlyCheck  :=true;
                      end;
-MID_Blizzard       : begin
+MID_UACStrike      : begin
                      mid_noFlyCheck  :=true;
                      mid_size        :=mid_base_SplashR div 2;
                      end;

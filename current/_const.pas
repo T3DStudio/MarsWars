@@ -1,7 +1,16 @@
 
+// FUNDAMENTAL TYPES
+
 type
-integer  = Smallint;
-pinteger = ^integer;
+integer     = Smallint;
+pinteger    = ^integer;
+
+//byte        = byte;
+pbyte       = ^byte;
+
+//string      = AnsiString;
+
+// GAME CONSTANTS
 
 const
 
@@ -618,7 +627,7 @@ MID_SSShot             = 111;
 MID_BFG                = 112;
 MID_Granade            = 113;
 MID_Tank               = 114;
-MID_Blizzard           = 115;
+MID_UACStrike          = 115;
 MID_ArchFire           = 116;
 MID_Flyer              = 117;
 MID_URocket            = 119;
@@ -1864,7 +1873,7 @@ menu_logoh             = 64;
 
 menu_BaseW1            = 28;
 menu_BaseWh            = menu_BaseW1 div 2;
-menu_BaseW1h           = 28+menu_BaseWh;
+menu_BaseW1h           = menu_BaseW1+menu_BaseWh;
 menu_BaseW2            = menu_BaseW1*2;
 menu_BasehW            = menu_BaseW1 div 2;
 menu_SmallW            =(menu_BaseW1 div 4)*3;
@@ -1874,6 +1883,7 @@ menu_ListLinehH        = menu_ListLineH div 2;
 
 menu_CaptionhW         = menu_BaseW1*3;
 menu_BigButtonW1       = menu_BaseW1*3+menu_BaseWh;
+menu_BigButtonWb       = menu_BigButtonW1+6;
 menu_BigButtonWImg     = menu_BigButtonW1+(menu_BigButtonW1 div 4)*3;
 menu_BigButtonH1       = menu_BaseW1;
 menu_BigButtonHh       = menu_BigButtonH1 div 2;
@@ -1971,6 +1981,7 @@ str_loading_gfx        : shortstring = 'LOADING GRAPHICS...'+#0;
 str_loading_sfx        : shortstring = 'LOADING SOUNDS...'+#0;
 str_loading_msc        : shortstring = 'LOADING MUSIC...'+#0;
 str_loading_netdns     : shortstring = 'RESOLVING DNS...'+#0;
+str_loading_lang       : shortstring = 'LOADING LANG FILE...'+#0;
 
 str_ConfigFName        : shortstring = 'marswars.cfg';
 str_ScreenShotPrefix   : shortstring = 'MWSCR_';
@@ -1995,16 +2006,17 @@ folder_save            : shortstring = 'save\';
 folder_replay          : shortstring = 'replay\';
 folder_effects         : shortstring = 'effs\';
 folder_ui              : shortstring = 'ui\';
+folder_language        : shortstring = 'language\';
 
 ui_limitstr            : shortstring = '125';
 
 tc_player0             = #0;
-{tc_player1             = #1;
+tc_player1             = #1;
 tc_player2             = #2;
 tc_player3             = #3;
 tc_player4             = #4;
 tc_player5             = #5;
-tc_player6             = #6;}
+tc_player6             = #6;
 tc_player7             = #7;
 tc_nl1                 = #8;
 tc_nl2                 = #9;

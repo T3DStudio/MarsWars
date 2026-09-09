@@ -77,7 +77,7 @@ begin
                             end;
         EID_Teleport      : setEID(@spr_eff_tel        ,sms_death);
         EID_InfantryGibs  : setEID(@spr_eff_g          ,sms_death);
-        MID_Blizzard,
+        MID_UACStrike,
         EID_BExp          : setEID(@spr_eff_eb         ,sms_death);
         EID_BBExp         : setEID(@spr_eff_ebb        ,sms_death);
         EID_HKeep_H,
@@ -208,7 +208,7 @@ EID_Teleport      : setEff(10,0 ,-1 ,-1       ,true ,0 );
 EID_InfantryGibs  : setEff(7 ,0 ,-1 ,dead_time,true ,0 );
 
 EID_BExp          : setEff(5 ,0 ,-1 ,-1       ,true ,0 );
-MID_Blizzard,
+MID_UACStrike,
 EID_BBExp         : setEff(6 ,0 ,-1 ,-1       ,true ,0 );
 
 EID_HKeep_H,
@@ -268,15 +268,15 @@ var  m:integer;
 begin
    for m:=0 to MaxMissiles do
      with g_missiles[m] do
-       if(m_mid=MID_Blizzard)
+       if(m_mid=MID_UACStrike)
        or(ui_CheckMapPointFogVision(m_x,m_y,true))then
          with g_mids[m_mid] do
            if(m_vstep>0)then
            begin
-              if(m_mid=MID_Blizzard)then
+              if(m_mid=MID_UACStrike)then
                 if(UACStrike_t0<=m_vstep)and(m_vstep<=UACStrike_t1)then continue;
 
-              spr:=SpriteModel2Sprite(mid_SpriteModel,sms_stand,m_dir,byte(m_mid=MID_Blizzard)*byte(m_vstep<=UACStrike_t1),nil);
+              spr:=SpriteModel2Sprite(mid_SpriteModel,sms_stand,m_dir,byte(m_mid=MID_UACStrike)*byte(m_vstep<=UACStrike_t1),nil);
               SpriteList_AddEffect(m_x,m_y,draw_DefaultSpriteDepth(m_y,m_mfs)+100,0,spr,255);
 
               if(mid_eid_FlyStep>0)and(mid_eid_FlyTrace>0)then

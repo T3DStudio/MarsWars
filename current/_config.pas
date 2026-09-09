@@ -49,10 +49,10 @@ cfg_key_NetServerAddr   : menu_ClientAddress := vl;
 cfg_key_NetServerPort   : menu_ServerPort    := vl;
 cfg_key_NetQuality      : net_cl_Quality     := vlw;
 cfg_key_NetServerList   : net_ServerListAdd(vl,false,false);
+cfg_key_UILanguage      : lang_Current       := vl;
 cfg_key_UICamScrollSpeed: ui_CamSpeed        := vli;
 cfg_key_UICamMouseScroll: ui_MouseScroll     :=(vl=b2c[true]);
 cfg_key_UIColoredShadows: ui_ColoredShadow   :=(vl=b2c[true]);
-cfg_key_UILanguage      : ui_language        :=(vl=b2c[true]);
 cfg_key_UICtrlPanelPos  : ui_ControlPanelPos := vlw;
 cfg_key_UIHealthBars    : ui_HealthBars      := vlw;
 cfg_key_UIPlayersColor  : ui_PlayersColor    := vlw;
@@ -137,6 +137,10 @@ begin
       if(ui_HealthBars     >ui_MaxHealthBars     )then ui_HealthBars     :=0;
       if(ui_PlayersColor   >ui_MaxPlayersColor   )then ui_PlayersColor   :=0;
    end;
+   lang_CurrentN:=lang_FindN(lang_Current);
+   if(lang_CurrentN<lang_Count)then
+     lang_Current:=lang_List[lang_CurrentN];
+
    menu_ResolutionWi:=vid_vw;
    menu_ResolutionHi:=vid_vh;
    menu_ClientAddress:=menu_GetClientAddress(menu_ClientAddress,@net_cl_svip,@net_cl_svport);
@@ -148,17 +152,20 @@ var f:text;
     i:integer;
 begin
    assign(f,str_ConfigFName);
-{$I-}rewrite(f);{$I+} if (ioresult<>0) then exit;
+   {$I-}
+   rewrite(f);
+   {$I+}
+   if(ioresult<>0)then exit;
 
    writeln(f,cfg_key_PlayerName      ,'=',PlayerName            );
    writeln(f,cfg_key_SoundVolume     ,'=',snd_SoundVolume       );
    writeln(f,cfg_key_MusicVolume     ,'=',snd_MusicVolume       );
    writeln(f,cfg_key_MusicListSize   ,'=',snd_musicListSize     );
    writeln(f,cfg_key_MusicListRenew  ,'=',b2c[snd_RenewMusicList]);
+   writeln(f,cfg_key_UILanguage      ,'=',lang_Current          );
    writeln(f,cfg_key_UICamScrollSpeed,'=',ui_CamSpeed           );
    writeln(f,cfg_key_UICamMouseScroll,'=',b2c[ui_MouseScroll]   );
    writeln(f,cfg_key_UIColoredShadows,'=',b2c[ui_ColoredShadow] );
-   writeln(f,cfg_key_UILanguage      ,'=',b2c[ui_language]      );
    writeln(f,cfg_key_UIRMBAction     ,'=',b2c[m_RightClickAct]  );
    writeln(f,cfg_key_UICtrlPanelPos  ,'=',ui_ControlPanelPos    );
    writeln(f,cfg_key_UIHealthBars    ,'=',ui_HealthBars         );

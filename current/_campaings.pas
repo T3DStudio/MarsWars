@@ -8,6 +8,17 @@ camp_AutoSavePrefix  = 'CampaignAutoSave_';
 procedure camp_Init;
 begin
    camp_data.cd_lastm:=5;
+
+   // CAMPAINGS
+   str_camp_clear;
+
+   str_camp_Add('1');
+
+   str_camp_MisAdd(0,'1');
+   str_camp_MisAdd(0,'2');
+   str_camp_MisAdd(0,'3');
+   str_camp_MisAdd(0,'4');
+   str_camp_MisAdd(0,'5');
 end;
 
 procedure camp_UnitsUpdateMiniMapXY;
@@ -198,7 +209,8 @@ begin
               camp_SetBaseLevelUnitUpgrades(ap,(alevel-1)*2);
             aip_MaxUpgradeLevel:=alevel*2;
 
-            camp_removeAIFlag(ap,aif_base_DefendAlly);
+            camp_removeAIFlag(ap,aif_base_DefendAlly   );
+            camp_removeAIFlag(ap,aif_base_suicide      );
             camp_removeAIFlag(ap,aif_army_early_attack0);
             camp_removeAIFlag(ap,aif_army_early_attack1);
             camp_removeAIFlag(ap,aif_army_scout);
@@ -251,6 +263,7 @@ end;
 
 procedure cmp_StartMission;
 var
+camp_skill,
 p,
 p_player,
 p_ally1,
@@ -260,6 +273,9 @@ begin
    game_DefaultAll;
    g_FixedPositions:=true;
    g_NewObservers  :=false;
+   camp_skill:=camp_diff;
+   if(camp_skill>3)then camp_skill:=3;
+
    case camp_sel of
    0 : begin  ////  HELL vs HELL
           p_player   :=0;
@@ -305,11 +321,11 @@ begin
 
                  camp_SetPlayer(p_enemy1,r_hell,1,ps_AI   ,str_Camp_HE_CoB);
 
-                 camp_SetAI(p_enemy1,camp_diff,210,-1);
+                 camp_SetAI(p_enemy1,camp_skill,210,-1);
                  with g_PlayersGame[p_enemy1] do
                  begin
                     aip_MaxUnitLimit  :=ul30;
-                    aip_MaxAttackLimit:=ul2+ul2*camp_diff; //ul2..ul10
+                    aip_MaxAttackLimit:=ul2+ul2*camp_skill; //ul2..ul10
                     aip_MaxTowers     :=6;
                     aip_MaxEnergy     :=4000;
                  end;
@@ -359,7 +375,7 @@ begin
 
                  camp_SetPlayer(p_player,r_hell,0,ps_human,PlayerName);
 
-                 camp_SetPStart(p_player,map_Size1 div 4,map_Size1 div 5);
+                 camp_SetPStart(p_player,map_Size1 div 5,map_Size1 div 6);
 
                  camp_CreateUnit(p_player,map_PlayerStartX[p_player]-100,map_PlayerStartY[p_player]-100,UID_HKeep);
                  camp_CreateUnit(p_player,map_PlayerStartX[p_player]+100,map_PlayerStartY[p_player]+100,UID_HKeep);
@@ -383,34 +399,33 @@ begin
                                                       upgr_hell_BuilderR    ], 2       ,true);
                  with g_PlayersGame[p_player] do a_ability:=[uab_ToHAKeep];
 
-                 // Tribe of Evil (green)
-                 camp_SetPStart(p_enemy1,(map_Size1 div 7)*4,map_Size1-(map_Size1 div 6));
+                 // Evil Eyes (green)
+                 camp_SetPStart(p_enemy1,(map_Size1 div 4),map_Size1-(map_Size1 div 4));
 
-                 camp_SetPlayer(p_enemy1,r_hell,1,ps_AI   ,str_Camp_HE_ToE);
-                 camp_SetAI(p_enemy1,camp_diff,0  ,-1);
+                 camp_SetPlayer(p_enemy1,r_hell,1,ps_AI   ,str_Camp_HE_EE);
+                 camp_SetAI(p_enemy1,camp_skill,0  ,-1);
                  with g_PlayersGame[p_enemy1] do
                  begin
                     aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
-                    aip_MaxTowers     :=2+camp_diff;
-                    aip_flags         :=aip_flags or aif_army_scout;
+                    aip_MaxTowers     :=2+camp_skill*2;
                  end;
                  camp_removeAIFlag(p_enemy1,aif_base_smart_order);
 
-                 camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]    ,map_PlayerStartY[p_enemy1]-100,UID_HKeep,60);
-                 camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]-110,map_PlayerStartY[p_enemy1]+100,UID_HKeep,60);
-                 camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]+110,map_PlayerStartY[p_enemy1]+100,UID_HKeep,60);
-                 camp_CreateUnitAreaR(p_enemy1,5,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Revenant,60);
-                 camp_CreateUnitAreaR(p_enemy1,5,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Baron   ,60);
-                 camp_CreateUnitAreaR(p_enemy1,5,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Demon   ,60);
+                 camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]    ,map_PlayerStartY[p_enemy1]-100,UID_HAKeep,60);
+                 camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]-110,map_PlayerStartY[p_enemy1]+100,UID_HAKeep,60);
+                 camp_CreateUnit(p_enemy1,map_PlayerStartX[p_enemy1]+110,map_PlayerStartY[p_enemy1]+100,UID_HAKeep,60);
+                 camp_CreateUnitAreaR(p_enemy1,7,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Revenant,60);
+                 camp_CreateUnitAreaR(p_enemy1,7,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Baron   ,60);
+                 camp_CreateUnitAreaR(p_enemy1,7,map_PlayerStartX[p_enemy1],map_PlayerStartY[p_enemy1],100,UID_Demon   ,60);
 
                  player_SetAllowedUnits   (p_enemy1,[ UID_HAKeep,
                                                       UID_HGate,
                                                       UID_HPools,
                                                       UID_HFTower,
-                                                      UID_HTeleport          ], MaxUnits,true );
+                                                      UID_HEyeNest          ], MaxUnits,true );
                  player_SetAllowedUnits   (p_enemy1,[ UID_Demon,
                                                       UID_Baron,
-                                                      UID_Revenant           ], 30      ,false);
+                                                      UID_Revenant           ], 40      ,false);
                  player_SetAllowedUpgrades(p_enemy1,[ upgr_hell_DistDamage1,
                                                       upgr_hell_UnitArmor ,
                                                       upgr_hell_MeleeDamage,
@@ -419,34 +434,33 @@ begin
                                                       upgr_hell_BuilderR     ], 5       ,true );
                  with g_PlayersGame[p_enemy1] do a_ability:=[uab_ToHAKeep];
 
-                 // Hell Knights
-                 camp_SetPStart(p_enemy2,map_Size1-(map_Size1 div 6),(map_Size1 div 7)*3);
+                 // Pack of Anger (orange)
+                 camp_SetPStart(p_enemy2,map_Size1-(map_Size1 div 5),map_Size1 div 2);
 
-                 camp_SetPlayer(p_enemy2,r_hell,2,ps_AI   ,str_Camp_HE_HN);
-                 camp_SetAI(p_enemy2,camp_diff,0  ,-1);
+                 camp_SetPlayer(p_enemy2,r_hell,2,ps_AI   ,str_Camp_HE_PoA);
+                 camp_SetAI(p_enemy2,camp_skill,0  ,-1);
                  with g_PlayersGame[p_enemy2] do
                  begin
                     aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
-                    aip_MaxTowers     :=2+camp_diff;
-                    aip_flags         :=aip_flags or aif_army_scout;
+                    aip_MaxTowers     :=2+camp_skill;
                  end;
                  camp_removeAIFlag(p_enemy1,aif_base_smart_order);
 
-                 camp_CreateUnit(p_enemy2,map_PlayerStartX[p_enemy2]+110,map_PlayerStartY[p_enemy2]-110,UID_HKeep,60);
-                 camp_CreateUnit(p_enemy2,map_PlayerStartX[p_enemy2]-100,map_PlayerStartY[p_enemy2]+110,UID_HKeep,60);
-                 camp_CreateUnit(p_enemy2,map_PlayerStartX[p_enemy2]+110,map_PlayerStartY[p_enemy2]+60 ,UID_HKeep,60);
-                 camp_CreateUnitAreaR(p_enemy2,5,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Cacodemon,60);
-                 camp_CreateUnitAreaR(p_enemy2,5,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Knight   ,60);
-                 camp_CreateUnitAreaR(p_enemy2,5,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Imp      ,60);
+                 camp_CreateUnit(p_enemy2,map_PlayerStartX[p_enemy2]+110,map_PlayerStartY[p_enemy2]-110,UID_HAKeep,60);
+                 camp_CreateUnit(p_enemy2,map_PlayerStartX[p_enemy2]-100,map_PlayerStartY[p_enemy2]+110,UID_HAKeep,60);
+                 camp_CreateUnit(p_enemy2,map_PlayerStartX[p_enemy2]+110,map_PlayerStartY[p_enemy2]+60 ,UID_HAKeep,60);
+                 camp_CreateUnitAreaR(p_enemy2,7,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Cacodemon,60);
+                 camp_CreateUnitAreaR(p_enemy2,7,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Knight   ,60);
+                 camp_CreateUnitAreaR(p_enemy2,7,map_PlayerStartX[p_enemy2],map_PlayerStartY[p_enemy2],100,UID_Imp      ,60);
 
                  player_SetAllowedUnits   (p_enemy2,[ UID_HAKeep,
                                                       UID_HGate,
                                                       UID_HPools,
                                                       UID_HFTower,
-                                                      UID_HEyeNest           ], MaxUnits,true );
+                                                      UID_HTeleport          ], MaxUnits,true );
                  player_SetAllowedUnits   (p_enemy2,[ UID_Imp,
-                                                      UID_Knight,
-                                                      UID_Cacodemon          ], 30      ,false);
+                                                      UID_Cacodemon          ], 40      ,false);
+                 player_SetAllowedUnits   (p_enemy2,[ UID_Knight             ], 10      ,false);
                  player_SetAllowedUpgrades(p_enemy2,[ upgr_hell_DistDamage1,
                                                       upgr_hell_UnitArmor ,
                                                       upgr_hell_MeleeDamage,
@@ -533,13 +547,13 @@ begin
                 camp_AllowUnitsForPlayer(LocalPlayer,[ UID_Baron,
                                                        UID_Revenant,
                                                        UID_HAKeep  ,
-                                                       UID_HTeleport]);
+                                                       UID_HEyeNest]);
 
               if(g_PlayersGame[1].units_bld_lc[true]=0)then
                 camp_AllowUnitsForPlayer(LocalPlayer,[ UID_Knight,
                                                        UID_Cacodemon,
                                                        UID_HAKeep   ,
-                                                       UID_HEyeNest ]);
+                                                       UID_HTeleport]);
 
               if (g_PlayersGame[LocalPlayer].units_uid_c[UID_HKeep ]=0)
               and(g_PlayersGame[LocalPlayer].units_uid_c[UID_HAKeep]=0)then

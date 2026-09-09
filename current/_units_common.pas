@@ -700,7 +700,7 @@ end;
 
 procedure ability_UACStrike_missile(playeri:byte;fromx,fromy,tox,toy:integer);
 begin
-   missile_add(tox,toy,fromx,fromy,0,MID_Blizzard,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
+   missile_add(tox,toy,fromx,fromy,0,MID_UACStrike,playeri,uf_ground,uf_ground,false,0,dm_RSMShot);
    {$IFDEF _FULLGAME}
    effect_add(fromx,fromy-15,draw_DefaultSpriteDepth(fromy+10,false),EID_Exp2);
    snd_SoundPlayUnit(snd_bomblaunch,nil,nil);

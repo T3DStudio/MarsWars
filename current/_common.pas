@@ -1875,7 +1875,7 @@ gs_waitplayers: begin
 gs_win_team0..
 gs_win_team7  : if(POVPlayer>LastPlayer)then
                 begin
-                   SetS(str_gstat_WonByTeam+b2s(gstatus-gs_win_team0+1));
+                   SetS(str_gstat_WonTeam+b2s(gstatus-gs_win_team0+1));
                    SetC(c_ltgray);
                 end
                 else

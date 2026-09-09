@@ -1,0 +1,1369 @@
+
+# str_tmp1,str_tmp2,str_tmp3 - temp vars
+
+str_ps_AI                     = 'AI'
+str_ps_Host                   = 'HOST'
+str_ps_Hum                    = 'HUM'
+
+str_Caption_Map               = 'MAP'
+str_Caption_Players           = 'PLAYERS'
+str_Caption_Multiplayer       = 'MULTIPLAYER'
+str_Caption_GOptions          = 'GAME OPTIONS'
+str_Caption_Server            = 'SERVER'
+str_Caption_Client            = 'CLIENT'
+str_Caption_Objectives        = 'OBJECTIVES'
+str_Caption_NetSvList         = 'SERVER LIST'
+
+str_menu_Campaings            = 'TUTORIALS&CAMPAIGNS'
+str_menu_Scirmish             = 'SKIRMISH'
+str_menu_Playback             = 'REPLAY PLAYBACK'
+str_menu_SaveLoad             = 'SAVE/LOAD'
+str_menu_LoadGame             = 'LOAD GAME'
+str_menu_Replays              = 'REPLAYS'
+str_menu_Settings             = 'SETTINGS'
+str_menu_Help                 = 'HELP'
+
+str_menu_Start                = 'START'
+str_menu_Cancel               = 'CANCEL'
+str_menu_Surrender            = 'SURRENDER'
+str_menu_MissionAbort         = 'ABORT MISSION'
+str_menu_MissionEnd           = 'END MISSION'
+str_menu_PlaybackStop         = 'STOP PLAYBACK'
+str_menu_Exit                 = 'EXIT'
+str_menu_Back                 = 'BACK'
+
+str_menu_Chat                 = 'chat(all players)'
+str_menu_Pause                = 'Pause'
+str_menu_InGameTime           = 'In-game timer: '
+
+str_or                        = 'or'
+str_and                       = 'and'
+str_YesNoG[true]              = 'YES'
+str_YesNoG[false]             = 'NO'
+
+str_lobby_PlayerReady[false]  = ' is '+tc_red +'not ready'
+str_lobby_PlayerReady[true]   = ' is '+tc_lime+'ready'
+str_lobby_ReadyToStart        = 'Game is ready to start!'
+str_lobby_BreakStarting       = 'Game is not ready!'
+str_lobby_GameStartIn         = 'Game starts in '
+str_lobby_GameResetIn         = 'Reset in the lobby in '
+
+str_menuMsg_HintImg           = '- press any key to close -'
+str_menuMsg_HintDefault       = '- press any key to close the message -'
+str_menuMsg_HintClient        = '- press any key to disconnect -'
+
+str_S_Game                    = 'GAME'
+str_S_Replay                  = 'RECORDING'
+str_S_Video                   = 'VIDEO'
+str_S_Sound                   = 'SOUND'
+
+str_SR_RecordGames            = 'Record games'
+str_SR_Quality                = 'File size/quality'
+str_SR_ReplayPrefix           = 'Replay prefix'
+
+str_SG_ShowAPM                = 'Show APM'
+str_SG_ColoredShadow          = 'Colored shadows'
+str_SG_ScrollSpeed            = 'Scroll speed'
+str_SG_MouseScroll            = 'Screen edge scrolling'
+str_SG_PlayerName             = 'Player name'
+str_SG_Language               = 'UI language'
+str_SG_RightClickAct          = 'Right-click action'
+str_SG_RightClickActL[true]   = tc_lime  +'move'  +tc_default
+str_SG_RightClickActL[false]  = tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default
+str_SG_ControlPanelPos        = 'Control panel position'
+str_SG_ControlPanelPosL[cpp_left]  = tc_lime  +'left'  +tc_default
+str_SG_ControlPanelPosL[cpp_right] = tc_orange+'right' +tc_default
+str_SG_ControlPanelPosL[cpp_top]   = tc_yellow+'top'   +tc_default
+str_SG_ControlPanelPosL[cpp_bottom]= tc_aqua  +'bottom'+tc_default
+str_SG_ControlPanelAuto       = 'Control panel auto-switching'
+str_SG_ShowPlayerScrns        = 'Other player screens on the minimap'
+str_SG_HealthBars             = 'Health bars'
+str_SG_HealthBarsL[0]         = tc_lime  +'selected'+tc_default+'&'+tc_red+'damaged'+tc_default
+str_SG_HealthBarsL[1]         = tc_aqua  +'always'  +tc_default
+str_SG_HealthBarsL[2]         = tc_orange+'only '   +tc_lime+'selected'+tc_default
+str_SG_PlayersColor           = 'Override player colors'
+str_SG_PlayersColorL[1]       = tc_lime  +'own ' +tc_yellow+'ally '+tc_red+'enemy'+tc_default
+str_SG_PlayersColorL[2]       = tc_white +'own ' +tc_yellow+'ally '+tc_red+'enemy'+tc_default
+str_SG_PlayersColorL[3]       = tc_white +'own ' +tc_aqua  +'ally '+tc_red+'enemy'+tc_default
+str_SG_PlayersColorL[4]       = tc_purple+'teams'+tc_default
+str_SG_PlayersColorL[5]       = tc_white +'own ' +tc_purple+'teams'+tc_default
+
+str_SV_ResolutionW            = 'Resolution (width)'
+str_SV_ResolutionH            = 'Resolution (height)'
+str_SV_ResolutionApply        = 'Apply resolution'
+str_SV_Windowed               = 'Windowed'
+str_SV_MenuScale              = 'Menu scaling'
+str_SV_ShowFPS                = 'Show FPS'
+
+str_SS_MusicVolume            = 'Music volume'
+str_SS_SoundVolume            = 'Sound volume'
+str_SS_NextTrack              = 'Play next track'
+str_SS_ReloadMusic            = 'Load new playlist'
+str_SS_RenewMusicList         = 'Renew playlist on start'
+str_SS_MusicListSize          = 'Music playlist size'
+str_SS_Playlist               = 'Current game playlist'
+
+str_GO_AISlots                = 'Fill empty slots'
+str_GO_FixedStarts            = 'Fixed player starts'
+str_GO_NewObservers           = 'New observers after game start'
+str_GO_Random                 = 'Random skirmish'
+
+str_map                       = 'Map'
+str_map_Seed                  = 'Seed'
+str_map_Size                  = 'Size'
+str_map_Random                = 'Random map'
+str_map_Scenario              = 'Scenario'
+str_map_ScenarioL[mc_ffa3]    = tc_lime  +'FFA(3)'      +tc_default
+str_map_ScenarioL[mc_ffa4]    = tc_lime  +'FFA(4)'      +tc_default
+str_map_ScenarioL[mc_ffa5]    = tc_lime  +'FFA(5)'      +tc_default
+str_map_ScenarioL[mc_ffa6]    = tc_lime  +'FFA(6)'      +tc_default
+str_map_ScenarioL[mc_ffa7]    = tc_lime  +'FFA(7)'      +tc_default
+str_map_ScenarioL[mc_ffa8]    = tc_lime  +'FFA(8)'      +tc_default
+str_map_ScenarioL[mc_1x1]     = tc_yellow+'1x1'         +tc_default
+str_map_ScenarioL[mc_2x2]     = tc_yellow+'2x2'         +tc_default
+str_map_ScenarioL[mc_3x3]     = tc_yellow+'3x3'         +tc_default
+str_map_ScenarioL[mc_4x4]     = tc_yellow+'4x4'         +tc_default
+str_map_ScenarioL[mc_2x2x2]   = tc_orange+'2x2x2'       +tc_default
+str_map_ScenarioL[mc_2x2x2x2] = tc_orange+'2x2x2x2'     +tc_default
+str_map_ScenarioL[mc_KeyPoints]=tc_aqua  +'Key points'  +tc_default
+str_map_ScenarioL[mc_KotH]    = tc_aqua  +'KotH'        +tc_default
+str_map_ScenarioL[mc_royale]  = tc_red   +'Royal Battle'+tc_default
+
+str_map_Generators            = 'Gener. time'
+str_map_GeneratorsL[mapg_5]   = '5 min'
+str_map_GeneratorsL[mapg_10]  = '10 min'
+str_map_GeneratorsL[mapg_15]  = '15 min'
+str_map_GeneratorsL[mapg_20]  = '20 min'
+str_map_GeneratorsL[mapg_inf] = 'infinity'
+
+str_map_Symmetry              = 'Symmetry'
+str_map_SymmertyL[maps_none]  = 'no'
+str_map_SymmertyL[maps_point] = 'point'
+str_map_SymmertyL[maps_lineV] = 'line |'
+str_map_SymmertyL[maps_lineh] = 'line -'
+str_map_SymmertyL[maps_lineL] = 'line \'
+str_map_SymmertyL[maps_lineR] = 'line /'
+
+str_map_Template              = 'Template'
+str_map_TemplateL[mapt_lake]  = tc_red   +'lake'
+str_map_TemplateL[mapt_island]= tc_orange+'island'
+str_map_TemplateL[mapt_temple]= tc_yellow+'temple'
+str_map_TemplateL[mapt_cave]  = tc_blue  +'cave'
+str_map_TemplateL[mapt_steppe]= tc_gray  +'steppe'
+str_map_TemplateL[mapt_canyon]= tc_lime  +'canyon'
+
+str_objective_Scirmish        = '-Destroy all enemy players'
+str_objective_RoyalBattle     = '-Stay alive'
+str_objective_KotH            = '-Keep central area'
+str_objective_KeyPoints       = '-Capture all key points'
+
+str_FileError_NExists         = 'File not exists!'
+str_FileError_Open            = 'Can`t open file!'
+str_FileError_WData           = 'Wrong file data!'
+str_FileError_WVer            = 'Wrong version!'
+
+str_PT_Player                 = 'PLAYER'
+str_PT_State                  = 'STATUS'
+str_PT_Race                   = 'RACE'
+str_PT_Team                   = 'TEAM'
+str_PT_Color                  = 'COLOR'
+str_PT_Ping                   = 'PING'
+str_PT_Obs                    = 'OBS.'
+
+str_race[r_random]            = tc_default+'RANDOM'+tc_default
+str_race[r_hell]              = tc_orange +'HELL'  +tc_default
+str_race[r_uac]               = tc_lime   +'UAC'   +tc_default
+str_observer                  = 'OBSERVER'
+
+str_Players                   = 'Players'
+str_all                       = 'All'
+
+str_themes[0]                 = tc_lime  +'UAC BASE'
+str_themes[1]                 = tc_aqua  +'ICE CAVE'
+str_themes[2]                 = tc_purple+'HELL CAVES'
+str_themes[3]                 = tc_red   +'HELL CITY'
+str_themes[4]                 = tc_blue  +'EARTH CITY'
+str_themes[5]                 = tc_white +'EARTH MOON'
+str_themes[6]                 = tc_orange+'MARS'
+str_themes[7]                 = tc_yellow+'PHOBOS'
+str_themes[8]                 = tc_gray  +'DEIMOS'
+
+str_FileInfo                  = 'FILE INFO'
+str_FileSave                  = 'Save'
+str_FileLoad                  = 'Load'
+str_FilePlay                  = 'Play'
+str_FileDelete                = 'Delete'
+str_FileReWrite               = 'Rewrite'
+
+str_gstat_Lobby               = 'LOBBY'
+str_gstat_WonTeam             = 'Won by a team #'
+str_gstat_Started             = 'Started'
+str_gstat_Win                 = 'VICTORY!'
+str_gstat_Lose                = 'DEFEAT!'
+str_gstat_GamePaused          = 'Paused by '
+str_gstat_ReplayEnd           = 'Replay ended!'
+str_gstat_ReplayError         = 'Read file error!'
+str_gstat_ReplayPaused        = 'Playback paused'
+str_gstat_WaitForServer       = 'Awaiting server...'
+str_gstat_WaitForPlayers      = 'Awaiting players...'
+str_gstat_Unknown             = 'Unknown status!'
+
+str_gmsg_GameSaved            = 'Game saved'
+str_gmsg_GameLoaded           = 'Game loaded'
+str_gmsg_NoNewObservers       = 'New observers after game start is not allowed'
+str_gmsg_PlayerConnected      = ' has connected'
+str_gmsg_PlayerLeave          = ' left the game'
+str_gmsg_PlayerTimeOut        = ' was kicked due to a timeout'
+str_gmsg_PlayerDefeat         = ' was defeated'
+str_gmsg_PlayerSurrender      = ' surrenders'
+str_gmsg_PlayerPaused         = ' paused the game'
+str_gmsg_PlayerResumed        = ' resumed the game'
+str_gmsg_PlayerRevealed       = ' is revealed'
+str_gmsg_PlayerNoRevealed     = ' is no longer revealed'
+str_gmsg_PortBlocked          = 'UDP Port is blocked!'
+str_gmsg_WrongVersion         = 'Wrong version!'
+str_gmsg_ServerFull           = 'Server is full!'
+str_gmsg_RecordStart          = 'Start recording: '
+str_gmsg_RecordError          = 'Recording error: '
+str_gmsg_RecordStop           = 'Stop recording: '
+
+str_ui_time                   = 'Time: '
+str_ui_menu                   = 'Menu'
+str_ui_UnitGroups             = 'Unit groups:'
+str_ui_KothTime               = 'Center capture time left: '
+str_ui_KotHTime_act           = 'Time left until center area is active: '
+str_ui_KotHWinner             = ' - King of the Hill!'
+str_ui_ChatAll                = 'ALL'
+str_ui_ChatAllies             = 'ALLIES'
+str_ui_Tab[tab_Buildings]     = 'Buildings'
+str_ui_Tab[tab_Units]         = 'Units'
+str_ui_Tab[tab_Upgrades]      = 'Upgrades'
+str_ui_Tab[tab_Controls]      = 'Controls'
+str_ui_LimitArmy              = tc_orange+'Army limit'  +tc_white
+str_ui_LimitBuildings         = tc_red   +str_ui_Tab[tab_Units]+tc_white
+str_ui_LimitUnits             = tc_gray  +str_ui_Tab[tab_Buildings]+tc_white
+str_ui_EnergyLevel            = tc_aqua  +'Energy level'+tc_white
+str_ui_HellPower              = tc_yellow+'Hell power'  +tc_white
+str_ui_UACLoot                = tc_lime  +'UAC Loot'    +tc_white
+str_ui_objectives             = 'Objectives'
+str_ui_SelectTarget           = 'Select target for '
+str_ui_SelectBPlace           = 'Choose a location to build '
+str_ui_BuildHint              = 'Hold "'+iAct_12_hk+'" to disable position pushing from obstacles.'
+str_ui_BuildTip               = 'TIP: build buildings close to each other - units will not get stuck between them.'
+str_ui_RightClickCancel       = 'Press "'+iAct_2_hk+'" to cancel.'
+
+str_warn_AbilityBadPlace      = 'Invalid landing/teleporting location'
+str_warn_prod_BadPlace        = 'Invalid building location'
+str_warn_prod_CD              = 'The construction system is rebooting'
+str_warn_prod_BadOrder        = 'Invalid production order'
+str_warn_prod_AllBusy         = 'All production is busy'
+str_warn_prod_Unavailable     = 'Unavailable for production'
+str_warn_Req_Energy           = 'Need more energy'
+str_warn_Req_HellPower        = 'Need more "Hell Power"'
+str_warn_Req_UACLoot          = 'Need more "UAC Loot"'
+str_warn_Req_Common           = 'Check requirements'
+str_warn_unit_MaxLevel        = 'Maximum level reached'
+str_warn_unit_Levelup         = 'Unit promoted'
+str_warn_unit_complete        = 'Unit ready'
+str_warn_unit_attacked        = 'Unit is under attack'
+str_warn_unit_resurrected     = 'Unit was resurrected'
+str_warn_unit_captured        = 'Unit captured'
+str_warn_unit_lost            = 'Unit lost'
+str_warn_upgrade_InProgress   = 'Already in progress'
+str_warn_upgrade_complete     = 'Upgrade complete'
+str_warn_building_complete    = 'Construction complete'
+str_warn_base_attacked        = 'Base is under attack'
+str_warn_allies_attacked      = 'Our allies is under attack'
+str_warn_MaxLimitReached      = 'Maximum army limit reached'
+str_warn_NeedBuilder          = 'Need builder'
+str_warn_NeedProdUnit         = 'Need production unit'
+str_warn_MaxCountReached      = 'Maximum reached'
+str_warn_MaxBuildersReached   = 'Maximum number of builders has been reached'
+str_warn_MarkLook             = ': look here!'
+str_warn_MarkAttack           = ': attack here!'
+str_warn_kpoint_Captured      = ' was captured Key Point #'
+str_warn_kpoint_CaptureStart  = ' captures Key Point #'
+str_warn_koth_CaptureStart    = ' starts controlling the center'
+str_warn_koth_Alarm           = 'the center timer alarm: '
+str_warn_ngen_captured        = 'Generator was captured'
+str_warn_ngen_alarm           = 'Generator alarm!'
+str_warn_ngen_lost            = 'Generator was lost'
+str_warn_ngen_exh             = 'Generator was exhausted'
+str_warn_Invalid_Target       = 'Invalid target'
+str_warn_Invalid_Order        = 'Invalid order'
+str_warn_AbilityReload        = 'Ability is on cooldown'
+str_warn_AbilityCasting       = 'Unit is in ability-casting state'
+str_warn_AbilityReqUACNear    = 'Need an allied unit of UAC nearby'
+str_warn_AbilityReqHelNear    = 'Need an allied unit of Hell nearby'
+str_warn_AbilityTar2Close     = 'Target is too close'
+str_warn_UACStrike            = ' launched a tactical missile'
+str_warn_UACScan              = 'Our units have been scanned by '
+
+
+str_attr_alive                = tc_lime  +'ALIVE'+tc_default
+str_attr_dead                 = tc_dgray +'DEAD'+tc_default
+str_attr_unit                 = tc_gray  +'UNIT'+tc_default
+str_attr_building             = tc_red   +'BUILDING'+tc_default
+str_attr_mech                 = tc_blue  +'MECHANICAL'+tc_default
+str_attr_bio                  = tc_orange+'BIOLOGICAL'+tc_default
+str_attr_light                = tc_yellow+'LIGHT'+tc_default
+str_attr_heavy                = tc_green +'HEAVY'+tc_default
+str_attr_fly                  = tc_aqua  +'FLYING'+tc_default
+str_attr_ground               = tc_lime  +'GROUND'+tc_default
+str_attr_level                = tc_white +'LEVEL'+tc_default
+str_attr_SSoul                = tc_blue  +'SOUL SPHERE'+tc_default
+str_attr_SInvuln              = tc_white +'INVULN. SPHERE'+tc_default
+str_attr_SInvis               = tc_purple+'INVIS. SPHERE'+tc_default
+str_attr_SRDamage             = tc_gray  +'DAM. RESIST. SPHERE'+tc_default
+str_attr_SDDamage             = tc_red   +'DOUBLE DAMAGE SPHERE'+tc_default
+str_attr_STurbo               = tc_orange+'TURBO SPHERE'+tc_default
+str_attr_HVision              = tc_green +'HELL VISION'+tc_default
+str_attr_Scaned               = tc_lime  +'SCANED'+tc_default
+str_attr_Decay                = tc_red   +'DECAY AURA'+tc_default
+str_attr_stuned               = tc_yellow+'STUNED'+tc_default
+str_attr_detector             = tc_purple+'DETECTOR'+tc_default
+str_attr_heroic               = tc_red   +'HEROIC'+tc_default
+
+str_hint_upgrade              = 'upgrade'
+str_hint_sec                  = 'sec.'
+str_hint_requirements         = 'Requirements: '
+str_hint_req                  = 'Req.: '
+str_hint_uprod                = tc_lime+'Produced by: '   +tc_default
+str_hint_bprod                = tc_lime+'Constructed by: '+tc_default
+str_hint_UpgradesLvl          = 'Upgrades: '
+str_hint_Zombies              = 'zombies'
+str_hint_Demons               = 'demons&'+str_hint_Zombies
+str_hint_Except               = 'except'
+str_hint_SplashResist         = 'Immune to splash damage'
+str_hint_FlyLikeTarget        = 'Becomes ['+str_attr_ground+'] when attacking ['+str_attr_ground+'] targets'
+str_hint_TargetLimit          = 'target limit'
+str_hint_builder              = 'Builder'
+str_hint_barrack              = 'Unit production'
+str_hint_forge                = 'Upgrades facility'
+str_hint_IncEnergyLevel       = 'Increase energy level: '
+str_hint_UnitArming           = 'Arming: '
+str_hint_Abilities            = 'Abilities: '
+str_hint_SightR               = 'sight range'
+str_hint_MaxQuantity          = 'Maximum quantity: '
+
+str_uarm_melee                = 'melee attack'
+str_uarm_ranged               = 'ranged attack'
+str_uarm_zombie               = '+zombification'
+str_uarm_ressurect            = 'resurrection'
+str_uarm_heal                 = 'heal/repair'
+str_uarm_spawn                = 'spawn'
+str_uarm_targets              = 'targets: '
+str_uarm_BaseImpact           = 'base impact'
+str_uarm_MinRange             = 'min. range: '
+str_uarm_MaxRange             = 'max. range: '
+str_uarm_BonusAFlyR           = 'bonus anti-fly range: '
+str_uarm_BonusAGroundR        = 'bonus anti-ground range: '
+str_uarm_BonusAUnitR          = 'bonus anti-unit range: '
+str_uarm_BonusABuildingR      = 'bonus anti-building range: '
+str_uarm_SplashDamageR        = 'splash damage radius: '
+str_uarm_Upgrade              = str_hint_upgrade+': '
+str_uarm_Factor               = ', factor: '
+str_uarm_ShotsPerSec          = 'hits per sec.: '
+
+str_ability_passive           = 'Passive ability'
+str_ability_active            = 'Active ability'
+str_ability_notarget          = 'Self-targeted'
+str_ability_point             = 'Ground-targeted'
+str_ability_UnitAny           = 'Any-unit-targeted'
+str_ability_UnitOwn           = 'Own-unit-targeted'
+str_ability_UnitAlly          = 'Own&ally-unit-targeted'
+str_ability_UnitEnemy         = 'Enemy-unit-targeted'
+str_ability_reload            = 'Base reloading time: '
+str_ability_ReloadFactors     = 'Reload time reduction factors: '
+str_ability_rldDecByLevel     = 'unit level'
+
+str_net_Ready                 = 'READY'
+str_net_Disconnect            = 'DISCONNECT'
+str_net_UDPPort               = 'UDP port'
+str_net_ServerStart           = 'Start server'
+str_net_ServerStop            = 'Stop server'
+str_net_Connect               = 'Connect'
+str_net_Quality               = 'Units update rate'
+str_net_Address               = 'Address'
+str_net_ServerList            = 'Server list'
+str_net_ServerListAdd         = 'Add'
+str_net_ServerLANAdv          = 'LAN Advertise'
+str_net_ConnectedTo           = '- connected to'
+str_net_DedicatedServer       = ' dedicated server'
+
+str_help_Credits              = 'Credits'
+str_help_GameControls         = 'Game Controls'
+str_help_GameHotKeys          = 'Game Hotkeys'
+str_help_GameUI               = 'Game UI'
+str_help_GameMechanics        = 'Game Mechanics'
+str_help_UnitsInfo            = 'Units Info'
+str_help_BalanceTable         = 'Units Balance'
+str_help_UpgradesInfo         = 'Upgrades Info'
+str_help_Other                = 'Other'
+
+str_help_ImgUI                = 'im. #1 UI'
+str_help_ImgUUpgrade          = 'im. #2 Unit upgrades'
+str_help_ImgGenerators        = 'im. #3 Generators'
+str_help_ImgKeyPoints         = 'im. #4 Key Points'
+str_help_ImgKotH              = 'im. #5 KotH area'
+
+str_doc_HotKey                = 'Hot key: '
+str_doc_Attributes            = 'Attributes: '
+str_doc_ReqEnergy             = 'Energy required: '
+str_doc_ReqHellPower          = 'Hell Power required: '
+str_doc_ReqUACLoot            = 'UAC Loot required: '
+str_doc_ProdTime              = 'Build time: '
+str_doc_Limit                 = 'Limit used: '
+str_doc_MaxHits               = 'Max hits: '
+str_doc_FastDeath             = 'Always fast death: '
+str_doc_Hits                  = 'Hits: '
+str_doc_LifeTime              = 'Lifetime: '
+str_doc_BaseRegen             = 'Base regeneration: '
+str_doc_BaseSightR            = 'Base '+str_hint_SightR+': '
+str_doc_Size                  = 'Size: '
+str_doc_BaseMSpeed            = 'Base speed: '
+str_doc_Role                  = 'Unit function: '
+str_doc_Description           = 'Description: '
+str_doc_PainC                 = 'PainState base threshold: '
+str_doc_TransportSize         = 'Places in transport: '
+str_doc_TransportCpst         = 'Base transport capacity: '
+str_doc_UpgrLevels            = 'Max level: '
+str_doc_UpgrAffectedUIDs      = 'Affected units: '
+str_doc_LevelUpTime           = 'Time in combat to level up: '
+str_doc_LevelArmorBonus       = 'Bonus to armor per level: '
+str_doc_LevelDamageBonus      = 'Bonus to impact per level: '
+str_doc_LevelPainSBonus       = 'Bonus to PainState threshold per level: '
+str_doc_LevelRegenBonus       = 'Bonus to regeneration per level: '
+str_doc_BountyHellPower       = 'Hell Power bounty: '
+str_doc_BountyUACLoot         = 'UAC Loot bounty: '
+str_doc_ZombieUID             = 'Zombie-version: '
+str_doc_ZombieHits            = 'Hits threshold for zombification: '
+str_doc_DeathUnit             = 'Spawn unit at death: '
+str_doc_UpgrArmor             = 'Armor: '
+str_doc_UpgrRegen             = 'Regeneration: '
+str_doc_UpgrSpeed             = 'Move speed: '
+str_doc_UpgrPainS             = 'Painstate threshold: '
+str_doc_UpgrSightR            = 'Sight range: '
+str_doc_UpgrTransport         = 'Transport capacity: '
+str_doc_BalanceGood           = tc_lime+'Good against'   +tc_default+':'
+str_doc_BalanceBad            = tc_red +'Bad against'    +tc_default+':'
+str_doc_BalanceUseless        = tc_gray+'Useless against'+tc_default+':'
+str_doc_LMB                   = tc_lime+'LMB'+tc_white
+str_doc_RMB                   = tc_red +'RMB'+tc_white
+str_doc_MWH                   = tc_yellow+'MWheel'+tc_white
+str_doc_NoteUnitBalance       = 'Note: this data is calculated for "ideal" conditions with fully upgraded units without any buff or debuff effects and no micro-control.'
+str_doc_NoteMaxBuilders       = 'Note: each player cannot have more than '+str_PlayerMaxBuilders+' builders'
+
+str_ScoreBoardC[psc_units_created]   = 'Units created'
+str_ScoreBoardC[psc_units_summoned]  = 'Units summoned'
+str_ScoreBoardC[psc_units_resurected]= 'Units resurrected'
+str_ScoreBoardC[psc_units_captured]  = 'Units captured'
+str_ScoreBoardC[psc_units_lost]      = 'Units lost'
+str_ScoreBoardC[psc_units_destroyed] = 'Units destroyed'
+str_ScoreBoardC[psc_units_ExpTotal]  = 'Total unit experience'
+str_ScoreBoardC[psc_builds_created]  = 'Buildings created'
+str_ScoreBoardC[psc_builds_summoned] = 'Buildings summoned'
+str_ScoreBoardC[psc_builds_captured] = 'Buildings captured'
+str_ScoreBoardC[psc_builds_lost]     = 'Buildings lost'
+str_ScoreBoardC[psc_builds_destroyed]= 'Buildings destroyed'
+str_ScoreBoardC[psc_upgrades_level]  = 'Completed upgrades'
+str_ScoreBoardC[psc_InGameTime]      = 'Defeat time'
+
+str_ScoreBoardI[psi_res_energy_max]  = 'Max energy level'
+str_ScoreBoardI[psi_res_UACLoot]     = 'Collected '+str_ui_UACLoot
+str_ScoreBoardI[psi_res_HellPower]   = 'Collected '+str_ui_HellPower
+
+
+/////////////////////////////////////////////////////////////////////////////
+//  UNITS
+
+str_name[UID_HKeep]             = 'Hell Keep'
+str_dscr[UID_HKeep]             = ''
+str_name[UID_HAKeep]            = 'Great Hell Keep'
+str_dscr[UID_HAKeep]            = ''
+str_name[UID_HGate]             = 'Demon`s Gate'
+str_dscr[UID_HGate]             = ''
+str_name[UID_HPools]            = 'Infernal Pools'
+str_dscr[UID_HPools]            = ''
+str_name[UID_HPentagram]        = 'Pentagram of Death'
+str_dscr[UID_HPentagram]        = ''
+str_name[UID_HMonastery]        = 'Monastery of Despair'
+str_dscr[UID_HMonastery]        = ''
+str_name[UID_HFortress]         = 'Castle of Damned'
+str_dscr[UID_HFortress]         = ''
+str_name[UID_HFTower]           = 'Fire Tower'
+str_dscr[UID_HFTower]           = 'Basic defensive structure'
+str_name[UID_HTotem]            = 'Totem of Horror'
+str_dscr[UID_HTotem]            = 'Advanced defensive structure'
+str_name[UID_HEyeNest]          = 'Evil Eye Nest'
+str_dscr[UID_HEyeNest]          = 'Detection and scouting structure.'
+str_name[UID_HEye]              = 'Evil Eye'
+str_dscr[UID_HEye]              = 'Detection and scouting structure.'
+str_name[UID_HTeleport]         = 'Teleport'
+str_dscr[UID_HTeleport]         = ''
+str_name[UID_HAltar]            = 'Altar of Pain'
+str_dscr[UID_HAltar]            = 'Uses "' + str_ui_HellPower + '" to perform special abilities. '
+                                  'Generates "' + str_ui_HellPower + '". ' + str_hint_MaxQuantity + str_scirmish_MaxHAltar
+str_name[UID_HCommandCenter]    = 'Hell Command Center'
+str_dscr[UID_HCommandCenter]    = 'Corrupted Command Center'
+str_name[UID_HACommandCenter]   = 'Advanced Hell Command Center'
+str_dscr[UID_HACommandCenter]   = 'Corrupted Advanced Command Center'
+str_name[UID_HBarracks]         = 'Zombie Barracks'
+str_dscr[UID_HBarracks]         = 'Corrupted Barracks'
+str_name[UID_HMarker]           = 'Hell Beacon'
+str_dscr[UID_HMarker]           = ''
+str_name[UID_LostSoul]          = 'Lost Soul'
+str_dscr[UID_LostSoul]          = str_hint_MaxQuantity + str_scirmish_MaxLost
+str_name[UID_Phantom]           = 'Phantom'
+str_dscr[UID_Phantom]           = str_hint_MaxQuantity + str_scirmish_MaxLost
+str_name[UID_Imp]               = 'Imp'
+str_dscr[UID_Imp]               = ''
+str_name[UID_Demon]             = 'Pinky Demon'
+str_dscr[UID_Demon]             = ''
+str_name[UID_Cacodemon]         = 'Cacodemon'
+str_dscr[UID_Cacodemon]         = ''
+str_name[UID_Knight]            = 'Hell Knight'
+str_dscr[UID_Knight]            = ''
+str_name[UID_Baron]             = 'Baron of Hell'
+str_dscr[UID_Baron]             = ''
+str_name[UID_Cyberdemon]        = 'Cyberdemon'
+str_dscr[UID_Cyberdemon]        = ''
+str_name[UID_Mastermind]        = 'Spider Mastermind'
+str_dscr[UID_Mastermind]        = ''
+str_name[UID_Pain]              = 'Pain Elemental'
+str_dscr[UID_Pain]              = ''
+str_name[UID_Revenant]          = 'Revenant'
+str_dscr[UID_Revenant]          = ''
+str_name[UID_Mancubus]          = 'Mancubus'
+str_dscr[UID_Mancubus]          = ''
+str_name[UID_Arachnotron]       = 'Arachnotron'
+str_dscr[UID_Arachnotron]       = ''
+str_name[UID_Archvile]          = 'Arch-Vile'
+str_dscr[UID_Archvile]          = ''
+str_name[UID_ZMedic]            = 'Zombie Medic'
+str_dscr[UID_ZMedic]            = ''
+str_name[UID_ZEngineer]         = 'Zombie Engineer'
+str_dscr[UID_ZEngineer]         = ''
+str_name[UID_ZSergant]          = 'Zombie Shotguner'
+str_dscr[UID_ZSergant]          = ''
+str_name[UID_ZSSergant]         = 'Zombie SuperShotguner'
+str_dscr[UID_ZSSergant]         = ''
+str_name[UID_ZCommando]         = 'Zombie Commando'
+str_dscr[UID_ZCommando]         = ''
+str_name[UID_ZAntiaircrafter]   = 'Zombie Antiaircrafter'
+str_dscr[UID_ZAntiaircrafter]   = ''
+str_name[UID_ZSiegeMarine]      = 'Zombie Siege Marine'
+str_dscr[UID_ZSiegeMarine]      = ''
+str_name[UID_ZFPlasmagunner]    = 'Zombie Plasmaguner'
+str_dscr[UID_ZFPlasmagunner]    = ''
+str_name[UID_ZBFGMarine]        = 'Zombie BFG Marine'
+str_dscr[UID_ZBFGMarine]        = ''
+str_name[UID_UCommandCenter]    = 'Command Center'
+str_dscr[UID_UCommandCenter]    = ''
+str_name[UID_UACommandCenter]   = 'Advanced Command Center'
+str_dscr[UID_UACommandCenter]   = ''
+str_name[UID_UBarracks]         = 'Barracks'
+str_dscr[UID_UBarracks]         = ''
+str_name[UID_UFactory]          = 'Vehicle Factory'
+str_dscr[UID_UFactory]          = ''
+str_name[UID_UWeaponFactory]    = 'Weapon Factory'
+str_dscr[UID_UWeaponFactory]    = ''
+str_name[UID_UGTurret]          = 'Anti-ground Turret'
+str_dscr[UID_UGTurret]          = 'Anti-ground defensive structure'
+str_name[UID_UATurret]          = 'Anti-air Turret'
+str_dscr[UID_UATurret]          = 'Anti-air defensive structure'
+str_name[UID_UScienceCenter]    = 'Science Facility'
+str_dscr[UID_UScienceCenter]    = ''
+str_name[UID_UComputerStation]  = 'Computer Station'
+str_dscr[UID_UComputerStation]  = ''
+str_name[UID_URadar]            = 'Radar'
+str_dscr[UID_URadar]            = 'Reveals the map and detects invisible enemy units'
+str_name[UID_UAcademy]          = 'UAC Academy'
+str_dscr[UID_UAcademy]          = 'Uses "' + str_ui_UACLoot + '" to perform special abilities'
+str_name[UID_UHPowerConductor]  = 'Hell Power Conductor'
+str_dscr[UID_UHPowerConductor]  = 'Uses "' + str_ui_HellPower + '" to perform special abilities'
+str_name[UID_URMStation]        = 'Rocket Launcher Station'
+str_dscr[UID_URMStation]        = 'Delivers a powerful missile strike'
+str_name[UID_Sergant]           = 'Shotguner'
+str_dscr[UID_Sergant]           = ''
+str_name[UID_SSergant]          = 'SuperShotguner'
+str_dscr[UID_SSergant]          = ''
+str_name[UID_Commando]          = 'Commando'
+str_dscr[UID_Commando]          = ''
+str_name[UID_Antiaircrafter]    = 'Antiaircrafter'
+str_dscr[UID_Antiaircrafter]    = ''
+str_name[UID_SiegeMarine]       = 'Siege Marine'
+str_dscr[UID_SiegeMarine]       = ''
+str_name[UID_FPlasmagunner]     = 'Plasmaguner'
+str_dscr[UID_FPlasmagunner]     = ''
+str_name[UID_BFGMarine]         = 'BFG Marine'
+str_dscr[UID_BFGMarine]         = ''
+str_name[UID_Engineer]          = 'Engineer'
+str_dscr[UID_Engineer]          = ''
+str_name[UID_Medic]             = 'Medic'
+str_dscr[UID_Medic]             = ''
+str_name[UID_UTransport]        = 'Dropship'
+str_dscr[UID_UTransport]        = ''
+str_name[UID_UACDron]           = 'Drone'
+str_dscr[UID_UACDron]           = ''
+str_name[UID_Terminator]        = 'Terminator'
+str_dscr[UID_Terminator]        = ''
+str_name[UID_Tank]              = 'Tank'
+str_dscr[UID_Tank]              = ''
+str_name[UID_Flyer]             = 'Fighter'
+str_dscr[UID_Flyer]             = ''
+
+BalanceHint_BFG                 = 'due to big splash damage - good against big groups of ['+str_attr_bio+'] units'
+BalanceHint_PainState           = 'due to "pain state" effect, this unit can be bad againt frequent attacks'
+
+/////////////////////////////////////////////////////////////////////////////
+//  ABILITIES
+
+str_tmp1 = 'The ability`s cooldown is multiplied by the target`s limit.'
+
+str_name[uab_Teleport]           = 'Teleportation'
+str_dscr[uab_Teleport]           = 'Transfers units directed at it to the specified allied unit-beacon. '+str_tmp1
+str_name[uab_Recall]             = 'Recall'
+str_dscr[uab_Recall]             = 'Transfers target unit to the Teleport. '+str_tmp1
+str_name[uab_UACScan]            = 'Scan'
+str_dscr[uab_UACScan]            = 'Reveals units (including invisible ones) in the target area for '+str_detection_time_sec+' seconds'
+str_name[uab_UACStrike]          = 'Missile strike'
+str_dscr[uab_UACStrike]          = 'Strikes a taktical rocket missile that deal '+tc_red+UACStrike_base_damage+tc_default+' damage(explode size: '+UACStrike_size+','+str_uarm_SplashDamageR+UACStrike_base_SplashR+')'+str_uarm_Factor+UACStrike_dm_RSMShot
+                                   '. Note: launching a missile reveals the building to all players for '+UACStrike_Revealing_sec+' seconds'
+str_name[uab_HEyeSpawn]          = 'Spawn "'+str_name[UID_HEye]+'"'
+str_dscr[uab_HEyeSpawn]          = 'Spawns the Evil Eye at target point. There must be at least one Hell unit allied with you around the point target'
+str_name[uab_HEyeVision]         = 'Hell Vision'
+str_dscr[uab_HEyeVision]         = 'Gives allied target ability to detect invisible units for '+str_detection_time_sec+' seconds'
+str_name[uab_HTowerBlink]        = 'Planar Jump'
+str_dscr[uab_HTowerBlink]        = 'Short-range teleportation'
+str_name[uab_HKeepShift]         = 'Dimension Shift'
+str_dscr[uab_HKeepShift]         = 'The building teleport itself to target location. Required upgrade canceled after teleportation'
+str_name[uab_HKeepAura]          = 'Decay Aura'
+str_dscr[uab_HKeepAura]          = 'Deals damage('+tc_red+str_DecayAuraDamage+tc_default+' hits 2 times per sec.) to all non-building enemy units around. Damage ignores units armor.'
+str_name[uab_SpawnLost]          = 'Spawn "'+str_name[UID_LostSoul]+'"'
+str_dscr[uab_SpawnLost]          = ''
+str_name[uab_SpawnLostTo]        = 'Spawn "'+str_name[UID_LostSoul]+'" to point'
+str_dscr[uab_SpawnLostTo]        = ''
+str_name[uab_SphereSoul]         = 'Soul Sphere'
+str_dscr[uab_SphereSoul]         = 'Restores '+str_soul_maxHeal+' health to the target over '+str_soul_time_sec+' seconds'
+str_name[uab_SphereInvis]        = 'Invisibility Sphere'
+str_dscr[uab_SphereInvis]        = 'Makes target invisible for '+str_invis_time_sec+' seconds'
+str_name[uab_SphereInvuln]       = 'Invulnerability Sphere'
+str_dscr[uab_SphereInvuln]       = 'Makes target invulnerable for '+str_invuln_time_sec+' seconds'
+str_name[uab_SphereRDamage]      = 'Damage Resistance Sphere'
+str_dscr[uab_SphereRDamage]      = 'Halves damage to the target for '+str_rdamage_time_sec+' seconds.'
+str_name[uab_SphereDDamage]      = 'Double Damage Sphere'
+str_dscr[uab_SphereDDamage]      = 'Doubles the target`s damage for '+str_ddamage_time_sec+' seconds.'
+str_name[uab_SphereTurbo]        = 'Turbo Sphere'
+str_dscr[uab_SphereTurbo]        = 'Speeds up all target parameters by 2 times for '+str_dturbo_time_sec+' seconds.'
+str_name[uab_UACGeneral]         = 'UAC General Rank'
+str_dscr[uab_UACGeneral]         = 'Valid targets: non-heroic allied UAC units. Makes the target a "['+str_attr_heroic
+                                   ']", which increases the damage it deal by 1.5 times and reduces the damage it take by a third. There can be a maximum of '+str_UACGeneralsMax+' "['+str_attr_heroic+']" units in your army.'
+str_name[uab_Bribe]              = 'Bribe'
+str_dscr[uab_Bribe]              = 'Valid targets: non-heroic enemy UAC units. Turns the target to your side. There must be at least one UAC unit allied with you around the target'
+str_name[uab_Hack]               = 'System Hack'
+str_dscr[uab_Hack]               = 'Valid targets: completed enemy UAC buildings. Turns the target to your side. There must be at least one UAC unit allied with you around the target'
+str_name[uab_UACCCLand]          = 'Land/Take-off'
+str_dscr[uab_UACCCLand]          = ''
+str_name[uab_UACCCLandTo]        = 'Land/Take-off to point'
+str_dscr[uab_UACCCLandTo]        = ''
+str_name[uab_HellCCLand]         = 'Land/Take-off'
+str_dscr[uab_HellCCLand]         = ''
+str_name[uab_HellCCLandTo]       = 'Land/Take-off to point'
+str_dscr[uab_HellCCLandTo]       = ''
+str_name[uab_Unload]             = 'Unload'
+str_dscr[uab_Unload]             = ''
+str_name[uab_UnloadTo]           = 'Unload to point'
+str_dscr[uab_UnloadTo]           = ''
+str_name[uab_HSpecter]           = 'Specter'
+str_dscr[uab_HSpecter]           = 'Permanent invisibility'
+str_name[uab_HStealth]           = 'Stealth Technology'
+str_dscr[uab_HStealth]           = 'Permanent invisibility'
+str_name[uab_HHTShroud]          = 'Shroud of Horror'
+str_dscr[uab_HHTShroud]          = 'Permanent invisibility'
+str_name[uab_HT2TNoCD]           = 'Portal link'
+str_dscr[uab_HT2TNoCD]           = 'If the destination is another Teleport, the teleportation occurs without cooldown'
+str_name[uab_UAASplash]          = 'Ainti-air Fragmentation Missiles'
+str_dscr[uab_UAASplash]          = 'Anti-air missiles do extra damage around the target'    
+
+str_tmp1='Transform to '
+str_name[uab_ToHAKeep]           = str_tmp1+str_name[UID_HAKeep]                     
+str_dscr[uab_ToHAKeep]           = ''
+str_name[uab_ToHACommandCenter]  = str_tmp1+str_name[UID_HACommandCenter]                          
+str_dscr[uab_ToHACommandCenter]  = ''
+str_name[uab_ToUACommandCenter]  = str_tmp1+str_name[UID_UACommandCenter]                          
+str_dscr[uab_ToUACommandCenter]  = ''
+str_name[uab_ToUAGTurret]        = str_tmp1+str_name[UID_UGTurret]                        
+str_dscr[uab_ToUAGTurret]        = ''
+str_name[uab_ToUAATurret]        = str_tmp1+str_name[UID_UATurret]                         
+str_dscr[uab_ToUAATurret]        = ''
+str_name[uab_ToUGTurretTo]       = str_tmp1+str_name[UID_UGTurret]                       
+str_dscr[uab_ToUGTurretTo]       = ''
+str_name[uab_ToUATurretTo]       = str_tmp1+str_name[UID_UATurret]                        
+str_dscr[uab_ToUATurretTo]       = ''
+str_name[uab_ToUACDron]          = str_tmp1+str_name[UID_UACDron]                        
+str_dscr[uab_ToUACDron]          = ''
+
+str_tmp1='Advanced '
+str_tmp2='Simultaneous multiple production and increased armor'
+str_name[uab_ToHGate]            = str_tmp1+str_name[UID_HGate]  
+str_dscr[uab_ToHGate]            = str_tmp2
+str_name[uab_ToHPools]           = str_tmp1+str_name[UID_HPools]  
+str_dscr[uab_ToHPools]           = str_tmp2
+str_name[uab_ToHBarracks]        = str_tmp1+str_name[UID_HBarracks]  
+str_dscr[uab_ToHBarracks]        = str_tmp2
+str_name[uab_ToUBarracks]        = str_tmp1+str_name[UID_UBarracks]  
+str_dscr[uab_ToUBarracks]        = str_tmp2
+str_name[uab_ToUFactory]         = str_tmp1+str_name[UID_UFactory]  
+str_dscr[uab_ToUFactory]         = str_tmp2
+str_name[uab_ToUWeaponFactory]   = str_tmp1+str_name[UID_UWeaponFactory] 
+str_dscr[uab_ToUWeaponFactory]   = str_tmp2
+str_name[uab_LvlUpURadar]        = str_tmp1+'"+str_name[UID_URadar]+"'
+str_dscr[uab_LvlUpURadar]        = 'Upgrades the +'"+str_name[UID_URadar]+"'+ to lower its ability reload time'
+str_name[uab_LvlUpURMStation]    = str_tmp1+'"+str_name[UID_URMStation]+"'
+str_dscr[uab_LvlUpURMStation]    = 'Upgrades the +'"+str_name[UID_URMStation]+"'+ to lower its ability reload time'
+     
+/////////////////////////////////////////////////////////////////////////////
+//  UPGRADES
+
+str_name[upgr_hell_DistDamage1]    = 'Hell Firepower'
+str_dscr[upgr_hell_DistDamage1]    = 'Increases the damage of ranged attacks for '+str_upgr_hell_DistDamage1_uids
+str_name[upgr_hell_UnitArmor]      = 'Combat Flesh'
+str_dscr[upgr_hell_UnitArmor]      = 'Increases the armor of all Hell units'
+str_name[upgr_hell_BuildArmor]     = 'Stone Walls'
+str_dscr[upgr_hell_BuildArmor]     = 'Increases the armor of all Hell buildings'
+str_name[upgr_hell_MeleeDamage]    = 'Claws and Teeth'
+str_dscr[upgr_hell_MeleeDamage]    = 'Increases the damage of melee attacks'
+str_name[upgr_hell_Regeneration]   = 'Flesh Regeneration'
+str_dscr[upgr_hell_Regeneration]   = 'Health regeneration for all Hell units'
+str_name[upgr_hell_PainFactor]     = 'Pain Threshold'
+str_dscr[upgr_hell_PainFactor]     = 'Hell units can take more hits before being stunned by pain'
+str_name[upgr_hell_ADetection]     = 'Evil Eye Magic'
+str_dscr[upgr_hell_ADetection]     = 'Unlocks "'+str_name[uab_HEyeSpawn]+'" and "'+str_name[uab_HEyeVision]+'" abilities for '+str_name[UID_HEyeNest]
+str_tmp1=str_UnitsNamesList([UID_HKeep,UID_HAKeep])
+str_name[upgr_hell_HKeepShift]     = str_name[uab_HKeepShift]
+str_dscr[upgr_hell_HKeepShift]     = 'Charge of "'+str_name[uab_HKeepShift]+'" ability for '+str_tmp1
+str_name[upgr_hell_DecayAura]      = str_name[uab_HKeepAura]
+str_dscr[upgr_hell_DecayAura]      = 'Unlocks "'+str_name[uab_HKeepAura]+'" ability for '+str_tmp1
+str_name[upgr_hell_BuilderR]       = 'Builder Range Upgrade'
+str_dscr[upgr_hell_BuilderR]       = 'Increases range of sight for '+str_tmp1
+str_name[upgr_hell_Spectre]        = str_name[uab_HSpecter]
+str_dscr[upgr_hell_Spectre]        = 'Pinky Demon becomes invisible'
+str_name[upgr_hell_UnitSightR]     = 'Hell Sight'
+str_dscr[upgr_hell_UnitSightR]     = 'Increases the sight range of all Hell units'
+str_name[upgr_hell_Phantoms]       = 'Phantoms'
+str_dscr[upgr_hell_Phantoms]       = 'Pain Elemental spawns Phantoms instead of Lost Soul'
+str_name[upgr_hell_DistDamage2]    = 'Demon`s Weapons'
+str_dscr[upgr_hell_DistDamage2]    = 'Increases the damage of ranged attacks for '+str_upgr_hell_DistDamage2_uids
+str_name[upgr_hell_TeleportCD]     = 'Teleport Upgrade'
+str_dscr[upgr_hell_TeleportCD]     = 'Reduces the cooldown of the Teleport ability'
+str_name[upgr_hell_T2TNoCD]        = str_name[uab_HT2TNoCD]
+str_dscr[upgr_hell_T2TNoCD]        = str_dscr[uab_HT2TNoCD]
+str_name[upgr_hell_EvilEyeR]       = 'Evil Eye Upgrade'
+str_dscr[upgr_hell_EvilEyeR]       = 'Increases the sight range of Evil Eye'
+str_name[upgr_hell_TotemInvis]     = str_name[uab_HHTShroud]
+str_dscr[upgr_hell_TotemInvis]     = 'Totem of Horror becomes invisible'
+str_name[upgr_hell_BuildRestore]   = 'Building Restoration'
+str_dscr[upgr_hell_BuildRestore]   = 'Health regeneration upgrade for all Hell buildings'
+str_tmp1=str_UnitsNamesList([UID_HFTower,UID_HTotem])
+str_name[upgr_hell_TowerR]         = 'Demonic Spirits'
+str_dscr[upgr_hell_TowerR]         = 'Increases the range for '+str_tmp1
+str_name[upgr_hell_TowerBlink]     = str_name[uab_HTowerBlink]
+str_dscr[upgr_hell_TowerBlink]     = 'Unlocks "'+str_name[uab_HTowerBlink]+'" ability for '+str_tmp1
+str_name[upgr_hell_Resurrect]      = 'Resurrection'
+str_dscr[upgr_hell_Resurrect]      = 'Unlocks ArchVile`s resurrection weapon'
+str_name[upgr_hell_FTowerAMech]    = 'Cacodemon`s Nest '
+str_dscr[upgr_hell_FTowerAMech]    = 'Anti-['+str_attr_mech+'] weapon for '+str_name[UID_HFTower]
+str_name[upgr_uac_DistDamage]      = 'Weapons Upgrade'
+str_dscr[upgr_uac_DistDamage]      = 'Increases the damage of ranged attacks for all UAC units and defensive structures'
+str_name[upgr_uac_BioArmor]        = 'Infantry Combat Armor Upgrade'
+str_dscr[upgr_uac_BioArmor]        = 'Increases the armor of all Barrack`s units'
+str_name[upgr_uac_BuildArmor]      = 'Concrete Walls'
+str_dscr[upgr_uac_BuildArmor]      = 'Increases the armor of all UAC buildings'
+str_name[upgr_uac_RepairTools]     = 'Advanced Tools'
+str_dscr[upgr_uac_RepairTools]     = 'Increases repair/healing efficiency for '+str_UnitsNamesList([UID_Medic,UID_Engineer])
+str_name[upgr_uac_BioSpeed]        = 'Lightweight Armor'
+str_dscr[upgr_uac_BioSpeed]        = 'Increases the movement speed of all Barrack`s units'
+str_name[upgr_uac_SSMWeapon]       = 'Surface to Surface Missiles'
+str_dscr[upgr_uac_SSMWeapon]       = 'Anti-ground weapon for '+str_name[UID_Antiaircrafter]
+str_name[upgr_uac_ADetection]      = str_name[uab_UACScan]
+str_dscr[upgr_uac_ADetection]      = 'Unlocks "'+str_name[uab_UACScan]+'" ability for '+str_name[UID_URadar]
+str_tmp1=str_UnitsNamesList([UID_UCommandCenter,UID_UACommandCenter])
+str_name[upgr_uac_CCFly]           = 'Flight Engines'
+str_dscr[upgr_uac_CCFly]           = str_tmp1+' gains ability to fly'
+str_name[upgr_uac_CCAttack]        = 'Built-in Plasma Turret'
+str_dscr[upgr_uac_CCAttack]        = 'Plasma turret for '+str_tmp1
+str_name[upgr_uac_BuilderR]        = 'Builder Range Upgrade'
+str_dscr[upgr_uac_BuilderR]        = 'Increases range of sight for '+str_tmp1
+str_name[upgr_uac_DronTurret]      = 'Drone Transformation Protocol'
+str_tmp1=str_UnitsNamesList([UID_UATurret,UID_UGTurret])
+str_dscr[upgr_uac_DronTurret]      = 'Drone can rebuild to '+str_tmp1+'; turrets can transform to Drone'
+str_name[upgr_uac_UnitSightR]      = 'Light Amplification Visors'
+str_dscr[upgr_uac_UnitSightR]      = 'Increases the sight range of all UAC units'
+str_name[upgr_uac_CommandoInvis]   = str_name[uab_HStealth]
+str_dscr[upgr_uac_CommandoInvis]   = 'Commando becomes invisible'
+str_name[upgr_uac_AASplash]        = str_name[uab_UAASplash]
+str_dscr[upgr_uac_AASplash]        = str_dscr[uab_UAASplash]
+str_name[upgr_uac_MechSpeed]       = 'Advanced Fuel'
+str_dscr[upgr_uac_MechSpeed]       = 'Increases the movement speed of all Factory`s units'
+str_name[upgr_uac_MechArmor]       = 'Mech Combat Armor Upgrade'
+str_dscr[upgr_uac_MechArmor]       = 'Increases the armor of all Factory`s units'
+str_name[upgr_uac_TerAAWeapon]     = 'Anti-air Weapon'
+str_dscr[upgr_uac_TerAAWeapon]     = 'Anti-air weapon for Terminator'
+str_name[upgr_uac_Transport]       = 'Dropship Upgrade'
+str_dscr[upgr_uac_Transport]       = 'Increases the capacity of Dropship'
+str_name[upgr_uac_RadarR]          = 'Radar Upgrade'
+str_dscr[upgr_uac_RadarR]          = 'Increases radar scanning radius and range of sight'
+str_name[upgr_uac_TurretPlasma]    = 'Anti-ground Plasmagun'
+str_dscr[upgr_uac_TurretPlasma]    = 'Anti-['+str_attr_mech+'] weapon for '+str_name[UID_UGTurret]
+str_name[upgr_uac_TowerR]          = 'Spotlights'
+str_dscr[upgr_uac_TowerR]          = 'Increases the range for '+str_tmp1
+str_name[upgr_uac_TurretArmor]     = 'Additional Armoring'
+str_dscr[upgr_uac_TurretArmor]     = 'Additional armor for '+str_tmp1
+
+
+/////////////////////////////////////////////////////////////////////////////
+//  GAME ACT HINTS
+
+str_tmp1='attack enemies'
+str_dscr[iAct_Control_UAMove]      = 'Attack/Move, '+str_tmp1
+str_dscr[iAct_Control_UAStop]      = 'Stop, '       +str_tmp1
+str_dscr[iAct_Control_UAPatrol]    = 'Patrol, '     +str_tmp1
+str_tmp1='ignore enemies'
+str_dscr[iAct_Control_UMove]       = 'Move, '  +str_tmp1
+str_dscr[iAct_Control_UStop]       = 'Stop, '  +str_tmp1
+str_dscr[iAct_Control_UPatrol]     = 'Patrol, '+str_tmp1
+
+str_dscr[iAct_Control_UProdCncl]   = 'Cancel production'
+str_dscr[iAct_Control_UDestroy]    = 'Self-destruction'
+
+str_dscr[iAct_Control_USelBase]    = 'Select all builders'
+str_dscr[iAct_Control_USelArmy]    = 'Select all not busy battle units; "not busy battle units" criterias:'+tc_nl+
+                                     '- alive, completed, can attack, can move, NOT ['+str_attr_building+'];'+tc_nl+
+                                     '- no "Patrol" or "Stop, '+str_tmp1+'" orders;'+tc_nl+
+                                     '- no order to use an ability;'+tc_nl+
+                                     '- no order to teleport or transport;'
+
+str_dscr[iAct_Control_MarkLook]    = 'Map mark: look here'
+str_dscr[iAct_Control_MarkAttack]  = 'Map mark: attack here'
+str_dscr[iAct_Control_ScoreBoard]  = 'Scoreboard'
+
+str_dscr[iAct_InGamePause]         = 'Pause'
+str_dscr[iAct_InGameMenu]          = 'Menu'
+
+str_dscr[iAct_Replay_Fast]         = 'Faster game speed'
+str_dscr[iAct_Replay_Pause]        = 'Pause'
+str_dscr[iAct_Replay_Back2]        = 'Rewind 2 seconds'
+str_dscr[iAct_Replay_Back10]       = 'Rewind 10 seconds'
+str_dscr[iAct_Replay_Back60]       = 'Rewind 60 seconds'
+str_dscr[iAct_Replay_Forward2]     = 'Fast forward 2 seconds'
+str_dscr[iAct_Replay_Forward10]    = 'Fast forward 10 seconds'
+str_dscr[iAct_Replay_Forward60]    = 'Fast forward 60 seconds'
+str_dscr[iAct_Replay_POV]          = 'Player-recorder POV'
+str_dscr[iAct_Replay_Log]          = 'List of game messages'
+str_dscr[iAct_Replay_Fog]          = 'Fog of war'
+str_dscr[iAct_Replay_PlayerAll]    = 'All players'
+str_dscr[iAct_Replay_Player0]      = 'Player #1'
+str_dscr[iAct_Replay_Player1]      = 'Player #2'
+str_dscr[iAct_Replay_Player2]      = 'Player #3'
+str_dscr[iAct_Replay_Player3]      = 'Player #4'
+str_dscr[iAct_Replay_Player4]      = 'Player #5'
+str_dscr[iAct_Replay_Player5]      = 'Player #6'
+str_dscr[iAct_Replay_Player6]      = 'Player #7'
+str_dscr[iAct_Replay_Player7]      = 'Player #8'
+
+str_dscr[iAct_Observer_Fog]        = 'Fog of war'
+str_dscr[iAct_Observer_POV]        = 'Player POV'
+str_dscr[iAct_Observer_PlayerAll]  = 'All players'
+str_dscr[iAct_Observer_Player0]    = 'Player #1'
+str_dscr[iAct_Observer_Player1]    = 'Player #2'
+str_dscr[iAct_Observer_Player2]    = 'Player #3'
+str_dscr[iAct_Observer_Player3]    = 'Player #4'
+str_dscr[iAct_Observer_Player4]    = 'Player #5'
+str_dscr[iAct_Observer_Player5]    = 'Player #6'
+str_dscr[iAct_Observer_Player6]    = 'Player #7'
+str_dscr[iAct_Observer_Player7]    = 'Player #8'
+
+
+/////////////////////////////////////////////////////////////////////////////
+//  MENU HINTS
+
+menu_110_descr  = ': change AI skill'
+menu_111_descr  = ': change AI skill'
+menu_112_descr  = ': change AI skill'
+menu_113_descr  = ': change AI skill'
+menu_114_descr  = ': change AI skill'
+menu_115_descr  = ': change AI skill'
+menu_116_descr  = ': change AI skill'
+menu_117_descr  = ': change AI skill'
+
+menu_120_descr  = ': jump to this slot'
+menu_121_descr  = ': jump to this slot'
+menu_122_descr  = ': jump to this slot'
+menu_123_descr  = ': jump to this slot'
+menu_124_descr  = ': jump to this slot'
+menu_125_descr  = ': jump to this slot'
+menu_126_descr  = ': jump to this slot'
+menu_127_descr  = ': jump to this slot'
+
+menu_130_descr  = ': add/remove AI Player'
+menu_131_descr  = ': add/remove AI Player'
+menu_132_descr  = ': add/remove AI Player'
+menu_133_descr  = ': add/remove AI Player'
+menu_134_descr  = ': add/remove AI Player'
+menu_135_descr  = ': add/remove AI Player'
+menu_136_descr  = ': add/remove AI Player'
+menu_137_descr  = ': add/remove AI Player'
+
+menu_183_descr  = ': generators life time'
+menu_184_descr  = ': select for edition/make random value'
+
+/////////////////////////////////////////////////////////////////////////////
+//  Help docs  CREDITS
+
+DocHelp_Credits = 
+tc_orange+str_gcaption+tc_default+' - is a real-time strategy game based on Doom 2 universe. Current version is '+str_version+'.'
+tc_docbr
+'Project leader and developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.'
+tc_docbr
+'Sources: www.github.com/T3DStudio/MarsWars'
+'Web site: www.t3dstudio.ru'
+tc_docbr
+'Software used:'+tc_default+tc_doccpt
+'- Free Pascal 3.2.2 (www.freepascal.org);'
+'- Lazarus IDE 4.2 (www.lazarus-ide.org);'
+'- Simple DirectMedia Layer (SDL) Version 1.2 (www.libsdl.org);'
+'- Ultimate Doom Builder (www.github.com/UltimateDoomBuilder/UltimateDoomBuilder);'
+'- NASTY tool by jmickle66666666 (www.doomworld.com/forum/topic/98689-nasty-nota-sourceport-thank-you-alpha-4);'
+'- Game Maker 8.0 by Mark Overmas.'
+tc_docbr
+'Thanks to:'+tc_default+tc_doccpt
+'- ID Software for "DooM" game;'
+'- Daniel Tormentor667 Gimmer for Doom 2 repository (www.realm667.com);'
+'- 3D Realms for "Duke Nukem 3D" game;'
+'- Monolith Productions for "BLOOD" game;'
+'- cybermind aka Mistranger for "DoomWars" game;'
+'- Doom Hacker for "Doom: The Battle For Mars" game;'
+'- Bertie Butts for main menu background image.'
+tc_docbr
+'Unit voices:'+tc_default+tc_doccpt
+'- Jake Crusher - Shotgunner, Super Shotgunner;'
+'- cybermind aka Mistranger - Commando;'
+'- Swoy45 - Siedge Marine, Transport;'
+'- Kyran Jackson - Plasmaguner;'
+'- Demonologist - Hell announcer;'
+'- b-o - Combat Medic;'
+'- Diabol - UAC Fighter;'
+'- Mr.Basik - Antiaircrafter;'
+'- DinkyDyeAussie - UAC Tank;'
+'- DoomWars game - UAC announcer.'
+tc_docbr
+'Used music:'+tc_default+tc_doccpt
+
+
+/////////////////////////////////////////////////////////////////////////////
+//  Help docs  GAME Controls
+
+DocHelp_BaseControls = 
+tc_orange+'BASIC GAME CONTROLS'+tc_default+tc_doccpt
+tc_docbr
+'The majority of your control during the game is through using your mouse. The mouse performs the following actions:'
+tc_docbr+'- SELECTION: the "'+iAct_1_hk+'" is used to select units, buildings, command buttons and points of action (locations where orders are carried out).'
+tc_docbr+'- AUTO COMMANDS: when you have a unit or group selected, the "'+iAct_2_hk+'" can be used to issue intelligent commands that will automatically be carried out.'
+tc_docbr
+tc_docbr
+tc_orange+'CAMERA MOVEMENT'+tc_default+tc_doccpt
+tc_docbr
+'Possible ways to move the game camera include:'
+tc_docbr+'- using keyboard arrow keys;'
+tc_docbr+'- clicking and holding the "'+iAct_3_hk+'";'
+tc_docbr+'- moving the cursor to the edges of the screen (this option can be enabled or disabled in the game settings).'
+tc_docbr+'The speed of camera movement can be adjusted in the game settings.'
+tc_docbr
+tc_docbr
+tc_orange+'BASE CONSTRUCTION'+tc_default+tc_doccpt
+tc_docbr
+'You must have at least one builder to build a base. Switch the control panel to "'+str_ui_Tab[tab_Buildings]+'" tab and click on the building icon to select the type of building you need(or press the associated hotkey).'
+'If the requirements for the selected building type are not met, the game will display an error message; otherwise, the game will draw the building`s sprite and a circle around the mouse cursor.'
+'The radius of the circle is the radius of the building. If the circle is red - the building needs more space, if it is blue - the build place is too far away from the nearest builder, if it is green - the building can be built here.'
+'To deselect a building type, press "'+iAct_2_hk+'".'
+str_ui_BuildHint
+'To cancel the construction of a building, select it and issue the "'+str_dscr[iAct_Control_UProdCncl]+'" or "'+str_dscr[iAct_Control_UDestroy]+'" order.'
+str_doc_NoteMaxBuilders+'.'
+tc_docbr+'NOTE: losing your buildings affect your construction system into short cooldown effect.'
+tc_docbr+str_ui_BuildTip
+tc_docbr
+tc_docbr
+tc_orange+'UNIT PRODUCTION'+tc_default+tc_doccpt
+tc_docbr
+'Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met.'
+'Switch the control panel to "'+str_ui_Tab[tab_Units]+'" tab and click on the unit icon(or press the associated hotkey or hover your mouse over the unit icon and scroll the "'+iAct_4_hk+'").'
+'If the requirements for the selected unit type are not met, the game will display an error message.'
+'If no unit production building is selected - the game sends the production order to nearest unbusy production building, otherwise it sends the order to nearest unbusy selected production buildings.'
+'It is impossible to create a unit production queue.'
+'To cancel unit production process, click "'+iAct_2_hk+'" on the unit icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order.'
+tc_docbr
+tc_docbr
+tc_orange+'UPGRADES PRODUCTION'+tc_default+tc_doccpt
+tc_docbr
+'Go to the "'+str_ui_Tab[tab_Upgrades]+'" tab in the Control Panel and click the upgrade icon. If the requirements for the selected upgrade type are not met, the game will display an error message.'
+'If no upgrade production facility is selected - the game sends the production order to any nearest unbusy production facility, otherwise it sends the order to nearest unbusy selected production facilities.'
+'It is impossible to create an upgrade production queue.'
+'To cancel upgrade production process, click "'+iAct_2_hk+'" on the upgrade icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order.'
+tc_docbr
+
+/////////////////////////////////////////////////////////////////////////////
+//  Help docs  GAME HOTKEYS
+
+DocHelp_HotKeyAction = 
+tc_orange+'COMMON HOTKEYS'+tc_default+tc_doccpt
+tc_docbr
+HK_InGameChat       +'in-game chat(common)'
+HK_InGameChatAll    +'in-game chat(to all players)'   
+HK_InGameChatAllies +'in-game chat(to allied players)'
+HK_InGamePause      +'toggle pause(multiplayer)'
+HK_InGameMenu       +'toggle menu'
+HK_Tab              +'switch control panel tab' 
+HK_ScreenShot       +'make *'+fileExt_Scrshot+' screenshot'
+HK_ToggleWindowed   +'toggle "'+str_SV_Windowed+'" option' 
+tc_docbr
+tc_docbr
+tc_orange+'GAME HOTKEYS'+tc_default+tc_doccpt
+tc_docbr
+HK_LastEvent         +'move camera to last event location'
+tc_docbr
+HK_USetGroups        +'assign currently selected units to the numbered control group'    
+HK_USetGroup0        +'unassign currently selected units from any numbered control group'
+tc_docbr
+HK_UAddGroups        +'add currently selected units to the numbered control group'
+tc_docbr
+HK_USelGroups        +'select units from the numbered control group; double tap - move camera to nearest unit from the group'
+tc_docbr
+HK_UASlGroups        +'add to selection units from the numbered control group'
+tc_docbr
+HK_Control_UAbility  +'abilities of selected units'
+HK_Control_BaseMove  +'basic move/attack orders of selected units'
+HK_Control_UProdCncl +'cancel production in selected buildings'
+HK_Control_UDestroy  +'kill selected units'
+tc_docbr
+HK_Control_USelBase  +'select all builders; double tap - move camera to nearest builder'
+HK_Control_USelArmy  +'select all not busy battle units; double tap - move camera to nearest unit'
+tc_docbr
+HK_Control_MarkLook  +'set map mark(multiplayer): "look here"'  
+HK_Control_MarkAttack+'set map mark(multiplayer): "attack here"'
+tc_docbr
+HK_Control_ScoreBoard+'toggle scoreboard display'
+tc_docbr
+HK_Control_ToggleRec +'toggle "'+str_SR_RecordGames+'" option'
+HK_TogglePlayersColor+'toggle "'+str_SG_PlayersColor+'" option'
+tc_docbr
+HK_SProds            +'production hotkeys'
+tc_docbr
+HK_Alt               +'show unit`s rects and circles' 
+tc_docbr
+tc_docbr
+tc_orange+'REPLAY PLAYBACK HOTKEYS'+tc_default+tc_doccpt
+tc_docbr
+HK_Replay_Fast       +'toggle uncapped FPS(faster game speed)' 
+HK_Replay_Pause      +'pause playback'    
+HK_Replay_Back60     +'rewind 60 seconds' 
+HK_Replay_Back10     +'rewind 10 seconds' 
+HK_Replay_Back2      +'rewind 2 seconds'  
+HK_Replay_Forward2   +'fast forward 2 seconds' 
+HK_Replay_Forward10  +'fast forward 10 seconds'
+HK_Replay_Forward60  +'fast forward 60 seconds'
+HK_Replay_POV        +'toggle player-recorder POV'  
+HK_Replay_Log        +'toggle list of game messages'
+HK_Replay_Fog        +'toggle fog of war' 
+HK_Replay_PlayerAll  +'set all players vision'
+HK_Replay_Players    +'set player vision'
+tc_docbr
+tc_docbr
+tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt
+tc_docbr
+HK_Observer_Fog      +'toggle fog of war' 
+HK_Observer_POV      +'toggle player POV' 
+HK_Observer_PlayerAll+'set all players vision'
+HK_Observer_Players  +'set player vision'
+tc_docbr
+tc_docbr
+tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt
+tc_docbr
+HK_test_FastTime     +'toggle uncapped FPS(faster game speed)'
+HK_test_InstaProd    +'toggle instant production'
+HK_test_ToggleAI     +'toggle AI control for current player'
+HK_test_iddqd        +'toggle invulnerability for current player'
+HK_test_FogToggle    +'toggle fog of war'   
+HK_test_DrawToggle   +'toggle screen redraw'
+HK_test_NullUpgrades +'cancel all upgrades for current player'
+HK_test_BePlayers    +'set current player'
+HK_test_AddHellPower +'add '+str_testmode_HellPower+' '+str_ui_HellPower+' to current player'
+HK_test_AddUACLoot   +'add '+str_testmode_UACLoot  +' '+str_ui_UACLoot  +' to current player'
+tc_docbr
+
+/////////////////////////////////////////////////////////////////////////////
+//  Help docs  GAME UI
+
+DocHelp_GamUI = 
+tc_orange+'COMMON'+tc_default+tc_doccpt
+tc_docbr
+'See "'+str_help_ImgUI+'":'
+tc_docbr+'1) game timer;'
+tc_docbr+'2) objectives and information, specific to current scenario;'
+tc_docbr+'3) player resources;'
+tc_docbr+'4) army limit;'
+tc_docbr+'5) FPS&APM counters;'
+tc_docbr+'6) numbered control groups;'
+tc_docbr+'7) minimap;'
+tc_docbr+'8) control panel; the position of the control panel can be changed in the game settings;'
+tc_docbr+'9) last game messages.'
+tc_docbr
+tc_docbr
+tc_orange+'UNIT UPGRADE INDICATORS'+tc_default+tc_doccpt
+tc_docbr
+'See "'+str_help_ImgUUpgrade+'":'
+tc_docbr+'- '+tc_red+'red'+tc_default+' numbers - summ of attack upgrades;'
+tc_docbr+'- '+tc_lime+'green'+tc_default+' numbers - summ of armor upgrades;'
+tc_docbr+'- '+tc_yellow+'yellow'+tc_default+' numbers - summ of other upgrades.'
+tc_docbr
+tc_docbr
+tc_orange+'CONTROL PANEL'+tc_default+tc_doccpt
+tc_docbr
+'Minimap marks:'+tc_doccpt
+tc_docbr+'- pulsating red rectangle - base is under attack;'
+tc_docbr+'- pulsating red circle - unit is under attack;'
+tc_docbr+'- pulsating lime circle - unit ready;'
+tc_docbr+'- pulsating lime rectangle - construction complete;'
+tc_docbr+'- pulsating blue circle - unit promoted;'
+tc_docbr+'- pulsating yellow rectangle - upgrade complete;'
+tc_docbr+'- pulsating aqua circle - generator event;'
+tc_docbr+'- pulsating dark-yellow circle - key point event;'
+tc_docbr+'- pulsating light-gray circle - "look here" mark;'
+tc_docbr+'- pulsating light-red circle - "attack here" mark.'
+tc_docbr
+tc_docbr+'Tabs:'+tc_doccpt
+tc_docbr+'"'+str_ui_Tab[tab_Buildings]+'" - available buildings;'
+tc_docbr+'"'+str_ui_Tab[tab_Units]+'" - available units;'
+tc_docbr+'"'+str_ui_Tab[tab_Upgrades]+'" - available upgrades;'
+tc_docbr+'"'+str_ui_Tab[tab_Controls]+'" - abilities and basic orders of selected units; some game controls;'
+tc_docbr
+tc_docbr+'Description of numbers on icons:'+tc_doccpt
+tc_docbr+tc_lime  +'green' +tc_default+' - number of selected units of this type;'
+tc_docbr+tc_yellow+'yellow'+tc_default+' - number of production processes of this type;'
+tc_docbr+tc_orange+'orange'+tc_default+' or '+tc_gray  +'gray'  +tc_default+' - total number of that type of building/unit or upgrade level;'
+tc_docbr+tc_purple+'purple'+tc_default+' - number of units of that type in selected transport(s);'
+tc_docbr+tc_white +'white' +tc_default+' - time remaining until completion of production;'
+tc_docbr+tc_aqua  +'aqua'  +tc_default+' - remaining time until ability cooldown.'
+
+// unit upgrades
+
+/////////////////////////////////////////////////////////////////////////////
+//  Help docs  GAME Mechanics
+
+DocHelp_BaseMechanics = 
+tc_orange+'MAP SCENARIOS'+tc_default+tc_doccpt
+tc_docbr
+'* '+str_map_ScenarioL[mc_ffa3]+'-'+str_map_ScenarioL[mc_ffa8]+' - several free-for-all scenarios for different numbers of players; players team numbers can be changed.'
+tc_docbr+'* '+str_map_ScenarioL[mc_1x1]+' - a classic 1x1 scenario;'
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2]+','+str_map_ScenarioL[mc_3x3]+','+str_map_ScenarioL[mc_4x4]+','+str_map_ScenarioL[mc_2x2x2]+','+str_map_ScenarioL[mc_2x2x2x2]+' - various team skirmish; players team numbers cannot be changed;'
+tc_docbr+str_ui_objectives+':'
+tc_docbr+str_objective_Scirmish
+tc_docbr+'* '+str_map_ScenarioL[mc_KeyPoints]+' - a tactical scenario in which players must capture '+str_keyPoint_mcN+' moving key points(see "'+str_help_ImgKeyPoints+'").'
+'To capture a point, a player must have at least one unit inside it. Capturing a key point takes '+str_keyPoint_CTime_Def_Sec+' seconds.'
+tc_docbr+'After capturing it, there is no requirement to keep units inside it.'
+tc_docbr+str_ui_objectives+':'
+tc_docbr+str_objective_KeyPoints
+tc_docbr+'* '+str_map_ScenarioL[mc_KotH]+' (King of the Hill) - a tactical scenario in which players must hold the central area of the map(see "'+str_help_ImgKotH+'") for '+str_keyPoint_CTime_KotH_Sec+' seconds.'
+'There is a '+str_keyPoint_KotH_pause_sec+'-seconds cooldown before capturing the central area.'
+tc_docbr+str_ui_objectives+':'
+tc_docbr+str_objective_KotH
+tc_docbr+'* '+str_map_ScenarioL[mc_royale]+' - a variant of free-for-all scenario, where the death circle gradually narrows the available space on the map.'
+tc_docbr+str_ui_objectives+':'
+tc_docbr+str_objective_RoyalBattle
+tc_docbr+str_or
+tc_docbr+str_objective_Scirmish
+tc_docbr
+tc_docbr
+tc_orange+'NEUTRAL GENERATORS'+tc_default+tc_doccpt
+tc_docbr
+'Neutral generators (see "'+str_help_ImgGenerators+'") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of neutral generators:'
+tc_docbr+'- "Starter" generator - appears at players base in "Scirmish" game. Required at least '+str_map_generators_LimitS+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyS+'.'
+tc_docbr+'- "Normal" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
+tc_docbr+'Both types of neutral generators requires holding units inside it, otherwise generator become back to neutral state.'
+tc_docbr
+tc_docbr
+tc_orange+'RESOURCES'+tc_default+tc_doccpt
+tc_docbr
+'There are 3 types of resources in the game:'
+tc_docbr+'- The main resource of the game is the "'+str_ui_EnergyLevel+'". Almost all production (building construction, unit creation, or upgrade research) in the game consumes this resource.'
+'In the user interface, it is displayed as two numbers: the level of free energy and the '+tc_aqua+'maximum energy level'+tc_default+'.'
+'When a player starts any production that requires this resource, the game reduces the free energy level by the production cost and restores this amount after the production is completed.'
+'The energy level can be increased by specific buildings, as well as special objects on the game map that need to be captured and held.'
+tc_docbr
+tc_docbr+'There are also 2 additional types of resources used for special technologies and abilities:'
+tc_docbr+'- '+str_ui_HellPower+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.'
+'The replenishment rate increases with each additional "Altar of Pain", but constructing more than '+str_scirmish_MaxHAltar+' "Altars of Pain" does not provide any further benefit. '
+'When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.'
+str_hint_MaxQuantity+str_HellPower_Max+'. '
+tc_docbr+'- '+str_ui_UACLoot+' - this resource is acquired by both factions through the destruction of enemy UAC units and buildings. '+str_hint_MaxQuantity+str_UACLoot_Max+'.'
+tc_docbr
+tc_docbr
+tc_orange+'ARMY LIMIT'+tc_default+tc_doccpt
+tc_docbr
+'Each units and buildings in the game takes at least 1 limit point. Maximum limit points per each player is '+tc_red+'125'+tc_default+'!'
+'Dead units still exist in the game and takes limit.'
+tc_docbr
+tc_docbr
+tc_orange+'UNIT ATTRIBUTES'+tc_default+tc_doccpt
+tc_docbr
+'- '+str_attr_alive   +' or '+str_attr_dead    +''
+tc_docbr+'- '+str_attr_unit    +' or '+str_attr_building+''
+tc_docbr+'- '+str_attr_mech    +' or '+str_attr_bio     +''
+tc_docbr+'- '+str_attr_light   +' or '+str_attr_heavy   +''
+tc_docbr+'- '+str_attr_fly     +' or '+str_attr_ground  +''
+tc_docbr+'- '+str_attr_level   +'2..4 - unit level if it is higher than 1.'
+tc_docbr
+tc_docbr
+tc_orange+'UNIT EFFECTS'+tc_default+tc_doccpt
+tc_docbr
+'- '+str_attr_stuned  +' - unit is stuned and can`t attack or move;'
+tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;'
+tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and takes a third less damage;'
+tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;'
+tc_docbr+'- '+str_attr_Decay   +' - unit is under "Decay Aura" effect; it slowly lose health;'
+tc_docbr+'- '+str_attr_HVision +' - unit is under "Hell Vision" effect; it can see invisible enemy units;'
+tc_docbr+'- '+str_attr_SSoul   +' - unit is under "Soul Sphere" effect; it`s regaining it health;'
+tc_docbr+'- '+str_attr_SInvuln +' - unit is under "Invulnerability Sphere" effect; it is immune to any damage;'
+tc_docbr+'- '+str_attr_SInvis  +' - unit is under "Invisibility Sphere" effect; it invisibile;'
+tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage and resist to "pain state" effect;'
+tc_docbr+'- '+str_attr_SDDamage+' - unit is under "Double Damage Sphere" effect; it deals double damage;'
+tc_docbr+'- '+str_attr_STurbo  +' - unit is under "Turbo Sphere" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.'
+tc_docbr
+tc_docbr
+tc_orange+'PAIN STATE'+tc_default+tc_doccpt
+tc_docbr
+'Some units have "Pain State" - it is a 1-second stun state after a certain number of damage hits. During the "Pain State" unit can`t attack or move. "Pain State" is accompanied by a special sound and unit animation.'
+tc_docbr
+tc_docbr
+tc_orange+'VETERAN SYSTEM'+tc_default+tc_doccpt
+tc_docbr
+'All combat units gain combat experience and increase their level. All units spawn at level 1 and can be upgraded to level 4. With each new level, the unit increases its damage, armor, and pain threshold.'
+'The time in combat required to reach the next level varies for each type of unit(see "'+str_help_UnitsInfo+'" section).'
+tc_docbr
+tc_docbr
+tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt
+tc_docbr
+'1) The game takes the attacking unit`s base damage and adds bonuses from upgrades and veteran level;'
+tc_docbr+'2) Special effects of the attacking unit that affect its damage amount are applied ("'+str_attr_heroic+'" attribute and "'+str_attr_SDDamage+'" effect);'
+tc_docbr+'3) A damage modifier for the attacking unit is applied to the resulting value;'
+tc_docbr+'4) Special effects reducing the received damage by the target unit are applied ("'+str_attr_heroic+'" attribute and "'+str_attr_SRDamage+'" effect);'
+tc_docbr+'5) The armor of the target unit is calculated (bonuses from upgrades and its veteran level are summed up) and subtracted from the inflicted damage; if the damage drops below 1, it is raised to 1;'
+tc_docbr+'6) The target unit receives the final calculated damage.'
+tc_docbr+'Special cases:'
+tc_docbr+'- If the unit is a building under construction, steps 4 and 5 are skipped;'
+tc_docbr+'- Damage dealt by the "Decay Aura" effect also ignores points 4 and 5;'
+tc_docbr+'- Units with '+str_attr_building+' or '+str_attr_mech+' attribute are immune to splash damage.'
+tc_docbr
+tc_docbr
+tc_orange+'OTHER'+tc_default+tc_doccpt
+tc_docbr
+'If a player loses all his builders - all his units revealed on the map.'
+tc_docbr
+tc_docbr+'Unit hits regeneration period is 1 second.'
+
+/////////////////////////////////////////////////////////////////////////////
+//  Help docs  OTHER
+
+DocHelp_Other = 
+tc_orange+'DEDICATED SERVER'+tc_default+tc_doccpt
+tc_docbr
+tc_docbr+'Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:'
+tc_docbr
+tc_doccnt+'MarsWars_ded.exe [X] [Y]'
+tc_docbr
+'where X - UDP port (optional argument, default value - '+str_net_DefaultPort+' Y - LAN Advertise (optional argument, default value - 1 (true))).'
+tc_docbr+'Any connected player can change the game settings in a dedicated server`s lobby.'
+tc_docbr+'The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.'
+tc_docbr
+tc_docbr
+tc_orange+'AI BOT SKILL LEVELS'+tc_default+tc_doccpt
+tc_docbr
+tc_docbr+'AI1 - the easiest bot; AI9 - the the hardest.'
+tc_docbr+'AI1-5 - bot operates under the same conditions as a player-human; there are no unfair advantages and it does not ignore the fog of war; '
+'the difference is various size of army, super weapon or "magic" using, some micro-control abilities and build-order.'
+tc_docbr+'AI3+ - there is a chance of an early attack by a small group of units.'
+tc_docbr+'AI4+ - there is a chance of an super early attack by a first unit.'
+tc_docbr+'AI6 - AI5 + building construction speed is doubled.'
+tc_docbr+'AI7 - AI6 + upgrades production speed is doubled.'
+tc_docbr+'AI8 - AI7 + unit production speed is doubled.'
+tc_docbr+'AI9 - AI8 + bot can see enemy units or buildings, ignoring fog of war.'
+
+/////////////////////////////////////////////////////////////////////////////
+//  CAMPAING STRINGS
+
+str_Camp_Difficulty           = 'Difficulty'
+str_Camp_DifficultyL[0]       = tc_aqua  +'I`m too young to die'+tc_default
+str_Camp_DifficultyL[1]       = tc_lime  +'Hey, not too rough'  +tc_default
+str_Camp_DifficultyL[2]       = tc_yellow+'Hurt me plenty'      +tc_default
+str_Camp_DifficultyL[3]       = tc_orange+'Ultra-Violence'      +tc_default
+str_Camp_DifficultyL[4]       = tc_red   +'Nightmare'           +tc_default
+
+str_Camp_Campaign             = 'Campaign'
+str_Camp_Mission              = 'Mission'
+str_Camp_Info                 = 'Information'
+str_Camp_Location             = 'Location'
+str_Camp_NewUnits             = 'New units available: '
+
+str_Camp_HE_CoB               = 'Clan of Bites'
+str_Camp_HE_EE                = 'Evil Eyes Tribe'
+str_Camp_HE_PoA               = 'Pack of Anger'
+str_Camp_HE_BS                = 'Blood Squad'
+str_Camp_HE_LoH               = 'Lords of Horror'
+str_Camp_HE_CoBS              = 'Clan of Burning Sky'
+
+///////////////////     HELL VS HELL
+
+str_camp_1                    = 'Ascension'
+
+str_tmp1 =    'Hell Empire'+tc_nl
+
+//////////     HELL VS HELL    1
+
+str_camp_1_miss_1_name =  'Mt. Erebus'
+
+str_camp_1_miss_1_obj  = '- Don`t lose the Hell Keep'
+                   tc_nl+'- Capture 1 generator'
+                   tc_nl+'- Build 10 Demon`s Gates'
+                   tc_nl+'- Summon 30 Imps'
+                   tc_nl+'- Destroy the '+str_Camp_HE_CoB
+str_camp_1_miss_1_loc  = str_tmp1+'Mountain Erebus'
+
+str_camp_1_miss_1_plot = 
+'On a distant, unknown planet of the Hell Empire, there exists a long-standing tradition of "ascension":'
+'once every few dozen cycles, the leaders of savage demonic tribes, eager to ascend to a higher position in the Empire, gather for a journey to a sacred place - the "Slough of Despair".'
+'The journey there is long and arduous - they must overcome canyons, caves, steppes, lakes, and - most importantly - his rivals! Only one will survive, only one will ascend to the rank of "General of Hell"!'
+tc_docbr
+'You are one of the ascension candidates. Your journey begins in a cave at the foot of the Mount Erebus. The first obstacle lies ahead - your rival`s outpost! Build a camp, summon your warriors, and crush the enemy!'
+'MISSION TIPS:'
+
+//////////     HELL VS HELL    2
+
+str_camp_1_miss_2_name = 'Valley of Fear'
+
+str_camp_1_miss_2_obj  = '- At least 1 Hell Keep must survive'
+                   tc_nl+'- Destroy the '+str_Camp_HE_EE
+                   tc_nl+'- Destroy the '+str_Camp_HE_PoA
+str_camp_1_miss_2_loc  = str_tmp1+'Valley of Fear'
+
+str_camp_1_miss_2_plot = 
+'It was a glorious victory! You enslave some Pinky Demons to strengthen your army, stole Fire Tower technology to defend your base and capture Hell Pools for upgrades!'
+tc_docbr
+'But there is no time to celebrate - an earthquake has occurred, and the ground behind you has begun to fill with lava. Your next challenge is to cross the Valley of Fear faster than the lava flow.'
+tc_docbr
+'There are two more opponents in this area - destroy them as well, adding their forces to yours.'
+tc_docbr
+tc_docbr
+'MISSION TIPS:'
+'* Hell Keep teleportation ability is not available for you yet, so your only option is to build new Hell Keeps toward the bottom-right corner of the map.'
+'* Each of your units has "self-destruction" ability - use it to free builder limit;'
+'* Your opponents have different army compositions and you should choose your army composition wisely for greater effectiveness. '

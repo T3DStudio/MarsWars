@@ -2300,9 +2300,14 @@ begin
             if(transformTimer>0)then
             begin
                if(res_energyl_cur>=0)then
-                 if(buffs[ub_SphereTurbo]>0)
-                 then transformTimer-=2
-                 else transformTimer-=1;
+               begin
+                  if(buffs[ub_SphereTurbo]>0)
+                  then transformTimer-=2
+                  else transformTimer-=1;
+                  if(g_uids[transformUID].uid_isbuilding)
+                  then transformTimer-=upgrs_cur[upgr_fprod_build]
+                  else transformTimer-=upgrs_cur[upgr_fprod_unit ];
+               end;
 
                if(transformTimer<1){$IFDEF TESTMODE}or(test_InstaProd){$ENDIF} then transformTimer:=1;
                if(transformTimer=1)then

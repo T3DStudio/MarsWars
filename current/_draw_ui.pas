@@ -301,8 +301,8 @@ begin
                       else
                         if(ua_mbrush_r=uambt_Blizzard)then
                         begin
-                           circleColor(tar,mouse_x,mouse_y,g_mids[MID_Blizzard].mid_base_SplashR,c_aqua);
-                           circleColor(tar,mouse_x,mouse_y,g_mids[MID_Blizzard].mid_size        ,c_blue);
+                           circleColor(tar,mouse_x,mouse_y,g_mids[MID_UACStrike].mid_base_SplashR,c_aqua);
+                           circleColor(tar,mouse_x,mouse_y,g_mids[MID_UACStrike].mid_size        ,c_blue);
                         end
                         else
                           if(ua_mbrush_r<0)
@@ -824,9 +824,13 @@ w : integer;
 cx: single;
 begin
    cx:=replay_GetProgress;
-   w :=round(cx*ui_ReplayBarW);
+   w :=round(cx*(ui_ReplayBarW-1));
 
-   boxColor (tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+w,ui_ReplayBarY,c_violet);
+   boxColor      (tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+ui_ReplayBarW-1,ui_ReplayBarY-1,c_black);
+   rectangleColor(tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+ui_ReplayBarW-1,ui_ReplayBarY-1,c_white);
+
+   boxColor      (tar,ui_ReplayBarX+1  ,ui_ReplayBarY-ui_ReplayBarH+1,
+                      ui_ReplayBarX+w-1,ui_ReplayBarY-2,c_violet);
    draw_text(tar,ui_ReplayBarX+2,ui_ReplayBarY-font_wh,i2s(round(cx*100))+'%',ta_LB,255,c_white);
 
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then

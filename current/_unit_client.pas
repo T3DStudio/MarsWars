@@ -928,7 +928,7 @@ begin
      if(pu_prev^.hits<=hits_dead)and(hits>hits_dead)then // create unit
      begin
         unit_SetDefaults(pu_cur,true);
-        unit_ApplyUID(pu_cur);
+        unit_ApplyUID(pu_cur,true);   //hits
         unit_TeamReveal (pu_cur,true);
         unit_AddNETVision(pu_cur,POVPlayer,rpl);
 

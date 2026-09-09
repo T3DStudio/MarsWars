@@ -346,6 +346,109 @@ begin
      str_AddToStringArray(@slist_l,@slist_n,@slist_w,lineLen,newPara,Justify,newstr);
 end;
 
+// RUS Chars fix
+
+const
+char_num = 65;
+chars_utf  : array[0..char_num] of char = (
+#192,
+#193,#194,#195,#196,#197,#198,#199,#200,#201,#202,#203,#204,#205,#206,#207,
+#208,#209,#210,#211,#212,#213,#214,#215,#216,#217,#218,#219,#220,#221,#222,
+#223,
+#224,
+#225,#226,#227,#228,#229,#230,#231,#232,#233,#234,#235,#236,#237,#238,#239,
+#240,#241,#242,#243,#244,#245,#246,#247,#248,#249,#250,#251,#252,#253,#254,
+#255,
+#229,
+#197
+);
+chars_utfs : set of char = [#192..#255];
+chars_unic : array[0..char_num] of string[2] = (
+#208#144,
+#208#145,#208#146,#208#147,#208#148,#208#149,#208#150,#208#151,#208#152,
+#208#153,#208#154,#208#155,#208#156,#208#157,#208#158,#208#159,#208#160,
+#208#161,#208#162,#208#163,#208#164,#208#165,#208#166,#208#167,#208#168,
+#208#169,#208#170,#208#171,#208#172,#208#173,#208#174,
+#208#175,
+
+#208#176,
+#208#177,#208#178,#208#179,#208#180,#208#181,#208#182,#208#183,#208#184,
+#208#185,#208#186,#208#187,#208#188,#208#189,#208#190,#208#191,#209#128,
+#209#129,#209#130,#209#131,#209#132,#209#133,#209#134,#209#135,#209#136,
+#209#137,#209#138,#209#139,#209#140,#209#141,#209#142,
+#209#143,
+#209#145,
+#208#129
+  );
+{
+Р° = #208#176      144
+Р±        177      145
+РІ        178      146
+Рі        179      147
+Рґ        180      148
+Рµ        181      149
+Р¶        182      150
+Р·        183      151
+Рё        184      152
+Р№        185      153
+Рє        186      154
+Р»        187      155
+Рј        188      156
+РЅ        189      157
+Рѕ        190      158
+Рї        191      159
+СЂ   #209#128      160
+СЃ        129      161
+С‚        130      162
+Сѓ        131      163
+С„        132      164
+С…        133      165
+С†        134      166
+С‡        135      167
+С€        136      168
+С‰        137      169
+СЉ        138      170
+С‹        139      171
+СЊ        140      172
+СЌ        141      173
+СЋ        142      174
+СЏ        143      175
+С‘        144 #208#129
+}
+procedure lang_UTF82b1b(pline:pAnsiString);
+var i,p:cardinal;
+begin
+   if(length(pline^)>=2)then
+     for i:=0 to char_num do
+       while(true)do
+       begin
+          p:=pos(chars_unic[i],pline^);
+          if(p=0)
+          then break
+          else
+          begin
+             delete(pline^,p,length(chars_unic[i]));
+             insert(chars_utf[i],pline^,p);
+          end;
+       end;
+end;
+function lang_UTF81b2b(inline:UTF8String):UTF8String;
+var i,p:cardinal;
+begin
+   lang_UTF81b2b:='';
+   if(length(inline)>0)then
+     for i:=1 to length(inline) do
+       if not(inline[i] in chars_utfs)
+       then lang_UTF81b2b+=inline[i]
+       else
+         for p:=0 to char_num do
+           if(inline[i]=chars_utf[p])then
+           begin
+              lang_UTF81b2b+=chars_unic[p];
+              break;
+           end;
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   STRING LISTs
@@ -440,7 +543,7 @@ begin
    else str_ProductionHotKey:='';
 end;
 
-procedure str_SetAbilityBaseHint(aid:byte;NAME,DESCR:shortstring);
+{procedure str_SetAbilityBaseHint(aid:byte;NAME,DESCR:shortstring);
 begin
   with g_aids[aid] do
   begin
@@ -461,7 +564,7 @@ begin
       uid_str_BaseDescript:=DESCR;
       str_EndDot(@uid_str_BaseDescript);
    end;
-end;
+end;   }
 procedure str_SetUnitBalanceHint(uids:TSoB;hintG,hintB,hintU:shortstring;force:boolean);
 var u:byte;
 begin
@@ -474,7 +577,7 @@ begin
      end;
 end;
 
-procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
+{procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
 begin
    with g_upgrs[upid] do
    begin
@@ -492,7 +595,7 @@ begin
    if(length(hk)>0)
    then str_action_hint[action]:=hint+' ('+hk+')'
    else str_action_hint[action]:=hint;
-end;
+end;  }
 
 function str_UpgradeNameForReq(upid:byte):shortstring;
 begin
@@ -809,7 +912,7 @@ begin
      if(aw_FakeShotsN>0)
      then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
      else sps:=(fr_fps1*n/aw_reload);
-     STRADD(@str_UnitArmDPS,Float2Str(sps)+str_uarm_ShotsPerSec,sep_scomma);
+     STRADD(@str_UnitArmDPS,str_uarm_ShotsPerSec+Float2Str(sps),sep_scomma);
   end;
 end;
 
@@ -1335,12 +1438,6 @@ begin
         end;
         AddLineUnitDocHint(' ');
      end;
-end;
-
-procedure menu_set_hint(item,itemPos:byte;itemHint:shortstring);
-begin
-   menu_hint_pos[item]:=itemPos;
-   str_menu_hint[item]:=itemHint;
 end;
 
 

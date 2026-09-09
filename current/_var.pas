@@ -287,7 +287,6 @@ ui_fog_sy         : integer = 0;
 ui_fog_ex         : integer = 0;
 ui_fog_ey         : integer = 0;
 
-ui_language       : boolean = false;
 ui_tab_Auto       : boolean = true;
 
 ui_ScoresShow     : boolean = true;
@@ -403,6 +402,16 @@ ui_CursorItemActs : byte = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+//  LANGUAGE
+//
+
+lang_List         : array of shortstring;
+lang_Count        : byte = 0;
+lang_CurrentN     : byte = 0;
+lang_Current      : shortstring = '';
+
+////////////////////////////////////////////////////////////////////////////////
+//
 //  MENU
 //
 
@@ -497,9 +506,9 @@ camp_mis_scroll: integer = 0;
 camp_mis_list  : array of TStringArray;          // [campaing num][mission num] = mission name
 camp_mis_size  : array of integer;               // [campaing num] = mission count
 
-camp_obj_main  : array of array of TStringArray; // [campaing num][mission num][line num] = objective line
-camp_obj_object: array of array of shortstring;  // [campaing num][mission num][line num] = objective line
-camp_obj_loc   : array of array of shortstring;  // [campaing num][mission num][line num] = objective line
+camp_obj_main  : array of array of TStringArray; // [campaing num][mission num][line num] = plot line
+camp_obj_object: array of array of shortstring;  // [campaing num][mission num] = objective line
+camp_obj_loc   : array of array of shortstring;  // [campaing num][mission num] = location line
 camp_obj_size  : array of array of integer;      // [campaing num][mission num] = lines count
 camp_obj_scroll: integer;
 
@@ -1231,7 +1240,7 @@ str_gstat_ReplayPaused,
 str_gstat_GamePaused,
 str_gstat_Lobby,
 str_gstat_Started,
-str_gstat_WonByTeam,
+str_gstat_WonTeam,
 str_gstat_Win,
 str_gstat_Lose,
 
@@ -1348,8 +1357,11 @@ str_Camp_Info,
 str_Camp_Location,
 str_Camp_NewUnits,
 str_Camp_HE_CoB,
-str_Camp_HE_ToE,
-str_Camp_HE_HN,
+str_Camp_HE_EE,
+str_Camp_HE_PoA,
+str_Camp_HE_BS,
+str_Camp_HE_LoH,
+str_Camp_HE_CoBS,
 
 str_all,
 str_Players,
@@ -1403,7 +1415,6 @@ str_or,
 str_and                  : shortstring;
 str_YesNoC,
 str_YesNoG,
-str_SG_LanguageL,
 str_SG_RightClickActL    : array[false..true] of shortstring;
 
 ////////////////////////////////////////////////////////////////////////////////

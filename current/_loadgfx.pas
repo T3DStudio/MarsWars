@@ -614,7 +614,6 @@ end;
 procedure gfx_MakeScoreSurface;
 const
 ss_LeftCaptionsW = font_w1*22;
-ss_PlayerSecWh   = ((MaxPlayerNameLen+3)*font_w1) div 2;
 ss_BordersW      = font_w1;
 ss_UpCaptionH    = txt_line_h3;
 ss_LineH         = txt_line_h3;
@@ -624,8 +623,10 @@ ss_PanelH        = ss_UpCaptionsH+(psc_Last+1)*ss_LineH+(psi_Last+1)*ss_LineH+ss
 ss_ScaleH        = vid_minh-ss_PanelH;
 var
 p,i,
+maxNameLen,
 playerCount: byte;
 tx,ty,t,
+ss_PlayerSecWh,
 ss_PanelW,
 ss_PanelWh : integer;
 tstr       : shortstring;
@@ -639,11 +640,17 @@ minval_i   : array[0..psi_Last] of longint;
 begin
    gfx_FreeSDLSurface(ui_ScoresSurf);
 
+   maxNameLen :=0;
    playerCount:=0;
    for p:=0 to LastPlayer do
      with g_PlayersScore[p] do
        if(ps_state>0)then
-         playerCount+=1;
+       begin
+          playerCount+=1;
+          if(length(ps_name)>maxNameLen)then
+            maxNameLen:=length(ps_name);
+       end;
+   ss_PlayerSecWh:=((maxNameLen+3)*font_w1) div 2;
 
    for i:=0 to psc_Last do begin
                               maxval_c[i]:=maxval_c[i].MinValue;

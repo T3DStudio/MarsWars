@@ -270,7 +270,7 @@ begin
    // SETTINGS  GAME
 
    drawmenu_ItemText2(tar,mi_SG_PlayerName      ,str_SG_PlayerName      ,PlayerName+vc(mi_SG_PlayerName)            ,menu_ItemSelected);
-   drawmenu_ItemText2(tar,mi_SG_Language        ,str_SG_Language        ,str_SG_LanguageL[ui_language]              ,0);
+   drawmenu_ItemText2(tar,mi_SG_Language        ,str_SG_Language        ,lang_Current                               ,0);
    drawmenu_ItemText2(tar,mi_SG_ColoredShadows  ,str_SG_ColoredShadow   ,str_YesNoC[ui_ColoredShadow]               ,0);
    drawmenu_ItemText2(tar,mi_SG_PlayersColor    ,str_SG_PlayersColor    ,str_SG_PlayersColorL[ui_PlayersColor  ]    ,0);
    drawmenu_ItemText2(tar,mi_SG_ShowAPM         ,str_SG_ShowAPM         ,str_YesNoC[ui_ShowAPM]                     ,0);
@@ -857,7 +857,7 @@ begin
    begin
       ix:=cx-(menu_image^.w div 2);
       iy:=cy-(menu_image^.h div 2);
-      draw_text(tar,ix+(menu_image^.w div 2),iy                      ,menu_image_caption ,ta_MB,255,c_white);
+      draw_text(tar,ix+(menu_image^.w div 2),iy-2                    ,menu_image_caption ,ta_MB,255,c_white);
       draw_text(tar,ix+(menu_image^.w div 2),iy+menu_image^.h+font_wh,str_menuMsg_HintImg,ta_MU,255,c_white);
       draw_sdlsurface(tar,ix,iy,menu_image);
       rectangleColor(tar,ix,iy,

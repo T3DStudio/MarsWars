@@ -158,16 +158,16 @@ begin
    flist_n:=0;
    setlength(flist_l,0);
    if(FindFirst(folder_sound+dir+'*.ogg',faReadonly,info)=0)then
-    repeat
-      s:=info.Name;
-      if(length(s)>4)then
-      begin
-         delete(s,length(s)-3,4);
-         flist_n+=1;
-         setlength(flist_l,flist_n);
-         flist_l[flist_n-1]:=s;
-      end;
-    until(FindNext(info)<>0);
+     repeat
+       s:=info.Name;
+       if(length(s)>4)then
+       begin
+          delete(s,length(s)-3,4);
+          flist_n+=1;
+          setlength(flist_l,flist_n);
+          flist_l[flist_n-1]:=s;
+       end;
+     until(FindNext(info)<>0);
    FindClose(info);
 
    if(flist_n<count)then count:=flist_n;

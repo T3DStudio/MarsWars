@@ -510,19 +510,19 @@ begin
    gapX:=0;
    if(n>1)then
    begin
-      gapX:=(menu_w-menu_BaseW1-(menu_BigButtonW1*n)) div (n-1);
+      gapX:=(menu_w-menu_BaseW1-(menu_BigButtonWb*n)) div (n-1);
       if(gapX>menu_BaseW1)then gapX:=menu_BaseW1;
-      mtx0  :=menu_hw-((menu_BigButtonW1*n)+gapX*(n-1)) div 2;
+      mtx0  :=menu_hw-((menu_BigButtonWb*n)+gapX*(n-1)) div 2;
    end
-   else mtx0:=menu_hw-(menu_BigButtonW1 div 2);
+   else mtx0:=menu_hw-(menu_BigButtonWb div 2);
 
-   if(b1>0)then begin menu_Item_Set(b1,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
-   if(b2>0)then begin menu_Item_Set(b2,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
-   if(b3>0)then begin menu_Item_Set(b3,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
-   if(b4>0)then begin menu_Item_Set(b4,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
-   if(b5>0)then begin menu_Item_Set(b5,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
-   if(b6>0)then begin menu_Item_Set(b6,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonW1+gapX;end;
-   if(b7>0)then begin menu_Item_Set(b7,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);                           end;
+   if(b1>0)then begin menu_Item_Set(b1,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonWb+gapX;end;
+   if(b2>0)then begin menu_Item_Set(b2,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonWb+gapX;end;
+   if(b3>0)then begin menu_Item_Set(b3,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonWb+gapX;end;
+   if(b4>0)then begin menu_Item_Set(b4,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonWb+gapX;end;
+   if(b5>0)then begin menu_Item_Set(b5,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonWb+gapX;end;
+   if(b6>0)then begin menu_Item_Set(b6,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);mtx0+=menu_BigButtonWb+gapX;end;
+   if(b7>0)then begin menu_Item_Set(b7,mtx0,mty0,mtx0+menu_BigButtonWb,mty0+menu_BigButtonH1,true);                           end;
 end;
 
 procedure menu_page_TopCaption(mi:byte);
@@ -655,9 +655,9 @@ begin
    mtx0:=menu_BaseW1;
    mty0:=menu_underCaptionY;
    menu_Item_Set(mi_help_Credits      ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
+   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
    menu_Item_Set(mi_help_GameControls ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
    menu_Item_Set(mi_help_GameHotKeys  ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
-   menu_Item_Set(mi_help_GameUI       ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
    menu_Item_Set(mi_help_GameMechanics,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
    menu_Item_Set(mi_help_UnitsInfo    ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
    menu_Item_Set(mi_help_UnitsBalance ,mtx0,mty0,mtx0+menu_BigButtonW1,mty0+menu_BigButtonH1,true);mty0+=menu_BigButtonH1+menu_BigButtonHh;
@@ -1181,7 +1181,14 @@ mi_SG_RightClickAction : if(not check)then m_RightClickAct :=not m_RightClickAct
 mi_SG_ScrollSpeed      : if(not check)then menu_GetBarValByte(item,@ui_CamSpeed,1,ui_MaxCamSpeed);
 mi_SG_MouseScroll      : if(not check)then ui_MouseScroll  :=not ui_MouseScroll;
 mi_SG_PlayerName       : ;
-mi_SG_Language         : if(not check)then begin ui_language:=not ui_language;SwitchLanguage;ui_ScoresRebuild:=true;end;
+mi_SG_Language         : if(not check)then begin
+                                              if(lang_Count>0)then
+                                              begin
+                                                 ScrollByte(@lang_CurrentN,true,0,lang_Count-1);
+                                                 lang_Current:=lang_List[lang_CurrentN];
+                                              end;
+                                              lang_Update;
+                                           end;
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(true);
 mi_SG_ControlPanelAuto : if(not check)then ui_tab_Auto:=not ui_tab_Auto;
 mi_SG_ShowPlayerScrns  : if(not check)then ui_PlayersScreens:=not ui_PlayersScreens;
@@ -1388,6 +1395,14 @@ function menu_Controls_MRB(item:byte;check:boolean):boolean;
 begin
    menu_Controls_MRB:=true;
    case item of
+mi_SG_Language         : if(not check)then begin
+                                              if(lang_Count>0)then
+                                              begin
+                                                 ScrollByte(@lang_CurrentN,false,0,lang_Count-1);
+                                                 lang_Current:=lang_List[lang_CurrentN];
+                                              end;
+                                              lang_Update;
+                                           end;
 mi_SG_PlayersColor     : if(not check)then menu_ScrollPlayersColor(false);
 mi_SG_HealthBars       : if(not check)then ScrollByte(@ui_HealthBars    ,false,0,ui_MaxHealthBars  );
 mi_SG_ControlPanelPos  : if(not check)then menu_ControlPanelPosScroll(false);

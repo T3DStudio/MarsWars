@@ -1,4 +1,4 @@
-
+﻿
 {$IFDEF _FULLGAME}   // FULL GAME
   {$APPTYPE CONSOLE}
   {$DEFINE TESTMODE}
@@ -28,8 +28,10 @@ uses SysUtils, SDL, SDL_Net,crt
      {$IFDEF _FULLGAME}
         {$include _objects_client_data.pas}
         {$include _strings.pas}
-        {$include _html_doc.pas}
         {$include _lang.pas}
+        {$IFDEF DOCGEN}
+            {$include _html_doc.pas}
+        {$ENDIF}
         {$include _config.pas}
         {$include _sprite_model.pas}
         {$include _draw_com.pas}
@@ -64,24 +66,22 @@ uses SysUtils, SDL, SDL_Net,crt
 
 {$R *.res}
 
-{var
-  st:single;   }
-var t:pSDL_Surface;
+//var t:byte;
 
 begin
-   //t^.format^.palette^.colors;
-
    game_Init;
 
-   {$IFDEF _FULLGAME}
-   {$IFDEF DOCGEN}
-   htmldoc_make;
-   ui_language:=not ui_language;SwitchLanguage;
-   htmldoc_make;
-   ui_language:=not ui_language;SwitchLanguage;
-   htmldoc_SaveSprites;
-   {$ENDIF}
-   {$ENDIF}
+   {for t:=1 to length(str_menu_Scirmish) do
+     write(ord(str_menu_Scirmish[t]),' ');
+   writeln;
+
+   writeln('* ',length(str_menu_Scirmish),' ',str_menu_Scirmish);
+   writeln('* ',length(lang_UTF81b2b(str_menu_Scirmish)),' ',lang_UTF81b2b(str_menu_Scirmish,true));
+
+   readln;
+
+   halt; }
+
 
    while(game_Cycle)do
    begin

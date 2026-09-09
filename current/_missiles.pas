@@ -13,7 +13,7 @@ begin
 MID_Imp        : mid_SpriteModel:=@spr_h_p0;
 MID_Cacodemon  : mid_SpriteModel:=@spr_h_p1;
 MID_Baron      : mid_SpriteModel:=@spr_h_p2;
-MID_Blizzard   : mid_SpriteModel:=@spr_u_rs;
+MID_UACStrike  : mid_SpriteModel:=@spr_u_rs;
 MID_CyberRocket: mid_SpriteModel:=@spr_h_p3;
 MID_Revenant   : mid_SpriteModel:=@spr_h_p4;
 MID_Mancubus   : mid_SpriteModel:=@spr_h_p5;
@@ -43,7 +43,7 @@ MID_Revenant   : begin
                  mid_eid_FlyTrace:=MID_Bullet;
                  mid_eid_FlyStep :=4;
                  end;
-MID_Blizzard   : begin
+MID_UACStrike   : begin
                  mid_eid_FlyTrace:=MID_Granade;
                  mid_eid_FlyStep :=1;
                  mid_eid_Decal   :=EID_db_h1;
@@ -59,7 +59,7 @@ MID_Imp,
 MID_Cacodemon,
 MID_Baron     : mid_snd_death[false]:=snd_explode_plasma;
 MID_ArchFire,
-MID_Blizzard,
+MID_UACStrike,
 MID_Tank,
 MID_Granade,
 MID_CyberRocket,
@@ -183,7 +183,7 @@ begin
            m_dir    := point_dir(m_x,m_y,m_tox,m_toy);
            d        := point_dist_rint(m_tox,m_toy,m_x,m_y);
 
-           {if(m_mid=MID_Blizzard)and(rpls_pstate=rpls_read)then
+           {if(m_mid=MID_UACStrike)and(rpls_pstate=rpls_read)then
            begin
               ui_Camera_MoveToPoint(m_tox,m_toy);
               g_status:=gs_replaypause;
@@ -307,13 +307,11 @@ begin
         if(tu^.buffs[ub_Teleported]>0)
         then m_homing:=mh_none
         else
-          if{(tu^.x<>tu^.vx)
-          or(tu^.y<>tu^.vy)
-          or}(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
+          if(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
             case m_homing of
 mh_magnetic : begin
-                 m_tox+=sign(tu^.x-m_tox)*5;
-                 m_toy+=sign(tu^.y-m_toy)*5;
+                 m_tox:=tu^.x-(sign(tu^.x-m_tox)*tu^.uid^.uid_missileR);
+                 m_toy:=tu^.y-(sign(tu^.y-m_toy)*tu^.uid^.uid_missileR);
                  m_mfe:=tu^.isfly;
               end;
 mh_homing   : begin
@@ -323,7 +321,7 @@ mh_homing   : begin
               end;
             end;
 
-      if(m_mid=MID_Blizzard)then
+      if(m_mid=MID_UACStrike)then
       begin
          if(m_vstep>UACStrike_t1)
          then m_y-=fr_fps1
