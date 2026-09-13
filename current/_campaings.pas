@@ -194,16 +194,16 @@ begin
             else aip_skill:=5;
             end;
             ai_PlayerSetSkirmishSettings(ap);
-            if(alevel=2)then  // HMP,UV,NM
-            begin
-               res_energyl_cur:=1000;
-               res_energyl_max:=1000;
-            end;
-            if(alevel=3)then  // UV,NM
-            begin
-               res_energyl_cur:=3000;
-               res_energyl_max:=3000;
-               upgrs_cur[upgr_fprod_build]:=1;
+            case alevel of
+            2: begin // HMP
+                  res_energyl_cur:=1000;
+                  res_energyl_max:=1000;
+               end;
+            3: begin // UV,NM
+                  res_energyl_cur:=3000;
+                  res_energyl_max:=3000;
+                  upgrs_cur[upgr_fprod_build]:=1;
+               end;
             end;
             if(alevel>1)then
               camp_SetBaseLevelUnitUpgrades(ap,(alevel-1)*2);

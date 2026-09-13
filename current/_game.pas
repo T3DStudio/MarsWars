@@ -941,6 +941,7 @@ begin
                     end;
              true : if(net_ttl>=TTLMaxClientGame )then
                     begin
+                       player_SetDefeat(@g_PlayersGame[p]);
                        GameLog_PlayerTimeOut(p);
                        state:=ps_none;
                        menu_update:=true;
@@ -1004,7 +1005,7 @@ begin
                     then log_EnergyCheckTimer:=1
                     else
                     begin
-                       log_EnergyCheckTimer:=fr_fps6;
+                       log_EnergyCheckTimer:=fr_fps10;
                        players_LogAdd(p,0,lmt_Req_Energy,0,0,'',-1,-1);
                     end;
              end;

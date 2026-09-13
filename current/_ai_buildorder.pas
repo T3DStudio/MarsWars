@@ -233,7 +233,12 @@ begin
              build_dir :=point_dir(x,y,aiu_alarm_x,aiu_alarm_y);
              build_dirs:=22;
              build_step:=srange-g_random(g_uids[build_uid].uid_r);
-          end;
+          end
+          else
+            case g_random(2) of
+            0: build_step:=srange;
+            1: build_step:=uid^.uid_r;
+            end;
    end;
 end;
 
@@ -475,83 +480,97 @@ end;
 //
 
 procedure ai_Forge(pFroge:PTUnit);
-var i:byte;
+var i,upgrid:byte;
 procedure SetUpgrade(upid,lvl:byte);
 var uip:integer;
 begin
-   if(upid>0)then
+   if(upid>0)and(upgrid=0)then
      with pFroge^ do
      with player^ do
      begin
         uip:=upgrs_cur[upid]+prod_upgr_upid[upid];
-        if(uip<lvl)and(uip<aip_MaxUpgradeLevel)then unit_ProdStartUpgrade(pFroge,upid,false);
+        if(uip<lvl)and(uip<aip_MaxUpgradeLevel)then
+          if(unit_ProdStartUpgrade(pFroge,upid,true)=0)then upgrid:=upid;
      end;
 end;
 begin
    with pFroge^ do
    with uid^    do
    with player^ do
-     case uid_race of
-     r_hell: begin
-                if((aip_flags and aif_upgr_smart_order)>0)then
-                begin
-                   SetUpgrade(upgr_hell_BuilderR    ,1);
-                   SetUpgrade(upgr_hell_ADetection  ,1);
-                   SetUpgrade(upgr_hell_HKeepShift  ,1);
-                   SetUpgrade(upgr_hell_BuilderR    ,2);
-                   SetUpgrade(upgr_hell_Spectre     ,1);
-                   SetUpgrade(upgr_hell_DecayAura   ,1);
-                   SetUpgrade(upgr_hell_Resurrect   ,1);
-                   SetUpgrade(upgr_hell_Phantoms    ,1);
+   begin
+      upgrid:=0;
+      case uid_race of
+      r_hell: begin
+                 if((aip_flags and aif_upgr_smart_order)>0)then
+                 begin
+                    SetUpgrade(upgr_hell_BuilderR    ,1);
+                    SetUpgrade(upgr_hell_ADetection  ,1);
+                    SetUpgrade(upgr_hell_HKeepShift  ,1);
+                    SetUpgrade(upgr_hell_BuilderR    ,2);
+                    SetUpgrade(upgr_hell_Spectre     ,1);
+                    SetUpgrade(upgr_hell_DecayAura   ,1);
+                    SetUpgrade(upgr_hell_Resurrect   ,1);
+                    SetUpgrade(upgr_hell_Phantoms    ,1);
+                    SetUpgrade(upgr_hell_TotemInvis  ,1);
 
-                   for i:=1 to aip_MaxUpgradeLevel do
-                   begin
-                      if(map_NeedTransport)then
-                        SetUpgrade(upgr_hell_TeleportCD,i);
-                      SetUpgrade(upgr_hell_PainFactor  ,i);
-                      SetUpgrade(upgr_hell_Regeneration,i);
-                      SetUpgrade(upgr_hell_UnitSightR  ,i);
-                      SetUpgrade(upgr_hell_DistDamage1 ,i);
-                      SetUpgrade(upgr_hell_DistDamage2 ,i);
-                      SetUpgrade(upgr_hell_MeleeDamage ,i);
-                      SetUpgrade(upgr_hell_UnitArmor   ,i);
-                      SetUpgrade(upgr_hell_BuildArmor  ,i);
-                      SetUpgrade(upgr_hell_EvilEyeR    ,i);
-                     end;
-                end;
+                    for i:=1 to aip_MaxUpgradeLevel do
+                    begin
+                       if(map_NeedTransport)then
+                         SetUpgrade(upgr_hell_TeleportCD,i);
+                       SetUpgrade(upgr_hell_PainFactor  ,i);
+                       SetUpgrade(upgr_hell_Regeneration,i);
+                       SetUpgrade(upgr_hell_UnitSightR  ,i);
+                       SetUpgrade(upgr_hell_DistDamage1 ,i);
+                       SetUpgrade(upgr_hell_DistDamage2 ,i);
+                       SetUpgrade(upgr_hell_UnitArmor   ,i);
+                       SetUpgrade(upgr_hell_BuildArmor  ,i);
+                       SetUpgrade(upgr_hell_EvilEyeR    ,i);
+                       SetUpgrade(upgr_hell_MeleeDamage ,i);
+                      end;
+                 end;
 
-                SetUpgrade(upgr_hell_DistDamage1+g_random(22),aip_MaxUpgradeLevel);
-             end;
-     r_uac : begin
-                if((aip_flags and aif_upgr_smart_order)>0)then
-                begin
-                   SetUpgrade(upgr_uac_SSMWeapon    ,1);
-                   SetUpgrade(upgr_uac_BuilderR     ,1);
-                   SetUpgrade(upgr_uac_ADetection   ,1);
-                   SetUpgrade(upgr_uac_CCFly        ,1);
-                   SetUpgrade(upgr_uac_BuilderR     ,2);
-                   SetUpgrade(upgr_uac_CommandoInvis,1);
-                   SetUpgrade(upgr_uac_CCAttack     ,1);
-                   if(map_NeedTransport)then
-                     SetUpgrade(upgr_uac_Transport  ,1);
-                   SetUpgrade(upgr_uac_DronTurret   ,1);
-                   SetUpgrade(upgr_uac_TerAAWeapon  ,1);
+                 SetUpgrade(upgr_hell_DistDamage1+g_random(22),aip_MaxUpgradeLevel);
+              end;
+      r_uac : begin
+                 if((aip_flags and aif_upgr_smart_order)>0)then
+                 begin
+                    SetUpgrade(upgr_uac_SSMWeapon    ,1);
+                    SetUpgrade(upgr_uac_BuilderR     ,1);
+                    SetUpgrade(upgr_uac_ADetection   ,1);
+                    SetUpgrade(upgr_uac_CCFly        ,1);
+                    SetUpgrade(upgr_uac_BuilderR     ,2);
+                    SetUpgrade(upgr_uac_CommandoInvis,1);
+                    SetUpgrade(upgr_uac_CCAttack     ,1);
+                    if(map_NeedTransport)then
+                      SetUpgrade(upgr_uac_Transport  ,1);
+                    SetUpgrade(upgr_uac_DronTurret   ,1);
+                    SetUpgrade(upgr_uac_TerAAWeapon  ,1);
 
-                   for i:=1 to aip_MaxUpgradeLevel do
-                   begin
-                      SetUpgrade(upgr_uac_UnitSightR ,i);
-                      SetUpgrade(upgr_uac_DistDamage ,i);
-                      SetUpgrade(upgr_uac_BioArmor   ,i);
-                      SetUpgrade(upgr_uac_MechArmor  ,i);
-                      SetUpgrade(upgr_uac_RepairTools,i);
-                      SetUpgrade(upgr_uac_MechSpeed  ,i);
-                      SetUpgrade(upgr_uac_BuildArmor ,i);
-                   end;
-                end;
+                    for i:=1 to aip_MaxUpgradeLevel do
+                    begin
+                       SetUpgrade(upgr_uac_UnitSightR ,i);
+                       SetUpgrade(upgr_uac_DistDamage ,i);
+                       SetUpgrade(upgr_uac_BioArmor   ,i);
+                       SetUpgrade(upgr_uac_MechArmor  ,i);
+                       SetUpgrade(upgr_uac_RepairTools,i);
+                       SetUpgrade(upgr_uac_MechSpeed  ,i);
+                       SetUpgrade(upgr_uac_BuildArmor ,i);
+                    end;
+                 end;
 
-                SetUpgrade(upgr_uac_DistDamage  +g_random(21),aip_MaxUpgradeLevel);
-             end;
-     end;
+                 SetUpgrade(upgr_uac_DistDamage  +g_random(21),aip_MaxUpgradeLevel);
+              end;
+      end;
+
+      case upgrid of
+      upgr_hell_Spectre,
+      upgr_hell_TotemInvis,
+      upgr_uac_CommandoInvis: if(not ai_useInvis)then upgrid:=0;
+      end;
+
+      if(upgrid>0)then
+        unit_ProdStartUpgrade(pFroge,upgrid,false);
+   end;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

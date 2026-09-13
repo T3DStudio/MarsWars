@@ -142,10 +142,12 @@ gs_paused4             = 4;
 gs_paused5             = 5;
 gs_paused6             = 6;   }
 gs_paused7             = 7;
+{$IFDEF _FULLGAME}
 gs_replayend           = 10;
 gs_replayerror         = 11;
 gs_replaypause         = 12;
 gs_waitserver          = 13;
+{$ENDIF}
 gs_waitplayers         = 14;
 gs_win_team0           = 20; // 0
 {gs_win_team1           = 21;
@@ -182,7 +184,6 @@ str_gcaption           = 'MarsWars: HELL & UAC';
 str_wcaption           : shortstring = str_gcaption+', '+str_version+#0;
 str_copyright          : shortstring = 'TGA[T3DStudio] (c) 2016-2026';
 str_ps_ttl             : char = '?';
-str_ps_Me              : char = '>';
 b2c                    : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
@@ -270,29 +271,6 @@ lmt_invalid_Target     = 69;
 lmt_Invalid_Order      = 70;
 lmt_other_UACStrike    = 71;
 lmt_other_UACScan      = 72;
-
-lmts_menu_chat         = [
-                          lmt_chat_player0..
-                          lmt_chat_player7,
-                          lmt_chat_local,
-                          lmt_game_message,
-                          lmt_game_end,
-                          lmt_game_ReadyToStart,
-                          lmt_game_BreakStarting,
-                          lmt_game_StartsIn,
-                          lmt_game_ResetIn,
-                          lmt_game_Paused,
-                          lmt_game_Resumed,
-                          lmt_player_connected,
-                          lmt_player_leave,
-                          lmt_player_timeout,
-                          lmt_player_defeated,
-                          lmt_player_revealed,
-                          lmt_player_surrender,
-                          lmt_player_ready,
-                          lmt_player_nready
-                         ];
-lmts_last_events       = [1..255];
 
 lmt_argt_unit          = 0;
 lmt_argt_upgrade       = 1;
@@ -485,17 +463,19 @@ aif_base_BuilderMove   : cardinal = 1 shl 4;
 aif_base_DefendOwn     : cardinal = 1 shl 5;
 aif_base_DefendAlly    : cardinal = 1 shl 6;
 aif_army_scout         : cardinal = 1 shl 7;
-aif_army_early_attack0 : cardinal = 1 shl 8; // 'scout' attack
-aif_army_early_attack1 : cardinal = 1 shl 9; // 'early minimum group' attack
-aif_army_smart_order   : cardinal = 1 shl 10;
-aif_army_smart_micro   : cardinal = 1 shl 11;
-aif_army_smart_Target  : cardinal = 1 shl 12;
-aif_upgr_smart_order   : cardinal = 1 shl 13;
-aif_ability_detection  : cardinal = 1 shl 14;
-aif_ability_other      : cardinal = 1 shl 15;
-aif_ability_TowerRush  : cardinal = 1 shl 16;
-aif_cheat_VisBuildings : cardinal = 1 shl 17;
-aif_cheat_VisUnits     : cardinal = 1 shl 18;
+aif_army_scoutAggr     : cardinal = 1 shl 8;
+aif_army_early_attack0 : cardinal = 1 shl 9;  // 'scout' attack
+aif_army_early_attack1 : cardinal = 1 shl 10; // 'early minimum group' attack
+aif_army_smart_order   : cardinal = 1 shl 11;
+aif_army_smart_micro   : cardinal = 1 shl 12;
+aif_army_smart_Target  : cardinal = 1 shl 13;
+aif_upgr_smart_order   : cardinal = 1 shl 14;
+aif_ability_detection  : cardinal = 1 shl 15;
+aif_ability_other      : cardinal = 1 shl 16;
+aif_ability_TowerRush  : cardinal = 1 shl 17;
+aif_ability_invis      : cardinal = 1 shl 18;
+aif_cheat_VisBuildings : cardinal = 1 shl 19;
+aif_cheat_VisUnits     : cardinal = 1 shl 20;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -939,7 +919,7 @@ KeyPointLifeClientXC   = (60*20)/KeyPointLifeClientMax;
 
 keyPoint_CTime_Def_Sec = ptimeh;
 keyPoint_CTime_Def_Tick= fr_fps1*keyPoint_CTime_Def_Sec;
-keyPoint_CTime_Gen_Tick= fr_fps1*ptime1;
+keyPoint_CTime_Gen_Tick= fr_fps1*ptimeh;
 keyPoint_CTime_KotH_Sec= ptime3;
 keyPoint_CTime_KotH_Tick= fr_fps1*keyPoint_CTime_KotH_Sec;
 keyPoint_DefR          = 100;
@@ -1343,6 +1323,7 @@ dead_time              = -hits_dead;
 char_detect            = #7;
 
 spr_upgrade_icons      = 22;
+str_ps_Me              : char = '>';
 
 MaxUnitGroups          = 9;
 
@@ -1582,6 +1563,30 @@ ui_SysMessagesLast     = ui_SysMessagesMax;
 uambt_self             = -257;
 uambt_sightR           = -258;
 uambt_Blizzard         = -259;
+
+// log
+lmts_menu_chat         = [
+                          lmt_chat_player0..
+                          lmt_chat_player7,
+                          lmt_chat_local,
+                          lmt_game_message,
+                          lmt_game_end,
+                          lmt_game_ReadyToStart,
+                          lmt_game_BreakStarting,
+                          lmt_game_StartsIn,
+                          lmt_game_ResetIn,
+                          lmt_game_Paused,
+                          lmt_game_Resumed,
+                          lmt_player_connected,
+                          lmt_player_leave,
+                          lmt_player_timeout,
+                          lmt_player_defeated,
+                          lmt_player_revealed,
+                          lmt_player_surrender,
+                          lmt_player_ready,
+                          lmt_player_nready
+                         ];
+lmts_last_events       = [1..255];
 
 ////////////////////////////////////////////////////////////////////////////////
 //

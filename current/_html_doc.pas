@@ -33,7 +33,7 @@ begin
      htmldoc_UID1Spr:=uid_SpriteModel[0]=uid_SpriteModel[LastUnitLevel];
 end;
 
-function htmldoc_UIDImg(uid:byte):shortstring;
+function htmldoc_UIDImg(uid:byte):UTF8String;
 var  l:byte;
 titels:shortstring;
 begin
@@ -52,11 +52,11 @@ begin
       end;
    end;
 end;
-function htmldoc_UIDBTN(uid:byte):shortstring;
+function htmldoc_UIDBTN(uid:byte):UTF8String;
 begin
    htmldoc_UIDBTN :='<img style="border:1px solid #666666" src="'+str_htmldoc_unitBTN+b2s(uid)+str_htmldoc_img_ext+'" title="'+lang_UTF81b2b(g_uids [uid].uid_str_name) +'">';
 end;
-function htmldoc_UpgrBTN(uid:byte):shortstring;
+function htmldoc_UpgrBTN(uid:byte):UTF8String;
 begin
    htmldoc_UpgrBTN:='<img style="border:1px solid #666666" src="'+str_htmldoc_upgrBTN+b2s(uid)+str_htmldoc_img_ext+'" title="'+lang_UTF81b2b(g_upgrs[uid].upgr_str_name)+'">';
 end;
@@ -289,7 +289,7 @@ begin
        begin
           writeln(html_f,'<tr><td align="center" style="width: 100px;">');
           //writeln(html_f,'<b>',uid_str_name,'</b><br><br>');
-          htmldoc_WriteLn(htmldoc_UIDBTN(uid));
+          writeln(html_f,htmldoc_UIDBTN(uid));
           writeln(html_f,'</td><td>');
 
           htmldoc_WriteLn('<center><b>'+uid_str_name+'</b></center>');
@@ -322,7 +322,7 @@ begin
        if(upgr_max>0)then
        begin
            writeln(html_f,'<tr><td align="center" style="width: 100px;">');
-           htmldoc_WriteLn(htmldoc_UpgrBTN(uid));
+           writeln(html_f,htmldoc_UpgrBTN(uid));
            writeln(html_f,'</td><td>');
 
            htmldoc_WriteLn('<center><b>'+upgr_str_name+'</b></center>');

@@ -322,7 +322,6 @@ begin
    ui_panel_CTabIActs[tcc_controls,MPos(13)]:=iAct_Control_USelArmy;
    ui_panel_CTabIActs[tcc_controls,MPos(15)]:=iAct_Control_MarkLook;
    ui_panel_CTabIActs[tcc_controls,MPos(16)]:=iAct_Control_MarkAttack;
-   ui_panel_CTabIActs[tcc_controls,MPos(22)]:=iAct_Control_ScoreBoard;
 
    ui_panel_CTabIActs[tcc_replay  ,MPos(0 )]:=iAct_Replay_Fast;
    ui_panel_CTabIActs[tcc_replay  ,MPos(1 )]:=iAct_Replay_Pause;
@@ -344,7 +343,6 @@ begin
    ui_panel_CTabIActs[tcc_replay  ,MPos(18)]:=iAct_Replay_Player5;
    ui_panel_CTabIActs[tcc_replay  ,MPos(19)]:=iAct_Replay_Player6;
    ui_panel_CTabIActs[tcc_replay  ,MPos(20)]:=iAct_Replay_Player7;
-   ui_panel_CTabIActs[tcc_replay  ,MPos(22)]:=iAct_Control_ScoreBoard;
 
    ui_panel_CTabIActs[tcc_observer,MPos(0 )]:=iAct_Observer_Fog;
    ui_panel_CTabIActs[tcc_observer,MPos(1 )]:=iAct_Observer_POV;
@@ -359,9 +357,6 @@ begin
    ui_panel_CTabIActs[tcc_observer,MPos(10)]:=iAct_Observer_Player7;
    ui_panel_CTabIActs[tcc_observer,MPos(12)]:=iAct_Control_MarkLook;
    ui_panel_CTabIActs[tcc_observer,MPos(13)]:=iAct_Control_MarkAttack;
-
-   ui_panel_CTabIActs[tcc_observer,MPos(22)]:=iAct_Control_ScoreBoard;
-
 end;
 
 procedure iActSetDisabled(iAct:byte;isdisabled:boolean);
@@ -1235,8 +1230,9 @@ begin
                     end;
       mf_CtrlPanel: ui_ControlPanel_click(pct_left,@clickSound);     // panel
       mf_MenuPause: case m_btnN of
-                    0 : ui_ExecInGameAction(iAct_InGameMenu ,pct_left,@clickSound);
-                    2 : ui_ExecInGameAction(iAct_InGamePause,pct_left,@clickSound);
+                    0 : ui_ExecInGameAction(iAct_InGameMenu        ,pct_left,@clickSound);
+                    1 : ui_ExecInGameAction(iAct_Control_ScoreBoard,pct_left,@clickSound);
+                    2 : ui_ExecInGameAction(iAct_InGamePause       ,pct_left,@clickSound);
                     end;
       end;
       if(m_UnitTargetP<>nil)
@@ -1329,13 +1325,13 @@ begin
    if(ui_ScoresShow)then
      if(InputActionPressed(iAct_Any))
      and(not InputActionReleased(iact_Screenshot))then
-     if(g_type=gt_scirmish)
-     then ui_ToggleShowScores
-     else
-     begin
-        ui_ExecInGameAction(iAct_InGameMenu,pct_left,@clickSound);
-        exit;
-     end;
+       if(g_type=gt_scirmish)
+       then ui_ToggleShowScores
+       else
+       begin
+          ui_ExecInGameAction(iAct_InGameMenu,pct_left,@clickSound);
+          exit;
+       end;
 
    if (not m_DragCamMove)
    and(not ui_playerPOV)
@@ -1398,6 +1394,10 @@ begin
    // pause
    if(InputActionPressed(iAct_InGamePause))then
      ui_ExecInGameAction(iAct_InGamePause,pct_left,@clickSound);
+
+   // Scoreboard
+   if(InputActionPressed(iAct_Control_ScoreBoard))then
+     ui_ExecInGameAction(iAct_Control_ScoreBoard,pct_left,@clickSound);
 
    // other ngame actions
    if(ui_InGameChat=0)then

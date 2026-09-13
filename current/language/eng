@@ -503,7 +503,9 @@ str_name[UID_HTeleport]         = 'Teleport'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Altar of Pain'
 str_dscr[UID_HAltar]            = 'Uses "' + str_ui_HellPower + '" to perform special abilities. '
-                                  'Generates "' + str_ui_HellPower + '". ' + str_hint_MaxQuantity + str_scirmish_MaxHAltar
+                                  'Generates "' + str_ui_HellPower + '": 1 building gives '+str_HellPower_Add1+' pres sec., 2 - '
+                                  str_HellPower_Add2+', 3 - '+str_HellPower_Add3+'. '
+                                  str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Hell Command Center'
 str_dscr[UID_HCommandCenter]    = 'Corrupted Command Center'
 str_name[UID_HACommandCenter]   = 'Advanced Hell Command Center'
@@ -651,7 +653,7 @@ str_dscr[uab_SphereInvis]        = 'Makes target invisible for '+str_invis_time_
 str_name[uab_SphereInvuln]       = 'Invulnerability Sphere'
 str_dscr[uab_SphereInvuln]       = 'Makes target invulnerable for '+str_invuln_time_sec+' seconds'
 str_name[uab_SphereRDamage]      = 'Damage Resistance Sphere'
-str_dscr[uab_SphereRDamage]      = 'Halves damage to the target for '+str_rdamage_time_sec+' seconds.'
+str_dscr[uab_SphereRDamage]      = 'Halves damage to the target for '+str_rdamage_time_sec+' seconds. Makes the target immune to the PainState effect.'
 str_name[uab_SphereDDamage]      = 'Double Damage Sphere'
 str_dscr[uab_SphereDDamage]      = 'Doubles the target`s damage for '+str_ddamage_time_sec+' seconds.'
 str_name[uab_SphereTurbo]        = 'Turbo Sphere'
@@ -665,11 +667,11 @@ str_name[uab_Hack]               = 'System Hack'
 str_dscr[uab_Hack]               = 'Valid targets: completed enemy UAC buildings. Turns the target to your side. There must be at least one UAC unit allied with you around the target'
 str_name[uab_UACCCLand]          = 'Land/Take-off'
 str_dscr[uab_UACCCLand]          = ''
-str_name[uab_UACCCLandTo]        = 'Land/Take-off to point'
+str_name[uab_UACCCLandTo]        = 'Land to point'
 str_dscr[uab_UACCCLandTo]        = ''
-str_name[uab_HellCCLand]         = 'Land/Take-off'
+str_name[uab_HellCCLand]         = str_name[uab_UACCCLand]
 str_dscr[uab_HellCCLand]         = ''
-str_name[uab_HellCCLandTo]       = 'Land/Take-off to point'
+str_name[uab_HellCCLandTo]       = str_name[uab_UACCCLandTo]
 str_dscr[uab_HellCCLandTo]       = ''
 str_name[uab_Unload]             = 'Unload'
 str_dscr[uab_Unload]             = ''
@@ -678,9 +680,9 @@ str_dscr[uab_UnloadTo]           = ''
 str_name[uab_HSpecter]           = 'Specter'
 str_dscr[uab_HSpecter]           = 'Permanent invisibility'
 str_name[uab_HStealth]           = 'Stealth Technology'
-str_dscr[uab_HStealth]           = 'Permanent invisibility'
+str_dscr[uab_HStealth]           = str_dscr[uab_HSpecter]
 str_name[uab_HHTShroud]          = 'Shroud of Horror'
-str_dscr[uab_HHTShroud]          = 'Permanent invisibility'
+str_dscr[uab_HHTShroud]          = str_dscr[uab_HSpecter]
 str_name[uab_HT2TNoCD]           = 'Portal link'
 str_dscr[uab_HT2TNoCD]           = 'If the destination is another Teleport, the teleportation occurs without cooldown'
 str_name[uab_UAASplash]          = 'Ainti-air Fragmentation Missiles'
@@ -718,10 +720,12 @@ str_name[uab_ToUFactory]         = str_tmp1+str_name[UID_UFactory]
 str_dscr[uab_ToUFactory]         = str_tmp2
 str_name[uab_ToUWeaponFactory]   = str_tmp1+str_name[UID_UWeaponFactory] 
 str_dscr[uab_ToUWeaponFactory]   = str_tmp2
+str_tmp2 = 'Upgrades the "'
+str_tmp3 = '" to lower its ability reload time'
 str_name[uab_LvlUpURadar]        = str_tmp1+'"+str_name[UID_URadar]+"'
-str_dscr[uab_LvlUpURadar]        = 'Upgrades the +'"+str_name[UID_URadar]+"'+ to lower its ability reload time'
+str_dscr[uab_LvlUpURadar]        = str_tmp2+str_name[UID_URadar]+str_tmp3
 str_name[uab_LvlUpURMStation]    = str_tmp1+'"+str_name[UID_URMStation]+"'
-str_dscr[uab_LvlUpURMStation]    = 'Upgrades the +'"+str_name[UID_URMStation]+"'+ to lower its ability reload time'
+str_dscr[uab_LvlUpURMStation]    = str_tmp2+str_name[UID_URMStation]+str_tmp3
      
 /////////////////////////////////////////////////////////////////////////////
 //  UPGRADES
@@ -771,8 +775,8 @@ str_dscr[upgr_hell_TowerR]         = 'Increases the range for '+str_tmp1
 str_name[upgr_hell_TowerBlink]     = str_name[uab_HTowerBlink]
 str_dscr[upgr_hell_TowerBlink]     = 'Unlocks "'+str_name[uab_HTowerBlink]+'" ability for '+str_tmp1
 str_name[upgr_hell_Resurrect]      = 'Resurrection'
-str_dscr[upgr_hell_Resurrect]      = 'Unlocks ArchVile`s resurrection weapon'
-str_name[upgr_hell_FTowerAMech]    = 'Cacodemon`s Nest '
+str_dscr[upgr_hell_Resurrect]      = 'Unlocks resurrection weapon for '+str_name[UID_Archvile]+' unit'
+str_name[upgr_hell_FTowerAMech]    = 'Cacodemon`s Nest'
 str_dscr[upgr_hell_FTowerAMech]    = 'Anti-['+str_attr_mech+'] weapon for '+str_name[UID_HFTower]
 str_name[upgr_uac_DistDamage]      = 'Weapons Upgrade'
 str_dscr[upgr_uac_DistDamage]      = 'Increases the damage of ranged attacks for all UAC units and defensive structures'
@@ -797,7 +801,7 @@ str_name[upgr_uac_BuilderR]        = 'Builder Range Upgrade'
 str_dscr[upgr_uac_BuilderR]        = 'Increases range of sight for '+str_tmp1
 str_name[upgr_uac_DronTurret]      = 'Drone Transformation Protocol'
 str_tmp1=str_UnitsNamesList([UID_UATurret,UID_UGTurret])
-str_dscr[upgr_uac_DronTurret]      = 'Drone can rebuild to '+str_tmp1+'; turrets can transform to Drone'
+str_dscr[upgr_uac_DronTurret]      = str_name[UID_UACDron]+' can rebuild to '+str_tmp1+'; turrets can transform to '+str_name[UID_UACDron]
 str_name[upgr_uac_UnitSightR]      = 'Light Amplification Visors'
 str_dscr[upgr_uac_UnitSightR]      = 'Increases the sight range of all UAC units'
 str_name[upgr_uac_CommandoInvis]   = str_name[uab_HStealth]
@@ -809,9 +813,9 @@ str_dscr[upgr_uac_MechSpeed]       = 'Increases the movement speed of all Factor
 str_name[upgr_uac_MechArmor]       = 'Mech Combat Armor Upgrade'
 str_dscr[upgr_uac_MechArmor]       = 'Increases the armor of all Factory`s units'
 str_name[upgr_uac_TerAAWeapon]     = 'Anti-air Weapon'
-str_dscr[upgr_uac_TerAAWeapon]     = 'Anti-air weapon for Terminator'
+str_dscr[upgr_uac_TerAAWeapon]     = 'Anti-air weapon for '+str_name[UID_Terminator]
 str_name[upgr_uac_Transport]       = 'Dropship Upgrade'
-str_dscr[upgr_uac_Transport]       = 'Increases the capacity of Dropship'
+str_dscr[upgr_uac_Transport]       = 'Increases the capacity of '+str_name[UID_UTransport]
 str_name[upgr_uac_RadarR]          = 'Radar Upgrade'
 str_dscr[upgr_uac_RadarR]          = 'Increases radar scanning radius and range of sight'
 str_name[upgr_uac_TurretPlasma]    = 'Anti-ground Plasmagun'
@@ -840,80 +844,80 @@ str_dscr[iAct_Control_UDestroy]    = 'Self-destruction'
 str_dscr[iAct_Control_USelBase]    = 'Select all builders'
 str_dscr[iAct_Control_USelArmy]    = 'Select all not busy battle units; "not busy battle units" criterias:'+tc_nl+
                                      '- alive, completed, can attack, can move, NOT ['+str_attr_building+'];'+tc_nl+
-                                     '- no "Patrol" or "Stop, '+str_tmp1+'" orders;'+tc_nl+
+                                     '- no "Patrol, *" or "'+str_dscr[iAct_Control_UStop]+'" orders;'+tc_nl+
                                      '- no order to use an ability;'+tc_nl+
                                      '- no order to teleport or transport;'
 
 str_dscr[iAct_Control_MarkLook]    = 'Map mark: look here'
 str_dscr[iAct_Control_MarkAttack]  = 'Map mark: attack here'
-str_dscr[iAct_Control_ScoreBoard]  = 'Scoreboard'
+str_dscr[iAct_Control_ScoreBoard]  = 'toggle scoreboard'
 
 str_dscr[iAct_InGamePause]         = 'Pause'
 str_dscr[iAct_InGameMenu]          = 'Menu'
 
-str_dscr[iAct_Replay_Fast]         = 'Faster game speed'
-str_dscr[iAct_Replay_Pause]        = 'Pause'
-str_dscr[iAct_Replay_Back2]        = 'Rewind 2 seconds'
-str_dscr[iAct_Replay_Back10]       = 'Rewind 10 seconds'
-str_dscr[iAct_Replay_Back60]       = 'Rewind 60 seconds'
-str_dscr[iAct_Replay_Forward2]     = 'Fast forward 2 seconds'
-str_dscr[iAct_Replay_Forward10]    = 'Fast forward 10 seconds'
-str_dscr[iAct_Replay_Forward60]    = 'Fast forward 60 seconds'
-str_dscr[iAct_Replay_POV]          = 'Player-recorder POV'
-str_dscr[iAct_Replay_Log]          = 'List of game messages'
-str_dscr[iAct_Replay_Fog]          = 'Fog of war'
-str_dscr[iAct_Replay_PlayerAll]    = 'All players'
-str_dscr[iAct_Replay_Player0]      = 'Player #1'
-str_dscr[iAct_Replay_Player1]      = 'Player #2'
-str_dscr[iAct_Replay_Player2]      = 'Player #3'
-str_dscr[iAct_Replay_Player3]      = 'Player #4'
-str_dscr[iAct_Replay_Player4]      = 'Player #5'
-str_dscr[iAct_Replay_Player5]      = 'Player #6'
-str_dscr[iAct_Replay_Player6]      = 'Player #7'
-str_dscr[iAct_Replay_Player7]      = 'Player #8'
+str_dscr[iAct_Replay_Fast]         = 'toggle faster game speed'
+str_dscr[iAct_Replay_Pause]        = str_dscr[iAct_InGamePause]+' playback'
+str_dscr[iAct_Replay_Back2]        = 'rewind 2 seconds'
+str_dscr[iAct_Replay_Back10]       = 'rewind 10 seconds'
+str_dscr[iAct_Replay_Back60]       = 'rewind 60 seconds'
+str_dscr[iAct_Replay_Forward2]     = 'fast forward 2 seconds'
+str_dscr[iAct_Replay_Forward10]    = 'fast forward 10 seconds'
+str_dscr[iAct_Replay_Forward60]    = 'fast forward 60 seconds'
+str_dscr[iAct_Replay_POV]          = 'toggle player-recorder POV'
+str_dscr[iAct_Replay_Log]          = 'toggle display of game messages list'
+str_dscr[iAct_Replay_Fog]          = 'toggle fog of war'
+str_dscr[iAct_Replay_PlayerAll]    = 'set vision of all players'
+str_dscr[iAct_Replay_Player0]      = 'set vision of player #1'
+str_dscr[iAct_Replay_Player1]      = 'set vision of player #2'
+str_dscr[iAct_Replay_Player2]      = 'set vision of player #3'
+str_dscr[iAct_Replay_Player3]      = 'set vision of player #4'
+str_dscr[iAct_Replay_Player4]      = 'set vision of player #5'
+str_dscr[iAct_Replay_Player5]      = 'set vision of player #6'
+str_dscr[iAct_Replay_Player6]      = 'set vision of player #7'
+str_dscr[iAct_Replay_Player7]      = 'set vision of player #8'
 
-str_dscr[iAct_Observer_Fog]        = 'Fog of war'
-str_dscr[iAct_Observer_POV]        = 'Player POV'
-str_dscr[iAct_Observer_PlayerAll]  = 'All players'
-str_dscr[iAct_Observer_Player0]    = 'Player #1'
-str_dscr[iAct_Observer_Player1]    = 'Player #2'
-str_dscr[iAct_Observer_Player2]    = 'Player #3'
-str_dscr[iAct_Observer_Player3]    = 'Player #4'
-str_dscr[iAct_Observer_Player4]    = 'Player #5'
-str_dscr[iAct_Observer_Player5]    = 'Player #6'
-str_dscr[iAct_Observer_Player6]    = 'Player #7'
-str_dscr[iAct_Observer_Player7]    = 'Player #8'
+str_dscr[iAct_Observer_Fog]        = str_dscr[iAct_Replay_Fog]
+str_dscr[iAct_Observer_POV]        = 'toggle current player POV'
+str_dscr[iAct_Observer_PlayerAll]  = str_dscr[iAct_Replay_PlayerAll]
+str_dscr[iAct_Observer_Player0]    = str_dscr[iAct_Replay_Player0]
+str_dscr[iAct_Observer_Player1]    = str_dscr[iAct_Replay_Player1]
+str_dscr[iAct_Observer_Player2]    = str_dscr[iAct_Replay_Player2]
+str_dscr[iAct_Observer_Player3]    = str_dscr[iAct_Replay_Player3]
+str_dscr[iAct_Observer_Player4]    = str_dscr[iAct_Replay_Player4]
+str_dscr[iAct_Observer_Player5]    = str_dscr[iAct_Replay_Player5]
+str_dscr[iAct_Observer_Player6]    = str_dscr[iAct_Replay_Player6]
+str_dscr[iAct_Observer_Player7]    = str_dscr[iAct_Replay_Player7]
 
 
 /////////////////////////////////////////////////////////////////////////////
 //  MENU HINTS
 
 menu_110_descr  = ': change AI skill'
-menu_111_descr  = ': change AI skill'
-menu_112_descr  = ': change AI skill'
-menu_113_descr  = ': change AI skill'
-menu_114_descr  = ': change AI skill'
-menu_115_descr  = ': change AI skill'
-menu_116_descr  = ': change AI skill'
-menu_117_descr  = ': change AI skill'
+menu_111_descr  = menu_110_descr
+menu_112_descr  = menu_110_descr
+menu_113_descr  = menu_110_descr
+menu_114_descr  = menu_110_descr
+menu_115_descr  = menu_110_descr
+menu_116_descr  = menu_110_descr
+menu_117_descr  = menu_110_descr
 
 menu_120_descr  = ': jump to this slot'
-menu_121_descr  = ': jump to this slot'
-menu_122_descr  = ': jump to this slot'
-menu_123_descr  = ': jump to this slot'
-menu_124_descr  = ': jump to this slot'
-menu_125_descr  = ': jump to this slot'
-menu_126_descr  = ': jump to this slot'
-menu_127_descr  = ': jump to this slot'
+menu_121_descr  = menu_120_descr
+menu_122_descr  = menu_120_descr
+menu_123_descr  = menu_120_descr
+menu_124_descr  = menu_120_descr
+menu_125_descr  = menu_120_descr
+menu_126_descr  = menu_120_descr
+menu_127_descr  = menu_120_descr
 
 menu_130_descr  = ': add/remove AI Player'
-menu_131_descr  = ': add/remove AI Player'
-menu_132_descr  = ': add/remove AI Player'
-menu_133_descr  = ': add/remove AI Player'
-menu_134_descr  = ': add/remove AI Player'
-menu_135_descr  = ': add/remove AI Player'
-menu_136_descr  = ': add/remove AI Player'
-menu_137_descr  = ': add/remove AI Player'
+menu_131_descr  = menu_130_descr
+menu_132_descr  = menu_130_descr
+menu_133_descr  = menu_130_descr
+menu_134_descr  = menu_130_descr
+menu_135_descr  = menu_130_descr
+menu_136_descr  = menu_130_descr
+menu_137_descr  = menu_130_descr
 
 menu_183_descr  = ': generators life time'
 menu_184_descr  = ': select for edition/make random value'
@@ -924,7 +928,7 @@ menu_184_descr  = ': select for edition/make random value'
 DocHelp_Credits = 
 tc_orange+str_gcaption+tc_default+' - is a real-time strategy game based on Doom 2 universe. Current version is '+str_version+'.'
 tc_docbr
-'Project leader and developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.'
+'Project`s author and developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.'
 tc_docbr
 'Sources: www.github.com/T3DStudio/MarsWars'
 'Web site: www.t3dstudio.ru'
@@ -976,7 +980,7 @@ tc_orange+'CAMERA MOVEMENT'+tc_default+tc_doccpt
 tc_docbr
 'Possible ways to move the game camera include:'
 tc_docbr+'- using keyboard arrow keys;'
-tc_docbr+'- clicking and holding the "'+iAct_3_hk+'";'
+tc_docbr+'- moving the mouse while holding down the "'+iAct_3_hk+'";'
 tc_docbr+'- moving the cursor to the edges of the screen (this option can be enabled or disabled in the game settings).'
 tc_docbr+'The speed of camera movement can be adjusted in the game settings.'
 tc_docbr
@@ -1018,10 +1022,10 @@ tc_docbr
 DocHelp_HotKeyAction = 
 tc_orange+'COMMON HOTKEYS'+tc_default+tc_doccpt
 tc_docbr
-HK_InGameChat       +'in-game chat(common)'
-HK_InGameChatAll    +'in-game chat(to all players)'   
-HK_InGameChatAllies +'in-game chat(to allied players)'
-HK_InGamePause      +'toggle pause(multiplayer)'
+HK_InGameChatAll    +'open in-game chat(to all players)'   
+HK_InGameChatAllies +'open in-game chat(to allied players)'
+HK_InGameChat       +'in-game chat(send message)'
+HK_InGamePause      +'toggle pause(multiplayer game)'
 HK_InGameMenu       +'toggle menu'
 HK_Tab              +'switch control panel tab' 
 HK_ScreenShot       +'make *'+fileExt_Scrshot+' screenshot'
@@ -1064,27 +1068,27 @@ tc_docbr
 tc_docbr
 tc_orange+'REPLAY PLAYBACK HOTKEYS'+tc_default+tc_doccpt
 tc_docbr
-HK_Replay_Fast       +'toggle uncapped FPS(faster game speed)' 
-HK_Replay_Pause      +'pause playback'    
-HK_Replay_Back60     +'rewind 60 seconds' 
-HK_Replay_Back10     +'rewind 10 seconds' 
-HK_Replay_Back2      +'rewind 2 seconds'  
-HK_Replay_Forward2   +'fast forward 2 seconds' 
-HK_Replay_Forward10  +'fast forward 10 seconds'
-HK_Replay_Forward60  +'fast forward 60 seconds'
-HK_Replay_POV        +'toggle player-recorder POV'  
-HK_Replay_Log        +'toggle list of game messages'
-HK_Replay_Fog        +'toggle fog of war' 
-HK_Replay_PlayerAll  +'set all players vision'
-HK_Replay_Players    +'set player vision'
+HK_Replay_Fast       +str_dscr[iAct_Replay_Fast]
+HK_Replay_Pause      +str_dscr[iAct_Replay_Pause]  
+HK_Replay_Back60     +str_dscr[iAct_Replay_Back60]
+HK_Replay_Back10     +str_dscr[iAct_Replay_Back10]
+HK_Replay_Back2      +str_dscr[iAct_Replay_Back2]  
+HK_Replay_Forward2   +str_dscr[iAct_Replay_Forward2] 
+HK_Replay_Forward10  +str_dscr[iAct_Replay_Forward10]
+HK_Replay_Forward60  +str_dscr[iAct_Replay_Forward60]
+HK_Replay_POV        +str_dscr[iAct_Replay_POV] 
+HK_Replay_Log        +str_dscr[iAct_Replay_Log]
+HK_Replay_Fog        +str_dscr[iAct_Replay_Fog]
+HK_Replay_PlayerAll  +str_dscr[iAct_Replay_PlayerAll]
+HK_Replay_Players    +str_dscr[iAct_Replay_Player0]+'..'+str_dscr[iAct_Replay_Player7]
 tc_docbr
 tc_docbr
 tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt
 tc_docbr
-HK_Observer_Fog      +'toggle fog of war' 
-HK_Observer_POV      +'toggle player POV' 
-HK_Observer_PlayerAll+'set all players vision'
-HK_Observer_Players  +'set player vision'
+HK_Observer_Fog      +str_dscr[iAct_Observer_Fog]
+HK_Observer_POV      +str_dscr[iAct_Observer_POV]
+HK_Observer_PlayerAll+str_dscr[iAct_Observer_PlayerAll]
+HK_Observer_Players  +str_dscr[iAct_Observer_Player0]+'..'+str_dscr[iAct_Observer_Player7]
 tc_docbr
 tc_docbr
 tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt
@@ -1165,7 +1169,11 @@ tc_orange+'MAP SCENARIOS'+tc_default+tc_doccpt
 tc_docbr
 '* '+str_map_ScenarioL[mc_ffa3]+'-'+str_map_ScenarioL[mc_ffa8]+' - several free-for-all scenarios for different numbers of players; players team numbers can be changed.'
 tc_docbr+'* '+str_map_ScenarioL[mc_1x1]+' - a classic 1x1 scenario;'
-tc_docbr+'* '+str_map_ScenarioL[mc_2x2]+','+str_map_ScenarioL[mc_3x3]+','+str_map_ScenarioL[mc_4x4]+','+str_map_ScenarioL[mc_2x2x2]+','+str_map_ScenarioL[mc_2x2x2x2]+' - various team skirmish; players team numbers cannot be changed;'
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2]
+tc_docbr+'* '+str_map_ScenarioL[mc_3x3]
+tc_docbr+'* '+str_map_ScenarioL[mc_4x4]
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2x2]
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2x2x2]+' - various team skirmish; players team numbers cannot be changed;'
 tc_docbr+str_ui_objectives+':'
 tc_docbr+str_objective_Scirmish
 tc_docbr+'* '+str_map_ScenarioL[mc_KeyPoints]+' - a tactical scenario in which players must capture '+str_keyPoint_mcN+' moving key points(see "'+str_help_ImgKeyPoints+'").'
@@ -1184,12 +1192,12 @@ tc_docbr+str_or
 tc_docbr+str_objective_Scirmish
 tc_docbr
 tc_docbr
-tc_orange+'NEUTRAL GENERATORS'+tc_default+tc_doccpt
+tc_orange+'GENERATORS'+tc_default+tc_doccpt
 tc_docbr
-'Neutral generators (see "'+str_help_ImgGenerators+'") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of neutral generators:'
+'Generators (see "'+str_help_ImgGenerators+'") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of generators:'
 tc_docbr+'- "Starter" generator - appears at players base in "Scirmish" game. Required at least '+str_map_generators_LimitS+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyS+'.'
 tc_docbr+'- "Normal" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
-tc_docbr+'Both types of neutral generators requires holding units inside it, otherwise generator become back to neutral state.'
+tc_docbr+'Both types of generators requires holding units inside it, otherwise generator become back to neutral state.'
 tc_docbr
 tc_docbr
 tc_orange+'RESOURCES'+tc_default+tc_doccpt
@@ -1202,7 +1210,7 @@ tc_docbr+'- The main resource of the game is the "'+str_ui_EnergyLevel+'". Almos
 tc_docbr
 tc_docbr+'There are also 2 additional types of resources used for special technologies and abilities:'
 tc_docbr+'- '+str_ui_HellPower+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.'
-'The replenishment rate increases with each additional "Altar of Pain", but constructing more than '+str_scirmish_MaxHAltar+' "Altars of Pain" does not provide any further benefit. '
+'The replenishment rate increases with each additional "Altar of Pain". '
 'When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.'
 str_hint_MaxQuantity+str_HellPower_Max+'. '
 tc_docbr+'- '+str_ui_UACLoot+' - this resource is acquired by both factions through the destruction of enemy UAC units and buildings. '+str_hint_MaxQuantity+str_UACLoot_Max+'.'
@@ -1230,14 +1238,14 @@ tc_docbr
 tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;'
 tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and takes a third less damage;'
 tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;'
-tc_docbr+'- '+str_attr_Decay   +' - unit is under "Decay Aura" effect; it slowly lose health;'
-tc_docbr+'- '+str_attr_HVision +' - unit is under "Hell Vision" effect; it can see invisible enemy units;'
-tc_docbr+'- '+str_attr_SSoul   +' - unit is under "Soul Sphere" effect; it`s regaining it health;'
-tc_docbr+'- '+str_attr_SInvuln +' - unit is under "Invulnerability Sphere" effect; it is immune to any damage;'
-tc_docbr+'- '+str_attr_SInvis  +' - unit is under "Invisibility Sphere" effect; it invisibile;'
-tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage and resist to "pain state" effect;'
-tc_docbr+'- '+str_attr_SDDamage+' - unit is under "Double Damage Sphere" effect; it deals double damage;'
-tc_docbr+'- '+str_attr_STurbo  +' - unit is under "Turbo Sphere" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.'
+tc_docbr+'- '+str_attr_Decay   +' - unit is under "'+str_name[uab_HKeepAura]+'" effect; it slowly lose health;'
+tc_docbr+'- '+str_attr_HVision +' - unit is under "'+str_name[uab_HEyeVision]+'" effect; it can see invisible enemy units;'
+tc_docbr+'- '+str_attr_SSoul   +' - unit is under "'+str_name[uab_SphereSoul]+'" effect; it`s regaining it health;'
+tc_docbr+'- '+str_attr_SInvuln +' - unit is under "'+str_name[uab_SphereInvuln]+'" effect; it is immune to any damage;'
+tc_docbr+'- '+str_attr_SInvis  +' - unit is under "'+str_name[uab_SphereInvis]+'" effect; it invisibile;'
+tc_docbr+'- '+str_attr_SRDamage+' - unit is under "'+str_name[uab_SphereRDamage]+'" effect; it takes half damage and resist to "pain state" effect;'
+tc_docbr+'- '+str_attr_SDDamage+' - unit is under "'+str_name[uab_SphereDDamage]+'" effect; it deals double damage;'
+tc_docbr+'- '+str_attr_STurbo  +' - unit is under "'+str_name[uab_SphereTurbo]+'" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.'
 tc_docbr
 tc_docbr
 tc_orange+'PAIN STATE'+tc_default+tc_doccpt
@@ -1247,8 +1255,8 @@ tc_docbr
 tc_docbr
 tc_orange+'VETERAN SYSTEM'+tc_default+tc_doccpt
 tc_docbr
-'All combat units gain combat experience and increase their level. All units spawn at level 1 and can be upgraded to level 4. With each new level, the unit increases its damage, armor, and pain threshold.'
-'The time in combat required to reach the next level varies for each type of unit(see "'+str_help_UnitsInfo+'" section).'
+'All combat units gain combat experience and increase their level. All units spawn at level 1 and can be upgraded to level 4. With each new level, the unit increases its damage, armor, regeneration and pain threshold.'
+'Each unit type has its own next-level time and its own bonuses to characteristics (see section "'+str_help_UnitsInfo+'").'
 tc_docbr
 tc_docbr
 tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt
@@ -1288,15 +1296,15 @@ tc_docbr
 tc_docbr
 tc_orange+'AI BOT SKILL LEVELS'+tc_default+tc_doccpt
 tc_docbr
-tc_docbr+'AI1 - the easiest bot; AI9 - the the hardest.'
-tc_docbr+'AI1-5 - bot operates under the same conditions as a player-human; there are no unfair advantages and it does not ignore the fog of war; '
+tc_docbr+str_ps_AI+'1 - the easiest bot; '+str_ps_AI+'9 - the the hardest.'
+tc_docbr+str_ps_AI+'1-5 - bot operates under the same conditions as a player-human; there are no unfair advantages and it does not ignore the fog of war; '
 'the difference is various size of army, super weapon or "magic" using, some micro-control abilities and build-order.'
-tc_docbr+'AI3+ - there is a chance of an early attack by a small group of units.'
-tc_docbr+'AI4+ - there is a chance of an super early attack by a first unit.'
-tc_docbr+'AI6 - AI5 + building construction speed is doubled.'
-tc_docbr+'AI7 - AI6 + upgrades production speed is doubled.'
-tc_docbr+'AI8 - AI7 + unit production speed is doubled.'
-tc_docbr+'AI9 - AI8 + bot can see enemy units or buildings, ignoring fog of war.'
+tc_docbr+str_ps_AI+'3+ - there is a chance of an early attack by a small group of units.'
+tc_docbr+str_ps_AI+'4+ - there is a chance of an super early attack by a first unit.'
+tc_docbr+str_ps_AI+'6 - '+str_ps_AI+'5 plus building construction speed is doubled.'
+tc_docbr+str_ps_AI+'7 - '+str_ps_AI+'6 plus upgrades production speed is doubled.'
+tc_docbr+str_ps_AI+'8 - '+str_ps_AI+'7 plus unit production speed is doubled.'
+tc_docbr+str_ps_AI+'9 - '+str_ps_AI+'8 plus bot can see enemy units or buildings, ignoring fog of war.'
 
 /////////////////////////////////////////////////////////////////////////////
 //  CAMPAING STRINGS

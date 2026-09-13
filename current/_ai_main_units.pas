@@ -459,10 +459,10 @@ begin
                                            if(group=aic_group_GenWait)
                                            then group:=aic_group_GenAssault;
           aic_group_GenGuard       : if(ai_generator_d=NOTSET)
-                                     then group:=aic_group_Home
+                                     then group:=aic_group_AttackNow
                                      else
                                        if(ai_energy_future>=aip_MaxEnergy)and(ai_generator_d<=ai_generator_kp^.kp_RCapture)and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit)
-                                       then group:=aic_group_Home
+                                       then group:=aic_group_AttackNow
                                        else
                                          if(ai_generator_d>srange)
                                          or((ai_generator_kp^.kp_Zone<>mapZone)and(not isfly))
@@ -570,9 +570,14 @@ begin
                                           end;
                                      end;
       aic_group_Scout          : begin
-                                    uo_id:=ua_move;
-                                    if(ai_enemy_battle_u<>nil)and(ai_enemy_battle_d<base_r1)
-                                    then ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d)
+                                    if((aip_flags and aif_army_scoutAggr)>0)
+                                    then uo_id:=ua_amove
+                                    else uo_id:=ua_move;
+                                    if(ai_enemy_battle_u<>nil)and(ai_enemy_battle_d<base_r1)then
+                                    begin
+                                       ai_RunFrom(pu,ai_enemy_battle_u,0,0,ai_enemy_battle_d);
+                                       uo_id:=ua_move;
+                                    end
                                     else
                                       if(ai_KeyPoint_d>srange)
                                       then ai_DefaultIdle(pu)
@@ -631,7 +636,7 @@ begin
               then uo_tar:=ai_enemy_Primary_u^.unum;
          end;
 
-         if((aip_flags and aif_ability_other)>0)then ai_AbilitiesCommon(pu);
+         if((aip_flags and aif_ability_other)>0)then ai_AbilitiesOther(pu);
       end;
 
      { if(isselected)then

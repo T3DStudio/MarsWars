@@ -688,83 +688,84 @@ begin
                                 ss_PanelW-1,
                                 ss_PanelH-1,c_ltgray);
 
-    draw_text(ui_ScoresSurf,ss_PanelWh,font_wh          ,str_action_hint[iAct_Control_ScoreBoard],ta_MU,255,c_white);
-    draw_text(ui_ScoresSurf,ss_PanelWh,ss_PanelH-font_wh,str_menuMsg_HintImg                     ,ta_MB,255,c_white);
+   draw_text(ui_ScoresSurf,ss_PanelWh,font_wh          ,str_action_hint[iAct_Control_ScoreBoard],ta_MU,255,c_white);
+   draw_text(ui_ScoresSurf,ss_PanelWh,ss_PanelH-font_wh,str_menuMsg_HintImg                     ,ta_MB,255,c_white);
 
-    tx:=font_wh+ss_LeftCaptionsW;
-    ty:=font_wh+ss_UpCaptionsH+ss_LineHh;
+   tx:=font_wh+ss_LeftCaptionsW;
+   ty:=font_wh+ss_UpCaptionsH+ss_LineHh;
 
-    for i:=0 to psc_Last do
-    begin
-       draw_text(ui_ScoresSurf,tx,ty,str_ScoreBoardC[i],ta_RU,255,c_white);
-       ty+=ss_LineH;
-    end;
-    for i:=0 to psi_Last do
-    begin
-       draw_text(ui_ScoresSurf,tx,ty,str_ScoreBoardI[i],ta_RU,255,c_white);
-       ty+=ss_LineH;
-    end;
+   for i:=0 to psc_Last do
+   begin
+      draw_text(ui_ScoresSurf,tx,ty,str_ScoreBoardC[i],ta_RU,255,c_white);
+      ty+=ss_LineH;
+   end;
+   for i:=0 to psi_Last do
+   begin
+      draw_text(ui_ScoresSurf,tx,ty,str_ScoreBoardI[i],ta_RU,255,c_white);
+      ty+=ss_LineH;
+   end;
 
-    odd:=true;
-    for p:=0 to LastPlayer do
-      with g_PlayersScore[p] do
-        if(ps_state>0)then
-        begin
-           tx+=ss_PlayerSecWh;
-           ty:=font_wh+ss_UpCaptionH;
-           if(g_PlayersGame[p].isdefeated)
-           then t:=(length(ps_name)*font_w1) div 2
-           else t:=0;
-           if(ps_team<=LastPlayer)
-           then tstr:=b2s(ps_team+1)
-           else tstr:='?';
-           case ps_race of
-           r_hell: tstr+=tc_RankHell;
-           r_uac : tstr+=tc_RankUAC;
-           else    tstr+='?'
-           end;
+   odd:=true;
+   for p:=0 to LastPlayer do
+     with g_PlayersScore[p] do
+       if(ps_state>0)then
+       begin
+          tx+=ss_PlayerSecWh;
+          ty:=font_wh+ss_UpCaptionH;
+          if(g_PlayersGame[p].isdefeated)
+          then t:=(length(ps_name)*font_w1) div 2
+          else t:=0;
+          {if(ps_team<=LastPlayer)
+          then tstr:=b2s(ps_team+1)
+          else tstr:='?';
+          case ps_race of
+          r_hell: tstr+=tc_RankHell;
+          r_uac : tstr+=tc_RankUAC;
+          else    tstr+='?'
+          end; }
+          tstr:=ui_TeamRace(ps_team,ps_race);
 
-           if(not odd)then ty+=ss_LineHh;
-           draw_text(ui_ScoresSurf,tx,ty,tstr+ps_name+'  ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
-           if(t>0)then
-             lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
-           if(odd)then ty+=ss_LineHh;
+          if(not odd)then ty+=ss_LineHh;
+          draw_text(ui_ScoresSurf,tx,ty,tstr+ps_name+'  ',ta_MU,255,PlayerColorsSchemeCurNormal[p]);
+          if(t>0)then
+            lineColor(ui_ScoresSurf,tx-t,ty+font_wh,tx+t,ty+font_wh,c_red);
+          if(odd)then ty+=ss_LineHh;
 
-           ty+=ss_LineH;
-           odd:=not odd;
+          ty+=ss_LineH;
+          odd:=not odd;
 
-           for i:=0 to psc_Last do
-           begin
-              color:=c_white;
-              if(maxval_c[i]<>minval_c[i])then
-                if(minval_c[i]=ps_data_c[i])
-                then color:=c_gray
-                else
-                  if(maxval_c[i]=ps_data_c[i])
-                  then color:=c_yellow;
+          for i:=0 to psc_Last do
+          begin
+             color:=c_white;
+             if(maxval_c[i]<>minval_c[i])then
+               if(minval_c[i]=ps_data_c[i])
+               then color:=c_gray
+               else
+                 if(maxval_c[i]=ps_data_c[i])
+                 then color:=c_yellow;
 
-              if(i<>psc_InGameTime)
-              then draw_text (ui_ScoresSurf,tx,ty,c2s(ps_data_c[i]),ta_MU,255,color)
-              else
-                if(ps_data_c[i]=0)
-                then draw_text (ui_ScoresSurf,tx,ty,'-'         ,ta_MU,255   ,color)
-                else draw_timer(ui_ScoresSurf,tx,ty,ps_data_c[i],ta_MU,255,'',color);
-              ty+=ss_LineH;
-           end;
-           for i:=0 to psi_Last do
-           begin
-              color:=c_white;
-              if(maxval_i[i]<>minval_i[i])then
-                if(minval_i[i]=ps_data_i[i])
-                then color:=c_gray
-                else
-                  if(maxval_i[i]=ps_data_i[i])
-                  then color:=c_yellow;
+             if(i<>psc_InGameTime)
+             then draw_text (ui_ScoresSurf,tx,ty,c2s(ps_data_c[i]),ta_MU,255,color)
+             else
+               if(ps_data_c[i]=0)
+               then draw_text (ui_ScoresSurf,tx,ty,'-'         ,ta_MU,255   ,color)
+               else draw_timer(ui_ScoresSurf,tx,ty,ps_data_c[i],ta_MU,255,'',color);
+             ty+=ss_LineH;
+          end;
+          for i:=0 to psi_Last do
+          begin
+            color:=c_white;
+             if(maxval_i[i]<>minval_i[i])then
+               if(minval_i[i]=ps_data_i[i])
+               then color:=c_gray
+               else
+                 if(maxval_i[i]=ps_data_i[i])
+                 then color:=c_yellow;
 
-              draw_text(ui_ScoresSurf,tx,ty,li2s(ps_data_i[i]),ta_MU,255,color);
-              ty+=ss_LineH;
-           end;
-        end;
+             draw_text(ui_ScoresSurf,tx,ty,li2s(ps_data_i[i]),ta_MU,255,color);
+             ty+=ss_LineH;
+          end;
+       end;
 
    tsurf:=ui_ScoresSurf;
    t:=round((vid_vh-vid_minh)*0.5);

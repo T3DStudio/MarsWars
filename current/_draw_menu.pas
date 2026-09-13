@@ -838,7 +838,7 @@ else
 
    if(menu_hint_pos[menu_ItemTarget]>0)then
      with menu_items[menu_hint_pos[menu_ItemTarget]] do
-       draw_text(tar,mi_x1-font_w1,mi_y0-font_wh,drawmenu_ItemActsStr+str_menu_hint[menu_ItemTarget],ta_RB,255,c_white);
+       draw_text(tar,mi_x1-font_w1,mi_y0-font_wq,drawmenu_ItemActsStr+str_menu_hint[menu_ItemTarget],ta_RB,255,c_white);
 end;
 
 procedure draw_MenuBoxes(tar:pSDL_surface);

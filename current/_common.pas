@@ -185,14 +185,6 @@ begin
    else ct2s:=0;
 end;
 
-procedure STRADD(s:pshortstring;ad,sep:shortstring);
-begin
-   if(length(ad)>0)then
-     if(length(s^)=0)
-     then s^:=ad
-     else s^:=s^+sep+ad;
-end;
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   basic math
@@ -1480,7 +1472,7 @@ false : if(units_unitProds_c<=0)then begin unit_CheckReqs:=lmt_unit_NeedProdUnit
       if(uid_req_UACLoot  >0)and(res_UACLoot  <uid_req_UACLoot  )then begin unit_CheckReqs:=lmt_Req_UACLoot;  exit;end;
 
       if(uid_isbuilding and(res_energyl_max<=0))
-      or(res_energyl_cur<0)then begin unit_CheckReqs:=lmt_Req_Energy;exit;end;
+      or((uid_req_EnergyLevel>0)and(res_energyl_cur<0))then begin unit_CheckReqs:=lmt_Req_Energy;exit;end;
 
       if(uid_req_EnergyLevel>0)then
         case(state=ps_AI)and(uid_isbuilder)of
@@ -1717,6 +1709,15 @@ begin
    writeln(mess);
    {$ENDIF}
    Close(f);
+end;
+
+
+procedure STRADD(s:pshortstring;ad,sep:shortstring);
+begin
+   if(length(ad)>0)then
+     if(length(s^)=0)
+     then s^:=ad
+     else s^:=s^+sep+ad;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1982,6 +1983,17 @@ end;
 //
 //   UI
 //
+
+function ui_TeamRace(team,race:byte):string4;
+begin
+   ui_TeamRace:='';
+   if(team<=LastPlayer)then ui_TeamRace+=b2s(team+1);
+   case race of
+   r_hell: ui_TeamRace+=tc_RankHell;
+   r_uac : ui_TeamRace+=tc_RankUAC;
+   else    ui_TeamRace+='?'
+   end;
+end;
 
 function RectInCam(x,y,hw,hh,s:integer):boolean;
 begin

@@ -237,7 +237,8 @@ begin
       begin
          if(tu^.buffs[ub_SphereInvuln]<=0)then
          begin
-            if(tu^.iscomplete)then
+            if (tu^.iscomplete)
+            and(tu^.transformTimer<=0)then
             begin
                // enemy
                if(not tu^.isfly)
@@ -256,7 +257,10 @@ begin
                if(tu^.uid^.uid_isbuilding)and(pfcheck)then
                  if(not tu^.isfly)
                  or(isattackable)then setNearestTarget(@ai_enemy_build_u,@ai_enemy_build_d,ud);
-               if(tu^.uid^.uid_CanAttack)then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
+               if(tu^.uid^.uid_CanAttack)then
+                 if((    isfly)and(tu^.uid^.uid_CanAttackAir   ))
+                 or((not isfly)and(tu^.uid^.uid_CanAttackGround))
+                 then setNearestTarget(@ai_enemy_battle_u,@ai_enemy_battle_d,ud);
             end;
 
             // invis enemy in vision

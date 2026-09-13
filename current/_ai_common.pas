@@ -39,7 +39,8 @@ ai_flags_BaseAOther,
 ai_earlyAttack,
 ai_available_HKeep,
 ai_HaveTransport,
-ai_SmartTarget
+ai_SmartTarget,
+ai_useInvis
                      : boolean;
 
 ai_generator_kp,
@@ -298,7 +299,7 @@ end;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure ai_SetBaseOpt(aplayer:byte;aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxSuper,aMaxAttackLimit,aMaxArmyLimit,aAttackPause,aDetectionPause,aSpecialPause:integer);
+procedure ai_SetBaseOpt(aplayer:byte;aMaxEnergy,aMaxBuilders,aMaxBarracks,aMaxForges,aMaxDetectors,aMinTowers,aMaxTowers,aMaxSuper,aMaxAttackLimit,aMaxArmyLimit,aAttackPause,aDetectionPause,aMagicPause,aSuperPause:integer);
 begin
    with g_PlayersGame[aplayer] do
    begin
@@ -313,9 +314,9 @@ begin
       aip_MaxAttackLimit   :=aMaxAttackLimit*ul1;
       aip_MaxUnitLimit     :=aMaxArmyLimit*ul1;
       aip_pause_attack     :=fr_fps1*aAttackPause;
-      aip_pause_detection  :=max2i(fr_fps1,fr_fps1*aDetectionPause);
-      aip_pause_magic      :=max2i(fr_fps1,fr_fps1*aSpecialPause  );
-      aip_pause_superweapon:=max2i(fr_fps1,fr_fps1*aSpecialPause  );
+      aip_pause_detection  :=fr_fps1*aDetectionPause;
+      aip_pause_magic      :=fr_fps1*aMagicPause;
+      aip_pause_superweapon:=fr_fps1*aSuperPause;
 
       if(aip_MaxAttackLimit<aic_keyPoint_LimitMin)then aip_MaxAttackLimit:=aic_keyPoint_LimitMin;
       if(aip_MaxUnitLimit  <aic_keyPoint_LimitMax)then aip_MaxUnitLimit  :=aic_keyPoint_LimitMax;
@@ -332,13 +333,13 @@ begin
 
       case aip_skill of
       //                   energy buil bar   forges dete  min   max       army        pause
-      //                          ders racks        ctors tower tower     atta  max   atta det  spec
-      0  : ai_SetBaseOpt(p,0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0    ,0   ,0   ,0   );
-      1  : ai_SetBaseOpt(p,1000  ,1   ,2    ,0     ,0    ,2    ,2    ,0  ,5    ,15   ,240 ,120 ,240 );
-      2  : ai_SetBaseOpt(p,3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,15   ,35   ,180 ,90  ,180 );
-      3  : ai_SetBaseOpt(p,6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,50   ,55   ,60  ,30  ,120 );
-      4  : ai_SetBaseOpt(p,7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,70   ,0   ,10  ,80  );
-      else ai_SetBaseOpt(p,9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,125  ,0   ,0   ,0   );
+      //                          ders racks        ctors tower tower     atta  max   atta det  magic  super
+      0  : ai_SetBaseOpt(p,0     ,0   ,0    ,0     ,0    ,0    ,0    ,0  ,0    ,0    ,0   ,-1  ,-1    ,-1 );
+      1  : ai_SetBaseOpt(p,1000  ,1   ,2    ,0     ,0    ,2    ,2    ,0  ,5    ,15   ,240 ,-1  ,-1    ,-1 );
+      2  : ai_SetBaseOpt(p,3000  ,2   ,5    ,1     ,3    ,6    ,6    ,0  ,15   ,35   ,180 ,90  ,-1    ,-1 );
+      3  : ai_SetBaseOpt(p,6000  ,3   ,12   ,3     ,8    ,6    ,10   ,1  ,45   ,50   ,60  ,40  ,90    ,210);
+      4  : ai_SetBaseOpt(p,7500  ,4   ,16   ,4     ,10   ,6    ,12   ,2  ,70   ,70   ,0   ,10  ,60    ,90 );
+      else ai_SetBaseOpt(p,9400  ,4   ,20   ,6     ,12   ,6    ,14   ,3  ,125  ,125  ,0   ,0   ,0     ,0  );
       end;
 
       if(aip_skill>1)
@@ -358,9 +359,11 @@ begin
                      +aif_base_advanceOther
                      +aif_base_advanceMain
                      +aif_ability_detection
+                     +aif_ability_other
                      +aif_base_DefendOwn
                      +aif_base_DefendAlly;
       4  : aip_flags:=aif_army_scout
+                     +aif_army_scoutAggr
                      +aif_army_smart_order
                      +aif_base_suicide
                      +aif_base_smart_order
@@ -369,6 +372,7 @@ begin
                      +aif_base_BuilderMove
                      +aif_ability_detection
                      +aif_ability_other
+                     +aif_ability_invis
                      +aif_base_DefendOwn
                      +aif_base_DefendAlly;
       else aip_flags:=aif_base_smart_order
@@ -377,12 +381,14 @@ begin
                      +aif_base_advanceMain
                      +aif_base_BuilderMove
                      +aif_army_scout
+                     +aif_army_scoutAggr
                      +aif_army_smart_order
                      +aif_army_smart_micro
                      +aif_army_smart_Target
                      +aif_upgr_smart_order
                      +aif_ability_detection
                      +aif_ability_other
+                     +aif_ability_invis
                      +aif_ability_TowerRush
                      +aif_base_DefendOwn
                      +aif_base_DefendAlly;
@@ -548,6 +554,8 @@ begin
       ai_HaveTransport     := (units_uid_c[UID_HTeleport]>0)or(units_uid_c[UID_UTransport]>0);
 
       ai_SmartTarget       :=((aip_flags and aif_army_smart_Target)>0)and(uid_CanAttack);
+
+      ai_useInvis          :=((aip_flags and aif_ability_invis)>0);
    end;
 
    FillChar(ai_GroupAll_ucount,SizeOf(ai_GroupAll_ucount),0);
@@ -1055,6 +1063,7 @@ begin
      or(aiu_alarm_d>srange)
      or(not newu^.uid^.uid_CanAttack and (newu^.buffs[ub_damaged]<=0))
      or(buffs[ub_SphereInvuln]>0)
+     or(not ai_useInvis)
      then exit;
 
    // scout or harrasment groups in first
@@ -1346,9 +1355,10 @@ begin
          //writeln(playerN,' pause=',aip_pause_attack,' timer=',aip_timer_attack,' - armyL=',armylimit,' maxLimitB=',aic_MaxLimitBorder,' : curLimitC=',units_bld_lc[false],' MaxUnitLimit=',aip_MaxUnitLimit);
          //writeln(aip_timer_detection);
          //writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
-         writeln(playerN,' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' aip_pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);
+         //writeln(playerN,' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' aip_pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);
         // writeln('aip_MaxUpgradeLevel=',aip_MaxUpgradeLevel,' isrevealed=',isrevealed);
-      end;  }
+         writeln('aip_timer_detection=',aip_timer_detection,' aip_timer_magic=',aip_timer_magic,' aip_timer_superweapon=',aip_timer_superweapon);
+      end;}
 
       if(aip_timer_detection  >0)then aip_timer_detection  -=1;
       if(aip_timer_magic      >0)then aip_timer_magic      -=1;

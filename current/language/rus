@@ -81,7 +81,7 @@ str_SG_HealthBars             = 'Полоски здоровья юнитов'
 str_SG_HealthBarsL[0]         = tc_lime  +'выбранные'+tc_default+' и '+tc_red+'поврежденные'+tc_default
 str_SG_HealthBarsL[1]         = tc_aqua  +'всегда'   +tc_default
 str_SG_HealthBarsL[2]         = tc_orange+'только '  +tc_lime+'выбранные'+tc_default
-str_SG_PlayersColor           = 'Цветовая схема игроков'
+str_SG_PlayersColor           = 'Изменить цвета игроков'
 str_SG_PlayersColorL[1]       = tc_lime  +'свои ' +tc_yellow+'союзн. '+tc_red+'враги'+tc_default
 str_SG_PlayersColorL[2]       = tc_white +'свои ' +tc_yellow+'союзн. '+tc_red+'враги'+tc_default
 str_SG_PlayersColorL[3]       = tc_white +'свои ' +tc_aqua  +'союзн. '+tc_red+'враги'+tc_default
@@ -423,7 +423,7 @@ str_doc_Size                  = 'Размер: '
 str_doc_BaseMSpeed            = 'Базовая скорость: '
 str_doc_Role                  = 'Функция юнита: '
 str_doc_Description           = 'Описание: '
-str_doc_PainC                 = 'Базовый болевой порог: '
+str_doc_PainC                 = 'Базовый порог "состояния боли": '
 str_doc_TransportSize         = 'Занимает мест в транспорте: '
 str_doc_TransportCpst         = 'Базовая транспортная вместимость: '
 str_doc_UpgrLevels            = 'Максимальный уровень: '
@@ -431,7 +431,7 @@ str_doc_UpgrAffectedUIDs      = 'Влияет на юнитов: '
 str_doc_LevelUpTime           = 'Время в бою до повышения уровня: '
 str_doc_LevelArmorBonus       = 'Доп. броня за уровень: '
 str_doc_LevelDamageBonus      = 'Доп. воздействие за уровень: '
-str_doc_LevelPainSBonus       = 'Доп. болевой порог за уровень: '
+str_doc_LevelPainSBonus       = 'Доп. порог "состояния боли" за уровень: '
 str_doc_LevelRegenBonus       = 'Доп. регенерация за уровень: '
 str_doc_BountyHellPower       = 'Дает Адской силы за уничтожение: '
 str_doc_BountyUACLoot         = 'Дает трофеев UAC за уничтожение: '
@@ -441,7 +441,7 @@ str_doc_DeathUnit             = 'Порождает юнита после сме
 str_doc_UpgrArmor             = 'Броня: '
 str_doc_UpgrRegen             = 'Регенерация: '
 str_doc_UpgrSpeed             = 'Скорость передвижения: '
-str_doc_UpgrPainS             = 'Болевой порог: '
+str_doc_UpgrPainS             = 'Порог "состояния боли": '
 str_doc_UpgrSightR            = 'Область зрения: '
 str_doc_UpgrTransport         = 'Транспортная вместимость: '
 str_doc_BalanceGood           = tc_lime+'Эффективен против'   +tc_default+':'
@@ -452,7 +452,7 @@ str_doc_RMB                   = tc_red +'ПКМ'+tc_white
 str_doc_MWH                   = tc_yellow+'Кол.мыши'+tc_white
 str_doc_NoteUnitBalance       = 'Внимание: эти данные вычисляются для "идеальных" условий, где юниты имеют все улучшения, '
                                 'не имеют никаких эффектов и без микро-контроля.'
-str_doc_NoteMaxBuilders       = 'Внимание: игроки не могут иметь больше чем '+str_PlayerMaxBuilders+' строителей'
+str_doc_NoteMaxBuilders       = 'Внимание: игроки не могут иметь больше '+str_PlayerMaxBuilders+' строителей'
 
 str_ScoreBoardC[psc_units_created]   = 'Юнитов создано'
 str_ScoreBoardC[psc_units_summoned]  = 'Юнитов призвано'
@@ -502,8 +502,10 @@ str_dscr[UID_HEye]              = 'Сооружение для детекции 
 str_name[UID_HTeleport]         = 'Телепорт'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Алтарь боли'
-str_dscr[UID_HAltar]            = 'Использует "' + str_ui_HellPower + '" для применения специальных способностей. '
-                                  'Генерирует "' + str_ui_HellPower + '". ' + str_hint_MaxQuantity + str_scirmish_MaxHAltar
+str_dscr[UID_HAltar]            = 'Использует ресурс "'+str_ui_HellPower+'" для применения специальных способностей. '
+                                  'Генерирует ресурс "'+str_ui_HellPower+'": 1 здание дает '+str_HellPower_Add1+' в сек., 2 - '
+                                  str_HellPower_Add2+', 3 - '+str_HellPower_Add3+'. '
+                                  str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Адский командный центр'
 str_dscr[UID_HCommandCenter]    = 'Проклятый командный центр'
 str_name[UID_HACommandCenter]   = 'Улучшенный адский командный центр'
@@ -512,51 +514,51 @@ str_name[UID_HBarracks]         = 'Зомби-бараки'
 str_dscr[UID_HBarracks]         = 'Проклятые бараки'
 str_name[UID_HMarker]           = 'Адский маркер'
 str_dscr[UID_HMarker]           = ''
-str_name[UID_LostSoul]          = 'Lost Soul'
-str_dscr[UID_LostSoul]          = str_hint_MaxQuantity + str_scirmish_MaxLost
-str_name[UID_Phantom]           = 'Phantom'
-str_dscr[UID_Phantom]           = str_hint_MaxQuantity + str_scirmish_MaxLost
-str_name[UID_Imp]               = 'Imp'
+str_name[UID_LostSoul]          = 'Потерянная душа'
+str_dscr[UID_LostSoul]          = str_hint_MaxQuantity+str_scirmish_MaxLost
+str_name[UID_Phantom]           = 'Фантом'
+str_dscr[UID_Phantom]           = str_hint_MaxQuantity+str_scirmish_MaxLost
+str_name[UID_Imp]               = 'Бес'
 str_dscr[UID_Imp]               = ''
-str_name[UID_Demon]             = 'Pinky Demon'
+str_name[UID_Demon]             = 'Демон'
 str_dscr[UID_Demon]             = ''
-str_name[UID_Cacodemon]         = 'Cacodemon'
+str_name[UID_Cacodemon]         = 'Какодемон'
 str_dscr[UID_Cacodemon]         = ''
-str_name[UID_Knight]            = 'Hell Knight'
+str_name[UID_Knight]            = 'Рыцарь Ада'
 str_dscr[UID_Knight]            = ''
-str_name[UID_Baron]             = 'Baron of Hell'
+str_name[UID_Baron]             = 'Барон Ада'
 str_dscr[UID_Baron]             = ''
-str_name[UID_Cyberdemon]        = 'Cyberdemon'
+str_name[UID_Cyberdemon]        = 'Кибердемон'
 str_dscr[UID_Cyberdemon]        = ''
-str_name[UID_Mastermind]        = 'Spider Mastermind'
+str_name[UID_Mastermind]        = 'Паук-предводитель'
 str_dscr[UID_Mastermind]        = ''
-str_name[UID_Pain]              = 'Pain Elemental'
+str_name[UID_Pain]              = 'Элементаль боли'
 str_dscr[UID_Pain]              = ''
-str_name[UID_Revenant]          = 'Revenant'
+str_name[UID_Revenant]          = 'Ревенант'
 str_dscr[UID_Revenant]          = ''
-str_name[UID_Mancubus]          = 'Mancubus'
+str_name[UID_Mancubus]          = 'Манкубус'
 str_dscr[UID_Mancubus]          = ''
-str_name[UID_Arachnotron]       = 'Arachnotron'
+str_name[UID_Arachnotron]       = 'Арахнотрон'
 str_dscr[UID_Arachnotron]       = ''
-str_name[UID_Archvile]          = 'Arch-Vile'
+str_name[UID_Archvile]          = 'Арчвайл'
 str_dscr[UID_Archvile]          = ''
-str_name[UID_ZMedic]            = 'Zombie Medic'
+str_name[UID_ZMedic]            = 'Зомби Медик'
 str_dscr[UID_ZMedic]            = ''
-str_name[UID_ZEngineer]         = 'Zombie Engineer'
+str_name[UID_ZEngineer]         = 'Зомби Инженер'
 str_dscr[UID_ZEngineer]         = ''
-str_name[UID_ZSergant]          = 'Zombie Shotguner'
+str_name[UID_ZSergant]          = 'Зомби Сержант'
 str_dscr[UID_ZSergant]          = ''
-str_name[UID_ZSSergant]         = 'Zombie SuperShotguner'
+str_name[UID_ZSSergant]         = 'Зомби Ст.Сержант'
 str_dscr[UID_ZSSergant]         = ''
-str_name[UID_ZCommando]         = 'Zombie Commando'
+str_name[UID_ZCommando]         = 'Зомби Коммандо'
 str_dscr[UID_ZCommando]         = ''
-str_name[UID_ZAntiaircrafter]   = 'Zombie Antiaircrafter'
+str_name[UID_ZAntiaircrafter]   = 'Зомби Зенитчик'
 str_dscr[UID_ZAntiaircrafter]   = ''
-str_name[UID_ZSiegeMarine]      = 'Zombie Siege Marine'
+str_name[UID_ZSiegeMarine]      = 'Осадной Зомби'
 str_dscr[UID_ZSiegeMarine]      = ''
-str_name[UID_ZFPlasmagunner]    = 'Zombie Plasmaguner'
+str_name[UID_ZFPlasmagunner]    = 'Летающий Зомби'
 str_dscr[UID_ZFPlasmagunner]    = ''
-str_name[UID_ZBFGMarine]        = 'Zombie BFG Marine'
+str_name[UID_ZBFGMarine]        = 'Зомби с BFG'
 str_dscr[UID_ZBFGMarine]        = ''
 str_name[UID_UCommandCenter]    = 'Командный центр'
 str_dscr[UID_UCommandCenter]    = ''
@@ -579,9 +581,9 @@ str_dscr[UID_UComputerStation]  = ''
 str_name[UID_URadar]            = 'Радар'
 str_dscr[UID_URadar]            = 'Раскрывает карту и обнаруживает невидимых юнитов'
 str_name[UID_UAcademy]          = 'Академия UAC'
-str_dscr[UID_UAcademy]          = 'Использует "' + str_ui_UACLoot + '" для применения специальных способностей'
+str_dscr[UID_UAcademy]          = 'Использует ресурс "' + str_ui_UACLoot + '" для применения специальных способностей'
 str_name[UID_UHPowerConductor]  = 'Проводник адской силы'
-str_dscr[UID_UHPowerConductor]  = 'Использует "' + str_ui_HellPower + '" для применения специальных способностей'
+str_dscr[UID_UHPowerConductor]  = 'Использует ресурс "' + str_ui_HellPower + '" для применения специальных способностей'
 str_name[UID_URMStation]        = 'Станция ракетного залпа'
 str_dscr[UID_URMStation]        = 'Позволяет наносить мощный ракетный удар'
 str_name[UID_Sergant]           = 'Сержант'
@@ -594,7 +596,7 @@ str_name[UID_Antiaircrafter]    = 'Зенитчик'
 str_dscr[UID_Antiaircrafter]    = ''
 str_name[UID_SiegeMarine]       = 'Осадной солдат'
 str_dscr[UID_SiegeMarine]       = ''
-str_name[UID_FPlasmagunner]     = 'Майор'
+str_name[UID_FPlasmagunner]     = 'Летающий солдат'
 str_dscr[UID_FPlasmagunner]     = ''
 str_name[UID_BFGMarine]         = 'Солдат с BFG'
 str_dscr[UID_BFGMarine]         = ''
@@ -614,7 +616,7 @@ str_name[UID_Flyer]             = 'Истребитель'
 str_dscr[UID_Flyer]             = ''
 
 BalanceHint_BFG                 = 'из-за урона по большой области - очень эффективен против больших групп ['+str_attr_bio+'] юнитов'
-BalanceHint_PainState           = 'из-за наличия эффекта "болевого порога" может быть уязвим против частых атак'
+BalanceHint_PainState           = 'из-за наличия "состояния боли" может быть уязвим против частых атак'
 
 /////////////////////////////////////////////////////////////////////////////
 //  ABILITIES
@@ -628,11 +630,12 @@ str_dscr[uab_Recall]             = 'Перемещает цель к телеп�
 str_name[uab_UACScan]            = 'Сканирование'
 str_dscr[uab_UACScan]            = 'Раскрывает юнитов (включая невидимые) в указаной области в течении '+str_detection_time_sec+' сек.'
 str_name[uab_UACStrike]          = 'Ракетный удар'
-str_dscr[uab_UACStrike]          = 'Запускает ракету, которая наносит '+tc_red+UACStrike_base_damage+tc_default+' урона(размер взрыва: '+UACStrike_size+','+str_uarm_SplashDamageR+UACStrike_base_SplashR+')'+str_uarm_Factor+UACStrike_dm_RSMShot
+str_dscr[uab_UACStrike]          = 'Запускает ракету, которая наносит '+tc_red+UACStrike_base_damage+tc_default+' урона(размер взрыва: '+UACStrike_size+','+str_uarm_SplashDamageR+UACStrike_base_SplashR+')'
+                                   str_uarm_Factor+UACStrike_dm_RSMShot
                                    '. Внимание: применение способности раскрывает здание для всех игроков на '+UACStrike_Revealing_sec+' сек.'
 str_name[uab_HEyeSpawn]          = 'Создать "'+str_name[UID_HEye]+'"'
 str_dscr[uab_HEyeSpawn]          = 'Создает "'+str_name[UID_HEye]+'" в указаной точке. Рядом с точкой должен быть хотя бы один союзный юнит Hell.'
-str_name[uab_HEyeVision]         = 'Адское зрение'
+str_name[uab_HEyeVision]         = 'Зрение злого глаза'
 str_dscr[uab_HEyeVision]         = 'Дает цели возможность видеть невидимых юнитов в течении '+str_detection_time_sec+' сек.'
 str_name[uab_HTowerBlink]        = 'Пространственный скачок'
 str_dscr[uab_HTowerBlink]        = 'Телепортация на короткую дистанцию'
@@ -646,47 +649,48 @@ str_name[uab_SpawnLostTo]        = 'Создавать "'+str_name[UID_LostSoul]
 str_dscr[uab_SpawnLostTo]        = ''
 str_name[uab_SphereSoul]         = 'Сфера души'
 str_dscr[uab_SphereSoul]         = 'Восстанавливает '+str_soul_maxHeal+' здоровья в течении '+str_soul_time_sec+' сек.'
-str_name[uab_SphereInvis]        = 'Invisibility Sphere'
-str_dscr[uab_SphereInvis]        = 'Makes target invisible for '+str_invis_time_sec+' seconds'
-str_name[uab_SphereInvuln]       = 'Invulnerability Sphere'
-str_dscr[uab_SphereInvuln]       = 'Makes target invulnerable for '+str_invuln_time_sec+' seconds'
-str_name[uab_SphereRDamage]      = 'Damage Resistance Sphere'
-str_dscr[uab_SphereRDamage]      = 'Halves damage to the target for '+str_rdamage_time_sec+' seconds.'
-str_name[uab_SphereDDamage]      = 'Double Damage Sphere'
-str_dscr[uab_SphereDDamage]      = 'Doubles the target`s damage for '+str_ddamage_time_sec+' seconds.'
-str_name[uab_SphereTurbo]        = 'Turbo Sphere'
-str_dscr[uab_SphereTurbo]        = 'Speeds up all target parameters by 2 times for '+str_dturbo_time_sec+' seconds.'
-str_name[uab_UACGeneral]         = 'UAC General Rank'
-str_dscr[uab_UACGeneral]         = 'Valid targets: non-heroic allied UAC units. Makes the target a "['+str_attr_heroic
-                                   ']", which increases the damage it deal by 1.5 times and reduces the damage it take by a third. There can be a maximum of '+str_UACGeneralsMax+' "['+str_attr_heroic+']" units in your army.'
-str_name[uab_Bribe]              = 'Bribe'
-str_dscr[uab_Bribe]              = 'Valid targets: non-heroic enemy UAC units. Turns the target to your side. There must be at least one UAC unit allied with you around the target'
-str_name[uab_Hack]               = 'System Hack'
-str_dscr[uab_Hack]               = 'Valid targets: completed enemy UAC buildings. Turns the target to your side. There must be at least one UAC unit allied with you around the target'
-str_name[uab_UACCCLand]          = 'Land/Take-off'
+str_name[uab_SphereInvis]        = 'Сфера невидимости'
+str_dscr[uab_SphereInvis]        = 'Делает цель невидимой на '+str_invis_time_sec+' сек.'
+str_name[uab_SphereInvuln]       = 'Сфера неуязвимости'
+str_dscr[uab_SphereInvuln]       = 'Делает цель неуязвимой на '+str_invuln_time_sec+' сек.'
+str_name[uab_SphereRDamage]      = 'Сфера сопротивления урону'
+str_dscr[uab_SphereRDamage]      = 'Уменьшает вдвое урон получаемый целью на '+str_rdamage_time_sec+' сек. Делает цель невосприимчивой к "состоянию боли".'
+str_name[uab_SphereDDamage]      = 'Сфера двойного урона'
+str_dscr[uab_SphereDDamage]      = 'Удваивает урон, наносимый целью на '+str_ddamage_time_sec+' сек.'
+str_name[uab_SphereTurbo]        = 'Турбо Сфера'
+str_dscr[uab_SphereTurbo]        = 'В 2 раза ускоряет все параметры цели на '+str_dturbo_time_sec+' сек.'
+str_name[uab_UACGeneral]         = 'Звание Генерала UAC'
+str_dscr[uab_UACGeneral]         = 'Допустимые цели: не-героические союзные юниты UAC. Выдает цели атрибут ['+str_attr_heroic
+                                   '], что в 1.5 раза увеличивает урон юнита и на 1/3 снижает получаемый им урон. Игрок не может иметь больше '+str_UACGeneralsMax+' юнитов с таким атрибутом одновременно.'
+str_name[uab_Bribe]              = 'Подкуп'
+str_tmp3  = 'Рядом с целью должен быть хотя бы один союзный юнит UAC.'
+str_dscr[uab_Bribe]              = 'Допустимые цели: не-героические вражеские юниты UAC. Переманивает цель на вашу сторону. '+str_tmp3
+str_name[uab_Hack]               = 'Взлом системы'
+str_dscr[uab_Hack]               = 'Допустимые цели: завершенные вражеские здания UAC. Переманивает цель на вашу сторону. '+str_tmp3
+str_name[uab_UACCCLand]          = 'Приземлиться/Взлететь'
 str_dscr[uab_UACCCLand]          = ''
-str_name[uab_UACCCLandTo]        = 'Land/Take-off to point'
+str_name[uab_UACCCLandTo]        = 'Приземлиться в точку'
 str_dscr[uab_UACCCLandTo]        = ''
-str_name[uab_HellCCLand]         = 'Land/Take-off'
+str_name[uab_HellCCLand]         = str_name[uab_UACCCLand]
 str_dscr[uab_HellCCLand]         = ''
-str_name[uab_HellCCLandTo]       = 'Land/Take-off to point'
+str_name[uab_HellCCLandTo]       = str_name[uab_UACCCLandTo]
 str_dscr[uab_HellCCLandTo]       = ''
-str_name[uab_Unload]             = 'Unload'
+str_name[uab_Unload]             = 'Выгрузить'
 str_dscr[uab_Unload]             = ''
-str_name[uab_UnloadTo]           = 'Unload to point'
+str_name[uab_UnloadTo]           = 'Выгрузить в точку'
 str_dscr[uab_UnloadTo]           = ''
-str_name[uab_HSpecter]           = 'Specter'
-str_dscr[uab_HSpecter]           = 'Permanent invisibility'
-str_name[uab_HStealth]           = 'Stealth Technology'
-str_dscr[uab_HStealth]           = 'Permanent invisibility'
-str_name[uab_HHTShroud]          = 'Shroud of Horror'
-str_dscr[uab_HHTShroud]          = 'Permanent invisibility'
-str_name[uab_HT2TNoCD]           = 'Portal link'
-str_dscr[uab_HT2TNoCD]           = 'If the destination is another Teleport, the teleportation occurs without cooldown'
-str_name[uab_UAASplash]          = 'Ainti-air Fragmentation Missiles'
-str_dscr[uab_UAASplash]          = 'Anti-air missiles do extra damage around the target'    
+str_name[uab_HSpecter]           = 'Призрак'
+str_dscr[uab_HSpecter]           = 'Постоянная невидимость'
+str_name[uab_HStealth]           = 'Стелс технология'
+str_dscr[uab_HStealth]           = str_dscr[uab_HSpecter]
+str_name[uab_HHTShroud]          = 'Облако ужаса'
+str_dscr[uab_HHTShroud]          = str_dscr[uab_HSpecter]
+str_name[uab_HT2TNoCD]           = 'Портальная связь'
+str_dscr[uab_HT2TNoCD]           = 'Если точка назначения Телепорта - другой Телепорт, перемещение будет происхолить без перезарядки'
+str_name[uab_UAASplash]          = 'Анти-воздушные осколочные снаряды'
+str_dscr[uab_UAASplash]          = 'Анти-воздушные снаряды наносят урон по площади'
 
-str_tmp1='Transform to '
+str_tmp1='Трансформироваться в '
 str_name[uab_ToHAKeep]           = str_tmp1+str_name[UID_HAKeep]                     
 str_dscr[uab_ToHAKeep]           = ''
 str_name[uab_ToHACommandCenter]  = str_tmp1+str_name[UID_HACommandCenter]                          
@@ -704,8 +708,8 @@ str_dscr[uab_ToUATurretTo]       = ''
 str_name[uab_ToUACDron]          = str_tmp1+str_name[UID_UACDron]                        
 str_dscr[uab_ToUACDron]          = ''
 
-str_tmp1='Advanced '
-str_tmp2='Simultaneous multiple production and increased armor'
+str_tmp1='Улучшенние для '
+str_tmp2='Дает возможность выполнять несколько одновременных производств и увеличивает защиту'
 str_name[uab_ToHGate]            = str_tmp1+str_name[UID_HGate]  
 str_dscr[uab_ToHGate]            = str_tmp2
 str_name[uab_ToHPools]           = str_tmp1+str_name[UID_HPools]  
@@ -718,235 +722,237 @@ str_name[uab_ToUFactory]         = str_tmp1+str_name[UID_UFactory]
 str_dscr[uab_ToUFactory]         = str_tmp2
 str_name[uab_ToUWeaponFactory]   = str_tmp1+str_name[UID_UWeaponFactory] 
 str_dscr[uab_ToUWeaponFactory]   = str_tmp2
+str_tmp2 = 'Улучшает здание, уменьшая время перезарядки способности'
 str_name[uab_LvlUpURadar]        = str_tmp1+'"+str_name[UID_URadar]+"'
-str_dscr[uab_LvlUpURadar]        = 'Upgrades the +'"+str_name[UID_URadar]+"'+ to lower its ability reload time'
+str_dscr[uab_LvlUpURadar]        = str_tmp2
 str_name[uab_LvlUpURMStation]    = str_tmp1+'"+str_name[UID_URMStation]+"'
-str_dscr[uab_LvlUpURMStation]    = 'Upgrades the +'"+str_name[UID_URMStation]+"'+ to lower its ability reload time'
+str_dscr[uab_LvlUpURMStation]    = str_tmp2
      
 /////////////////////////////////////////////////////////////////////////////
 //  UPGRADES
 
-str_name[upgr_hell_DistDamage1]    = 'Hell Firepower'
-str_dscr[upgr_hell_DistDamage1]    = 'Increases the damage of ranged attacks for '+str_upgr_hell_DistDamage1_uids
-str_name[upgr_hell_UnitArmor]      = 'Combat Flesh'
-str_dscr[upgr_hell_UnitArmor]      = 'Increases the armor of all Hell units'
-str_name[upgr_hell_BuildArmor]     = 'Stone Walls'
-str_dscr[upgr_hell_BuildArmor]     = 'Increases the armor of all Hell buildings'
-str_name[upgr_hell_MeleeDamage]    = 'Claws and Teeth'
-str_dscr[upgr_hell_MeleeDamage]    = 'Increases the damage of melee attacks'
-str_name[upgr_hell_Regeneration]   = 'Flesh Regeneration'
-str_dscr[upgr_hell_Regeneration]   = 'Health regeneration for all Hell units'
-str_name[upgr_hell_PainFactor]     = 'Pain Threshold'
-str_dscr[upgr_hell_PainFactor]     = 'Hell units can take more hits before being stunned by pain'
-str_name[upgr_hell_ADetection]     = 'Evil Eye Magic'
-str_dscr[upgr_hell_ADetection]     = 'Unlocks "'+str_name[uab_HEyeSpawn]+'" and "'+str_name[uab_HEyeVision]+'" abilities for '+str_name[UID_HEyeNest]
+str_name[upgr_hell_DistDamage1]    = 'Адский огонь'
+str_dscr[upgr_hell_DistDamage1]    = 'Увеличение урона дальних атак, наносимых юнитами '+str_upgr_hell_DistDamage1_uids
+str_name[upgr_hell_UnitArmor]      = 'Боевая шкура'
+str_dscr[upgr_hell_UnitArmor]      = 'Увеличение брони всех юнитов Hell'
+str_name[upgr_hell_BuildArmor]     = 'Каменные стены'
+str_dscr[upgr_hell_BuildArmor]     = 'Увеличение брони для всех зданий Hell'
+str_name[upgr_hell_MeleeDamage]    = 'Когти и клыки'
+str_dscr[upgr_hell_MeleeDamage]    = 'Увеличение урона ближнего боя для всех юнитов Hell'
+str_name[upgr_hell_Regeneration]   = 'Регенерация'
+str_dscr[upgr_hell_Regeneration]   = 'Активация и улучшение регенерации здоровья для всех юнитов Hell'
+str_name[upgr_hell_PainFactor]     = 'Болевой порог'
+str_dscr[upgr_hell_PainFactor]     = 'Юниты Hell могут выдержать больше ударов, прежде чем у них случится "состояние боли"'
+str_name[upgr_hell_ADetection]     = 'Магия Злого глаза'
+str_dscr[upgr_hell_ADetection]     = 'Активация способностей "'+str_name[uab_HEyeSpawn]+'" и "'+str_name[uab_HEyeVision]+'" для здания "'+str_name[UID_HEyeNest]+'"'
 str_tmp1=str_UnitsNamesList([UID_HKeep,UID_HAKeep])
 str_name[upgr_hell_HKeepShift]     = str_name[uab_HKeepShift]
-str_dscr[upgr_hell_HKeepShift]     = 'Charge of "'+str_name[uab_HKeepShift]+'" ability for '+str_tmp1
+str_dscr[upgr_hell_HKeepShift]     = 'Заряд для способности "'+str_name[uab_HKeepShift]+'" у зданий '+str_tmp1
 str_name[upgr_hell_DecayAura]      = str_name[uab_HKeepAura]
-str_dscr[upgr_hell_DecayAura]      = 'Unlocks "'+str_name[uab_HKeepAura]+'" ability for '+str_tmp1
-str_name[upgr_hell_BuilderR]       = 'Builder Range Upgrade'
-str_dscr[upgr_hell_BuilderR]       = 'Increases range of sight for '+str_tmp1
+str_dscr[upgr_hell_DecayAura]      = 'Активация способности "'+str_name[uab_HKeepAura]+'" у зданий '+str_tmp1
+str_name[upgr_hell_BuilderR]       = 'Улучшение строителей'
+str_dscr[upgr_hell_BuilderR]       = 'Увеличение области обзора и строительства для зданий '+str_tmp1
 str_name[upgr_hell_Spectre]        = str_name[uab_HSpecter]
-str_dscr[upgr_hell_Spectre]        = 'Pinky Demon becomes invisible'
-str_name[upgr_hell_UnitSightR]     = 'Hell Sight'
-str_dscr[upgr_hell_UnitSightR]     = 'Increases the sight range of all Hell units'
-str_name[upgr_hell_Phantoms]       = 'Phantoms'
-str_dscr[upgr_hell_Phantoms]       = 'Pain Elemental spawns Phantoms instead of Lost Soul'
-str_name[upgr_hell_DistDamage2]    = 'Demon`s Weapons'
-str_dscr[upgr_hell_DistDamage2]    = 'Increases the damage of ranged attacks for '+str_upgr_hell_DistDamage2_uids
-str_name[upgr_hell_TeleportCD]     = 'Teleport Upgrade'
-str_dscr[upgr_hell_TeleportCD]     = 'Reduces the cooldown of the Teleport ability'
+str_dscr[upgr_hell_Spectre]        = 'Демон становится невидимым'
+str_name[upgr_hell_UnitSightR]     = 'Адское зрение'
+str_dscr[upgr_hell_UnitSightR]     = 'Увеличение радиуса обзора и атаки для всех юнитов Hell'
+str_name[upgr_hell_Phantoms]       = 'Фантомы'
+str_dscr[upgr_hell_Phantoms]       = 'Элементаль боли создание Фантомов вместо Потерянных душ'
+str_name[upgr_hell_DistDamage2]    = 'Вооружение демонов'
+str_dscr[upgr_hell_DistDamage2]    = 'Увеличение урона дальних атак, наносимых юнитами '+str_upgr_hell_DistDamage2_uids
+str_name[upgr_hell_TeleportCD]     = 'Улучшение Телепорта'
+str_dscr[upgr_hell_TeleportCD]     = 'Уменьшение времени перезарядки Телепорта'
 str_name[upgr_hell_T2TNoCD]        = str_name[uab_HT2TNoCD]
 str_dscr[upgr_hell_T2TNoCD]        = str_dscr[uab_HT2TNoCD]
-str_name[upgr_hell_EvilEyeR]       = 'Evil Eye Upgrade'
-str_dscr[upgr_hell_EvilEyeR]       = 'Increases the sight range of Evil Eye'
+str_name[upgr_hell_EvilEyeR]       = 'Улучшение Злого глаза'
+str_dscr[upgr_hell_EvilEyeR]       = 'Увеличение радиуса обзора Злого глаза'
 str_name[upgr_hell_TotemInvis]     = str_name[uab_HHTShroud]
-str_dscr[upgr_hell_TotemInvis]     = 'Totem of Horror becomes invisible'
-str_name[upgr_hell_BuildRestore]   = 'Building Restoration'
-str_dscr[upgr_hell_BuildRestore]   = 'Health regeneration upgrade for all Hell buildings'
+str_dscr[upgr_hell_TotemInvis]     = 'Тотем ужаса становится невидимым'
+str_name[upgr_hell_BuildRestore]   = 'Самовосстановление зданий'
+str_dscr[upgr_hell_BuildRestore]   = 'Активация и улучшение регенерации здоровья для всех зданий Hell'
 str_tmp1=str_UnitsNamesList([UID_HFTower,UID_HTotem])
-str_name[upgr_hell_TowerR]         = 'Demonic Spirits'
-str_dscr[upgr_hell_TowerR]         = 'Increases the range for '+str_tmp1
+str_name[upgr_hell_TowerR]         = 'Демонические духи'
+str_dscr[upgr_hell_TowerR]         = 'Увеличение радиуса обзора и атаки для зданий '+str_tmp1
 str_name[upgr_hell_TowerBlink]     = str_name[uab_HTowerBlink]
-str_dscr[upgr_hell_TowerBlink]     = 'Unlocks "'+str_name[uab_HTowerBlink]+'" ability for '+str_tmp1
-str_name[upgr_hell_Resurrect]      = 'Resurrection'
-str_dscr[upgr_hell_Resurrect]      = 'Unlocks ArchVile`s resurrection weapon'
-str_name[upgr_hell_FTowerAMech]    = 'Cacodemon`s Nest '
-str_dscr[upgr_hell_FTowerAMech]    = 'Anti-['+str_attr_mech+'] weapon for '+str_name[UID_HFTower]
-str_name[upgr_uac_DistDamage]      = 'Weapons Upgrade'
-str_dscr[upgr_uac_DistDamage]      = 'Increases the damage of ranged attacks for all UAC units and defensive structures'
-str_name[upgr_uac_BioArmor]        = 'Infantry Combat Armor Upgrade'
-str_dscr[upgr_uac_BioArmor]        = 'Increases the armor of all Barrack`s units'
-str_name[upgr_uac_BuildArmor]      = 'Concrete Walls'
-str_dscr[upgr_uac_BuildArmor]      = 'Increases the armor of all UAC buildings'
-str_name[upgr_uac_RepairTools]     = 'Advanced Tools'
-str_dscr[upgr_uac_RepairTools]     = 'Increases repair/healing efficiency for '+str_UnitsNamesList([UID_Medic,UID_Engineer])
-str_name[upgr_uac_BioSpeed]        = 'Lightweight Armor'
-str_dscr[upgr_uac_BioSpeed]        = 'Increases the movement speed of all Barrack`s units'
-str_name[upgr_uac_SSMWeapon]       = 'Surface to Surface Missiles'
-str_dscr[upgr_uac_SSMWeapon]       = 'Anti-ground weapon for '+str_name[UID_Antiaircrafter]
+str_dscr[upgr_hell_TowerBlink]     = 'Активация способности "'+str_name[uab_HTowerBlink]+'" для зданий '+str_tmp1
+str_name[upgr_hell_Resurrect]      = 'Воскрешение'
+str_dscr[upgr_hell_Resurrect]      = 'Активация способности юнита '+str_name[UID_Archvile]+' воскрешать убитых монстров'
+str_name[upgr_hell_FTowerAMech]    = 'Насест для Какодемона'
+str_dscr[upgr_hell_FTowerAMech]    = 'Анти-['+str_attr_mech+'] оружие для здания '+str_name[UID_HFTower]
+
+str_name[upgr_uac_DistDamage]      = 'Улучшение вооружения'
+str_dscr[upgr_uac_DistDamage]      = 'Увеличение урона дальних атак, наносимых всеми юнитами и защитными сооружениями UAC'
+str_name[upgr_uac_BioArmor]        = 'Увеличение защиты юнитов, производимых в Бараках'
+str_dscr[upgr_uac_BioArmor]        = 'Увеличение защиты юнитов, производимых в Бараках'
+str_name[upgr_uac_BuildArmor]      = 'Бетонные стены'
+str_dscr[upgr_uac_BuildArmor]      = 'Увеличение брони всех зданий UAC'
+str_name[upgr_uac_RepairTools]     = 'Продвинутые инструменты'
+str_dscr[upgr_uac_RepairTools]     = 'Улучшение эффективности лечения/починки для юнитов '+str_UnitsNamesList([UID_Medic,UID_Engineer])
+str_name[upgr_uac_BioSpeed]        = 'Легкая броня'
+str_dscr[upgr_uac_BioSpeed]        = 'Увеличение скорости передвижения юнитов, производимых в Бараках'
+str_name[upgr_uac_SSMWeapon]       = 'Снаряды земля-земля'
+str_dscr[upgr_uac_SSMWeapon]       = 'Анти-наземное оружие для юнита '+str_name[UID_Antiaircrafter]
 str_name[upgr_uac_ADetection]      = str_name[uab_UACScan]
-str_dscr[upgr_uac_ADetection]      = 'Unlocks "'+str_name[uab_UACScan]+'" ability for '+str_name[UID_URadar]
+str_dscr[upgr_uac_ADetection]      = 'Активация способности "'+str_name[uab_UACScan]+'" для здания '+str_name[UID_URadar]
 str_tmp1=str_UnitsNamesList([UID_UCommandCenter,UID_UACommandCenter])
-str_name[upgr_uac_CCFly]           = 'Flight Engines'
-str_dscr[upgr_uac_CCFly]           = str_tmp1+' gains ability to fly'
-str_name[upgr_uac_CCAttack]        = 'Built-in Plasma Turret'
-str_dscr[upgr_uac_CCAttack]        = 'Plasma turret for '+str_tmp1
-str_name[upgr_uac_BuilderR]        = 'Builder Range Upgrade'
-str_dscr[upgr_uac_BuilderR]        = 'Increases range of sight for '+str_tmp1
-str_name[upgr_uac_DronTurret]      = 'Drone Transformation Protocol'
+str_name[upgr_uac_CCFly]           = 'Летные двигатели'
+str_dscr[upgr_uac_CCFly]           = 'Активация способностей полета для зданий '+str_tmp1
+str_name[upgr_uac_CCAttack]        = 'Встроенная плазменная турель'
+str_dscr[upgr_uac_CCAttack]        = 'Вооружение для зданий '+str_tmp1
+str_name[upgr_uac_BuilderR]        = 'Улучшение строителей'
+str_dscr[upgr_uac_BuilderR]        = 'Увеличение области обзора и строительства для зданий '+str_tmp1
+str_name[upgr_uac_DronTurret]      = 'Протокол трансформации Дрона'
 str_tmp1=str_UnitsNamesList([UID_UATurret,UID_UGTurret])
-str_dscr[upgr_uac_DronTurret]      = 'Drone can rebuild to '+str_tmp1+'; turrets can transform to Drone'
-str_name[upgr_uac_UnitSightR]      = 'Light Amplification Visors'
-str_dscr[upgr_uac_UnitSightR]      = 'Increases the sight range of all UAC units'
+str_dscr[upgr_uac_DronTurret]      = str_name[UID_UACDron]+' может может трансформироваться в здания '+str_tmp1+'; турели могут трансформироваться в юнита '+str_name[UID_UACDron]
+str_name[upgr_uac_UnitSightR]      = 'Светоусиливающие приборы'
+str_dscr[upgr_uac_UnitSightR]      = 'Увеличение радиуса обзора и атаки для всех юнитов UAC'
 str_name[upgr_uac_CommandoInvis]   = str_name[uab_HStealth]
-str_dscr[upgr_uac_CommandoInvis]   = 'Commando becomes invisible'
+str_dscr[upgr_uac_CommandoInvis]   = 'Коммандо становится невидимым'
 str_name[upgr_uac_AASplash]        = str_name[uab_UAASplash]
 str_dscr[upgr_uac_AASplash]        = str_dscr[uab_UAASplash]
-str_name[upgr_uac_MechSpeed]       = 'Advanced Fuel'
-str_dscr[upgr_uac_MechSpeed]       = 'Increases the movement speed of all Factory`s units'
-str_name[upgr_uac_MechArmor]       = 'Mech Combat Armor Upgrade'
-str_dscr[upgr_uac_MechArmor]       = 'Increases the armor of all Factory`s units'
-str_name[upgr_uac_TerAAWeapon]     = 'Anti-air Weapon'
-str_dscr[upgr_uac_TerAAWeapon]     = 'Anti-air weapon for Terminator'
-str_name[upgr_uac_Transport]       = 'Dropship Upgrade'
-str_dscr[upgr_uac_Transport]       = 'Increases the capacity of Dropship'
-str_name[upgr_uac_RadarR]          = 'Radar Upgrade'
-str_dscr[upgr_uac_RadarR]          = 'Increases radar scanning radius and range of sight'
-str_name[upgr_uac_TurretPlasma]    = 'Anti-ground Plasmagun'
-str_dscr[upgr_uac_TurretPlasma]    = 'Anti-['+str_attr_mech+'] weapon for '+str_name[UID_UGTurret]
-str_name[upgr_uac_TowerR]          = 'Spotlights'
-str_dscr[upgr_uac_TowerR]          = 'Increases the range for '+str_tmp1
-str_name[upgr_uac_TurretArmor]     = 'Additional Armoring'
-str_dscr[upgr_uac_TurretArmor]     = 'Additional armor for '+str_tmp1
+str_name[upgr_uac_MechSpeed]       = 'Улучшенное топливо'
+str_dscr[upgr_uac_MechSpeed]       = 'Увеличение скорости передвижения юнитов, производимых в Заводе техники'
+str_name[upgr_uac_MechArmor]       = 'Улучшение защиты техники'
+str_dscr[upgr_uac_MechArmor]       = 'Увеличение защиты юнитов, производимых в Заводе техники'
+str_name[upgr_uac_TerAAWeapon]     = 'Анти-воздушное оружие'
+str_dscr[upgr_uac_TerAAWeapon]     = 'Анти-воздушное вооружение для юнита '+str_name[UID_Terminator]
+str_name[upgr_uac_Transport]       = 'Улучшение транспорта'
+str_dscr[upgr_uac_Transport]       = 'Увеличение вместимости юнита '+str_name[UID_UTransport]
+str_name[upgr_uac_RadarR]          = 'Улучшение Радара'
+str_dscr[upgr_uac_RadarR]          = 'Увеличение области обзора Радара и радиуса области действия его способности'
+str_name[upgr_uac_TurretPlasma]    = 'Анти-наземное плазменное орудие'
+str_dscr[upgr_uac_TurretPlasma]    = 'Anti-['+str_attr_mech+'] оружие для здания '+str_name[UID_UGTurret]
+str_name[upgr_uac_TowerR]          = 'Прожекторы'
+str_dscr[upgr_uac_TowerR]          = 'Увеличение радиуса обзора и атаки для зданий '+str_tmp1
+str_name[upgr_uac_TurretArmor]     = 'Дополнительное бронирование'
+str_dscr[upgr_uac_TurretArmor]     = 'Дополнительная броня для зданий '+str_tmp1
 
 
 /////////////////////////////////////////////////////////////////////////////
 //  GAME ACT HINTS
 
-str_tmp1='attack enemies'
-str_dscr[iAct_Control_UAMove]      = 'Attack/Move, '+str_tmp1
-str_dscr[iAct_Control_UAStop]      = 'Stop, '       +str_tmp1
-str_dscr[iAct_Control_UAPatrol]    = 'Patrol, '     +str_tmp1
-str_tmp1='ignore enemies'
-str_dscr[iAct_Control_UMove]       = 'Move, '  +str_tmp1
-str_dscr[iAct_Control_UStop]       = 'Stop, '  +str_tmp1
-str_dscr[iAct_Control_UPatrol]     = 'Patrol, '+str_tmp1
+str_tmp1='атакуя врагов'
+str_dscr[iAct_Control_UAMove]      = 'Атаковать/Двигаться, '+str_tmp1
+str_dscr[iAct_Control_UAStop]      = 'Остановиться, '       +str_tmp1
+str_dscr[iAct_Control_UAPatrol]    = 'Патрулировать, '      +str_tmp1
+str_tmp1='игнорируя врагов'
+str_dscr[iAct_Control_UMove]       = 'Двигаться, '    +str_tmp1
+str_dscr[iAct_Control_UStop]       = 'Остановиться, ' +str_tmp1
+str_dscr[iAct_Control_UPatrol]     = 'Патрулировать, '+str_tmp1
 
-str_dscr[iAct_Control_UProdCncl]   = 'Cancel production'
-str_dscr[iAct_Control_UDestroy]    = 'Self-destruction'
+str_dscr[iAct_Control_UProdCncl]   = 'Отменить производство'
+str_dscr[iAct_Control_UDestroy]    = 'Самоуничтожение'
 
-str_dscr[iAct_Control_USelBase]    = 'Select all builders'
-str_dscr[iAct_Control_USelArmy]    = 'Select all not busy battle units; "not busy battle units" criterias:'+tc_nl+
-                                     '- alive, completed, can attack, can move, NOT ['+str_attr_building+'];'+tc_nl+
-                                     '- no "Patrol" or "Stop, '+str_tmp1+'" orders;'+tc_nl+
-                                     '- no order to use an ability;'+tc_nl+
-                                     '- no order to teleport or transport;'
+str_dscr[iAct_Control_USelBase]    = 'Выбрать всех строителей'
+str_dscr[iAct_Control_USelArmy]    = 'Выбрать всех боевых не занятых юнитов; "боевые не занятые юниты" это:'+tc_nl+
+                                     '- живые, законченные, могут атаковать, могут двигаться, НЕ ['+str_attr_building+'];'+tc_nl+
+                                     '- не выполняют приказы "Патрулировать, *" или "'+str_dscr[iAct_Control_UStop]+'";'+tc_nl+
+                                     '- не имеют приказа применять способность;'+tc_nl+
+                                     '- не направлены в Телепорт или транспорт;'
 
-str_dscr[iAct_Control_MarkLook]    = 'Map mark: look here'
-str_dscr[iAct_Control_MarkAttack]  = 'Map mark: attack here'
-str_dscr[iAct_Control_ScoreBoard]  = 'Scoreboard'
+str_dscr[iAct_Control_MarkLook]    = 'Отметка: смотреть сюда'
+str_dscr[iAct_Control_MarkAttack]  = 'Отметка: атаковать тут'
+str_dscr[iAct_Control_ScoreBoard]  = 'Статистика'
 
-str_dscr[iAct_InGamePause]         = 'Pause'
-str_dscr[iAct_InGameMenu]          = 'Menu'
+str_dscr[iAct_InGamePause]         = 'Пауза'
+str_dscr[iAct_InGameMenu]          = 'Меню'
 
-str_dscr[iAct_Replay_Fast]         = 'Faster game speed'
-str_dscr[iAct_Replay_Pause]        = 'Pause'
-str_dscr[iAct_Replay_Back2]        = 'Rewind 2 seconds'
-str_dscr[iAct_Replay_Back10]       = 'Rewind 10 seconds'
-str_dscr[iAct_Replay_Back60]       = 'Rewind 60 seconds'
-str_dscr[iAct_Replay_Forward2]     = 'Fast forward 2 seconds'
-str_dscr[iAct_Replay_Forward10]    = 'Fast forward 10 seconds'
-str_dscr[iAct_Replay_Forward60]    = 'Fast forward 60 seconds'
-str_dscr[iAct_Replay_POV]          = 'Player-recorder POV'
-str_dscr[iAct_Replay_Log]          = 'List of game messages'
-str_dscr[iAct_Replay_Fog]          = 'Fog of war'
-str_dscr[iAct_Replay_PlayerAll]    = 'All players'
-str_dscr[iAct_Replay_Player0]      = 'Player #1'
-str_dscr[iAct_Replay_Player1]      = 'Player #2'
-str_dscr[iAct_Replay_Player2]      = 'Player #3'
-str_dscr[iAct_Replay_Player3]      = 'Player #4'
-str_dscr[iAct_Replay_Player4]      = 'Player #5'
-str_dscr[iAct_Replay_Player5]      = 'Player #6'
-str_dscr[iAct_Replay_Player6]      = 'Player #7'
-str_dscr[iAct_Replay_Player7]      = 'Player #8'
+str_dscr[iAct_Replay_Fast]         = 'вкл./выкл. быструю скорость игры'
+str_dscr[iAct_Replay_Pause]        = str_dscr[iAct_InGamePause]+' воспроизведения'
+str_dscr[iAct_Replay_Back2]        = 'Отмотать назад на 2 секунды'
+str_dscr[iAct_Replay_Back10]       = 'Отмотать назад на 10 секунд'
+str_dscr[iAct_Replay_Back60]       = 'Отмотать назад на 60 секунд'
+str_dscr[iAct_Replay_Forward2]     = 'Промотать вперед на 2 секунды'
+str_dscr[iAct_Replay_Forward10]    = 'Промотать вперед на 10 секунд'
+str_dscr[iAct_Replay_Forward60]    = 'Промотать вперед на 60 секунд'
+str_dscr[iAct_Replay_POV]          = 'Преключение просмотра "из глаз" записывающего игрока'
+str_dscr[iAct_Replay_Log]          = 'Отобразить/скрыть список игровых сообщений'
+str_dscr[iAct_Replay_Fog]          = 'Вкл./выкл. туман войны'
+str_dscr[iAct_Replay_PlayerAll]    = 'Установить область обзора для всех игроков'
+str_dscr[iAct_Replay_Player0]      = 'Установить область обзора для игрока #1'
+str_dscr[iAct_Replay_Player1]      = 'Установить область обзора для игрока #2'
+str_dscr[iAct_Replay_Player2]      = 'Установить область обзора для игрока #3'
+str_dscr[iAct_Replay_Player3]      = 'Установить область обзора для игрока #4'
+str_dscr[iAct_Replay_Player4]      = 'Установить область обзора для игрока #5'
+str_dscr[iAct_Replay_Player5]      = 'Установить область обзора для игрока #6'
+str_dscr[iAct_Replay_Player6]      = 'Установить область обзора для игрока #7'
+str_dscr[iAct_Replay_Player7]      = 'Установить область обзора для игрока #8'
 
-str_dscr[iAct_Observer_Fog]        = 'Fog of war'
-str_dscr[iAct_Observer_POV]        = 'Player POV'
-str_dscr[iAct_Observer_PlayerAll]  = 'All players'
-str_dscr[iAct_Observer_Player0]    = 'Player #1'
-str_dscr[iAct_Observer_Player1]    = 'Player #2'
-str_dscr[iAct_Observer_Player2]    = 'Player #3'
-str_dscr[iAct_Observer_Player3]    = 'Player #4'
-str_dscr[iAct_Observer_Player4]    = 'Player #5'
-str_dscr[iAct_Observer_Player5]    = 'Player #6'
-str_dscr[iAct_Observer_Player6]    = 'Player #7'
-str_dscr[iAct_Observer_Player7]    = 'Player #8'
+str_dscr[iAct_Observer_Fog]        = str_dscr[iAct_Replay_Fog]
+str_dscr[iAct_Observer_POV]        = '"Из глаз" текущего игрока'
+str_dscr[iAct_Observer_PlayerAll]  = str_dscr[iAct_Replay_PlayerAll]
+str_dscr[iAct_Observer_Player0]    = str_dscr[iAct_Replay_Player0]
+str_dscr[iAct_Observer_Player1]    = str_dscr[iAct_Replay_Player1]
+str_dscr[iAct_Observer_Player2]    = str_dscr[iAct_Replay_Player2]
+str_dscr[iAct_Observer_Player3]    = str_dscr[iAct_Replay_Player3]
+str_dscr[iAct_Observer_Player4]    = str_dscr[iAct_Replay_Player4]
+str_dscr[iAct_Observer_Player5]    = str_dscr[iAct_Replay_Player5]
+str_dscr[iAct_Observer_Player6]    = str_dscr[iAct_Replay_Player6]
+str_dscr[iAct_Observer_Player7]    = str_dscr[iAct_Replay_Player7]
 
 
 /////////////////////////////////////////////////////////////////////////////
 //  MENU HINTS
 
-menu_110_descr  = ': change AI skill'
-menu_111_descr  = ': change AI skill'
-menu_112_descr  = ': change AI skill'
-menu_113_descr  = ': change AI skill'
-menu_114_descr  = ': change AI skill'
-menu_115_descr  = ': change AI skill'
-menu_116_descr  = ': change AI skill'
-menu_117_descr  = ': change AI skill'
+menu_110_descr  = ': изменить уровень ИИ'
+menu_111_descr  = menu_110_descr
+menu_112_descr  = menu_110_descr
+menu_113_descr  = menu_110_descr
+menu_114_descr  = menu_110_descr
+menu_115_descr  = menu_110_descr
+menu_116_descr  = menu_110_descr
+menu_117_descr  = menu_110_descr
 
-menu_120_descr  = ': jump to this slot'
-menu_121_descr  = ': jump to this slot'
-menu_122_descr  = ': jump to this slot'
-menu_123_descr  = ': jump to this slot'
-menu_124_descr  = ': jump to this slot'
-menu_125_descr  = ': jump to this slot'
-menu_126_descr  = ': jump to this slot'
-menu_127_descr  = ': jump to this slot'
+menu_120_descr  = ': переместиться на этот слот'
+menu_121_descr  = menu_120_descr
+menu_122_descr  = menu_120_descr
+menu_123_descr  = menu_120_descr
+menu_124_descr  = menu_120_descr
+menu_125_descr  = menu_120_descr
+menu_126_descr  = menu_120_descr
+menu_127_descr  = menu_120_descr
 
-menu_130_descr  = ': add/remove AI Player'
-menu_131_descr  = ': add/remove AI Player'
-menu_132_descr  = ': add/remove AI Player'
-menu_133_descr  = ': add/remove AI Player'
-menu_134_descr  = ': add/remove AI Player'
-menu_135_descr  = ': add/remove AI Player'
-menu_136_descr  = ': add/remove AI Player'
-menu_137_descr  = ': add/remove AI Player'
+menu_130_descr  = ': добавить/удалить бота'
+menu_131_descr  = menu_130_descr
+menu_132_descr  = menu_130_descr
+menu_133_descr  = menu_130_descr
+menu_134_descr  = menu_130_descr
+menu_135_descr  = menu_130_descr
+menu_136_descr  = menu_130_descr
+menu_137_descr  = menu_130_descr
 
-menu_183_descr  = ': generators life time'
-menu_184_descr  = ': select for edition/make random value'
+menu_183_descr  = ': время работы генераторов'
+menu_184_descr  = ': выбрать для редактирования/установить случайное значение'
 
 /////////////////////////////////////////////////////////////////////////////
 //  Help docs  CREDITS
 
 DocHelp_Credits = 
-tc_orange+str_gcaption+tc_default+' - is a real-time strategy game based on Doom 2 universe. Current version is '+str_version+'.'
+tc_orange+str_gcaption+tc_default+' - стратегия в реальном времени по вселенной Doom 2. Текущая версия - '+str_version+'.'
 tc_docbr
-'Project leader and developer: '+tc_red+'Andrey TGA Goryainov'+tc_default+'.'
+'Автор проекта и разработчик: '+tc_red+'Андрей TGA Горяинов'+tc_default+'.'
 tc_docbr
-'Sources: www.github.com/T3DStudio/MarsWars'
-'Web site: www.t3dstudio.ru'
+'Исходники: www.github.com/T3DStudio/MarsWars'
+'Сайт: www.t3dstudio.ru'
 tc_docbr
-'Software used:'+tc_default+tc_doccpt
+'Использованное ПО:'+tc_default+tc_doccpt
 '- Free Pascal 3.2.2 (www.freepascal.org);'
 '- Lazarus IDE 4.2 (www.lazarus-ide.org);'
 '- Simple DirectMedia Layer (SDL) Version 1.2 (www.libsdl.org);'
 '- Ultimate Doom Builder (www.github.com/UltimateDoomBuilder/UltimateDoomBuilder);'
-'- NASTY tool by jmickle66666666 (www.doomworld.com/forum/topic/98689-nasty-nota-sourceport-thank-you-alpha-4);'
-'- Game Maker 8.0 by Mark Overmas.'
+'- NASTY от jmickle66666666 (www.doomworld.com/forum/topic/98689-nasty-nota-sourceport-thank-you-alpha-4);'
+'- Game Maker 8.0 от Mark Overmas.'
 tc_docbr
-'Thanks to:'+tc_default+tc_doccpt
-'- ID Software for "DooM" game;'
-'- Daniel Tormentor667 Gimmer for Doom 2 repository (www.realm667.com);'
-'- 3D Realms for "Duke Nukem 3D" game;'
-'- Monolith Productions for "BLOOD" game;'
-'- cybermind aka Mistranger for "DoomWars" game;'
-'- Doom Hacker for "Doom: The Battle For Mars" game;'
-'- Bertie Butts for main menu background image.'
+'Отдельное спасибо:'+tc_default+tc_doccpt
+'- ID Software за игру "DooM";'
+'- Daniel Tormentor667 Gimmer за репозиторий с ресурсами для Doom 2 (www.realm667.com);'
+'- 3D Realms за игру "Duke Nukem 3D";'
+'- Monolith Productions за игру "BLOOD";'
+'- cybermind aka Mistranger за игру "DoomWars";'
+'- Doom Hacker за игру "Doom: The Battle For Mars";'
+'- Bertie Butts за фон меню.'
 tc_docbr
-'Unit voices:'+tc_default+tc_doccpt
+'Голоса юнитов:'+tc_default+tc_doccpt
 '- Jake Crusher - Shotgunner, Super Shotgunner;'
 '- cybermind aka Mistranger - Commando;'
 '- Swoy45 - Siedge Marine, Transport;'
@@ -958,50 +964,52 @@ tc_docbr
 '- DinkyDyeAussie - UAC Tank;'
 '- DoomWars game - UAC announcer.'
 tc_docbr
-'Used music:'+tc_default+tc_doccpt
+'Использованная музыка:'+tc_default+tc_doccpt
 
 
 /////////////////////////////////////////////////////////////////////////////
 //  Help docs  GAME Controls
 
 DocHelp_BaseControls = 
-tc_orange+'BASIC GAME CONTROLS'+tc_default+tc_doccpt
+tc_orange+'ОСНОВЫ УПРАВЛЕНИЯ В ИГРЕ'+tc_default+tc_doccpt
 tc_docbr
-'The majority of your control during the game is through using your mouse. The mouse performs the following actions:'
-tc_docbr+'- SELECTION: the "'+iAct_1_hk+'" is used to select units, buildings, command buttons and points of action (locations where orders are carried out).'
-tc_docbr+'- AUTO COMMANDS: when you have a unit or group selected, the "'+iAct_2_hk+'" can be used to issue intelligent commands that will automatically be carried out.'
-tc_docbr
-tc_docbr
-tc_orange+'CAMERA MOVEMENT'+tc_default+tc_doccpt
-tc_docbr
-'Possible ways to move the game camera include:'
-tc_docbr+'- using keyboard arrow keys;'
-tc_docbr+'- clicking and holding the "'+iAct_3_hk+'";'
-tc_docbr+'- moving the cursor to the edges of the screen (this option can be enabled or disabled in the game settings).'
-tc_docbr+'The speed of camera movement can be adjusted in the game settings.'
+'Основной метод управления в игре - использование мыши. С помощью мыши можно выполнять следующие операции:'
+tc_docbr+'- ВЫБОР: используя "'+iAct_1_hk+'" вы можете выбирать юнитов/здания, активировать кнопоки и указывать точку выполнения приказа;'
+tc_docbr+'- АВТО-КОМАНДА: когда у вас выбраны юниты и/или здания, вы можете отдавать общий приказ используюя "'+iAct_2_hk+'" '
+'(тип приказа - движение, атака или установка пункта сбора - определяется автоматически).'
 tc_docbr
 tc_docbr
-tc_orange+'BASE CONSTRUCTION'+tc_default+tc_doccpt
+tc_orange+'ПЕРЕМЕЩЕНИЕ КАМЕРЫ'+tc_default+tc_doccpt
 tc_docbr
-'You must have at least one builder to build a base. Switch the control panel to "'+str_ui_Tab[tab_Buildings]+'" tab and click on the building icon to select the type of building you need(or press the associated hotkey).'
-'If the requirements for the selected building type are not met, the game will display an error message; otherwise, the game will draw the building`s sprite and a circle around the mouse cursor.'
-'The radius of the circle is the radius of the building. If the circle is red - the building needs more space, if it is blue - the build place is too far away from the nearest builder, if it is green - the building can be built here.'
-'To deselect a building type, press "'+iAct_2_hk+'".'
+'Способы перемещения камеры:'
+tc_docbr+'- использовать клавишы стрелок на клавиатуре;'
+tc_docbr+'- движениями мыши с зажатой "'+iAct_3_hk+'";'
+tc_docbr+'- поднести курсор к границам экрана (данный способ может быть включен или отключен в настройках).'
+tc_docbr+'Скорость движения камеры может быть изменена в настройках.'
+tc_docbr
+tc_docbr
+tc_orange+'СТРОИТЕЛЬСТВО БАЗЫ'+tc_default+tc_doccpt
+tc_docbr
+'Для постройки зданий вы должны иметь хотя бы одного строителя. Переключитесь на вкладку "'+str_ui_Tab[tab_Buildings]+'"'
+' на контрольной панели и кликните("'+iAct_1_hk+'") на икноку нужного здания (или нажмите соответствующую горячую клавишу на клавиатуре).'
+'Если требования к выбранному зданию не удовлетворены - игра выдаст сообщение об ошибке, иначе - предложит выбрать место для постройки: '
+'вокруг курсора начнет отображаться спрайт здания и цветной круг, показывающий размер сторения. Если круг красный - '
+'для здания требуется больше места, синий - позиция слишком далека от ближайшего строителя, зеленый - строительство возможно в этой точке.'
+'Что бы отменить выбор здания, нажмите "'+iAct_2_hk+'".'
 str_ui_BuildHint
-'To cancel the construction of a building, select it and issue the "'+str_dscr[iAct_Control_UProdCncl]+'" or "'+str_dscr[iAct_Control_UDestroy]+'" order.'
+'Что бы отменить постройку - выберите здание и отдайте приказ "'+str_dscr[iAct_Control_UProdCncl]+'" или "'+str_dscr[iAct_Control_UDestroy]+'".'
 str_doc_NoteMaxBuilders+'.'
-tc_docbr+'NOTE: losing your buildings affect your construction system into short cooldown effect.'
+tc_docbr+'Важно: потеря здания на несколько секунд выводит из строя систему строительства.'
 tc_docbr+str_ui_BuildTip
 tc_docbr
 tc_docbr
-tc_orange+'UNIT PRODUCTION'+tc_default+tc_doccpt
+tc_orange+'ПРОИЗВОДСТВО ЮНИТОВ'+tc_default+tc_doccpt
 tc_docbr
-'Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met.'
-'Switch the control panel to "'+str_ui_Tab[tab_Units]+'" tab and click on the unit icon(or press the associated hotkey or hover your mouse over the unit icon and scroll the "'+iAct_4_hk+'").'
-'If the requirements for the selected unit type are not met, the game will display an error message.'
-'If no unit production building is selected - the game sends the production order to nearest unbusy production building, otherwise it sends the order to nearest unbusy selected production buildings.'
-'It is impossible to create a unit production queue.'
-'To cancel unit production process, click "'+iAct_2_hk+'" on the unit icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order.'
+'Что бы создать юнита - необходимо хотя бы одно здание, способное его производить. Переключитесь на вкладку "'+str_ui_Tab[tab_Units]+'" и кликните("'+iAct_1_hk+'") по иконке нужного типа юнита '
+'(или нажмите соответствующую юниту горячую клавишу или вращайте "'+iAct_4_hk+'" удерживая курсор на иконке юнита).'
+'Если требования к выбранному типу юнита не удовлетворены - игра отобразит ошибку, иначе - начнет производства юнита: в ближайшем к центру экрана выбранном производящем здании '
+'(если ни одного здания не выбрано - игра будет считать, что выбраны все). Нельзя сформировать очередь производства.'
+'Что бы отменить производство юнита - нажмите "'+iAct_2_hk+'" (или выберите производящее здание и отдайте ему приказ "'+str_dscr[iAct_Control_UProdCncl]+'")'
 tc_docbr
 tc_docbr
 tc_orange+'UPGRADES PRODUCTION'+tc_default+tc_doccpt
@@ -1016,320 +1024,327 @@ tc_docbr
 //  Help docs  GAME HOTKEYS
 
 DocHelp_HotKeyAction = 
-tc_orange+'COMMON HOTKEYS'+tc_default+tc_doccpt
+tc_orange+'ОБЩИЕ ГОРЯЧИЕ КЛАВИШИ'+tc_default+tc_doccpt
 tc_docbr
-HK_InGameChat       +'in-game chat(common)'
-HK_InGameChatAll    +'in-game chat(to all players)'   
-HK_InGameChatAllies +'in-game chat(to allied players)'
-HK_InGamePause      +'toggle pause(multiplayer)'
-HK_InGameMenu       +'toggle menu'
-HK_Tab              +'switch control panel tab' 
-HK_ScreenShot       +'make *'+fileExt_Scrshot+' screenshot'
-HK_ToggleWindowed   +'toggle "'+str_SV_Windowed+'" option' 
-tc_docbr
-tc_docbr
-tc_orange+'GAME HOTKEYS'+tc_default+tc_doccpt
-tc_docbr
-HK_LastEvent         +'move camera to last event location'
-tc_docbr
-HK_USetGroups        +'assign currently selected units to the numbered control group'    
-HK_USetGroup0        +'unassign currently selected units from any numbered control group'
-tc_docbr
-HK_UAddGroups        +'add currently selected units to the numbered control group'
-tc_docbr
-HK_USelGroups        +'select units from the numbered control group; double tap - move camera to nearest unit from the group'
-tc_docbr
-HK_UASlGroups        +'add to selection units from the numbered control group'
-tc_docbr
-HK_Control_UAbility  +'abilities of selected units'
-HK_Control_BaseMove  +'basic move/attack orders of selected units'
-HK_Control_UProdCncl +'cancel production in selected buildings'
-HK_Control_UDestroy  +'kill selected units'
-tc_docbr
-HK_Control_USelBase  +'select all builders; double tap - move camera to nearest builder'
-HK_Control_USelArmy  +'select all not busy battle units; double tap - move camera to nearest unit'
-tc_docbr
-HK_Control_MarkLook  +'set map mark(multiplayer): "look here"'  
-HK_Control_MarkAttack+'set map mark(multiplayer): "attack here"'
-tc_docbr
-HK_Control_ScoreBoard+'toggle scoreboard display'
-tc_docbr
-HK_Control_ToggleRec +'toggle "'+str_SR_RecordGames+'" option'
-HK_TogglePlayersColor+'toggle "'+str_SG_PlayersColor+'" option'
-tc_docbr
-HK_SProds            +'production hotkeys'
-tc_docbr
-HK_Alt               +'show unit`s rects and circles' 
+HK_InGameChatAll    +'открыть игровой чат(все игроки)'
+HK_InGameChatAllies +'открыть игровой чат(союзники)'
+HK_InGameChat       +'игровой чат(отправить сообщение)'
+HK_InGamePause      +'включение/выключение паузы в сетевой игре'
+HK_InGameMenu       +'открыть/закрыть меню'
+HK_Tab              +'переключение вкладки контрольной панели'
+HK_ScreenShot       +'создание *'+fileExt_Scrshot+' скриншота'
+HK_ToggleWindowed   +'переключение оконного режима'
 tc_docbr
 tc_docbr
-tc_orange+'REPLAY PLAYBACK HOTKEYS'+tc_default+tc_doccpt
+tc_orange+'ИГРОВЫЕ ГОРЯЧИЕ КЛАВИШИ'+tc_default+tc_doccpt
 tc_docbr
-HK_Replay_Fast       +'toggle uncapped FPS(faster game speed)' 
-HK_Replay_Pause      +'pause playback'    
-HK_Replay_Back60     +'rewind 60 seconds' 
-HK_Replay_Back10     +'rewind 10 seconds' 
-HK_Replay_Back2      +'rewind 2 seconds'  
-HK_Replay_Forward2   +'fast forward 2 seconds' 
-HK_Replay_Forward10  +'fast forward 10 seconds'
-HK_Replay_Forward60  +'fast forward 60 seconds'
-HK_Replay_POV        +'toggle player-recorder POV'  
-HK_Replay_Log        +'toggle list of game messages'
-HK_Replay_Fog        +'toggle fog of war' 
-HK_Replay_PlayerAll  +'set all players vision'
-HK_Replay_Players    +'set player vision'
+HK_LastEvent         +'перемещение камеры на последнее событие'
+tc_docbr
+HK_USetGroups        +'назначение выбранных юнитов в цифровую группу'
+HK_USetGroup0        +'удаление выбранных юнитов из любых цифровых групп'
+tc_docbr
+HK_UAddGroups        +'добавление выбранных юнитов в цифровую группу'
+tc_docbr
+HK_USelGroups        +'выбор юнитов в цифровой группе; двойное нажатие - перемещение камеры к ближайшему юниту в группе'
+tc_docbr
+HK_UASlGroups        +'добавление в выбор юнитов из цифровой группы'
+tc_docbr
+HK_Control_UAbility  +'горячие клавиши способностей у выбранных юнитов'
+HK_Control_BaseMove  +'базовые приказы атаки/движения у выбранных юнитов'
+HK_Control_UProdCncl +'отмена производства в выбранных зданиях'
+HK_Control_UDestroy  +'самоуничтожение выбранных юнитов'
+tc_docbr
+HK_Control_USelBase  +'выбор всех строителей; двойное нажатие - перемещение камеры к ближайшему строителю'
+HK_Control_USelArmy  +'выбор всех незанятых боевых юнитов; двойное нажатие - перемещение камеры к ближайшему такому юниту'
+tc_docbr
+HK_Control_MarkLook  +'(сетевая игра) установить метку: "смотреть сюда"'
+HK_Control_MarkAttack+'(сетевая игра) установить метку: "атаковать тут"'
+tc_docbr
+HK_Control_ScoreBoard+'отобразить/скрыть итоговую статистику'
+tc_docbr
+HK_Control_ToggleRec +'переключение опции "'+str_SR_RecordGames+'"'
+HK_TogglePlayersColor+'переключение опции "'+str_SG_PlayersColor+'"'
+tc_docbr
+HK_SProds            +'горячие клавиши для зданий/юнитов/улучшений'
+tc_docbr
+HK_Alt               +'отображение цветных рамок и статусов всех юнитов на экране'
 tc_docbr
 tc_docbr
-tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt
+tc_orange+'ГОРЯЧИЕ КЛАВИШИ УПРАВЛЕНИЯ ВОСПРОИЗВОДСТВОМ ЗАПИСИ'+tc_default+tc_doccpt
 tc_docbr
-HK_Observer_Fog      +'toggle fog of war' 
-HK_Observer_POV      +'toggle player POV' 
-HK_Observer_PlayerAll+'set all players vision'
-HK_Observer_Players  +'set player vision'
+HK_Replay_Fast       +str_dscr[iAct_Replay_Fast]
+HK_Replay_Pause      +str_dscr[iAct_Replay_Pause]  
+HK_Replay_Back60     +str_dscr[iAct_Replay_Back60]
+HK_Replay_Back10     +str_dscr[iAct_Replay_Back10]
+HK_Replay_Back2      +str_dscr[iAct_Replay_Back2]  
+HK_Replay_Forward2   +str_dscr[iAct_Replay_Forward2] 
+HK_Replay_Forward10  +str_dscr[iAct_Replay_Forward10]
+HK_Replay_Forward60  +str_dscr[iAct_Replay_Forward60]
+HK_Replay_POV        +str_dscr[iAct_Replay_POV] 
+HK_Replay_Log        +str_dscr[iAct_Replay_Log]
+HK_Replay_Fog        +str_dscr[iAct_Replay_Fog]
+HK_Replay_PlayerAll  +str_dscr[iAct_Replay_PlayerAll]
+HK_Replay_Players    +str_dscr[iAct_Replay_Player0]+'..'+str_dscr[iAct_Replay_Player7]
 tc_docbr
 tc_docbr
-tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt
+tc_orange+'ГОРЯЧИЕ КЛАВИШИ В РЕЖИМЕ ЗРИТЕЛЯ'+tc_default+tc_doccpt
 tc_docbr
-HK_test_FastTime     +'toggle uncapped FPS(faster game speed)'
-HK_test_InstaProd    +'toggle instant production'
-HK_test_ToggleAI     +'toggle AI control for current player'
-HK_test_iddqd        +'toggle invulnerability for current player'
-HK_test_FogToggle    +'toggle fog of war'   
-HK_test_DrawToggle   +'toggle screen redraw'
-HK_test_NullUpgrades +'cancel all upgrades for current player'
-HK_test_BePlayers    +'set current player'
-HK_test_AddHellPower +'add '+str_testmode_HellPower+' '+str_ui_HellPower+' to current player'
-HK_test_AddUACLoot   +'add '+str_testmode_UACLoot  +' '+str_ui_UACLoot  +' to current player'
+HK_Observer_Fog      +str_dscr[iAct_Observer_Fog]
+HK_Observer_POV      +str_dscr[iAct_Observer_POV]
+HK_Observer_PlayerAll+str_dscr[iAct_Observer_PlayerAll]
+HK_Observer_Players  +str_dscr[iAct_Observer_Player0]+'..'+str_dscr[iAct_Observer_Player7]
+tc_docbr
+tc_docbr
+tc_orange+'ГОРЯЧИЕ КЛАВИШИ ТЕСТОВОГО РЕЖИМА'+tc_default+tc_doccpt
+tc_docbr
+HK_test_FastTime     +str_dscr[iAct_Replay_Fast]
+HK_test_InstaProd    +'вкл./выкл. мгновенное производство'
+HK_test_ToggleAI     +'вкл./выкл. управление ИИ у текущего игрока'
+HK_test_iddqd        +'вкл./выкл. неуязвимость у текущего игрока'
+HK_test_FogToggle    +str_dscr[iAct_Observer_POV] 
+HK_test_DrawToggle   +'вкл./выкл. графическую подсистему'
+HK_test_NullUpgrades +'отменить все улучшения для текущего игрока'
+HK_test_BePlayers    +'установить текущего игрока'
+HK_test_AddHellPower +'добавить '+str_testmode_HellPower+' '+str_ui_HellPower+' текущему игроку'
+HK_test_AddUACLoot   +'добавить '+str_testmode_UACLoot  +' '+str_ui_UACLoot  +' текущему игроку'
 tc_docbr
 
 /////////////////////////////////////////////////////////////////////////////
 //  Help docs  GAME UI
 
 DocHelp_GamUI = 
-tc_orange+'COMMON'+tc_default+tc_doccpt
+tc_orange+'ОБЩЕЕ'+tc_default+tc_doccpt
 tc_docbr
-'See "'+str_help_ImgUI+'":'
-tc_docbr+'1) game timer;'
-tc_docbr+'2) objectives and information, specific to current scenario;'
-tc_docbr+'3) player resources;'
-tc_docbr+'4) army limit;'
-tc_docbr+'5) FPS&APM counters;'
-tc_docbr+'6) numbered control groups;'
-tc_docbr+'7) minimap;'
-tc_docbr+'8) control panel; the position of the control panel can be changed in the game settings;'
-tc_docbr+'9) last game messages.'
-tc_docbr
-tc_docbr
-tc_orange+'UNIT UPGRADE INDICATORS'+tc_default+tc_doccpt
-tc_docbr
-'See "'+str_help_ImgUUpgrade+'":'
-tc_docbr+'- '+tc_red+'red'+tc_default+' numbers - summ of attack upgrades;'
-tc_docbr+'- '+tc_lime+'green'+tc_default+' numbers - summ of armor upgrades;'
-tc_docbr+'- '+tc_yellow+'yellow'+tc_default+' numbers - summ of other upgrades.'
+'См. "'+str_help_ImgUI+'":'
+tc_docbr+'1) игровой таймер;'
+tc_docbr+'2) задачи и информация, уникальная для текущего сценария;'
+tc_docbr+'3) ресурсы игрока;'
+tc_docbr+'4) лимит(размер) армии;'
+tc_docbr+'5) счетчики FPS&APM;'
+tc_docbr+'6) цифровые группы юнитов;'
+tc_docbr+'7) миникарта;'
+tc_docbr+'8) контрольная панель; расположение контрольной панели может быть другим - меняется в настройках;'
+tc_docbr+'9) список последних игровых сообщений.'
 tc_docbr
 tc_docbr
-tc_orange+'CONTROL PANEL'+tc_default+tc_doccpt
+tc_orange+'ИНДИКАТОРЫ УЛУЧШЕНИЙ ЮНИТОВ'+tc_default+tc_doccpt
 tc_docbr
-'Minimap marks:'+tc_doccpt
-tc_docbr+'- pulsating red rectangle - base is under attack;'
-tc_docbr+'- pulsating red circle - unit is under attack;'
-tc_docbr+'- pulsating lime circle - unit ready;'
-tc_docbr+'- pulsating lime rectangle - construction complete;'
-tc_docbr+'- pulsating blue circle - unit promoted;'
-tc_docbr+'- pulsating yellow rectangle - upgrade complete;'
-tc_docbr+'- pulsating aqua circle - generator event;'
-tc_docbr+'- pulsating dark-yellow circle - key point event;'
-tc_docbr+'- pulsating light-gray circle - "look here" mark;'
-tc_docbr+'- pulsating light-red circle - "attack here" mark.'
+'См. "'+str_help_ImgUUpgrade+'":'
+tc_docbr+'- '+tc_red+'красные'+tc_default+' числа - сумма улучшений на атаку;'
+tc_docbr+'- '+tc_lime+'зеленые'+tc_default+' числа - сумма улучшений на защиту;'
+tc_docbr+'- '+tc_yellow+'желтые'+tc_default+' числа - сумма прочих улучшений.'
 tc_docbr
-tc_docbr+'Tabs:'+tc_doccpt
-tc_docbr+'"'+str_ui_Tab[tab_Buildings]+'" - available buildings;'
-tc_docbr+'"'+str_ui_Tab[tab_Units]+'" - available units;'
-tc_docbr+'"'+str_ui_Tab[tab_Upgrades]+'" - available upgrades;'
-tc_docbr+'"'+str_ui_Tab[tab_Controls]+'" - abilities and basic orders of selected units; some game controls;'
 tc_docbr
-tc_docbr+'Description of numbers on icons:'+tc_doccpt
-tc_docbr+tc_lime  +'green' +tc_default+' - number of selected units of this type;'
-tc_docbr+tc_yellow+'yellow'+tc_default+' - number of production processes of this type;'
-tc_docbr+tc_orange+'orange'+tc_default+' or '+tc_gray  +'gray'  +tc_default+' - total number of that type of building/unit or upgrade level;'
-tc_docbr+tc_purple+'purple'+tc_default+' - number of units of that type in selected transport(s);'
-tc_docbr+tc_white +'white' +tc_default+' - time remaining until completion of production;'
-tc_docbr+tc_aqua  +'aqua'  +tc_default+' - remaining time until ability cooldown.'
-
-// unit upgrades
+tc_orange+'КОНТРОЛЬНАЯ ПАНЕЛЬ'+tc_default+tc_doccpt
+tc_docbr
+'Виды индикаторов на миникарте:'+tc_doccpt
+tc_docbr+'- пульсирующий красный квадрат - ваша база атакована;'
+tc_docbr+'- пульсирующий красный круг - ваш юнит атакован;'
+tc_docbr+'- пульсирующий зеленый круг - юнит готов;'
+tc_docbr+'- пульсирующий зеленый квадрат - постройка завершена;'
+tc_docbr+'- пульсирующий синий круг - юнит повышен;'
+tc_docbr+'- пульсирующий желтый квадрат - улучшение завершено;'
+tc_docbr+'- пульсирующий бирюзовый круг - событие генератора;'
+tc_docbr+'- пульсирующий темно-желтый круг - событие ключевой точки;'
+tc_docbr+'- пульсирующий светло-серый круг - отметка "смотреть сюда";'
+tc_docbr+'- пульсирующий светло-красный круг - отметка "атаковать тут".'
+tc_docbr
+tc_docbr+'Вкладки:'+tc_doccpt
+tc_docbr+'"'+str_ui_Tab[tab_Buildings]+'" - доступные здания;'
+tc_docbr+'"'+str_ui_Tab[tab_Units]+'" - доступные юниты;'
+tc_docbr+'"'+str_ui_Tab[tab_Upgrades]+'" - доступные улучшения;'
+tc_docbr+'"'+str_ui_Tab[tab_Controls]+'" - способности и базовые приказы выбранных юнитов; общие функции управления игрой.'
+tc_docbr
+tc_docbr+'Описание чисел на иконках:'+tc_doccpt
+tc_docbr+tc_lime  +'зеленые'   +tc_default+' - количество выбранных юнитов этого типа;'
+tc_docbr+tc_yellow+'желтые'    +tc_default+' - количество производящихся юнитов этого типа;'
+tc_docbr+tc_orange+'оранжевые' +tc_default+' или '+tc_gray  +'серые'  +tc_default+' - общее количество юнитов этого типа или уровень улучшения;'
+tc_docbr+tc_purple+'фиолетовые'+tc_default+' - количество юнитов этого типа внутри выбранного странспорта;'
+tc_docbr+tc_white +'белые'     +tc_default+' - время до завершения производства;'
+tc_docbr+tc_aqua  +'бирюзовые' +tc_default+' - время перезарядки способностей.'
 
 /////////////////////////////////////////////////////////////////////////////
 //  Help docs  GAME Mechanics
 
 DocHelp_BaseMechanics = 
-tc_orange+'MAP SCENARIOS'+tc_default+tc_doccpt
+tc_orange+'СЦЕНАРИИ КАРТЫ'+tc_default+tc_doccpt
 tc_docbr
-'* '+str_map_ScenarioL[mc_ffa3]+'-'+str_map_ScenarioL[mc_ffa8]+' - several free-for-all scenarios for different numbers of players; players team numbers can be changed.'
-tc_docbr+'* '+str_map_ScenarioL[mc_1x1]+' - a classic 1x1 scenario;'
-tc_docbr+'* '+str_map_ScenarioL[mc_2x2]+','+str_map_ScenarioL[mc_3x3]+','+str_map_ScenarioL[mc_4x4]+','+str_map_ScenarioL[mc_2x2x2]+','+str_map_ScenarioL[mc_2x2x2x2]+' - various team skirmish; players team numbers cannot be changed;'
+'* '+str_map_ScenarioL[mc_ffa3]+'-'+str_map_ScenarioL[mc_ffa8]+' - несколько FFA сценариев на разное количество игроков; номер команды можно менять.'
+tc_docbr+'* '+str_map_ScenarioL[mc_1x1]+' - классический сценарий 1х1;'
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2]
+tc_docbr+'* '+str_map_ScenarioL[mc_3x3]
+tc_docbr+'* '+str_map_ScenarioL[mc_4x4]
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2x2]
+tc_docbr+'* '+str_map_ScenarioL[mc_2x2x2x2]+' - различные командные сценарии; номер команды менять нельзя;'
 tc_docbr+str_ui_objectives+':'
 tc_docbr+str_objective_Scirmish
-tc_docbr+'* '+str_map_ScenarioL[mc_KeyPoints]+' - a tactical scenario in which players must capture '+str_keyPoint_mcN+' moving key points(see "'+str_help_ImgKeyPoints+'").'
-'To capture a point, a player must have at least one unit inside it. Capturing a key point takes '+str_keyPoint_CTime_Def_Sec+' seconds.'
-tc_docbr+'After capturing it, there is no requirement to keep units inside it.'
+tc_docbr+'* '+str_map_ScenarioL[mc_KeyPoints]+' - тактический сценарий, в котором игроки(или команды игроков) должны захватить '+str_keyPoint_mcN+' движущихся по карте точки(см. "'+str_help_ImgKeyPoints+'").'
+'Что бы захватить точку, необходимо расположить в ней хотя бы одного юнита. На захват уходит '+str_keyPoint_CTime_Def_Sec+' сек.'
+tc_docbr+'Захваченная точка не требует постоянного наличия юнитов внутри для ее удержания.'
 tc_docbr+str_ui_objectives+':'
 tc_docbr+str_objective_KeyPoints
-tc_docbr+'* '+str_map_ScenarioL[mc_KotH]+' (King of the Hill) - a tactical scenario in which players must hold the central area of the map(see "'+str_help_ImgKotH+'") for '+str_keyPoint_CTime_KotH_Sec+' seconds.'
-'There is a '+str_keyPoint_KotH_pause_sec+'-seconds cooldown before capturing the central area.'
+tc_docbr+'* '+str_map_ScenarioL[mc_KotH]+' - тактический сценарий, где игрокам(или командам игроков) '
+'необходимо захватить и удерживать центральную область карты (см. "'+str_help_ImgKotH+'") '
+'в течении '+str_keyPoint_CTime_KotH_Sec+' сек.'
+'Центральная область активируется спустя '+str_keyPoint_KotH_pause_sec+' сек. после начала игры.'
 tc_docbr+str_ui_objectives+':'
 tc_docbr+str_objective_KotH
-tc_docbr+'* '+str_map_ScenarioL[mc_royale]+' - a variant of free-for-all scenario, where the death circle gradually narrows the available space on the map.'
+tc_docbr+'* '+str_map_ScenarioL[mc_royale]+' - вариант FFA сценария, где от углов карты к ее центру медленно сужается круг смерти, мгновенно убивающий любых юнитов.'
 tc_docbr+str_ui_objectives+':'
 tc_docbr+str_objective_RoyalBattle
 tc_docbr+str_or
 tc_docbr+str_objective_Scirmish
 tc_docbr
 tc_docbr
-tc_orange+'NEUTRAL GENERATORS'+tc_default+tc_doccpt
+tc_orange+'ГЕНЕРАТОРЫ'+tc_default+tc_doccpt
 tc_docbr
-'Neutral generators (see "'+str_help_ImgGenerators+'") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of neutral generators:'
-tc_docbr+'- "Starter" generator - appears at players base in "Scirmish" game. Required at least '+str_map_generators_LimitS+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyS+'.'
-tc_docbr+'- "Normal" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
-tc_docbr+'Both types of neutral generators requires holding units inside it, otherwise generator become back to neutral state.'
+'Генераторы (см. "'+str_help_ImgGenerators+'") - особые объекты на карте, которые, если их захватить, повышают "'+str_ui_EnergyLevel+'". Есть 2 типа генераторов:'
+tc_docbr+'- "Стартовый" - всегда расположен рядом со стартовыми позициями игроков. Требует хотя бы '+str_map_generators_LimitS+' лимита юнитов для захвата. '
+'Увеличивает "'+str_ui_EnergyLevel+'" на '+str_map_generators_EnergyS+'.'
+tc_docbr+'- "Обычный" - может быть расположен где угодно. Требует хотя бы '+str_map_generators_LimitO+' лимита юнитов для захвата. '
+'Увеличивает "'+str_ui_EnergyLevel+'" на '+str_map_generators_EnergyO+'.'
+tc_docbr+'Любой вид генераторов после захвата стребует постоянного присутствия юнитов на нем, иначе он вернется в нейтральное состояние.'
 tc_docbr
 tc_docbr
-tc_orange+'RESOURCES'+tc_default+tc_doccpt
+tc_orange+'РЕСУРСЫ'+tc_default+tc_doccpt
 tc_docbr
-'There are 3 types of resources in the game:'
-tc_docbr+'- The main resource of the game is the "'+str_ui_EnergyLevel+'". Almost all production (building construction, unit creation, or upgrade research) in the game consumes this resource.'
-'In the user interface, it is displayed as two numbers: the level of free energy and the '+tc_aqua+'maximum energy level'+tc_default+'.'
-'When a player starts any production that requires this resource, the game reduces the free energy level by the production cost and restores this amount after the production is completed.'
-'The energy level can be increased by specific buildings, as well as special objects on the game map that need to be captured and held.'
+'В игре существует 3 вида ресурсов:'
+tc_docbr+'- Основной ресурс игры: "'+str_ui_EnergyLevel+'". Практически все виды производства в игре (постройка зданий, создание юнитов или исследование улучшений) требуют этот ресурс.'
+'В интерфейсе этот ресурс отображается как два числа: уровень свободной энергии и '+tc_aqua+'максимальный уровень энергии'+tc_default+'.'
+'Когда игрок начинает прозводство требующее этот ресурс - игра вычитает стоимость производства из уровня свободной энергии и возвращает ее назад когда работа завершается.'
+'Уровень энергии может быть увеличен специальными зданиями или особыми захватываемыми объектами на карте.'
 tc_docbr
-tc_docbr+'There are also 2 additional types of resources used for special technologies and abilities:'
-tc_docbr+'- '+str_ui_HellPower+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.'
-'The replenishment rate increases with each additional "Altar of Pain", but constructing more than '+str_scirmish_MaxHAltar+' "Altars of Pain" does not provide any further benefit. '
-'When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.'
+tc_docbr+'Два дополнительных ресурса, расходуемых на особые технологии и способности:'
+tc_docbr+'- '+str_ui_HellPower+' - при игре за Hell: этот ресурс автоматически пополняет здание "'+str_name[UID_HAltar]+'".'
+'Чем больше таких зданий игрок имеет, тем быстрее пополняется ресурс. '
+'При игре за UAC: этот ресурс пополняется уничтожением вражеских юнитов и зданий Hell.'
 str_hint_MaxQuantity+str_HellPower_Max+'. '
-tc_docbr+'- '+str_ui_UACLoot+' - this resource is acquired by both factions through the destruction of enemy UAC units and buildings. '+str_hint_MaxQuantity+str_UACLoot_Max+'.'
+tc_docbr+'- '+str_ui_UACLoot+' - этот ресурс у обоих сторон пополняется уничтожением вражеских юнитов и зданий UAC. '+str_hint_MaxQuantity+str_UACLoot_Max+'.'
 tc_docbr
 tc_docbr
-tc_orange+'ARMY LIMIT'+tc_default+tc_doccpt
+tc_orange+'РАЗМЕР АРМИИ'+tc_default+tc_doccpt
 tc_docbr
-'Each units and buildings in the game takes at least 1 limit point. Maximum limit points per each player is '+tc_red+'125'+tc_default+'!'
-'Dead units still exist in the game and takes limit.'
-tc_docbr
-tc_docbr
-tc_orange+'UNIT ATTRIBUTES'+tc_default+tc_doccpt
-tc_docbr
-'- '+str_attr_alive   +' or '+str_attr_dead    +''
-tc_docbr+'- '+str_attr_unit    +' or '+str_attr_building+''
-tc_docbr+'- '+str_attr_mech    +' or '+str_attr_bio     +''
-tc_docbr+'- '+str_attr_light   +' or '+str_attr_heavy   +''
-tc_docbr+'- '+str_attr_fly     +' or '+str_attr_ground  +''
-tc_docbr+'- '+str_attr_level   +'2..4 - unit level if it is higher than 1.'
+'Любой юнит или здание в игре занимает как минимум 1 ед. лимита. Максимальное количество лимита на игрока - '+tc_red+'125'+tc_default+'!'
+'Мертвые юниты продолжают существовать в игре и тоже занимают лимит.'
 tc_docbr
 tc_docbr
-tc_orange+'UNIT EFFECTS'+tc_default+tc_doccpt
+tc_orange+'АТРИБУТЫ ЮНИТОВ'+tc_default+tc_doccpt
 tc_docbr
-'- '+str_attr_stuned  +' - unit is stuned and can`t attack or move;'
-tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;'
-tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and takes a third less damage;'
-tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;'
-tc_docbr+'- '+str_attr_Decay   +' - unit is under "Decay Aura" effect; it slowly lose health;'
-tc_docbr+'- '+str_attr_HVision +' - unit is under "Hell Vision" effect; it can see invisible enemy units;'
-tc_docbr+'- '+str_attr_SSoul   +' - unit is under "Soul Sphere" effect; it`s regaining it health;'
-tc_docbr+'- '+str_attr_SInvuln +' - unit is under "Invulnerability Sphere" effect; it is immune to any damage;'
-tc_docbr+'- '+str_attr_SInvis  +' - unit is under "Invisibility Sphere" effect; it invisibile;'
-tc_docbr+'- '+str_attr_SRDamage+' - unit is under "Damage Resistance Sphere" effect; it takes half damage and resist to "pain state" effect;'
-tc_docbr+'- '+str_attr_SDDamage+' - unit is under "Double Damage Sphere" effect; it deals double damage;'
-tc_docbr+'- '+str_attr_STurbo  +' - unit is under "Turbo Sphere" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.'
+'- '+str_attr_alive+' или '+str_attr_dead
+tc_docbr+'- '+str_attr_unit    +' или '+str_attr_building
+tc_docbr+'- '+str_attr_mech    +' или '+str_attr_bio
+tc_docbr+'- '+str_attr_light   +' или '+str_attr_heavy  
+tc_docbr+'- '+str_attr_fly     +' или '+str_attr_ground
+tc_docbr+'- '+str_attr_level   +'2..4 - уровень юнита (если он выше 1).'
 tc_docbr
 tc_docbr
-tc_orange+'PAIN STATE'+tc_default+tc_doccpt
+tc_orange+'ЭФФЕКТЫ ЮНИТОВ'+tc_default+tc_doccpt
 tc_docbr
-'Some units have "Pain State" - it is a 1-second stun state after a certain number of damage hits. During the "Pain State" unit can`t attack or move. "Pain State" is accompanied by a special sound and unit animation.'
-tc_docbr
-tc_docbr
-tc_orange+'VETERAN SYSTEM'+tc_default+tc_doccpt
-tc_docbr
-'All combat units gain combat experience and increase their level. All units spawn at level 1 and can be upgraded to level 4. With each new level, the unit increases its damage, armor, and pain threshold.'
-'The time in combat required to reach the next level varies for each type of unit(see "'+str_help_UnitsInfo+'" section).'
-tc_docbr
-tc_docbr
-tc_orange+'DAMAGE CALCULATION SEQUENCE'+tc_default+tc_doccpt
-tc_docbr
-'1) The game takes the attacking unit`s base damage and adds bonuses from upgrades and veteran level;'
-tc_docbr+'2) Special effects of the attacking unit that affect its damage amount are applied ("'+str_attr_heroic+'" attribute and "'+str_attr_SDDamage+'" effect);'
-tc_docbr+'3) A damage modifier for the attacking unit is applied to the resulting value;'
-tc_docbr+'4) Special effects reducing the received damage by the target unit are applied ("'+str_attr_heroic+'" attribute and "'+str_attr_SRDamage+'" effect);'
-tc_docbr+'5) The armor of the target unit is calculated (bonuses from upgrades and its veteran level are summed up) and subtracted from the inflicted damage; if the damage drops below 1, it is raised to 1;'
-tc_docbr+'6) The target unit receives the final calculated damage.'
-tc_docbr+'Special cases:'
-tc_docbr+'- If the unit is a building under construction, steps 4 and 5 are skipped;'
-tc_docbr+'- Damage dealt by the "Decay Aura" effect also ignores points 4 and 5;'
-tc_docbr+'- Units with '+str_attr_building+' or '+str_attr_mech+' attribute are immune to splash damage.'
+'- '+str_attr_stuned  +' - юнит оглушен и не может двигаться или атаковать;'
+tc_docbr+'- '+str_attr_detector+' - юнит может видеть невидимых юнитов противника;'
+tc_docbr+'- '+str_attr_heroic  +' - юнит - герой; он наносит в 1.5 раза больше урона и сам получает на 1/3 меньше урона;'
+tc_docbr+'- '+str_attr_Scaned  +' - юнит был просканирован Радаром UAC;'
+tc_docbr+'- '+str_attr_Decay   +' - юнит находится под эффектом способности "'+str_name[uab_HKeepAura]+'"; он медленно теряет здоровье;'
+tc_docbr+'- '+str_attr_HVision +' - юнит находится под эффектом способности "'+str_name[uab_HEyeVision]+'"; он может видеть невидимых вражеских юнитов;'
+tc_docbr+'- '+str_attr_SSoul   +' - юнит находится под эффектом способности "'+str_name[uab_SphereSoul]+'"; он быстро восстанавливает свое здоровье;'
+tc_docbr+'- '+str_attr_SInvuln +' - юнит находится под эффектом способности "'+str_name[uab_SphereInvuln]+'"; он неуязвим;'
+tc_docbr+'- '+str_attr_SInvis  +' - юнит находится под эффектом способности "'+str_name[uab_SphereInvis]+'"; он невидим;'
+tc_docbr+'- '+str_attr_SRDamage+' - юнит находится под эффектом способности "'+str_name[uab_SphereRDamage]+'"; он получает только половину урона и невосприимчив к "состоянию боли";'
+tc_docbr+'- '+str_attr_SDDamage+' - юнит находится под эффектом способности "'+str_name[uab_SphereDDamage]+'"; он наносит вдвое больше урона;'
+tc_docbr+'- '+str_attr_STurbo  +' - юнит находится под эффектом способности "'+str_name[uab_SphereTurbo]+'"; он имеет удвоенную скорость передвижения, атаки, регенерации, перезарядки и производства.'
 tc_docbr
 tc_docbr
-tc_orange+'OTHER'+tc_default+tc_doccpt
+tc_orange+'СОСТОЯНИЕ БОЛИ'+tc_default+tc_doccpt
 tc_docbr
-'If a player loses all his builders - all his units revealed on the map.'
+'Некоторые юниты могут иметь "состояние боли" - при получении определенного количества ударов (см. секцию "'+str_help_UnitsInfo+'", параметр "'+str_doc_PainC+'..") юнит оглушается на 1 секунду. '
+'В этом состоянии юнит не может двигаться или атаковать. Переход в "состояние боли" сопровождается особым звуком и анимацией.'
 tc_docbr
-tc_docbr+'Unit hits regeneration period is 1 second.'
+tc_docbr
+tc_orange+'СИСТЕМА ВЕТЕРАНСТВА ЮНИТОВ'+tc_default+tc_doccpt
+tc_docbr
+'Все боевые юниты получают опыт в бою и могут повысить свой уровень. Юниты изначально имеют 1 уровень и могут прокачаться до 4. С каждым новым уровнем юниты увеличивают свою атаку, защиту, регенерацию и болевой порог.'
+'Каждый тип юнита имеет свое время прокачки и свои размеры бонусов к характеристикам (см. секцию "'+str_help_UnitsInfo+'").'
+tc_docbr
+tc_docbr
+tc_orange+'ПОРЯДОК ВЫЧИСЛЕНИЯ УРОНА'+tc_default+tc_doccpt
+tc_docbr
+'1) Игра берет базовый урон атакующего юнита и добавляет к нему все бонусы от улучшений и уровня ветеранства;'
+tc_docbr+'2) Применяются особые эффекты атакующего юнита, которые могут влиять на его урон (атрибут "'+str_attr_heroic+'" и эффект "'+str_attr_SDDamage+'");'
+tc_docbr+'3) Применяется моддификатор урона атакующего юнита;'
+tc_docbr+'4) Применяются особые эффекты юнита-цели, которые могут повлиять на получаемый им урон (атрибут "'+str_attr_heroic+'" и эффект "'+str_attr_SRDamage+'");'
+tc_docbr+'5) Вычисляется размер брони юнита-цели (складываются бонусы от улучшений и уровня ветеранства); полученный размер брони вычитается из наносимого урона; если результат получается меньше 1 - он повышается до 1;'
+tc_docbr+'6) Юнит-цель получает урон.'
+tc_docbr+'Особые случаи:'
+tc_docbr+'- Если юнит - здание в процессе постройки - шаги 4 и 5 пропускаются;'
+tc_docbr+'- Урон, наносимый способностью "'+str_name[uab_HKeepAura]+'" так же игнорирует шаги 4 и 5;'
+tc_docbr+'- Юнит с атрибутами '+str_attr_building+' или '+str_attr_mech+' невосприимчив к урону по области.'
+tc_docbr
+tc_docbr
+tc_orange+'ПРОЧЕЕ'+tc_default+tc_doccpt
+tc_docbr
+'Если игрок теряет всех строителей - его оставшиеся юниты раскрываются для всех игроков.'
+tc_docbr
+tc_docbr+'Время регенерации юнитов - 1 секунда.'
 
 /////////////////////////////////////////////////////////////////////////////
 //  Help docs  OTHER
 
 DocHelp_Other = 
-tc_orange+'DEDICATED SERVER'+tc_default+tc_doccpt
+tc_orange+'ВЫДЕЛЕННЫЙ СЕРВЕР'+tc_default+tc_doccpt
 tc_docbr
-tc_docbr+'Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:'
+tc_docbr+'Выделенный сервер - особая консольная версия игры, которая не загружает никаких игровых ресурсов и сразу запускается как игровой сервер. Выделенный сервер можно запускать со следующими параметрами:'
 tc_docbr
 tc_doccnt+'MarsWars_ded.exe [X] [Y]'
 tc_docbr
-'where X - UDP port (optional argument, default value - '+str_net_DefaultPort+' Y - LAN Advertise (optional argument, default value - 1 (true))).'
-tc_docbr+'Any connected player can change the game settings in a dedicated server`s lobby.'
-tc_docbr+'The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.'
+'где X - UDP порт (опциональный параметр, значение по умолчанию - '+str_net_DefaultPort+' Y - видимость сервера в LAN (опциональный параметр, значение по умолчанию - 1 (true))).'
+tc_docbr+'На выделенном сервере любой подключившийся игрок может менять параметры игры или карты.'
+tc_docbr+'Игра автоматически начинется, когда все игроки отметят свою готовность соответствующей опцией в лобби. Сервер вернется в лобби через 1 минуту после завершения игры или сразу после отключения последнего игрока.'
 tc_docbr
 tc_docbr
-tc_orange+'AI BOT SKILL LEVELS'+tc_default+tc_doccpt
+tc_orange+'УРОВНИ СЛОЖНОСТИ ИИ-ИГРОКОВ'+tc_default+tc_doccpt
 tc_docbr
-tc_docbr+'AI1 - the easiest bot; AI9 - the the hardest.'
-tc_docbr+'AI1-5 - bot operates under the same conditions as a player-human; there are no unfair advantages and it does not ignore the fog of war; '
-'the difference is various size of army, super weapon or "magic" using, some micro-control abilities and build-order.'
-tc_docbr+'AI3+ - there is a chance of an early attack by a small group of units.'
-tc_docbr+'AI4+ - there is a chance of an super early attack by a first unit.'
-tc_docbr+'AI6 - AI5 + building construction speed is doubled.'
-tc_docbr+'AI7 - AI6 + upgrades production speed is doubled.'
-tc_docbr+'AI8 - AI7 + unit production speed is doubled.'
-tc_docbr+'AI9 - AI8 + bot can see enemy units or buildings, ignoring fog of war.'
+tc_docbr+str_ps_AI+'1 - самый легкий; '+str_ps_AI+'9 - самый сложный.'
+tc_docbr+str_ps_AI+'1-5 - бот действует в тех же условиях, что и игрок-человек - у него нет никаких нечестных преимуществ и он не видит сквозь туман войны; '
+'разница в уровнях тут - максимальный размер армии, частота применения "магии" или супер-оружия, а так же качество контроля юнитами.'
+tc_docbr+str_ps_AI+'3+ - начиная с этого уровня, у бота есть шанс совершить ранюю атаку маленькой группой юнитов.'
+tc_docbr+str_ps_AI+'4+ - начиная с этого уровня, у бота есть шанс выполнить сверх ранюю атаку первым боевым юнитом.'
+tc_docbr+str_ps_AI+'6 - '+str_ps_AI+'5 плюс скорость постройки зданий удваивается.'
+tc_docbr+str_ps_AI+'7 - '+str_ps_AI+'6 плюс скорость исследования улучшений удваивается.'
+tc_docbr+str_ps_AI+'8 - '+str_ps_AI+'7 плюс удваивается скорость производства юнитов.'
+tc_docbr+str_ps_AI+'9 - '+str_ps_AI+'8 плюс бот может видеть врагов игнорируя туман войны.'
 
 /////////////////////////////////////////////////////////////////////////////
 //  CAMPAING STRINGS
 
-str_Camp_Difficulty           = 'Difficulty'
+str_Camp_Difficulty           = 'Сложность'
 str_Camp_DifficultyL[0]       = tc_aqua  +'I`m too young to die'+tc_default
 str_Camp_DifficultyL[1]       = tc_lime  +'Hey, not too rough'  +tc_default
 str_Camp_DifficultyL[2]       = tc_yellow+'Hurt me plenty'      +tc_default
 str_Camp_DifficultyL[3]       = tc_orange+'Ultra-Violence'      +tc_default
 str_Camp_DifficultyL[4]       = tc_red   +'Nightmare'           +tc_default
 
-str_Camp_Campaign             = 'Campaign'
-str_Camp_Mission              = 'Mission'
-str_Camp_Info                 = 'Information'
-str_Camp_Location             = 'Location'
-str_Camp_NewUnits             = 'New units available: '
+str_Camp_Campaign             = 'Кампания'
+str_Camp_Mission              = 'Миссия'
+str_Camp_Info                 = 'Информация'
+str_Camp_Location             = 'Место действия'
+str_Camp_NewUnits             = 'Доступны новые юниты: '
 
-str_Camp_HE_CoB               = 'Clan of Bites'
-str_Camp_HE_EE                = 'Evil Eyes Tribe'
-str_Camp_HE_PoA               = 'Pack of Anger'
-str_Camp_HE_BS                = 'Blood Squad'
-str_Camp_HE_LoH               = 'Lords of Horror'
-str_Camp_HE_CoBS              = 'Clan of Burning Sky'
+str_Camp_HE_CoB               = 'Клан укусов'
+str_Camp_HE_EE                = 'Племя злого глаза'
+str_Camp_HE_PoA               = 'Стая Злобы'
+str_Camp_HE_BS                = 'Кровавый отряд'
+str_Camp_HE_LoH               = 'Лорды ужаса'
+str_Camp_HE_CoBS              = 'Клан горящих небес'
 
 ///////////////////     HELL VS HELL
 
-str_camp_1                    = 'Ascension'
+str_camp_1                    = 'Возвышение'
 
-str_tmp1 =    'Hell Empire'+tc_nl
+str_tmp1 =    'Адская Империя'+tc_nl
 
 //////////     HELL VS HELL    1
 
-str_camp_1_miss_1_name =  'Mt. Erebus'
+str_camp_1_miss_1_name =  'гор. Эребус'
 
 str_camp_1_miss_1_obj  = '- Don`t lose the Hell Keep'
                    tc_nl+'- Capture 1 generator'

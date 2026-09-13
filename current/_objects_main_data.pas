@@ -1851,7 +1851,7 @@ begin
    setUPGR(r_hell,upgr_hell_TeleportCD  ,60 ,0,30,2   ,400 ,0,200 ,0            ,UID_HAKeep          );
    setUPGR(r_hell,upgr_hell_T2TNoCD     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          );
    setUPGR(r_hell,upgr_hell_Spectre     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
-   setUPGR(r_hell,upgr_hell_UnitSightR  ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_HMonastery      );
+   setUPGR(r_hell,upgr_hell_UnitSightR  ,60 ,0,30,2   ,900 ,0,600 ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_Phantoms    ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_DistDamage2 ,60 ,0,50,4   ,900 ,0,900 ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_Resurrect   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
@@ -1875,7 +1875,7 @@ begin
    setUPGR(r_uac ,upgr_uac_TowerR       ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UACommandCenter );
    setUPGR(r_uac ,upgr_uac_DronTurret   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UACommandCenter );
    setUPGR(r_uac ,upgr_uac_Transport    ,60 ,0,0 ,1   ,800 ,0,0   ,0            ,UID_UACommandCenter );
-   setUPGR(r_uac ,upgr_uac_UnitSightR   ,60 ,0,30,2   ,600 ,0,300 ,0            ,UID_UScienceCenter  );
+   setUPGR(r_uac ,upgr_uac_UnitSightR   ,60 ,0,30,2   ,900 ,0,600 ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_CommandoInvis,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_AASplash     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_MechSpeed    ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_UScienceCenter  );

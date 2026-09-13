@@ -1332,7 +1332,7 @@ begin
    vl:=StringReplace(vl,'str_soul_maxHeal'            ,i2s(soul_maxHeal)           ,replace_a);
    vl:=StringReplace(vl,'str_soul_time_sec'           ,i2s(soul_time_sec)          ,replace_a);
    vl:=StringReplace(vl,'str_invis_time_sec'          ,i2s(invis_time_sec)         ,replace_a);
-   vl:=StringReplace(vl,'str_invuln_time_sec'         ,i2s(invis_time_sec)         ,replace_a);
+   vl:=StringReplace(vl,'str_invuln_time_sec'         ,i2s(invuln_time_sec)        ,replace_a);
    vl:=StringReplace(vl,'str_rdamage_time_sec'        ,i2s(rdamage_time_sec)       ,replace_a);
    vl:=StringReplace(vl,'str_ddamage_time_sec'        ,i2s(ddamage_time_sec)       ,replace_a);
    vl:=StringReplace(vl,'str_dturbo_time_sec'         ,i2s(dturbo_time_sec)        ,replace_a);
@@ -1344,6 +1344,10 @@ begin
    vl:=StringReplace(vl,'str_keyPoint_KotH_pause_sec' ,i2s(keyPoint_KotH_pause_sec),replace_a);
    vl:=StringReplace(vl,'str_keyPoint_CTime_Def_Sec'  ,i2s(keyPoint_CTime_Def_Sec) ,replace_a);
    vl:=StringReplace(vl,'str_keyPoint_mcN'            ,i2s(keyPoint_mcN)           ,replace_a);
+
+   vl:=StringReplace(vl,'str_HellPower_Add1'          ,i2s(HellPower_Add1)         ,replace_a);
+   vl:=StringReplace(vl,'str_HellPower_Add2'          ,i2s(HellPower_Add2)         ,replace_a);
+   vl:=StringReplace(vl,'str_HellPower_Add3'          ,i2s(HellPower_Add3)         ,replace_a);
 
    vl:=StringReplace(vl,'str_map_generators_EnergyO'  ,i2s(map_generators_EnergyO) ,replace_a);
    vl:=StringReplace(vl,'str_map_generators_EnergyS'  ,i2s(map_generators_EnergyS) ,replace_a);
@@ -1370,9 +1374,9 @@ begin
 
    // Game hotkeys
 
-   vl:=StringReplace(vl,'HK_InGameChat'        ,DocHelp_GetHotKeys([iAct_InGameChat          ]),replace_a);
    vl:=StringReplace(vl,'HK_InGameChatAll'     ,DocHelp_GetHotKeys([iAct_InGameChatAll       ]),replace_a);
    vl:=StringReplace(vl,'HK_InGameChatAllies'  ,DocHelp_GetHotKeys([iAct_InGameChatAllies    ]),replace_a);
+   vl:=StringReplace(vl,'HK_InGameChat'        ,DocHelp_GetHotKeys([iAct_InGameChat          ]),replace_a);
    vl:=StringReplace(vl,'HK_InGamePause'       ,DocHelp_GetHotKeys([iAct_InGamePause         ]),replace_a);
    vl:=StringReplace(vl,'HK_InGameMenu'        ,DocHelp_GetHotKeys([iAct_InGameMenu          ]),replace_a);
    vl:=StringReplace(vl,'HK_Tab'               ,DocHelp_GetHotKeys([iAct_Tab                 ]),replace_a);
@@ -1438,9 +1442,10 @@ begin
    vl:=StringReplace(vl,'HK_test_AddHellPower' ,DocHelp_GetHotKeys([iAct_test_AddHellPower   ]),replace_a);
    vl:=StringReplace(vl,'HK_test_AddUACLoot'   ,DocHelp_GetHotKeys([iAct_test_AddUACLoot     ]),replace_a);
 
-
-   if(pos('str_',vl)>0)then writeln('str_ "',vl,'"');
-   if(pos('2s'  ,vl)>0)then writeln('2s "'  ,vl,'"');
+   if(pos('str_'      ,vl)>0)then writeln('str_ "'      ,vl,'"');
+   if(pos('2s'        ,vl)>0)then writeln('2s "'        ,vl,'"');
+   if(pos('UACStrike_',vl)>0)then writeln('UACStrike_ "',vl,'"');
+   if(pos('HK_'       ,vl)>0)then writeln('HK_ "'       ,vl,'"');
 
    lang_ParseLangLine+=vl;
 end;
@@ -1478,7 +1483,7 @@ vr,vl:shortstring;
 i    :cardinal;
 begin
    line:=Trim(line);
-   if(length(line)>255)then setlength(line,255);
+   //if(length(line)>255)then setlength(line,255);
    lang_UTF82b1b(@line);
 
    vr:='';

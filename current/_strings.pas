@@ -1121,6 +1121,12 @@ end;
 
 begin
    /////////////////////////////////////////////////////////////////////////////
+   //   iActs
+   for uid:=0 to 255 do
+     if(length(input_actions[uid].ik_str_HK)>0)then
+       str_action_hint[uid]:=str_action_hint[uid]+' ('+input_actions[uid].ik_str_HK+')';
+
+   /////////////////////////////////////////////////////////////////////////////
    //   UNITS
    for uid:=0 to 255 do
      with g_uids[uid] do

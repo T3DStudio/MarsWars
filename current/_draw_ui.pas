@@ -473,12 +473,10 @@ begin
          3: draw_UITabButtonT(tar,ucl,0                   ,0            ,0                 ,0                 ,0      ,0       ,0     ,0       );
          end;
 
-   if(iActOn(iAct_InGameMenu ))then draw_UIButtonSText(tar,0,ui_CtrlPanelBL,ta_MM,@str_ui_menu   ,c_white                    ,false,false);
-   if(iActOn(iAct_InGamePause))then draw_UIButtonSText(tar,2,ui_CtrlPanelBL,ta_MM,@str_menu_Pause,PlayerGetColorDef(g_status),false,false);
+   if(iActOn(iAct_InGameMenu        ))then draw_UIButtonSText(tar,0,ui_CtrlPanelBL,ta_MM,@str_ui_menu   ,c_white                    ,false,false);
+   if(iActOn(iAct_Control_ScoreBoard))then draw_UIButtonS    (tar,1,ui_CtrlPanelBL,spr_uibtn_ShowScores,false,not iActEnabled(iAct_Control_ScoreBoard));
+   if(iActOn(iAct_InGamePause       ))then draw_UIButtonSText(tar,2,ui_CtrlPanelBL,ta_MM,@str_menu_Pause,PlayerGetColorDef(g_status),false,false);
 
-{
-draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
-}
    case ui_tab of
    tab_buildings,
    tab_units,
@@ -498,21 +496,23 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
                                            begin
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,m_brush=uid,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_bprod_ucl_time[uid_uibtn]),i2s(ui_bprod_ucl_count[ucl]),i2s(units_ucl_s[true,ucl]),i2s(units_ucl_e[true,ucl])                            ,ir2s(ui_bucl_reload[ucl]),
-                                              ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
+                                              ir2s(ui_bprod_ucl_time[uid_uibtn]) ,i2s(ui_bprod_ucl_count[ucl]),i2s(units_ucl_s[true,ucl]),i2s(units_ucl_e[true,ucl])                            ,ir2s(ui_bucl_reload[ucl]),
+                                              ui_cenergy[(res_energyl_cur<0)
+                                                      and(uid_req_EnergyLevel>0)],c_dyellow                   ,c_lime                    ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_aqua,ir2s(build_cd));
                                            end;
                             tab_units    : with g_uids[uid] do
                                            begin
                                               draw_UIButtonS(tar,ux,uy,uid_BTNBig.surf,false,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_uprod_uid_time[uid])      ,i2s(ui_uprod_uid_cur[uid])  ,i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
-                                              ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
+                                              ir2s(ui_uprod_uid_time[uid])       ,i2s(ui_uprod_uid_cur[uid])  ,i2s(units_uid_s[uid]),i2s(units_uid_e[uid])                                 ,i2s(ui_units_inapc[uid]),
+                                              ui_cenergy[(res_energyl_cur<0)
+                                                      and(uid_req_EnergyLevel>0)],c_dyellow                   ,c_lime               ,ui_max_color[not player_UIDLimitCheck(PVisPlayer,uid)],c_purple,'');
                                            end;
                             tab_upgrades : begin
                                               draw_UIButtonS(tar,ux,uy,g_upgrs[uid].upgr_btnBig.surf,ui_pprod_upg_time[uid]>0,not iActEnabled(act));
                                               draw_UIButtonT(tar,ux,uy,
-                                              ir2s(ui_pprod_upg_time[uid])      ,i2s(ui_pprod_upg_cur[uid])  ,'',b2s(upgrs_cur[uid])                                 ,'',
-                                              ui_cenergy[res_energyl_cur<0]     ,c_dyellow                   ,0 ,ui_max_color[upgrs_cur[uid]>=upgrs_max[uid]] ,0 ,'');
+                                              ir2s(ui_pprod_upg_time[uid])       ,i2s(ui_pprod_upg_cur[uid])  ,'',b2s(upgrs_cur[uid])                                 ,'',
+                                              ui_cenergy[res_energyl_cur<0]      ,c_dyellow                   ,0 ,ui_max_color[upgrs_cur[uid]>=upgrs_max[uid]] ,0 ,'');
                                            end;
                             end;
                        end;
@@ -559,8 +559,6 @@ draw_UIButtonS(tar,ux,uy,spr_uibtn_mmark  ,false   ,false              );
 
                        iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,not iActEnabled(uid));
                        iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,not iActEnabled(uid));
-
-                       iAct_Control_ScoreBoard: draw_UIButtonS(tar,ux,uy,spr_uibtn_ShowScores,false,not iActEnabled(uid));
 
                        iAct_Replay_Fog,
                        iAct_Observer_Fog      : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayFog ,ui_fog,not iActEnabled(uid));
@@ -663,7 +661,7 @@ begin
               if(uid_gen_EnergyLevel>0)then
                 STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_scomma);
               AddLine(@s1);
-              s1:=tc_white+'('+tc_default+chr(playeri)+name+tc_white+')';
+              s1:=tc_white+'('+ui_TeamRace(team,race)+chr(playeri)+name+tc_white+')';
               AddLine(@s1);
            end;
 end;
@@ -799,9 +797,11 @@ begin
                                   end;
                     end;
    mf_MenuPause: case m_btnN of
-                 0 : if(iActOn(iAct_InGameMenu ))then begin AddLine(@str_action_hint[iAct_InGameMenu ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
-                 2 : if(iActOn(iAct_InGamePause))then begin AddLine(@str_action_hint[iAct_InGamePause]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 0 : if(iActOn(iAct_InGameMenu        ))then begin AddLine(@str_action_hint[iAct_InGameMenu        ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 1 : if(iActOn(iAct_Control_ScoreBoard))then begin AddLine(@str_action_hint[iAct_Control_ScoreBoard]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 2 : if(iActOn(iAct_InGamePause       ))then begin AddLine(@str_action_hint[iAct_InGamePause       ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
                  end;
+
    end;
 end;
 
@@ -820,17 +820,22 @@ end;
 
 procedure draw_ReplayProgress(tar:pSDL_Surface);
 var
-w : integer;
+w,
+b0,
+b1: integer;
 cx: single;
 begin
    cx:=replay_GetProgress;
    w :=round(cx*(ui_ReplayBarW-1));
 
    boxColor      (tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+ui_ReplayBarW-1,ui_ReplayBarY-1,c_black);
-   rectangleColor(tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+ui_ReplayBarW-1,ui_ReplayBarY-1,c_white);
+   rectangleColor(tar,ui_ReplayBarX  ,ui_ReplayBarY-ui_ReplayBarH,ui_ReplayBarX+ui_ReplayBarW-1,ui_ReplayBarY-1,c_ltgray);
 
-   boxColor      (tar,ui_ReplayBarX+1  ,ui_ReplayBarY-ui_ReplayBarH+1,
-                      ui_ReplayBarX+w-1,ui_ReplayBarY-2,c_violet);
+   b0:=ui_ReplayBarX+1;
+   b1:=ui_ReplayBarX+w-1;
+   if(b1<b0)then b1:=b0;
+   boxColor      (tar,b0,ui_ReplayBarY-ui_ReplayBarH+1,
+                      b1,ui_ReplayBarY-2,c_violet);
    draw_text(tar,ui_ReplayBarX+2,ui_ReplayBarY-font_wh,i2s(round(cx*100))+'%',ta_LB,255,c_white);
 
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)then
@@ -855,17 +860,29 @@ begin
    with map_KeyPointsL[kpi] do
    with kp_TeamData[MaxPlayers] do
    begin
-      if(kptd_OwnerPlayer<=LastPlayer)
-      then kpowner:=g_PlayersGame[kptd_OwnerPlayer].name
-      else kpowner:='---';
+      {if(ps_team<=LastPlayer)
+      then tstr:=b2s(ps_team+1)
+      else tstr:='?';
+      case ps_race of
+      r_hell: tstr+=tc_RankHell;
+      r_uac : tstr+=tc_RankUAC;
+      else    tstr+='?'
+      end;}
+
+      if(kptd_OwnerPlayer>LastPlayer)
+      then kpowner:='---'
+      else
+        with g_PlayersGame[kptd_OwnerPlayer] do
+          kpowner:=ui_TeamRace(team,race)+name;
 
       if(kptd_Timer<=0)or(ui_blink2_colorb)
       then kpcolor:=PlayerGetColorCur(kptd_OwnerPlayer     ,false)
       else
       begin
          kpcolor:=PlayerGetColorCur(kptd_TimerOwnerPlayer,false);
-         if(kptd_TimerOwnerPlayer<=LastPlayer)
-         then kpowner:=g_PlayersGame[kptd_TimerOwnerPlayer].name;
+         if(kptd_TimerOwnerPlayer<=LastPlayer)then
+           with g_PlayersGame[kptd_TimerOwnerPlayer] do
+             kpowner:=ui_TeamRace(team,race)+name;
       end;
 
       draw_text(tar,x,y,'#'+b2s(kpi+1)+': '+kpowner,ta_LU,ui_Objectives_LineLen,kpcolor);

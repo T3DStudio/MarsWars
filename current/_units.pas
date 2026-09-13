@@ -1535,7 +1535,8 @@ begin
    with pu^     do
    with uid^    do
    with player^ do
-     if(res_energyl_cur>=0)then
+     if(res_energyl_cur>=0)
+     or(uid_req_EnergyLevel=0)then
      begin
         if(g_cycle_order=cycle_order)and(buffs[ub_Damaged]<=0)then
         begin
@@ -2299,7 +2300,8 @@ begin
           else
             if(transformTimer>0)then
             begin
-               if(res_energyl_cur>=0)then
+               if(res_energyl_cur>=0)
+               or(g_uids[transformUID].uid_req_EnergyLevel=0)then
                begin
                   if(buffs[ub_SphereTurbo]>0)
                   then transformTimer-=2

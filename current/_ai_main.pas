@@ -212,7 +212,7 @@ function ai_AbilitiesTransformIf(pu:PTUnit):boolean;
 begin
    with pu^ do
      ai_AbilitiesTransformIf:=(buffs[ub_damaged]<=0)
-                           and(hits>uid^.uid_MaxHitsh);
+                           and(hits>uid^.uid_MaxHitsq);
 end;
 
 procedure ai_AbilitiesTransform(pu:PTUnit);
@@ -338,7 +338,7 @@ begin
    end;
 end;
 
-procedure ai_AbilitiesCommon(pCaster:PTunit);
+procedure ai_AbilitiesOther(pCaster:PTunit);
 var
 cx,cy,cd:integer;
 begin
@@ -383,7 +383,6 @@ begin
                                cd:=aiu_alarm_d;
                             end;
 
-
                           if(cd<NOTSET)
                           then ai_ability_TowerBlink2Dir(pCaster,cx,cy,cd,g_randomr(30))  //srange
                           else
@@ -394,33 +393,33 @@ begin
      UID_HTeleport   : if(ai_enemy_battle_d<base_r1h)and(ai_HTeleportRecall_u<>nil)then
                          if(ai_HTeleportRecall_u^.aiu_alarm_d>base_r2)then
                            ai_UnitAbility(pCaster,uab_Recall,ai_HTeleportRecall_u^.unum,0,0);
-     UID_HAltar      : if(aip_timer_magic=0)then
+     UID_HAltar      : if(aip_pause_magic>=0)and(aip_timer_magic=0)then
                        begin
                           if(ai_AbilityMagic(pCaster,ai_SphereTurbo_u  ,uab_SphereTurbo  ))
-                          then aip_timer_magic:=aip_pause_magic
+                          then aip_timer_magic:=aip_pause_magic+fr_fps1
                           else
                             if(ai_AbilityMagic(pCaster,ai_SphereDDamage_u,uab_SphereDDamage))
-                            then aip_timer_magic:=aip_pause_magic
+                            then aip_timer_magic:=aip_pause_magic+fr_fps1
                             else
                               if(ai_AbilityMagic(pCaster,ai_SphereRDamage_u,uab_SphereRDamage))
-                              then aip_timer_magic:=aip_pause_magic;
+                              then aip_timer_magic:=aip_pause_magic+fr_fps1;
                        end;
      UID_UHPowerConductor
-                     : if(aip_timer_magic=0)then
+                     : if(aip_pause_magic>=0)and(aip_timer_magic=0)then
                        begin
                           if(ai_AbilityMagic(pCaster,ai_SphereInvuln_u,uab_SphereInvuln))
-                          then aip_timer_magic:=aip_pause_magic
+                          then aip_timer_magic:=aip_pause_magic+fr_fps1
                           else
                             if(ai_AbilityMagic(pCaster,ai_SphereSoul_u,uab_SphereSoul))
-                            then aip_timer_magic:=aip_pause_magic
+                            then aip_timer_magic:=aip_pause_magic+fr_fps1
                             else
                               if(ai_SphereInvis_u<>ai_SphereInvuln_u)then
                                 if(ai_AbilityMagic(pCaster,ai_SphereInvis_u,uab_SphereInvis))
-                                then aip_timer_magic:=aip_pause_magic;
+                                then aip_timer_magic:=aip_pause_magic+fr_fps1;
                        end;
-     UID_UAcademy    : if(aip_timer_magic=0)then
-                         if(ai_AbilityMagic(pCaster,ai_Heroic_u,uab_UACGeneral))then aip_timer_magic:=aip_pause_magic;
-     UID_URMStation  : if(aip_timer_superweapon=0)then
+     UID_UAcademy    : if(aip_pause_magic>=0)and(aip_timer_magic=0)then
+                         if(ai_AbilityMagic(pCaster,ai_Heroic_u,uab_UACGeneral))then aip_timer_magic:=aip_pause_magic+fr_fps1;
+     UID_URMStation  : if(aip_pause_superweapon>=0)and(aip_timer_superweapon=0)then
                          if(ai_AbilityMagic(pCaster,ai_Strike_u,uab_UACStrike ))then aip_timer_superweapon:=aip_pause_superweapon;
 
      UID_Pain        : if ((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)
@@ -456,19 +455,26 @@ begin
 
    with pCaster^ do
      with player^ do
-       if(mapZone<>zone_solid)and(ai_HEyeNest_u<>nil)and(ai_near_HEye<=0)and(ai_need_heye_u=nil)and(aip_timer_magic=0)then
-         if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic;
+       if (mapZone<>zone_solid)
+       and(ai_HEyeNest_u<>nil)
+       and(ai_near_HEye<=0)
+       and(ai_need_heye_u=nil)
+       and(aip_pause_detection>=0)
+       and(aip_pause_magic>=0)
+       and(aip_timer_magic=0)then
+         if(ai_UnitAbility(ai_HEyeNest_u,uab_HEyeSpawn,0,x,y))then aip_timer_magic:=aip_pause_magic+fr_fps1;
 
    if(ai_Bribe_u<>nil)
    or(ai_Hack_u <>nil)then
      if(IsUnitRange(pCaster^.player^.units_uid_u[UID_UAcademy],@pCaster))then
        with pCaster^.player^ do
-       begin
-          if(ai_Bribe_u<>nil)and(aip_timer_magic=0)then
-            if(ai_UnitAbility(pCaster,uab_Bribe,ai_Bribe_u^.unum,0,0))then aip_timer_magic:=aip_pause_magic;
-          if(ai_Hack_u <>nil)and(aip_timer_magic=0)then
-            if(ai_UnitAbility(pCaster,uab_Hack ,ai_Hack_u^ .unum,0,0))then aip_timer_magic:=aip_pause_magic;
-       end;
+         if(aip_pause_magic>=0)then
+         begin
+            if(ai_Bribe_u<>nil)and(aip_timer_magic=0)then
+              if(ai_UnitAbility(pCaster,uab_Bribe,ai_Bribe_u^.unum,0,0))then aip_timer_magic:=aip_pause_magic+fr_fps1;
+            if(ai_Hack_u <>nil)and(aip_timer_magic=0)then
+              if(ai_UnitAbility(pCaster,uab_Hack ,ai_Hack_u^ .unum,0,0))then aip_timer_magic:=aip_pause_magic+fr_fps1;
+         end;
 end;
 
 
@@ -482,15 +488,15 @@ begin
                       //if(isselected)then writeln('ai_need_heye_d ',ai_need_heye_d,' ai_AvailableDetectors ',ai_AvailableDetectors);
                       if(ai_need_heye_d<NOTSET)then
                         if(ai_UnitAbility(pCaster,uab_HEyeVision,ai_need_heye_u^.unum,0,0))then
-                          aip_timer_detection:=aip_pause_detection;
+                          aip_timer_detection:=aip_pause_detection+fr_fps1;
                    end;
      UID_URadar  : begin
                       if(ai_enemy_inv_d<NOTSET)then
                         if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y))then
-                          aip_timer_detection:=aip_pause_detection;
+                          aip_timer_detection:=aip_pause_detection+fr_fps1;
                       if(ai_need_heye_u<>nil)then
                         if(ai_UnitAbility(pCaster,uab_UACScan   ,0,ai_need_heye_u^.x,ai_need_heye_u^.y))then
-                          aip_timer_detection:=aip_pause_detection;
+                          aip_timer_detection:=aip_pause_detection+fr_fps1;
 
                       if(map_GeneratorT<mapg_inf)and(ai_choosen)and(units_uid_e[uidi]>2)then
                       begin
@@ -682,7 +688,7 @@ begin
                                       if(ai_BaseOwn_d<NOTSET)
                                       then setLandingPlace(ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,ai_BaseOwn_d,base_r1)
                                       else
-                                        if(ai_BaseAlly_d<NOTSET)
+                                        if(ai_BaseAlly_d<NOTSET)and(units_builders_e=1)
                                         then setLandingPlace(ai_BaseAlly_u^.x,ai_BaseAlly_u^.y,ai_BaseAlly_d,base_r1)
                                         else setLandingPlace(x,y,0,base_r1h);
                                    end;
@@ -795,10 +801,10 @@ begin
          UnitsInfo_AddLine(x+2,y,uo_x,uo_y+2,c_yellow);
       end; }
 
-      if(aip_timer_detection=0)then
+      if(aip_pause_detection>=0)and(aip_timer_detection=0)then
         if((aip_flags and aif_ability_detection)>0)then ai_AbilitiesDetection(pu);
       if(uid_isbuilder)then                             ai_AbilitiesBuilderMove(pu);
-      if((aip_flags and aif_ability_other      )>0)then ai_AbilitiesCommon(pu);
+      if((aip_flags and aif_ability_other      )>0)then ai_AbilitiesOther(pu);
    end;
 end;
 
@@ -878,7 +884,7 @@ begin
       //if(isselected)then
       //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
       //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-     { if(isselected)or(m_UnitTargetN=unum)then
+      {if(isselected)or(m_UnitTargetN=unum)then
       begin
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);
          //writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
@@ -892,7 +898,8 @@ begin
            UnitsInfo_AddLine(x+1,y+1,aiu_alarm_x,aiu_alarm_y,c_red);
 
          writeln(TeamVision[g_PlayersGame[LocalPlayer].team]);   }
-         writeln('energy_future=',ai_energy_future,' MaxEnergy=',player^.aip_MaxEnergy);
+         //writeln('energy_future=',ai_energy_future,' MaxEnergy=',player^.aip_MaxEnergy);
+         writeln(ai_AbilitiesTransformIf(pu));
 
          //if(ai_keypoint_d<NOTSET)then
          //  with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
@@ -903,7 +910,7 @@ begin
          {writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
          if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
          if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua); }
-      end;  }
+      end;}
      { if(isselected)then
       with player^ do
       begin

@@ -859,26 +859,22 @@ end;
 procedure cleffect_teleport(cur_u,prev_u:PTUnit;UIVision:boolean);
 var sx,sy:integer;
 begin
-   with cur_u^  do
+   if(prev_u<>nil)then
    begin
-      vx:=x;
-      vy:=y;
-      if(prev_u<>nil)then
-      begin
-         sx:=prev_u^.vx;
-         sy:=prev_u^.vy;
-      end
-      else
-      begin
-         sx:=NOTSET;
-         sy:=NOTSET;
-      end;
-      case uidi of
-      UID_HKeep : effect_teleport(sx,sy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube,@UIVision,@UIVision);
-      UID_HAKeep: effect_teleport(sx,sy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube,@UIVision,@UIVision);
-      else        effect_teleport(sx,sy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     ,@UIVision,@UIVision);
-      end;
+      sx:=prev_u^.vx;
+      sy:=prev_u^.vy;
+   end
+   else
+   begin
+      sx:=NOTSET;
+      sy:=NOTSET;
    end;
+   with cur_u^ do
+     case uidi of
+     UID_HKeep : effect_teleport(sx,sy,vx,vy,isfly,EID_HKeep_H ,EID_HKeep_S ,snd_IconOfSinCube,@UIVision,@UIVision);
+     UID_HAKeep: effect_teleport(sx,sy,vx,vy,isfly,EID_HAKeep_H,EID_HAKeep_S,snd_IconOfSinCube,@UIVision,@UIVision);
+     else        effect_teleport(sx,sy,vx,vy,isfly,EID_Teleport,EID_Teleport,snd_Teleport     ,@UIVision,@UIVision);
+     end;
 end;
 
 procedure unit_clear_a_tar(tar:integer);
@@ -1012,7 +1008,16 @@ begin
                missiles_clear_tar(unum,true);
                unit_clear_a_tar(unum);
             end;
-            vis:=ui_CheckUnitUIPlayerVision(pu_cur,true)
+
+            if(buffs[ub_Teleported]>0)then
+              if(pu_prev^.x<>x)
+              or(pu_prev^.y<>y)then
+              begin
+                 vx:=x;
+                 vy:=y;
+              end;
+
+            vis:=ui_CheckUnitUIPlayerVision(pu_cur ,true)
               or ui_CheckUnitUIPlayerVision(pu_prev,true);
 
             unit_Bonuses(pu_prev);

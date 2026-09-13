@@ -1398,7 +1398,7 @@ begin
 mi_SG_Language         : if(not check)then begin
                                               if(lang_Count>0)then
                                               begin
-                                                 ScrollByte(@lang_CurrentN,false,0,lang_Count-1);
+                                                 //ScrollByte(@lang_CurrentN,false,0,lang_Count-1);
                                                  lang_Current:=lang_List[lang_CurrentN];
                                               end;
                                               lang_Update;

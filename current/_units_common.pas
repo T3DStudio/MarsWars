@@ -392,10 +392,12 @@ begin
 end;
 
 procedure unit_Teleport2Point(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
+{$IFDEF _FULLGAME}
 var
 uivis,
 svis,
 tvis:boolean;
+{$ENDIF}
 begin
    with pu^ do
    begin
@@ -2411,17 +2413,18 @@ begin
          exit;
       end;
 
-      if(res_HellPower  <ptarUID^.uid_req_HellPower  )then begin unit_TransformStart:=lmt_Req_HellPower;exit;end;
-      if(res_UACLoot    <ptarUID^.uid_req_UACLoot    )then begin unit_TransformStart:=lmt_Req_UACLoot;  exit;end;
+      if(ptarUID^.uid_req_HellPower>0)and(res_HellPower<ptarUID^.uid_req_HellPower)then begin unit_TransformStart:=lmt_Req_HellPower;exit;end;
+      if(ptarUID^.uid_req_UACLoot  >0)and(res_UACLoot  <ptarUID^.uid_req_UACLoot  )then begin unit_TransformStart:=lmt_Req_UACLoot;  exit;end;
 
       //if(isselected)and(not check)then writeln((state=ps_AI)and(ptarUID^.uid_isbuilder),' ',energyCur_units+energyCur_upgrades,' ',ptarUID^.uid_req_EnergyLevel);
 
-      case (state=ps_AI)and(ptarUID^.uid_isbuilder) of
-      false: if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-      true : if((res_energyl_cur+energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
-             or(res_energyl_max<ptarUID^.uid_req_EnergyLevel)
-             then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
-      end;
+      if(ptarUID^.uid_req_EnergyLevel>0)then
+        case (state=ps_AI)and(ptarUID^.uid_isbuilder) of
+        false: if(res_energyl_cur<ptarUID^.uid_req_EnergyLevel)then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
+        true : if((res_energyl_cur+energyCur_units+energyCur_upgrades)<ptarUID^.uid_req_EnergyLevel)
+               or(res_energyl_max<ptarUID^.uid_req_EnergyLevel)
+               then begin unit_TransformStart:=lmt_Req_Energy;exit;end;
+        end;
 
       unit_TransformStart:=lmt_prod_AllBusy;
       if(state<>ps_AI)then
@@ -2598,7 +2601,7 @@ begin
 
             if((units_all_e+prod_unit_Now)>MaxPlayerUnits)
             or((armylimit+prod_unit_Limit)>MaxPlayerLimit)
-            or(res_energyl_cur<0)
+            or((res_energyl_cur<0)and(g_uids[puid].uid_req_EnergyLevel>0))
             or(units_uid_e[puid]>=units_uid_m[puid])
             then
             else
