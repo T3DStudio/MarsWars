@@ -1120,6 +1120,7 @@ function unit_ability_Bribe(pCaster:PTUnit;target:integer;target_building,check:
 var
 pTarget: PTUnit;
 u      : integer;
+tisbld : boolean;
 begin
    // pCaster - caster
    // pTarget - target
@@ -1148,7 +1149,14 @@ begin
 
    if(unit_ability_Bribe>0)then exit;
 
+   tisbld:=pTarget^.uid^.uid_isbuilding;
+
    unit_ability_Bribe:=unit_TryChangeOwner(pTarget,pCaster^.player,true,false);
+
+   if(unit_ability_Bribe=0)then
+     if(tisbld)
+     then game_ScoresAddC(pCaster^.playeri,psc_builds_captured)
+     else game_ScoresAddC(pCaster^.playeri,psc_units_captured );
 end;
 
 function unit_ability_UACStrike(pu:PTUnit;x0,y0:integer;check:boolean):byte;

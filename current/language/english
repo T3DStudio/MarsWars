@@ -249,7 +249,7 @@ str_ui_objectives             = 'Objectives'
 str_ui_SelectTarget           = 'Select target for '
 str_ui_SelectBPlace           = 'Choose a location to build '
 str_ui_BuildHint              = 'Hold "'+iAct_12_hk+'" to disable position pushing from obstacles.'
-str_ui_BuildTip               = 'TIP: build buildings close to each other - units will not get stuck between them.'
+str_ui_BuildTip               = 'TIP: build buildings close to each other - your units will not get stuck between them.'
 str_ui_RightClickCancel       = 'Press "'+iAct_2_hk+'" to cancel.'
 
 str_warn_AbilityBadPlace      = 'Invalid landing/teleporting location'
@@ -615,6 +615,23 @@ str_dscr[UID_Tank]              = ''
 str_name[UID_Flyer]             = 'Fighter'
 str_dscr[UID_Flyer]             = ''
 
+str_name[UID_UPortal]           = 'The Portal'
+str_dscr[UID_UPortal]           = ''
+str_name[UID_UBaseMil]          = 'UAC Industrial building'
+str_dscr[UID_UBaseMil]          = ''
+str_name[UID_UBaseCom]          = 'UAC Industrial building'
+str_dscr[UID_UBaseCom]          = ''
+str_name[UID_UBaseGen]          = 'UAC Super generator'
+str_dscr[UID_UBaseGen]          = ''
+str_name[UID_UBaseRef]          = 'UAC Industrial building'
+str_dscr[UID_UBaseRef]          = ''
+str_name[UID_UBaseNuc]          = 'UAC Industrial building'
+str_dscr[UID_UBaseNuc]          = ''
+str_name[UID_UBaseLab]          = 'UAC Industrial building'
+str_dscr[UID_UBaseLab]          = ''
+str_name[UID_USPort]            = 'Launch pad'
+str_dscr[UID_USPort]            = ''
+
 BalanceHint_BFG                 = 'due to big splash damage - good against big groups of ['+str_attr_bio+'] units'
 BalanceHint_PainState           = 'due to "pain state" effect, this unit can be bad againt frequent attacks'
 
@@ -760,7 +777,7 @@ str_dscr[upgr_hell_Phantoms]       = 'Pain Elemental spawns Phantoms instead of 
 str_name[upgr_hell_DistDamage2]    = 'Demon`s Weapons'
 str_dscr[upgr_hell_DistDamage2]    = 'Increases the damage of ranged attacks for '+str_upgr_hell_DistDamage2_uids
 str_name[upgr_hell_TeleportCD]     = 'Teleport Upgrade'
-str_dscr[upgr_hell_TeleportCD]     = 'Reduces the cooldown of the Teleport ability'
+str_dscr[upgr_hell_TeleportCD]     = 'Reduces the cooldown of the Teleport abilities'
 str_name[upgr_hell_T2TNoCD]        = str_name[uab_HT2TNoCD]
 str_dscr[upgr_hell_T2TNoCD]        = str_dscr[uab_HT2TNoCD]
 str_name[upgr_hell_EvilEyeR]       = 'Evil Eye Upgrade'
@@ -959,8 +976,7 @@ tc_docbr
 '- b-o - Combat Medic;'
 '- Diabol - UAC Fighter;'
 '- Mr.Basik - Antiaircrafter;'
-'- DinkyDyeAussie - UAC Tank;'
-'- DoomWars game - UAC announcer.'
+'- DinkyDyeAussie - UAC Tank.'
 tc_docbr
 'Used music:'+tc_default+tc_doccpt
 
@@ -1003,17 +1019,19 @@ tc_docbr
 'Any unit may be built if the player has at least one building capable of producing that type of unit, and the unit`s other requirements are met.'
 'Switch the control panel to "'+str_ui_Tab[tab_Units]+'" tab and click on the unit icon(or press the associated hotkey or hover your mouse over the unit icon and scroll the "'+iAct_4_hk+'").'
 'If the requirements for the selected unit type are not met, the game will display an error message.'
-'If no unit production building is selected - the game sends the production order to nearest unbusy production building, otherwise it sends the order to nearest unbusy selected production buildings.'
+'If no unit production building is selected - the game sends the production order to nearest* unbusy production building, otherwise it sends the order to nearest* unbusy selected production buildings.'
 'It is impossible to create a unit production queue.'
-'To cancel unit production process, click "'+iAct_2_hk+'" on the unit icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order.'
+'To cancel unit production process, click "'+iAct_2_hk+'" on the unit icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order (or hover your mouse over the unit icon and scroll the "'+iAct_5_hk+'").'
 tc_docbr
 tc_docbr
 tc_orange+'UPGRADES PRODUCTION'+tc_default+tc_doccpt
 tc_docbr
 'Go to the "'+str_ui_Tab[tab_Upgrades]+'" tab in the Control Panel and click the upgrade icon. If the requirements for the selected upgrade type are not met, the game will display an error message.'
-'If no upgrade production facility is selected - the game sends the production order to any nearest unbusy production facility, otherwise it sends the order to nearest unbusy selected production facilities.'
+'If no upgrade production facility is selected - the game sends the production order to any nearest* unbusy production facility, otherwise it sends the order to nearest* unbusy selected production facilities.'
 'It is impossible to create an upgrade production queue.'
 'To cancel upgrade production process, click "'+iAct_2_hk+'" on the upgrade icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order.'
+tc_docbr
+'* - nearest to screen center'
 tc_docbr
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1080,7 +1098,7 @@ HK_Replay_POV        +str_dscr[iAct_Replay_POV]
 HK_Replay_Log        +str_dscr[iAct_Replay_Log]
 HK_Replay_Fog        +str_dscr[iAct_Replay_Fog]
 HK_Replay_PlayerAll  +str_dscr[iAct_Replay_PlayerAll]
-HK_Replay_Players    +str_dscr[iAct_Replay_Player0]+'..'+str_dscr[iAct_Replay_Player7]
+HK_Replay_Players    +str_dscr[iAct_Replay_Player0]+'..#8'
 tc_docbr
 tc_docbr
 tc_orange+'OBSERVER MODE HOTKEYS'+tc_default+tc_doccpt
@@ -1088,7 +1106,7 @@ tc_docbr
 HK_Observer_Fog      +str_dscr[iAct_Observer_Fog]
 HK_Observer_POV      +str_dscr[iAct_Observer_POV]
 HK_Observer_PlayerAll+str_dscr[iAct_Observer_PlayerAll]
-HK_Observer_Players  +str_dscr[iAct_Observer_Player0]+'..'+str_dscr[iAct_Observer_Player7]
+HK_Observer_Players  +str_dscr[iAct_Observer_Player0]+'..#8'
 tc_docbr
 tc_docbr
 tc_orange+'TEST MODE HOTKEYS'+tc_default+tc_doccpt
@@ -1238,19 +1256,20 @@ tc_docbr
 tc_docbr+'- '+str_attr_detector+' - unit can see invisible enemy units;'
 tc_docbr+'- '+str_attr_heroic  +' - unit is a hero; it deals 1.5 times more damage and takes a third less damage;'
 tc_docbr+'- '+str_attr_Scaned  +' - unit was scanned by UAC Radar;'
-tc_docbr+'- '+str_attr_Decay   +' - unit is under "'+str_name[uab_HKeepAura]+'" effect; it slowly lose health;'
-tc_docbr+'- '+str_attr_HVision +' - unit is under "'+str_name[uab_HEyeVision]+'" effect; it can see invisible enemy units;'
-tc_docbr+'- '+str_attr_SSoul   +' - unit is under "'+str_name[uab_SphereSoul]+'" effect; it`s regaining it health;'
-tc_docbr+'- '+str_attr_SInvuln +' - unit is under "'+str_name[uab_SphereInvuln]+'" effect; it is immune to any damage;'
-tc_docbr+'- '+str_attr_SInvis  +' - unit is under "'+str_name[uab_SphereInvis]+'" effect; it invisibile;'
-tc_docbr+'- '+str_attr_SRDamage+' - unit is under "'+str_name[uab_SphereRDamage]+'" effect; it takes half damage and resist to "pain state" effect;'
-tc_docbr+'- '+str_attr_SDDamage+' - unit is under "'+str_name[uab_SphereDDamage]+'" effect; it deals double damage;'
-tc_docbr+'- '+str_attr_STurbo  +' - unit is under "'+str_name[uab_SphereTurbo]+'" effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.'
+tc_docbr+'- '+str_attr_Decay   +' - unit is under "'+str_name[uab_HKeepAura]+'" ability effect; it slowly lose health;'
+tc_docbr+'- '+str_attr_HVision +' - unit is under "'+str_name[uab_HEyeVision]+'" ability effect; it can see invisible enemy units;'
+tc_docbr+'- '+str_attr_SSoul   +' - unit is under "'+str_name[uab_SphereSoul]+'" ability effect; it`s regaining it health;'
+tc_docbr+'- '+str_attr_SInvuln +' - unit is under "'+str_name[uab_SphereInvuln]+'" ability effect; it is immune to any damage;'
+tc_docbr+'- '+str_attr_SInvis  +' - unit is under "'+str_name[uab_SphereInvis]+'" ability effect; it invisibile;'
+tc_docbr+'- '+str_attr_SRDamage+' - unit is under "'+str_name[uab_SphereRDamage]+'" ability effect; it takes half damage and resist to "pain state" effect;'
+tc_docbr+'- '+str_attr_SDDamage+' - unit is under "'+str_name[uab_SphereDDamage]+'" ability effect; it deals double damage;'
+tc_docbr+'- '+str_attr_STurbo  +' - unit is under "'+str_name[uab_SphereTurbo]+'" ability effect; its movement, attack, regeneration, production, construction and reloading speeds are doubled.'
 tc_docbr
 tc_docbr
 tc_orange+'PAIN STATE'+tc_default+tc_doccpt
 tc_docbr
-'Some units have "Pain State" - it is a 1-second stun state after a certain number of damage hits. During the "Pain State" unit can`t attack or move. "Pain State" is accompanied by a special sound and unit animation.'
+'Some units have "Pain State" - it is a short(1 sec. for Hell units and 0.5 sec. for UAC units) stun state after a certain number of damage hits. During the "Pain State" unit can`t attack or move. '
+'"Pain State" is accompanied by a special sound and unit animation.'
 tc_docbr
 tc_docbr
 tc_orange+'VETERAN SYSTEM'+tc_default+tc_doccpt

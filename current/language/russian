@@ -615,6 +615,23 @@ str_dscr[UID_Tank]              = ''
 str_name[UID_Flyer]             = 'Истребитель'
 str_dscr[UID_Flyer]             = ''
 
+str_name[UID_UPortal]           = 'Портал'
+str_dscr[UID_UPortal]           = ''
+str_name[UID_UBaseMil]          = 'Промышленное здание UAC'
+str_dscr[UID_UBaseMil]          = ''
+str_name[UID_UBaseCom]          = 'Промышленное здание UAC'
+str_dscr[UID_UBaseCom]          = ''
+str_name[UID_UBaseGen]          = 'Супер генератор UAC'
+str_dscr[UID_UBaseGen]          = ''
+str_name[UID_UBaseRef]          = 'Промышленное здание UAC'
+str_dscr[UID_UBaseRef]          = ''
+str_name[UID_UBaseNuc]          = 'Промышленное здание UAC'
+str_dscr[UID_UBaseNuc]          = ''
+str_name[UID_UBaseLab]          = 'Промышленное здание UAC'
+str_dscr[UID_UBaseLab]          = ''
+str_name[UID_USPort]            = 'Стартовая площадка'
+str_dscr[UID_USPort]            = ''
+
 BalanceHint_BFG                 = 'из-за урона по большой области - очень эффективен против больших групп ['+str_attr_bio+'] юнитов'
 BalanceHint_PainState           = 'из-за наличия "состояния боли" может быть уязвим против частых атак'
 
@@ -761,7 +778,7 @@ str_dscr[upgr_hell_Phantoms]       = 'Элементаль боли создан
 str_name[upgr_hell_DistDamage2]    = 'Вооружение демонов'
 str_dscr[upgr_hell_DistDamage2]    = 'Увеличение урона дальних атак, наносимых юнитами '+str_upgr_hell_DistDamage2_uids
 str_name[upgr_hell_TeleportCD]     = 'Улучшение Телепорта'
-str_dscr[upgr_hell_TeleportCD]     = 'Уменьшение времени перезарядки Телепорта'
+str_dscr[upgr_hell_TeleportCD]     = 'Уменьшение времени перезарядки способностей Телепорта'
 str_name[upgr_hell_T2TNoCD]        = str_name[uab_HT2TNoCD]
 str_dscr[upgr_hell_T2TNoCD]        = str_dscr[uab_HT2TNoCD]
 str_name[upgr_hell_EvilEyeR]       = 'Улучшение Злого глаза'
@@ -961,8 +978,7 @@ tc_docbr
 '- b-o - Combat Medic;'
 '- Diabol - UAC Fighter;'
 '- Mr.Basik - Antiaircrafter;'
-'- DinkyDyeAussie - UAC Tank;'
-'- DoomWars game - UAC announcer.'
+'- DinkyDyeAussie - UAC Tank.'
 tc_docbr
 'Использованная музыка:'+tc_default+tc_doccpt
 
@@ -1007,17 +1023,18 @@ tc_orange+'ПРОИЗВОДСТВО ЮНИТОВ'+tc_default+tc_doccpt
 tc_docbr
 'Что бы создать юнита - необходимо хотя бы одно здание, способное его производить. Переключитесь на вкладку "'+str_ui_Tab[tab_Units]+'" и кликните("'+iAct_1_hk+'") по иконке нужного типа юнита '
 '(или нажмите соответствующую юниту горячую клавишу или вращайте "'+iAct_4_hk+'" удерживая курсор на иконке юнита).'
-'Если требования к выбранному типу юнита не удовлетворены - игра отобразит ошибку, иначе - начнет производства юнита: в ближайшем к центру экрана выбранном производящем здании '
+'Если требования к выбранному типу юнита не удовлетворены - игра отобразит ошибку, иначе - начнет производство юнита в ближайшем к центру экрана выбранном производящем здании '
 '(если ни одного здания не выбрано - игра будет считать, что выбраны все). Нельзя сформировать очередь производства.'
-'Что бы отменить производство юнита - нажмите "'+iAct_2_hk+'" (или выберите производящее здание и отдайте ему приказ "'+str_dscr[iAct_Control_UProdCncl]+'")'
+'Что бы отменить производство юнита - кликните "'+iAct_2_hk+'" по иконке юнита (или выберите производящее здание и отдайте ему приказ "'+str_dscr[iAct_Control_UProdCncl]+'"'
+' или вращайте "'+iAct_5_hk+'" удерживая курсор на иконке юнита).'
 tc_docbr
 tc_docbr
-tc_orange+'UPGRADES PRODUCTION'+tc_default+tc_doccpt
+tc_orange+'ИССЛЕДОВАНИЕ УЛУЧШЕНИЙ'+tc_default+tc_doccpt
 tc_docbr
-'Go to the "'+str_ui_Tab[tab_Upgrades]+'" tab in the Control Panel and click the upgrade icon. If the requirements for the selected upgrade type are not met, the game will display an error message.'
-'If no upgrade production facility is selected - the game sends the production order to any nearest unbusy production facility, otherwise it sends the order to nearest unbusy selected production facilities.'
-'It is impossible to create an upgrade production queue.'
-'To cancel upgrade production process, click "'+iAct_2_hk+'" on the upgrade icon or select production buildings and issue then "'+str_dscr[iAct_Control_UProdCncl]+'" order.'
+'Для исследования улучшений необходимо специальное здание. Переключитесь на вкладку "'+str_ui_Tab[tab_Upgrades]+'" и кликните("'+iAct_1_hk+'") по иконке нужного улучшения '
+'(или нажмите соответствующую горячую клавишу). Если требования к улучшению не выполняются - игра отобразит ошибку, иначе - начнет иследование в ближайшем к центру экрана выбранном производящем здании '
+'(если ни одного здания не выбрано - игра будет считать, что выбраны все). Нельзя сформировать очередь исследований.'
+'Что бы отменить исследование - кликните "'+iAct_2_hk+'" по иконке улучшения (или выберите производящее здание и отдайте ему приказ "'+str_dscr[iAct_Control_UProdCncl]+'").'
 tc_docbr
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1084,7 +1101,7 @@ HK_Replay_POV        +str_dscr[iAct_Replay_POV]
 HK_Replay_Log        +str_dscr[iAct_Replay_Log]
 HK_Replay_Fog        +str_dscr[iAct_Replay_Fog]
 HK_Replay_PlayerAll  +str_dscr[iAct_Replay_PlayerAll]
-HK_Replay_Players    +str_dscr[iAct_Replay_Player0]+'..'+str_dscr[iAct_Replay_Player7]
+HK_Replay_Players    +str_dscr[iAct_Replay_Player0]+'..#8'
 tc_docbr
 tc_docbr
 tc_orange+'ГОРЯЧИЕ КЛАВИШИ В РЕЖИМЕ ЗРИТЕЛЯ'+tc_default+tc_doccpt
@@ -1092,7 +1109,7 @@ tc_docbr
 HK_Observer_Fog      +str_dscr[iAct_Observer_Fog]
 HK_Observer_POV      +str_dscr[iAct_Observer_POV]
 HK_Observer_PlayerAll+str_dscr[iAct_Observer_PlayerAll]
-HK_Observer_Players  +str_dscr[iAct_Observer_Player0]+'..'+str_dscr[iAct_Observer_Player7]
+HK_Observer_Players  +str_dscr[iAct_Observer_Player0]+'..#8'
 tc_docbr
 tc_docbr
 tc_orange+'ГОРЯЧИЕ КЛАВИШИ ТЕСТОВОГО РЕЖИМА'+tc_default+tc_doccpt
@@ -1256,7 +1273,7 @@ tc_docbr
 tc_docbr
 tc_orange+'СОСТОЯНИЕ БОЛИ'+tc_default+tc_doccpt
 tc_docbr
-'Некоторые юниты могут иметь "состояние боли" - при получении определенного количества ударов (см. секцию "'+str_help_UnitsInfo+'", параметр "'+str_doc_PainC+'..") юнит оглушается на 1 секунду. '
+'Некоторые юниты могут иметь "состояние боли" - при получении определенного количества ударов (см. секцию "'+str_help_UnitsInfo+'", параметр "'+str_doc_PainC+'..") юнит оглушается на 1 сек. у юнитов Hell или на 0.5 сек. у юнитов UAC. '
 'В этом состоянии юнит не может двигаться или атаковать. Переход в "состояние боли" сопровождается особым звуком и анимацией.'
 tc_docbr
 tc_docbr

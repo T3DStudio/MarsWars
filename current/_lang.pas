@@ -1027,6 +1027,23 @@ begin
    'str_name[UID_Flyer]'                : lang_Key2StrVar:= @g_uids[UID_Flyer            ].uid_str_name;
    'str_dscr[UID_Flyer]'                : lang_Key2StrVar:= @g_uids[UID_Flyer            ].uid_str_BaseDescript;
 
+   'str_name[UID_UPortal]'              : lang_Key2StrVar:= @g_uids[UID_UPortal          ].uid_str_name;
+   'str_dscr[UID_UPortal]'              : lang_Key2StrVar:= @g_uids[UID_UPortal          ].uid_str_BaseDescript;
+   'str_name[UID_UBaseMil]'             : lang_Key2StrVar:= @g_uids[UID_UBaseMil         ].uid_str_name;
+   'str_dscr[UID_UBaseMil]'             : lang_Key2StrVar:= @g_uids[UID_UBaseMil         ].uid_str_BaseDescript;
+   'str_name[UID_UBaseCom]'             : lang_Key2StrVar:= @g_uids[UID_UBaseCom         ].uid_str_name;
+   'str_dscr[UID_UBaseCom]'             : lang_Key2StrVar:= @g_uids[UID_UBaseCom         ].uid_str_BaseDescript;
+   'str_name[UID_UBaseGen]'             : lang_Key2StrVar:= @g_uids[UID_UBaseGen         ].uid_str_name;
+   'str_dscr[UID_UBaseGen]'             : lang_Key2StrVar:= @g_uids[UID_UBaseGen         ].uid_str_BaseDescript;
+   'str_name[UID_UBaseRef]'             : lang_Key2StrVar:= @g_uids[UID_UBaseRef         ].uid_str_name;
+   'str_dscr[UID_UBaseRef]'             : lang_Key2StrVar:= @g_uids[UID_UBaseRef         ].uid_str_BaseDescript;
+   'str_name[UID_UBaseNuc]'             : lang_Key2StrVar:= @g_uids[UID_UBaseNuc         ].uid_str_name;
+   'str_dscr[UID_UBaseNuc]'             : lang_Key2StrVar:= @g_uids[UID_UBaseNuc         ].uid_str_BaseDescript;
+   'str_name[UID_UBaseLab]'             : lang_Key2StrVar:= @g_uids[UID_UBaseLab         ].uid_str_name;
+   'str_dscr[UID_UBaseLab]'             : lang_Key2StrVar:= @g_uids[UID_UBaseLab         ].uid_str_BaseDescript;
+   'str_name[UID_USPort]'               : lang_Key2StrVar:= @g_uids[UID_USPort           ].uid_str_name;
+   'str_dscr[UID_USPort]'               : lang_Key2StrVar:= @g_uids[UID_USPort           ].uid_str_BaseDescript;
+
    // UPGRADES
 
    'str_name[upgr_hell_DistDamage1]'    : lang_Key2StrVar:= @g_upgrs[upgr_hell_DistDamage1 ].upgr_str_Name;
@@ -1374,8 +1391,8 @@ begin
 
    // Game hotkeys
 
-   vl:=StringReplace(vl,'HK_InGameChatAll'     ,DocHelp_GetHotKeys([iAct_InGameChatAll       ]),replace_a);
    vl:=StringReplace(vl,'HK_InGameChatAllies'  ,DocHelp_GetHotKeys([iAct_InGameChatAllies    ]),replace_a);
+   vl:=StringReplace(vl,'HK_InGameChatAll'     ,DocHelp_GetHotKeys([iAct_InGameChatAll       ]),replace_a);
    vl:=StringReplace(vl,'HK_InGameChat'        ,DocHelp_GetHotKeys([iAct_InGameChat          ]),replace_a);
    vl:=StringReplace(vl,'HK_InGamePause'       ,DocHelp_GetHotKeys([iAct_InGamePause         ]),replace_a);
    vl:=StringReplace(vl,'HK_InGameMenu'        ,DocHelp_GetHotKeys([iAct_InGameMenu          ]),replace_a);

@@ -1448,7 +1448,7 @@ begin
    SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpsh,MID_Flyer  ,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
 end;
 
-UID_USPort  ,
+{UID_USPort  ,
 UID_UPortal :
 begin
    uid_MaxHits1        := 20000;
@@ -1479,15 +1479,15 @@ end;
 UID_UBaseGen:
 begin
    uid_MaxHits1        := 6000;
-   uid_gen_EnergyLevel := 1000;
-   uid_req_EnergyLevel := 500;
+   uid_gen_EnergyLevel := 2000;
+   uid_req_EnergyLevel := 1000;
    uid_r               := 55;
    uid_uibtn           := 22;
    uid_ProdTimeSec     := ptime10;
    uid_isbuilding      := true;
    uid_ismech          := true;
 end;
-
+     }
       end;
 
       if(uid_TransportMax_Base>0)then
@@ -1867,7 +1867,7 @@ begin
    setUPGR(r_uac ,upgr_uac_BuildArmor   ,60 ,0,45,4   ,800 ,0,1000,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_RepairTools  ,60 ,0,35,2   ,600 ,0,400 ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_BioSpeed     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   );
-   setUPGR(r_uac ,upgr_uac_SSMWeapon    ,60 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   );
+   setUPGR(r_uac ,upgr_uac_SSMWeapon    ,30 ,0,0 ,1   ,300 ,0,0   ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_ADetection   ,60 ,0,0 ,1   ,600 ,0,300 ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_BuilderR     ,60 ,0,15,2   ,600 ,0,0   ,0            ,0                   );
    setUPGR(r_uac ,upgr_uac_CCFly        ,120,0,0 ,1   ,600 ,0,0   ,0            ,0                   );

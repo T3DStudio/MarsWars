@@ -16,7 +16,7 @@ MarsWars: HELL & UAC
 <a href="#Other"><u><b>9. Other</b></u></a><br>
 <br><center><h2 id="Credits"><b>Credits</b></h2></center><br>
 <font color="FF8C00">MarsWars: HELL & UAC</font> - is a real-time strategy game based on Doom 2 
-universe. Current version is v54.<br>
+universe. Current version is v54b.<br>
 <br>
 Project`s author and developer: <font color="FF0000">Andrey TGA Goryainov</font>.<br>
 <br>
@@ -51,8 +51,7 @@ nota-sourceport-thank-you-alpha-4);<br>
 - b-o - Combat Medic;<br>
 - Diabol - UAC Fighter;<br>
 - Mr.Basik - Antiaircrafter;<br>
-- DinkyDyeAussie - UAC Tank;<br>
-- DoomWars game - UAC announcer.<br>
+- DinkyDyeAussie - UAC Tank.<br>
 <br>
 <b>Used music:<br></b>
 - Duke Nukem 3D - Alfred H. (My Family's Plot) (Lee Jackson)<br>
@@ -196,8 +195,8 @@ production" or "Self-destruction" order.
 Note: each player cannot have more than 4 builders.
 <br>NOTE: losing your buildings affect your construction system into short 
 cooldown effect.
-<br>TIP: build buildings close to each other - units will not get stuck between 
-them.
+<br>TIP: build buildings close to each other - your units will not get stuck 
+between them.
 <br>
 <br>
 <b><font color="FF8C00">UNIT PRODUCTION</font></b>
@@ -210,12 +209,13 @@ the associated hotkey or hover your mouse over the unit icon and scroll the
 If the requirements for the selected unit type are not met, the game will 
 display an error message.
 If no unit production building is selected - the game sends the production 
-order to nearest unbusy production building, otherwise it sends the order 
-to nearest unbusy selected production buildings.
+order to nearest* unbusy production building, otherwise it sends the order 
+to nearest* unbusy selected production buildings.
 It is impossible to create a unit production queue.
 To cancel unit production process, click "<font color="00FF00">Mouse right button</font>" on the unit 
 icon or select production buildings and issue then "Cancel production" 
-order.
+order (or hover your mouse over the unit icon and scroll the "<font color="00FF00">Mouse wheel </font>
+down").
 <br>
 <br>
 <b><font color="FF8C00">UPGRADES PRODUCTION</font></b>
@@ -224,18 +224,20 @@ Go to the "Upgrades" tab in the Control Panel and click the upgrade icon.
 If the requirements for the selected upgrade type are not met, the game 
 will display an error message.
 If no upgrade production facility is selected - the game sends the 
-production order to any nearest unbusy production facility, otherwise it 
-sends the order to nearest unbusy selected production facilities.
+production order to any nearest* unbusy production facility, otherwise it 
+sends the order to nearest* unbusy selected production facilities.
 It is impossible to create an upgrade production queue.
 To cancel upgrade production process, click "<font color="00FF00">Mouse right button</font>" on the 
 upgrade icon or select production buildings and issue then "Cancel 
 production" order.
 <br>
+* - nearest to screen center
+<br>
 <br><center><h2 id="Game Hotkeys"><b>Game Hotkeys</b></h2></center><br>
 <b><font color="FF8C00">COMMON HOTKEYS</font></b>
 <br>
 <br><font color="00FF00">Ctrl</font>+<font color="00FF00">RETURN</font>: open in-game chat(to all players)
-<br><font color="00FF00">Ctrl</font>+<font color="00FF00">RETURN</font>: iesopen in-game chat(to allied players)
+<br><font color="00FF00">Shift</font>+<font color="00FF00">RETURN</font>: open in-game chat(to allied players)
 <br><font color="00FF00">RETURN</font>: in-game chat(send message)
 <br><font color="00FF00">PAUSE</font>: toggle pause(multiplayer game)
 <br><font color="00FF00">ESCAPE</font>: toggle menu
@@ -298,7 +300,7 @@ unit
 <br><font color="00FF00">T</font>: toggle display of game messages list
 <br><font color="00FF00">Y</font>: toggle fog of war
 <br><font color="00FF00">F</font>: set vision of all players
-<br><font color="00FF00">1</font> <font color="00FF00">2</font> <font color="00FF00">3</font> <font color="00FF00">4</font> <font color="00FF00">5</font> <font color="00FF00">6</font> <font color="00FF00">7</font> <font color="00FF00">8</font>: set vision of player #1..set vision of player #8
+<br><font color="00FF00">1</font> <font color="00FF00">2</font> <font color="00FF00">3</font> <font color="00FF00">4</font> <font color="00FF00">5</font> <font color="00FF00">6</font> <font color="00FF00">7</font> <font color="00FF00">8</font>: set vision of player #1..#8
 <br>
 <br>
 <b><font color="FF8C00">OBSERVER MODE HOTKEYS</font></b>
@@ -306,7 +308,7 @@ unit
 <br><font color="00FF00">Q</font>: toggle fog of war
 <br><font color="00FF00">W</font>: toggle current player POV
 <br><font color="00FF00">E</font>: set vision of all players
-<br><font color="00FF00">1</font> <font color="00FF00">2</font> <font color="00FF00">3</font> <font color="00FF00">4</font> <font color="00FF00">5</font> <font color="00FF00">6</font> <font color="00FF00">7</font> <font color="00FF00">8</font>: set vision of player #1..set vision of player #8
+<br><font color="00FF00">1</font> <font color="00FF00">2</font> <font color="00FF00">3</font> <font color="00FF00">4</font> <font color="00FF00">5</font> <font color="00FF00">6</font> <font color="00FF00">7</font> <font color="00FF00">8</font>: set vision of player #1..#8
 <br>
 <br>
 <b><font color="FF8C00">TEST MODE HOTKEYS</font></b>
@@ -421,26 +423,30 @@ Dead units still exist in the game and takes limit.
 <br>- <font color="FF0000">HEROIC</font> - unit is a hero; it deals 1.5 times more damage and takes a third 
 less damage;
 <br>- <font color="00FF00">SCANED</font> - unit was scanned by UAC Radar;
-<br>- <font color="FF0000">DECAY AURA</font> - unit is under "Decay Aura" effect; it slowly lose health;
-<br>- <font color="009600">HELL VISION</font> - unit is under "Hell Vision" effect; it can see invisible 
-enemy units;
-<br>- <font color="3232FF">SOUL SPHERE</font> - unit is under "Soul Sphere" effect; it`s regaining it 
+<br>- <font color="FF0000">DECAY AURA</font> - unit is under "Decay Aura" ability effect; it slowly lose 
 health;
-<br>- <font color="FFFFFF">INVULN. SPHERE</font> - unit is under "Invulnerability Sphere" effect; it is 
-immune to any damage;
-<br>- <font color="FF00FF">INVIS. SPHERE</font> - unit is under "Invisibility Sphere" effect; it invisibile;
-<br>- <font color="787878">DAM. RESIST. SPHERE</font> - unit is under "Damage Resistance Sphere" effect; it 
-takes half damage and resist to "pain state" effect;
-<br>- <font color="FF0000">DOUBLE DAMAGE SPHERE</font> - unit is under "Double Damage Sphere" effect; it 
-deals double damage;
-<br>- <font color="FF8C00">TURBO SPHERE</font> - unit is under "Turbo Sphere" effect; its movement, attack, 
-regeneration, production, construction and reloading speeds are doubled.
+<br>- <font color="009600">HELL VISION</font> - unit is under "Hell Vision" ability effect; it can see 
+invisible enemy units;
+<br>- <font color="3232FF">SOUL SPHERE</font> - unit is under "Soul Sphere" ability effect; it`s regaining 
+it health;
+<br>- <font color="FFFFFF">INVULN. SPHERE</font> - unit is under "Invulnerability Sphere" ability effect; 
+it is immune to any damage;
+<br>- <font color="FF00FF">INVIS. SPHERE</font> - unit is under "Invisibility Sphere" ability effect; it 
+invisibile;
+<br>- <font color="787878">DAM. RESIST. SPHERE</font> - unit is under "Damage Resistance Sphere" ability 
+effect; it takes half damage and resist to "pain state" effect;
+<br>- <font color="FF0000">DOUBLE DAMAGE SPHERE</font> - unit is under "Double Damage Sphere" ability 
+effect; it deals double damage;
+<br>- <font color="FF8C00">TURBO SPHERE</font> - unit is under "Turbo Sphere" ability effect; its movement, 
+attack, regeneration, production, construction and reloading speeds are 
+doubled.
 <br>
 <br>
 <b><font color="FF8C00">PAIN STATE</font></b>
 <br>
-Some units have "Pain State" - it is a 1-second stun state after a certain 
-number of damage hits. During the "Pain State" unit can`t attack or move. 
+Some units have "Pain State" - it is a short(1 sec. for Hell units and 0.5 
+sec. for UAC units) stun state after a certain number of damage hits. 
+During the "Pain State" unit can`t attack or move.
 "Pain State" is accompanied by a special sound and unit animation.
 <br>
 <br>
@@ -1059,11 +1065,6 @@ production and increased armor.
 <br>Active ability. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Castle of Damned
 <br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront17.bmp" title="Hell Beacon">
-</td><td>
-<center><b>Hell Beacon</b></center>
 </td></tr>
 <tr><td align="center">
 <img src="imgs\unitFront20.bmp" title="Lost Soul">
@@ -2502,175 +2503,6 @@ time.
 <br>
 </td></tr>
 <tr><td align="center">
-<img src="imgs\unitFront65.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">H</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 20000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">2000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 150
-<br>Base sight range: 300
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">2000</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront66.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 15000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">1000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 100
-<br>Base sight range: 200
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">1500</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront67.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 15000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">1000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 100
-<br>Base sight range: 200
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">1500</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront68.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">B</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 6000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">500</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 55
-<br>Base sight range: 110
-<br>Immune to splash damage: YES
-<br>Increase energy level: <font color="00FFFF">1000</font>
-<br>UAC Loot bounty: <font color="00FF00">600</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront69.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 15000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">1000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 100
-<br>Base sight range: 200
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">1500</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront70.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 15000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">1000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 100
-<br>Base sight range: 200
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">1500</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront71.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">V</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 15000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">1000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 100
-<br>Base sight range: 200
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">1500</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
-<img src="imgs\unitFront72.bmp" title="">
-</td><td>
-<center><b></b></center>
-<br>Hot key: <font color="00FF00">Ctrl</font>+<font color="00FF00">H</font>
-<br>Attributes:
-<br>[<font color="FF0000">BUILDING</font>,<font color="3232FF">MECHANICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
-<br>RACE: <font color="00FF00">UAC</font>
-<br>Max hits: 20000
-<br>Always fast death: YES
-<br>Energy required: <font color="00FFFF">2000</font>
-<br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">200</font>
-<br>Size: 150
-<br>Base sight range: 300
-<br>Immune to splash damage: YES
-<br>UAC Loot bounty: <font color="00FF00">2000</font>
-<br><br>
-<br>Upgrades:
-<br>
-</td></tr>
-<tr><td align="center">
 <img src="imgs\unitFront80.bmp" title="Engineer">
 </td><td>
 <center><b>Engineer</b></center>
@@ -3357,14 +3189,6 @@ Note: this data is calculated for "ideal" conditions with fully upgraded units w
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <img style="border:1px solid #666666" src="imgs\unitBTN83.bmp" title="SuperShotguner">
 <img style="border:1px solid #666666" src="imgs\unitBTN85.bmp" title="Antiaircrafter">
 <img style="border:1px solid #666666" src="imgs\unitBTN87.bmp" title="Plasmaguner">
@@ -3877,14 +3701,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
@@ -3981,14 +3797,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <img style="border:1px solid #666666" src="imgs\unitBTN83.bmp" title="SuperShotguner">
 <img style="border:1px solid #666666" src="imgs\unitBTN86.bmp" title="Siege Marine">
 <img style="border:1px solid #666666" src="imgs\unitBTN87.bmp" title="Plasmaguner">
@@ -4047,14 +3855,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <img style="border:1px solid #666666" src="imgs\unitBTN83.bmp" title="SuperShotguner">
 <br><br>
 <font color="FF0000">Bad against</font>:
@@ -4370,14 +4170,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
@@ -4659,14 +4451,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <img style="border:1px solid #666666" src="imgs\unitBTN80.bmp" title="Engineer">
 <img style="border:1px solid #666666" src="imgs\unitBTN81.bmp" title="Medic">
 <img style="border:1px solid #666666" src="imgs\unitBTN82.bmp" title="Shotguner">
@@ -4937,14 +4721,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <br><br>
 <font color="FF0000">Bad against</font>:
 <br>
@@ -5178,14 +4954,6 @@ due to "pain state" effect, this unit can be bad againt frequent attacks
 <img style="border:1px solid #666666" src="imgs\unitBTN60.bmp" title="UAC Academy">
 <img style="border:1px solid #666666" src="imgs\unitBTN61.bmp" title="Hell Power Conductor">
 <img style="border:1px solid #666666" src="imgs\unitBTN62.bmp" title="Rocket Launcher Station">
-<img style="border:1px solid #666666" src="imgs\unitBTN65.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN66.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN67.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN68.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN69.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN70.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN71.bmp" title="">
-<img style="border:1px solid #666666" src="imgs\unitBTN72.bmp" title="">
 <img style="border:1px solid #666666" src="imgs\unitBTN83.bmp" title="SuperShotguner">
 <br><br>
 <font color="FF0000">Bad against</font>:
@@ -5479,7 +5247,7 @@ Totem of Horror.
 <br>Hot key: <font color="00FF00">L</font>
 <br>RACE: <font color="FF8C00">HELL</font>
 <br>Max level: 2
-<br>Energy required: <font color="00FFFF">600</font>/<font color="00FFFF">900</font>
+<br>Energy required: <font color="00FFFF">900</font>/<font color="00FFFF">1500</font>
 <br>Build time: 60/90
 <br><font color="FFFF00">Requirements: </font>Monastery of Despair
 <br><br>
@@ -5545,7 +5313,8 @@ Plasmaguner, Zombie BFG Marine
 <br>Build time: 60
 <br><font color="FFFF00">Requirements: </font>Monastery of Despair
 <br><br>
-<br>Description: Unlocks ArchVile`s resurrection weapon.
+<br>Description: Unlocks resurrection weapon for Arch-Vile 
+unit.
 <br><br>
 <br>Affected units:
 <br>Arch-Vile
@@ -5562,7 +5331,7 @@ Plasmaguner, Zombie BFG Marine
 <br><font color="FFFF00">Requirements: </font>Great Hell Keep
 <br><br>
 <br>Description: Reduces the cooldown of the Teleport 
-ability.
+abilities.
 <br><br>
 <br>Affected units:
 <br>Teleport
@@ -5766,7 +5535,7 @@ Antiaircrafter, Siege Marine, Plasmaguner, BFG Marine
 <br>RACE: <font color="00FF00">UAC</font>
 <br>Max level: 1
 <br>Energy required: <font color="00FFFF">300</font>
-<br>Build time: 60
+<br>Build time: 30
 <br><br>
 <br>Description: Anti-ground weapon for Antiaircrafter.
 <br><br>
@@ -5878,7 +5647,7 @@ and Anti-air Turret; turrets can transform to Drone.
 <br>Hot key: <font color="00FF00">K</font>
 <br>RACE: <font color="00FF00">UAC</font>
 <br>Max level: 2
-<br>Energy required: <font color="00FFFF">600</font>/<font color="00FFFF">900</font>
+<br>Energy required: <font color="00FFFF">900</font>/<font color="00FFFF">1500</font>
 <br>Build time: 60/90
 <br><font color="FFFF00">Requirements: </font>Science Facility
 <br><br>
@@ -6066,8 +5835,8 @@ the difference is various size of army, super weapon or "magic" using, some
 micro-control abilities and build-order.
 <br>AI3 - there is a chance of an early attack by a small group of units.
 <br>AI4 - there is a chance of an super early attack by a first unit.
-<br>AI6 - AI5 building construction speed is doubled.
-<br>AI7 - AI6 upgrades production speed is doubled.
-<br>AI8 - AI7 unit production speed is doubled.
-<br>AI9 - AI8 bot can see enemy units or buildings, ignoring fog of war.
+<br>AI6 - AI5 plus building construction speed is doubled.
+<br>AI7 - AI6 plus upgrades production speed is doubled.
+<br>AI8 - AI7 plus unit production speed is doubled.
+<br>AI9 - AI8 plus bot can see enemy units or buildings, ignoring fog of war.
 </td></tr></table></div></html>

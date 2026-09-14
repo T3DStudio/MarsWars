@@ -179,7 +179,7 @@ g_GameStartTime        = fr_fps1*5+fr_fps1-1;
 //  BASE STRINGS
 //
 
-str_version            = 'v54';
+str_version            = 'v54b';
 str_gcaption           = 'MarsWars: HELL & UAC';
 str_wcaption           : shortstring = str_gcaption+', '+str_version+#0;
 str_copyright          : shortstring = 'TGA[T3DStudio] (c) 2016-2026';

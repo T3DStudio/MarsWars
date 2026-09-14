@@ -192,7 +192,7 @@ begin
 end;
 UID_Imp:
 begin
-   uid_AnimStepWalk :=13;
+   uid_AnimStepWalk :=14;
    uid_AnimStepDeath:=8;
    setMWSModel  (0,@spr_imp);
    setCommandSND(snd_imp_ready,snd_imp_move,snd_imp_ready,snd_zimba_pain  ,snd_imp_move);

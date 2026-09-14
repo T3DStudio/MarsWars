@@ -263,7 +263,7 @@ begin
    htmldoc_WriteLn('<center><table bgcolor="#000000" width="900" border="1" bordercolor="#ffffff">');
    for uid:=0 to 255 do
      with g_uids[uid] do
-       if(uid_r>0)then
+       if(uid_r>0)and(not uid_ismarker)then
        begin
            writeln(html_f,'<tr><td align="center">');
            //writeln(html_f,'<b>',uid_str_name,'</b><br><br>');

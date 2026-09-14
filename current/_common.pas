@@ -1820,6 +1820,18 @@ begin
        if(state=ps_human)and(not isobserver)and(not isdefeated)and(net_ttl>=fr_fps1)then
          STRADD(@GetLagPlayers,name+'('+b2s((TTLMaxClientGame-net_ttl) div fr_fps1)+')',sep_comma);
 end;
+function GetWinnerPlayer:shortstring;
+var p,wt:byte;
+begin
+   wt:=gstatus-gs_win_team0;
+   GetWinnerPlayer:='';
+   for p:=0 to LastPlayer do
+     with g_PlayersGame[p] do
+       if(team=wt)then
+         if(length(GetWinnerPlayer)=0)
+         then GetWinnerPlayer:=name
+         else GetWinnerPlayer:=str_gstat_WonTeam+b2s(wt+1);
+end;
 procedure SetS(str:shortstring;add:boolean=false);
 begin
    if(pstr=nil)then exit;
@@ -1876,7 +1888,7 @@ gs_waitplayers: begin
 gs_win_team0..
 gs_win_team7  : if(POVPlayer>LastPlayer)then
                 begin
-                   SetS(str_gstat_WonTeam+b2s(gstatus-gs_win_team0+1));
+                   SetS(GetWinnerPlayer);
                    SetC(c_ltgray);
                 end
                 else

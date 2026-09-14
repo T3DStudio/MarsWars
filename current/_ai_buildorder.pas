@@ -248,8 +248,9 @@ begin
 
    with pBuilder^  do
    with player^ do
-     if (ai_curr_UnitProds<needN)
-     and(ai_curr_UnitProds<aip_MaxBarracks)then
+     if((ai_curr_UnitProds<needN)
+     and(ai_curr_UnitProds<aip_MaxBarracks))
+     or(uid^.uid_req_EnergyLevel=0)then
        case race of
        r_hell: SetBuildUID1(UID_HGate    );
        r_uac : SetBuildUID2(UID_UBarracks,UID_UFactory);
@@ -288,29 +289,29 @@ begin
       if (units_builders_e<needN)
       and(units_builders_e<aip_MaxBuilders )
       and(units_builders_e<PlayerMaxBuilders)
-      and(ai_curr_UnitProds>=2)
-      and((units_bld_l[false]>=aip_MaxUnitMinPart)or single_adv)
       and(ai_BuildersInTransform   =0)
       and(ai_BuildersInConstruction=0)
       and(not ai_earlyAttack)then
-      begin
-         if(not single_adv)then
-           checkExtraEnergy:=550;
-         case race of
-         r_hell: if(ai_available_HKeep)
-                and(units_builders_e=(aip_MaxBuilders-1))
-                and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
-                 then SetBuildUID1(UID_HKeep)
-                 else
-                 begin
-                    if (units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])>(units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])then
-                      SetBuildUID1(UID_HCommandCenter);
-                    SetBuildUID1(UID_HKeep)
-                 end;
-         r_uac : SetBuildUID1(UID_UCommandCenter);
-         end;
-         checkExtraEnergy:=0;
-      end;
+        if((ai_curr_UnitProds>=2)and((units_bld_l[false]>=aip_MaxUnitMinPart)or single_adv))
+        or(uid^.uid_req_EnergyLevel=0)then
+        begin
+           if(not single_adv)then
+             checkExtraEnergy:=550;
+           case race of
+           r_hell: if(ai_available_HKeep)
+                  and(units_builders_e=(aip_MaxBuilders-1))
+                  and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
+                   then SetBuildUID1(UID_HKeep)
+                   else
+                   begin
+                      if (units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])>(units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])then
+                        SetBuildUID1(UID_HCommandCenter);
+                      SetBuildUID1(UID_HKeep)
+                   end;
+           r_uac : SetBuildUID1(UID_UCommandCenter);
+           end;
+           checkExtraEnergy:=0;
+        end;
    end;
 end;
 procedure SetDetectors(needL:longint);
@@ -452,11 +453,11 @@ begin
 
       i:=unit_start_build(build_x,build_y,build_uid,playeri,true);
 
-     { if(isselected)then
+      {if(isselected)or(m_UnitTargetN=unum)then
       begin
          writeln('build_uid=',build_uid,' build_step=',build_step,' build_dir=',build_dir,' aiu_BuildAttempts=',aiu_BuildAttempts,' i=',i);
          UnitsInfo_AddLine(x,y,build_x,build_y,c_orange);
-      end;  }
+      end; }
 
       if(i<>lmt_prod_BadPlace)then
       begin

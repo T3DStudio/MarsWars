@@ -2425,13 +2425,14 @@ begin
            {$IFDEF _FULLGAME}
            if(ServerSide)then
            {$ENDIF}
-             with player^ do
-               if(isdefeated)
-               or(isobserver)then
-               begin
-                  unit_kill(pu,true,true,false,true,true);
-                  continue;
-               end;
+             if(not game_IsEnded)then
+               with player^ do
+                 if(isdefeated)
+                 or(isobserver)then
+                 begin
+                    unit_kill(pu,true,true,false,true,true);
+                    continue;
+                 end;
 
            if(cycle_order=g_cycle_order)then
              unit_TeamReveal(pu,false);
