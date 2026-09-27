@@ -44,7 +44,7 @@ General:
 -- generators must now have a "vision" by your own or allied units to determine their current state; a generator hidden in the fog of war will appear as the player last saw it;
 -- generators can be of two types:
 --- "Starter" - one is always created near a player's builder and is immediately captured by that player; increases energy levels by 1000; requires at least 1 limit to capture and hold;
---- "Normal" - increases energy levels by 2000; requires at least 5 limit to capture and hold;
+--- "Regular" - increases energy levels by 2000; requires at least 5 limit to capture and hold;
 -- generators now provide energy only to the player who captured them (in previous versions, energy was also provided to that player's allies);
 - one "barracks" always appears next to the starting builder;
 - in the "Key Points" mode (scenario) (in previous versions, "Capturing Points"), the four points that must be captured to win now move constantly across the map;
@@ -96,7 +96,7 @@ The balance hasn't changed fundamentally since the previous version, but there a
 - siege units' building damage multiplier has been reduced from 400% to 300%;
 - units with regeneration now receive a small bonus to regeneration when leveling up;
 - UAC units now have a PainState effect - it's shorter in duration and, on average, occurs less frequently than for demons without the "Pain Threshold" upgrade;
-- a new building upgrade system has been implemented. In previous versions, this essentially meant rebuilding the structure without the ability to cancel the process without losing the structure. Now, during an upgrade, the building is considered "completed," the process can be canceled at any time, and partial functionality is retained - a "builder," for example, continues to provide energy and the ability to build around itself;
+- a new building upgrade system has been implemented. In previous versions, this essentially meant rebuilding the structure without the ability to cancel the process without losing the structure. Now, during an upgrade, the building is considered "completed", the process can be canceled at any time, and partial functionality is retained - a "builder", for example, continues to provide energy and the ability to build around itself;
 -- the old mechanism remains in some situations - for example, converting a UAC Drone into a turret is the same as constructing a new building, and canceling the process won't return the unit;
 -- there are also situations where the upgrade occurs instantly - the "Radar" and "Rocket Launcher Station" are upgraded using new resources in this way;
 - upgraded production buildings ("barracks" and "forges") now receive a small armor bonus with each level;
@@ -108,7 +108,7 @@ The balance hasn't changed fundamentally since the previous version, but there a
 -- Hell buildings now have initial regeneration;
 - the "Hell Tower Blink" ability has been changed. Researching the upgrade once is now enough to activate the ability (previously there was a "charge" system - research the upgrade, apply the ability, the upgrade is canceled, research again). A 30-second cooldown has been added.
 - "Evil Eye" can no longer be built as a standalone building. Instead, Hell now has the "Evil Eye Nest," which has two abilities:
-"Spawn Evil Eye" - creates a temporary (1 minute) "Evil Eye" within the line of sight of any friendly or allied Hell unit;
+"Spawn Evil Eye" - creates a temporary "Evil Eye" within the line of sight of any friendly or allied Hell unit;
 "Hell Vision" - applied to any friendly or allied unit - grants them the ability to see invisible units for 8 seconds;
 The "Evil Eye Nest" itself also "detectors" invisible units around it;
 - "Arachnotron" now requires the "Pentagram of Death," meaning Hell now requires one building for all mechanical units;

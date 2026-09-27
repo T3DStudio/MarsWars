@@ -390,7 +390,7 @@ procedure SetThemeObs0    (istr:shortstring);begin SetThemeList(@theme_obstacle0
 procedure SetThemeObs1    (istr:shortstring);begin SetThemeList(@theme_obstacle1L  ,@theme_obstacle1N  ,@theme_spr_obstaclesN,istr);end;
 procedure SetThemeObs2    (istr:shortstring);begin SetThemeList(@theme_obstacle2L  ,@theme_obstacle2N  ,@theme_spr_obstaclesN,istr);end;
 
-procedure SetTheme(nTheme,nTerrain,nLiquidFront,nLiquidBack,nCrater:integer);
+procedure SetTheme(nTheme:byte;nTerrain,nLiquidFront,nLiquidBack,nCrater:integer);
 procedure SetTLBlC;
 begin
    if(theme_craterN     <=0)then theme_map_Crater     :=-1 else begin if(nCrater     <0)then theme_map_Crater     :=abs(nCrater      mod theme_craterN     ) else theme_map_Crater     :=min2i(theme_craterN     -1,nCrater     ); theme_map_Crater     :=theme_craterL     [theme_map_Crater     ];end;
@@ -399,7 +399,7 @@ begin
    if(theme_liquidFrontN<=0)then theme_map_LiquidFront:=-1 else begin if(nLiquidFront<0)then theme_map_LiquidFront:=abs(nLiquidFront mod theme_liquidFrontN) else theme_map_LiquidFront:=min2i(theme_liquidFrontN-1,nLiquidFront); theme_map_LiquidFront:=theme_liquidFrontL[theme_map_LiquidFront];end;
 end;
 begin
-   if(nTheme<0)or(nTheme>=theme_n)then nTheme:=abs(nTheme) mod theme_n;
+   if(nTheme>=theme_n)then nTheme:=nTheme mod theme_n;
    theme_i:=nTheme;
    case theme_i of
    0 : begin  // UAC BASE
@@ -552,9 +552,25 @@ begin
               theme_crater_style:=tcs_default;
 
               SetThemeTerrains('16');
-              SetThemeLiquidsB('14' );
+              SetThemeLiquidsB('14');
               SetThemeCraters ('29');
               SetThemeLiquidsF('9' );
+
+              theme_map_RBattleFront:=8;
+           end;
+       2 : begin
+              SetThemeDecals  ('-4,-4,-4,-4,-4,1_3,18_20,30,33,34');
+              SetThemeObs0    ('13,16,20,21,106,112');
+              SetThemeObs1    ('103_105,107_111');
+              SetThemeObs2    ('117_120');
+
+              theme_liquid_style:=tcs_default;
+              theme_crater_style:=tcs_default;
+
+              SetThemeTerrains('23');
+              SetThemeLiquidsB('14');
+              SetThemeCraters ('35');
+              SetThemeLiquidsF('10');
 
               theme_map_RBattleFront:=8;
            end;

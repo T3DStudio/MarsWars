@@ -1,6 +1,4 @@
 
-
-
 procedure ai_CalcBuildNeed(pu:PTUnit);
 begin
    with pu^  do
@@ -29,8 +27,6 @@ begin
          r_uac : ai_need_UnitProds:=(res_energyl_max div 425);
          end;
 
-         // добавлять еще один барак если у игрока только один тип бараков?
-
          if(ai_UpgradesLeft>0)then ai_need_UnitProds-=ai_need_UpgrProds;
          if(ai_need_UnitProds<2)then ai_need_UnitProds:=2;
          if(ai_need_UnitProds>aip_MaxBarracks)then ai_need_UnitProds:=aip_MaxBarracks;
@@ -54,16 +50,10 @@ begin
          if(g_tick<aic_DetectionBuildDelay)and(ai_need_detect>ul1)then ai_need_detect:=ul1;
       end;
 
-      // ai_TechPriority
-      {case race of
-      r_hell: ;
-      r_uac : ;
-      end;   }
-
-      {if(isselected)then
+     { if(isselected)or(m_UnitTargetN=unum)then
       begin
-         writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds)
-         //writeln('ai_need_detect=',ai_need_detect,' ai_curr_Detect=',ai_curr_Detect);
+         //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds)
+         writeln('ai_need_detect=',ai_need_detect,' ai_curr_Detect=',ai_curr_Detect,' ',(ai_enemy_inv_u<>nil),' ',(ai_need_heye_u<>nil));
          //writeln('ai_need_Energy=',ai_need_Energy,' ai_need_UnitProds=',ai_need_UnitProds,' ai_need_UpgrProds=',ai_need_UpgrProds,' ',ai_UpgradesLeft);
          //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds);
         // writeln('ai_need_UpgrProds=',ai_need_UpgrProds,' ai_curr_UpgrProds=',ai_curr_UpgrProds);
@@ -212,7 +202,7 @@ begin
 
       if(build_uid=0)then exit;
 
-      if((map_scenario=mc_koth) and(ai_keypoint_d<=keyPoint_KotR))
+      if(ai_KotH and(ai_keypoint_d<=keyPoint_KotR))
       or((map_scenario=mc_royale)and(u_royal_cd<base_r1h))then
       begin
          // default
@@ -248,9 +238,8 @@ begin
 
    with pBuilder^  do
    with player^ do
-     if((ai_curr_UnitProds<needN)
-     and(ai_curr_UnitProds<aip_MaxBarracks))
-     or(uid^.uid_req_EnergyLevel=0)then
+     if (ai_curr_UnitProds<needN)
+     and(ai_curr_UnitProds<aip_MaxBarracks)then
        case race of
        r_hell: SetBuildUID1(UID_HGate    );
        r_uac : SetBuildUID2(UID_UBarracks,UID_UFactory);
@@ -383,7 +372,7 @@ function NeedMaxTowers:boolean;
 begin
    with pBuilder^  do
      NeedMaxTowers:=((ai_enemy_d<base_r2)and(aiu_limitaround_ally<aiu_limitaround_enemy))
-                  or((map_scenario=mc_koth) and(ai_keypoint_d<=keyPoint_KotR))
+                  or(ai_KotH and(ai_keypoint_d<=keyPoint_KotR))
                   or((map_scenario=mc_royale)and(u_royal_cd<base_r1h));
 end;
 
@@ -662,8 +651,9 @@ uprod_base       : begin
                       begin
                          if(ai_Barrack(pBarrack,uprod_Transport))then exit;
 
-                         if(ai_armylimit_siedge<=ul10)and(ai_BaseDef_d=NOTSET)and(map_scenario<>mc_koth)then
-                           if(ai_Barrack(pBarrack,uprod_Sidge))then exit;
+                         if(ai_armylimit_siedge<=ul10)and(ai_BaseDef_d=NOTSET)then
+                           if(map_scenario<>mc_koth)or(ai_keypoint_d=NOTSET)then
+                             if(ai_Barrack(pBarrack,uprod_Sidge))then exit;
 
                          if(ai_Barrack(pBarrack,uprod_Special))then exit;
 
@@ -840,12 +830,12 @@ uprod_random     :    case race of
       case tuid of
       UID_UTransport,
       UID_Pain,
-      UID_BFGMarine,
-      UID_ZBFGMarine,
       UID_ZMedic,
       UID_Medic,
       UID_ZEngineer,
-      UID_Engineer  : tuid_m:=min2i(aip_skill,aic_max_SpecUID);
+      UID_Engineer  : tuid_m:=aic_max_SpecUID;
+      UID_BFGMarine,
+      UID_ZBFGMarine: tuid_m:=aip_skill;
       else            tuid_m:=MaxUnits;
       end;
 

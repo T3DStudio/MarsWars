@@ -588,10 +588,11 @@ begin
        with g_PlayersTemp[p] do
          if(GetBBit(@bs_cam,p))then
          begin
-            wudata_int(cam_x,rpl);
-            wudata_int(cam_y,rpl);
-            wudata_int(cam_w,rpl);
-            wudata_int(cam_h,rpl);
+            wudata_int (cam_x,rpl);
+            wudata_int (cam_y,rpl);
+            wudata_int (cam_w,rpl);
+            wudata_int (cam_h,rpl);
+            wudata_word(apm  ,rpl);
          end;
 end;
 
@@ -1009,7 +1010,8 @@ begin
                unit_clear_a_tar(unum);
             end;
 
-            if(buffs[ub_Teleported]>0)then
+            if((pu_prev^.buffs[ub_Teleported]<=0)and(buffs[ub_Teleported]>0))
+            or(speed<=0)then
               if(pu_prev^.x<>x)
               or(pu_prev^.y<>y)then
               begin
@@ -1734,7 +1736,7 @@ begin
          if(map_KeyPointsN>0)then
            rclinet_KeyPoint(rpl,fast_skip);
 
-         // player's cam
+         // player's cam and APM
          if(not rpl)then
          begin
             bs:=rudata_byte(rpl,0);
@@ -1742,10 +1744,11 @@ begin
               with g_PlayersTemp[i] do
                 if(GetBBit(@bs,i))then
                 begin
-                   cam_x:=rudata_int(rpl,0);
-                   cam_y:=rudata_int(rpl,0);
-                   cam_w:=rudata_int(rpl,0);
-                   cam_h:=rudata_int(rpl,0);
+                   cam_x:=rudata_int (rpl,0);
+                   cam_y:=rudata_int (rpl,0);
+                   cam_w:=rudata_int (rpl,0);
+                   cam_h:=rudata_int (rpl,0);
+                   apm  :=rudata_word(rpl,0);
                 end
                 else
                 begin
@@ -1753,6 +1756,7 @@ begin
                    cam_y:=0;
                    cam_w:=0;
                    cam_h:=0;
+                   apm  :=0;
                 end;
          end;
       end;

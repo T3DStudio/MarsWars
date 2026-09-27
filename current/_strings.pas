@@ -892,15 +892,15 @@ begin
      wpt_directdmgZ,
      wpt_heal      : BaseDmg:=aw_object_count;
      end;
-     begin
-        n:=0;
-        for i:=aw_reload downto 1 do
-          if(i in aw_ShotPoints)then
-            if (aw_reload=255) or not((i+1) in aw_ShotPoints)then n+=1;
-     end;
+
+     n:=0;
+     for i:=aw_reload downto 1 do
+       if(i in aw_ShotPoints)then
+         if (aw_reload=255) or not((i+1) in aw_ShotPoints)then n+=1;
 
      if(BaseDmg>0)then
      begin
+        str_UnitArmDPS:=str_uarm_BaseImpact+' ';
         if(aw_type=wpt_heal)
         then STRADD(@str_UnitArmDPS,tc_lime+i2s(BaseDmg)+tc_default,'')
         else STRADD(@str_UnitArmDPS,tc_red +i2s(BaseDmg)+tc_default,'');
@@ -960,7 +960,7 @@ begin
 
       STRADD(@str_UnitArmLine,str_uarm_targets+str_UnitArmTargets(aw_tar_Flags,aw_tar_uids),sep_scomma);
 
-      STRADD(@str_UnitArmLine,str_uarm_BaseImpact+' '+str_UnitArmDPS(uid,wid),sep_scomma);
+      STRADD(@str_UnitArmLine,str_UnitArmDPS(uid,wid),sep_scomma);
 
       if(aw_type=wpt_missle)then
         with g_mids[aw_object_id] do
@@ -1365,7 +1365,7 @@ begin
           ua_str_ReloadFactors:='';
           case ua_type of
           uat_passive  : STRADD(@ua_str_Common,str_ability_passive  ,sep_sdot);
-          uat_notarget : STRADD(@ua_str_Common,str_ability_active   ,sep_sdot);
+          else           STRADD(@ua_str_Common,str_ability_active   ,sep_sdot);
           end;
           case ua_type of
           uat_passive  : ;

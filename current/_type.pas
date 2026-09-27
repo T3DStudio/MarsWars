@@ -251,7 +251,18 @@ TMenuItem = record
    mi_state: TActAState;
 end;
 
-TMenuMessageBoxType = (mmbt_none,mmbt_nothing,mmbt_netPortBlock,mmbt_netWaitServer,mmbt_DeleteReplay,mmbt_DeleteSave,mmbt_DeleteServer,mmbt_SaveRewrite);
+TMenuMessageBoxType = (mmbt_none,
+                       mmbt_nothing,
+                       mmbt_netPortBlock,
+                       mmbt_netWaitServer,
+                       mmbt_DeleteReplay,
+                       mmbt_DeleteSave,
+                       mmbt_DeleteServer,
+                       mmbt_SaveRewrite,
+                       mmbt_ExitGame,
+                       mmbt_BreakGame,
+                       mmbt_Surrender,
+                       mmbt_Disconnect);
 
 TSaveLoadItem = record
    data_p:pointer;
@@ -278,8 +289,15 @@ TServerInfo = record
 end;
 
 TCampaignData = record
-   cd_lastm : integer;
-   cd_NMTime: cardinal;
+   cd_lastm   : integer;
+   cd_NMTime  : cardinal;
+   cd_camp_skill,
+   cd_p_player,
+   cd_p_ally1,
+   cd_p_ally2,
+   cd_p_enemy1,
+   cd_p_enemy2,
+   cd_p_enemy3: byte;
 end;
 
 TAPMData = record
@@ -687,6 +705,7 @@ TPlayerDataTemp = record
    cam_y,
    cam_w,
    cam_h        : integer;
+   apm          : word;
 end;
 
 TPlayerDataGame = record

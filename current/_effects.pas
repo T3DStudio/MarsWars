@@ -298,12 +298,12 @@ begin
    if (0<sx)and(sx<map_Size1)
    and(0<sy)and(sy<map_Size1)then
      if(CheckPVis(@pUIVisS))then
-       effect_add(sx,sy,draw_DefaultSpriteDepth(sy+1,ukfly),seid,true);
+       effect_add(sx,sy,draw_DefaultSpriteDepth(sy+20,ukfly),seid,true);
 
    if (0<tx)and(tx<map_Size1)
    and(0<ty)and(ty<map_Size1)then
      if(CheckPVis(@pUIVisT))then
-       effect_add(tx,ty,draw_DefaultSpriteDepth(ty+1,ukfly),eeid,true);
+       effect_add(tx,ty,draw_DefaultSpriteDepth(ty+20,ukfly),eeid,true);
 
    if(CheckPVis(@pUIVisS))
    or(CheckPVis(@pUIVisT))

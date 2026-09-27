@@ -272,6 +272,8 @@ add to selection units from the numbered control group
 <br><font color="00FF00">F2</font>: select all not busy battle units; double tap - move camera to nearest 
 unit
 <br>
+<br><font color="00FF00">Ctrl</font>+<font color="00FF00">Z</font>: set rally point for unit-production or unit-teleportation buildings
+<br>
 <br><font color="00FF00">F5</font>: set map mark(multiplayer): "look here"
 <br><font color="00FF00">F6</font>: set map mark(multiplayer): "attack here"
 <br>
@@ -367,7 +369,7 @@ Generators (see "im. #3 Generators") - special objects on the game map that,
 <br>- "Starter" generator - appears at players base in "Scirmish" game. 
 Required at least 1 unit limit to be captured. Increase "<font color="00FFFF">Energy level</font><font color="FFFFFF">" by </font>
 1000.
-<br>- "Normal" generator - appears at any map locations. Required at least 5 
+<br>- "Regular" generator - appears at any map locations. Required at least 5 
 unit limit to be captured. Increase "<font color="00FFFF">Energy level</font><font color="FFFFFF">" by 2000.</font>
 <br>Both types of generators requires holding units inside it, otherwise 
 generator become back to neutral state.
@@ -518,15 +520,15 @@ Center,Advanced Hell Command Center
 <br>- Dimension Shift (<font color="00FF00">Q</font>): The building teleport itself to 
 target location. Required upgrade canceled after 
 teleportation.
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Dimension Shift"
 <br>- Decay Aura: Deals damage(<font color="FF0000">7</font> hits 2 times per sec.) to 
 all non-building enemy units around. Damage ignores 
 units armor.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Decay Aura"
 <br>- Transform to Great Hell Keep (<font color="00FF00">E</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -559,12 +561,12 @@ units armor.
 <br>- Dimension Shift (<font color="00FF00">Q</font>): The building teleport itself to 
 target location. Required upgrade canceled after 
 teleportation.
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Dimension Shift"
 <br>- Decay Aura: Deals damage(<font color="FF0000">7</font> hits 2 times per sec.) to 
 all non-building enemy units around. Damage ignores 
 units armor.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Decay Aura"
 <br>
 </td></tr>
@@ -597,7 +599,7 @@ units armor.
 <br>Abilities:
 <br>- Advanced Demon`s Gate (<font color="00FF00">E</font>): Simultaneous multiple 
 production and increased armor.
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Castle of Damned
 <br>
 </td></tr>
@@ -630,7 +632,7 @@ production and increased armor.
 <br>Abilities:
 <br>- Advanced Infernal Pools (<font color="00FF00">E</font>): Simultaneous multiple 
 production and increased armor.
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Castle of Damned
 <br>
 </td></tr>
@@ -752,7 +754,8 @@ upgrade: "Hell Firepower"(+8), factor: 200%
 <br><br>
 <br>Abilities:
 <br>- Planar Jump (<font color="00FF00">Q</font>): Short-range teleportation.
-<br>Ground-targeted. Base reloading time: <font color="00FFFF">30</font> sec.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted. Base reloading time: 
+<font color="00FFFF">30</font> sec.
 <br><font color="FFFF00">Requirements: </font>upgrade "Planar Jump"
 <br>
 </td></tr>
@@ -791,10 +794,11 @@ factor: 200% [<font color="009600">HEAVY</font>]
 <br><br>
 <br>Abilities:
 <br>- Planar Jump (<font color="00FF00">Q</font>): Short-range teleportation.
-<br>Ground-targeted. Base reloading time: <font color="00FFFF">30</font> sec.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted. Base reloading time: 
+<font color="00FFFF">30</font> sec.
 <br><font color="FFFF00">Requirements: </font>upgrade "Planar Jump"
 <br>- Shroud of Horror: Permanent invisibility.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Shroud of Horror"
 <br>
 </td></tr>
@@ -827,18 +831,19 @@ factor: 200% [<font color="009600">HEAVY</font>]
 <br>- Teleportation: Transfers units directed at it to the 
 specified allied unit-beacon. The ability`s cooldown is 
 multiplied by the target`s limit.
-<br>Passive ability. Base reloading time: <font color="00FFFF">5</font> sec.
+<br><font color="00FFFF">Passive ability</font>. Base reloading time: <font color="00FFFF">4</font> sec.
 <br>Reload time reduction factors: upgrade "Teleport 
 Upgrade"(-1)
 <br>- Recall (<font color="00FF00">W</font>): Transfers target unit to the Teleport. 
 The ability`s cooldown is multiplied by the target`s 
 limit.
-<br>Own-unit-targeted. Base reloading time: <font color="00FFFF">5</font> sec.
+<br><font color="FFFF00">Active ability</font>. Own-unit-targeted. Base reloading time: 
+<font color="00FFFF">3</font> sec.
 <br>Reload time reduction factors: upgrade "Teleport 
 Upgrade"(-1)
 <br>- Portal link: If the destination is another Teleport, 
 the teleportation occurs without cooldown.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Portal link"
 <br>
 </td></tr>
@@ -873,11 +878,13 @@ Center,Advanced Hell Command Center
 <br>- Spawn "Evil Eye" (<font color="00FF00">Q</font>): Spawns the Evil Eye at target 
 point. There must be at least one Hell unit allied with 
 you around the point target.
-<br>Ground-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted. Base reloading time: 
+<font color="00FFFF">60</font> sec.
 <br><font color="FFFF00">Requirements: </font>upgrade "Evil Eye Magic"
 <br>- Hell Vision (<font color="00FF00">W</font>): Gives allied target ability to 
 detect invisible units for 8 seconds.
-<br>Own&ally-unit-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Base reloading 
+time: <font color="00FFFF">60</font> sec.
 <br><font color="FFFF00">Requirements: </font>upgrade "Evil Eye Magic"
 <br>
 </td></tr>
@@ -889,15 +896,15 @@ detect invisible units for 8 seconds.
 <br>Attributes:
 <br>[<font color="FF0000">BUILDING</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="FFFF00">LIGHT</font>,<font color="00FF00">GROUND</font>,<font color="FF00FF">DETECTOR</font>]
 <br>RACE: <font color="FF8C00">HELL</font>
-<br>Max hits: 60
+<br>Max hits: 120
 <br>Always fast death: YES
-<br>Lifetime: 60 sec.
+<br>Lifetime: 120 sec.
 <br>Limit used: <font color="FF8C00">1</font>
 <br>Build time: NO
 <br>Size: 10
 <br>Base sight range: 300
 <br>Immune to splash damage: YES
-<br>Hell Power bounty: <font color="FFFF00">6</font>
+<br>Hell Power bounty: <font color="FFFF00">12</font>
 <br>Description: Detection and scouting structure.
 <br><br>
 <br>Upgrades:
@@ -936,13 +943,16 @@ pres sec., 2 - 150, 3 - 200. Maximum quantity: 3.
 <br>- Damage Resistance Sphere (<font color="00FF00">Q</font>): Halves damage to the 
 target for 30 seconds. Makes the target immune to the 
 PainState effect.
-<br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">6000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Hell Power 
+required: <font color="FFFF00">6000</font>.
 <br>- Double Damage Sphere (<font color="00FF00">W</font>): Doubles the target`s damage 
 for 20 seconds.
-<br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">9000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Hell Power 
+required: <font color="FFFF00">9000</font>.
 <br>- Turbo Sphere (<font color="00FF00">E</font>): Speeds up all target parameters by 
 2 times for 15 seconds.
-<br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">12000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Hell Power 
+required: <font color="FFFF00">12000</font>.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -983,11 +993,11 @@ hits per sec.: 2, upgrade: "Hell Firepower"(+8), factor:
 <br><br>
 <br>Abilities:
 <br>- Land/Take-off (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>- Land to point (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br>- Transform to Advanced Hell Command Center (<font color="00FF00">E</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -1026,9 +1036,9 @@ hits per sec.: 2, upgrade: "Hell Firepower"(+8), factor:
 <br><br>
 <br>Abilities:
 <br>- Land/Take-off (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>- Land to point (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -1062,7 +1072,7 @@ Command Center
 <br>Abilities:
 <br>- Advanced Zombie Barracks (<font color="00FF00">E</font>): Simultaneous multiple 
 production and increased armor.
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Castle of Damned
 <br>
 </td></tr>
@@ -1205,16 +1215,16 @@ Teeth"(+8)
 <br>Attributes:
 <br>[<font color="787878">UNIT</font>,<font color="FF8C00">BIOLOGICAL</font>,<font color="009600">HEAVY</font>,<font color="00FF00">GROUND</font>]
 <br>RACE: <font color="FF8C00">HELL</font>
-<br>Max hits: 1500
+<br>Max hits: 1250
 <br>Always fast death: NO
 <br>Energy required: <font color="00FFFF">300</font>
 <br>Limit used: <font color="FF8C00">1</font>
-<br>Build time: <font color="FFFFFF">20</font>
+<br>Build time: <font color="FFFFFF">15</font>
 <br>Size: 14
 <br>Base speed: 16
 <br>Base sight range: 200
 <br>PainState base threshold: 8
-<br>Time in combat to level up: 20
+<br>Time in combat to level up: 15
 <br>Bonus to armor per level: 2
 <br>Bonus to impact per level: 2
 <br>Bonus to PainState threshold per level: 1
@@ -1236,7 +1246,7 @@ Teeth"(+8), factor: 200% [<font color="787878">UNIT</font>,<font color="FF8C00">
 <br><br>
 <br>Abilities:
 <br>- Specter: Permanent invisibility.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Specter"
 <br>
 </td></tr>
@@ -1444,10 +1454,9 @@ Teeth"(+8)
 <br><br>
 <br>Arming:
 <br>- spawn "Phantom", max. range: sight range+50, targets: 
-[<font color="00FF00">ALIVE</font>], base impact hits per sec.: 0.33, {<font color="FFFF00">Req.: </font>
-upgrade "Phantoms"}
+[<font color="00FF00">ALIVE</font>], hits per sec.: 0.33, {<font color="FFFF00">Req.: </font>upgrade "Phantoms"}
 <br>- spawn "Lost Soul", max. range: sight range+50, 
-targets: [<font color="00FF00">ALIVE</font>], base impact hits per sec.: 0.33
+targets: [<font color="00FF00">ALIVE</font>], hits per sec.: 0.33
 <br><br>
 <br>Upgrades:
 <br>- Armor: "Combat Flesh"(+8)
@@ -1457,9 +1466,9 @@ targets: [<font color="00FF00">ALIVE</font>], base impact hits per sec.: 0.33
 <br><br>
 <br>Abilities:
 <br>- Spawn "Lost Soul" (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>- Spawn "Lost Soul" to point (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -1574,8 +1583,7 @@ sec.: 1.5, upgrade: "Demon`s Weapons"(+8), factor: 200%
 <br>Arming:
 <br>- resurrection, max. range: 8, targets: [<font color="464646">DEAD</font>,demons&
 zombies] except [Cyberdemon,Spider Mastermind,Arch-
-Vile], base impact hits per sec.: 2, {<font color="FFFF00">Req.: </font>upgrade 
-"Resurrection"}
+Vile], hits per sec.: 2, {<font color="FFFF00">Req.: </font>upgrade "Resurrection"}
 <br>- ranged attack, max. range: sight range, targets: 
 [<font color="00FF00">ALIVE</font>], base impact <font color="FF0000">270</font>, hits per sec.: 0.5, splash 
 damage radius: 20, upgrade: "Hell Firepower"(+8), 
@@ -2066,13 +2074,13 @@ range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF
 <br><br>
 <br>Abilities:
 <br>- Land/Take-off (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Flight Engines"
 <br>- Land to point (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Flight Engines"
 <br>- Transform to Advanced Command Center (<font color="00FF00">E</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -2110,10 +2118,10 @@ range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF
 <br><br>
 <br>Abilities:
 <br>- Land/Take-off (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Flight Engines"
 <br>- Land to point (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Flight Engines"
 <br>
 </td></tr>
@@ -2146,7 +2154,7 @@ range, targets: [<font color="00FF00">ALIVE</font>], base impact <font color="FF
 <br>Abilities:
 <br>- Advanced Barracks (<font color="00FF00">E</font>): Simultaneous multiple 
 production and increased armor.
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Computer Station
 <br>
 </td></tr>
@@ -2177,7 +2185,7 @@ production and increased armor.
 <br>Abilities:
 <br>- Advanced Vehicle Factory (<font color="00FF00">E</font>): Simultaneous multiple 
 production and increased armor.
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Computer Station
 <br>
 </td></tr>
@@ -2208,7 +2216,7 @@ production and increased armor.
 <br>Abilities:
 <br>- Advanced Weapon Factory (<font color="00FF00">E</font>): Simultaneous multiple 
 production and increased armor.
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>Computer Station
 <br>
 </td></tr>
@@ -2298,9 +2306,9 @@ upgrade: "Weapons Upgrade"(+8), factor: 200%
 <br><br>
 <br>Abilities:
 <br>- Transform to Anti-air Turret (<font color="00FF00">W</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>- Transform to Drone (<font color="00FF00">E</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Drone Transformation Protocol"
 <br>
 </td></tr>
@@ -2336,13 +2344,13 @@ upgrade: "Weapons Upgrade"(+8), factor: 200% [<font color="00FFFF">FLYING</font>
 <br><br>
 <br>Abilities:
 <br>- Transform to Anti-ground Turret (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>- Ainti-air Fragmentation Missiles: Anti-air missiles 
 do extra damage around the target.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Ainti-air Fragmentation Missiles"
 <br>- Transform to Drone (<font color="00FF00">E</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Drone Transformation Protocol"
 <br>
 </td></tr>
@@ -2375,12 +2383,13 @@ enemy units.
 <br>Abilities:
 <br>- Scan (<font color="00FF00">Q</font>): Reveals units (including invisible ones) in 
 the target area for 8 seconds.
-<br>Ground-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted. Base reloading time: 
+<font color="00FFFF">60</font> sec.
 <br>Reload time reduction factors: unit level(-5)
 <br><font color="FFFF00">Requirements: </font>upgrade "Scan"
 <br>- Advanced "Radar" (<font color="00FF00">E</font>): Upgrades the "Radar" to lower 
 its ability reload time.
-<br>Active ability. Self-targeted. UAC Loot required: <font color="00FF00">2000</font>.
+<br><font color="FFFF00">Active ability</font>. Self-targeted. UAC Loot required: <font color="00FF00">2000</font>.
 <br><font color="FFFF00">Requirements: </font>Advanced Command Center
 <br>
 </td></tr>
@@ -2413,17 +2422,20 @@ abilities.
 <br>- Bribe (<font color="00FF00">Q</font>): Valid targets: non-heroic enemy UAC units. 
 Turns the target to your side. There must be at least 
 one UAC unit allied with you around the target.
-<br>Enemy-unit-targeted. UAC Loot required: <font color="00FF00">5000</font>.
+<br><font color="FFFF00">Active ability</font>. Enemy-unit-targeted. UAC Loot required: 
+<font color="00FF00">5000</font>.
 <br>- System Hack (<font color="00FF00">W</font>): Valid targets: completed enemy UAC 
 buildings. Turns the target to your side. There must be 
 at least one UAC unit allied with you around the target.
-<br>Enemy-unit-targeted. UAC Loot required: <font color="00FF00">7500</font>.
+<br><font color="FFFF00">Active ability</font>. Enemy-unit-targeted. UAC Loot required: 
+<font color="00FF00">7500</font>.
 <br>- UAC General Rank (<font color="00FF00">E</font>): Valid targets: non-heroic 
 allied UAC units. Makes the target a "[<font color="FF0000">HEROIC</font>]", which 
 increases the damage it deal by 1.5 times and reduces 
 the damage it take by a third. There can be a maximum 
 of 4 "[<font color="FF0000">HEROIC</font>]" units in your army.
-<br>Own&ally-unit-targeted. UAC Loot required: <font color="00FF00">10000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. UAC Loot 
+required: <font color="00FF00">10000</font>.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -2454,13 +2466,16 @@ abilities.
 <br>Abilities:
 <br>- Soul Sphere (<font color="00FF00">Q</font>): Restores 1000 health to the target 
 over 6 seconds.
-<br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">1000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Hell Power 
+required: <font color="FFFF00">1000</font>.
 <br>- Invisibility Sphere (<font color="00FF00">W</font>): Makes target invisible for 
 60 seconds.
-<br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">2000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Hell Power 
+required: <font color="FFFF00">2000</font>.
 <br>- Invulnerability Sphere (<font color="00FF00">E</font>): Makes target invulnerable 
 for 30 seconds.
-<br>Own&ally-unit-targeted. Hell Power required: <font color="FFFF00">9000</font>.
+<br><font color="FFFF00">Active ability</font>. Own&ally-unit-targeted. Hell Power 
+required: <font color="FFFF00">9000</font>.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -2493,12 +2508,13 @@ that deal <font color="FF0000">1800</font> damage(explode size: 60,splash damage
 radius: 120), factor: 400% [<font color="FF0000">BUILDING</font>]. Note: launching 
 a missile reveals the building to all players for 5 
 seconds.
-<br>Ground-targeted. Base reloading time: <font color="00FFFF">60</font> sec.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted. Base reloading time: 
+<font color="00FFFF">60</font> sec.
 <br>Reload time reduction factors: unit level(-5)
 <br>- Advanced "Rocket Launcher Station" (<font color="00FF00">E</font>): Upgrades the 
 "Rocket Launcher Station" to lower its ability reload 
 time.
-<br>Active ability. Self-targeted. UAC Loot required: <font color="00FF00">3000</font>.
+<br><font color="FFFF00">Active ability</font>. Self-targeted. UAC Loot required: <font color="00FF00">3000</font>.
 <br><font color="FFFF00">Requirements: </font>Computer Station
 <br>
 </td></tr>
@@ -2710,7 +2726,7 @@ upgrade: "Weapons Upgrade"(+8), factor: 200%
 <br><br>
 <br>Abilities:
 <br>- Stealth Technology: Permanent invisibility.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Stealth Technology"
 <br>
 </td></tr>
@@ -2761,7 +2777,7 @@ Surface Missiles"}
 <br>Abilities:
 <br>- Ainti-air Fragmentation Missiles: Anti-air missiles 
 do extra damage around the target.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Ainti-air Fragmentation Missiles"
 <br>
 </td></tr>
@@ -2921,9 +2937,9 @@ factor: 50% [<font color="FF0000">BUILDING</font>]
 <br><br>
 <br>Abilities:
 <br>- Unload (<font color="00FF00">Q</font>):
-<br>Active ability. Self-targeted.
+<br><font color="FFFF00">Active ability</font>. Self-targeted.
 <br>- Unload to point (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br>
 </td></tr>
 <tr><td align="center">
@@ -2965,10 +2981,10 @@ upgrade: "Weapons Upgrade"(+8), factor: 200%
 <br><br>
 <br>Abilities:
 <br>- Transform to Anti-ground Turret (<font color="00FF00">Q</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Drone Transformation Protocol"
 <br>- Transform to Anti-air Turret (<font color="00FF00">W</font>):
-<br>Ground-targeted.
+<br><font color="FFFF00">Active ability</font>. Ground-targeted.
 <br><font color="FFFF00">Requirements: </font>upgrade "Drone Transformation Protocol"
 <br>
 </td></tr>
@@ -3018,7 +3034,7 @@ air Weapon"}
 <br>Abilities:
 <br>- Ainti-air Fragmentation Missiles: Anti-air missiles 
 do extra damage around the target.
-<br>Passive ability.
+<br><font color="00FFFF">Passive ability</font>.
 <br><font color="FFFF00">Requirements: </font>upgrade "Ainti-air Fragmentation Missiles"
 <br>
 </td></tr>
@@ -5326,8 +5342,8 @@ unit.
 <br>Hot key: <font color="00FF00">O</font>
 <br>RACE: <font color="FF8C00">HELL</font>
 <br>Max level: 2
-<br>Energy required: <font color="00FFFF">400</font>/<font color="00FFFF">600</font>
-<br>Build time: 60/90
+<br>Energy required: <font color="00FFFF">600</font>/<font color="00FFFF">1200</font>
+<br>Build time: 60/120
 <br><font color="FFFF00">Requirements: </font>Great Hell Keep
 <br><br>
 <br>Description: Reduces the cooldown of the Teleport 
@@ -5813,12 +5829,12 @@ and Anti-air Turret.
 <br>
 <br>Dedicated server - a special version of the game that does not load any 
 game resources and immediately starts working as a server. To start a 
-dedicated server, run it with the following parameters:
+dedicated server, run MarsWars_ded.exe.
+<br>The dedicated server have next optional start parameters:
 <br>
-<center>MarsWars_ded.exe [X] [Y]</center>
+<br>-netport [X] - UDP port(1-65535); default value is 10666.
+<br>-lanadv [X] - LAN Advertise(0(off) or 1(on)); default value is 1.
 <br>
-where X - UDP port (optional argument, default value - 10666 Y - LAN 
-Advertise (optional argument, default value - 1 (true))).
 <br>Any connected player can change the game settings in a dedicated server`s 
 lobby.
 <br>The game will start automatically as soon as all players mark the "ready" 

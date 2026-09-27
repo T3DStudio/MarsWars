@@ -40,7 +40,8 @@ ai_earlyAttack,
 ai_available_HKeep,
 ai_HaveTransport,
 ai_SmartTarget,
-ai_useInvis
+ai_useInvis,
+ai_KotH
                      : boolean;
 
 ai_generator_kp,
@@ -842,7 +843,9 @@ begin
                      if(kptd_Timer>0)then
                        if(kptd_TimerOwnerTeam=team)and(kptd_TimerOwnerPlayer<>playeri)then continue;
                      if(kp_LimitTeamP[team]>0)and(kp_LimitPlayerP[playeri]=0)then continue;
-                  end;
+                  end
+                  else
+                    if(kptd_OwnerTeam<=LastPlayer)and(kptd_OwnerTeam=team)then continue;
 
                   if(not koth_point)and(kp_Energy>0)then
                     case(transportM>0)of
@@ -851,8 +854,11 @@ begin
                            if((d+uid_r)<=kp_RCapture)then l-=uid_LimitUse;
                            if(l>=0)then continue;
                            end;
-                    false: if(((kp_LimitPlayerP[playeri])>=kp_CaptureLimit  )and(d> kp_RCapture))        //uid_LimitUse
-                           or(((kp_LimitPlayerP[playeri])>=kp_CaptureLimit*2)and(d<=kp_RCapture))then continue;
+                    false: begin
+                           l:=kp_LimitPlayerP[playeri]-uid_LimitUse;
+                           if((l>=kp_CaptureLimit  )and(d> kp_RCapture))
+                           or((l>=kp_CaptureLimit*2)and(d<=kp_RCapture))then continue;
+                           end;
                     end;
 
                   if(kptd_OwnerTeam<=LastPlayer)
@@ -869,6 +875,8 @@ begin
                   end;
                end;
           end;
+
+   ai_KotH :=(map_scenario=mc_KotH)and(ai_keypoint_d<NOTSET);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////

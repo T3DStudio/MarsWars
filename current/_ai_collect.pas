@@ -148,7 +148,7 @@ begin
         setNearestTarget(@ai_HTeleportTarget_u,@ai_HTeleportTarget_d,tu^.aiu_alarm_d,(upgrs_cur[upgr_hell_T2TNoCD]>0)and(tu^.uidi=UID_HTeleport));
 
       // teleport beacon for KOTH
-      if(map_scenario=mc_koth)then
+      if(ai_KotH)and(ai_keypoint_d<NOTSET)then
         with map_KeyPointsL[0] do
           if (tu^.mapZone=kp_Zone)
           and(tu^.mapZone<>mapZone)

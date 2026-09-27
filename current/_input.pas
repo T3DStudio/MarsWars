@@ -100,11 +100,11 @@ begin
    input_SetAction(iAct_Control_UDestroy  ,ikt_keyboard,0           ,SDLK_DELETE      );
    input_SetAction(iAct_Control_USelBase  ,ikt_keyboard,0           ,SDLK_F1          );
    input_SetAction(iAct_Control_USelArmy  ,ikt_keyboard,0           ,SDLK_F2          );
+   input_SetAction(iAct_Control_USetRPoint,ikt_keyboard,iAct_control,SDLK_Z           );
    input_SetAction(iAct_Control_MarkLook  ,ikt_keyboard,0           ,SDLK_F5          );
    input_SetAction(iAct_Control_MarkAttack,ikt_keyboard,0           ,SDLK_F6          );
    input_SetAction(iAct_Control_ToggleRec ,ikt_keyboard,0           ,SDLK_F10         );
    input_SetAction(iAct_Control_ScoreBoard,ikt_keyboard,0           ,SDLK_F7          );
-
 
    input_SetAction(iAct_SProd1            ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_SProd2            ,ikt_keyboard,0           ,SDLK_T           );
@@ -317,7 +317,8 @@ begin
    ui_panel_CTabIActs[tcc_controls,MPos(7 )]:=iAct_Control_UStop;
    ui_panel_CTabIActs[tcc_controls,MPos(8 )]:=iAct_Control_UPatrol;
    ui_panel_CTabIActs[tcc_controls,MPos(9 )]:=iAct_Control_UProdCncl;
-   ui_panel_CTabIActs[tcc_controls,MPos(10)]:=iAct_Control_UDestroy;
+   ui_panel_CTabIActs[tcc_controls,MPos(10)]:=iAct_Control_USetRPoint;
+   ui_panel_CTabIActs[tcc_controls,MPos(11)]:=iAct_Control_UDestroy;
    ui_panel_CTabIActs[tcc_controls,MPos(12)]:=iAct_Control_USelBase;
    ui_panel_CTabIActs[tcc_controls,MPos(13)]:=iAct_Control_USelArmy;
    ui_panel_CTabIActs[tcc_controls,MPos(15)]:=iAct_Control_MarkLook;
@@ -412,6 +413,7 @@ begin
                iAct_Control_UPatrol,
                iAct_Control_UProdCncl,
                iAct_Control_UDestroy,
+               iAct_Control_USetRPoint,
                iAct_Control_USelBase,
                iAct_Control_USelArmy,
                iAct_Control_MarkLook,
@@ -470,6 +472,7 @@ begin
       iActSetOnEnabled(iAct_Control_USelBase  , true                                 ,ui_group_f1.ugroup_n>0);
       iActSetOnEnabled(iAct_Control_USelArmy  , true                                 ,ui_group_f2.ugroup_n>0);
 
+      iActSetOnEnabled(iAct_Control_USetRPoint, ui_uibtn_rpoint  >0                  ,true );
       iActSetOnEnabled(iAct_Control_UProdCncl , ui_uibtn_ProdCncl>0                  ,true );
 
       if(POVPlayer=nil)
@@ -559,35 +562,37 @@ begin
      begin
         case cmd of
         co_move,
-        co_patrol : local_CommandSound(uid_snd_move);
+        co_patrol   : local_CommandSound(uid_snd_move);
         co_amove,
-        co_apatrol: local_CommandSound(uid_snd_attack);
-        co_rcamove: if(uid_HaveRallypoint)
-                    then local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race])
-                    else local_CommandSound(uid_snd_attack);
-        co_rcmove : if(uid_HaveRallypoint)
-                    then local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race])
-                    else
-                      if(local_TarIsEnemy)
-                      then local_CommandSound(uid_snd_attack)
-                      else local_CommandSound(uid_snd_move  );
+        co_apatrol  : local_CommandSound(uid_snd_attack);
+        co_setRPoint: local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race]);
+        co_rcamove  : if(uid_HaveRallypoint)
+                      then local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race])
+                      else local_CommandSound(uid_snd_attack);
+        co_rcmove   : if(uid_HaveRallypoint)
+                      then local_CommandSound(snd_rally_point[ui_CommandercPU^.player^.race])
+                      else
+                        if(local_TarIsEnemy)
+                        then local_CommandSound(uid_snd_attack)
+                        else local_CommandSound(uid_snd_move  );
         end;
 
         case cmd of
-        co_ability: with g_aids[oid]do
-                      case ua_type of
-                      uat_point    : local_ClickEffect(c_aqua);
-                      uat_UnitAny,
-                      uat_UnitOwn,
-                      uat_UnitAlly,
-                      uat_UnitEnemy: if(not IsUnitRange(otar,nil))then local_UnitMarkEffect;
-                      end;
+        co_ability  : with g_aids[oid]do
+                        case ua_type of
+                        uat_point    : local_ClickEffect(c_aqua);
+                        uat_UnitAny,
+                        uat_UnitOwn,
+                        uat_UnitAlly,
+                        uat_UnitEnemy: if(not IsUnitRange(otar,nil))then local_UnitMarkEffect;
+                        end;
         co_move,
-        co_patrol : local_ClickEffect(c_lime);
-        co_apatrol: local_ClickEffect(c_red);
+        co_patrol   : local_ClickEffect(c_lime);
+        co_apatrol  : local_ClickEffect(c_red );
         co_amove,
-        co_rcamove: if(not IsUnitRange(otar,nil))then local_ClickEffect(c_red ) else local_UnitMarkEffect;
-        co_rcmove : if(not IsUnitRange(otar,nil))then local_ClickEffect(c_lime) else local_UnitMarkEffect;
+        co_rcamove  : if(not IsUnitRange(otar,nil))then local_ClickEffect(c_red   ) else local_UnitMarkEffect;
+        co_rcmove   : if(not IsUnitRange(otar,nil))then local_ClickEffect(c_lime  ) else local_UnitMarkEffect;
+        co_setRPoint: if(not IsUnitRange(otar,nil))then local_ClickEffect(c_orange) else local_UnitMarkEffect;
         end;
      end;
 end;
@@ -791,6 +796,7 @@ begin
                  co_patrol          : if(not iActEnabled(iAct_Control_UPatrol   ))then m_brush:=co_empty;
                  co_amove           : if(not iActEnabled(iAct_Control_UAMove    ))then m_brush:=co_empty;
                  co_apatrol         : if(not iActEnabled(iAct_Control_UAPatrol  ))then m_brush:=co_empty;
+                 co_setRPoint       : if(not iActEnabled(iAct_Control_USetRPoint))then m_brush:=co_empty;
                  co_markLook        : if(not iActEnabled(iAct_Control_MarkLook  ))then m_brush:=co_empty;
                  co_markAttack      : if(not iActEnabled(iAct_Control_MarkAttack))then m_brush:=co_empty;
                  else  m_brush:=co_empty
@@ -821,16 +827,17 @@ begin
                 else GameLog_ReqMsg(LocalPlayer,byte(-m_brush),lmt_argt_ability,lmt_invalid_Target,mouse_map_x,mouse_map_y);
                 if(g_PlayersGame[LocalPlayer].units_all_s>1)then exit;
              end;
-co_move    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // move
-co_amove   : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);  // attack
+co_setRPoint,
+co_move,
+co_amove    : PlayerSendOrder(m_brush   ,target,x,y,0,uo_corder,LocalPlayer);
 co_patrol,
-co_apatrol : PlayerSendOrder(m_brush   ,0     ,x,y,0,uo_corder,LocalPlayer);
-co_empty   : if(ui_uibtn_move  >0) // rclick
-             or(ui_uibtn_attack>0)
-             or(ui_uibtn_rpoint>0)then
-        if(m_RightClickAct)
-        then PlayerSendOrder(co_rcmove ,target,x,y,0,uo_corder,LocalPlayer)
-        else PlayerSendOrder(co_rcamove,target,x,y,0,uo_corder,LocalPlayer);
+co_apatrol  : PlayerSendOrder(m_brush   ,0     ,x,y,0,uo_corder,LocalPlayer);
+co_empty    : if(ui_uibtn_move  >0) // rclick
+              or(ui_uibtn_attack>0)
+              or(ui_uibtn_rpoint>0)then
+         if(m_RightClickAct)
+         then PlayerSendOrder(co_rcmove ,target,x,y,0,uo_corder,LocalPlayer)
+         else PlayerSendOrder(co_rcamove,target,x,y,0,uo_corder,LocalPlayer);
    end;
 
    m_brush:=co_empty;
@@ -969,6 +976,7 @@ begin
    iAct_Control_UAPatrol  : if(SoundEnabledLeft)then m_brush :=co_apatrol;
    iAct_Control_UMove     : if(SoundEnabledLeft)then m_brush :=co_move;
    iAct_Control_UPatrol   : if(SoundEnabledLeft)then m_brush :=co_patrol;
+   iAct_Control_USetRPoint: if(SoundEnabledLeft)then m_brush :=co_setRPoint;
    iAct_Control_UAStop    : if(SoundEnabledLeft)then PlayerSendOrder(co_astand,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UStop     : if(SoundEnabledLeft)then PlayerSendOrder(co_stand ,0,0,0,0,uo_corder,LocalPlayer);
    iAct_Control_UProdCncl : if(SoundEnabledLeft)then
@@ -1050,8 +1058,10 @@ begin
 
    while(SDL_PollEvent(sys_EVENT)>0)do
      case(sys_EVENT^.type_)of
-      SDL_QUITEV         : game_Cycle:=false;
-      //SDL_ACTIVEEVENT    : sys_WindowFocus:=not sys_WindowFocus;
+      SDL_QUITEV         : begin
+                           menu_mbox_QuitInit;
+                           MainMenu:=true;
+                           end;
       SDL_VIDEORESIZE    : begin
                               nvid_vw:=max2i(vid_minw,sys_EVENT^.resize.w);
                               nvid_vh:=max2i(vid_minh,sys_EVENT^.resize.h);
@@ -1204,6 +1214,7 @@ begin
                     co_empty     : input_SingleClickLMB;
                     1..255,
                     -255..-1,
+                    co_setRPoint,
                     co_move,
                     co_amove,
                     co_patrol,
@@ -1213,6 +1224,7 @@ begin
                     end;
       mf_minimap  : case m_brush of
                    -255..-1,
+                    co_setRPoint,
                     co_move,
                     co_amove,
                     co_patrol,

@@ -228,13 +228,13 @@ begin
    g_cycle_regen := 0;
    g_LobbyTimer  := 0;
 
+   menu_update:=true;
+
+   {$IFDEF _FULLGAME}
    {$IFDEF DEBUG0}
    test_InstaProd:=false;
    {$ENDIF}
 
-   menu_update:=true;
-
-   {$IFDEF _FULLGAME}
    ServerSide     :=true;
 
    sys_uncappedFPS:=false;
@@ -244,34 +244,30 @@ begin
    ui_cam_x:=-ui_CtrlPanelW;
    ui_cam_y:=0;
    ui_Camera_Bounds;
-
    ui_blink_timer1:=0;
    ui_blink_timer2:=0;
    ui_tab :=0;
    ui_ScoresRebuild:=true;
+   ui_InGameChat :=0;
+   ui_umark_u:=0;
+   ui_umark_t:=0;
+   ui_fog   :=true;
+   ui_playerPOV:=false;
 
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
    FillChar(g_effects,SizeOf(g_effects),0);
    FillChar(g_PlayerAPM,SizeOf(g_PlayerAPM),0);
 
-   ui_InGameChat :=0;
    net_chat_str:='';
    net_cl_svttl:=0;
    net_cl_Hoster:=255;
-
-   ui_umark_u:=0;
-   ui_umark_t:=0;
 
    mouse_select_xs0:=NOTSET;
    mouse_select_ys0:=NOTSET;
    m_brush:=co_empty;
 
-   ui_fog   :=true;
-
    svld_str_fname:='';
-
    rpls_pnu    :=0;
-   ui_playerPOV:=false;
    rpls_pstate :=rpls_none;
 
    PlayersUpdateColorSchema(LocalPlayer);
@@ -288,14 +284,16 @@ begin
    begin
       ui_tab  :=tab_controls;
       UIPlayer:=MaxPlayers;
+      ui_Camera_MoveToPoint(map_SizeH,map_SizeH);
       for p:=0 to LastPlayer do
         with g_PlayersGame[p] do
           if (state>ps_none)
           and(not isobserver)
-          and(not isdefeated)then break;
-      if(p<MaxPlayers)
-      then ui_Camera_MoveToPoint(map_PlayerStartX[p],map_PlayerStartY[p])
-      else ui_Camera_MoveToPoint(map_SizeH,map_SizeH);
+          and(not isdefeated)then
+          begin
+             ui_Camera_MoveToPoint(map_PlayerStartX[p],map_PlayerStartY[p]);
+             break;
+          end;
    end
    else
    begin
@@ -304,6 +302,7 @@ begin
    end;
    ui_log_LastTimer:=0;
    rpls_RecordTryPause:=0;
+   menu_msgBox_Off;
    if(snd_RenewMusicList)then
      snd_GameMusicReLoad;
 end;
@@ -861,6 +860,7 @@ begin
                                 co_destroy  : unit_kill(pu,false,false,true,false,true);
                                 co_rcamove,
                                 co_rcmove,
+                                co_setRPoint,
                                 co_stand,
                                 co_move,
                                 co_patrol,
@@ -1480,7 +1480,8 @@ begin
                          end;
       {$IFDEF _FULLGAME}
                       end;
-         gt_campaing: cmp_MissionCode;
+         gt_campaing: if(g_cycle_regen=0)then
+                        cmp_MissionCode;
          end;
       end
       else Scenario_KeyPointsCodeClient;

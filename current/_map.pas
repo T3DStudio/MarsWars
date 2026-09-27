@@ -9,10 +9,16 @@ begin
    gfx_MapMakeRBattleFront;
 end;
 
+function map_seed2theme_i(seed:cardinal):byte;
+begin
+   map_seed2theme_i:=seed and $0000000F;
+   if(map_seed2theme_i>=theme_n)then map_seed2theme_i:=map_seed2theme_i mod theme_n;
+end;
+
 procedure map_seed2theme;
 begin
    SetTheme(
-      map_seed and $0000000F,            // theme number
+      map_seed2theme_i(map_seed),        // theme number
    -((map_seed and $00000FF0) shr 4 ),   // terrain
    -((map_seed and $000FF000) shr 12),   // liquid front
    -((map_seed and $0FF00000) shr 20),   // liquid back
@@ -444,7 +450,7 @@ begin
    if(longint(itick)<map_SizeKPCR)
    then cd:=integer(itick)
    else cd:=map_SizeKPCR;
-   cdir:=(stick mod 109000)/400+(map_seed mod 360);
+   cdir:=(stick mod 109000)/300+(map_seed mod 360);
    cx  :=map_sizeH+round(cd*cos(cdir*DEGTORAD));
    cy  :=map_sizeH+round(cd*sin(cdir*DEGTORAD));
    odir:=map_SymmetryDir+(stick mod 119000)/600;
@@ -572,7 +578,7 @@ begin
 end;}
 
 procedure map_KeyPoints_Random(acount,aCaptureR,aNoBuildR,aEnergy,aCaptureTime:integer;aLifeTime:cardinal;aCaptureLimit:longint);
-const max_attempts = 500;
+const max_attempts = 600;
 var
 ix,iy,
 sx,sy,
@@ -644,7 +650,17 @@ mc_KeyPoints: begin
                     map_KeyPoints_Add(map_SizeH,map_SizeH,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
      end;
 
-   map_KeyPoints_Random(map_MaxPlayers*2,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
+   {$IFDEF _FULLGAME}
+   if(g_type=gt_campaing)
+   then i:=MaxKeyPoints
+   else{$ENDIF}
+     case map_MaxPlayers of
+     0..4: i:=map_MaxPlayers*2;
+     else  i:=MaxKeyPoints
+     end;
+
+   if(i>0)then
+     map_KeyPoints_Random(i,keyPoint_GenR,keyPoint_GenNB,map_generators_EnergyO,keyPoint_CTime_Gen_Tick,map_generators_LFTicks[map_GeneratorT],map_generators_LimitO);
 
    map_KeyPoints_UpdateZone;
    map_KeyPoints_UpdateTeamData;

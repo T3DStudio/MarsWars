@@ -69,7 +69,7 @@ str_SG_PlayerName             = 'Имя игрока'
 str_SG_Language               = 'Язык интерфейса'
 str_SG_RightClickAct          = 'Действие на ПКМ'
 str_SG_RightClickActL[true]   = tc_lime+'движение'+tc_default
-str_SG_RightClickActL[false]  = tc_lime+'движение'+tc_default+'+'+tc_red+'атака'+tc_default
+str_SG_RightClickActL[false]  = tc_lime+'движение'+tc_default+','+tc_red+'атака'+tc_default
 str_SG_ControlPanelPos        = 'Позиция контрольной панели'
 str_SG_ControlPanelPosL[cpp_left]  = tc_lime  +'слева' +tc_default
 str_SG_ControlPanelPosL[cpp_right] = tc_orange+'справа'+tc_default
@@ -286,7 +286,7 @@ str_warn_kpoint_CaptureStart  = ' захватывает ключевую точ
 str_warn_koth_CaptureStart    = ' контролирует центр'
 str_warn_koth_Alarm           = 'Внимание на центральную зону: '
 str_warn_ngen_captured        = 'Генератор захвачен'
-str_warn_ngen_alarm           = 'Тревога у генератора!'
+str_warn_ngen_alarm           = 'Пропадает над генератором'
 str_warn_ngen_lost            = 'Генератор потерян'
 str_warn_ngen_exh             = 'Генератор исчерпан'
 str_warn_Invalid_Target       = 'Неподходящая цель'
@@ -334,7 +334,7 @@ str_hint_Zombies              = 'зомби'
 str_hint_Demons               = 'демоны и '+str_hint_Zombies
 str_hint_Except               = 'кроме'
 str_hint_SplashResist         = 'Невоспр. к урону по области'
-str_hint_FlyLikeTarget        = 'Становится ['+str_attr_ground+'] когда атакует ['+str_attr_ground+'] цели'
+str_hint_FlyLikeTarget        = 'Получает атрибут ['+str_attr_ground+'] когда атакует цели с атрибутом ['+str_attr_ground+']'
 str_hint_TargetLimit          = 'лимит цели'
 str_hint_builder              = 'Строитель'
 str_hint_barrack              = 'Производство юнитов'
@@ -364,8 +364,8 @@ str_uarm_Upgrade              = str_hint_upgrade+': '
 str_uarm_Factor               = ', моддификатор: '
 str_uarm_ShotsPerSec          = 'ударов в сек.: '
 
-str_ability_passive           = 'Пассивная способность'
-str_ability_active            = 'Активная способность'
+str_ability_passive           = tc_aqua+'Пассивная способность'+tc_default
+str_ability_active            = tc_yellow+'Активная способность'+tc_default
 str_ability_notarget          = 'Цель-сам юнит'
 str_ability_point             = 'Цель-точка на земле'
 str_ability_UnitAny           = 'Цель-любой юнит'
@@ -388,7 +388,7 @@ str_net_ServerList            = 'Список серверов'
 str_net_ServerListAdd         = 'Добавить'
 str_net_ServerLANAdv          = 'Виден в LAN'
 str_net_ConnectedTo           = '- подключен к'
-str_net_DedicatedServer       = ' выделенный сервер'
+str_net_DedicatedServer       = 'выделенный сервер'
 
 str_help_Credits              = 'О игре'
 str_help_GameControls         = 'Игровое управление'
@@ -642,7 +642,7 @@ str_tmp1 = 'Время перезарядки способности умнож�
 
 str_name[uab_Teleport]           = 'Телепортация'
 str_dscr[uab_Teleport]           = 'Перемещает юнитов к указанному юниту-маяку. '+str_tmp1
-str_name[uab_Recall]             = 'Recall'
+str_name[uab_Recall]             = 'Призыв'
 str_dscr[uab_Recall]             = 'Перемещает цель к телепорту. '+str_tmp1
 str_name[uab_UACScan]            = 'Сканирование'
 str_dscr[uab_UACScan]            = 'Раскрывает юнитов (включая невидимые) в указаной области в течении '+str_detection_time_sec+' сек.'
@@ -867,6 +867,8 @@ str_dscr[iAct_Control_USelArmy]    = 'Выбрать всех боевых не 
                                      '- не имеют приказа применять способность;'+tc_nl+
                                      '- не направлены в Телепорт или транспорт;'
 
+str_dscr[iAct_Control_USetRPoint]  = 'Установить точку сбора'
+
 str_dscr[iAct_Control_MarkLook]    = 'Отметка: смотреть сюда'
 str_dscr[iAct_Control_MarkAttack]  = 'Отметка: атаковать тут'
 str_dscr[iAct_Control_ScoreBoard]  = 'Статистика'
@@ -1073,6 +1075,8 @@ HK_Control_UDestroy  +'самоуничтожение выбранных юни�
 tc_docbr
 HK_Control_USelBase  +'выбор всех строителей; двойное нажатие - перемещение камеры к ближайшему строителю'
 HK_Control_USelArmy  +'выбор всех незанятых боевых юнитов; двойное нажатие - перемещение камеры к ближайшему такому юниту'
+tc_docbr
+HK_Control_USetRPoint+'установить точку сбора для производящих или телепортирующих зданий'
 tc_docbr
 HK_Control_MarkLook  +'(сетевая игра) установить метку: "смотреть сюда"'
 HK_Control_MarkAttack+'(сетевая игра) установить метку: "атаковать тут"'
@@ -1309,11 +1313,12 @@ tc_docbr+'Время регенерации юнитов - 1 секунда.'
 DocHelp_Other = 
 tc_orange+'ВЫДЕЛЕННЫЙ СЕРВЕР'+tc_default+tc_doccpt
 tc_docbr
-tc_docbr+'Выделенный сервер - особая консольная версия игры, которая не загружает никаких игровых ресурсов и сразу запускается как игровой сервер. Выделенный сервер можно запускать со следующими параметрами:'
+tc_docbr+'Выделенный сервер - особая консольная версия игры, которая не загружает никаких игровых ресурсов и сразу запускается как игровой сервер. Что бы поднять выделенный сервер - запустите MarsWars_ded.exe.'
+tc_docbr+'Выделенный сервер может иметь следующие параметры запуска:'
 tc_docbr
-tc_doccnt+'MarsWars_ded.exe [X] [Y]'
+tc_docbr+'-netport [X] - UDP порт(1-65535); значение по умолчанию - '+str_net_DefaultPort+'.'
+tc_docbr+'-lanadv [X] - автообнаружение сервера в LAN(0(нет) or 1(да)); значение по умолчанию - 1.'
 tc_docbr
-'где X - UDP порт (опциональный параметр, значение по умолчанию - '+str_net_DefaultPort+' Y - видимость сервера в LAN (опциональный параметр, значение по умолчанию - 1 (true))).'
 tc_docbr+'На выделенном сервере любой подключившийся игрок может менять параметры игры или карты.'
 tc_docbr+'Игра автоматически начинется, когда все игроки отметят свою готовность соответствующей опцией в лобби. Сервер вернется в лобби через 1 минуту после завершения игры или сразу после отключения последнего игрока.'
 tc_docbr
@@ -1346,9 +1351,12 @@ str_Camp_Info                 = 'Информация'
 str_Camp_Location             = 'Место действия'
 str_Camp_NewUnits             = 'Доступны новые юниты: '
 
+
 str_Camp_HE_CoB               = 'Клан укусов'
 str_Camp_HE_EE                = 'Племя злого глаза'
 str_Camp_HE_PoA               = 'Стая Злобы'
+str_Camp_HE_SoF               = 'Служители огня'
+str_Camp_HE_CB                = 'Кибер дивизион'
 str_Camp_HE_BS                = 'Кровавый отряд'
 str_Camp_HE_LoH               = 'Лорды ужаса'
 str_Camp_HE_CoBS              = 'Клан горящих небес'
@@ -1358,44 +1366,76 @@ str_Camp_HE_CoBS              = 'Клан горящих небес'
 str_camp_1                    = 'Возвышение'
 
 str_tmp1 =    'Адская Империя'+tc_nl
+              'неизвестная планета'+tc_nl
 
 //////////     HELL VS HELL    1
 
-str_camp_1_miss_1_name =  'гор. Эребус'
+str_camp_1_miss_1_name =  'Гора Эребус'
+str_camp_1_miss_1_loc  = str_tmp1+'подножие горы Эребус'
 
-str_camp_1_miss_1_obj  = '- Don`t lose the Hell Keep'
-                   tc_nl+'- Capture 1 generator'
-                   tc_nl+'- Build 10 Demon`s Gates'
-                   tc_nl+'- Summon 30 Imps'
-                   tc_nl+'- Destroy the '+str_Camp_HE_CoB
-str_camp_1_miss_1_loc  = str_tmp1+'Mountain Erebus'
+str_camp_1_miss_1_obj  = '- '+tc_CO1+'Сохраните Адскую крепость'
+        tc_default+tc_nl+'- '+tc_CO2+'Захватите как минимум 1 генератор'
+        tc_default+tc_nl+'- '+tc_CO3+'Постройте 10 Врат Демонов'
+        tc_default+tc_nl+'- '+tc_CO4+'Призовите 30 Бесов'
+        tc_default+tc_nl+'- '+tc_CO5+'Уничтожьте '+str_Camp_HE_CoB
 
 str_camp_1_miss_1_plot = 
-'On a distant, unknown planet of the Hell Empire, there exists a long-standing tradition of "ascension":'
-'once every few dozen cycles, the leaders of savage demonic tribes, eager to ascend to a higher position in the Empire, gather for a journey to a sacred place - the "Slough of Despair".'
-'The journey there is long and arduous - they must overcome canyons, caves, steppes, lakes, and - most importantly - his rivals! Only one will survive, only one will ascend to the rank of "General of Hell"!'
+'На далекой неизвестной планете Адской Империи существует давняя традиция "вознесения": '
+'раз в несколько десятков циклов вожди диких демонических племен, жаждущие занять более высокое положении в Империи, собираются в поход в священное место - "Болото Отчаяния". '
+'Путь туда долгий и сложный - им необходимо преодолеть каньоны, пещеры, степи, озера и - самое важное - своих конкурентов! Только один выживет, только один сможет вознестись до ранга "Генерала Ада"!'
 tc_docbr
-'You are one of the ascension candidates. Your journey begins in a cave at the foot of the Mount Erebus. The first obstacle lies ahead - your rival`s outpost! Build a camp, summon your warriors, and crush the enemy!'
-'MISSION TIPS:'
+'Вы - один из претендентов на вознесение. Ваш путь начинается в пещере у подножия священной горы Эребус. Впереди первое препятствие - аванпост конкурента!'
+'Постройте лагерь, призовите своих воинов и сокрушите врага!'
+tc_docbr
+tc_docbr
+tc_lime+ПОДСКАЗКИ И СОВЕТЫ+tc_default+:
+tc_lime+*+tc_default+ В этой миссии вам нужно научиться основным механикам игры: строительству базы, созданию юнитов и работе экономики.
+tc_lime+*+tc_default+ У вас нет ограничений по времени - генераторы будут работать бесконечно, а враг не начнет нападать, пока вы не призовете требуемое количество Бесов.
+tc_lime+*+tc_default+' Если возникнут трудности - подробную информацию об управлении и механиках игры вы сможете найти в разделе "'+str_menu_Help+'", доступном в любой момент из меню.'
 
 //////////     HELL VS HELL    2
 
-str_camp_1_miss_2_name = 'Valley of Fear'
-
-str_camp_1_miss_2_obj  = '- At least 1 Hell Keep must survive'
-                   tc_nl+'- Destroy the '+str_Camp_HE_EE
-                   tc_nl+'- Destroy the '+str_Camp_HE_PoA
-str_camp_1_miss_2_loc  = str_tmp1+'Valley of Fear'
+str_camp_1_miss_2_name = 'Долина Страха'
+str_camp_1_miss_2_loc  = str_tmp1+str_camp_1_miss_2_name
+str_camp_1_miss_2_obj  = '- '+tc_CO1+'Сохраните хотя бы одну Адскую крепость'
+        tc_default+tc_nl+'- '+tc_CO2+'Уничтожьте племена конкурентов'
 
 str_camp_1_miss_2_plot = 
-'It was a glorious victory! You enslave some Pinky Demons to strengthen your army, stole Fire Tower technology to defend your base and capture Hell Pools for upgrades!'
+Это была славная победа! Вы поработили нескольких зубастых демонов усилив ими свою армию, украли технологию производства Огненной башни для обороны своей базы и захватили Инфернальные Омуты для исследования улучшений!
 tc_docbr
-'But there is no time to celebrate - an earthquake has occurred, and the ground behind you has begun to fill with lava. Your next challenge is to cross the Valley of Fear faster than the lava flow.'
+Но времени праздновать нет - произошло землетрясение, и территория позади вас начинает заполнятся лавой. Ваша следующий вызов - пересечь Долину Страха раньше, чем вас накроет раскаленной волной.
 tc_docbr
-'There are two more opponents in this area - destroy them as well, adding their forces to yours.'
+И, кстати, тут расположены базы еще двух конкурентов - уничтожьте их, чтобы пополнить вашу армию новыми технологиями и видами войск.
 tc_docbr
 tc_docbr
-'MISSION TIPS:'
-'* Hell Keep teleportation ability is not available for you yet, so your only option is to build new Hell Keeps toward the bottom-right corner of the map.'
-'* Each of your units has "self-destruction" ability - use it to free builder limit;'
-'* Your opponents have different army compositions and you should choose your army composition wisely for greater effectiveness. '
+tc_lime+ПОДСКАЗКИ И СОВЕТЫ+tc_default+:
+tc_lime+*+tc_default+ В данной миссии вам следует действовать быстро - волна лавы, уничтожающая все на своем пути, будет распространятся из левого верхнего угла карты. Захватывайте ближайшие генераторы и развивайтесь как можно быстрее.
+Ваши оппоненты будут заняты войной друг с другом.
+tc_lime+*+tc_default+Уничтожение одного из врагов даст вам возможность производить новые виды юнитов и зданий.
+tc_lime+*+tc_default+Технология телепортации Адской крепости вам пока не доступна, так что единственный способ сохранить вашу базу - строить новые Адские крепости по направлению в правый нижний угол и перестраивать производящие здания дальше от волны.
+tc_lime+*+tc_default+Баланс в игре во многом строится на том, что одни виды юнитов наносят больше урона по другим и получают больше урона от третьих. Ваши оппоненты имеют разные составы армий - ваш успех зависит от правильно подобранных контр-юнитов.
+Вы можете посмотреть информацию о балансе в разделе "'+str_menu_Help+'" -> "'+str_help_BalanceTable+'".'
+tc_lime+*+tc_default+Каждый юнит имеет особый приказ - "самоуничтожение" - используйте его, чтобы освободить лимит от бесполезных юнитов или зданий.
+tc_lime+*+tc_default+Не забывайте исследовать улучшения для вашей армии.
+
+//////////     HELL VS HELL    3
+
+str_camp_1_miss_3_name = 'Нечестивый собор'
+str_camp_1_miss_3_loc  = str_tmp1+str_camp_1_miss_3_name
+
+str_camp_1_miss_3_obj  = '- '+tc_CO1+'Вы и ваши союзники не должны потерять все Адские крепости'
+        tc_default+tc_nl+'- '+tc_CO2+'Не дайте врагам захватить центр карты'
+        tc_default+tc_nl+'- '+tc_CO3+'Захватите центр карты'
+        tc_default+tc_nl+'- '+tc_CO4+'Уничтожте вражеские племена'
+
+str_camp_1_miss_3_plot = 
+Выжив в Долине Страха, вы подходите к вратам Нечестивого Собора. По легенде - пройти в эти врата могут три вождя, окропившие площадь перед Собором кровью своих врагов.
+По ту сторону площади находятся трое командиров, уже выполнивших условие - и все, что им осталось - пройти врата и лишить вас возможности вознестись на еще один десяток циклов.
+Похоже, ситуация вынуждает вас объединить усилия с другими племенами и не позволить этому случиться!
+tc_docbr
+tc_docbr
+tc_lime+ПОДСКАЗКИ И СОВЕТЫ+tc_default+:
+tc_lime+*+tc_default+В этой миссии вам нужно научится трем важным в игре вещам:
+взаимодействие с союзниками;
+применение способностей детекции(раскрытие невидимых юнитов - у врагов будут такие, но ваши союзники не имеют технологий детекции)
+использование Телепорта - технологии адской рассы для перемещения войск в другие области карты;

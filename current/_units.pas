@@ -1668,6 +1668,15 @@ begin
         if(buffs[ub_Cast]>0)then skipOrder:=true;
 
       case aorder of
+      co_setRPoint
+                : if(uid_HaveRallyPoint)then
+                  begin
+                     unit_SetBaseOrder:=true;
+                     if(check)then exit;
+                     rpoint_tar:=atar;
+                     rpoint_x  :=ax;
+                     rpoint_y  :=ay;
+                  end;
       co_rcamove,
       co_rcmove : if(uid_HaveRallyPoint)then // right click
                   begin

@@ -382,6 +382,7 @@ co_cunit               = -419;
 co_pcancle             = -420;
 co_markLook            = -421;
 co_markAttack          = -422;
+co_setRPoint           = -423;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1185,6 +1186,7 @@ iAct_Control_MarkLook  = 74;
 iAct_Control_MarkAttack= 75;
 iAct_Control_ToggleRec = 76;
 iAct_Control_ScoreBoard= 77;
+iAct_Control_USetRPoint = 78;
 
 iAct_Replay_Fast       = 110;
 iAct_Replay_Back2      = 111;
@@ -2044,6 +2046,11 @@ tc_default             = #25;
 
 tc_RankUAC             = #176;
 tc_RankHell            = #177;
+tc_CampObj1            = #178;
+tc_CampObj2            = #179;
+tc_CampObj3            = #180;
+tc_CampObj4            = #181;
+tc_CampObj5            = #182;
 
 tc_SpecChars           = [tc_player0..tc_default];
 
@@ -2084,16 +2091,17 @@ testmode_UACLoot       = testmode_HellPower;
 {$ELSE }
 
 ded_GameEndTime          = fr_fps1*60+fr_fps1-1;
+{
+str_gstat_Lobby            : shortstring = 'Lobby';
+str_gstat_Started          : shortstring = 'Started';
+str_gstat_WaitForPlayers        : shortstring = 'Waiting for players';
+str_gstat_WonTeam            : shortstring = 'Won by a team #';
+str_gstat_GamePaused           : shortstring = 'Paused by ';
+str_gstat_Status           : shortstring = 'Game status: ';
 
-str_GameLobby            : shortstring = 'Lobby';
-str_GameStarted          : shortstring = 'Started';
-str_GameWFPlayers        : shortstring = 'Waiting for players';
-str_GameEnded            : shortstring = 'Won by a team #';
-str_GamePaused           : shortstring = 'Paused by ';
-str_UDPPort              : shortstring = ' UPD port: ';
-str_GameStatus           : shortstring = 'Game status: ';
-str_GameOptions          : shortstring = 'Game options:';
-str_MapOptions           : shortstring = 'Map options:';
+str_net_UDPPort              : shortstring = ' UPD port: ';
+str_Caption_GOptions          : shortstring = 'Game options:';
+str_Caption_Map           : shortstring = 'Map options:';
 
 str_map_GeneratorsL      : array[0..mapg_Last] of shortstring = ('5 min','10 min','15 min','20 min','infinity');
 str_map_ScenarioL        : array[0..mc_Last  ] of shortstring = ('FFA(3)',
@@ -2131,11 +2139,9 @@ str_map_Seed             : shortstring = 'Seed';
 str_map_Size             : shortstring = 'Size';
 str_map_Template         : shortstring = 'Template';
 str_map_Symmetry         : shortstring = 'Symmetry';
-str_game_AISlots         : shortstring = 'Fill empty slots';
-str_game_FixedPositions  : shortstring = 'Fixed player starts';
-str_game_NoNewObservers  : shortstring = 'New observers after game start';
-str_gmsg_PlayerPaused    : shortstring = 'player paused the game';
-str_gmsg_PlayerResumed   : shortstring = 'player has resumed the game';
+str_GO_AISlots         : shortstring = 'Fill empty slots';
+str_GO_FixedStarts  : shortstring = 'Fixed player starts';
+str_GO_NewObservers  : shortstring = 'New observers after game start';
 
 str_Player               : shortstring = 'Player';
 str_State                : shortstring = 'State';
@@ -2148,7 +2154,7 @@ str_ps_Hum               : shortstring = 'Hum.';
 
 str_race                 : array[0..r_count] of shortstring = ('RANDOM','HELL','UAC');
 str_observer             : shortstring = 'OBSERVER';
-
+      }
 {$ENDIF}
 
 

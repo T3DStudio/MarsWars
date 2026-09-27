@@ -2,6 +2,110 @@
 const
 ded_ConsoleBaseLine = '                                                                                 ';
 
+procedure dedicated_Lang;
+begin
+   str_gstat_Lobby                := 'Lobby';
+   str_gstat_Started              := 'Started';
+   str_gstat_WaitForPlayers       := 'Waiting for players';
+   str_gstat_WonTeam              := 'Won by a team #';
+   str_gstat_GamePaused           := 'Paused by ';
+   str_gstat_Status               := 'Game status: ';
+   str_net_UDPPort                := ' UPD port: ';
+   str_Caption_GOptions           := 'Game options:';
+   str_Caption_Map                := 'Map options:';
+
+   str_map_GeneratorsL[mapg_5  ]  := '5 min';
+   str_map_GeneratorsL[mapg_10 ]  := '10 min';
+   str_map_GeneratorsL[mapg_15 ]  := '15 min';
+   str_map_GeneratorsL[mapg_20 ]  := '20 min';
+   str_map_GeneratorsL[mapg_inf]  := 'infinity';
+
+   str_map_ScenarioL[mc_ffa3     ]:= 'FFA(3)';
+   str_map_ScenarioL[mc_ffa4     ]:= 'FFA(4)';
+   str_map_ScenarioL[mc_ffa5     ]:= 'FFA(5)';
+   str_map_ScenarioL[mc_ffa6     ]:= 'FFA(6)';
+   str_map_ScenarioL[mc_ffa7     ]:= 'FFA(7)';
+   str_map_ScenarioL[mc_ffa8     ]:= 'FFA(8)';
+   str_map_ScenarioL[mc_1x1      ]:= '1x1';
+   str_map_ScenarioL[mc_2x2      ]:= '2x2';
+   str_map_ScenarioL[mc_3x3      ]:= '3x3';
+   str_map_ScenarioL[mc_4x4      ]:= '4x4';
+   str_map_ScenarioL[mc_2x2x2    ]:= '2x2x2';
+   str_map_ScenarioL[mc_2x2x2x2  ]:= '2x2x2x2';
+   str_map_ScenarioL[mc_KeyPoints]:= 'Key Points';
+   str_map_ScenarioL[mc_KotH     ]:= 'KotH';
+   str_map_ScenarioL[mc_royale   ]:= 'Royal Battle';
+
+   str_map_SymmetryL[maps_none ]  := 'no';
+   str_map_SymmetryL[maps_point]  := 'point';
+   str_map_SymmetryL[maps_lineV]  := 'line |';
+   str_map_SymmetryL[maps_lineH]  := 'line -';
+   str_map_SymmetryL[maps_lineL]  := 'line \';
+   str_map_SymmetryL[maps_lineR]  := 'line /';
+
+   str_map_TemplateL[mapt_lake]   := 'lake';
+   str_map_TemplateL[mapt_island] := 'island';
+   str_map_TemplateL[mapt_temple] := 'temple';
+   str_map_TemplateL[mapt_cave]   := 'cave';
+   str_map_TemplateL[mapt_steppe] := 'steppe';
+   str_map_TemplateL[mapt_canyon] := 'canyon';
+
+
+   str_map_Scenario               := 'Scenario';
+   str_map_Generators             := 'Generators';
+   str_map_Seed                   := 'Seed';
+   str_map_Size                   := 'Size';
+   str_map_Template               := 'Template';
+   str_map_Symmetry               := 'Symmetry';
+   str_GO_AISlots                 := 'Fill empty slots';
+   str_GO_FixedStarts             := 'Fixed player starts';
+   str_GO_NewObservers            := 'New observers after game start';
+
+   str_Player                     := 'Player';
+   str_State                      := 'State';
+   str_team                       := 'Team';
+   str_srace                      := 'Race';
+   str_ping                       := 'Ping';
+
+   str_ps_AI                      := 'AI';
+   str_ps_Hum                     := 'Hum.';
+
+   str_race[r_random]             := 'RANDOM';
+   str_race[r_hell  ]             := 'HELL';
+   str_race[r_uac   ]             := 'UAC';
+   str_observer                   := 'OBSERVER';
+end;
+
+procedure dedicated_StartParams;
+const  dedp_netport = '-netport';
+       dedp_lanadv  = '-lanadv';
+var i,t:longint;
+nparam,
+cparam:shortstring;
+begin
+   cparam:='';
+   t:=ParamCount;
+   if(t>0)then
+     for i:=1 to t do
+     begin
+        nparam:=ParamStr(i);
+        case nparam of
+        dedp_netport,
+        dedp_lanadv : cparam:=nparam;
+        else
+           case cparam of
+           dedp_netport: begin
+                            net_ServerPort:=s2w(nparam);
+                            if(net_ServerPort=0)then
+                              net_ServerPort:=net_DefaultPort;
+                         end;
+           dedp_lanadv : net_svLanAdv:=s2i(nparam)<>0;
+           else cparam:='';
+           end;
+        end;
+     end;
+end;
+
 procedure dedicated_Init;
 begin
    if(net_UpSocket(net_ServerPort))then
@@ -114,15 +218,15 @@ end;
 function Dedicated_GameStatusStr:shortstring;
 begin
    if(not g_started)
-   then Dedicated_GameStatusStr:=str_GameLobby
+   then Dedicated_GameStatusStr:=str_gstat_Lobby
    else
      case G_status of
-     gs_running    : Dedicated_GameStatusStr:=str_GameStarted;
+     gs_running    : Dedicated_GameStatusStr:=str_gstat_Started;
      gs_paused0..
-     gs_paused7    : Dedicated_GameStatusStr:=str_GamePaused+g_PlayersGame[G_status-gs_paused0].name;
-     gs_waitplayers: Dedicated_GameStatusStr:=str_GameWFPlayers;
+     gs_paused7    : Dedicated_GameStatusStr:=str_gstat_GamePaused+g_PlayersGame[G_status-gs_paused0].name;
+     gs_waitplayers: Dedicated_GameStatusStr:=str_gstat_WaitForPlayers;
      gs_win_team0..
-     gs_win_team7  : Dedicated_GameStatusStr:=str_GameEnded+b2s(G_Status-gs_win_team0+1);
+     gs_win_team7  : Dedicated_GameStatusStr:=str_gstat_WonTeam+b2s(G_Status-gs_win_team0+1);
      else            Dedicated_GameStatusStr:='UNKNOWN STATUS';
      end;
 end;
@@ -149,13 +253,13 @@ begin
    if(console_y<=ded_ScreenUpdatePause)then
    begin
       case console_y of
-      0 : writeln(str_wcaption,' ',str_copyright,str_UDPPort,net_ServerPort);
-      2 : dedicated_Line1(str_GameStatus+Dedicated_GameStatusStr);
-      4 : writeln(str_GameOptions);
-      6 : dedicated_Line5(str_game_FixedPositions,1, str_game_AISlots,25, str_game_NoNewObservers,50, '' ,1,'',55,'',70);
-      8 : dedicated_Line5(b2c[g_FixedPositions]  ,1, g_AISlotsStr    ,25, b2c[g_NewObservers]    ,50, '' ,1,'',55,'',70);
+      0 : writeln(str_wcaption,' ',str_copyright,str_net_UDPPort,net_ServerPort);
+      2 : dedicated_Line1(str_gstat_Status+Dedicated_GameStatusStr);
+      4 : writeln(str_Caption_GOptions);
+      6 : dedicated_Line5(str_GO_FixedStarts   ,1, str_GO_AISlots,25, str_GO_NewObservers,50, '' ,1,'',55,'',70);
+      8 : dedicated_Line5(b2c[g_FixedPositions],1, g_AISlotsStr  ,25, b2c[g_NewObservers],50, '' ,1,'',55,'',70);
       10: writeln;
-      12: writeln(str_MapOptions);
+      12: writeln(str_Caption_Map);
       14: dedicated_Line5(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);
       16: dedicated_Line5(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generatorT],15, c2s(map_seed),30, i2s(map_Size1),45, str_map_TemplateL[map_Template],55, str_map_SymmetryL[map_symmetry],70);
       18: writeln;

@@ -39,27 +39,6 @@ begin
      end;
 end;
 
-{$ELSE}
-
-procedure StartParams;
-var t:integer;
-begin
-   t:=ParamCount;
-   net_ServerPort:=10666;
-   if(ParamCount>0)then
-     for t:=1 to ParamCount do
-       case t of
-       1: begin
-             net_ServerPort:=s2w(ParamStr(t));
-             if(net_ServerPort=0)then net_ServerPort:=10666;
-          end;
-       2: case ParamStr(t) of
-          '-',
-          '0': net_svLanAdv:=false;
-          end;
-       end;
-end;
-
 {$ENDIF}
 
 procedure game_Init;
@@ -68,7 +47,12 @@ begin
 
    fr_init;
 
+   {$IFDEF _FULLGAME}
    StartParams;
+   {$ELSE}
+   dedicated_StartParams;
+   dedicated_Lang;
+   {$ENDIF}
    randomize;
 
    game_InitGameDataAll;

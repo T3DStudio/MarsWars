@@ -496,6 +496,7 @@ map_KeyPointsVis  : array[0..LastKeyPoint] of TKeyPointVis;
 
 camp_diff      : byte = 1;
 camp_data      : TCampaignData;
+camp_ObjStat   : byte = 0;
 camp_size      : integer = 0;
 camp_scroll    : integer = 0;
 camp_list      : TStringArray;                   // [campaing num] = camp name
@@ -578,6 +579,7 @@ rpls_ForwardSkip  : integer = 0;
 rpls_FastSkip     : boolean = false;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
+rpls_apm          : word = 0;
 rpls_player       : byte = 0;
 rpls_GameStatus   : byte = 0;
 rpls_PlayersScore : boolean = false;
@@ -676,8 +678,8 @@ KeyPointColorDefaultShadow : TMWColor = 0;
 //  THEMES
 //
 
-theme_n                 : integer = 0;
-theme_i                 : integer = 0;
+theme_n                 : byte = 0;
+theme_i                 : byte = 0;
 
 theme_liquid_animStyle  : TThemeAnimStyle;
 theme_liquid_animTime   : byte;
@@ -947,6 +949,8 @@ spr_uibtn_F1,
 spr_uibtn_F2,
 spr_uibtn_ProdCancel,
 spr_uibtn_Delete,
+spr_uibtn_MaskPass,
+spr_uibtn_setRPoint,
 spr_doc_ui,
 spr_doc_Upgrades,
 spr_doc_Generators,
@@ -1359,6 +1363,8 @@ str_Camp_NewUnits,
 str_Camp_HE_CoB,
 str_Camp_HE_EE,
 str_Camp_HE_PoA,
+str_Camp_HE_SoF,
+str_Camp_HE_CB,
 str_Camp_HE_BS,
 str_Camp_HE_LoH,
 str_Camp_HE_CoBS,
@@ -1686,6 +1692,47 @@ snd_hell
 
 
 {$ELSE}
+
+
+str_gstat_Lobby,
+str_gstat_Started,
+str_gstat_WaitForPlayers,
+str_gstat_WonTeam,
+str_gstat_GamePaused,
+str_gstat_Status,
+
+str_net_UDPPort,
+
+str_Caption_GOptions,
+str_Caption_Map,
+
+str_map_Scenario,
+str_map_Generators,
+str_map_Seed,
+str_map_Size,
+str_map_Template,
+str_map_Symmetry,
+str_GO_AISlots,
+str_GO_FixedStarts,
+str_GO_NewObservers,
+
+str_Player,
+str_State,
+str_team,
+str_srace,
+str_ping,
+
+str_ps_AI,
+str_ps_Hum,
+
+str_observer             : shortstring;
+
+str_race                 : array[0..r_count  ] of shortstring;
+str_map_GeneratorsL      : array[0..mapg_Last] of shortstring;
+str_map_ScenarioL        : array[0..mc_Last  ] of shortstring;
+str_map_SymmetryL        : array[0..maps_Last] of shortstring;
+str_map_TemplateL        : array[0..mapt_Last] of shortstring;
+
 
 menu_update       : boolean = true;
 console_y         : integer = 0;

@@ -258,7 +258,7 @@ end;
 
 UID_HEye:
 begin
-   uid_MaxHits1        := 60;
+   uid_MaxHits1        := 120;
    uid_req_EnergyLevel := 0;
    uid_r               := 10;
    uid_SightR_Base     := 300;
@@ -391,7 +391,7 @@ begin
 end;
 UID_Demon     :
 begin
-   uid_MaxHits1        := 1500;
+   uid_MaxHits1        := 1250;
    uid_req_EnergyLevel := 300;
    uid_r               := 14;
    uid_MSpeed_Base     := 16;
@@ -402,8 +402,8 @@ begin
    uid_uibtn           := 1;
    uid_PainState_Base  := 8;
    uid_PainState_upgr  := upgr_hell_PainFactor;
-   uid_ProdTimeSec     := ptime1;
-   uid_LevelUpTimeSecs := ptime1;
+   uid_ProdTimeSec     := ptime1-ptimeq;
+   uid_LevelUpTimeSecs := ptime1-ptimeq;
    uid_ability3        := uab_HSpecter;
    SetWeapon(0,wpt_directdmg,aw_dmelee,0,BaseDamage1,fr_fpst2,0,0,0,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground,wpr_any ,uids_all,[],0,0,0,dm_AntiUnitBioHeavy2);
 end;
@@ -1658,7 +1658,7 @@ begin
    for m:=0 to 255 do
    with g_mids[m] do
    begin
-      mid_size      := 0;
+      mid_size      := 2;
       mid_homing    := mh_magnetic;
       mid_TeamDamage:= true;
 
@@ -1848,7 +1848,7 @@ begin
    setUPGR(r_hell,upgr_hell_HKeepShift  ,90 ,0,0 ,1   ,600 ,0,0   ,0            ,0                   );
    setUPGR(r_hell,upgr_hell_DecayAura   ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          );
    setUPGR(r_hell,upgr_hell_TowerR      ,60 ,0,15,2   ,600 ,0,300 ,0            ,UID_HAKeep          );
-   setUPGR(r_hell,upgr_hell_TeleportCD  ,60 ,0,30,2   ,400 ,0,200 ,0            ,UID_HAKeep          );
+   setUPGR(r_hell,upgr_hell_TeleportCD  ,60 ,0,60,2   ,600 ,0,600 ,0            ,UID_HAKeep          );
    setUPGR(r_hell,upgr_hell_T2TNoCD     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HAKeep          );
    setUPGR(r_hell,upgr_hell_Spectre     ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HMonastery      );
    setUPGR(r_hell,upgr_hell_UnitSightR  ,60 ,0,30,2   ,900 ,0,600 ,0            ,UID_HMonastery      );
@@ -1907,13 +1907,13 @@ begin
       case a of
 uab_Teleport        : begin
                          ua_type         := uat_passive;
-                         ua_reload       := 5*fr_fps1;
+                         ua_reload       := 4*fr_fps1;
                          ua_rldDec_upgr  := upgr_hell_TeleportCD;
                          ua_rldDec_upgrS := fr_fps1;
                       end;
 uab_Recall          : begin
                          ua_type         := uat_UnitOwn;
-                         ua_reload       := 5*fr_fps1;
+                         ua_reload       := 3*fr_fps1;
                          ua_rldDec_upgr  := upgr_hell_TeleportCD;
                          ua_rldDec_upgrS := fr_fps1;
                       end;

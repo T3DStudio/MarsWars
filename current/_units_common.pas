@@ -383,12 +383,15 @@ begin
        end;
 end;
 
-procedure teleport_CalcReload(pTeleporter:PTUnit;limit:integer);
+procedure teleport_CalcReload(pTeleporter:PTUnit;limit:integer;uab:byte);
 begin
    with pTeleporter^ do
      with player^ do
-       with g_aids[uab_Teleport] do
-         rld:=integer(round(limit/MinUnitLimit*(ua_reload-(upgrs_cur[ua_rldDec_upgr]*ua_rldDec_upgrS))));
+       with g_aids[uab] do
+       begin
+          rld:=integer(round(limit/MinUnitLimit*(ua_reload-(upgrs_cur[ua_rldDec_upgr]*ua_rldDec_upgrS))));
+          if(rld<0)then rld:=0;
+       end;
 end;
 
 procedure unit_Teleport2Point(pu:PTUnit;tx,ty:integer{$IFDEF _FULLGAME};eidstart,eidend:byte;snd:PTSoundSet{$ENDIF});
@@ -404,7 +407,7 @@ begin
       tx:=mm3i(0,tx,map_Size1);
       ty:=mm3i(0,ty,map_Size1);
       {$IFDEF _FULLGAME}
-      uivis:=ui_CheckUnitUIPlayerVision(pu,false);
+      uivis:=ui_CheckUnitUIPlayerVision(pu,true);
       svis :=uivis or ui_CheckMapPointFogVision(vx,vy,false);
       tvis :=uivis or ui_CheckMapPointFogVision(tx,ty,false);
       effect_teleport(vx,vy,tx,ty,isfly,eidstart,eidend,snd,@svis,@tvis);
@@ -810,7 +813,7 @@ begin
       begin
          unit_ability_Recall:=0;
          unit_Teleport2Point(pTarget,x,y{$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
-         teleport_CalcReload(pTeleporter,pTarget^.uid^.uid_LimitUse);
+         teleport_CalcReload(pTeleporter,pTarget^.uid^.uid_LimitUse,uab_Recall);
 
          pTarget^.uo_x  :=pTarget^.x;
          pTarget^.uo_y  :=pTarget^.y;
@@ -864,7 +867,7 @@ begin
       {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
       if(pTeleporter^.player^.upgrs_cur[upgr_hell_T2TNoCD]>0)and(pTBeacon^.uidi=pTeleporter^.uidi)
       then
-      else teleport_CalcReload(pTeleporter,uid_LimitUse);
+      else teleport_CalcReload(pTeleporter,uid_LimitUse,uab_Teleport);
 
       unit_ability_teleport:=true;
    end;

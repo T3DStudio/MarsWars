@@ -69,7 +69,7 @@ str_SG_PlayerName             = 'Player name'
 str_SG_Language               = 'UI language'
 str_SG_RightClickAct          = 'Right-click action'
 str_SG_RightClickActL[true]   = tc_lime  +'move'  +tc_default
-str_SG_RightClickActL[false]  = tc_lime  +'move'  +tc_default+'+'+tc_red+'attack'+tc_default
+str_SG_RightClickActL[false]  = tc_lime  +'move'  +tc_default+','+tc_red+'attack'+tc_default
 str_SG_ControlPanelPos        = 'Control panel position'
 str_SG_ControlPanelPosL[cpp_left]  = tc_lime  +'left'  +tc_default
 str_SG_ControlPanelPosL[cpp_right] = tc_orange+'right' +tc_default
@@ -286,7 +286,7 @@ str_warn_kpoint_CaptureStart  = ' captures Key Point #'
 str_warn_koth_CaptureStart    = ' starts controlling the center'
 str_warn_koth_Alarm           = 'the center timer alarm: '
 str_warn_ngen_captured        = 'Generator was captured'
-str_warn_ngen_alarm           = 'Generator alarm!'
+str_warn_ngen_alarm           = 'Generator control is losing'
 str_warn_ngen_lost            = 'Generator was lost'
 str_warn_ngen_exh             = 'Generator was exhausted'
 str_warn_Invalid_Target       = 'Invalid target'
@@ -365,8 +365,8 @@ str_uarm_Upgrade              = str_hint_upgrade+': '
 str_uarm_Factor               = ', factor: '
 str_uarm_ShotsPerSec          = 'hits per sec.: '
 
-str_ability_passive           = 'Passive ability'
-str_ability_active            = 'Active ability'
+str_ability_passive           = tc_aqua+'Passive ability'+tc_default
+str_ability_active            = tc_yellow+'Active ability'+tc_default
 str_ability_notarget          = 'Self-targeted'
 str_ability_point             = 'Ground-targeted'
 str_ability_UnitAny           = 'Any-unit-targeted'
@@ -389,7 +389,7 @@ str_net_ServerList            = 'Server list'
 str_net_ServerListAdd         = 'Add'
 str_net_ServerLANAdv          = 'LAN Advertise'
 str_net_ConnectedTo           = '- connected to'
-str_net_DedicatedServer       = ' dedicated server'
+str_net_DedicatedServer       = 'dedicated server'
 
 str_help_Credits              = 'Credits'
 str_help_GameControls         = 'Game Controls'
@@ -864,6 +864,7 @@ str_dscr[iAct_Control_USelArmy]    = 'Select all not busy battle units; "not bus
                                      '- no "Patrol, *" or "'+str_dscr[iAct_Control_UStop]+'" orders;'+tc_nl+
                                      '- no order to use an ability;'+tc_nl+
                                      '- no order to teleport or transport;'
+str_dscr[iAct_Control_USetRPoint]  = 'Set rally point'
 
 str_dscr[iAct_Control_MarkLook]    = 'Map mark: look here'
 str_dscr[iAct_Control_MarkAttack]  = 'Map mark: attack here'
@@ -1071,6 +1072,8 @@ tc_docbr
 HK_Control_USelBase  +'select all builders; double tap - move camera to nearest builder'
 HK_Control_USelArmy  +'select all not busy battle units; double tap - move camera to nearest unit'
 tc_docbr
+HK_Control_USetRPoint+'set rally point for unit-production or unit-teleportation buildings'
+tc_docbr
 HK_Control_MarkLook  +'set map mark(multiplayer): "look here"'  
 HK_Control_MarkAttack+'set map mark(multiplayer): "attack here"'
 tc_docbr
@@ -1214,7 +1217,7 @@ tc_orange+'GENERATORS'+tc_default+tc_doccpt
 tc_docbr
 'Generators (see "'+str_help_ImgGenerators+'") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of generators:'
 tc_docbr+'- "Starter" generator - appears at players base in "Scirmish" game. Required at least '+str_map_generators_LimitS+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyS+'.'
-tc_docbr+'- "Normal" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
+tc_docbr+'- "Regular" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
 tc_docbr+'Both types of generators requires holding units inside it, otherwise generator become back to neutral state.'
 tc_docbr
 tc_docbr
@@ -1304,11 +1307,12 @@ tc_docbr+'Unit hits regeneration period is 1 second.'
 DocHelp_Other = 
 tc_orange+'DEDICATED SERVER'+tc_default+tc_doccpt
 tc_docbr
-tc_docbr+'Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run it with the following parameters:'
+tc_docbr+'Dedicated server - a special version of the game that does not load any game resources and immediately starts working as a server. To start a dedicated server, run MarsWars_ded.exe.'
+tc_docbr+'The dedicated server have next optional start parameters:'
 tc_docbr
-tc_doccnt+'MarsWars_ded.exe [X] [Y]'
+tc_docbr+'-netport [X] - UDP port(1-65535); default value is '+str_net_DefaultPort+'.'
+tc_docbr+'-lanadv [X] - LAN Advertise(0(off) or 1(on)); default value is 1.'
 tc_docbr
-'where X - UDP port (optional argument, default value - '+str_net_DefaultPort+' Y - LAN Advertise (optional argument, default value - 1 (true))).'
 tc_docbr+'Any connected player can change the game settings in a dedicated server`s lobby.'
 tc_docbr+'The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.'
 tc_docbr
@@ -1352,35 +1356,39 @@ str_Camp_HE_CoBS              = 'Clan of Burning Sky'
 
 str_camp_1                    = 'Ascension'
 
-str_tmp1 =    'Hell Empire'+tc_nl
+str_tmp1 = 'Hell Empire'+tc_nl+'unknown planet'+tc_nl
 
 //////////     HELL VS HELL    1
 
-str_camp_1_miss_1_name =  'Mt. Erebus'
-
-str_camp_1_miss_1_obj  = '- Don`t lose the Hell Keep'
-                   tc_nl+'- Capture 1 generator'
-                   tc_nl+'- Build 10 Demon`s Gates'
-                   tc_nl+'- Summon 30 Imps'
-                   tc_nl+'- Destroy the '+str_Camp_HE_CoB
+str_camp_1_miss_1_name = 'Mt. Erebus'
 str_camp_1_miss_1_loc  = str_tmp1+'Mountain Erebus'
+
+str_camp_1_miss_1_obj  = '- '+tc_CO1+'Don`t lose the Hell Keep'
+        tc_default+tc_nl+'- '+tc_CO2+'Capture 1 generator'
+        tc_default+tc_nl+'- '+tc_CO3+'Build 10 Demon`s Gates'
+        tc_default+tc_nl+'- '+tc_CO4+'Summon 30 Imps'
+        tc_default+tc_nl+'- '+tc_CO5+'Destroy the '+str_Camp_HE_CoB
 
 str_camp_1_miss_1_plot = 
 'On a distant, unknown planet of the Hell Empire, there exists a long-standing tradition of "ascension":'
 'once every few dozen cycles, the leaders of savage demonic tribes, eager to ascend to a higher position in the Empire, gather for a journey to a sacred place - the "Slough of Despair".'
-'The journey there is long and arduous - they must overcome canyons, caves, steppes, lakes, and - most importantly - his rivals! Only one will survive, only one will ascend to the rank of "General of Hell"!'
+'The journey there is long and difficult - they must overcome canyons, caves, steppes, lakes, and - most importantly - their competitors! Only one will survive, only one will ascend to the rank of "General of Hell"!'
 tc_docbr
 'You are one of the ascension candidates. Your journey begins in a cave at the foot of the Mount Erebus. The first obstacle lies ahead - your rival`s outpost! Build a camp, summon your warriors, and crush the enemy!'
-'MISSION TIPS:'
+tc_docbr
+tc_docbr
+tc_lime+MISSION TIPS+tc_default+:
+tc_lime+*+tc_default+ In this mission, you need to learn the basic mechanics of the game: base building, unit creation, and how the economy works.
+tc_lime+*+tc_default+ You have no time limits - the generators will work forever, and the enemy will not start attacking until you summon the required number of Imps.
+tc_lime+*+tc_default+' If you encounter any difficulties, detailed information about the game`s controls and mechanics can be found in the "'+str_menu_Help+'" section, which is accessible at any time from the menu.'
 
 //////////     HELL VS HELL    2
 
 str_camp_1_miss_2_name = 'Valley of Fear'
+str_camp_1_miss_2_loc  = str_tmp1+str_camp_1_miss_2_name
 
-str_camp_1_miss_2_obj  = '- At least 1 Hell Keep must survive'
-                   tc_nl+'- Destroy the '+str_Camp_HE_EE
-                   tc_nl+'- Destroy the '+str_Camp_HE_PoA
-str_camp_1_miss_2_loc  = str_tmp1+'Valley of Fear'
+str_camp_1_miss_2_obj  = '- '+tc_CO1+'At least 1 Hell Keep must survive'
+        tc_default+tc_nl+'- '+tc_CO2+'Destroy the competitors' tribes'
 
 str_camp_1_miss_2_plot = 
 'It was a glorious victory! You enslave some Pinky Demons to strengthen your army, stole Fire Tower technology to defend your base and capture Hell Pools for upgrades!'
@@ -1390,7 +1398,28 @@ tc_docbr
 'There are two more opponents in this area - destroy them as well, adding their forces to yours.'
 tc_docbr
 tc_docbr
-'MISSION TIPS:'
-'* Hell Keep teleportation ability is not available for you yet, so your only option is to build new Hell Keeps toward the bottom-right corner of the map.'
-'* Each of your units has "self-destruction" ability - use it to free builder limit;'
-'* Your opponents have different army compositions and you should choose your army composition wisely for greater effectiveness. '
+tc_lime+MISSION TIPS+tc_default+:
+tc_lime+*+tc_default+ In this mission, you`ll need to act quickly - a wave of lava, destroying everything in its path, will spread from the upper left corner of the map. Capture nearby generators and develop your base as quickly as possible.
+Your opponents will be busy fighting each other.
+tc_lime+*+tc_default+ Destroying one of the enemies will give you the opportunity to produce new types of units and buildings.
+tc_lime+*+tc_default+ The Hell Keep teleportation technology is not yet available to you, so the only way to save your base is to build new Hell Keeps towards the bottom right corner and rebuild production buildings further away from the wave.
+tc_lime+*+tc_default+ Game balance is largely based on the fact that some unit types deal more damage to others and take more damage from others.
+'Your opponents have different army compositions - your success depends on the right choice of counter-units. You can view balance information in the section "'+str_menu_Help+'" -> "'+str_help_BalanceTable+'".'
+tc_lime+*+tc_default+ Each unit has a special order - "self-destruct" - use it to clear the limit of useless units or buildings.
+tc_lime+*+tc_default+ Don`t forget to research upgrades for your army.
+
+//////////     HELL VS HELL    3
+
+str_camp_1_miss_3_name = 'Unholy Cathedral'
+str_camp_1_miss_3_loc  = str_tmp1+str_camp_1_miss_3_name
+
+//////////     HELL VS HELL    4
+
+str_camp_1_miss_4_name = 'House of Pain'
+str_camp_1_miss_4_loc  = str_tmp1+str_camp_1_miss_4_name
+
+//////////     HELL VS HELL    5
+
+str_camp_1_miss_5_name = 'Slough of Despair'
+str_camp_1_miss_5_loc  = str_tmp1+str_camp_1_miss_5_name
+

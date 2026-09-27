@@ -163,7 +163,6 @@ begin
    AddItem(@map_Size1           ,SizeOf(map_Size1     ));
    AddItem(@map_Template        ,SizeOf(map_Template  ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry  ));
-   AddItem(@theme_i             ,SizeOf(theme_i       ));
    AddItem(@LocalPlayer         ,SizeOf(LocalPlayer   ));
    AddItem(@g_tick              ,SizeOf(g_tick        ));
    for p:=0 to LastPlayer do
@@ -262,7 +261,7 @@ begin
    if(check)then exit;
 
    if(FileExists(folder_save+svld_str_fname+fileExt_save))
-   then menu_msgBox_Set(str_FileSave+': '+str_FileReWrite,svld_str_fname,mmbt_SaveRewrite)
+   then menu_msgBox_Set(str_FileSave+': '+str_FileReWrite+'?',svld_str_fname,mmbt_SaveRewrite)
    else saveload_SaveWrite(svld_str_fname);
 end;
 
@@ -401,6 +400,6 @@ begin
       exit;
    end;
 
-   menu_msgBox_Set(str_FileDelete,svld_str_fname,mmbt_DeleteSave);
+   menu_msgBox_Set(str_FileDelete+'?',svld_str_fname,mmbt_DeleteSave);
 end;
 

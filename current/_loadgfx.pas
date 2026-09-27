@@ -715,14 +715,6 @@ begin
           if(g_PlayersGame[p].isdefeated)
           then t:=(length(ps_name)*font_w1) div 2
           else t:=0;
-          {if(ps_team<=LastPlayer)
-          then tstr:=b2s(ps_team+1)
-          else tstr:='?';
-          case ps_race of
-          r_hell: tstr+=tc_RankHell;
-          r_uac : tstr+=tc_RankUAC;
-          else    tstr+='?'
-          end; }
           tstr:=ui_TeamRace(ps_team,ps_race);
 
           if(not odd)then ty+=ss_LineHh;
@@ -942,6 +934,20 @@ begin
    spr_uibtn_Tabs[1]           := gfx_ButtonLoad(folder_ui+'b_F2'              ,ui_TabButtonW-2,false);
    spr_uibtn_Tabs[2]           := gfx_ButtonLoad(folder_ui+'tab_upgrades'      ,ui_TabButtonW-2,false);
    spr_uibtn_Tabs[3]           := gfx_ButtonLoad(folder_ui+'tab_controls'      ,ui_TabButtonW-2,false);
+
+   spr_uibtn_MaskPass          := gfx_CreateSDLSurface(ui_ButtonW1-1,ui_ButtonW1-1);
+   boxColor(spr_uibtn_MaskPass,0,0,menu_w,menu_h,c_purple);
+   SDL_SetColorKey(spr_uibtn_MaskPass,SDL_SRCCOLORKEY,sdl_getpixel(spr_uibtn_MaskPass,0,0));
+   for r:=3 to 5 do
+     for x:=r to ui_ButtonW1-1-r do
+       if((x div 2) mod 2)=0 then
+       begin
+          pixelColor(spr_uibtn_MaskPass,x,r              ,c_aqua);
+          pixelColor(spr_uibtn_MaskPass,x,ui_ButtonW1-1-r,c_aqua);
+
+          pixelColor(spr_uibtn_MaskPass,r              ,x,c_aqua);
+          pixelColor(spr_uibtn_MaskPass,ui_ButtonW1-1-r,x,c_aqua);
+       end;
 
    spr_doc_ui                  := gfx_LoadSDLSurface('doc_ui'        ,false,true);
    spr_doc_Upgrades            := gfx_LoadSDLSurface('doc_upgrades'  ,false,true);
@@ -1163,6 +1169,12 @@ begin
    gfx_LoadMWTexture(@spr_kp_genT[0]        ,'kp_gen0'                                 ,true);
    gfx_LoadMWTexture(@spr_kp_genT[1]        ,'kp_gen1'                                 ,true);
 
+   spr_uibtn_setRPoint  :=  gfx_CreateSDLSurface(ui_ButtonW1-1,ui_ButtonW1-1);
+   with spr_RallyPoint[r_hell] do
+     draw_sdlsurface(spr_uibtn_setRPoint,ui_ButtonWq-hw,ui_ButtonWh-hh,surf);
+   with spr_RallyPoint[r_uac ] do
+     draw_sdlsurface(spr_uibtn_setRPoint,ui_ButtonWh+
+                                         ui_ButtonWq-hw,ui_ButtonWh-hh,surf);
 
    spr_u_p1s:=spr_u_p1;
    with spr_u_p1s do sm_kind:=smt_effect2;

@@ -301,7 +301,7 @@ begin
                                       case g_started of
                                       false: player_SetState(pid,ps_None);
                                       true : begin
-                                                player_Kill(pid,true);
+                                                player_SetDefeat(@g_PlayersGame[pid]);
                                                 g_PlayersGame[pid].state:=ps_none;
                                              end;
                                       end;
@@ -353,6 +353,7 @@ begin
                                           cam_y   :=net_readint;
                                           cam_w   :=net_readint;
                                           cam_h   :=net_readint;
+                                          apm     :=net_readword;
                                        end;
                  nmid_pause          : begin
                                           if(g_status<=LastPlayer)then
@@ -697,6 +698,7 @@ nmid_LobbyInfo    : begin
                             MainMenu   :=true;
                             PlayerReady:=false;
                             game_DefaultAll;
+                            menu_msgBox_Off;
                          end;
                       end;
                    end;
@@ -730,6 +732,7 @@ nmid_GameData    : if(g_started)then
          net_writeint (ui_cam_y);
          net_writeint (ui_cam_w);
          net_writeint (ui_cam_h);
+         net_writeword(g_PlayerAPM.apm_cur);
       end
       else
       begin

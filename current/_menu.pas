@@ -145,6 +145,7 @@ end;
 //
 //   MENU ACTIONS
 
+
 procedure menu_ToggleFullScreen;
 begin
    vid_windowed:=not vid_windowed;
@@ -255,7 +256,8 @@ function GameNetClient(connect,check:boolean):boolean;
 begin
    GameNetClient:=false;
 
-   if(menu_msg_type<>mmbt_none)then exit;
+   if (menu_msg_type<>mmbt_none)
+   and(menu_msg_type<>mmbt_Disconnect)then exit;
 
    case connect of
    true : begin   // start connecting
@@ -414,7 +416,7 @@ begin
    if(check)then exit;
 
    with net_SvList_listi[net_SvList_sel] do
-     menu_msgBox_Set(str_FileDelete,si_line,mmbt_DeleteServer);
+     menu_msgBox_Set(str_FileDelete+'?',si_line,mmbt_DeleteServer);
 end;
 
 function GameNetServerListDelete(svline:shortstring):boolean;
@@ -446,6 +448,26 @@ begin
    //menu_FixScroll(@net_SvList_scroll,net_SvList_sel,menu_ServerListH);
 end;
 
+procedure menu_mbox_GameBreak;
+begin
+   if(game_IsEnded)
+   then game_Break(false)
+   else menu_msgBox_Set(drawmenu_BreakString+'?','',mmbt_BreakGame);
+end;
+procedure menu_mbox_Surrender;
+begin
+   menu_msgBox_Set(str_menu_Surrender+'?','',mmbt_Surrender);
+end;
+procedure menu_mbox_QuitInit;
+begin
+   menu_msgBox_Set(str_menu_Exit+'?','',mmbt_ExitGame);
+end;
+procedure menu_mbox_Disconnect;
+begin
+   if(g_Started)and(not game_IsEnded)
+   then menu_msgBox_Set(str_net_DisConnect+'?','',mmbt_Disconnect)
+   else GameNetClient(false,false);
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1140,7 +1162,7 @@ begin
    menu_Controls_MLB:=true;
    case item of
 mi_back                : if(not check)then MenuBack(false,false,clickSound);
-mi_exit                : if(not check)then game_Cycle:=false;
+mi_exit                : if(not check)then menu_mbox_QuitInit;
 mi_StartTimer          : if(not check)then {$IFDEF TESTMODE}
                                            if(TestMode>0)
                                            then g_LobbyTimer:=2
@@ -1150,10 +1172,8 @@ mi_StopTimer           : if(not check)then begin
                                            GameLog_BreakStarting;
                                            end;
 mi_StartNow            : if(not check)then game_Start(false);
-mi_Break               : if(not check)then game_Break(false);
-mi_Surrender           : if(not check)then
-                           if(player_Surrender(LocalPlayer,false))then
-                             if(MainMenu)then MenuBack(true,false);
+mi_Break               : if(not check)then menu_mbox_GameBreak;
+mi_Surrender           : if(not check)then menu_mbox_Surrender;
 
 mi_Campaings           : if(not check)then g_type:=gt_campaing;
 mi_Scirmish            : if(not check)then begin
@@ -1235,7 +1255,7 @@ mi_SaveLoad_list       : if(not check)then
                          end;
 //mi_SaveLoad_info
 mi_SaveLoad_fname      : ;
-mi_SaveLoad_save       : if(not check)then saveload_SaveInit      (false);
+mi_SaveLoad_save       : if(not check)then saveload_SaveInit  (false);
 mi_SaveLoad_load       : if(not check)then saveload_Load      (false);
 mi_SaveLoad_delete     : if(not check)then saveload_DeleteInit(false);
 
@@ -1246,7 +1266,7 @@ mi_Replays_list        : if(not check)then
                             replay_Select;
                          end;
 //mi_Replays_info
-mi_Replays_play        : if(not check)then replay_Play  (false);
+mi_Replays_play        : if(not check)then replay_Play      (false);
 mi_Replays_delete      : if(not check)then replay_DeleteInit(false);
 
 // SCIRMISH PLAYERS
@@ -1283,7 +1303,7 @@ mi_MP_ServerToggle     : if(not check)then GameNetServer(net_status<>ns_server,f
 mi_MP_ServerPort       : ;
 mi_MP_ServerLANVis     : if(not check)then net_svLanAdv:=not net_svLanAdv;
 mi_MP_Connect          : if(not check)then GameNetClient(true ,false);
-mi_MP_Disconnect       : if(not check)then GameNetClient(false,false);
+mi_MP_Disconnect       : if(not check)then menu_mbox_Disconnect;
 mi_MP_ClientQuality    : if(not check)then ScrollByte(@net_cl_Quality,true,0,net_MaxQuality);
 mi_MP_ClientAddress    : ;
 mi_MP_ClientServerList : if(not check)then game_NetServerList(true,false);
@@ -1369,8 +1389,15 @@ mi_help_ImgKotH        : if(not check)then begin
                                            end;
 // CAMPAIGNS
 mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,true,0,camp_Maxdiff);
-mi_camp_Campaigns      : if(not check)then menu_ListMouseXY2Line(item,@camp_sel    ,camp_scroll    ,menu_CampLineH);
-mi_camp_Missions       : if(not check)then menu_ListMouseXY2Line(item,@camp_mis_sel,camp_mis_scroll,menu_MissLineH);
+mi_camp_Campaigns      : if(not check)then begin
+                                           menu_ListMouseXY2Line(item,@camp_sel    ,camp_scroll    ,menu_CampLineH);
+                                           camp_obj_scroll:=0;
+                                           camp_mis_sel:=0;
+                                           end;
+mi_camp_Missions       : if(not check)then begin
+                                           menu_ListMouseXY2Line(item,@camp_mis_sel,camp_mis_scroll,menu_MissLineH);
+                                           camp_obj_scroll:=0;
+                                           end;
    else
       menu_Controls_MLB:=false;
    end;
@@ -1544,8 +1571,7 @@ mi_MP_ChatList         : if(not check)then net_chat_str      :=    StringApplyIn
    end;
 end;
 
-function menu_msgBox_Code:boolean;
-procedure msgBoxOff;
+procedure menu_msgBox_Off;
 begin
    menu_msg_type    :=mmbt_none;
    menu_ItemTarget  :=0;
@@ -1553,17 +1579,23 @@ begin
    menu_update      :=true;
    snd_SoundPlayUI(snd_click);
 end;
+
+function menu_msgBox_Code:boolean;
 begin
    menu_msgBox_Code:=(menu_msg_type<>mmbt_none);
 
    case menu_msg_type of
    mmbt_nothing,
-   mmbt_netPortBlock : if(InputActionPressed(iAct_any))then msgBoxOff;
+   mmbt_netPortBlock : if(InputActionPressed(iAct_any))then menu_msgBox_Off;
    mmbt_netWaitServer: if(InputActionPressed(iAct_any))then
                        begin
                           GameResetNetGame;
-                          msgBoxOff;
+                          menu_msgBox_Off;
                        end;
+   mmbt_BreakGame,
+   mmbt_Surrender,
+   mmbt_ExitGame,
+   mmbt_Disconnect,
    mmbt_SaveRewrite,
    mmbt_DeleteSave,
    mmbt_DeleteReplay,
@@ -1578,10 +1610,15 @@ begin
                                mmbt_DeleteSave  :     saveload_DeleteFile(menu_msg_Body);
                                mmbt_DeleteReplay:       replay_DeleteFile(menu_msg_Body);
                                mmbt_DeleteServer: GameNetServerListDelete(menu_msg_Body);
+                               mmbt_ExitGame    : game_Cycle:=false;
+                               mmbt_BreakGame   : game_Break(false);
+                               mmbt_Surrender   : if(player_Surrender(LocalPlayer,false))then
+                                                    if(MainMenu)then MenuBack(true,false);
+                               mmbt_Disconnect  : GameNetClient(false,false);
                                end;
                                snd_SoundPlayUI(snd_click);
                             end;
-                          if(InputActionPressed(iAct_any))then msgBoxOff;
+                          if(InputActionPressed(iAct_any))then menu_msgBox_Off;
                        end;
    end;
 end;

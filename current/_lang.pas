@@ -756,6 +756,8 @@ begin
    'str_Camp_HE_CoB'                    : lang_Key2StrVar:= @str_Camp_HE_CoB;
    'str_Camp_HE_EE'                     : lang_Key2StrVar:= @str_Camp_HE_EE;
    'str_Camp_HE_PoA'                    : lang_Key2StrVar:= @str_Camp_HE_PoA;
+   'str_Camp_HE_SoF'                    : lang_Key2StrVar:= @str_Camp_HE_SoF;
+   'str_Camp_HE_CB'                     : lang_Key2StrVar:= @str_Camp_HE_CB;
    'str_Camp_HE_BS'                     : lang_Key2StrVar:= @str_Camp_HE_BS;
    'str_Camp_HE_LoH'                    : lang_Key2StrVar:= @str_Camp_HE_LoH;
    'str_Camp_HE_CoBS'                   : lang_Key2StrVar:= @str_Camp_HE_CoBS;
@@ -1152,6 +1154,8 @@ begin
    'str_dscr[iAct_Control_USelBase]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_USelBase];
    'str_dscr[iAct_Control_USelArmy]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_USelArmy];
 
+   'str_dscr[iAct_Control_USetRPoint]'  : lang_Key2StrVar:= @str_action_hint[iAct_Control_USetRPoint];
+
    'str_dscr[iAct_Control_MarkLook]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_MarkLook];
    'str_dscr[iAct_Control_MarkAttack]'  : lang_Key2StrVar:= @str_action_hint[iAct_Control_MarkAttack];
    'str_dscr[iAct_Control_ScoreBoard]'  : lang_Key2StrVar:= @str_action_hint[iAct_Control_ScoreBoard];
@@ -1334,6 +1338,11 @@ begin
    vl:=StringReplace(vl,'tc_default' ,tc_default ,replace_a);
    vl:=StringReplace(vl,'tc_RankUAC' ,tc_RankUAC ,replace_a);
    vl:=StringReplace(vl,'tc_RankHell',tc_RankHell,replace_a);
+   vl:=StringReplace(vl,'tc_CO1'     ,tc_CampObj1,replace_a);
+   vl:=StringReplace(vl,'tc_CO2'     ,tc_CampObj2,replace_a);
+   vl:=StringReplace(vl,'tc_CO3'     ,tc_CampObj3,replace_a);
+   vl:=StringReplace(vl,'tc_CO4'     ,tc_CampObj4,replace_a);
+   vl:=StringReplace(vl,'tc_CO5'     ,tc_CampObj5,replace_a);
 
    vl:=StringReplace(vl,'str_gcaption'   ,str_gcaption    ,replace_a);
    vl:=StringReplace(vl,'str_version'    ,str_version     ,replace_a);
@@ -1419,6 +1428,7 @@ begin
                                                                     iAct_Control_UAPatrol    ]),replace_a);
    vl:=StringReplace(vl,'HK_Control_UProdCncl' ,DocHelp_GetHotKeys([iAct_Control_UProdCncl   ]),replace_a);
    vl:=StringReplace(vl,'HK_Control_UDestroy'  ,DocHelp_GetHotKeys([iAct_Control_UDestroy    ]),replace_a);
+   vl:=StringReplace(vl,'HK_Control_USetRPoint',DocHelp_GetHotKeys([iAct_Control_USetRPoint  ]),replace_a);
    vl:=StringReplace(vl,'HK_Control_USelBase'  ,DocHelp_GetHotKeys([iAct_Control_USelBase    ]),replace_a);
    vl:=StringReplace(vl,'HK_Control_USelArmy'  ,DocHelp_GetHotKeys([iAct_Control_USelArmy    ]),replace_a);
    vl:=StringReplace(vl,'HK_Control_MarkLook'  ,DocHelp_GetHotKeys([iAct_Control_MarkLook    ]),replace_a);

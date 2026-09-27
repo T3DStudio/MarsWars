@@ -688,7 +688,7 @@ begin
 
           if(kptd_VisTimer>0)then
           begin
-             if(kp_Energy    >0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1*2,i2s(kp_Energy)                ,c_aqua );
+             if(kp_Energy    >0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1*2,'+'+i2s(kp_Energy)            ,c_aqua );
              if(kptd_lifeTime>0)then UnitsInfo_AddText(kp_x,kp_y-txt_line_h1 ,cr2s(kptd_lifeTime            ),c_white);
              if(kptd_Timer   >0)then UnitsInfo_AddText(kp_x,kp_y             ,ir2s(kp_CaptureTime-kptd_Timer),colorN );
 

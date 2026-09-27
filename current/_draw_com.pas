@@ -122,6 +122,13 @@ begin
                        draw_sdlsurface(sur,ix,y,spr_RaceRank[r_hell]);
                        ix+= font_w1;
                        end;
+         tc_CampObj1,
+         tc_CampObj2,
+         tc_CampObj3,
+         tc_CampObj4,
+         tc_CampObj5 : if(not MainMenu)and(GetBBit(@camp_ObjStat,ord(charc)-ord(tc_CampObj1)))
+                       then color:=c_green
+                       else color:=BaseColor;
          tc_player0..
          tc_player7  : color:=PlayerGetColorDef(ord(charc));
          tc_purple   : color:=c_purple ;

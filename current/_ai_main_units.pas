@@ -54,16 +54,20 @@ begin
      with ai_keypoint_kp^ do
      begin
         p:=ai_keypoint_d;
-        case map_scenario of
-        mc_koth     : if(ai_keypoint_d>kp_RCapture)
-                      then p:=p div 4
-                      else p:=p*3;
-        mc_keypoints: p:=p div 2;
-        end;
+        if(ai_KotH)then
+        begin
+           if(ai_keypoint_d>kp_RCapture)
+           then p:=p div 4
+           else p:=p*3;
+        end
+        else
+          if(map_scenario=mc_keypoints)
+          then p:=p div 2;
+
         MainTargetSet(nil,kp_x,kp_y,ai_keypoint_d ,kp_zone,p,kp_RCapture);
      end;
    with pu^ do
-     if(map_scenario<>mc_koth)
+     if(not ai_KotH)
      or(aiu_alarm_d<base_r1h)then
        MainTargetSet(nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,aiu_alarm_zone,aiu_alarm_d,0);
    if(ai_BaseDef_d<NOTSET)then
@@ -104,7 +108,7 @@ begin
    commander_d:=NOTSET;
    commander_u:=nil;
    if(pu^.uid^.uid_FlyLevelLikeTarget)then exit;
-   if(pu^.transportM>0)and(map_scenario=mc_koth)then exit;
+   if(pu^.transportM>0)and(ai_KotH)then exit;
 
    if(pu^.isfly)then
    begin
@@ -295,7 +299,7 @@ begin
    with player^ do
      NeedScouting:=((aip_flags and aif_army_scout)>0)
                 and((aip_flags and aif_army_early_attack0)=0)
-                and(map_scenario<>mc_koth)
+                and(not ai_KotH)
                 and(uid_AI_TargetWeight<=DefaultTargetWeight)
                 and(not uid_AI_Siedge);
 end;
@@ -362,14 +366,13 @@ begin
            if((ai_GroupAll_ulimit[aic_group_Home      ]
               +ai_GroupAll_ulimit[aic_group_Scout     ])>=aip_MaxUnitMinPart)
            or((ai_GroupAll_ulimit[aic_group_GenAssault]
-              +ai_GroupAll_ulimit[aic_group_GenWait   ])>0)then
+              +ai_GroupAll_ulimit[aic_group_GenWait   ])> 0)then
            begin
               group:=aic_group_GenAssault;
               exit;
            end;
 
-         if (map_scenario=mc_koth)
-         and(ai_keypoint_d<NOTSET)
+         if (ai_KotH)
          and(g_tick>=keyPoint_KotH_pause)then
            with ai_keypoint_kp^ do
            begin
@@ -387,7 +390,7 @@ begin
          exit;
       end;
 
-      if(aiu_alarm_d>base_r1h)then
+      if(aiu_alarm_d>base_r1h)and(not ai_KotH)then
         case uidi of
         UID_LostSoul,
         UID_Phantom : if(ICanCaptureGenerators)
@@ -458,11 +461,21 @@ begin
                                          else
                                            if(group=aic_group_GenWait)
                                            then group:=aic_group_GenAssault;
-          aic_group_GenGuard       : if(ai_generator_d=NOTSET)
-                                     then group:=aic_group_AttackNow
+          aic_group_GenGuard       : if(ai_generator_d=NOTSET)then
+                                     begin
+                                        if(aip_MaxAttackLimit>0)
+                                        then group:=aic_group_AttackNow
+                                        else group:=aic_group_Home;
+                                     end
                                      else
-                                       if(ai_energy_future>=aip_MaxEnergy)and(ai_generator_d<=ai_generator_kp^.kp_RCapture)and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit)
-                                       then group:=aic_group_AttackNow
+                                       if (ai_energy_future>=aip_MaxEnergy)
+                                       and(ai_generator_d<=ai_generator_kp^.kp_RCapture)
+                                       and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit)then
+                                       begin
+                                          if(aip_MaxAttackLimit>0)
+                                          then group:=aic_group_AttackNow
+                                          else group:=aic_group_Home;
+                                       end
                                        else
                                          if(ai_generator_d>srange)
                                          or((ai_generator_kp^.kp_Zone<>mapZone)and(not isfly))
@@ -547,8 +560,12 @@ begin
                                            UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_orange);
                                         end;  }
                                         case group of
-                                        aic_group_AttackWait: if(map_scenario=mc_koth)and(ai_HTeleportTarKOTH_u<>nil)
-                                                              then TryTeleporting(ai_HTeleportTarKOTH_u)
+                                        aic_group_AttackWait: if(ai_KotH)then
+                                                              begin
+                                                                 if(ai_HTeleportTarKOTH_u<>nil)
+                                                                 then TryTeleporting(ai_HTeleportTarKOTH_u)
+                                                                 else ai_RunTo(pu,ai_HTeleportNearest_u,0,0,ai_HTeleportNearest_d,aic_BaseIdle_r);
+                                                              end
                                                               else
                                                                 if(ai_HTeleportTarget_u<>nil)
                                                                 then TryTeleporting(ai_HTeleportTarget_u)

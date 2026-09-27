@@ -109,7 +109,6 @@ begin
    AddItem(@map_Size1           ,SizeOf(map_Size1     ));
    AddItem(@map_Template        ,SizeOf(map_Template  ));
    AddItem(@map_Symmetry        ,sizeof(map_Symmetry  ));
-   AddItem(@theme_i             ,SizeOf(theme_i       ));
    AddItem(@rpls_player         ,SizeOf(rpls_player   ));
    AddItem(@g_tick              ,SizeOf(g_tick        ));
    for p:=0 to LastPlayer do
@@ -325,15 +324,18 @@ var
 i,gs,
 camx,
 camy: byte;
+apm : word;
 begin
    camx:=byte(ui_cam_cx shr rpls_UIcamXYt1b);
    camy:=byte(ui_cam_cy shr rpls_UIcamXYt1b);
+   apm :=g_PlayerAPM.apm_cur;
 
    gs:=g_status and %00011111;
    i :=gs;
    if(rpls_log_c>0)then i:=i or %10000000;
    if(rpls_vidx<>camx)
-   or(rpls_vidy<>camy)then
+   or(rpls_vidy<>camy)
+   or(rpls_apm <>apm )then
      if(gs=gs_running)then i:=i or %01000000;
    if(not rpls_PlayersScore)then
      if(game_IsEnded)then i:=i or %00100000;
@@ -348,8 +350,12 @@ begin
       begin
          rpls_vidx:=camx;
          rpls_vidy:=camy;
+         rpls_apm :=apm shr 1;
+         if(rpls_apm>255)then rpls_apm:=255;
          wudata_byte(rpls_vidx,true);
          wudata_byte(rpls_vidy,true);
+         wudata_byte(rpls_apm ,true);
+         rpls_apm :=apm;
       end;
       if((i and %00100000)>0)then
       begin
@@ -563,6 +569,7 @@ begin
       begin
          rpls_vidx:=rudata_byte(true,0);
          rpls_vidy:=rudata_byte(true,0);
+         rpls_apm :=rudata_byte(true,0) shl 1;
       end;
       if((i and %00100000)>0)then rudata_PlayersScores(true);
 
@@ -720,7 +727,7 @@ begin
       exit;
    end;
 
-   menu_msgBox_Set(str_FileDelete,rpls_list[rpls_list_sel],mmbt_DeleteReplay);
+   menu_msgBox_Set(str_FileDelete+'?',rpls_list[rpls_list_sel],mmbt_DeleteReplay);
 end;
 
 function replay_IsPaused:boolean;

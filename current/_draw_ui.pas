@@ -369,12 +369,14 @@ begin
 end;
 
 
-procedure draw_UIButtonS(tar:pSDL_Surface;bx,by:integer;surf:pSDL_Surface;selected,disabled:boolean);
+procedure draw_UIButtonS(tar:pSDL_Surface;bx,by:integer;surf:pSDL_Surface;selected,disabled:boolean;active:boolean=false);
 var ux,uy:integer;
 begin
    ui_Panel_ButtonXY(@ux,@uy,nil,nil,bx,by,ui_ButtonW1,ui_ButtonW1);
 
    draw_sdlsurface(tar,ux+1,uy+1,surf);
+
+   if(active)then draw_sdlsurface(tar,ux+1,uy+1,spr_uibtn_MaskPass);
 
    if(selected)
    then draw_rectw(tar,ux,uy,ux+ui_ButtonW1,uy+ui_ButtonW1,-2,0,c_lime)
@@ -537,14 +539,16 @@ begin
                                                    iAct_Control_UAbility3: p:=ui_CommandercPU^.uid^.uid_ability3;
                                                    end;
                                                    if(p>0)then
-                                                   begin
-                                                      draw_UIButtonS(tar,ux,uy,g_aids[p].ua_btn,-m_brush=p,not iActEnabled(uid));
-                                                      if(g_aids[p].ua_reload>0)
-                                                      then tstr:=ir2s(ui_CommandercPU^.rld)
-                                                      else tstr:='';
-                                                      draw_UIButtonT(tar,ux,uy,'','','','',tstr  ,
-                                                                               0 ,0 ,0 ,0 ,c_aqua,'');
-                                                   end;
+                                                     with g_aids[p] do
+                                                       if(ua_type>uat_none)then
+                                                       begin
+                                                          draw_UIButtonS(tar,ux,uy,ua_btn,-m_brush=p,not iActEnabled(uid),ua_type=uat_passive);
+                                                          if(ua_reload>0)
+                                                          then tstr:=ir2s(ui_CommandercPU^.rld)
+                                                          else tstr:='';
+                                                          draw_UIButtonT(tar,ux,uy,'','','','',tstr  ,
+                                                                                   0 ,0 ,0 ,0 ,c_aqua,'');
+                                                       end;
                                                 end;
                        iAct_Control_UAMove    : draw_UIButtonS(tar,ux,uy,spr_uibtn_Attack    ,false,not iActEnabled(uid));
                        iAct_Control_UAStop    : draw_UIButtonS(tar,ux,uy,spr_uibtn_Stop      ,false,not iActEnabled(uid));
@@ -556,6 +560,8 @@ begin
                        iAct_Control_UDestroy  : draw_UIButtonS(tar,ux,uy,spr_uibtn_Delete    ,false,not iActEnabled(uid));
                        iAct_Control_USelBase  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F1        ,false,not iActEnabled(uid));
                        iAct_Control_USelArmy  : draw_UIButtonS(tar,ux,uy,spr_uibtn_F2        ,false,not iActEnabled(uid));
+
+                       iAct_Control_USetRPoint: draw_UIButtonS(tar,ux,uy,spr_uibtn_setRPoint ,false,not iActEnabled(uid));
 
                        iAct_Control_MarkLook  : draw_UIButtonS(tar,ux,uy,spr_uibtn_markLook  ,false,not iActEnabled(uid));
                        iAct_Control_MarkAttack: draw_UIButtonS(tar,ux,uy,spr_uibtn_markAttack,false,not iActEnabled(uid));
@@ -703,6 +709,7 @@ begin
                    co_patrol    : s1:=str_action_name[iAct_Control_UPatrol   ];
                    co_amove     : s1:=str_action_name[iAct_Control_UAMove    ];
                    co_move      : s1:=str_action_name[iAct_Control_UMove     ];
+                   co_setRPoint : s1:=str_action_name[iAct_Control_USetRPoint];
                    end;
                    if(length(s1)>0)then
                    begin
@@ -895,6 +902,23 @@ limit :integer;
 logPov:byte;
   str :shortstring;
   col :TMWColor;
+procedure draw_KotH;
+begin
+   with map_KeyPointsL[0] do
+    if(g_tick<keyPoint_KotH_pause)
+    then draw_timer(tar,ui_objectivesx,y,keyPoint_KotH_pause-g_tick,ta_LU,ui_Objectives_LineLen,str_ui_KotHTime_act,c_gray,@y)
+    else
+      with kp_TeamData[MaxPlayers] do
+        if(kptd_OwnerPlayer<=LastPlayer)
+        then draw_text(tar,ui_objectivesx,y,g_PlayersGame[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
+        else
+          if(kptd_Timer<=0)
+          then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
+          else
+            if(ui_blink2_colorb)
+            then draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
+            else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColorCur(kptd_TimerOwnerPlayer,false),@y);
+end;
 begin
    // replay progress bar
    if(rpls_pstate=rpls_read)then
@@ -961,13 +985,33 @@ begin
                     then str:=g_PlayersGame[UIPlayer].name+tc_white+')'
                     else str:=str_all                              +')';
                     draw_text(tar,ui_GameStatusX,ui_PovPlayerY,str,ta_LU,255,PlayerGetColorCur(UIPlayer,false));
+                    if(ui_ShowAPM)then
+                    begin
+                       str:='';
+                       case ui_ControlTabType of
+                       tcc_replay  : if(UIPlayer=rpls_player)
+                                     then str:=w2s(rpls_apm)
+                                     else
+                                       if(UIPlayer<=LastPlayer)
+                                       then str:='???';
+                       tcc_observer: if(UIPlayer=LocalPlayer)
+                                     then str:=w2s(g_PlayerAPM.apm_cur)
+                                     else
+                                       if(UIPlayer<=LastPlayer)then
+                                         with g_PlayersTemp[UIPlayer] do
+                                           str:=w2s(apm);
+
+                       end;
+                       if(length(str)>0)then
+                         draw_text(tar,ui_APMx,ui_APMy,'APM: '+str,ta_LU,255,c_white);
+                    end;
                  end;
    tcc_controls: if(ui_ShowAPM)then draw_text(tar,ui_APMx,ui_APMy,'APM: '+w2s(g_PlayerAPM.apm_cur),ta_LU,255,c_white);
    end;
 
    // system messages
    y:=ui_SysMessageY;
-   for i:=0 to ui_SysMessagesLast do
+   for i:=ui_SysMessagesLast downto 0 do
      with ui_SysMessages[i] do
        if(sm_time>0)then
        begin
@@ -986,22 +1030,10 @@ begin
    case g_type  of
    gt_scirmish: case map_scenario of
                 mc_KotH     : begin
+                              y+=txt_line_h2;
                               draw_text(tar,ui_objectivesx,y,str_objective_KotH  ,ta_LU,ui_Objectives_LineLen,c_white,@y);
                               y+=txt_line_h2;
-                              with map_KeyPointsL[0] do
-                               if(g_tick<keyPoint_KotH_pause)
-                               then draw_timer(tar,ui_objectivesx,y,keyPoint_KotH_pause-g_tick,ta_LU,ui_Objectives_LineLen,str_ui_KotHTime_act,c_gray,@y)
-                               else
-                                 with kp_TeamData[MaxPlayers] do
-                                   if(kptd_OwnerPlayer<=LastPlayer)
-                                   then draw_text(tar,ui_objectivesx,y,g_PlayersGame[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
-                                   else
-                                     if(kptd_Timer<=0)
-                                     then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
-                                     else
-                                       if(ui_blink2_colorb)
-                                       then draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
-                                       else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColorCur(kptd_TimerOwnerPlayer,false),@y);
+                              draw_KotH;
                               end;
                 mc_KeyPoints: begin
                               draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white,@y);
@@ -1018,9 +1050,16 @@ begin
                               end;
                 else          draw_text(tar,ui_objectivesx,y,str_objective_Scirmish   ,ta_LU,ui_Objectives_LineLen,c_white);
                 end;
-   gt_campaing: if(0<=camp_sel)and(camp_sel<camp_size)then
-                if(0<=camp_mis_sel)and(camp_mis_sel<camp_mis_size[camp_sel])then
-                draw_text(tar,ui_objectivesx,y,camp_obj_object[camp_sel][camp_mis_sel],ta_LU,ui_Objectives_LineLen,c_white,@y);
+   gt_campaing: begin
+                   if(0<=camp_sel)and(camp_sel<camp_size)then
+                     if(0<=camp_mis_sel)and(camp_mis_sel<camp_mis_size[camp_sel])then
+                       draw_text(tar,ui_objectivesx,y,camp_obj_object[camp_sel][camp_mis_sel],ta_LU,ui_Objectives_LineLen,c_white,@y);
+                   if(map_scenario=mc_KotH)then
+                   begin
+                      y+=txt_line_h2;
+                      draw_KotH;
+                   end;
+                end;
    end;
 
    // MOUSE CURSOR TARGET HINT
@@ -1116,6 +1155,7 @@ begin
    mf_minimap,
    mf_map    : case m_brush of
                co_empty  :;
+               co_setRPoint,
                co_move,
                co_patrol : draw_sdlsurface(tar,mouse_x+spr_cursorWh,mouse_y+spr_cursorHh,spr_cursorSubG);
                co_markAttack,

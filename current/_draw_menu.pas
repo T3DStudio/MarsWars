@@ -643,8 +643,8 @@ begin
               drawmenu_ItemText2  (tar,mi_MP_ClientQuality   ,str_net_Quality        ,str_NetQualityL[net_cl_Quality],0);
 
               if(net_cl_Hoster=255)and(net_cl_svttl<TTLServer)
-              then drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedTo+str_net_DedicatedServer+': '+menu_ClientAddress,0)
-              else drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedTo+                        ': '+menu_ClientAddress,0);
+              then drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedTo+': '+menu_ClientAddress+'('+str_net_DedicatedServer+')',0)
+              else drawmenu_ItemText1(tar,mi_SubCaptionInfoLine,str_net_ConnectedTo+': '+menu_ClientAddress                                ,0);
               end;
    end;
 
@@ -714,9 +714,19 @@ begin
    drawmenu_ItemText2(tar,mi_MP_ClientAddress,menu_ClientAddress+vc(mi_MP_ClientAddress),'',menu_ItemSelected);
 end;
 
+function drawmenu_BreakString:shortstring;
+begin
+   if(rpls_pstate=rpls_read)
+   then drawmenu_BreakString:=str_menu_PlaybackStop
+   else
+     if(game_IsEnded)
+     then drawmenu_BreakString:=str_menu_MissionEnd
+     else drawmenu_BreakString:=str_menu_MissionAbort;
+end;
+
 procedure drawmenu_Update(tar:pSDL_Surface); //////////////////////////////////////
 var i:byte;
-ix,iy:integer;
+//ix,iy:integer;
 begin
    // COMMON
    //if(menu_DarkBack)
@@ -773,14 +783,7 @@ else drawmenu_ItemText1(tar,mi_SaveLoad         ,str_menu_LoadGame     ,0);
    drawmenu_ItemText1(tar,mi_Replays            ,str_menu_Replays      ,0);
    drawmenu_ItemText1(tar,mi_Settings           ,str_menu_Settings     ,0);
    drawmenu_ItemText1(tar,mi_Help               ,str_menu_Help         ,0);
-
-   if(rpls_pstate=rpls_read)
-then drawmenu_ItemText1(tar,mi_Break            ,str_menu_PlaybackStop ,0)
-else
-   if(game_IsEnded)
-   then drawmenu_ItemText1(tar,mi_Break         ,str_menu_MissionEnd   ,0)
-   else drawmenu_ItemText1(tar,mi_Break         ,str_menu_MissionAbort ,0);
-
+   drawmenu_ItemText1(tar,mi_Break              ,drawmenu_BreakString  ,0);
    drawmenu_ItemText1(tar,mi_Back               ,str_menu_Back         ,0);
    drawmenu_ItemText1(tar,mi_Exit               ,str_menu_Exit         ,0);
    drawmenu_ItemText1(tar,mi_Surrender          ,str_menu_Surrender    ,0);
@@ -870,12 +873,18 @@ begin
    // MESSAGE BOX
    if(menu_msg_type<>mmbt_none)then
    begin
-      boxColor      (tar,cx+menu_msg_x0,cy+menu_msg_y0,
-                         cx+menu_msg_x1,cy+menu_msg_y1,c_black);
-      rectangleColor(tar,cx+menu_msg_x0,cy+menu_msg_y0,
-                         cx+menu_msg_x1,cy+menu_msg_y1,c_white);
+      if(length(menu_msg_Body)>0)
+      then iy:=0
+      else iy:=menu_BaseW1;
 
-      draw_text(tar,cx+menu_msg_textx,cy+menu_msg_captiony,menu_msg_Caption,ta_MU,menu_ListLineWChars1,c_red   );
+      boxColor      (tar,cx+menu_msg_x0,cy+menu_msg_y0+iy,
+                         cx+menu_msg_x1,cy+menu_msg_y1   ,c_black);
+      rectangleColor(tar,cx+menu_msg_x0,cy+menu_msg_y0+iy,
+                         cx+menu_msg_x1,cy+menu_msg_y1   ,c_white);
+
+      draw_text(tar,cx+menu_msg_textx,cy+menu_msg_captiony+iy,menu_msg_Caption,ta_MU,menu_ListLineWChars1,c_red   );
+
+      if(length(menu_msg_Body)>0)then
       draw_text(tar,cx+menu_msg_textx,cy+menu_msg_bodyy   ,menu_msg_Body   ,ta_MM,menu_ListLineWChars1,c_yellow);
 
       case menu_msg_type of
@@ -883,6 +892,10 @@ begin
       mmbt_nothing,
       mmbt_netPortBlock : draw_text(tar,cx+menu_msg_textx,cy+menu_msg_btny,str_menuMsg_HintDefault,ta_MB,menu_ListLineWChars1,c_gray  );
       mmbt_netWaitServer: draw_text(tar,cx+menu_msg_textx,cy+menu_msg_btny,str_menuMsg_HintClient ,ta_MB,menu_ListLineWChars1,c_gray  );
+      mmbt_ExitGame,
+      mmbt_BreakGame,
+      mmbt_Surrender,
+      mmbt_Disconnect,
       mmbt_SaveRewrite,
       mmbt_DeleteSave,
       mmbt_DeleteReplay,
@@ -891,7 +904,8 @@ begin
                              vlineColor(tar,cx+menu_msg_btn1x1,cy+menu_msg_btn1y0,cy+menu_msg_btn1y1,c_white);
                              draw_text(tar,cx+menu_msg_btn1tx,cy+menu_msg_btny,str_YesNoC[true ]+'('+str_ActionHotKey(iAct_Return)+')'
                                                                                                 ,ta_MM,menu_ListLineWCharsh,c_gray);
-                             draw_text(tar,cx+menu_msg_btn2tx,cy+menu_msg_btny,str_YesNoC[false],ta_MM,menu_ListLineWCharsh,c_gray);
+                             draw_text(tar,cx+menu_msg_btn2tx,cy+menu_msg_btny,str_YesNoC[false]+'(ANY KEY)'
+                                                                                                ,ta_MM,menu_ListLineWCharsh,c_gray);
                           end;
       end;
    end;

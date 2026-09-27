@@ -58,6 +58,8 @@ function game_PauseToggle(check:boolean):boolean;forward;
 function game_NetServerList(start,check:boolean):boolean;forward;
 
 procedure menu_msgBox_Set(str_caption,str_body:shortstring;mtype:TMenuMessageBoxType);forward;
+procedure menu_msgBox_Off;forward;
+
 function menu_MouseXY2Item:byte; forward;
 function menu_ReadyButtonEnabled:boolean;forward;
 function menu_ChatSize:integer;  forward;
@@ -87,6 +89,7 @@ function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);forward;
 function map_ObstacleR(obs_f:byte):integer;forward;
 procedure map_RedrawMenuMinimap; forward;
+function map_seed2theme_i(seed:cardinal):byte; forward;
 
 function Float2Str(s:single):shortstring;
 var l:byte;
@@ -897,8 +900,6 @@ end;
 // KEY POINTS
 procedure GameLog_KeyPointCaptureStart(kpoint:byte);
 begin
-   if(LastKeyPoint<kpoint)then exit;
-
    with map_KeyPointsL[kpoint] do
      with kp_TeamData[MaxPlayers] do
        players_LogAdd(255,255,lmt_kpoint_CaptureStart,kpoint,kptd_TimerOwnerTeam,'',kp_x,kp_y);
@@ -914,6 +915,10 @@ end;
 // KotH
 procedure GameLog_KotHControl;
 begin
+   {$IFDEF _FULLGAME}
+   if(g_type=gt_campaing)then exit;
+   {$ENDIF}
+
    with map_KeyPointsL[0] do
      with kp_TeamData[MaxPlayers] do
        players_LogAdd(255,255,lmt_koth_CaptureStart,0,kptd_TimerOwnerTeam,'',kp_x,kp_y);
@@ -921,6 +926,10 @@ end;
 procedure GameLog_KothCountDown;
 var t:integer;
 begin
+   {$IFDEF _FULLGAME}
+   if(g_type=gt_campaing)then exit;
+   {$ENDIF}
+
    with map_KeyPointsL[0] do
      with kp_TeamData[MaxPlayers] do
      begin
@@ -1161,7 +1170,6 @@ end;
 //
 //   GAME SCORES
 //
-
 
 procedure game_ScoresAddC(playerN,stype:byte;value:cardinal=1);
 begin
@@ -2973,17 +2981,13 @@ begin
    BlockRead(f,vbyte1,sizeof(map_Template  ));
    if(vbyte1>mapt_Last                     )then exit
                                             else strInfoVar1^+=' '+str_map_Template  +': '+str_map_TemplateL[vbyte1]+tc_default+tc_nl2;
-
    vbyte1:=255;
    BlockRead(f,vbyte1,sizeof(map_Symmetry  ));
    if(vbyte1>maps_Last                     )then exit
                                             else strInfoVar1^+=' '+str_map_Symmetry  +': '+str_map_SymmertyL[vbyte1]+tc_nl2;
-
-   vint:=-1;
-   BlockRead(f,vint  ,sizeof(theme_i       ));
-   if(vint>=theme_n                        )then exit
-                                            else strInfoVar1^+=' '+str_themes[vint]+tc_default+tc_nl2;
-
+   vbyte1:=map_seed2theme_i(vcard);
+   if(vbyte1>=theme_n                      )then exit
+                                            else strInfoVar1^+=' '+str_themes[vbyte1]+tc_default+tc_nl2;
    lplayer:=255;
    BlockRead(f,lplayer,sizeof(LocalPlayer  ));
 

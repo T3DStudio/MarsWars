@@ -333,7 +333,7 @@ begin
       if(ai_generator_d<NOTSET)then
         if (ai_generator_d<ai_generator_kp^.kp_RCapture)
         and(ai_generator_d>ai_generator_kp^.kp_RNoBuild)then ai_AbilityDronToTower:=true;
-      if(ai_keypoint_d <NOTSET)and(map_scenario=mc_koth)then
+      if(ai_keypoint_d <NOTSET)and(ai_KotH)then
         if(ai_keypoint_d <ai_keypoint_kp^.kp_RCapture)then ai_AbilityDronToTower:=true;
    end;
 end;
@@ -422,9 +422,10 @@ begin
      UID_URMStation  : if(aip_pause_superweapon>=0)and(aip_timer_superweapon=0)then
                          if(ai_AbilityMagic(pCaster,ai_Strike_u,uab_UACStrike ))then aip_timer_superweapon:=aip_pause_superweapon;
 
-     UID_Pain        : if ((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)
-                       and((MaxPlayerLimit-armylimit-prod_unit_Limit)>ul1)then
+     UID_Pain        : if {((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)
+                       and}((MaxPlayerLimit-armylimit-prod_unit_Limit)>ul1)then
                        begin
+                          //if(isselected)or(m_UnitTargetN=unum)then writeln('UID_Pain ability');
                           if(upgrs_cur[upgr_hell_Phantoms]>0)
                           then cx:=UID_Phantom
                           else cx:=UID_LostSoul;
@@ -432,7 +433,7 @@ begin
                           if(units_uid_e[cx]<units_uid_m[cx])then
                             if((base_r1h<ai_enemy_battle_d)and(ai_enemy_battle_d<base_r2))
                             or((ai_ZombieTarget_d<base_r1h)and(upgrs_cur[upgr_hell_Phantoms]>0))
-                            or(units_uid_e[cx]=0)then
+                            or(units_uid_e[cx]<3)then
                               ai_UnitAbility(pCaster,uab_SpawnLost,0,0,0);
                        end;
      UID_UACDron     : if(ai_enemy_d>base_r1)and(ai_AbilityDronToTower)then
@@ -547,7 +548,7 @@ begin
    mc_koth  : with pBuilder^ do
               with player^ do
                 if (ai_choosen)
-                and(map_scenario=mc_koth)
+                and(ai_KotH)
                 and(ai_keypoint_d<NOTSET)
                 and(units_builders_c>=aip_MaxBuilders)
                 and(ai_BuildersInTransform=0)then
@@ -576,7 +577,7 @@ begin
    end;
 
    with pBuilder^ do
-     if(not (map_scenario=mc_koth))
+     if(not ai_KotH)
      or(ai_keypoint_d>keyPoint_KotR)then
        if (ai_enemy_d<base_r2)
        and(hits<uid^.uid_MaxHitsh)then
@@ -884,8 +885,9 @@ begin
       //if(isselected)then
       //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
       //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-      {if(isselected)or(m_UnitTargetN=unum)then
+     { if(isselected)or(m_UnitTargetN=unum)then
       begin
+         writeln(ai_HTeleportTarget_u<>nil,' ',ai_HTeleportTarKOTH_u<>nil,' ',aiu_alarm_d,' ',aiu_alarm_zone);
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);
          //writeln((ai_generator_d<NOTSET),' ',(ai_keypoint_d<NOTSET));
          {if(ai_generator_d<NOTSET)then
@@ -899,7 +901,7 @@ begin
 
          writeln(TeamVision[g_PlayersGame[LocalPlayer].team]);   }
          //writeln('energy_future=',ai_energy_future,' MaxEnergy=',player^.aip_MaxEnergy);
-         writeln(ai_AbilitiesTransformIf(pu));
+         //writeln(ai_AbilitiesTransformIf(pu));
 
          //if(ai_keypoint_d<NOTSET)then
          //  with ai_keypoint_kp^ do UnitsInfo_AddLine(x+2,y,kp_x,kp_y,c_green);
@@ -910,7 +912,7 @@ begin
          {writeln((ai_need_heye_u<>nil),' ',(ai_enemy_inv_u<>nil),' ',ai_need_detect);
          if(ai_need_heye_u<>nil)then UnitsInfo_AddLine(x,y,ai_need_heye_u^.x,ai_need_heye_u^.y,c_lime);
          if(ai_enemy_inv_u<>nil)then UnitsInfo_AddLine(x,y,ai_enemy_inv_u^.x,ai_enemy_inv_u^.y,c_aqua); }
-      end;}
+      end; }
      { if(isselected)then
       with player^ do
       begin
