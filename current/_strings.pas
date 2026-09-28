@@ -47,22 +47,6 @@ begin
    end;
 end;
 
-
-function str_DateTime:shortstring;
-var YY,MM,DD,H,M,S,MS:word;
-function w2sZ(v,l:word):shortstring;
-begin
-   w2sZ:=w2s(v);
-   if(l>0)then
-     while(length(w2sZ)<l)do
-       insert('0',w2sZ,1);
-end;
-begin
-   DeCodeDate(Date,YY,MM,DD);
-   DeCodeTime(Time,H,M,S,MS);
-   str_DateTime:=w2sZ(YY,4)+'_'+w2sZ(MM,2)+'_'+w2sZ(DD,2)+' '+w2sZ(H,2)+'-'+w2sZ(M,2)+'-'+w2sZ(S,2)+'-'+w2sZ(MS,4);
-end;
-
 function str_CutEnd(s:shortstring;l:byte):shortstring;
 var n:byte;
 begin

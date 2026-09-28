@@ -1,6 +1,6 @@
 
 const
-ded_ConsoleBaseLine = '                                                                                 ';
+ded_ConsoleBaseLine = '                                                                                          ';
 
 procedure dedicated_Lang;
 begin
@@ -10,6 +10,13 @@ begin
    str_gstat_WonTeam              := 'Won by a team #';
    str_gstat_GamePaused           := 'Paused by ';
    str_gstat_Status               := 'Game status: ';
+
+   str_gmsg_RecordStart           := '(DedServer)Start recording: ';
+   str_gmsg_RecordError           := '(DedServer)Recording error: ';
+   str_gmsg_RecordStop            := '(DedServer)Stop recording: ';
+
+   str_SR_RecordGames             := 'Record games';
+
    str_net_UDPPort                := ' UPD port: ';
    str_Caption_GOptions           := 'Game options:';
    str_Caption_Map                := 'Map options:';
@@ -74,11 +81,14 @@ begin
    str_race[r_hell  ]             := 'HELL';
    str_race[r_uac   ]             := 'UAC';
    str_observer                   := 'OBSERVER';
+
+   rpls_NamePrefix                := 'MWDedReplay';
 end;
 
 procedure dedicated_StartParams;
 const  dedp_netport = '-netport';
        dedp_lanadv  = '-lanadv';
+       dedp_record  = '-record';
 var i,t:longint;
 nparam,
 cparam:shortstring;
@@ -90,6 +100,7 @@ begin
      begin
         nparam:=ParamStr(i);
         case nparam of
+        dedp_record,
         dedp_netport,
         dedp_lanadv : cparam:=nparam;
         else
@@ -100,6 +111,7 @@ begin
                               net_ServerPort:=net_DefaultPort;
                          end;
            dedp_lanadv : net_svLanAdv:=s2i(nparam)<>0;
+           dedp_record : rpls_Record :=s2i(nparam)<>0;
            else cparam:='';
            end;
         end;
@@ -110,6 +122,7 @@ procedure dedicated_Init;
 begin
    if(net_UpSocket(net_ServerPort))then
    begin
+      replay_MakeReplayHeaderData;
       net_status:=ns_server;
       Players_SetDefaults;
       //game_MakeRandomSkirmish;
@@ -256,8 +269,8 @@ begin
       0 : writeln(str_wcaption,' ',str_copyright,str_net_UDPPort,net_ServerPort);
       2 : dedicated_Line1(str_gstat_Status+Dedicated_GameStatusStr);
       4 : writeln(str_Caption_GOptions);
-      6 : dedicated_Line5(str_GO_FixedStarts   ,1, str_GO_AISlots,25, str_GO_NewObservers,50, '' ,1,'',55,'',70);
-      8 : dedicated_Line5(b2c[g_FixedPositions],1, g_AISlotsStr  ,25, b2c[g_NewObservers],50, '' ,1,'',55,'',70);
+      6 : dedicated_Line5(str_GO_FixedStarts   ,1, str_GO_AISlots,22, str_GO_NewObservers,40, str_SR_RecordGames,72,'',55,'',70);
+      8 : dedicated_Line5(b2c[g_FixedPositions],1, g_AISlotsStr  ,22, b2c[g_NewObservers],40, b2c[rpls_Record]  ,72,'',55,'',70);
       10: writeln;
       12: writeln(str_Caption_Map);
       14: dedicated_Line5(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);

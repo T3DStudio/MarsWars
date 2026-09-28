@@ -844,6 +844,7 @@ begin
       or(uid_ismarker)
       then exit;
 
+      tard-=melee_r;
       if(buffs[ub_Teleported]>0)
       or(tard>pTeleporter^.uid^.uid_r)
       or(pTeleporter^.rld>0)then exit;

@@ -162,9 +162,9 @@ begin
    input_SetAction(iAct_Replay_Back60     ,ikt_keyboard,0           ,SDLK_A           );
    input_SetAction(iAct_Replay_Back10     ,ikt_keyboard,0           ,SDLK_S           );
    input_SetAction(iAct_Replay_Back2      ,ikt_keyboard,0           ,SDLK_D           );
-   input_SetAction(iAct_Replay_Forward2   ,ikt_keyboard,0           ,SDLK_Z           );
+   input_SetAction(iAct_Replay_Forward2   ,ikt_keyboard,0           ,SDLK_C           );
    input_SetAction(iAct_Replay_Forward10  ,ikt_keyboard,0           ,SDLK_X           );
-   input_SetAction(iAct_Replay_Forward60  ,ikt_keyboard,0           ,SDLK_C           );
+   input_SetAction(iAct_Replay_Forward60  ,ikt_keyboard,0           ,SDLK_Z           );
    input_SetAction(iAct_Replay_POV        ,ikt_keyboard,0           ,SDLK_R           );
    input_SetAction(iAct_Replay_Log        ,ikt_keyboard,0           ,SDLK_T           );
    input_SetAction(iAct_Replay_Fog        ,ikt_keyboard,0           ,SDLK_Y           );
@@ -489,7 +489,8 @@ begin
    iActSetOnEnabled(iAct_Replay_Forward2     ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*2 )+1,fr_fps1,true));
    iActSetOnEnabled(iAct_Replay_Forward10    ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*10)+1,fr_fps1,true));
    iActSetOnEnabled(iAct_Replay_Forward60    ,ui_ControlTabType=tcc_Replay,replay_SetPlayPosition(int64(g_tick)+(fr_fps1*60)+1,fr_fps1,true));
-   iActSetOnEnabled(iAct_Replay_POV          ,ui_ControlTabType=tcc_Replay,true);
+   iActSetOnEnabled(iAct_Replay_POV         ,(ui_ControlTabType=tcc_Replay)
+                                              and(rpls_player<=LastPlayer),true);
    iActSetOnEnabled(iAct_Replay_Log          ,ui_ControlTabType=tcc_Replay,true);
    iActSetOnEnabled(iAct_Replay_Fog          ,ui_ControlTabType=tcc_Replay,true);
    iActSetOnEnabled(iAct_Replay_PlayerAll    ,ui_ControlTabType=tcc_Replay,true);

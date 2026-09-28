@@ -35,6 +35,8 @@ procedure game_MakeRandomSkirmish; forward;
 procedure game_ShuffleAINames; forward;
 procedure game_DefaultAll; forward;
 
+procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
+
 {$IFDEF _FULLGAME}
 procedure draw_LoadingScreen(load_str:pshortstring;color:TMWColor);forward;
 function ui_AddMarker(ax,ay:integer;av:byte;new:boolean):boolean;forward;
@@ -83,7 +85,6 @@ function replay_Play  (check:boolean):boolean;forward;
 function replay_TogglePause (check:boolean):boolean;forward;
 function replay_IsPaused:boolean;  forward;
 function replay_GetProgress:single;forward;
-procedure replay_WriteBlock(count:cardinal;pData:pointer);forward;
 function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;forward;
 
 procedure map_MiniMap_KeyPoints(tar:pSDL_Surface;forGame:boolean);forward;
@@ -188,6 +189,21 @@ begin
    else ct2s:=0;
 end;
 
+function str_DateTime:shortstring;
+var YY,MM,DD,H,M,S,MS:word;
+function w2sZ(v,l:word):shortstring;
+begin
+   w2sZ:=w2s(v);
+   if(l>0)then
+     while(length(w2sZ)<l)do
+       insert('0',w2sZ,1);
+end;
+begin
+   DeCodeDate(Date,YY,MM,DD);
+   DeCodeTime(Time,H,M,S,MS);
+   str_DateTime:=w2sZ(YY,4)+'_'+w2sZ(MM,2)+'_'+w2sZ(DD,2)+' '+w2sZ(H,2)+'-'+w2sZ(M,2)+'-'+w2sZ(S,2)+'-'+w2sZ(MS,4);
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   basic math
@@ -237,7 +253,9 @@ end;
 
 function GetBBit(pb:pbyte;nb:byte):boolean;
 begin
-   GetBBit:=(pb^ and (1 shl nb))>0;
+   GetBBit:=false;
+   if(nb<=7)then
+     GetBBit:=(pb^ and (1 shl nb))>0;
 end;
 
 procedure SetBBit(pb:pbyte;nb:byte;nozero:boolean);

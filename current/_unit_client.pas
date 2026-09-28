@@ -23,6 +23,26 @@ begin
    pwtickb2^:=(wtick mod cardinal(fr_fpsd15 div dataPeriod))=0;    // every 8 tick?
 end;
 
+function IsPOVPlayerObserver(POVPlayer:byte):boolean;
+begin
+   if(POVPlayer>LastPlayer)
+   then IsPOVPlayerObserver:=true
+   else IsPOVPlayerObserver:=g_PlayersGame[POVPlayer].isobserver;
+end;
+
+function byte2s(b:byte):shortstring;
+begin
+   byte2s:='00000000';
+   if(b and %00000001)>0 then byte2s[8]:='1';
+   if(b and %00000010)>0 then byte2s[7]:='1';
+   if(b and %00000100)>0 then byte2s[6]:='1';
+   if(b and %00001000)>0 then byte2s[5]:='1';
+   if(b and %00010000)>0 then byte2s[4]:='1';
+   if(b and %00100000)>0 then byte2s[3]:='1';
+   if(b and %01000000)>0 then byte2s[2]:='1';
+   if(b and %10000000)>0 then byte2s[1]:='1';
+end;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   WRITE GAME DATA
@@ -31,9 +51,7 @@ end;
 procedure wudata_byte(bt:byte;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(SizeOf(bt),@bt);
-   {$ENDIF}
+   true : replay_WriteBlock   (SizeOf(bt),@bt);
    false: net_BufferBlock(true,SizeOf(bt),@bt);
    end;
 end;
@@ -41,9 +59,7 @@ end;
 procedure wudata_word(bt:word;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(SizeOf(bt),@bt);
-   {$ENDIF}
+   true : replay_WriteBlock   (SizeOf(bt),@bt);
    false: net_BufferBlock(true,SizeOf(bt),@bt);
    end;
 end;
@@ -51,9 +67,7 @@ end;
 procedure wudata_sint(bt:shortint;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(SizeOf(bt),@bt);
-   {$ENDIF}
+   true : replay_WriteBlock   (SizeOf(bt),@bt);
    false: net_BufferBlock(true,SizeOf(bt),@bt);
    end;
 end;
@@ -61,9 +75,7 @@ end;
 procedure wudata_int(bt:integer;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(SizeOf(bt),@bt);
-   {$ENDIF}
+   true : replay_WriteBlock   (SizeOf(bt),@bt);
    false: net_BufferBlock(true,SizeOf(bt),@bt);
    end;
 end;
@@ -71,9 +83,7 @@ end;
 procedure wudata_lint(bt:longint;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(SizeOf(bt),@bt);
-   {$ENDIF}
+   true : replay_WriteBlock   (SizeOf(bt),@bt);
    false: net_BufferBlock(true,SizeOf(bt),@bt);
    end;
 end;
@@ -81,9 +91,7 @@ end;
 procedure wudata_card(bt:cardinal;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(SizeOf(bt),@bt);
-   {$ENDIF}
+   true : replay_WriteBlock   (SizeOf(bt),@bt);
    false: net_BufferBlock(true,SizeOf(bt),@bt);
    end;
 end;
@@ -91,9 +99,7 @@ end;
 procedure wudata_string(s:shortstring;rpl:boolean);
 begin
    case rpl of
-   {$IFDEF _FULLGAME}
-   true : replay_WriteBlock(length(s)+1,@s);
-   {$ENDIF}
+   true : replay_WriteBlock   (length(s)+1,@s);
    false: net_BufferBlock(true,length(s)+1,@s);
    end;
 end;
@@ -341,7 +347,7 @@ begin
 
       b:=0;
       if(rpl)
-      or(g_PlayersGame[POVPlayer].isobserver)then
+      or(IsPOVPlayerObserver(POVPlayer))then
         b:=group and %00001111;
 
       if(not iscomplete)
@@ -386,13 +392,21 @@ procedure wudata_Unit(pu:PTUnit;rpl:boolean;POVPlayer:byte);
 var
 hits_si: shortint;
 wt     : word;
+function UnitExistForPOVPlayer:boolean;
+begin
+   if(POVPlayer>LastPlayer)or(rpl)
+   then UnitExistForPOVPlayer:=true
+   else
+     if(CheckUnitTeamVision(g_PlayersGame[POVPlayer].team,pu,true))
+     or(g_PlayersGame[POVPlayer].isobserver)
+     then UnitExistForPOVPlayer:=true
+     else UnitExistForPOVPlayer:=false;
+end;
 begin
    with pu^ do
    with uid^ do
    begin
-      if(CheckUnitTeamVision(g_PlayersGame[POVPlayer].team,pu,true))
-      or(rpl)
-      or(g_PlayersGame[POVPlayer].isobserver)
+      if(UnitExistForPOVPlayer)
       then hits_si:=hits_li2si(hits,uid_MaxHits1,uid_hits_li2si)
       else hits_si:=-128;
 
@@ -441,7 +455,7 @@ begin
               end;
 
             if(playeri=POVPlayer)
-            or(g_PlayersGame[POVPlayer].isobserver)then wudata_OwnerUData(pu,POVPlayer,rpl);
+            or(IsPOVPlayerObserver(POVPlayer))then wudata_OwnerUData(pu,POVPlayer,rpl);
          end;
       end;
    end;
@@ -529,8 +543,8 @@ begin
 
    wdkpi^:=(wdkpi^+1) mod map_KeyPointsN;
 
-   if(g_PlayersGame[POVPlayer].isobserver)
-   or(rpl)
+   if(rpl)
+   or(IsPOVPlayerObserver(POVPlayer))
    then kpteam:=MaxPlayers
    else kpteam:=g_PlayersGame[POVPlayer].team;
 
@@ -648,6 +662,8 @@ begin
         units_ingame+=MaxPlayerUnits;
      end;
 
+   //writeln(rpls,' d',byte2s(bs_defeated),' o',byte2s(bs_observer),' r',byte2s(bs_revealed),' a',byte2s(bs_alive),' ui',units_ingame,' un',units_now);
+
    wudata_byte(bs_defeated,rpl);
    wudata_byte(bs_observer,rpl);
    if(bs_alive>0)then
@@ -673,7 +689,7 @@ begin
          if(GetBBit(@bs_alive,POVPlayer))
          then wpdata_BuildCDRes(POVPlayer,rpl)
          else
-           if(GetBBit(@bs_observer,POVPlayer))then
+           if(POVPlayer>LastPlayer)or(GetBBit(@bs_observer,POVPlayer))then
              for i:=0 to LastPlayer do
                if(GetBBit(@bs_alive,i))then wpdata_BuildCDRes(i,rpl);
 
@@ -888,7 +904,7 @@ end;
 
 procedure unit_AddNETVision(pu_cur:PTUnit;POVPlayer:byte;rpl:boolean);
 begin
-   if(not rpl)and(not g_PlayersGame[POVPlayer].isobserver)then
+   if(not rpl)and(not IsPOVPlayerObserver(POVPlayer))then
      with g_PlayersGame[POVPlayer] do
        with pu_cur^ do
          AddToInt(@TeamVision[team],MinVisionTime);
@@ -1189,19 +1205,6 @@ begin
    end;
 end;
 
-{function byte2s(b:byte):shortstring;
-begin
-   byte2s:='00000000';
-   if(b and %00000001)>0 then byte2s[8]:='1';
-   if(b and %00000010)>0 then byte2s[7]:='1';
-   if(b and %00000100)>0 then byte2s[6]:='1';
-   if(b and %00001000)>0 then byte2s[5]:='1';
-   if(b and %00010000)>0 then byte2s[4]:='1';
-   if(b and %00100000)>0 then byte2s[3]:='1';
-   if(b and %01000000)>0 then byte2s[2]:='1';
-   if(b and %10000000)>0 then byte2s[1]:='1';
-end;   }
-
 procedure  rudata_log(p:byte;rpl:boolean);
 var
 s,b,
@@ -1459,7 +1462,7 @@ begin
       b:=rudata_byte(rpl,0);
 
       if(rpl)
-      or(g_PlayersGame[POVPlayer].isobserver)then
+      or(IsPOVPlayerObserver(POVPlayer))then
         group:=b and %00001111;
 
       uo:=(b and %01110000)shr 4;
@@ -1561,7 +1564,7 @@ begin
               end;
 
             if(playeri=POVPlayer)
-            or(g_PlayersGame[POVPlayer].isobserver)then rudata_OwnerUData(uu,POVPlayer,rpl);
+            or(IsPOVPlayerObserver(POVPlayer))then rudata_OwnerUData(uu,POVPlayer,rpl);
          end;
       end
       else
@@ -1766,7 +1769,7 @@ begin
          if(GetBBit(@bs_alive,POVPlayer))
          then rpdata_BuildCDRes(POVPlayer,rpl)
          else
-           if(GetBBit(@bs_observer,POVPlayer))then
+           if(POVPlayer>LastPlayer)or(GetBBit(@bs_observer,POVPlayer))then
              for i:=0 to LastPlayer do
                if(GetBBit(@bs_alive,i))then rpdata_BuildCDRes(i,rpl);
 

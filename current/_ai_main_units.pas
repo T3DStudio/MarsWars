@@ -148,7 +148,7 @@ begin
       TryTeleporting:=true;
       pu^.uo_x:=ai_HTeleportNearest_u^.x;
       pu^.uo_y:=ai_HTeleportNearest_u^.y;
-      if(ai_HTeleportNearest_d<ai_HTeleportNearest_u^.uid^.uid_r)then
+      if(ai_HTeleportNearest_d<=ai_HTeleportNearest_u^.uid^.uid_r)then
       begin
          ai_HTeleportNearest_u^.rpoint_tar:=toU^.unum;
          unit_ability_teleport(pu,ai_HTeleportNearest_u,ai_HTeleportNearest_d);

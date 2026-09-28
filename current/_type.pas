@@ -264,11 +264,6 @@ TMenuMessageBoxType = (mmbt_none,
                        mmbt_Surrender,
                        mmbt_Disconnect);
 
-TSaveLoadItem = record
-   data_p:pointer;
-   data_s:cardinal;
-end;
-
 TUnitGroup = record
    ugroup_n,
    ugroup_d,
@@ -318,6 +313,11 @@ end;
 //
 //   GAME
 //
+
+TSaveLoadItem = record
+   data_p:pointer;
+   data_s:cardinal;
+end;
 
 TCheckCollisionR = (cbr_no,cbr_mapSide,cbr_unit,cbr_cpoint,cbr_obstacle);
 TCheckBuildArea  = (cba_inBuildArea,cba_noBuilders,cba_NoBuildArea,cba_outBuildArea);

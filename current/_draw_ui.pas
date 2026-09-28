@@ -197,11 +197,14 @@ begin
 
    //rpls_vidx
    if(ui_PlayersScreens)then
-     if(rpls_pstate=rpls_read)
-     then rectangleColor(ui_minimap,round((rpls_vidx shl rpls_UIcamXYt1b)*map_MiniMap_cx)-(map_MiniMap_CamW div 2),
+     if(rpls_pstate=rpls_read)then
+     begin
+        if(rpls_player<=LastPlayer)then
+          rectangleColor(ui_minimap,round((rpls_vidx shl rpls_UIcamXYt1b)*map_MiniMap_cx)-(map_MiniMap_CamW div 2),
                                     round((rpls_vidy shl rpls_UIcamXYt1b)*map_MiniMap_cx)-(map_MiniMap_CamH div 2),
                                     round((rpls_vidx shl rpls_UIcamXYt1b)*map_MiniMap_cx)+(map_MiniMap_CamW div 2),
-                                    round((rpls_vidy shl rpls_UIcamXYt1b)*map_MiniMap_cx)+(map_MiniMap_CamH div 2), PlayerGetColorDef(rpls_player))
+                                    round((rpls_vidy shl rpls_UIcamXYt1b)*map_MiniMap_cx)+(map_MiniMap_CamH div 2), PlayerGetColorDef(rpls_player));
+     end
      else
        if(net_status<>ns_none)then
          for i:=0 to LastPlayer do
@@ -376,7 +379,7 @@ begin
 
    draw_sdlsurface(tar,ux+1,uy+1,surf);
 
-   if(active)then draw_sdlsurface(tar,ux+1,uy+1,spr_uibtn_MaskPass);
+   if(active)then draw_sdlsurface(tar,ux,uy,spr_uibtn_MaskPass);
 
    if(selected)
    then draw_rectw(tar,ux,uy,ux+ui_ButtonW1,uy+ui_ButtonW1,-2,0,c_lime)
@@ -412,6 +415,7 @@ ta_MM: if(ui_ControlPanelPos<2)
        then draw_text(tar,ux+ui_ButtonWh,min2i(uy+ui_ButtonWh,vid_vh-font_w1h),txt^,align,5,color)
        else draw_text(tar,ux+ui_ButtonWh,      uy+ui_ButtonWh                 ,txt^,align,5,color);
 ta_LU:      draw_text(tar,ux+font_wh    ,uy+font_wh                           ,txt^,align,5,color);
+ta_RB:      draw_text(tar,ux+ui_ButtonW1,uy+ui_ButtonW1                       ,txt^,align,5,color);
    end;
    draw_UIButtonS(tar,bx,by,spr_empty,selected,disabled);
 end;
@@ -584,6 +588,11 @@ begin
                                                    p:=uid-iAct_Replay_Player0;
                                                    with g_PlayersGame[p] do
                                                      draw_UIButtonSText(tar,ux,uy,ta_LU,@name,PlayerGetColorDef(p),UIPlayer=p,not iActEnabled(uid));
+                                                   if(p=rpls_player)then
+                                                   begin
+                                                      tstr:='*';
+                                                      draw_UIButtonSText(tar,ux,uy,ta_RB,@tstr,c_white,false,false);
+                                                   end;
                                                 end;
                        iAct_Replay_Log        : draw_UIButtonS(tar,ux,uy,spr_uibtn_ReplayLog  ,rpls_showlog    ,not iActEnabled(uid));
                        iAct_Observer_POV,

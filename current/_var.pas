@@ -103,6 +103,24 @@ rpls_u            : integer = 0;
 rpls_Quality      : byte = 0;
 rpls_wudata_t     : TWUDataTime;
 rpls_kpoints_kpi  : byte = 0;
+rpls_Record       : boolean = {$IFDEF _FULLGAME}true{$ELSE}false{$ENDIF};
+rpls_RecordTryPause:integer = 0;
+rpls_RecordTries  :integer = 0;
+rpls_fstate       : byte = 0;         // file status (none,write,read)
+rpls_pstate       : byte = rpls_none; // player/recorder status
+rpls_NamePrefix   : shortstring = 'LastReplay';
+rpls_str_path     : shortstring = '';
+rpls_player       : byte = 0;
+rpls_GameStatus   : byte = 0;
+rpls_PlayersScore : boolean = false;
+rpls_Ticks        : cardinal = 0;
+rpls_head_items   : array of TSaveLoadItem;
+rpls_head_itemn   : integer = 0;
+rpls_file_head_size
+                  : cardinal = 0;
+rpls_file_Pos     : cardinal = 0;
+rpls_file_LastErr : word = 0;
+rpls_file_LastErrS: shortstring = '';
 
 fr_FPSSecond,
 fr_FPSSecondD,
@@ -556,16 +574,21 @@ svld_file_size    : cardinal = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//  RECORDS
+//  RECORDS CLIENT
 //
 
-rpls_Record       : boolean = true;
-rpls_RecordTryPause:integer = 0;
-rpls_fstate       : byte = 0;         // file status (none,write,read)
-rpls_pstate       : byte = rpls_none; // player/recorder status
-rpls_pnu          : integer = 0;      // quality
-rpls_NamePrefix   : shortstring = 'LastReplay';
-rpls_str_path     : shortstring = '';
+rpls_ReadPosN     : cardinal = 0;
+rpls_ReadPosL     : array of TReplayPos;
+rpls_ForwardSkip  : integer = 0;
+rpls_FastSkip     : boolean = false;
+
+rpls_file_size    : cardinal = 0;
+rpls_pnu          : integer = 0;
+rpls_showlog      : boolean = false;
+rpls_log_c        : cardinal = 0;
+rpls_vidx         : byte = 0;
+rpls_vidy         : byte = 0;
+rpls_apm          : word = 0;
 rpls_str_info1    : shortstring = '';
 rpls_str_info2    : shortstring = '';
 rpls_str_info3    : shortstring = '';
@@ -573,27 +596,6 @@ rpls_list         : TStringArray;
 rpls_list_sel     : integer = 0;
 rpls_list_scroll  : integer = 0;
 rpls_list_size    : integer = 0;
-rpls_ReadPosN     : cardinal = 0;
-rpls_ReadPosL     : array of TReplayPos;
-rpls_ForwardSkip  : integer = 0;
-rpls_FastSkip     : boolean = false;
-rpls_vidx         : byte = 0;
-rpls_vidy         : byte = 0;
-rpls_apm          : word = 0;
-rpls_player       : byte = 0;
-rpls_GameStatus   : byte = 0;
-rpls_PlayersScore : boolean = false;
-rpls_showlog      : boolean = false;
-rpls_Ticks        : cardinal = 0;
-rpls_head_items   : array of TSaveLoadItem;
-rpls_head_itemn   : integer = 0;
-rpls_file_head_size
-                  : cardinal = 0;
-rpls_file_size    : cardinal = 0;
-rpls_file_Pos     : cardinal = 0;
-rpls_file_LastErr : word = 0;
-rpls_file_LastErrS: shortstring = '';
-rpls_log_c        : cardinal = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1700,6 +1702,12 @@ str_gstat_WaitForPlayers,
 str_gstat_WonTeam,
 str_gstat_GamePaused,
 str_gstat_Status,
+
+str_gmsg_RecordStart,
+str_gmsg_RecordError,
+str_gmsg_RecordStop,
+
+str_SR_RecordGames,
 
 str_net_UDPPort,
 

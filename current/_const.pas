@@ -188,6 +188,8 @@ b2c                    : array[false..true] of char = ('-','+');
 
 outlogfn               : shortstring = 'out.txt';
 
+fileExt_Replay         : shortstring = '.mwr';
+folder_replay          : shortstring = 'replay\';
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1080,14 +1082,21 @@ ai_names_o             : array[0..ai_names_max-1] of shortstring = (
 
 DefaultTargetWeight    = 100;
 
-{$IFDEF _FULLGAME}
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  REPLAYS
 //
+rpls_none              = 0;
+rpls_write             = 1;
 
 rpls_WriteTimeServer   = fr_fps1 div 30;
+
+rpls_RecordTriesMax    = 2;
+rpls_RecordTryPauseMax = fr_fps1;
+
+{$IFDEF _FULLGAME}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1611,11 +1620,10 @@ sss_sssize             : array[0..sss_count-1] of smallint = (1,12,1,3,1,1);
 //
 //  SAVE/LOAD/REPLAY
 //
-rpls_none              = 0;
-rpls_write             = 1;
-rpls_read              = 2;
 
 MaxReplayPrefixLen     = 20;
+
+rpls_read              = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1994,7 +2002,6 @@ str_ConfigFName        : shortstring = 'marswars.cfg';
 str_ScreenShotPrefix   : shortstring = 'MWSCR_';
 
 fileExt_save           : shortstring = '.mws';
-fileExt_Replay         : shortstring = '.mwr';
 fileExt_Scrshot        : shortstring = '.png';
 
 folder_Race            : array[1..r_count] of shortstring = ('hell\'          ,'uac\'          );
@@ -2010,7 +2017,6 @@ folder_sound           : shortstring = 'sound\';
 folder_music_menu      : shortstring = 'music\menu\';
 folder_music_game      : shortstring = 'music\game\';
 folder_save            : shortstring = 'save\';
-folder_replay          : shortstring = 'replay\';
 folder_effects         : shortstring = 'effs\';
 folder_ui              : shortstring = 'ui\';
 folder_language        : shortstring = 'language\';
@@ -2091,70 +2097,7 @@ testmode_UACLoot       = testmode_HellPower;
 {$ELSE }
 
 ded_GameEndTime          = fr_fps1*60+fr_fps1-1;
-{
-str_gstat_Lobby            : shortstring = 'Lobby';
-str_gstat_Started          : shortstring = 'Started';
-str_gstat_WaitForPlayers        : shortstring = 'Waiting for players';
-str_gstat_WonTeam            : shortstring = 'Won by a team #';
-str_gstat_GamePaused           : shortstring = 'Paused by ';
-str_gstat_Status           : shortstring = 'Game status: ';
 
-str_net_UDPPort              : shortstring = ' UPD port: ';
-str_Caption_GOptions          : shortstring = 'Game options:';
-str_Caption_Map           : shortstring = 'Map options:';
-
-str_map_GeneratorsL      : array[0..mapg_Last] of shortstring = ('5 min','10 min','15 min','20 min','infinity');
-str_map_ScenarioL        : array[0..mc_Last  ] of shortstring = ('FFA(3)',
-                                                                 'FFA(4)',
-                                                                 'FFA(5)',
-                                                                 'FFA(6)',
-                                                                 'FFA(7)',
-                                                                 'FFA(8)',
-                                                                 '1x1',
-                                                                 '2x2',
-                                                                 '3x3',
-                                                                 '4x4',
-                                                                 '2x2x2',
-                                                                 '2x2x2x2',
-                                                                 'key points',
-                                                                 'KotH',
-                                                                 'Royal Battle');
-str_map_SymmetryL        : array[0..maps_Last] of shortstring = ('no',
-                                                                 'point',
-                                                                 'line |',
-                                                                 'line -',
-                                                                 'line \',
-                                                                 'line /');
-
-str_map_TemplateL        : array[0..mapt_Last] of shortstring = ('lake',
-                                                                 'island',
-                                                                 'temple',
-                                                                 'cave',
-                                                                 'steppe',
-                                                                 'canyon');
-
-str_map_Scenario         : shortstring = 'Scenario';
-str_map_Generators       : shortstring = 'Generators';
-str_map_Seed             : shortstring = 'Seed';
-str_map_Size             : shortstring = 'Size';
-str_map_Template         : shortstring = 'Template';
-str_map_Symmetry         : shortstring = 'Symmetry';
-str_GO_AISlots         : shortstring = 'Fill empty slots';
-str_GO_FixedStarts  : shortstring = 'Fixed player starts';
-str_GO_NewObservers  : shortstring = 'New observers after game start';
-
-str_Player               : shortstring = 'Player';
-str_State                : shortstring = 'State';
-str_team                 : shortstring = 'Team';
-str_srace                : shortstring = 'Race';
-str_ping                 : shortstring = 'Ping';
-
-str_ps_AI                : shortstring = 'AI';
-str_ps_Hum               : shortstring = 'Hum.';
-
-str_race                 : array[0..r_count] of shortstring = ('RANDOM','HELL','UAC');
-str_observer             : shortstring = 'OBSERVER';
-      }
 {$ENDIF}
 
 

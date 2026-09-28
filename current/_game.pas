@@ -302,6 +302,7 @@ begin
    end;
    ui_log_LastTimer:=0;
    rpls_RecordTryPause:=0;
+   rpls_RecordTries   :=0;
    menu_msgBox_Off;
    if(snd_RenewMusicList)then
      snd_GameMusicReLoad;
@@ -316,8 +317,8 @@ begin
      ui_ToggleShowScores;
 end;
 
-{$include _replays.pas}
 {$ENDIF}
+{$include _replays.pas}
 
 function player_Surrender(pid:byte;check:boolean):boolean;
 begin
@@ -1441,13 +1442,12 @@ begin
        end;
 
    apm_Calc;
-
-   replay_Code;
-
    {$ELSE}
    Dedicated_Code;
    Dedicated_Screen;
    {$ENDIF}
+
+   replay_Code;
 
    game_LobbyTimer;
    game_PlayersCycle;

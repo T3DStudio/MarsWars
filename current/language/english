@@ -1312,6 +1312,7 @@ tc_docbr+'The dedicated server have next optional start parameters:'
 tc_docbr
 tc_docbr+'-netport [X] - UDP port(1-65535); default value is '+str_net_DefaultPort+'.'
 tc_docbr+'-lanadv [X] - LAN Advertise(0(off) or 1(on)); default value is 1.'
+tc_docbr+'-record [X] - record games(0(off) or 1(on)); default value is 0.'
 tc_docbr
 tc_docbr+'Any connected player can change the game settings in a dedicated server`s lobby.'
 tc_docbr+'The game will start automatically as soon as all players mark the "ready" option. The server will return to the lobby one minute after the game ends or immediately after all players leave the server.'

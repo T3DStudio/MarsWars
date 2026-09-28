@@ -939,14 +939,14 @@ begin
    boxColor(spr_uibtn_MaskPass,0,0,menu_w,menu_h,c_purple);
    SDL_SetColorKey(spr_uibtn_MaskPass,SDL_SRCCOLORKEY,sdl_getpixel(spr_uibtn_MaskPass,0,0));
    for r:=3 to 5 do
-     for x:=r to ui_ButtonW1-1-r do
+     for x:=r to ui_ButtonW1-r do
        if((x div 2) mod 2)=0 then
        begin
           pixelColor(spr_uibtn_MaskPass,x,r              ,c_aqua);
-          pixelColor(spr_uibtn_MaskPass,x,ui_ButtonW1-1-r,c_aqua);
+          pixelColor(spr_uibtn_MaskPass,x,ui_ButtonW1-r,c_aqua);
 
           pixelColor(spr_uibtn_MaskPass,r              ,x,c_aqua);
-          pixelColor(spr_uibtn_MaskPass,ui_ButtonW1-1-r,x,c_aqua);
+          pixelColor(spr_uibtn_MaskPass,ui_ButtonW1-r,x,c_aqua);
        end;
 
    spr_doc_ui                  := gfx_LoadSDLSurface('doc_ui'        ,false,true);

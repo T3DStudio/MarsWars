@@ -1,4 +1,5 @@
 
+{$IFDEF _FULLGAME}
 procedure replay_MenuSelectedInfo;
 var  f: file;
     fn: shortstring;
@@ -49,100 +50,6 @@ begin
    ioer:=IOResult;
    if(ioer<>0)then rpls_str_info1:=str_FileError_WData+'('+w2s(ioer)+')';
    close(f);
-end;
-
-procedure replay_WriteBlock(count:cardinal;pData:pointer);
-begin
-   if(rpls_file_LastErr<>0)then exit;
-   rpls_file_LastErr:=0;
-   IOResult;
-   {$I-}
-   BlockWrite(rpls_file,pData^,count);
-   {$I+}
-   rpls_file_LastErr:=IOResult;
-   if(rpls_file_LastErr<>0)then exit;
-
-   rpls_file_pos+=count;
-end;
-
-function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;
-begin
-   replay_ReadBlock:=false;
-   if(rpls_file_pos>=rpls_file_Size)then exit;
-   if((rpls_file_Size-rpls_file_pos)<count)then exit;
-   if(rpls_file_LastErr<>0)then exit;
-
-   rpls_file_LastErr:=0;
-   IOResult;
-   {$I-}
-   BlockRead(rpls_file,byte(pResult^),count);
-   {$I+}
-   rpls_file_LastErr:=IOResult;
-   if(rpls_file_LastErr<>0)then exit;
-
-   rpls_file_pos+=count;
-   replay_ReadBlock:=true;
-end;
-
-procedure replay_MakeReplayHeaderData;
-var p:byte;
-procedure AddItem(pdata:pointer;sdata:cardinal);
-begin
-   rpls_head_itemn+=1;
-   setlength(rpls_head_items,rpls_head_itemn);
-   with rpls_head_items[rpls_head_itemn-1] do
-   begin
-      data_p:=pdata;
-      data_s:=sdata;
-   end;
-   rpls_file_head_size+=sdata;
-end;
-begin
-   rpls_head_itemn:=0;
-   setlength(rpls_head_items,0);
-   rpls_file_head_size:=0;
-
-   AddItem(@g_version           ,SizeOf(g_version     ));
-   AddItem(@map_scenario        ,SizeOf(map_scenario  ));
-   AddItem(@map_GeneratorT      ,SizeOf(map_GeneratorT));
-   AddItem(@map_seed            ,SizeOf(map_seed      ));
-   AddItem(@map_Size1           ,SizeOf(map_Size1     ));
-   AddItem(@map_Template        ,SizeOf(map_Template  ));
-   AddItem(@map_Symmetry        ,sizeof(map_Symmetry  ));
-   AddItem(@rpls_player         ,SizeOf(rpls_player   ));
-   AddItem(@g_tick              ,SizeOf(g_tick        ));
-   for p:=0 to LastPlayer do
-     with g_PlayersGame[p] do
-     begin
-        AddItem(@state     ,SizeOf(state     ));
-        AddItem(@name      ,SizeOf(name      ));
-        AddItem(@mrace     ,SizeOf(mrace     ));
-        AddItem(@team      ,SizeOf(team      ));
-        AddItem(@isobserver,SizeOf(isobserver));
-     end;
-
-   for p:=0 to LastPlayer do
-     with g_PlayersGame[p] do
-       AddItem(@race,SizeOf(race));
-   AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
-   AddItem(@g_royal_Rx      ,SizeOf(g_royal_Rx      ));
-   AddItem(@g_royal_Ry      ,SizeOf(g_royal_Ry      ));
-end;
-
-function replay_GetProgress:single;
-begin
-   replay_GetProgress:=0;
-
-   if(rpls_pstate=rpls_read)and(rpls_fstate=rpls_read)and(rpls_file_size>0)then
-   begin
-      {$I-}
-      if(rpls_file_pos>=rpls_file_size)
-      then replay_GetProgress:=1
-      else replay_GetProgress:=rpls_file_pos/rpls_file_size;
-      {$I+}
-      if(replay_GetProgress>1)then replay_GetProgress:=1;
-      if(replay_GetProgress<0)then replay_GetProgress:=0;
-   end;
 end;
 
 procedure replay_SavePlayPosition;
@@ -248,24 +155,132 @@ begin
      end;
 end;
 
+function replay_ReadBlock(count:cardinal;pResult:pointer):boolean;
+begin
+   replay_ReadBlock:=false;
+   if(rpls_file_pos>=rpls_file_Size)then exit;
+   if((rpls_file_Size-rpls_file_pos)<count)then exit;
+   if(rpls_file_LastErr<>0)then exit;
+
+   rpls_file_LastErr:=0;
+   IOResult;
+   {$I-}
+   BlockRead(rpls_file,byte(pResult^),count);
+   {$I+}
+   rpls_file_LastErr:=IOResult;
+   if(rpls_file_LastErr<>0)then exit;
+
+   rpls_file_pos+=count;
+   replay_ReadBlock:=true;
+end;
+
+function replay_GetProgress:single;
+begin
+   replay_GetProgress:=0;
+
+   if(rpls_pstate=rpls_read)and(rpls_fstate=rpls_read)and(rpls_file_size>0)then
+   begin
+      {$I-}
+      if(rpls_file_pos>=rpls_file_size)
+      then replay_GetProgress:=1
+      else replay_GetProgress:=rpls_file_pos/rpls_file_size;
+      {$I+}
+      if(replay_GetProgress>1)then replay_GetProgress:=1;
+      if(replay_GetProgress<0)then replay_GetProgress:=0;
+   end;
+end;
+
+{$ENDIF}
+
+procedure replay_WriteBlock(count:cardinal;pData:pointer);
+begin
+   if(rpls_file_LastErr<>0)then exit;
+   rpls_file_LastErr:=0;
+   IOResult;
+   {$I-}
+   BlockWrite(rpls_file,pData^,count);
+   {$I+}
+   rpls_file_LastErr:=IOResult;
+   if(rpls_file_LastErr<>0)then exit;
+
+   rpls_file_pos+=count;
+end;
+
+procedure replay_MakeReplayHeaderData;
+var p:byte;
+procedure AddItem(pdata:pointer;sdata:cardinal);
+begin
+   rpls_head_itemn+=1;
+   setlength(rpls_head_items,rpls_head_itemn);
+   with rpls_head_items[rpls_head_itemn-1] do
+   begin
+      data_p:=pdata;
+      data_s:=sdata;
+   end;
+   rpls_file_head_size+=sdata;
+end;
+begin
+   rpls_head_itemn:=0;
+   setlength(rpls_head_items,0);
+   rpls_file_head_size:=0;
+
+   AddItem(@g_version           ,SizeOf(g_version     ));
+   AddItem(@map_scenario        ,SizeOf(map_scenario  ));
+   AddItem(@map_GeneratorT      ,SizeOf(map_GeneratorT));
+   AddItem(@map_seed            ,SizeOf(map_seed      ));
+   AddItem(@map_Size1           ,SizeOf(map_Size1     ));
+   AddItem(@map_Template        ,SizeOf(map_Template  ));
+   AddItem(@map_Symmetry        ,sizeof(map_Symmetry  ));
+   AddItem(@rpls_player         ,SizeOf(rpls_player   ));
+   AddItem(@g_tick              ,SizeOf(g_tick        ));
+   for p:=0 to LastPlayer do
+     with g_PlayersGame[p] do
+     begin
+        AddItem(@state     ,SizeOf(state     ));
+        AddItem(@name      ,SizeOf(name      ));
+        AddItem(@mrace     ,SizeOf(mrace     ));
+        AddItem(@team      ,SizeOf(team      ));
+        AddItem(@isobserver,SizeOf(isobserver));
+     end;
+
+   for p:=0 to LastPlayer do
+     with g_PlayersGame[p] do
+       AddItem(@race,SizeOf(race));
+   AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
+   AddItem(@g_royal_Rx      ,SizeOf(g_royal_Rx      ));
+   AddItem(@g_royal_Ry      ,SizeOf(g_royal_Ry      ));
+end;
+
+procedure replay_SysNotify(msg:shortstring);
+begin
+   {$IFDEF _FULLGAME}
+   ui_SysMassageAdd(msg,0);
+   {$ELSE}
+   GameLog_Chat(255,255,msg);
+   writeln(msg);
+   {$ENDIF}
+end;
+
 procedure replay_Abort;
 begin
-   if(length(rpls_str_path)>0)then
-   begin
-      if(rpls_pstate=rpls_write)
-      or(rpls_fstate=rpls_write)then ui_SysMassageAdd(str_gmsg_RecordStop+rpls_str_path,0);
-   end;
+   if(rpls_pstate=rpls_write)
+   or(rpls_fstate=rpls_write)then
+     if(length(rpls_str_path)>0)then replay_SysNotify(str_gmsg_RecordStop+rpls_str_path+' ('+w2s(rpls_file_LastErr)+')');
    if(rpls_fstate>rpls_none)then
    begin
       close(rpls_file);
       rpls_fstate   :=rpls_none;
       rpls_file_Pos :=0;
+      {$IFDEF _FULLGAME}
       rpls_file_Size:=0;
+      {$ENDIF}
    end;
-   rpls_str_path:='';
    rpls_pstate  :=rpls_none;
+   rpls_str_path:='';
+   {$IFDEF _FULLGAME}
    rpls_ReadPosN:=0;
    setlength(rpls_ReadPosl,rpls_ReadPosN);
+   {$ENDIF}
 end;
 
 // REPLAY WRITE
@@ -275,34 +290,52 @@ fname:shortstring;
 begin
    replay_Abort;
 
-   fname:=rpls_NamePrefix+'_'+str_fileinfo_ScenarioL[map_scenario]+'_'+str_DateTime+fileExt_Replay;
+   fname:=rpls_NamePrefix+'_'+{$IFDEF _FULLGAME}
+                              str_fileinfo_ScenarioL
+                              {$ELSE}
+                              str_map_ScenarioL
+                              {$ENDIF}[map_scenario]+'_'+str_DateTime+fileExt_Replay;
    rpls_str_path:=folder_replay+fname;
+
+   if not DirectoryExists(folder_replay)then
+     If not CreateDir(folder_replay)Then
+     begin
+        replay_SysNotify(str_gmsg_RecordError+rpls_str_path+' (folder creation)');
+        replay_Abort;
+        rpls_pstate:=rpls_none;
+     end;
 
    assign (rpls_file,rpls_str_path);
    {$I-}
    rewrite(rpls_file,1);
    {$I+}
+   rpls_file_LastErr:=ioresult;
 
-   if(ioresult<>0)then
+   if(rpls_file_LastErr<>0)then
    begin
+      replay_SysNotify(str_gmsg_RecordError+rpls_str_path+' ('+w2s(rpls_file_LastErr)+')');
       replay_Abort;
       rpls_pstate:=rpls_none;
    end
    else
    begin
-      rpls_file_Pos :=0;
-      rpls_file_Size:=0;
+      rpls_file_Pos    :=0;
       rpls_file_LastErr:=0;
+      {$IFDEF _FULLGAME}
+      rpls_file_Size:=0;
+      {$ENDIF}
 
       rpls_fstate      :=rpls_write;
       rpls_pstate      :=rpls_write;
       rpls_u           :=0;
-      rpls_player      :=LocalPlayer;
-      rpls_log_c       :=0;
+      rpls_player      :={$IFDEF _FULLGAME}LocalPlayer{$ELSE}255{$ENDIF};
       rpls_Ticks       :=0;
       rpls_GameStatus  :=255;
       rpls_PlayersScore:=false;
+      {$IFDEF _FULLGAME}
+      rpls_log_c       :=0;
       ui_playerPOV     :=false;
+      {$ENDIF}
 
       if(rpls_head_itemn>0)then
         for p:=0 to rpls_head_itemn-1 do
@@ -313,30 +346,39 @@ begin
       begin
          replay_Abort;
          rpls_pstate:=rpls_none;
-         ui_SysMassageAdd(str_gmsg_RecordError+fname+rpls_file_LastErrS,2);
+         replay_SysNotify(str_gmsg_RecordError+fname+rpls_file_LastErrS);
       end
-      else ui_SysMassageAdd(str_gmsg_RecordStart+fname,0);
+      else replay_SysNotify(str_gmsg_RecordStart+fname);
    end;
 end;
 
 procedure replay_WriteGameFrame;
 var
-i,gs,
+i,gs: byte;
+{$IFDEF _FULLGAME}
 camx,
 camy: byte;
 apm : word;
+{$ENDIF}
 begin
+   {$IFDEF _FULLGAME}
    camx:=byte(ui_cam_cx shr rpls_UIcamXYt1b);
    camy:=byte(ui_cam_cy shr rpls_UIcamXYt1b);
    apm :=g_PlayerAPM.apm_cur;
+   {$ENDIF}
 
    gs:=g_status and %00011111;
    i :=gs;
-   if(rpls_log_c>0)then i:=i or %10000000;
-   if(rpls_vidx<>camx)
-   or(rpls_vidy<>camy)
-   or(rpls_apm <>apm )then
-     if(gs=gs_running)then i:=i or %01000000;
+   {$IFDEF _FULLGAME}
+   if(rpls_player<=LastPlayer)then
+   begin
+      if(rpls_log_c>0)then i:=i or %10000000;
+      if(rpls_vidx<>camx)
+      or(rpls_vidy<>camy)
+      or(rpls_apm <>apm )then
+        if(gs=gs_running)then i:=i or %01000000;
+   end;
+   {$ENDIF}
    if(not rpls_PlayersScore)then
      if(game_IsEnded)then i:=i or %00100000;
 
@@ -345,6 +387,7 @@ begin
    or(rpls_GameStatus<>gs)then
    begin
       wudata_byte(i,true);
+      {$IFDEF _FULLGAME}
       if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_c,true);
       if((i and %01000000)>0)then
       begin
@@ -357,6 +400,7 @@ begin
          wudata_byte(rpls_apm ,true);
          rpls_apm :=apm;
       end;
+      {$ENDIF}
       if((i and %00100000)>0)then
       begin
          rpls_PlayersScore:=true;
@@ -372,10 +416,11 @@ begin
    begin
       replay_Abort;
       rpls_pstate:=rpls_none;
-      ui_SysMassageAdd(str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS,2);
+      replay_SysNotify(str_gmsg_RecordError+rpls_str_path+rpls_file_LastErrS);
    end;
 end;
 
+{$IFDEF _FULLGAME}
 // REPLAY READ
 procedure replay_ReadHead;
 var
@@ -475,7 +520,7 @@ begin
          or(map_Template  >mapt_Last)
          or(map_GeneratorT>mapg_Last)
          or not(map_scenario in allmapscenarios)
-         or(rpls_player>LastPlayer)then
+         or((rpls_player>LastPlayer)and(rpls_player<>255))then
          begin
             replay_Abort;
             g_started     :=false;
@@ -515,7 +560,9 @@ begin
          rpls_pstate:=rpls_read;
          rpls_pnu   :=0;
          rpls_Ticks :=0;
-         LocalPlayer:=rpls_player;
+         if(rpls_player<=LastPlayer)
+         then LocalPlayer:=rpls_player
+         else LocalPlayer:=0;
          UIPlayer   :=LocalPlayer;
 
          ui_playerPOV:=false;
@@ -564,12 +611,15 @@ begin
       i:=rudata_byte(true,0);
       g_status:=i and %00011111;
 
-      if((i and %10000000)>0)then rudata_log(rpls_player,true);
-      if((i and %01000000)>0)then
+      if(rpls_player<=LastPlayer)then
       begin
-         rpls_vidx:=rudata_byte(true,0);
-         rpls_vidy:=rudata_byte(true,0);
-         rpls_apm :=rudata_byte(true,0) shl 1;
+         if((i and %10000000)>0)then rudata_log(rpls_player,true);
+         if((i and %01000000)>0)then
+         begin
+            rpls_vidx:=rudata_byte(true,0);
+            rpls_vidy:=rudata_byte(true,0);
+            rpls_apm :=rudata_byte(true,0) shl 1;
+         end;
       end;
       if((i and %00100000)>0)then rudata_PlayersScores(true);
 
@@ -597,6 +647,7 @@ begin
 
    if(gs=gs_replaypause)then g_status:=gs;
 end;
+{$ENDIF}
 
 procedure replay_Code;
 begin
@@ -606,14 +657,20 @@ begin
       then rpls_RecordTryPause-=1
       else
       begin
-         if(g_started)and(not game_IsEnded)and(rpls_pstate=rpls_none)then rpls_pstate:=rpls_write;
-         rpls_RecordTryPause:=fr_fps1;
+         if(g_started)and(not game_IsEnded)and(rpls_pstate=rpls_none)then
+         begin
+            rpls_pstate:=rpls_write;
+            if(rpls_RecordTries<=rpls_RecordTriesMax)then rpls_RecordTries+=1;
+         end;
+         if(rpls_RecordTries>rpls_RecordTriesMax)
+         then rpls_RecordTryPause:=rpls_RecordTryPause.MaxValue
+         else rpls_RecordTryPause:=rpls_RecordTryPauseMax*rpls_RecordTries;
       end;
    end
    else
      if(rpls_pstate=rpls_write)then replay_Abort;
 
-   if(not g_started)or(rpls_pstate=rpls_none)or(g_type=gt_campaing)
+   if(not g_started)or(rpls_pstate=rpls_none){$IFDEF _FULLGAME}or(g_type=gt_campaing){$ENDIF}
    then replay_Abort
    else
      if(g_started)then
@@ -625,14 +682,17 @@ begin
                      else
                        if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
                          replay_WriteGameFrame;
+        {$IFDEF _FULLGAME}
         rpls_read  : if(rpls_fstate=rpls_read)then
                        if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
                          replay_ReadGameFrame;
+        {$ENDIF}
         else replay_Abort;
         end;
      end;
 end;
 
+{$IFDEF _FULLGAME}
 procedure replay_Select;
 begin
    if(0<=rpls_list_sel)and(rpls_list_sel<rpls_list_size)
@@ -759,6 +819,6 @@ begin
         rpls_ForwardSkip:=0;
      end;
 end;
-
+{$ENDIF}
 
 
