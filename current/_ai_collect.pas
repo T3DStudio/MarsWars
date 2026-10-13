@@ -194,22 +194,22 @@ begin
 
       // magic targets
       case uidi of
-      UID_UAcademy        : if(ability_CheckTarget_UACGeneral   (team,tu))then ai_SetTarget_UACGeneral   (tu);
-      UID_UHPowerConductor: begin
-                            if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
-                            if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
-                            end;
+      UID_UAcademy      : if(ability_CheckTarget_UACGeneral   (team,tu))then ai_SetTarget_UACGeneral   (tu);
+      UID_UHArtStorage  : begin
+                          if(ability_CheckTarget_SphereSoul   (team,tu))then ai_SetTarget_SphereSoul   (tu);
+                          if(ability_CheckTarget_SphereInvis  (team,tu))then ai_SetTarget_SphereInvis  (tu);
+                          end;
       end;
 
       if(tu^.group<>aic_group_Scout)
       or(tu^.player^.state<>ps_AI)then
         case uidi of
-        UID_UHPowerConductor: if(ability_CheckTarget_SphereInvuln (team,tu))then ai_SetTarget_SphereInvuln (tu);
-        UID_HAltar          : begin
-                              if(ability_CheckTarget_SphereRDamage(team,tu))then ai_SetTarget_SphereRDamage(tu);
-                              if(ability_CheckTarget_SphereDDamage(team,tu))then ai_SetTarget_SphereDDamage(tu);
-                              if(ability_CheckTarget_SphereTurbo  (team,tu))then ai_SetTarget_SphereTurbo  (tu);
-                              end;
+        UID_UHArtStorage: if(ability_CheckTarget_SphereInvuln (team,tu))then ai_SetTarget_SphereInvuln (tu);
+        UID_HAltar      : begin
+                          if(ability_CheckTarget_SphereRDamage(team,tu))then ai_SetTarget_SphereRDamage(tu);
+                          if(ability_CheckTarget_SphereDDamage(team,tu))then ai_SetTarget_SphereDDamage(tu);
+                          if(ability_CheckTarget_SphereTurbo  (team,tu))then ai_SetTarget_SphereTurbo  (tu);
+                          end;
         end;
 
       // repair/heal target

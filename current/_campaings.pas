@@ -180,10 +180,14 @@ begin
          camp_SetBaseLevelUnitUpgrades(p,level);
 end;
 
-procedure camp_removeAIFlag(ap:byte;flag:cardinal);
+procedure camp_AIFlagDel(ap:byte;flag:cardinal);
 begin
    with g_PlayersGame[ap] do
      if((aip_flags and flag)>0)then aip_flags:=aip_flags xor flag;
+end;
+procedure camp_AIFlagSel(ap:byte;flag:cardinal);
+begin
+   with g_PlayersGame[ap] do aip_flags:=aip_flags or flag;
 end;
 
 procedure camp_SetAI(ap,alevel:byte;attackDelay,attackPause:integer);
@@ -214,11 +218,10 @@ begin
               camp_SetBaseLevelUnitUpgrades(ap,(alevel-1)*2);
             aip_MaxUpgradeLevel:=alevel*2;
 
-            camp_removeAIFlag(ap,aif_base_DefendAlly   );
-            camp_removeAIFlag(ap,aif_base_suicide      );
-            camp_removeAIFlag(ap,aif_army_early_attack0);
-            camp_removeAIFlag(ap,aif_army_early_attack1);
-            camp_removeAIFlag(ap,aif_army_scout);
+            camp_AIFlagDel(ap,aif_base_suicide      );
+            camp_AIFlagDel(ap,aif_army_early_attack0);
+            camp_AIFlagDel(ap,aif_army_early_attack1);
+            camp_AIFlagDel(ap,aif_army_scout);
             aip_flags:=aip_flags or aif_cheat_VisBuildings;
 
             case attackPause of
@@ -416,7 +419,7 @@ begin
                     aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
                     aip_MaxTowers     :=2+cd_camp_skill*2;
                  end;
-                 camp_removeAIFlag(p,aif_base_smart_order);
+                 camp_AIFlagDel(p,aif_base_smart_order);
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]-100,UID_HAKeep,60);
                  camp_CreateUnit(p,map_PlayerStartX[p]-110,map_PlayerStartY[p]+100,UID_HAKeep,60);
@@ -455,7 +458,7 @@ begin
                     aip_flags:= aip_flags or aif_base_advanceMain;
                     aip_flags:= aip_flags or aif_base_advanceOther;
                  end;
-                 camp_removeAIFlag(p,aif_base_smart_order);
+                 camp_AIFlagDel(p,aif_base_smart_order);
 
                  camp_CreateUnit(p,map_PlayerStartX[p]+110,map_PlayerStartY[p]-110,UID_HAKeep,60);
                  camp_CreateUnit(p,map_PlayerStartX[p]-100,map_PlayerStartY[p]+110,UID_HAKeep,60);
@@ -766,7 +769,7 @@ begin
                     aip_MinTowers     :=aip_MaxTowers;
                     aip_flags := aip_flags or aif_ability_other;
                  end;
-                 camp_removeAIFlag(p,aif_army_smart_micro);
+                 camp_AIFlagDel(p,aif_army_smart_micro);
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]    ,UID_HAKeep);
                  camp_CreateUnit(p,map_PlayerStartX[p]+200,map_PlayerStartY[p]    ,UID_HAKeep);

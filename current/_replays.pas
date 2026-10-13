@@ -361,23 +361,18 @@ camy: byte;
 apm : word;
 {$ENDIF}
 begin
+   gs:=g_status and %00011111;
+   i :=gs;
    {$IFDEF _FULLGAME}
    camx:=byte(ui_cam_cx shr rpls_UIcamXYt1b);
    camy:=byte(ui_cam_cy shr rpls_UIcamXYt1b);
    apm :=g_PlayerAPM.apm_cur;
-   {$ENDIF}
 
-   gs:=g_status and %00011111;
-   i :=gs;
-   {$IFDEF _FULLGAME}
-   if(rpls_player<=LastPlayer)then
-   begin
-      if(rpls_log_c>0)then i:=i or %10000000;
-      if(rpls_vidx<>camx)
-      or(rpls_vidy<>camy)
-      or(rpls_apm <>apm )then
-        if(gs=gs_running)then i:=i or %01000000;
-   end;
+   if(rpls_log_c>0)then i:=i or %10000000;
+   if(rpls_vidx<>camx)
+   or(rpls_vidy<>camy)
+   or(rpls_apm <>apm )then
+     if(gs=gs_running)then i:=i or %01000000;
    {$ENDIF}
    if(not rpls_PlayersScore)then
      if(game_IsEnded)then i:=i or %00100000;
@@ -408,8 +403,8 @@ begin
       end;
       rpls_GameStatus:=gs;
 
-      if(gs=gs_running)
-      then wclinet_gframe(rpls_player,rpls_WriteTimeServer,true);
+      if(gs=gs_running)then
+        wclinet_gframe(rpls_player,rpls_WriteTimeServer,true);
    end;
 
    if(rpls_file_LastErr<>0)then
@@ -611,15 +606,12 @@ begin
       i:=rudata_byte(true,0);
       g_status:=i and %00011111;
 
-      if(rpls_player<=LastPlayer)then
+      if((i and %10000000)>0)then rudata_log(rpls_player,true);
+      if((i and %01000000)>0)then
       begin
-         if((i and %10000000)>0)then rudata_log(rpls_player,true);
-         if((i and %01000000)>0)then
-         begin
-            rpls_vidx:=rudata_byte(true,0);
-            rpls_vidy:=rudata_byte(true,0);
-            rpls_apm :=rudata_byte(true,0) shl 1;
-         end;
+         rpls_vidx:=rudata_byte(true,0);
+         rpls_vidy:=rudata_byte(true,0);
+         rpls_apm :=rudata_byte(true,0) shl 1;
       end;
       if((i and %00100000)>0)then rudata_PlayersScores(true);
 

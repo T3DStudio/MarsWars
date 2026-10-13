@@ -404,8 +404,7 @@ begin
                               if(ai_AbilityMagic(pCaster,ai_SphereRDamage_u,uab_SphereRDamage))
                               then aip_timer_magic:=aip_pause_magic+fr_fps1;
                        end;
-     UID_UHPowerConductor
-                     : if(aip_pause_magic>=0)and(aip_timer_magic=0)then
+     UID_UHArtStorage: if(aip_pause_magic>=0)and(aip_timer_magic=0)then
                        begin
                           if(ai_AbilityMagic(pCaster,ai_SphereInvuln_u,uab_SphereInvuln))
                           then aip_timer_magic:=aip_pause_magic+fr_fps1

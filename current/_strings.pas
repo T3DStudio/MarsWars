@@ -1053,7 +1053,7 @@ begin
    with g_uids[uid] do
    begin
       if(uid_req_EnergyLevel>0)then STRADD(@str_UIDCostLimit,tc_aqua  +i2s(uid_req_EnergyLevel)          +tc_default,sep_comma);
-      if(uid_req_HellPower  >0)then STRADD(@str_UIDCostLimit,tc_yellow+i2s(uid_req_HellPower  )          +tc_default,sep_comma);
+      if(uid_req_HellLoot   >0)then STRADD(@str_UIDCostLimit,tc_yellow+i2s(uid_req_HellLoot   )          +tc_default,sep_comma);
       if(uid_req_UACLoot    >0)then STRADD(@str_UIDCostLimit,tc_lime  +i2s(uid_req_UACLoot    )          +tc_default,sep_comma);
                                     STRADD(@str_UIDCostLimit,tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default,sep_comma);
       if(uid_ProdTimeSec    >0)then
@@ -1191,8 +1191,8 @@ begin
         AddLineUnitDocHint(str_doc_LifeTime       +i2s(round(uid_MaxHits1/-uid_Regen_Base*regen_period1))+' '+str_hint_sec );
         if(uid_req_EnergyLevel>0)then
         AddLineUnitDocHint(str_doc_ReqEnergy      +DocValI(uid_req_EnergyLevel,tc_aqua  ));
-        if(uid_req_HellPower>0)then
-        AddLineUnitDocHint(str_doc_ReqHellPower   +DocValI(uid_req_HellPower  ,tc_yellow));
+        if(uid_req_HellLoot>0)then
+        AddLineUnitDocHint(str_doc_ReqHellLoot    +DocValI(uid_req_HellLoot   ,tc_yellow));
         if(uid_req_UACLoot  >0)then
         AddLineUnitDocHint(str_doc_ReqUACLoot     +DocValI(uid_req_UACLoot    ,tc_lime  ));
         AddLineUnitDocHint(str_doc_Limit          +tc_orange+limit2s(uid_LimitUse,MinUnitLimit)+tc_default);
@@ -1222,8 +1222,8 @@ begin
         AddLineUnitDocHint(str_hint_SplashResist+': '+str_YesNoG[uid_isbuilding or uid_ismech]);
         if(uid_gen_EnergyLevel >0)then
         AddLineUnitDocHint(str_hint_IncEnergyLevel+DocValI(uid_gen_EnergyLevel ,tc_aqua  ));
-        if(uid_bounty_HellPower>0)then
-        AddLineUnitDocHint(str_doc_BountyHellPower+DocValI(uid_bounty_HellPower,tc_yellow));
+        if(uid_bounty_HellLoot >0)then
+        AddLineUnitDocHint(str_doc_BountyHellLoot +DocValI(uid_bounty_HellLoot,tc_yellow ));
         if(uid_bounty_UACLoot  >0)then
         AddLineUnitDocHint(str_doc_BountyUACLoot  +DocValI(uid_bounty_UACLoot  ,tc_lime  ));
         if(uid_ZombieUID>0)then
@@ -1361,8 +1361,8 @@ begin
           uat_UnitEnemy: STRADD(@ua_str_Common,str_ability_UnitEnemy,sep_sdot);
           end;
 
-          if(ua_req_HellPower>0)then STRADD(@ua_str_Common,str_doc_ReqHellPower+tc_yellow+i2s(ua_req_HellPower)+tc_default,sep_sdot);
-          if(ua_req_UACLoot  >0)then STRADD(@ua_str_Common,str_doc_ReqUACLoot  +tc_lime  +i2s(ua_req_UACLoot  )+tc_default,sep_sdot);
+          if(ua_req_HellLoot>0)then STRADD(@ua_str_Common,str_doc_ReqHellLoot+tc_yellow+i2s(ua_req_HellLoot)+tc_default,sep_sdot);
+          if(ua_req_UACLoot >0)then STRADD(@ua_str_Common,str_doc_ReqUACLoot +tc_lime  +i2s(ua_req_UACLoot )+tc_default,sep_sdot);
           if(ua_reload>0)then
           begin
              STRADD(@ua_str_Common,str_ability_reload+tc_aqua+ir2s(ua_reload)+tc_default+' '+str_hint_sec,sep_sdot);

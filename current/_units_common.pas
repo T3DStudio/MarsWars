@@ -1903,9 +1903,9 @@ begin
          if(uid_gen_EnergyLevel>0)
          then energyCur_BldGens +=uid_req_EnergyLevel
          else energyCur_BldOther+=uid_req_EnergyLevel;
-         res_energyl_cur -=uid_req_EnergyLevel;
-         res_HellPower   -=uid_req_HellPower;
-         res_UACLoot     -=uid_req_UACLoot;
+         res_energyl_cur-=uid_req_EnergyLevel;
+         res_HellLoot   -=uid_req_HellLoot;
+         res_UACLoot    -=uid_req_UACLoot;
          {$IFDEF _FULLGAME}
          if(playeri=UIPlayer)then snd_SoundPlayAnoncer(snd_build_place[uid_race],false,false);
          {$ENDIF}
@@ -2200,7 +2200,7 @@ begin
                prod_unit_uid[puid                  ]+=1;
                energyCur_units+=g_uids[puid].uid_req_EnergyLevel;
                res_energyl_cur-=g_uids[puid].uid_req_EnergyLevel;
-               res_HellPower  -=g_uids[puid].uid_req_HellPower;
+               res_HellLoot   -=g_uids[puid].uid_req_HellLoot;
                res_UACLoot    -=g_uids[puid].uid_req_UACLoot;
                uprod_u[pn]:=puid;
                uprod_r[pn]:=g_uids[puid].uid_ProdTimeTick;
@@ -2258,7 +2258,7 @@ begin
               res_energyl_cur+=g_uids[puid].uid_req_EnergyLevel;
               if(canceled)then
               begin
-              res_HellPower  +=g_uids[puid].uid_req_HellPower;
+              res_HellLoot   +=g_uids[puid].uid_req_HellLoot;
               res_UACLoot    +=g_uids[puid].uid_req_UACLoot;
               end;
               uprod_r[pn]:=0;
@@ -2425,8 +2425,8 @@ begin
          exit;
       end;
 
-      if(ptarUID^.uid_req_HellPower>0)and(res_HellPower<ptarUID^.uid_req_HellPower)then begin unit_TransformStart:=lmt_Req_HellPower;exit;end;
-      if(ptarUID^.uid_req_UACLoot  >0)and(res_UACLoot  <ptarUID^.uid_req_UACLoot  )then begin unit_TransformStart:=lmt_Req_UACLoot;  exit;end;
+      if(ptarUID^.uid_req_HellLoot>0)and(res_HellLoot<ptarUID^.uid_req_HellLoot)then begin unit_TransformStart:=lmt_Req_HellLoot;exit;end;
+      if(ptarUID^.uid_req_UACLoot >0)and(res_UACLoot <ptarUID^.uid_req_UACLoot )then begin unit_TransformStart:=lmt_Req_UACLoot; exit;end;
 
       //if(isselected)and(not check)then writeln((state=ps_AI)and(ptarUID^.uid_isbuilder),' ',energyCur_units+energyCur_upgrades,' ',ptarUID^.uid_req_EnergyLevel);
 
@@ -2456,7 +2456,7 @@ begin
 
       energyCur_transforms+=ptarUID^.uid_req_EnergyLevel;
       res_energyl_cur     -=ptarUID^.uid_req_EnergyLevel;
-      res_HellPower       -=ptarUID^.uid_req_HellPower;
+      res_HellLoot        -=ptarUID^.uid_req_HellLoot;
       res_UACLoot         -=ptarUID^.uid_req_UACLoot;
 
       unit_ProdStopUnit   (pu,255,true,true,false);
@@ -2487,7 +2487,7 @@ begin
 
       energyCur_transforms-=g_uids[transformUID].uid_req_EnergyLevel;
       res_energyl_cur     +=g_uids[transformUID].uid_req_EnergyLevel;
-      res_HellPower       +=g_uids[transformUID].uid_req_HellPower;
+      res_HellLoot        +=g_uids[transformUID].uid_req_HellLoot;
       res_UACLoot         +=g_uids[transformUID].uid_req_UACLoot;
       transformTimer:=0;
    end;
@@ -2557,7 +2557,7 @@ begin
          then energyCur_BldGens -=uid_req_EnergyLevel
          else energyCur_BldOther-=uid_req_EnergyLevel;
          res_energyl_cur +=uid_req_EnergyLevel;
-         res_HellPower   +=round(uid_req_HellPower*(uid_MaxHits1-hits)/uid_MaxHits1);
+         res_HellLoot    +=round(uid_req_HellLoot*(uid_MaxHits1-hits)/uid_MaxHits1);
          res_UACLoot     +=round(uid_req_UACLoot  *(uid_MaxHits1-hits)/uid_MaxHits1);
       end
       else

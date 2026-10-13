@@ -769,7 +769,7 @@ begin
    setMWSModel(0,@spr_UAcademy);
    setBuildingSND(snd_uac_academy);
 end;
-UID_UHPowerConductor:
+UID_UHArtStorage:
 begin
    setMWSModel(0,@spr_UHPowerConductor);
    setBuildingSND(snd_uac_rescc);

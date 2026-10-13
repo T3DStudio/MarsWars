@@ -397,8 +397,8 @@ begin
    if(POVPlayer>LastPlayer)or(rpl)
    then UnitExistForPOVPlayer:=true
    else
-     if(CheckUnitTeamVision(g_PlayersGame[POVPlayer].team,pu,true))
-     or(g_PlayersGame[POVPlayer].isobserver)
+     if(g_PlayersGame[POVPlayer].isobserver)
+     or(CheckUnitTeamVision(g_PlayersGame[POVPlayer].team,pu,true))
      then UnitExistForPOVPlayer:=true
      else UnitExistForPOVPlayer:=false;
 end;
@@ -494,8 +494,8 @@ begin
    with g_PlayersGame[p] do
    begin
       wudata_reload(build_cd,rpl);
-      wudata_int(res_HellPower,rpl);
-      wudata_int(res_UACLoot  ,rpl);
+      wudata_int(res_HellLoot,rpl);
+      wudata_int(res_UACLoot ,rpl);
    end;
 end;
 
@@ -973,10 +973,10 @@ begin
 
            if(iscomplete)and(buffs[ub_Cast]>0)then
              case uidi of
-             UID_URadar    : effect_ScanSound(pu_cur);
-             UID_Pain      : if(upgrs_cur[upgr_hell_Phantoms]>0)
-                             then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
-                             else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
+             UID_URadar : effect_ScanSound(pu_cur);
+             UID_Pain   : if(upgrs_cur[upgr_hell_Phantoms]>0)
+                          then unit_ArmSpawnUnit(pu_prev,UID_Phantom )
+                          else unit_ArmSpawnUnit(pu_prev,UID_LostSoul);
              end;
 
            with g_unitsVis[unum] do
@@ -1608,7 +1608,7 @@ begin
               case bp of
               0: begin
                     bv:=rudata_byte(rpl,0);
-                    upgrs_cur[n]:=min2i(upgr_max,bv and %00001111);         //???????
+                    upgrs_cur[n]:=min2i(upgr_max,bv and %00001111);
                     bp:=1;
                  end;
               1: begin
@@ -1624,8 +1624,8 @@ begin
    with g_PlayersGame[p] do
    begin
      rudata_reload(@build_cd,rpl);
-     res_HellPower:=rudata_int(rpl,0);
-     res_UACLoot  :=rudata_int(rpl,0);
+     res_HellLoot:=rudata_int(rpl,0);
+     res_UACLoot :=rudata_int(rpl,0);
    end;
 end;
 

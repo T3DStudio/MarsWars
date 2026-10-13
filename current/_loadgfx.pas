@@ -1361,8 +1361,8 @@ begin
 
    ui_EnergyX   := ui_UIPortXC-font_w2*2;
    ui_EnergyY   := ui_UIPortY0+font_wh;
-   ui_HellPowerY:= ui_EnergyY+txt_line_h2;
-   ui_UACLootY  := ui_HellPowerY+txt_line_h2; ;
+   ui_HellLootY := ui_EnergyY+txt_line_h2;
+   ui_UACLootY  := ui_HellLootY+txt_line_h2;
    ui_ArmyX     := ui_EnergyX+font_w1h;
    ui_ArmyY0    := ui_UIPortY0+font_wh;
    ui_ArmyY1    := ui_ArmyY0+txt_line_h2;

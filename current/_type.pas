@@ -329,7 +329,7 @@ TUnitAbility = record
    ua_type        : TUnitAbilityTargetType;
    ua_req_upgr,
    ua_req_uid     : byte;
-   ua_req_HellPower,
+   ua_req_HellLoot,
    ua_req_UACLoot,
    ua_reload      : integer;
    ua_rldDec_upgr : byte;
@@ -455,10 +455,10 @@ TUID = record
    uid_r,
    uid_RoyalBattleAutoOutR,
    uid_missileR,
-   uid_req_HellPower,
+   uid_req_HellLoot,
    uid_req_UACLoot,
    uid_req_EnergyLevel,
-   uid_bounty_HellPower,
+   uid_bounty_HellLoot,
    uid_bounty_UACLoot,
    uid_gen_EnergyLevel,
    uid_ProdTimeSec,
@@ -719,7 +719,7 @@ TPlayerDataGame = record
    build_cd,
    res_energyl_cur,
    res_energyl_max,
-   res_HellPower,
+   res_HellLoot,
    res_UACLoot
 
                    : integer;

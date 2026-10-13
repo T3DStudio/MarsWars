@@ -243,7 +243,7 @@ str_ui_LimitArmy              = tc_orange+'Лимит армии'+tc_white
 str_ui_LimitBuildings         = tc_red   +str_ui_Tab[tab_Units]+tc_white
 str_ui_LimitUnits             = tc_gray  +str_ui_Tab[tab_Buildings]+tc_white
 str_ui_EnergyLevel            = tc_aqua  +'Уровень энергии'+tc_white
-str_ui_HellPower              = tc_yellow+'Адская сила'+tc_white
+str_ui_HellLoot               = tc_yellow+'Артефакты Ада'+tc_white
 str_ui_UACLoot                = tc_lime  +'Трофеи UAC' +tc_white
 str_ui_objectives             = 'Задачи'
 str_ui_SelectTarget           = 'Укажите цель для '
@@ -259,7 +259,7 @@ str_warn_prod_BadOrder        = 'Невозможно произвести эт�
 str_warn_prod_AllBusy         = 'Все производства заняты'
 str_warn_prod_Unavailable     = 'Недоступно для производства'
 str_warn_Req_Energy           = 'Нужно больше энергии'
-str_warn_Req_HellPower        = 'Нужно больше Адской силы'
+str_warn_Req_HellLoot         = 'Нужно больше артефактов ада'
 str_warn_Req_UACLoot          = 'Нужно больше трофеев UAC'
 str_warn_Req_Common           = 'Проверьте требования'
 str_warn_unit_MaxLevel        = 'Максимальный уровень достигнут'
@@ -286,7 +286,7 @@ str_warn_kpoint_CaptureStart  = ' захватывает ключевую точ
 str_warn_koth_CaptureStart    = ' контролирует центр'
 str_warn_koth_Alarm           = 'Внимание на центральную зону: '
 str_warn_ngen_captured        = 'Генератор захвачен'
-str_warn_ngen_alarm           = 'Пропадает над генератором'
+str_warn_ngen_alarm           = 'Пропадает контроль над генератором'
 str_warn_ngen_lost            = 'Генератор потерян'
 str_warn_ngen_exh             = 'Генератор исчерпан'
 str_warn_Invalid_Target       = 'Неподходящая цель'
@@ -409,7 +409,7 @@ str_help_ImgKotH              = 'рис.#5 Область в ЦГ'
 str_doc_HotKey                = 'Горячая клавиша: '
 str_doc_Attributes            = 'Атрибуты: '
 str_doc_ReqEnergy             = 'Требуется энергии: '
-str_doc_ReqHellPower          = 'Требуется Адской силы: '
+str_doc_ReqHellLoot           = 'Требуется артефактов ада: '
 str_doc_ReqUACLoot            = 'Требуется трофеев UAC: '
 str_doc_ProdTime              = 'Время производства: '
 str_doc_Limit                 = 'Занимаемый лимит: '
@@ -433,7 +433,7 @@ str_doc_LevelArmorBonus       = 'Доп. броня за уровень: '
 str_doc_LevelDamageBonus      = 'Доп. воздействие за уровень: '
 str_doc_LevelPainSBonus       = 'Доп. порог "состояния боли" за уровень: '
 str_doc_LevelRegenBonus       = 'Доп. регенерация за уровень: '
-str_doc_BountyHellPower       = 'Дает Адской силы за уничтожение: '
+str_doc_BountyHellLoot        = 'Дает артефактов ада за уничтожение: '
 str_doc_BountyUACLoot         = 'Дает трофеев UAC за уничтожение: '
 str_doc_ZombieUID             = 'Зомби-версия: '
 str_doc_ZombieHits            = 'Минимум здровья для зомбификации: '
@@ -470,8 +470,8 @@ str_ScoreBoardC[psc_upgrades_level]  = 'Улучшений сделано'
 str_ScoreBoardC[psc_InGameTime]      = 'Время проигрыша'
 
 str_ScoreBoardI[psi_res_energy_max]  = 'Макс. уров. энергии'
-str_ScoreBoardI[psi_res_UACLoot]     = 'Собрано "'+str_ui_UACLoot  +'"'
-str_ScoreBoardI[psi_res_HellPower]   = 'Собрано "'+str_ui_HellPower+'"'
+str_ScoreBoardI[psi_res_UACLoot]     = 'Собрано "'+str_ui_UACLoot +'"'
+str_ScoreBoardI[psi_res_HellLoot]    = 'Собрано "'+str_ui_HellLoot+'"'
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -502,9 +502,9 @@ str_dscr[UID_HEye]              = 'Сооружение для детекции 
 str_name[UID_HTeleport]         = 'Телепорт'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Алтарь боли'
-str_dscr[UID_HAltar]            = 'Использует ресурс "'+str_ui_HellPower+'" для применения специальных способностей. '
-                                  'Генерирует ресурс "'+str_ui_HellPower+'": 1 здание дает '+str_HellPower_Add1+' в сек., 2 - '
-                                  str_HellPower_Add2+', 3 - '+str_HellPower_Add3+'. '
+str_dscr[UID_HAltar]            = 'Использует ресурс "'+str_ui_HellLoot+'" для применения специальных способностей. '
+                                  'Генерирует ресурс "'+str_ui_HellLoot+'": 1 здание дает '+str_HellLoot_Add1+' в сек., 2 - '
+                                  str_HellLoot_Add2+', 3 - '+str_HellLoot_Add3+'. '
                                   str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Адский командный центр'
 str_dscr[UID_HCommandCenter]    = 'Проклятый командный центр'
@@ -583,7 +583,7 @@ str_dscr[UID_URadar]            = 'Раскрывает карту и обнар
 str_name[UID_UAcademy]          = 'Академия UAC'
 str_dscr[UID_UAcademy]          = 'Использует ресурс "' + str_ui_UACLoot + '" для применения специальных способностей'
 str_name[UID_UHPowerConductor]  = 'Проводник адской силы'
-str_dscr[UID_UHPowerConductor]  = 'Использует ресурс "' + str_ui_HellPower + '" для применения специальных способностей'
+str_dscr[UID_UHPowerConductor]  = 'Использует ресурс "' + str_ui_HellLoot + '" для применения специальных способностей'
 str_name[UID_URMStation]        = 'Станция ракетного залпа'
 str_dscr[UID_URMStation]        = 'Позволяет наносить мощный ракетный удар'
 str_name[UID_Sergant]           = 'Сержант'
@@ -1126,8 +1126,8 @@ HK_test_FogToggle    +str_dscr[iAct_Observer_POV]
 HK_test_DrawToggle   +'вкл./выкл. графическую подсистему'
 HK_test_NullUpgrades +'отменить все улучшения для текущего игрока'
 HK_test_BePlayers    +'установить текущего игрока'
-HK_test_AddHellPower +'добавить '+str_testmode_HellPower+' '+str_ui_HellPower+' текущему игроку'
-HK_test_AddUACLoot   +'добавить '+str_testmode_UACLoot  +' '+str_ui_UACLoot  +' текущему игроку'
+HK_test_AddHellLoot  +'добавить '+str_testmode_HellLoot+' '+str_ui_HellLoot+' текущему игроку'
+HK_test_AddUACLoot   +'добавить '+str_testmode_UACLoot +' '+str_ui_UACLoot +' текущему игроку'
 tc_docbr
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1220,9 +1220,9 @@ tc_docbr
 tc_orange+'ГЕНЕРАТОРЫ'+tc_default+tc_doccpt
 tc_docbr
 'Генераторы (см. "'+str_help_ImgGenerators+'") - особые объекты на карте, которые, если их захватить, повышают "'+str_ui_EnergyLevel+'". Есть 2 типа генераторов:'
-tc_docbr+'- "Стартовый" - всегда расположен рядом со стартовыми позициями игроков. Требует хотя бы '+str_map_generators_LimitS+' лимита юнитов для захвата. '
+tc_docbr+'- "Малый" - всегда расположен рядом со стартовыми позициями игроков. Требует хотя бы '+str_map_generators_LimitS+' лимита юнитов для захвата. '
 'Увеличивает "'+str_ui_EnergyLevel+'" на '+str_map_generators_EnergyS+'.'
-tc_docbr+'- "Обычный" - может быть расположен где угодно. Требует хотя бы '+str_map_generators_LimitO+' лимита юнитов для захвата. '
+tc_docbr+'- "Большой" - может быть расположен где угодно. Требует хотя бы '+str_map_generators_LimitO+' лимита юнитов для захвата. '
 'Увеличивает "'+str_ui_EnergyLevel+'" на '+str_map_generators_EnergyO+'.'
 tc_docbr+'Любой вид генераторов после захвата стребует постоянного присутствия юнитов на нем, иначе он вернется в нейтральное состояние.'
 tc_docbr
@@ -1236,10 +1236,10 @@ tc_docbr+'- Основной ресурс игры: "'+str_ui_EnergyLevel+'". П
 'Уровень энергии может быть увеличен специальными зданиями или особыми захватываемыми объектами на карте.'
 tc_docbr
 tc_docbr+'Два дополнительных ресурса, расходуемых на особые технологии и способности:'
-tc_docbr+'- '+str_ui_HellPower+' - при игре за Hell: этот ресурс автоматически пополняет здание "'+str_name[UID_HAltar]+'".'
+tc_docbr+'- '+str_ui_HellLoot+' - при игре за Hell: этот ресурс автоматически пополняет здание "'+str_name[UID_HAltar]+'".'
 'Чем больше таких зданий игрок имеет, тем быстрее пополняется ресурс. '
 'При игре за UAC: этот ресурс пополняется уничтожением вражеских юнитов и зданий Hell.'
-str_hint_MaxQuantity+str_HellPower_Max+'. '
+str_hint_MaxQuantity+str_HellLoot_Max+'. '
 tc_docbr+'- '+str_ui_UACLoot+' - этот ресурс у обоих сторон пополняется уничтожением вражеских юнитов и зданий UAC. '+str_hint_MaxQuantity+str_UACLoot_Max+'.'
 tc_docbr
 tc_docbr

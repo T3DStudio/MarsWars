@@ -152,7 +152,7 @@ begin
         player_ClearLog(p);
         log_EnergyCheckTimer:=0;
 
-        //res_HellPower:=30000;
+        //res_HellLoot:=30000;
         //res_UACLoot  :=30000;
      end;
 
@@ -965,19 +965,19 @@ begin
              begin
                 game_ScoresAddI(p,psi_res_energy_max,res_energyl_max);
 
-                if(race=r_hell)and(res_HellPower<HellPower_Max)then
-                  if((g_tick mod HellPower_AddPeriod)=p)then
+                if(race=r_hell)and(res_HellLoot<HellLoot_Max)then
+                  if((g_tick mod HellLoot_AddPeriod)=p)then
                     if(units_uid_c[UID_HAltar]>0)then
                     begin
-                       HP_prev:=res_HellPower;
+                       HP_prev:=res_HellLoot;
                        case units_uid_c[UID_HAltar] of
-                       1  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add1);
-                       2  : res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add2);
-                       else res_HellPower:=min2i(HellPower_Max,res_HellPower+HellPower_Add3);
+                       1  : res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+HellLoot_Add1);
+                       2  : res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+HellLoot_Add2);
+                       else res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+HellLoot_Add3);
                        end;
 
-                       if(HP_prev<res_HellPower)then
-                         game_ScoresAddI(p,psi_res_HellPower,res_HellPower-HP_prev);
+                       if(HP_prev<res_HellLoot)then
+                         game_ScoresAddI(p,psi_res_HellLoot,res_HellLoot-HP_prev);
                     end;
 
                 trevealed:=(units_builders_e=0){$IFDEF _FULLGAME}and(g_type=gt_scirmish){$ENDIF};

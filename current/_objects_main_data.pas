@@ -662,7 +662,7 @@ begin
    uid_islight         := true;
    uid_FastDeathHits   := 1;
    uid_FlyLevelLikeTarget:=true;
-   uid_bounty_HellPower:= 1;
+   uid_bounty_HellLoot := 1;
    uid_LevelUpTimeSecs := ptime1;
    case i of
 UID_LostSoul: begin
@@ -1250,7 +1250,7 @@ begin
    uid_ability2        := uab_Hack;
    uid_ability3        := uab_UACGeneral;
 end;
-UID_UHPowerConductor:
+UID_UHArtStorage:
 begin
    uid_MaxHits1        := 8000;
    uid_req_EnergyLevel := 1000;
@@ -1533,13 +1533,13 @@ end;
       begin
          uid_ZombieHits :=uid_MaxHits1 div 4;
          uid_SightR_Base:=max2i(uid_r+uid_r,uid_SightR_Base);
-         if(uid_race=r_hell)and(uid_bounty_HellPower=0)then uid_bounty_HellPower:=round(uid_MaxHits1/HellPower_PerHP);
-         if(uid_race=r_uac )and(uid_bounty_UACLoot  =0)then uid_bounty_UACLoot  :=round(uid_MaxHits1/HellPower_PerHP);
+         if(uid_race=r_hell)and(uid_bounty_HellLoot=0)then uid_bounty_HellLoot:=round(uid_MaxHits1/HellLoot_PerHP);
+         if(uid_race=r_uac )and(uid_bounty_UACLoot =0)then uid_bounty_UACLoot :=round(uid_MaxHits1/HellLoot_PerHP);
       end
       else
       begin
-         if(uid_race=r_hell)and(uid_bounty_HellPower=0)then uid_bounty_HellPower:=round(uid_LimitUse/ul1*HellPower_PerLimit);
-         if(uid_race=r_uac )and(uid_bounty_UACLoot  =0)then uid_bounty_UACLoot  :=round(uid_LimitUse/ul1*HellPower_PerLimit);
+         if(uid_race=r_hell)and(uid_bounty_HellLoot=0)then uid_bounty_HellLoot:=round(uid_LimitUse/ul1*HellLoot_PerLimit);
+         if(uid_race=r_uac )and(uid_bounty_UACLoot =0)then uid_bounty_UACLoot :=round(uid_LimitUse/ul1*HellLoot_PerLimit);
       end;
 
       if(uid_TransportSize=0)then
@@ -1955,27 +1955,27 @@ uab_HKeepShift      : begin
 
 uab_SphereSoul      : begin
                          ua_type         := uat_UnitAlly;
-                         ua_req_HellPower:= 1000;
+                         ua_req_HellLoot := 1000;
                       end;
 uab_SphereInvis     : begin
                          ua_type         := uat_UnitAlly;
-                         ua_req_HellPower:= 2000;
+                         ua_req_HellLoot := 2000;
                       end;
 uab_SphereInvuln    : begin
                          ua_type         := uat_UnitAlly;
-                         ua_req_HellPower:= 9000;
+                         ua_req_HellLoot := 9000;
                       end;
 uab_SphereRDamage   : begin
                          ua_type         := uat_UnitAlly;
-                         ua_req_HellPower:= 6000;
+                         ua_req_HellLoot := 6000;
                       end;
 uab_SphereDDamage   : begin
                          ua_type         := uat_UnitAlly;
-                         ua_req_HellPower:= 9000;
+                         ua_req_HellLoot := 9000;
                       end;
 uab_SphereTurbo     : begin
                          ua_type         := uat_UnitAlly;
-                         ua_req_HellPower:= 12000;
+                         ua_req_HellLoot := 12000;
                       end;
 
 uab_Bribe           : begin

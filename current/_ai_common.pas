@@ -206,7 +206,7 @@ begin
    case unit_CheckReqs(player,uid) of
    0,
    lmt_Req_Limit,
-   lmt_Req_HellPower,
+   lmt_Req_HellLoot,
    lmt_Req_UACLoot,
    lmt_Req_Energy,
    lmt_Req_MaxCount : ai_IsAvailableUID:=(player^.aip_MaxEnergy  >=g_uids[uid].uid_req_EnergyLevel)

@@ -1494,8 +1494,8 @@ false : if(units_unitProds_c<=0)then begin unit_CheckReqs:=lmt_unit_NeedProdUnit
       or((armylimit+prod_unit_Limit+uid_LimitUse)> MaxPlayerLimit)then
       begin unit_CheckReqs:=lmt_Req_Limit;exit;end;
 
-      if(uid_req_HellPower>0)and(res_HellPower<uid_req_HellPower)then begin unit_CheckReqs:=lmt_Req_HellPower;exit;end;
-      if(uid_req_UACLoot  >0)and(res_UACLoot  <uid_req_UACLoot  )then begin unit_CheckReqs:=lmt_Req_UACLoot;  exit;end;
+      if(uid_req_HellLoot>0)and(res_HellLoot<uid_req_HellLoot)then begin unit_CheckReqs:=lmt_Req_HellLoot;exit;end;
+      if(uid_req_UACLoot >0)and(res_UACLoot <uid_req_UACLoot )then begin unit_CheckReqs:=lmt_Req_UACLoot; exit;end;
 
       if(uid_isbuilding and(res_energyl_max<=0))
       or((uid_req_EnergyLevel>0)and(res_energyl_cur<0))then begin unit_CheckReqs:=lmt_Req_Energy;exit;end;
@@ -2545,7 +2545,7 @@ lmt_Req_MaxCount      : ParseLogMessage:=str_warn_MaxCountReached;
 lmt_Req_MaxBuilders   : ParseLogMessage:=str_warn_MaxBuildersReached;
 lmt_Req_Common,
 lmt_Req_Energy,
-lmt_Req_HellPower,
+lmt_Req_HellLoot,
 lmt_Req_UACLoot,
 lmt_unit_MaxLevel,
 lmt_prod_Unavailable,
@@ -2555,7 +2555,7 @@ lmt_prod_BadPlace     : begin
                            case lm_type of
                            lmt_Req_Common      : ParseLogMessage:=str_warn_Req_Common;
                            lmt_Req_Energy      : ParseLogMessage:=str_warn_Req_Energy;
-                           lmt_Req_HellPower   : ParseLogMessage:=str_warn_Req_HellPower;
+                           lmt_Req_HellLoot    : ParseLogMessage:=str_warn_Req_HellLoot;
                            lmt_Req_UACLoot     : ParseLogMessage:=str_warn_Req_UACLoot;
                            lmt_unit_MaxLevel   : ParseLogMessage:=str_warn_unit_MaxLevel;
                            lmt_prod_Unavailable: ParseLogMessage:=str_warn_prod_Unavailable;

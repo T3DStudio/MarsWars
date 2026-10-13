@@ -970,8 +970,8 @@ begin
                                                                                                                                     ,ta_RU,255,ui_cenergy[res_energyl_cur<=0] );
           if(UIPlayer=LocalPlayer)or(rpls_pstate<>rpls_read)then
           begin
-             draw_text(tar,ui_EnergyX,ui_HellPowerY,str_ui_HellPower  +': '+tc_default+i2s(res_HellPower)                           ,ta_RU,255,ui_cenergy[res_HellPower>=HellPower_Max]);
-             draw_text(tar,ui_EnergyX,ui_UACLootY  ,str_ui_UACLoot    +': '+tc_default+i2s(res_UACLoot  )                           ,ta_RU,255,ui_cenergy[res_UACLoot  >=UACLoot_Max  ]);
+             draw_text(tar,ui_EnergyX,ui_HellLootY,str_ui_HellLoot  +': '+tc_default+i2s(res_HellLoot)                              ,ta_RU,255,ui_cenergy[res_HellLoot>=HellLoot_Max]);
+             draw_text(tar,ui_EnergyX,ui_UACLootY ,str_ui_UACLoot   +': '+tc_default+i2s(res_UACLoot )                              ,ta_RU,255,ui_cenergy[res_UACLoot >=UACLoot_Max ]);
           end;
 
           draw_text(tar,ui_ArmyX  ,ui_ArmyY0    ,str_ui_LimitArmy     +': '+tc_default+limit2s(limit,MinUnitLimit)+tc_white+' / '+tc_gray+ui_limitstr

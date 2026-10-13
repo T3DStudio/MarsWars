@@ -243,8 +243,8 @@ str_ui_LimitArmy              = tc_orange+'Army limit'  +tc_white
 str_ui_LimitBuildings         = tc_red   +str_ui_Tab[tab_Units]+tc_white
 str_ui_LimitUnits             = tc_gray  +str_ui_Tab[tab_Buildings]+tc_white
 str_ui_EnergyLevel            = tc_aqua  +'Energy level'+tc_white
-str_ui_HellPower              = tc_yellow+'Hell power'  +tc_white
-str_ui_UACLoot                = tc_lime  +'UAC Loot'    +tc_white
+str_ui_HellLoot               = tc_yellow+'Hell Artifacts'+tc_white
+str_ui_UACLoot                = tc_lime  +'UAC Loot'      +tc_white
 str_ui_objectives             = 'Objectives'
 str_ui_SelectTarget           = 'Select target for '
 str_ui_SelectBPlace           = 'Choose a location to build '
@@ -259,7 +259,7 @@ str_warn_prod_BadOrder        = 'Invalid production order'
 str_warn_prod_AllBusy         = 'All production is busy'
 str_warn_prod_Unavailable     = 'Unavailable for production'
 str_warn_Req_Energy           = 'Need more energy'
-str_warn_Req_HellPower        = 'Need more "Hell Power"'
+str_warn_Req_HellLoot         = 'Need more "Hell Artifacts"'
 str_warn_Req_UACLoot          = 'Need more "UAC Loot"'
 str_warn_Req_Common           = 'Check requirements'
 str_warn_unit_MaxLevel        = 'Maximum level reached'
@@ -410,7 +410,7 @@ str_help_ImgKotH              = 'im. #5 KotH area'
 str_doc_HotKey                = 'Hot key: '
 str_doc_Attributes            = 'Attributes: '
 str_doc_ReqEnergy             = 'Energy required: '
-str_doc_ReqHellPower          = 'Hell Power required: '
+str_doc_ReqHellLoot           = 'Hell Artifacts required: '
 str_doc_ReqUACLoot            = 'UAC Loot required: '
 str_doc_ProdTime              = 'Build time: '
 str_doc_Limit                 = 'Limit used: '
@@ -434,7 +434,7 @@ str_doc_LevelArmorBonus       = 'Bonus to armor per level: '
 str_doc_LevelDamageBonus      = 'Bonus to impact per level: '
 str_doc_LevelPainSBonus       = 'Bonus to PainState threshold per level: '
 str_doc_LevelRegenBonus       = 'Bonus to regeneration per level: '
-str_doc_BountyHellPower       = 'Hell Power bounty: '
+str_doc_BountyHellLoot        = 'Hell Artifacts bounty: '
 str_doc_BountyUACLoot         = 'UAC Loot bounty: '
 str_doc_ZombieUID             = 'Zombie-version: '
 str_doc_ZombieHits            = 'Hits threshold for zombification: '
@@ -471,7 +471,7 @@ str_ScoreBoardC[psc_InGameTime]      = 'Defeat time'
 
 str_ScoreBoardI[psi_res_energy_max]  = 'Max energy level'
 str_ScoreBoardI[psi_res_UACLoot]     = 'Collected '+str_ui_UACLoot
-str_ScoreBoardI[psi_res_HellPower]   = 'Collected '+str_ui_HellPower
+str_ScoreBoardI[psi_res_HellLoot]    = 'Collected '+str_ui_HellLoot
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -502,9 +502,9 @@ str_dscr[UID_HEye]              = 'Detection and scouting structure.'
 str_name[UID_HTeleport]         = 'Teleport'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Altar of Pain'
-str_dscr[UID_HAltar]            = 'Uses "' + str_ui_HellPower + '" to perform special abilities. '
-                                  'Generates "' + str_ui_HellPower + '": 1 building gives '+str_HellPower_Add1+' pres sec., 2 - '
-                                  str_HellPower_Add2+', 3 - '+str_HellPower_Add3+'. '
+str_dscr[UID_HAltar]            = 'Uses "' + str_ui_HellLoot + '" to perform special abilities. '
+                                  'Generates "' + str_ui_HellLoot + '": 1 building gives '+str_HellLoot_Add1+' pres sec., 2 - '
+                                  str_HellLoot_Add2+', 3 - '+str_HellLoot_Add3+'. '
                                   str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Hell Command Center'
 str_dscr[UID_HCommandCenter]    = 'Corrupted Command Center'
@@ -582,8 +582,8 @@ str_name[UID_URadar]            = 'Radar'
 str_dscr[UID_URadar]            = 'Reveals the map and detects invisible enemy units'
 str_name[UID_UAcademy]          = 'UAC Academy'
 str_dscr[UID_UAcademy]          = 'Uses "' + str_ui_UACLoot + '" to perform special abilities'
-str_name[UID_UHPowerConductor]  = 'Hell Power Conductor'
-str_dscr[UID_UHPowerConductor]  = 'Uses "' + str_ui_HellPower + '" to perform special abilities'
+str_name[UID_UHArtifactsStorage]= 'Hell Artifacts Storage'
+str_dscr[UID_UHArtifactsStorage]= 'Uses "' + str_ui_HellLoot + '" to perform special abilities'
 str_name[UID_URMStation]        = 'Rocket Launcher Station'
 str_dscr[UID_URMStation]        = 'Delivers a powerful missile strike'
 str_name[UID_Sergant]           = 'Shotguner'
@@ -1122,8 +1122,8 @@ HK_test_FogToggle    +'toggle fog of war'
 HK_test_DrawToggle   +'toggle screen redraw'
 HK_test_NullUpgrades +'cancel all upgrades for current player'
 HK_test_BePlayers    +'set current player'
-HK_test_AddHellPower +'add '+str_testmode_HellPower+' '+str_ui_HellPower+' to current player'
-HK_test_AddUACLoot   +'add '+str_testmode_UACLoot  +' '+str_ui_UACLoot  +' to current player'
+HK_test_AddHellLoot  +'add '+str_testmode_HellLoot+' '+str_ui_HellLoot+' to current player'
+HK_test_AddUACLoot   +'add '+str_testmode_UACLoot +' '+str_ui_UACLoot +' to current player'
 tc_docbr
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1216,8 +1216,8 @@ tc_docbr
 tc_orange+'GENERATORS'+tc_default+tc_doccpt
 tc_docbr
 'Generators (see "'+str_help_ImgGenerators+'") - special objects on the game map that, when captured, increase "'+str_ui_EnergyLevel+'". There are 2 types of generators:'
-tc_docbr+'- "Starter" generator - appears at players base in "Scirmish" game. Required at least '+str_map_generators_LimitS+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyS+'.'
-tc_docbr+'- "Regular" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
+tc_docbr+'- "Small" generator - appears at players base in "Scirmish" game. Required at least '+str_map_generators_LimitS+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyS+'.'
+tc_docbr+'- "Big" generator - appears at any map locations. Required at least '+str_map_generators_LimitO+' unit limit to be captured. Increase "'+str_ui_EnergyLevel+'" by '+str_map_generators_EnergyO+'.'
 tc_docbr+'Both types of generators requires holding units inside it, otherwise generator become back to neutral state.'
 tc_docbr
 tc_docbr
@@ -1230,10 +1230,10 @@ tc_docbr+'- The main resource of the game is the "'+str_ui_EnergyLevel+'". Almos
 'The energy level can be increased by specific buildings, as well as special objects on the game map that need to be captured and held.'
 tc_docbr
 tc_docbr+'There are also 2 additional types of resources used for special technologies and abilities:'
-tc_docbr+'- '+str_ui_HellPower+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.'
+tc_docbr+'- '+str_ui_HellLoot+' - when playing as the Hell faction, this resource is automatically replenished by the "Altar of Pain" building.'
 'The replenishment rate increases with each additional "Altar of Pain". '
 'When playing as UAC, the resource is generated from destroyed enemy units and Hell structures.'
-str_hint_MaxQuantity+str_HellPower_Max+'. '
+str_hint_MaxQuantity+str_HellLoot_Max+'. '
 tc_docbr+'- '+str_ui_UACLoot+' - this resource is acquired by both factions through the destruction of enemy UAC units and buildings. '+str_hint_MaxQuantity+str_UACLoot_Max+'.'
 tc_docbr
 tc_docbr

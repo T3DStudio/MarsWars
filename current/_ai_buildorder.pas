@@ -362,8 +362,8 @@ begin
      case race of
      r_hell: SetBuildUID1(UID_HAltar,aip_MaxSuper);
      r_uac : begin
-                if(res_UACLoot  >1000)then SetBuildUID1(UID_UAcademy        ,1);
-                if(res_HellPower>1000)then SetBuildUID1(UID_UHPowerConductor,1);
+                if(res_UACLoot >1000)then SetBuildUID1(UID_UAcademy    ,1);
+                if(res_HellLoot>1000)then SetBuildUID1(UID_UHArtStorage,1);
                 SetBuildUID1(UID_URMStation,aip_MaxSuper);
              end;
      end;

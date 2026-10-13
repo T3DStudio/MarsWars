@@ -24,17 +24,26 @@ cx,cy:single;
 begin
    if(menu_BackgroundSC<>nil)and(menu_BackgroundSC<>menu_Background)then sdl_FreeSurface(menu_BackgroundSC);
 
-   if(menu_scale)then
+   if(menu_scale){and((vid_vw<>menu_w)or(vid_vh<>menu_h))}then
    begin
       cx:=vid_vw/menu_Surface^.w;
       cy:=vid_vh/menu_Surface^.h;
       if(cx>cy)
       then menu_Surface_sc:=cy
       else menu_Surface_sc:=cx;
-      menu_Surface_x   :=(vid_vw-round(menu_w*menu_Surface_sc)) div 2;
-      menu_Surface_y   :=(vid_vh-round(menu_h*menu_Surface_sc)) div 2;
-      menu_BackgroundSC:=zoomSurface(menu_Background,menu_Surface_sc,menu_Surface_sc,0);
-      menu_Surface_sc  :=1/menu_Surface_sc;
+      if(menu_Surface_sc=1)then
+      begin
+         menu_Surface_x   :=(vid_vw-menu_w) div 2;
+         menu_Surface_y   :=(vid_vh-menu_h) div 2;
+         menu_BackgroundSC:=menu_Background;
+      end
+      else
+      begin
+         menu_Surface_x   :=(vid_vw-round(menu_w*menu_Surface_sc)) div 2;
+         menu_Surface_y   :=(vid_vh-round(menu_h*menu_Surface_sc)) div 2;
+         menu_BackgroundSC:=zoomSurface(menu_Background,menu_Surface_sc,menu_Surface_sc,0);
+         menu_Surface_sc  :=1/menu_Surface_sc;
+      end;
    end
    else
    begin

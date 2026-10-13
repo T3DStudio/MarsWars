@@ -163,10 +163,10 @@ begin
                    begin
                       if(race<>r_hell)then
                       begin
-                         armor:=res_HellPower;
-                         res_HellPower:=min2i(HellPower_Max,res_HellPower+uid_bounty_HellPower);
-                         if(res_HellPower>armor)then
-                           game_ScoresAddI(playerDDealer,psi_res_HellPower,res_HellPower-armor);
+                         armor:=res_HellLoot;
+                         res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+uid_bounty_HellLoot);
+                         if(res_HellLoot>armor)then
+                           game_ScoresAddI(playerDDealer,psi_res_HellLoot,res_HellLoot-armor);
                       end;
 
                       armor:=res_UACLoot;
@@ -236,9 +236,9 @@ begin
             unit_morph:=lmt_Req_Energy;
             exit;
          end;
-         if(res_HellPower<pNewUID^.uid_req_HellPower)then
+         if(res_HellLoot<pNewUID^.uid_req_HellLoot)then
          begin
-            unit_morph:=lmt_Req_HellPower;
+            unit_morph:=lmt_Req_HellLoot;
             exit;
          end;
          if(res_UACLoot<pNewUID^.uid_req_UACLoot)then
@@ -278,7 +278,7 @@ begin
       units_all_c-=1;
       unit_add(x,y,unum,ouid,playeri,ocomplete,summoned,ulevel);
 
-      //res_HellPower-=pNewUID^.uid_req_HellPower;
+      //res_HellLoot-=pNewUID^.uid_req_HellLoot;
       //res_UACLoot  -=pNewUID^.uid_req_UACLoot;
    end;
 
@@ -1845,8 +1845,8 @@ begin
          if( ua_reload       >0)and(rld>0)then unit_AbilityCheck:=lmt_ability_reload;
          if((ua_req_uid      >0)and(units_uid_c[ua_req_uid ]   <=0))
          or((ua_req_upgr     >0)and(upgrs_cur  [ua_req_upgr]   <=0))then unit_AbilityCheck:=lmt_Req_Common;
-         if( ua_req_HellPower>0)and(ua_req_HellPower>res_HellPower )then unit_AbilityCheck:=lmt_Req_HellPower;
-         if( ua_req_UACLoot  >0)and(ua_req_UACLoot  >res_UACLoot   )then unit_AbilityCheck:=lmt_Req_UACLoot;
+         if( ua_req_HellLoot >0)and(ua_req_HellLoot>res_HellLoot )then unit_AbilityCheck:=lmt_Req_HellLoot;
+         if( ua_req_UACLoot  >0)and(ua_req_UACLoot >res_UACLoot  )then unit_AbilityCheck:=lmt_Req_UACLoot;
          if( ua_type=uat_passive)then exit;
       end;
 
@@ -1996,8 +1996,8 @@ begin
                               begin
                                  rld:=ua_reload;
                                  if(ua_rldDec_level>0)then rld:=max2i(0,rld-(ua_rldDec_level*level));
-                                 player^.res_HellPower-=ua_req_HellPower;
-                                 player^.res_UACLoot  -=ua_req_UACLoot;
+                                 player^.res_HellLoot-=ua_req_HellLoot;
+                                 player^.res_UACLoot -=ua_req_UACLoot;
                               end;
                            end;
       uab_HKeepShift     : begin
@@ -2115,8 +2115,8 @@ begin
                               then GameLog_ReqMsg(playeri,aid,lmt_argt_ability,unit_AbilityExec,x,y)
                               else
                               begin
-                                 player^.res_HellPower-=ua_req_HellPower;
-                                 player^.res_UACLoot  -=ua_req_UACLoot;
+                                 player^.res_HellLoot-=ua_req_HellLoot;
+                                 player^.res_UACLoot -=ua_req_UACLoot;
                               end;
                            end;
 

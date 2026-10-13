@@ -245,7 +245,7 @@ lmt_unit_MaxLevel      = 41;
 lmt_upgrade_InProgress = 42;
 lmt_upgrade_complete   = 43;
 lmt_Req_Energy         = 44;
-lmt_Req_HellPower      = 45;
+lmt_Req_HellLoot       = 45;
 lmt_Req_UACLoot        = 46;
 lmt_Req_Common         = 47;
 lmt_Req_Limit          = 48;
@@ -479,6 +479,7 @@ aif_ability_TowerRush  : cardinal = 1 shl 17;
 aif_ability_invis      : cardinal = 1 shl 18;
 aif_cheat_VisBuildings : cardinal = 1 shl 19;
 aif_cheat_VisUnits     : cardinal = 1 shl 20;
+aif_camp_IgnoreKotH    : cardinal = 1 shl 21;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -788,7 +789,7 @@ UID_UGTurret           = 57;
 UID_UATurret           = 58;
 UID_URadar             = 59;
 UID_UAcademy           = 60;
-UID_UHPowerConductor   = 61;
+UID_UHArtStorage       = 61;
 UID_URMStation         = 62;
 
 UID_UPortal            = 65;
@@ -963,7 +964,7 @@ psc_Last               = 13;
 
 psi_res_energy_max     = 0;
 psi_res_UACLoot        = 1;
-psi_res_HellPower      = 2;
+psi_res_HellLoot       = 2;
 
 psi_Last               = 2;
 
@@ -1012,13 +1013,13 @@ regen_period1          = regen_period/fr_fps1;
 order_period           = fr_fpsh+1;
 MinVisionTime          = fr_fps2;
 
-HellPower_Max          = 15000;
-HellPower_PerLimit     = 100;
-HellPower_PerHP        = 10;
-HellPower_AddPeriod    = fr_fps1;
-HellPower_Add1         = HellPower_PerLimit;
-HellPower_Add2         = HellPower_Add1+(HellPower_Add1 div 2);
-HellPower_Add3         = HellPower_Add1*2;
+HellLoot_Max           = 15000;
+HellLoot_PerLimit      = 100;
+HellLoot_PerHP         = 10;
+HellLoot_AddPeriod     = fr_fps1;
+HellLoot_Add1          = HellLoot_PerLimit;
+HellLoot_Add2          = HellLoot_Add1+(HellLoot_Add1 div 2);
+HellLoot_Add3          = HellLoot_Add1*2;
 UACLoot_Max            = 30000;
 
 UACStrike_Revealing_sec= 5;
@@ -1280,7 +1281,7 @@ iAct_test_BePlayer4    = 221;
 iAct_test_BePlayer5    = 222;
 iAct_test_BePlayer6    = 223;
 iAct_test_BePlayer7    = 224;
-iAct_test_AddHellPower = 225;
+iAct_test_AddHellLoot  = 225;
 iAct_test_AddUACLoot   = 226;
 iAct_test_debug0       = 227;
 iAct_test_debug1       = 228;
@@ -2090,8 +2091,8 @@ LiquidAnimCount        = 4;
 //  TEST MODE
 //
 
-testmode_HellPower     = 1000;
-testmode_UACLoot       = testmode_HellPower;
+testmode_HellLoot      = 1000;
+testmode_UACLoot       = testmode_HellLoot;
 {$ENDIF}
 
 {$ELSE }

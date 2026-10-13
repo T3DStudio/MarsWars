@@ -502,7 +502,7 @@ begin
    'str_warn_prod_AllBusy'              : lang_Key2StrVar:= @str_warn_prod_AllBusy;
    'str_warn_prod_Unavailable'          : lang_Key2StrVar:= @str_warn_prod_Unavailable;
    'str_warn_Req_Energy'                : lang_Key2StrVar:= @str_warn_Req_Energy;
-   'str_warn_Req_HellPower'             : lang_Key2StrVar:= @str_warn_Req_HellPower;
+   'str_warn_Req_HellLoot'              : lang_Key2StrVar:= @str_warn_Req_HellLoot;
    'str_warn_Req_UACLoot'               : lang_Key2StrVar:= @str_warn_Req_UACLoot;
    'str_warn_Req_Common'                : lang_Key2StrVar:= @str_warn_Req_Common;
    'str_warn_unit_MaxLevel'             : lang_Key2StrVar:= @str_warn_unit_MaxLevel;
@@ -558,7 +558,7 @@ begin
    'str_ui_LimitBuildings'              : lang_Key2StrVar:= @str_ui_LimitBuildings;
    'str_ui_LimitUnits'                  : lang_Key2StrVar:= @str_ui_LimitUnits;
    'str_ui_EnergyLevel'                 : lang_Key2StrVar:= @str_ui_EnergyLevel;
-   'str_ui_HellPower'                   : lang_Key2StrVar:= @str_ui_HellPower;
+   'str_ui_HellLoot'                    : lang_Key2StrVar:= @str_ui_HellLoot;
    'str_ui_UACLoot'                     : lang_Key2StrVar:= @str_ui_UACLoot;
    'str_ui_objectives'                  : lang_Key2StrVar:= @str_ui_objectives;
    'str_ui_SelectTarget'                : lang_Key2StrVar:= @str_ui_SelectTarget;
@@ -677,7 +677,7 @@ begin
    'str_doc_HotKey'                     : lang_Key2StrVar:= @str_doc_HotKey;
    'str_doc_Attributes'                 : lang_Key2StrVar:= @str_doc_Attributes;
    'str_doc_ReqEnergy'                  : lang_Key2StrVar:= @str_doc_ReqEnergy;
-   'str_doc_ReqHellPower'               : lang_Key2StrVar:= @str_doc_ReqHellPower;
+   'str_doc_ReqHellLoot'                : lang_Key2StrVar:= @str_doc_ReqHellLoot;
    'str_doc_ReqUACLoot'                 : lang_Key2StrVar:= @str_doc_ReqUACLoot;
    'str_doc_ProdTime'                   : lang_Key2StrVar:= @str_doc_ProdTime;
    'str_doc_Limit'                      : lang_Key2StrVar:= @str_doc_Limit;
@@ -701,7 +701,7 @@ begin
    'str_doc_LevelDamageBonus'           : lang_Key2StrVar:= @str_doc_LevelDamageBonus;
    'str_doc_LevelPainSBonus'            : lang_Key2StrVar:= @str_doc_LevelPainSBonus;
    'str_doc_LevelRegenBonus'            : lang_Key2StrVar:= @str_doc_LevelRegenBonus;
-   'str_doc_BountyHellPower'            : lang_Key2StrVar:= @str_doc_BountyHellPower;
+   'str_doc_BountyHellLoot'             : lang_Key2StrVar:= @str_doc_BountyHellLoot;
    'str_doc_BountyUACLoot'              : lang_Key2StrVar:= @str_doc_BountyUACLoot;
    'str_doc_ZombieUID'                  : lang_Key2StrVar:= @str_doc_ZombieUID;
    'str_doc_ZombieHits'                 : lang_Key2StrVar:= @str_doc_ZombieHits;
@@ -738,7 +738,7 @@ begin
 
    'str_ScoreBoardI[psi_res_energy_max]': lang_Key2StrVar:= @str_ScoreBoardI[psi_res_energy_max];
    'str_ScoreBoardI[psi_res_UACLoot]'   : lang_Key2StrVar:= @str_ScoreBoardI[psi_res_UACLoot   ];
-   'str_ScoreBoardI[psi_res_HellPower]' : lang_Key2StrVar:= @str_ScoreBoardI[psi_res_HellPower ];
+   'str_ScoreBoardI[psi_res_HellLoot]'  : lang_Key2StrVar:= @str_ScoreBoardI[psi_res_HellLoot  ];
 
    'str_Camp_Difficulty'                : lang_Key2StrVar:= @str_Camp_Difficulty;
    'str_Camp_DifficultyL[0]'            : lang_Key2StrVar:= @str_Camp_DifficultyL[0];
@@ -996,8 +996,8 @@ begin
    'str_dscr[UID_URadar]'               : lang_Key2StrVar:= @g_uids[UID_URadar           ].uid_str_BaseDescript;
    'str_name[UID_UAcademy]'             : lang_Key2StrVar:= @g_uids[UID_UAcademy         ].uid_str_name;
    'str_dscr[UID_UAcademy]'             : lang_Key2StrVar:= @g_uids[UID_UAcademy         ].uid_str_BaseDescript;
-   'str_name[UID_UHPowerConductor]'     : lang_Key2StrVar:= @g_uids[UID_UHPowerConductor ].uid_str_name;
-   'str_dscr[UID_UHPowerConductor]'     : lang_Key2StrVar:= @g_uids[UID_UHPowerConductor ].uid_str_BaseDescript;
+   'str_name[UID_UHArtifactsStorage]'   : lang_Key2StrVar:= @g_uids[UID_UHArtStorage     ].uid_str_name;
+   'str_dscr[UID_UHArtifactsStorage]'   : lang_Key2StrVar:= @g_uids[UID_UHArtStorage     ].uid_str_BaseDescript;
    'str_name[UID_URMStation]'           : lang_Key2StrVar:= @g_uids[UID_URMStation       ].uid_str_name;
    'str_dscr[UID_URMStation]'           : lang_Key2StrVar:= @g_uids[UID_URMStation       ].uid_str_BaseDescript;
    'str_name[UID_Sergant]'              : lang_Key2StrVar:= @g_uids[UID_Sergant          ].uid_str_name;
@@ -1348,9 +1348,9 @@ begin
    vl:=StringReplace(vl,'str_version'    ,str_version     ,replace_a);
    vl:=StringReplace(vl,'fileExt_Scrshot',fileExt_Scrshot ,replace_a);
 
-   vl:=StringReplace(vl,'str_HellPower_Max'           ,i2s(HellPower_Max)          ,replace_a);
+   vl:=StringReplace(vl,'str_HellLoot_Max'            ,i2s(HellLoot_Max)           ,replace_a);
    vl:=StringReplace(vl,'str_UACLoot_Max'             ,i2s(UACLoot_Max)            ,replace_a);
-   vl:=StringReplace(vl,'str_testmode_HellPower'      ,i2s(testmode_HellPower)     ,replace_a);
+   vl:=StringReplace(vl,'str_testmode_HellLoot'       ,i2s(testmode_HellLoot)      ,replace_a);
    vl:=StringReplace(vl,'str_testmode_UACLoot'        ,i2s(testmode_UACLoot  )     ,replace_a);
    vl:=StringReplace(vl,'str_PlayerMaxBuilders'       ,i2s(PlayerMaxBuilders)      ,replace_a);
    vl:=StringReplace(vl,'str_detection_time_sec'      ,i2s(detection_time_sec)     ,replace_a);
@@ -1371,9 +1371,9 @@ begin
    vl:=StringReplace(vl,'str_keyPoint_CTime_Def_Sec'  ,i2s(keyPoint_CTime_Def_Sec) ,replace_a);
    vl:=StringReplace(vl,'str_keyPoint_mcN'            ,i2s(keyPoint_mcN)           ,replace_a);
 
-   vl:=StringReplace(vl,'str_HellPower_Add1'          ,i2s(HellPower_Add1)         ,replace_a);
-   vl:=StringReplace(vl,'str_HellPower_Add2'          ,i2s(HellPower_Add2)         ,replace_a);
-   vl:=StringReplace(vl,'str_HellPower_Add3'          ,i2s(HellPower_Add3)         ,replace_a);
+   vl:=StringReplace(vl,'str_HellLoot_Add1'           ,i2s(HellLoot_Add1)          ,replace_a);
+   vl:=StringReplace(vl,'str_HellLoot_Add2'           ,i2s(HellLoot_Add2)          ,replace_a);
+   vl:=StringReplace(vl,'str_HellLoot_Add3'           ,i2s(HellLoot_Add3)          ,replace_a);
 
    vl:=StringReplace(vl,'str_map_generators_EnergyO'  ,i2s(map_generators_EnergyO) ,replace_a);
    vl:=StringReplace(vl,'str_map_generators_EnergyS'  ,i2s(map_generators_EnergyS) ,replace_a);
@@ -1466,7 +1466,7 @@ begin
    vl:=StringReplace(vl,'HK_test_NullUpgrades' ,DocHelp_GetHotKeys([iAct_test_NullUpgrades   ]),replace_a);
    vl:=StringReplace(vl,'HK_test_BePlayers'    ,DocHelp_GetHotKeys([iAct_test_BePlayer0..
                                                                     iAct_test_BePlayer7      ]),replace_a);
-   vl:=StringReplace(vl,'HK_test_AddHellPower' ,DocHelp_GetHotKeys([iAct_test_AddHellPower   ]),replace_a);
+   vl:=StringReplace(vl,'HK_test_AddHellLoot'  ,DocHelp_GetHotKeys([iAct_test_AddHellLoot    ]),replace_a);
    vl:=StringReplace(vl,'HK_test_AddUACLoot'   ,DocHelp_GetHotKeys([iAct_test_AddUACLoot     ]),replace_a);
 
    if(pos('str_'      ,vl)>0)then writeln('str_ "'      ,vl,'"');

@@ -388,7 +388,7 @@ ui_ScoreBoardY    : integer = 0;
 ui_SysMessageY    : integer = 0;
 ui_EnergyX        : integer = 0;
 ui_EnergyY        : integer = 0;
-ui_HellPowerY     : integer = 0;
+ui_HellLootY      : integer = 0;
 ui_UACLootY       : integer = 0;
 ui_ArmyX          : integer = 0;
 ui_ArmyY0         : integer = 0;
@@ -1034,7 +1034,7 @@ str_help_ImgKotH,
 str_doc_HotKey,
 str_doc_Attributes,
 str_doc_ReqEnergy,
-str_doc_ReqHellPower,
+str_doc_ReqHellLoot,
 str_doc_ReqUACLoot,
 str_doc_ProdTime,
 str_doc_Limit,
@@ -1058,7 +1058,7 @@ str_doc_LevelArmorBonus,
 str_doc_LevelDamageBonus,
 str_doc_LevelPainSBonus,
 str_doc_LevelRegenBonus,
-str_doc_BountyHellPower,
+str_doc_BountyHellLoot,
 str_doc_BountyUACLoot,
 str_doc_ZombieUID,
 str_doc_ZombieHits,
@@ -1279,7 +1279,7 @@ str_warn_prod_BadOrder,
 str_warn_prod_CD,
 str_warn_prod_Unavailable,
 str_warn_Req_Energy,
-str_warn_Req_HellPower,
+str_warn_Req_HellLoot,
 str_warn_Req_UACLoot,
 str_warn_Req_Common,
 str_warn_unit_MaxLevel,
@@ -1342,7 +1342,7 @@ str_ui_LimitArmy,
 str_ui_LimitBuildings,
 str_ui_LimitUnits,
 str_ui_EnergyLevel,
-str_ui_HellPower,
+str_ui_HellLoot,
 str_ui_UACLoot,
 str_ui_objectives,
 str_ui_SelectTarget,

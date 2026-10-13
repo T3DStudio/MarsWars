@@ -66,14 +66,14 @@ General:
 - post-match statistics have been added;
 - added a short Hell-vs-Hell training campaign;
 
-- two new resource types and special technologies that utilize them have been added to the game: "Hell Power" and "UAC Loot":
--- "Hell Power," when playing as Hell: automatically replenished with the "Altar of Pain" building - one building provides 100 units per second, two - 150, three - 200; more than three cannot be built; the building takes up 8 limit, which should force the player to choose between playing a large army or a smaller army reinforced with "magic";
+- two new resource types and special technologies that utilize them have been added to the game: "Hell Artifacts" and "UAC Loot":
+-- "Hell Artifacts," when playing as Hell: automatically replenished with the "Altar of Pain" building - one building provides 100 units per second, two - 150, three - 200; more than three cannot be built; the building takes up 8 limit, which should force the player to choose between playing a large army or a smaller army reinforced with "magic";
 The resource is spent on using special abilities from the "Altar of Pain" itself - 3 spheres from Sculltag:
 'Damage Resistance Sphere' - applied to any friendly or allied unit/building - for 30 seconds, the target takes half the damage and is immune to paint state effects;
 'Double Damage Sphere' - applied to any friendly or allied unit/building that can attack - doubles damage for 20 seconds;
 'Turbo Sphere' - can be applied to any friendly or allied unit/building - doubles EVERYTHING that can be accelerated on the unit for 15 seconds (movement speed, attack speed, regeneration speed, and if it's a building, construction speed, upgrade speed, unit creation speed, or upgrade research speed, even recharge speed after using an ability);
--- "Hell Power," when playing as UAC: This resource is awarded for killing enemy Hell units or Hell buildings;
-This resource is spent on using special abilities in the new "Hell Power Conductor" building. Three classic spheres from DOOM:
+-- "Hell Artifacts," when playing as UAC: This resource is awarded for killing enemy Hell units or Hell buildings;
+This resource is spent on using special abilities in the new "Hell Artifacts Storage" building. Three classic spheres from DOOM:
 'Soul Sphere' - applied to any friendly or allied unit - restores 1000 HP over 6 seconds;
 'Invisibility Sphere' - applied to any friendly or allied unit - grants invisibility for 60 seconds;
 'Invulnerability Sphere' - can be applied to any friendly or allied unit - grants invulnerability for 30 seconds;
@@ -88,7 +88,7 @@ This resource is spent on using special abilities in the new "UAC Academy" build
 'UAC General Rank' - applies to any UAC unit of your own or an ally; A unit becomes a "hero" - the damage dealt/received by this unit is reduced/increased by 1.5 times; a player cannot have more than four such "heroes" at a time;
 "UAC Loot" can also be spent on upgrading "Radar" and "Rocket Launcher Station" - their ability cooldowns are reduced;
 Thus, almost every matchup now has a unique technology - except for Hell-vs-Hell (the "feature" here is essentially the lack of a feature);
-Maximum amount of new resources: "Hell Power" - 15000, "UAC Loot" - 30000;
+Maximum amount of new resources: "Hell Artifacts" - 15000, "UAC Loot" - 30000;
 
 The balance hasn't changed fundamentally since the previous version, but there are many minor changes:
 - base damage for all units has been slightly reduced, making battles take longer;

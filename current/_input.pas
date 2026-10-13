@@ -152,7 +152,7 @@ begin
    input_SetAction(iAct_test_BePlayer5    ,ikt_keyboard,0           ,SDLK_KP5         );
    input_SetAction(iAct_test_BePlayer6    ,ikt_keyboard,0           ,SDLK_KP6         );
    input_SetAction(iAct_test_BePlayer7    ,ikt_keyboard,0           ,SDLK_KP7         );
-   input_SetAction(iAct_test_AddHellPower ,ikt_keyboard,iAct_Control,SDLK_UP          );
+   input_SetAction(iAct_test_AddHellLoot  ,ikt_keyboard,iAct_Control,SDLK_UP          );
    input_SetAction(iAct_test_AddUACLoot   ,ikt_keyboard,iAct_Alt    ,SDLK_UP          );
    input_SetAction(iAct_test_debug0       ,ikt_keyboard,0           ,SDLK_KP8         );
    input_SetAction(iAct_test_debug1       ,ikt_keyboard,0           ,SDLK_KP9         );
@@ -1434,8 +1434,8 @@ begin
          if(InputActionPressed(iAct_test_BePlayer5   ))then begin LocalPlayer:=5;UIPlayer:=LocalPlayer;end;
          if(InputActionPressed(iAct_test_BePlayer6   ))then begin LocalPlayer:=6;UIPlayer:=LocalPlayer;end;
          if(InputActionPressed(iAct_test_BePlayer7   ))then begin LocalPlayer:=7;UIPlayer:=LocalPlayer;end;
-         if(InputActionPressed(iAct_test_AddHellPower))then with g_PlayersGame[LocalPlayer] do res_HellPower:=min2i(res_HellPower+testmode_HellPower,HellPower_Max);
-         if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersGame[LocalPlayer] do res_UACLoot  :=min2i(res_UACLoot  +testmode_UACLoot  ,UACLoot_Max  );
+         if(InputActionPressed(iAct_test_AddHellLoot ))then with g_PlayersGame[LocalPlayer] do res_HellLoot:=min2i(res_HellLoot+testmode_HellLoot,HellLoot_Max);
+         if(InputActionPressed(iAct_test_AddUACLoot  ))then with g_PlayersGame[LocalPlayer] do res_UACLoot :=min2i(res_UACLoot +testmode_UACLoot ,UACLoot_Max );
       end;
       {$ENDIF}
 
