@@ -1245,6 +1245,12 @@ end;
 //   GAME COMMON
 //
 
+
+function game_IsEnded:boolean;
+begin
+   game_IsEnded:=(gs_win_team0<=g_status)and(g_status<=gs_win_team7);
+end;
+
 procedure player_SetDefeat(player:PTPlayerGameData);
 begin
    with player^ do
@@ -1270,11 +1276,6 @@ begin
    if(map_scenario=mc_royale)
    then game_CheckRoyalBattlePoint:=(point_dist_int(x,y,g_royal_Rx,g_royal_Ry)+sizeR)>=g_royal_RCur
    else game_CheckRoyalBattlePoint:=false;
-end;
-
-function game_IsEnded:boolean;
-begin
-   game_IsEnded:=(gs_win_team0<=g_status)and(g_status<=gs_win_team7);
 end;
 
 procedure game_SetStatusDefeatedNTeam(wteam:byte);
@@ -1835,7 +1836,7 @@ end;
 //   GAME
 //
 
-function GameGetStatus(gstatus:byte;pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte):boolean;
+function GameGetStatus(gstatus:byte;pstr:pshortstring;pcol:PTMWColor;POVPlayer:byte;forServerList:boolean=false):boolean;
 function GetLagPlayers:shortstring;
 var p:byte;
 begin
@@ -1852,11 +1853,12 @@ begin
    wt:=gstatus-gs_win_team0;
    GetWinnerPlayer:='';
    for p:=0 to LastPlayer do
-     with g_PlayersGame[p] do
-       if(team=wt)then
-         if(length(GetWinnerPlayer)=0)
-         then GetWinnerPlayer:=name
-         else GetWinnerPlayer:=str_gstat_WonTeam+b2s(wt+1);
+     if(p<map_MaxPlayers)then
+       with g_PlayersGame[p] do
+         if(team=wt)and(state>ps_none)and(not isobserver)and(not isdefeated)then
+           if(length(GetWinnerPlayer)=0)
+           then GetWinnerPlayer:=str_gstat_WonBy+name
+           else GetWinnerPlayer:=str_gstat_WonBy+str_PT_Team+' #'+b2s(wt+1);
 end;
 procedure SetS(str:shortstring;add:boolean=false);
 begin
@@ -1881,7 +1883,10 @@ begin
       case gstatus of
 gs_paused0..
 gs_paused7    : begin
-                   SetS(str_gstat_GamePaused+g_PlayersGame[gstatus-gs_paused0].name);
+                   case forServerList of
+                   false: SetS(str_gstat_GamePaused+g_PlayersGame[gstatus-gs_paused0].name);
+                   true : SetS(str_gstat_GamePaused+str_PT_Player+' #'+b2s(gstatus-gs_paused0+1));
+                   end;
                    SetC(PlayerGetColorDef(gstatus-gs_paused0));
                 end;
 gs_replayerror: begin
@@ -1898,42 +1903,46 @@ gs_replaypause: begin
                 end;
 gs_waitserver : begin
                    SetS(str_gstat_WaitForServer);
-                   if(net_cl_Hoster<=LastPlayer)then
-                   begin
-                      SetS(tc_nl2+'('+g_PlayersGame[net_cl_Hoster].name+')',true);
-                      SetC(PlayerGetColorDef(gstatus-gs_paused0));
-                   end
-                   else SetC(PlayerColorDefaultNormal);
+                   if(not forServerList)then
+                     if(net_cl_Hoster<=LastPlayer)then
+                     begin
+                        SetS(tc_nl2+'('+g_PlayersGame[net_cl_Hoster].name+')',true);
+                        SetC(PlayerGetColorDef(gstatus-gs_paused0));
+                     end
+                     else SetC(PlayerColorDefaultNormal);
                 end;
 gs_waitplayers: begin
                    SetS(str_gstat_WaitForPlayers);
-                   if(rpls_pstate<>rpls_read)then
+                   if(rpls_pstate<>rpls_read)and(not forServerList)then
                      SetS(tc_nl2+GetLagPlayers,true);
                    SetC(c_white);
                 end;
 gs_win_team0..
-gs_win_team7  : if(POVPlayer>LastPlayer)then
-                begin
-                   SetS(GetWinnerPlayer);
-                   SetC(c_ltgray);
-                end
+gs_win_team7  : if(forServerList)
+                then SetS(str_gstat_WonBy+str_PT_Team+' #'+b2s(gstatus-gs_win_team0+1))
                 else
-                  if((gstatus-gs_win_team0)=g_PlayersGame[POVPlayer].team)then
+                  if(POVPlayer>LastPlayer)then
                   begin
-                     SetS(str_gstat_Win);
-                     SetC(c_lime);
+                     SetS(GetWinnerPlayer);
+                     SetC(c_ltgray);
                   end
                   else
-                  begin
-                     SetS(str_gstat_Lose);
-                     SetC(c_red);
-                  end;
+                    if((gstatus-gs_win_team0)=g_PlayersGame[POVPlayer].team)then
+                    begin
+                       SetS(str_gstat_Win);
+                       SetC(c_lime);
+                    end
+                    else
+                    begin
+                       SetS(str_gstat_Lose);
+                       SetC(c_red);
+                    end;
       end;
 
       if(rpls_pstate=rpls_read)and(rpls_file_pos>=rpls_file_size)then SetS(tc_nl2+tc_white+str_gstat_ReplayEnd,true);
    end
    else
-     if(POVPlayer<=LastPlayer)then
+     if(POVPlayer<=LastPlayer)and(not forServerList)then
        if(g_PlayersGame[POVPlayer].isdefeated)then
        begin
           SetS(str_gstat_Lose);
@@ -2114,16 +2123,25 @@ begin
 end;
 
 function PlayerGetColorCur(player:byte;shadow:boolean):TMWColor;
+var isobs:boolean;
 begin
-   if(player>LastPlayer)then
-     case shadow of
-     true : PlayerGetColorCur:=PlayerColorDefaultShadow;
-     false: PlayerGetColorCur:=PlayerColorDefaultNormal;
-     end
+   isobs:=false;
+   if(player>LastPlayer)
+   or(player>=map_MaxPlayers)
+   then isobs:=true
    else
-     if(shadow)
-     then PlayerGetColorCur:=PlayerColorsSchemeCurShadow[player]
-     else PlayerGetColorCur:=PlayerColorsSchemeCurNormal[player];
+     with g_PlayersGame[player] do
+       if(isobserver)and(not isdefeated)
+       then isobs:=true;
+
+   case isobs of
+   true : if(shadow)
+          then PlayerGetColorCur:=PlayerColorDefaultShadow
+          else PlayerGetColorCur:=PlayerColorDefaultNormal;
+   false: if(shadow)
+          then PlayerGetColorCur:=PlayerColorsSchemeCurShadow[player]
+          else PlayerGetColorCur:=PlayerColorsSchemeCurNormal[player];
+   end;
 end;
 
 function KeyPoint_GetColor(keyPoint:byte;shadow:boolean):TMWColor;

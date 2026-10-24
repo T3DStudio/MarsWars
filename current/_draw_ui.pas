@@ -646,27 +646,27 @@ var
 tuid,
 taid:byte;
 s1  :shortstring;
-procedure AddLine(pstr:pshortstring);
+procedure UIHintAdd_Line(pstr:pshortstring);
 begin
    if(pstr=nil)
    then str_AddToUIStringList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,tc_docbr)
    else str_AddToUIStringList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,pstr^);
 end;
-procedure BrushUnitTargetHint;
+procedure UIHintAdd_BrushUnitTarget;
 begin
    if(m_UnitTargetP<>nil)then
      with m_UnitTargetP^ do
      if(hits>0)then
        with uid^ do
          if(uid_ismarker)
-         then AddLine(@uid_str_name)
+         then UIHintAdd_Line(@uid_str_name)
          else
            with g_unitsVis[unum] do
            with player^ do
            begin
-              AddLine(@uid_str_name);
+              UIHintAdd_Line(@uid_str_name);
               s1:=str_UnitAttributes(m_UnitTargetP,0);
-              AddLine(@s1);
+              UIHintAdd_Line(@s1);
               s1:='';
               STRADD(@s1,lvlstr_w,sep_wdash);
               STRADD(@s1,lvlstr_a,sep_wdash);
@@ -675,10 +675,26 @@ begin
               STRADD(@s1,str_doc_Hits+li2s(hits),sep_scomma);
               if(uid_gen_EnergyLevel>0)then
                 STRADD(@s1,str_hint_IncEnergyLevel+'('+tc_aqua+'+'+i2s(uid_gen_EnergyLevel)+tc_default+')',sep_scomma);
-              AddLine(@s1);
+              UIHintAdd_Line(@s1);
               s1:=tc_white+'('+ui_TeamRace(team,race)+chr(playeri)+name+tc_white+')';
-              AddLine(@s1);
+              UIHintAdd_Line(@s1);
            end;
+end;
+procedure UIHintAdd_ReqLine(req:byte);
+var
+tlog  :TLogMes;
+tcolor:pcardinal;
+begin
+   if(req=0)then exit;
+   FillChar(tlog,SizeOf(tlog),0);
+   tlog.lm_type:=req;
+   s1:=ParseLogMessage(@tlog,@tcolor);
+   if(length(s1)>0)then
+   begin
+      UIHintAdd_Line(nil);
+      s1:=tc_red+'! '+s1+' !';
+      UIHintAdd_Line(@s1);
+   end;
 end;
 begin
    case m_uifocus of
@@ -687,27 +703,27 @@ begin
                  1..255    : begin
                                 with g_uids[ m_brush] do
                                 s1:=str_ui_SelectBPlace+'"'+uid_str_name+'"';
-                                AddLine(@s1);
-                                AddLine(nil);
-                                AddLine(@str_ui_BuildHint);
-                                AddLine(@str_ui_RightClickCancel);
-                                AddLine(@str_ui_BuildTip);
+                                UIHintAdd_Line(@s1);
+                                UIHintAdd_Line(nil);
+                                UIHintAdd_Line(@str_ui_BuildHint);
+                                UIHintAdd_Line(@str_ui_RightClickCancel);
+                                UIHintAdd_Line(@str_ui_BuildTip);
                              end;
                  -255..-1  : with g_aids[-m_brush] do
                              begin
                                 s1:=str_ui_SelectTarget+'"'+ua_str_name+'"';
-                                AddLine(@s1);
-                                AddLine(nil);
+                                UIHintAdd_Line(@s1);
+                                UIHintAdd_Line(nil);
                                 case ua_type of
                                 uat_UnitAny,
                                 uat_UnitOwn,
                                 uat_UnitAlly,
-                                uat_UnitEnemy: BrushUnitTargetHint;
+                                uat_UnitEnemy: UIHintAdd_BrushUnitTarget;
                                 uat_Point    : if(ui_CommandercPU<>nil)then
                                                  if(unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi)>0)then
-                                                   AddLine(@str_ui_BuildHint);
+                                                   UIHintAdd_Line(@str_ui_BuildHint);
                                 end;
-                                AddLine(@str_ui_RightClickCancel);
+                                UIHintAdd_Line(@str_ui_RightClickCancel);
                              end
                  else
                    s1:='';
@@ -723,7 +739,7 @@ begin
                    if(length(s1)>0)then
                    begin
                       s1:=str_ui_SelectTarget+'"'+s1+'"';
-                      AddLine(@s1);
+                      UIHintAdd_Line(@s1);
                    end;
 
                    case m_brush of
@@ -731,13 +747,13 @@ begin
                    co_markAttack,
                    co_apatrol,
                    co_patrol    : ;
-                   else BrushUnitTargetHint;
+                   else UIHintAdd_BrushUnitTarget;
                    end;
                  end;
 
    mf_Tabs     : if(0<=m_btnN)and(m_btnN<4)then
                  begin
-                    AddLine(@str_ui_Tab[m_BtnN]);
+                    UIHintAdd_Line(@str_ui_Tab[m_BtnN]);
                     SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);
                  end;
    mf_CtrlPanel: if(0<=m_btnN)and(m_btnN<=ui_ButtonsNum)then
@@ -756,6 +772,8 @@ begin
                                           tab_Buildings,
                                           tab_Units    : begin
                                                             with g_uids[tuid] do str_StringListCopy(@uid_HintInGame,@ui_MouseHintL);
+                                                            UIHintAdd_ReqLine(unit_CheckReqs(@g_PlayersGame[UIPlayer],tuid));
+
                                                             if(ui_tab=tab_Units)then
                                                               if(ui_ControlTabType=tcc_controls)then
                                                               begin
@@ -767,11 +785,12 @@ begin
                                                          begin
                                                             if(ui_ControlTabType=tcc_controls)then
                                                               SetBBit(@ui_CursorItemActs,miat_BtnRight,true);
-                                                            AddLine(@upgr_str_NameHK);
+                                                            UIHintAdd_Line(@upgr_str_NameHK);
                                                             s1:=str_UpgradeCost(tuid,upgrs_cur[tuid]+1);
-                                                            AddLine(@s1);
-                                                            AddLine(@upgr_str_Descript);
-                                                            AddLine(@upgr_str_Reqs);
+                                                            UIHintAdd_Line(@s1);
+                                                            UIHintAdd_Line(@upgr_str_Descript);
+                                                            UIHintAdd_Line(@upgr_str_Reqs);
+                                                            UIHintAdd_ReqLine(upgrade_CheckReqs(@g_PlayersGame[UIPlayer],tuid));
                                                          end;
                                           end;
                                        end;
@@ -803,19 +822,19 @@ begin
                                                                           iAct_Control_UAbility2: s1:=str_AbilityHintName(taid,1);
                                                                           iAct_Control_UAbility3: s1:=str_AbilityHintName(taid,2);
                                                                           end;
-                                                                          AddLine(@s1);
+                                                                          UIHintAdd_Line(@s1);
                                                                           str_StringListCopy(@ua_HintInGame,@ui_MouseHintL,true);
                                                                        end;
                                                                   end;
-                                        else                    AddLine(@str_action_hint[tuid]);
+                                        else                    UIHintAdd_Line(@str_action_hint[tuid]);
                                         end;
                                      end;
                                   end;
                     end;
    mf_MenuPause: case m_btnN of
-                 0 : if(iActOn(iAct_InGameMenu        ))then begin AddLine(@str_action_hint[iAct_InGameMenu        ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
-                 1 : if(iActOn(iAct_Control_ScoreBoard))then begin AddLine(@str_action_hint[iAct_Control_ScoreBoard]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
-                 2 : if(iActOn(iAct_InGamePause       ))then begin AddLine(@str_action_hint[iAct_InGamePause       ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 0 : if(iActOn(iAct_InGameMenu        ))then begin UIHintAdd_Line(@str_action_hint[iAct_InGameMenu        ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 1 : if(iActOn(iAct_Control_ScoreBoard))then begin UIHintAdd_Line(@str_action_hint[iAct_Control_ScoreBoard]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
+                 2 : if(iActOn(iAct_InGamePause       ))then begin UIHintAdd_Line(@str_action_hint[iAct_InGamePause       ]);SetBBit(@ui_CursorItemActs,miat_BtnLeft,true);end;
                  end;
 
    end;

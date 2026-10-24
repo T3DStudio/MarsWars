@@ -300,7 +300,7 @@ net_SendTimePing          = fr_fps2;
 net_SendTimeClient1       = fr_fpsq;
 net_SendTimeClient2       = fr_fpsd10;
 net_SendTimeServer        = fr_fps1 div 30;
-MaxNetBuffer              = 4096;
+MaxNetBuffer              = 8192;
 
 net_svLanAdv_port         = 63666; // local servers advertisement port
 net_svLanAdv_portS        = swap(net_svLanAdv_port);
@@ -437,6 +437,7 @@ wpt_heal               = 3;
 wpt_unit               = 4;
 wpt_directdmg          = 5;
 wpt_directdmgZ         = 6;
+wpt_consume            = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -646,17 +647,18 @@ LastDamageModFactor    = MaxDamageModFactors-1; //0..1
 dm_AntiUnitBioHeavy2   = 1 ; //   2*[unit bio heavy]
 dm_SSGShot2            = 2 ; //   2*[unit bio heavy] 0.5*[mech]
 dm_AntiUnitBioLight2   = 3 ; //   2*[unit bio light]
-dm_AntiUnitBio2        = 4 ; //   2*[unit bio]       0.5*[buildings]
-dm_AntiUnitMech2       = 5 ; //   2*[unit mech]
-dm_AntiUnitLight2      = 6 ; //   2*[unit light]
-dm_AntiFly2            = 7 ; //   2*[fly]
-dm_AntiGroundLight2    = 8 ; //   2*[light ground]
-dm_RSMShot             = 9 ; //   2*[buildings]
-dm_Siege4              = 10; //   4*[buildings]
-dm_Lost                = 11; //                      0.5*[mech]
-dm_BFG                 = 12; // 0.5*[buildings]
-dm_AntiBio2            = 13; //   2*[unit bio]
-dm_AntiHeavy2          = 14; //   2*[unit heavy]
+dm_AntiUnitBio1h       = 4 ; // 1.5*[unit bio]       0.5*[buildings]
+dm_AntiUnitBio2        = 5 ; //   2*[unit bio]       0.5*[buildings]
+dm_AntiUnitMech2       = 6 ; //   2*[unit mech]
+dm_AntiUnitLight1h     = 7 ; // 1.5*[unit light]
+dm_AntiFly2            = 8 ; //   2*[fly]
+dm_AntiGroundLight2    = 9 ; //   2*[light ground]
+dm_RSMShot             = 10; //   2*[buildings]
+dm_Siege4              = 11; //   4*[buildings]
+dm_Lost                = 12; //                      0.5*[mech]
+dm_BFG                 = 13; // 0.5*[buildings]
+dm_AntiBio2            = 14; //   2*[unit bio]
+dm_AntiHeavy2          = 15; //   2*[unit heavy]
 
 
 // LIMIT
@@ -1017,9 +1019,7 @@ HellLoot_Max           = 15000;
 HellLoot_PerLimit      = 100;
 HellLoot_PerHP         = 10;
 HellLoot_AddPeriod     = fr_fps1;
-HellLoot_Add1          = HellLoot_PerLimit;
-HellLoot_Add2          = HellLoot_Add1+(HellLoot_Add1 div 2);
-HellLoot_Add3          = HellLoot_Add1*2;
+HellLoot_AddPerB       = 100;
 UACLoot_Max            = 30000;
 
 UACStrike_Revealing_sec= 5;
@@ -1053,7 +1053,7 @@ rdamage_time_sec       = 30;
 rdamage_time           = fr_fps1*rdamage_time_sec;
 ddamage_time_sec       = 20;
 ddamage_time           = fr_fps1*ddamage_time_sec;
-dturbo_time_sec        = 15;
+dturbo_time_sec        = 20;
 dturbo_time            = fr_fps1*dturbo_time_sec;
 
 tank_sr                = 20;
@@ -1332,7 +1332,6 @@ char_kp                : char = #0;
 char_koth              : char = ' ';
 
 dead_time              = -hits_dead;
-char_detect            = #7;
 
 spr_upgrade_icons      = 22;
 str_ps_Me              : char = '>';

@@ -400,7 +400,7 @@ begin
    else POVPlayer:=nil;
 
    iActSetOnEnabled(iAct_InGamePause,game_PauseToggle(true),true);
-   iActSetOnEnabled(iAct_InGameMenu ,true                 ,true);
+   iActSetOnEnabled(iAct_InGameMenu ,true                  ,true);
 
    // production actions
    for ucl in [iAct_SProd1..iAct_SProd24,

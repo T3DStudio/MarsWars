@@ -271,6 +271,12 @@ begin
    setCommandSND(snd_pain_ready,snd_hell_move,snd_hell_move,snd_pain_pain,snd_hell_move);
    setEffectEID (0,0,0,u,0);
    setEffectSND (  nil,snd_pain_death,snd_pain_death,snd_pain_pain );
+
+   setWeaponESND(0,snd_pain_consume,nil,0,0);
+   setWeaponESND(1,nil,nil,0,0);
+   setWeaponTEID(0,nil,0,[0..255]);
+   with uid_arms[1] do
+   setWeaponTEID(1,nil,0,[aw_reload-fr_fps1..aw_reload]);
 end;
 UID_Revenant:
 begin

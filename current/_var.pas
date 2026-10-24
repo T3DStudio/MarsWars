@@ -299,7 +299,7 @@ ui_fog_gridw      : integer = 0;
 ui_fog_gridh      : integer = 0;
 ui_fog            : boolean = true;
 ui_fog_Tiles      : TFogTileSet;
-ui_fog_TileFx4    : pSDL_Surface;
+ui_fog_TileFx5    : pSDL_Surface;
 ui_fog_sx         : integer = 0;
 ui_fog_sy         : integer = 0;
 ui_fog_ex         : integer = 0;
@@ -1204,6 +1204,7 @@ str_uarm_ranged,
 str_uarm_zombie,
 str_uarm_ressurect,
 str_uarm_heal,
+str_uarm_consume,
 str_uarm_spawn,
 str_uarm_targets,
 str_uarm_BaseImpact,
@@ -1246,7 +1247,7 @@ str_gstat_ReplayPaused,
 str_gstat_GamePaused,
 str_gstat_Lobby,
 str_gstat_Started,
-str_gstat_WonTeam,
+str_gstat_WonBy,
 str_gstat_Win,
 str_gstat_Lose,
 
@@ -1611,6 +1612,7 @@ snd_revenant_move,
 snd_pain_ready,
 snd_pain_death,
 snd_pain_pain,
+snd_pain_consume,
 
 snd_mastermind_ready,
 snd_mastermind_death,

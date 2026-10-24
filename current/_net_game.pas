@@ -855,7 +855,7 @@ begin
       then STRADD(@net_ReadGameInfo,str_gstat_Started,sep_space)
       else
       begin
-         GameGetStatus(v,@t,nil,255);
+         GameGetStatus(v,@t,nil,255,true);
          STRADD(@net_ReadGameInfo,t,sep_space);
       end;
    end;

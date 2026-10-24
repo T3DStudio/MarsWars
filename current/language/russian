@@ -196,7 +196,7 @@ str_FileDelete                = 'Удалить'
 str_FileReWrite               = 'Перезаписать'
 
 str_gstat_Lobby               = 'ЛОББИ'
-str_gstat_WonTeam             = 'Победил клан #'
+str_gstat_WonBy               = 'Победил '
 str_gstat_Started             = 'Начата'
 str_gstat_Win                 = 'ПОБЕДА!'
 str_gstat_Lose                = 'ПОРАЖЕНИЕ!'
@@ -350,6 +350,7 @@ str_uarm_ranged               = 'дальняя атака'
 str_uarm_zombie               = '+зомбификация'
 str_uarm_ressurect            = 'воскрешение'
 str_uarm_heal                 = 'лечение/починка'
+str_uarm_consume              = 'пожирание'
 str_uarm_spawn                = 'создание'
 str_uarm_targets              = 'цели: '
 str_uarm_BaseImpact           = 'базовое воздействие'
@@ -471,7 +472,7 @@ str_ScoreBoardC[psc_InGameTime]      = 'Время проигрыша'
 
 str_ScoreBoardI[psi_res_energy_max]  = 'Макс. уров. энергии'
 str_ScoreBoardI[psi_res_UACLoot]     = 'Собрано "'+str_ui_UACLoot +'"'
-str_ScoreBoardI[psi_res_HellLoot]    = 'Собрано "'+str_ui_HellLoot+'"'
+str_ScoreBoardI[psi_res_HellLoot]    = 'Собр. "'+str_ui_HellLoot+'"'
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -503,8 +504,7 @@ str_name[UID_HTeleport]         = 'Телепорт'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Алтарь боли'
 str_dscr[UID_HAltar]            = 'Использует ресурс "'+str_ui_HellLoot+'" для применения специальных способностей. '
-                                  'Генерирует ресурс "'+str_ui_HellLoot+'": 1 здание дает '+str_HellLoot_Add1+' в сек., 2 - '
-                                  str_HellLoot_Add2+', 3 - '+str_HellLoot_Add3+'. '
+                                  'Генерирует ресурс "'+str_ui_HellLoot+'": '+str_HellLoot_Add1+' в сек. с каждого здания. '
                                   str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Адский командный центр'
 str_dscr[UID_HCommandCenter]    = 'Проклятый командный центр'
@@ -582,8 +582,8 @@ str_name[UID_URadar]            = 'Радар'
 str_dscr[UID_URadar]            = 'Раскрывает карту и обнаруживает невидимых юнитов'
 str_name[UID_UAcademy]          = 'Академия UAC'
 str_dscr[UID_UAcademy]          = 'Использует ресурс "' + str_ui_UACLoot + '" для применения специальных способностей'
-str_name[UID_UHPowerConductor]  = 'Проводник адской силы'
-str_dscr[UID_UHPowerConductor]  = 'Использует ресурс "' + str_ui_HellLoot + '" для применения специальных способностей'
+str_name[UID_UHArtifactsStorage]= 'Проводник адской силы'
+str_dscr[UID_UHArtifactsStorage]= 'Использует ресурс "' + str_ui_HellLoot + '" для применения специальных способностей'
 str_name[UID_URMStation]        = 'Станция ракетного залпа'
 str_dscr[UID_URMStation]        = 'Позволяет наносить мощный ракетный удар'
 str_name[UID_Sergant]           = 'Сержант'
@@ -1425,9 +1425,7 @@ str_camp_1_miss_3_name = 'Нечестивый собор'
 str_camp_1_miss_3_loc  = str_tmp1+str_camp_1_miss_3_name
 
 str_camp_1_miss_3_obj  = '- '+tc_CO1+'Вы и ваши союзники не должны потерять все Адские крепости'
-        tc_default+tc_nl+'- '+tc_CO2+'Не дайте врагам захватить центр карты'
-        tc_default+tc_nl+'- '+tc_CO3+'Захватите центр карты'
-        tc_default+tc_nl+'- '+tc_CO4+'Уничтожте вражеские племена'
+        tc_default+tc_nl+'- '+tc_CO2+'Уничтожте вражеские племена'
 
 str_camp_1_miss_3_plot = 
 Выжив в Долине Страха, вы подходите к вратам Нечестивого Собора. По легенде - пройти в эти врата могут три вождя, окропившие площадь перед Собором кровью своих врагов.

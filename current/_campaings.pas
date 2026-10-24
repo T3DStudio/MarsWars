@@ -410,7 +410,7 @@ begin
 
                  // Evil Eyes (green)
                  p:=cd_p_enemy1;
-                 camp_SetPStart(p,(map_Size1 div 4),map_Size1-(map_Size1 div 4));
+                 camp_SetPStart(p,(map_Size1 div 5)*2,map_Size1-(map_Size1 div 4));
 
                  camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_EE);
                  camp_SetAI(p,cd_camp_skill,0  ,-1);
@@ -447,7 +447,7 @@ begin
 
                  // Pack of Anger (orange)
                  p:=cd_p_enemy2;
-                 camp_SetPStart(p,map_Size1-(map_Size1 div 5),map_Size1-(map_Size1 div 3));
+                 camp_SetPStart(p,map_Size1-(map_Size1 div 5),map_Size1-(map_Size1 div 4));
 
                  camp_SetPlayer(p,r_hell,2,ps_AI   ,str_Camp_HE_PoA);
                  camp_SetAI(p,cd_camp_skill,0  ,-1);
@@ -490,7 +490,7 @@ begin
                  camp_data.cd_NMTime:=fr_fps1*125;
 
                  map_Seed         :=10666;
-                 map_scenario     :=mc_koth;
+                 map_scenario     :=mc_ffa6;
                  map_GeneratorT   :=2;
                  map_Size1        :=5750;
                  map_Template     :=mapt_temple;
@@ -706,7 +706,7 @@ begin
                  p:=cd_p_enemy2;
                  camp_SetPStart(p ,(map_Size1 div 7),map_Size1 div 2);
 
-                 camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_BS);
+                 camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_LoH);
                  camp_SetAI(p,cd_camp_skill,0  ,-1);
                  with g_PlayersGame[p] do
                  begin
@@ -933,21 +933,18 @@ begin
                    or((g_PlayersGame[cd_p_ally1 ].units_uid_c[UID_HKeep ]=0)and(g_PlayersGame[cd_p_ally1 ].units_uid_c[UID_HAKeep]=0))
                    or((g_PlayersGame[cd_p_ally2 ].units_uid_c[UID_HKeep ]=0)and(g_PlayersGame[cd_p_ally2 ].units_uid_c[UID_HAKeep]=0));
 
-              tmpb2:=(map_KeyPointsL[0].kp_TeamData[MaxPlayers].kptd_OwnerTeam=g_PlayersGame[cd_p_enemy1].team);
+              tmpb2:=(g_PlayersGame[cd_p_enemy1].units_bld_lc[true]=0)
+                  and(g_PlayersGame[cd_p_enemy2].units_bld_lc[true]=0)
+                  and(g_PlayersGame[cd_p_enemy3].units_bld_lc[true]=0);
 
               camp_ObjStat:=0;
               SetBBit(@camp_ObjStat,0,not tmpb1);
-              SetBBit(@camp_ObjStat,1,not tmpb2);
-              SetBBit(@camp_ObjStat,2,(map_KeyPointsL[0].kp_TeamData[MaxPlayers].kptd_OwnerTeam=g_PlayersGame[cd_p_player].team));
-              SetBBit(@camp_ObjStat,3,(g_PlayersGame[cd_p_enemy1].units_bld_lc[true]=0)
-                                   and(g_PlayersGame[cd_p_enemy2].units_bld_lc[true]=0)
-                                   and(g_PlayersGame[cd_p_enemy3].units_bld_lc[true]=0) );
+              SetBBit(@camp_ObjStat,1,    tmpb2);
 
               if(tmpb1)
-              or(tmpb2)
               then game_SetStatusWinnerTeam(g_PlayersGame[cd_p_enemy1].team)
               else
-                if(camp_ObjStat=%1111)
+                if(camp_ObjStat=%11)
                 then camp_Win;
            end;
        end;

@@ -380,7 +380,7 @@ begin
    with usmodel^ do
    begin
       choosen:=(m_UnitTargetN=unum)or(ui_umark_u=unum);
-      srect  :=((isselected)and(playeri=UIPlayer))
+      srect  :=((isselected)and( (playeri=UIPlayer)or(UIPlayer>LastPlayer) ))
              or(InputAction(iact_Alt))
              or(choosen);
 
@@ -399,9 +399,12 @@ begin
            if(ui_blink1_colorb)and(choosen)
            then acolor:=0
            else acolor:=PlayerColorsSchemeCurNormal[playeri];
-           if(playeri=UIPlayer)
-           then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,i2s6(group,false),'',lvlstr_b,i2s6(transportM,false),i2s6(transportC,false))
-           else UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w         ,'',lvlstr_b,lvlstr_a              ,lvlstr_s              );
+           if(UIPlayer>LastPlayer)
+           then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w,i2s6(transportC,false),i2s6(group,false),lvlstr_a              ,lvlstr_s              )
+           else
+             if(playeri=UIPlayer)
+             then UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,''      ,'',i2s6(group,false),i2s6(transportM,false),i2s6(transportC,false))
+             else UnitsInfo_AddRectText(vx-sm_SelectionHW,vy-sm_SelectionHH,vx+sm_SelectionHW,vy+sm_SelectionHH,acolor,lvlstr_w,'',''               ,lvlstr_a              ,lvlstr_s              );
            UnitsInfo_AddText(vx,vy-sm_SelectionHH-font_w1,lvlstr_l,c_white);
         end;
       acolor:=PlayerColorsSchemeCurNormal[playeri];
@@ -413,7 +416,7 @@ begin
 
       if(srect)and(uid_isbuilding)and(ui_UnitNeedDrawRange(pu))then UnitsInfo_AddCircle(x,y,srange,ui_blink2_color_BG);
 
-      if(playeri=UIPlayer)then
+      if(playeri=UIPlayer)or(UIPlayer>LastPlayer)then
         case iscomplete of
         true : begin
                   if(rld>0)then
@@ -731,18 +734,18 @@ var ix,iy:integer;
 begin
    fRect:=true;
    for ix:=cx to cx+step-1 do
-   for iy:=cy to cy+step-1 do
-     if (0<=ix)and(ix<ui_fog_gridw)
-     and(0<=iy)and(iy<ui_fog_gridh)then
-       case check of
-       false: ui_fog_fgrid[ix,iy]:=false;
-       true : if(not ui_fog_fgrid[ix,iy])
-              or((   ui_fog_pgrid[ix,iy])and(step>1))then
-              begin
-                 fRect:=false;
-                 exit;
-              end;
-       end;
+     if(0<=ix)and(ix<ui_fog_gridw)then
+       for iy:=cy to cy+step-1 do
+         if(0<=iy)and(iy<ui_fog_gridh)then
+           case check of
+           false: ui_fog_fgrid[ix,iy]:=false;
+           true : if(not ui_fog_fgrid[ix,iy])
+                  or((   ui_fog_pgrid[ix,iy])and(step>1))then
+                  begin
+                     fRect:=false;
+                     exit;
+                  end;
+           end;
 end;
 begin
    ssx :=-ui_cam_fx;
@@ -766,9 +769,15 @@ begin
                       GP(cx-1,cy),GP(cx,cy  ),GP(cx+1,cy),
                                   GP(cx,cy+1));
                    if(0<=i)and(i<=fog_TileSetSize)then
-                     draw_sdlsurface(tar,ssx,ssy,ui_fog_Tiles[i]);
+                   begin
+                      draw_sdlsurface(tar,ssx,ssy,ui_fog_Tiles[i]);
+                      //rectangleColor(tar,ssx, ssy,ssx+fog_cw*step, ssy+fog_cw*step,c_aqua)
+                   end;
                 end;
-            4 : draw_sdlsurface(tar,ssx, ssy, ui_fog_TileFx4);
+            5 : begin
+                draw_sdlsurface(tar,ssx, ssy, ui_fog_TileFx5);
+                //rectangleColor(tar,ssx, ssy,ssx+fog_cw*step, ssy+fog_cw*step,c_white)
+                end;
             end;
             fRect(false);
          end;
@@ -789,7 +798,7 @@ begin
       ui_fog_fgrid[cx,cy]:=true;
    end;
 
-   drawFogGrid(4);
+   drawFogGrid(5);
    //drawFogGrid(2);
    drawFogGrid(1);
 
@@ -869,7 +878,7 @@ begin
   { map_SymmetryPoints(mouse_map_x,mouse_map_y,@ix,@iy);
    UnitsInfo_AddLine(mouse_map_x,mouse_map_y,ix,iy,c_white);
                                                               }
-   if(InputAction(iact_Shift))then
+  { if(InputAction(iact_Shift))then
      for u:=0 to LastPlayer do
       with g_PlayersGame[u] do
       begin
@@ -887,7 +896,7 @@ begin
 
          for iy:=0 to 8  do draw_text(vid_screen,ix,130+iy*10,b2s(units_ucl_e[true ,iy])+'/'+b2s(units_ucl_c[true ,iy])+' '+b2s(units_ucl_s[true ,iy])+' '+i2s(units_ucl_u[true,iy]), ta_LU,255, c);
          for iy:=0 to 11 do draw_text(vid_screen,ix,230+iy*10,b2s(units_ucl_e[false,iy])+' '+b2s(units_ucl_s [false,iy]), ta_LU,255, c);
-      end;
+      end; }
 
    if(InputAction(iact_Control))then
    for u:=1 to MaxUnits do

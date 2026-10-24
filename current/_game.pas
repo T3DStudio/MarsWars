@@ -280,6 +280,7 @@ end;
 procedure game_LocalStart;
 var p:byte;
 begin
+   ui_ControlTabType:=ui_ControlTabTypeF;
    if(g_PlayersGame[LocalPlayer].isobserver)then
    begin
       ui_tab  :=tab_controls;
@@ -970,11 +971,7 @@ begin
                     if(units_uid_c[UID_HAltar]>0)then
                     begin
                        HP_prev:=res_HellLoot;
-                       case units_uid_c[UID_HAltar] of
-                       1  : res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+HellLoot_Add1);
-                       2  : res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+HellLoot_Add2);
-                       else res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+HellLoot_Add3);
-                       end;
+                       res_HellLoot:=min2i(HellLoot_Max,res_HellLoot+units_uid_c[UID_HAltar]*HellLoot_AddPerB);
 
                        if(HP_prev<res_HellLoot)then
                          game_ScoresAddI(p,psi_res_HellLoot,res_HellLoot-HP_prev);

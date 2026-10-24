@@ -577,6 +577,7 @@ begin
    gfx_SetTransparent(fsurf);
    for x:=0 to fsurf^.w-1 do
    for y:=0 to fsurf^.h-1 do
+     //if(((x div 3)+(y div 3))mod 2)=0 then
      if((x+y)mod 4)=0 then
        pixelColor(fsurf,x,y,c_purple);
 
@@ -598,17 +599,20 @@ begin
          if(b11)then draw_sdlsurface(ui_fog_Tiles[x],       -fog_ds,       -fog_ds,fsurf);
          if(b21)then draw_sdlsurface(ui_fog_Tiles[x], fog_cw-fog_ds,       -fog_ds,fsurf);
          if(b12)then draw_sdlsurface(ui_fog_Tiles[x],       -fog_ds, fog_cw-fog_ds,fsurf);
+
+         gfx_SetTransparent(ui_fog_Tiles[x],2);
       end;
    end;
 
    gfx_FreeSDLSurface(fsurf);
 
-   ui_fog_TileFx4:=gfx_CreateSDLSurface(fog_cw*4,fog_cw*4);
-   boxColor(ui_fog_TileFx4,0,0,ui_fog_TileFx4^.w,ui_fog_TileFx4^.h,c_purple);
-   gfx_SetTransparent(ui_fog_TileFx4);
-   for x:=0 to 3 do
-   for y:=0 to 3 do
-     draw_sdlsurface(ui_fog_TileFx4,x*fog_cw,y*fog_cw,ui_fog_Tiles[0]);
+   ui_fog_TileFx5:=gfx_CreateSDLSurface(fog_cw*5,fog_cw*5);
+   boxColor(ui_fog_TileFx5,0,0,ui_fog_TileFx5^.w,ui_fog_TileFx5^.h,c_purple);
+   gfx_SetTransparent(ui_fog_TileFx5);
+   for x:=0 to 4 do
+   for y:=0 to 4 do
+     draw_sdlsurface(ui_fog_TileFx5,x*fog_cw,y*fog_cw,ui_fog_Tiles[0]);
+   gfx_SetTransparent(ui_fog_TileFx5,2);
 end;
 
 procedure gfx_MakeScoreSurface;

@@ -72,16 +72,16 @@ end;
 
 // READ   //////////////////////////////////////////////////////////////////
 
-function net_BufferBlock(wrt:boolean;count:integer;pResult:pointer):boolean;
+function net_BufferBlock(awrite:boolean;count:integer;pResult:pointer):boolean;
 begin
    net_BufferBlock:=false;
    if(net_bufpos>=MaxNetBuffer)then exit;
    if((MaxNetBuffer-net_bufpos)<count)then exit;
-   if(not wrt)then
+   if(not awrite)then
      if((net_buffer^.len-net_bufpos)<count)then exit;
 
    net_BufferBlock:=true;
-   if(wrt)
+   if(awrite)
    then move(pResult^,(net_buffer^.data+net_bufpos)^, count)
    else move((net_buffer^.data+net_bufpos)^, pResult^,count);
    net_bufpos+=count;

@@ -831,11 +831,12 @@ begin
 
                   if(not koth_point)then
                   begin
-                     if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
-                     or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
-                       if(isfly)
-                       or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
-                         ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,d,kp_zone);
+                     if(kptd_VisTimer<=0)then
+                       if((kptd_OwnerTeam     <=LastPlayer)and(kptd_OwnerTeam     <>team))
+                       or((kptd_TimerOwnerTeam<=LastPlayer)and(kptd_TimerOwnerTeam<>team)and(kptd_Timer>0))then
+                         if(isfly)
+                         or((kp_zone=mapZone)and(kp_zone<>zone_solid))then
+                           ai_Local_SetCurrentAlarm(pu,nil,kp_x,kp_y,d,kp_zone);
 
                      if(kptd_OwnerTeam=team)then
                        if(kptd_OwnerPlayer<>playeri)
@@ -855,9 +856,9 @@ begin
                            if(l>=0)then continue;
                            end;
                     false: begin
-                           l:=kp_LimitPlayerP[playeri]-uid_LimitUse;
+                           l:=kp_LimitPlayerP[playeri];
                            if((l>=kp_CaptureLimit  )and(d> kp_RCapture))
-                           or((l>=kp_CaptureLimit*2)and(d<=kp_RCapture))then continue;
+                           or(((l-uid_LimitUse)>=kp_CaptureLimit*2)and(d<=kp_RCapture))then continue;
                            end;
                     end;
 

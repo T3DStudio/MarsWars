@@ -53,7 +53,8 @@ begin
 end;
 
 procedure replay_SavePlayPosition;
-var fpos:int64;
+var
+fpos:int64;
 begin
    if(rpls_fstate<>rpls_read)
    or(rpls_pstate<>rpls_read)then exit;
@@ -335,6 +336,8 @@ begin
       {$IFDEF _FULLGAME}
       rpls_log_c       :=0;
       ui_playerPOV     :=false;
+      {$ELSE}
+      rpls_Quality     :=0;
       {$ENDIF}
 
       if(rpls_head_itemn>0)then
@@ -784,7 +787,9 @@ end;
 
 function replay_IsPaused:boolean;
 begin
-   replay_IsPaused:=(g_status=gs_replaypause)or((gs_paused0<=g_status)and(g_status<=gs_paused7));
+   replay_IsPaused:=(g_status=gs_replaypause)
+                  or(g_status=gs_waitplayers)
+                  or((gs_paused0<=g_status)and(g_status<=gs_paused7));
 end;
 
 function replay_TogglePause(check:boolean):boolean;

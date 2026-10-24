@@ -602,7 +602,7 @@ begin
       if(point_dist_int(uo_x,uo_y,lx,ly)>=lr)then exit;
       if(map_scenario=mc_royale)then
         if(base_r1h>(g_royal_RCur-point_dist_int(uo_x,uo_y,g_royal_Rx,g_royal_Ry)))then exit;
-      if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,true,255,pBuilder)<>cbr_no)then exit;
+      if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,true,255,nil)<>cbr_no)then exit;
    end;
    checkLandingPlace:=true;
 end;

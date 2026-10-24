@@ -196,7 +196,7 @@ str_FileDelete                = 'Delete'
 str_FileReWrite               = 'Rewrite'
 
 str_gstat_Lobby               = 'LOBBY'
-str_gstat_WonTeam             = 'Won by a team #'
+str_gstat_WonBy               = 'Won by '
 str_gstat_Started             = 'Started'
 str_gstat_Win                 = 'VICTORY!'
 str_gstat_Lose                = 'DEFEAT!'
@@ -299,7 +299,6 @@ str_warn_AbilityTar2Close     = 'Target is too close'
 str_warn_UACStrike            = ' launched a tactical missile'
 str_warn_UACScan              = 'Our units have been scanned by '
 
-
 str_attr_alive                = tc_lime  +'ALIVE'+tc_default
 str_attr_dead                 = tc_dgray +'DEAD'+tc_default
 str_attr_unit                 = tc_gray  +'UNIT'+tc_default
@@ -351,6 +350,7 @@ str_uarm_ranged               = 'ranged attack'
 str_uarm_zombie               = '+zombification'
 str_uarm_ressurect            = 'resurrection'
 str_uarm_heal                 = 'heal/repair'
+str_uarm_consume              = 'devouring'
 str_uarm_spawn                = 'spawn'
 str_uarm_targets              = 'targets: '
 str_uarm_BaseImpact           = 'base impact'
@@ -471,7 +471,7 @@ str_ScoreBoardC[psc_InGameTime]      = 'Defeat time'
 
 str_ScoreBoardI[psi_res_energy_max]  = 'Max energy level'
 str_ScoreBoardI[psi_res_UACLoot]     = 'Collected '+str_ui_UACLoot
-str_ScoreBoardI[psi_res_HellLoot]    = 'Collected '+str_ui_HellLoot
+str_ScoreBoardI[psi_res_HellLoot]    = 'Coll. '+str_ui_HellLoot
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -503,8 +503,7 @@ str_name[UID_HTeleport]         = 'Teleport'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Altar of Pain'
 str_dscr[UID_HAltar]            = 'Uses "' + str_ui_HellLoot + '" to perform special abilities. '
-                                  'Generates "' + str_ui_HellLoot + '": 1 building gives '+str_HellLoot_Add1+' pres sec., 2 - '
-                                  str_HellLoot_Add2+', 3 - '+str_HellLoot_Add3+'. '
+                                  'Generates "' + str_ui_HellLoot + '": '+str_HellLoot_AddPerB+' per building for sec. '
                                   str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Hell Command Center'
 str_dscr[UID_HCommandCenter]    = 'Corrupted Command Center'

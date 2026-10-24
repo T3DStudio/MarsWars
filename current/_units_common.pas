@@ -1225,7 +1225,7 @@ begin
       false: unit_ArmSpawnUnit(pCaster,UID_LostSoul);
       true : unit_ArmSpawnUnit(pCaster,UID_Phantom );
       end;
-      rld:=uid_arms[0].aw_reload;
+      rld:=uid_arms[1].aw_reload;
       buffs[ub_Cast]:=rld div 2;
    end;
 end;

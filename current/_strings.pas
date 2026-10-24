@@ -893,9 +893,12 @@ begin
         then str_UnitArmDPS+='x'+i2s(ocount);
      end;
 
-     if(aw_FakeShotsN>0)
-     then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
-     else sps:=(fr_fps1*n/aw_reload);
+     if(aw_type=wpt_consume)
+     then sps:=fr_fps1/aw_reload
+     else
+       if(aw_FakeShotsN>0)
+       then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
+       else sps:= fr_fps1*n/aw_reload ;
      STRADD(@str_UnitArmDPS,str_uarm_ShotsPerSec+Float2Str(sps),sep_scomma);
   end;
 end;
@@ -918,6 +921,7 @@ begin
       wpt_resurect  :      STRADD(@str_UnitArmLine,'- '+str_uarm_ressurect,sep_scomma);
       wpt_heal      :      STRADD(@str_UnitArmLine,'- '+str_uarm_heal     ,sep_scomma);
       wpt_unit      :      STRADD(@str_UnitArmLine,'- '+str_uarm_spawn+' "'+g_uids[aw_object_id].uid_str_name+'"',sep_scomma);
+      wpt_consume   :      STRADD(@str_UnitArmLine,'- '+str_uarm_consume  ,sep_scomma);
       end;
 
       if(aw_min_range>0)then
@@ -1155,30 +1159,7 @@ begin
            if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusABuildingR+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
         end;
 
-        str_StringListClear(@uid_HintInGame );
         str_StringListClear(@uid_HintDoc    );
-
-        // Basic Game hint
-        AddLineUnitGameHint(uid_str_NameHK       );
-        AddLineUnitGameHint(uid_str_CostLimit    );
-        AddLineUnitGameHint(uid_str_DefaultAttr  );
-        AddLineUnitGameHint(uid_str_1LineDescript);
-        AddLineUnitGameHint(uid_str_Reqs);
-        AddLineUnitGameHint(uid_str_Prod);
-        if(uid_CanAttack)then
-        begin
-           AddLineUnitGameHint(str_hint_UnitArming);
-           for arm:=0 to LastUnitArms do
-             AddLineUnitGameHint(str_UnitArmLine(uid,arm,false));
-           AddLineUnitGameHint(uid_str_ArmsCommon );
-        end;
-        if(uid_HaveAbility)then
-        begin
-           AddLineUnitGameHint(str_hint_Abilities);
-           if(uid_ability1>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability1,255));AddLineUnitGameHint(g_aids[uid_ability1].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability1].ua_str_ReqsUHint);end;
-           if(uid_ability2>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));AddLineUnitGameHint(g_aids[uid_ability2].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability2].ua_str_ReqsUHint);end;
-           if(uid_ability3>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));AddLineUnitGameHint(g_aids[uid_ability3].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability3].ua_str_ReqsUHint);end;
-        end;
 
         // Basic Doc hint //////////////////////////////////////////////////////
         AddLineUnitDocHint(str_doc_HotKey         +uid_str_HK        );
@@ -1397,8 +1378,29 @@ begin
      with g_uids[uid] do
      if(uid_r>0)and(not uid_ismarker)then
      begin
+
+        str_StringListClear(@uid_HintInGame );
+        // Basic Game hint
+        AddLineUnitGameHint(uid_str_NameHK       );
+        AddLineUnitGameHint(uid_str_CostLimit    );
+        AddLineUnitGameHint(uid_str_DefaultAttr  );
+        AddLineUnitGameHint(uid_str_1LineDescript);
+        AddLineUnitGameHint(uid_str_Reqs);
+        AddLineUnitGameHint(uid_str_Prod);
+        if(uid_CanAttack)then
+        begin
+           AddLineUnitGameHint(str_hint_UnitArming);
+           for arm:=0 to LastUnitArms do
+             AddLineUnitGameHint(str_UnitArmLine(uid,arm,false));
+           AddLineUnitGameHint(uid_str_ArmsCommon );
+        end;
         if(uid_HaveAbility)then
         begin
+           AddLineUnitGameHint(str_hint_Abilities);
+           if(uid_ability1>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability1,255));AddLineUnitGameHint(g_aids[uid_ability1].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability1].ua_str_ReqsUHint);end;
+           if(uid_ability2>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability2,255));AddLineUnitGameHint(g_aids[uid_ability2].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability2].ua_str_ReqsUHint);end;
+           if(uid_ability3>0)then begin AddLineUnitGameHint('- '+str_AbilityHintName(uid_ability3,255));AddLineUnitGameHint(g_aids[uid_ability3].ua_str_Descript);AddLineUnitGameHint(g_aids[uid_ability3].ua_str_ReqsUHint);end;
+
            AddLineUnitDocHint(tc_docbr);
            AddLineUnitDocHint(str_hint_Abilities);
            if(uid_ability1>0)then

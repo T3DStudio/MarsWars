@@ -161,7 +161,7 @@ begin
    end;
 end;
 
-procedure dedicated_Clear;
+procedure dedicated_ClearLine;
 var x,y:byte;
 begin
    x:=WhereX;
@@ -171,9 +171,9 @@ begin
    GotoXY(x,y);
 end;
 
-procedure dedicated_Line1(s1:shortstring);
+procedure dedicated_Line1(s1:shortstring='');
 begin
-   dedicated_Clear;
+   dedicated_ClearLine;
    writeln(s1);
 end;
 
@@ -266,16 +266,16 @@ begin
    if(console_y<=ded_ScreenUpdatePause)then
    begin
       case console_y of
-      0 : writeln(str_wcaption,' ',str_copyright,str_net_UDPPort,net_ServerPort);
+      0 : dedicated_Line1(str_wcaption+' '+str_copyright+str_net_UDPPort+w2s(net_ServerPort));
       2 : dedicated_Line1(str_gstat_Status+Dedicated_GameStatusStr);
-      4 : writeln(str_Caption_GOptions);
+      4 : dedicated_Line1(str_Caption_GOptions);
       6 : dedicated_Line5(str_GO_FixedStarts   ,1, str_GO_AISlots,22, str_GO_NewObservers,40, str_SR_RecordGames,72,'',55,'',70);
       8 : dedicated_Line5(b2c[g_FixedPositions],1, g_AISlotsStr  ,22, b2c[g_NewObservers],40, b2c[rpls_Record]  ,72,'',55,'',70);
-      10: writeln;
-      12: writeln(str_Caption_Map);
+      10: dedicated_Line1;
+      12: dedicated_Line1(str_Caption_Map);
       14: dedicated_Line5(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);
       16: dedicated_Line5(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generatorT],15, c2s(map_seed),30, i2s(map_Size1),45, str_map_TemplateL[map_Template],55, str_map_SymmetryL[map_symmetry],70);
-      18: writeln;
+      18: dedicated_Line1;
       20: dedicated_Line5('#',1,str_State                ,3, str_Player,11,str_srace,29,str_team ,39, str_ping,49);   // captions
       22: PlayerDataLine(0);
       24: PlayerDataLine(1);

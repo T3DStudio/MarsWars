@@ -445,12 +445,11 @@ begin
       begin
          // building areas
          if(iscomplete)and(uid_isbuilder)and(not isfly)then
-           //if(units_builders_s=0)or(isselected)then
-             case m_brush of
-             1..255 : if(m_brush in uid_prod_Buildings)then
-                        if(RectInCam(x,y,srange,srange,0))then
-                          UnitsInfo_AddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
-             end;
+           case m_brush of
+           1..255 : if(m_brush in uid_prod_Buildings)then
+                      if(RectInCam(x,y,srange,srange,0))then
+                        UnitsInfo_AddCircle(x,y,srange,ui_blink_color1[ui_blink2_colorb]);
+           end;
          // rally points
          if(uid_HaveRallyPoint)then
            if(isselected)or(m_UnitTargetN=unum)then
@@ -547,10 +546,6 @@ begin
    with uid^    do
    with player^ do
    begin
-      // buffs and level
-      lvlstr_b:='';
-      if(buffs[ub_Detector]>0)then lvlstr_b+=char_detect;
-
       lvlstr_l:='';
       if(not uid_isbuilding)
       or(uid_isbarrack)
@@ -747,7 +742,7 @@ begin
           then unit_AddSpriteDead (pu)
           else
           begin
-             if(playeri=UIPlayer)then unit_UIMarks(pu);
+             if(playeri=UIPlayer)or(UIPlayer>LastPlayer)then unit_UIMarks(pu);
              unit_AddSpriteAlive(pu,noanim);
              //unit_DebugMark(pu);
           end;

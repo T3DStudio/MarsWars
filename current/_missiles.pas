@@ -142,20 +142,20 @@ begin
        if(dm_TargetFlags>0)then
         if(CheckUnitBaseFlags(tu,dm_TargetFlags))then
          case dm_Factor of
-       0   : ApplyDamageMod:=0;
-       25  : ApplyDamageMod:=               (ApplyDamageMod div 4);
-       50  : ApplyDamageMod:=               (ApplyDamageMod div 2);
-       75  : ApplyDamageMod:=               (ApplyDamageMod div 4)*3;
-       100 : ;
-       125 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 4);
-       150 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 2);
-       175 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 4)*3;
-       200 : ApplyDamageMod:=ApplyDamageMod* 2;
-       300 : ApplyDamageMod:=ApplyDamageMod* 3;
-       350 : ApplyDamageMod:=ApplyDamageMod* 3+(ApplyDamageMod div 2);
-       400 : ApplyDamageMod:=ApplyDamageMod* 4;
-       500 : ApplyDamageMod:=ApplyDamageMod* 5;
-         else ApplyDamageMod:=round(ApplyDamageMod/100*dm_Factor);
+         0   : ApplyDamageMod:=0;
+         25  : ApplyDamageMod:=               (ApplyDamageMod div 4);
+         50  : ApplyDamageMod:=               (ApplyDamageMod div 2);
+         75  : ApplyDamageMod:=               (ApplyDamageMod div 4)*3;
+         100 : ;
+         125 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 4);
+         150 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 2);
+         175 : ApplyDamageMod:=ApplyDamageMod+(ApplyDamageMod div 4)*3;
+         200 : ApplyDamageMod:=ApplyDamageMod* 2;
+         300 : ApplyDamageMod:=ApplyDamageMod* 3;
+         350 : ApplyDamageMod:=ApplyDamageMod* 3+(ApplyDamageMod div 2);
+         400 : ApplyDamageMod:=ApplyDamageMod* 4;
+         500 : ApplyDamageMod:=ApplyDamageMod* 5;
+         else  ApplyDamageMod:=round(ApplyDamageMod/100*dm_Factor);
          end;
 end;
 
@@ -310,8 +310,8 @@ begin
           if(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
             case m_homing of
 mh_magnetic : begin
-                 m_tox:=tu^.x-(sign(tu^.x-m_tox)*tu^.uid^.uid_missileR);
-                 m_toy:=tu^.y-(sign(tu^.y-m_toy)*tu^.uid^.uid_missileR);
+                 m_tox:=tu^.x+(sign(tu^.x-m_tox)*tu^.uid^.uid_missileR);
+                 m_toy:=tu^.y+(sign(tu^.y-m_toy)*tu^.uid^.uid_missileR);
                  m_mfe:=tu^.isfly;
               end;
 mh_homing   : begin

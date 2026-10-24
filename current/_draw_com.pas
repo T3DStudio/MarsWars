@@ -145,7 +145,6 @@ begin
          tc_default  : color:=BaseColor;
          else
             case charc of
-            char_detect: boxColor(sur,ix,y,ix+font_wi,y+font_wi,c_purple );
             ',',';',
             '[',']',
             '{','}'    : boxColor(sur,ix,y,ix+font_wi,y+font_wi,BaseColor);

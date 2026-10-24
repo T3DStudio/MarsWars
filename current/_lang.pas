@@ -464,7 +464,7 @@ begin
    'str_FileReWrite'                    : lang_Key2StrVar:= @str_FileReWrite;
 
    'str_gstat_Lobby'                    : lang_Key2StrVar:= @str_gstat_Lobby;
-   'str_gstat_WonTeam'                  : lang_Key2StrVar:= @str_gstat_WonTeam;
+   'str_gstat_WonBy'                    : lang_Key2StrVar:= @str_gstat_WonBy;
    'str_gstat_Started'                  : lang_Key2StrVar:= @str_gstat_Started;
    'str_gstat_Win'                      : lang_Key2StrVar:= @str_gstat_Win;
    'str_gstat_Lose'                     : lang_Key2StrVar:= @str_gstat_Lose;
@@ -618,6 +618,7 @@ begin
    'str_uarm_zombie'                    : lang_Key2StrVar:= @str_uarm_zombie;
    'str_uarm_ressurect'                 : lang_Key2StrVar:= @str_uarm_ressurect;
    'str_uarm_heal'                      : lang_Key2StrVar:= @str_uarm_heal;
+   'str_uarm_consume'                   : lang_Key2StrVar:= @str_uarm_consume;
    'str_uarm_spawn'                     : lang_Key2StrVar:= @str_uarm_spawn;
    'str_uarm_targets'                   : lang_Key2StrVar:= @str_uarm_targets;
    'str_uarm_BaseImpact'                : lang_Key2StrVar:= @str_uarm_BaseImpact;
@@ -1371,9 +1372,7 @@ begin
    vl:=StringReplace(vl,'str_keyPoint_CTime_Def_Sec'  ,i2s(keyPoint_CTime_Def_Sec) ,replace_a);
    vl:=StringReplace(vl,'str_keyPoint_mcN'            ,i2s(keyPoint_mcN)           ,replace_a);
 
-   vl:=StringReplace(vl,'str_HellLoot_Add1'           ,i2s(HellLoot_Add1)          ,replace_a);
-   vl:=StringReplace(vl,'str_HellLoot_Add2'           ,i2s(HellLoot_Add2)          ,replace_a);
-   vl:=StringReplace(vl,'str_HellLoot_Add3'           ,i2s(HellLoot_Add3)          ,replace_a);
+   vl:=StringReplace(vl,'str_HellLoot_AddPerB'        ,i2s(HellLoot_AddPerB)       ,replace_a);
 
    vl:=StringReplace(vl,'str_map_generators_EnergyO'  ,i2s(map_generators_EnergyO) ,replace_a);
    vl:=StringReplace(vl,'str_map_generators_EnergyS'  ,i2s(map_generators_EnergyS) ,replace_a);

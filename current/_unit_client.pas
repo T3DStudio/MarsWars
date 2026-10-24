@@ -421,8 +421,8 @@ begin
          else
            if(hits_si>0)then
            begin
-              wudata_int(vx ,rpl);
-              wudata_int(vy ,rpl);
+              wudata_int(vx,rpl);
+              wudata_int(vy,rpl);
            end
            else
            begin
@@ -537,7 +537,7 @@ begin
    end;
 end;
 begin
-   if(rpl)
+   if(rpl)or(POVPlayer>LastPlayer)
    then wdkpi:=@rpls_kpoints_kpi
    else wdkpi:=@g_PlayersTemp[POVPlayer].net_kpoints_kpi;
 
@@ -592,9 +592,12 @@ begin
          if(state=ps_human)
          and(not isdefeated)
          and(not isobserver)then
-           if(g_PlayersGame[POVPlayer].isobserver)
-           or(team=g_PlayersGame[POVPlayer].team)then
-             SetBBit(@bs_cam,p,true);
+         begin
+            if(POVPlayer<=LastPlayer)then
+              if(not g_PlayersGame[POVPlayer].isobserver)
+              and(team<>g_PlayersGame[POVPlayer].team)then continue;
+            SetBBit(@bs_cam,p,true);
+         end;
 
    wudata_byte(bs_cam,rpl);
    if(bs_cam>0)then
@@ -630,7 +633,7 @@ begin
 
    //writeln(g_tick,' ',wtickb0,' ',wtickb1,' ',wtickb2);
 
-   if(rpl)then
+   if(rpl)or(POVPlayer>LastPlayer)then
    begin
       units_now:=Quality2Units[rpls_Quality];
       lastPUnit:=@rpls_u;
@@ -641,9 +644,9 @@ begin
       lastPUnit:=@g_PlayersTemp[POVPlayer].n_u;
    end;
 
-   bs_defeated :=255;
-   bs_observer :=0;
-   bs_revealed :=0;
+   bs_defeated:=255;
+   bs_observer:=0;
+   bs_revealed:=0;
    for i:=0 to LastPlayer do
      with g_PlayersGame[i] do
        if(state>ps_None)then
@@ -668,10 +671,10 @@ begin
    wudata_byte(bs_observer,rpl);
    if(bs_alive>0)then
    begin
-      if(units_now>255)then units_now:=255;
+      units_now:=mm3i(1,units_now,255);
       wudata_byte(byte(units_now),rpl);
 
-      if(units_now=0)then exit;
+      if(units_now<=0)then exit;
 
       units_now:=min2i(units_ingame,units_now*4);
 
@@ -686,12 +689,14 @@ begin
 
       if(wtickb0)then
       begin
-         if(GetBBit(@bs_alive,POVPlayer))
-         then wpdata_BuildCDRes(POVPlayer,rpl)
+         if(IsPOVPlayerObserver(POVPlayer))then
+         begin
+            for i:=0 to LastPlayer do
+              if(GetBBit(@bs_alive,i))then wpdata_BuildCDRes(i,rpl);
+         end
          else
-           if(POVPlayer>LastPlayer)or(GetBBit(@bs_observer,POVPlayer))then
-             for i:=0 to LastPlayer do
-               if(GetBBit(@bs_alive,i))then wpdata_BuildCDRes(i,rpl);
+           if(GetBBit(@bs_alive,POVPlayer))then
+             wpdata_BuildCDRes(POVPlayer,rpl);
 
          wpdata_Upgrades(rpl,bs_alive);
          wudata_byte(bs_revealed,rpl);
@@ -1766,12 +1771,14 @@ begin
 
       if(wtickb0)then
       begin
-         if(GetBBit(@bs_alive,POVPlayer))
-         then rpdata_BuildCDRes(POVPlayer,rpl)
+         if(IsPOVPlayerObserver(POVPlayer))then
+         begin
+            for i:=0 to LastPlayer do
+              if(GetBBit(@bs_alive,i))then rpdata_BuildCDRes(i,rpl);
+         end
          else
-           if(POVPlayer>LastPlayer)or(GetBBit(@bs_observer,POVPlayer))then
-             for i:=0 to LastPlayer do
-               if(GetBBit(@bs_alive,i))then rpdata_BuildCDRes(i,rpl);
+           if(GetBBit(@bs_alive,POVPlayer))then
+             rpdata_BuildCDRes(POVPlayer,rpl);
 
          rpdata_Upgrades(rpl,bs_alive);
          bs:=rudata_byte(rpl,0);

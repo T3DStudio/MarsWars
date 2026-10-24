@@ -67,7 +67,7 @@ General:
 - added a short Hell-vs-Hell training campaign;
 
 - two new resource types and special technologies that utilize them have been added to the game: "Hell Artifacts" and "UAC Loot":
--- "Hell Artifacts," when playing as Hell: automatically replenished with the "Altar of Pain" building - one building provides 100 units per second, two - 150, three - 200; more than three cannot be built; the building takes up 8 limit, which should force the player to choose between playing a large army or a smaller army reinforced with "magic";
+-- "Hell Artifacts," when playing as Hell: automatically replenished with the "Altar of Pain" building - provides 100 per second from each Altar; more than 3 cannot be built; the building takes up 8 limit, which should force the player to choose between playing a large army or a smaller army reinforced with "magic";
 The resource is spent on using special abilities from the "Altar of Pain" itself - 3 spheres from Sculltag:
 'Damage Resistance Sphere' - applied to any friendly or allied unit/building - for 30 seconds, the target takes half the damage and is immune to paint state effects;
 'Double Damage Sphere' - applied to any friendly or allied unit/building that can attack - doubles damage for 20 seconds;
@@ -117,8 +117,9 @@ The "Evil Eye Nest" itself also "detectors" invisible units around it;
 - the "Hell Knight" and "Baron of Hell" have had their limit increased by 1 (to 3 and 4, respectively), and their health, damage, and cost have been proportionally increased;
 - activating "active" detection and reconnaissance abilities (UAC's "Radar" ability and Hell's "Evil Eye Nest" abilities) now requires a separate upgrade;
 - the maximum level of basic unit attack/defense upgrades has been reduced from 5 to 4, the bonus from each level has been proportionally increased, and prices have been adjusted: the first level has become more expensive, while the last level is slightly cheaper.
-- upgrades for improving the teleporter and transport now require an advanced builder instead of a special "technological" building.
-
+- upgrades for improving the teleporter and transport now require an advanced builder instead of a special "technological" building;
+- "Pain Elemental" now has a new attack type, "devouring". This attack can only target enemy Lost Souls and Phantoms. The elemental quickly pulls the target unit to itself, instantly killing it;
+- "Lost Soul" and "Phantom" are no longer affected by the PainState threshold upgrade.
 
 53:
 General:

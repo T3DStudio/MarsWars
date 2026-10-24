@@ -170,7 +170,6 @@ TUnitVis = record
             : integer;
    lvlstr_w,  // weapon upgrades
    lvlstr_r,  // reload
-   lvlstr_b,  // buffs
    lvlstr_l,  // level
    lvlstr_a,  // armor
    lvlstr_s   // other upgrs

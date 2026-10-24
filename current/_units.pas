@@ -1252,7 +1252,7 @@ end;
 function unit_attack(pAttacker:PTUnit):boolean;
 var arm,a   : byte;
 pTarget     : PTUnit;
-damage,
+damage,kx,ky,
 upgradd,c   : integer;
 fakemissile,
 attackinmove: boolean;
@@ -1502,6 +1502,29 @@ wpt_resurect    : begin
 wpt_heal        : begin
                      damage:=round((aw_object_count+upgradd)*impactX);
                      pTarget^.hits:=mm3i(1,pTarget^.hits+damage,pTarget^.uid^.uid_MaxHits1);
+                  end;
+wpt_consume     : begin
+                     if(pTarget^.buffs[ub_PainState]<=0)then
+                     begin
+                        {$IFDEF _FULLGAME}
+                        effect_UnitPain(pTarget,nil);
+                        {$ENDIF}
+                        pTarget^.buffs[ub_PainState]:=aw_reload*2;
+                     end;
+                     pTarget^.dir:=dir;
+                     pTarget^.isfly:=isfly;
+                     c:=dir_MOD360(dir+23) div 45;
+                     damage:=max2i(1,(aw_reload-a_rld));
+
+                     kx:=x+dir_stepX[c]*uid_MissileR;
+                     ky:=y+dir_stepX[c]*uid_MissileR;
+
+                     if(abs(pTarget^.x-kx)<=damage)then pTarget^.x:=kx else pTarget^.x-=sign(pTarget^.x-kx)*damage;
+                     if(abs(pTarget^.y-ky)<=damage)then pTarget^.y:=ky else pTarget^.y-=sign(pTarget^.y-ky)*damage;
+
+                     if((point_dist_int(x,y,pTarget^.vx,pTarget^.vy)-uid_r)<=0)then
+                       unit_damage(pTarget,pTarget^.hits,playeri,true);
+
                   end;
                 end;
             end;

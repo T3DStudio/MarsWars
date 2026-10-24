@@ -902,6 +902,7 @@ begin
    snd_pain_ready           :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'pain\d_pain_c');
    snd_pain_death           :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'pain\d_pain_d');
    snd_pain_pain            :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'pain\d_pain_p');
+   snd_pain_consume         :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'pain\consume');
 
    snd_mastermind_ready     :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'mastermind\d_u6_c');
    snd_mastermind_death     :=snd_SoundSetLoad(folder_RaceUnits[r_hell]+'mastermind\d_u6_d');
