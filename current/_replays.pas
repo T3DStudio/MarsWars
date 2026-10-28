@@ -125,7 +125,7 @@ begin
    begin
       if(target_Tick>g_Tick)then
       begin
-         vi:=(target_Tick-g_Tick) div 2;
+         vi:=(target_Tick-g_Tick);
          if(vi>rpls_ForwardSkip.MaxValue)
          then rpls_ForwardSkip:=rpls_ForwardSkip.MaxValue
          else rpls_ForwardSkip:=integer(vi);
@@ -330,7 +330,6 @@ begin
       rpls_pstate      :=rpls_write;
       rpls_u           :=0;
       rpls_player      :={$IFDEF _FULLGAME}LocalPlayer{$ELSE}255{$ENDIF};
-      rpls_Ticks       :=0;
       rpls_GameStatus  :=255;
       rpls_PlayersScore:=false;
       {$IFDEF _FULLGAME}
@@ -407,7 +406,7 @@ begin
       rpls_GameStatus:=gs;
 
       if(gs=gs_running)then
-        wclinet_gframe(rpls_player,rpls_WriteTimeServer,true);
+        wclinet_gframe(rpls_player,true);
    end;
 
    if(rpls_file_LastErr<>0)then
@@ -551,13 +550,8 @@ begin
            with g_PlayersGame[p] do
              if(length(name)>MaxPlayerNameLen)then setlength(name,MaxPlayerNameLen);
 
-         if(rpls_pnu=0)then rpls_pnu:=net_SendTimeServer;
-         UnitStepTicks:=trunc(MaxUnits/rpls_pnu)*net_SendTimeServer;
-         if(UnitStepTicks=0)then UnitStepTicks:=1;
-
          rpls_pstate:=rpls_read;
          rpls_pnu   :=0;
-         rpls_Ticks :=0;
          if(rpls_player<=LastPlayer)
          then LocalPlayer:=rpls_player
          else LocalPlayer:=0;
@@ -606,6 +600,7 @@ begin
    begin
       replay_SavePlayPosition;
 
+      //debuglog_pref:='g_status ';
       i:=rudata_byte(true,0);
       g_status:=i and %00011111;
 
@@ -619,7 +614,7 @@ begin
       if((i and %00100000)>0)then rudata_PlayersScores(true);
 
       if(g_status=gs_running)
-      then rclinet_gframe(rpls_player,rpls_WriteTimeServer,true,rpls_FastSkip)
+      then rclinet_gframe(rpls_player,true,rpls_FastSkip)
       else
         if(gs<>g_status)and(game_IsEnded)then game_LocalEnd;
 
@@ -669,22 +664,16 @@ begin
    then replay_Abort
    else
      if(g_started)then
-     begin
-        rpls_Ticks+=1;
-        case rpls_pstate of
-        rpls_write : if(rpls_fstate<>rpls_write)
-                     then replay_WriteHead
-                     else
-                       if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
-                         replay_WriteGameFrame;
-        {$IFDEF _FULLGAME}
-        rpls_read  : if(rpls_fstate=rpls_read)then
-                       if((rpls_Ticks mod rpls_WriteTimeServer)=0)then
-                         replay_ReadGameFrame;
-        {$ENDIF}
-        else replay_Abort;
-        end;
-     end;
+       case rpls_pstate of
+       rpls_write : if(rpls_fstate<>rpls_write)
+                    then replay_WriteHead
+                    else replay_WriteGameFrame;
+       {$IFDEF _FULLGAME}
+       rpls_read  : if(rpls_fstate=rpls_read)then
+                      replay_ReadGameFrame;
+       {$ENDIF}
+       else replay_Abort;
+       end;
 end;
 
 {$IFDEF _FULLGAME}

@@ -11,16 +11,13 @@ begin
      end;
 end;
 
-procedure cl_calcWTicks(dataPeriod:byte;pwtickb0,pwtickb1,pwtickb2:pboolean;rpl:boolean);
-var wtick:cardinal;
+procedure cl_calcWTicks(pwtickb0,pwtickb1,pwtickb2:pboolean;rpl:boolean);
 begin
-   wtick:=g_tick div dataPeriod;
-
-   pwtickb0^:=(wtick mod cardinal(fr_fps1 div dataPeriod))=0;
+        pwtickb0^:=(g_tick mod fr_fps1)=0;  // every second
    if(rpl)
-   then pwtickb1^:=(wtick mod cardinal(fr_fps2 div dataPeriod))=0  // every 2 second
-   else pwtickb1^:= pwtickb0^;                                     // every second
-   pwtickb2^:=(wtick mod cardinal(fr_fpsd15 div dataPeriod))=0;    // every 8 tick?
+   then pwtickb1^:=(g_tick mod fr_fps2)=0   // every 2 second
+   else pwtickb1^:= pwtickb0^;              // every second
+        pwtickb2^:=(g_tick mod fr_fpsd15)=0;// 4 times per sec
 end;
 
 function IsPOVPlayerObserver(POVPlayer:byte):boolean;
@@ -278,8 +275,8 @@ begin
    then wudata_int(-tar^,rpl)
    else
    begin
-      wudata_int(x^,rpl);
-      wudata_int(y^,rpl);
+      wudata_int(mm3i(0,x^,map_size1),rpl);
+      wudata_int(mm3i(0,y^,map_size1),rpl);
    end;
 end;
 
@@ -613,7 +610,7 @@ begin
          end;
 end;
 
-procedure wclinet_gframe(POVPlayer,dataPeriod:byte;rpl:boolean);
+procedure wclinet_gframe(POVPlayer:byte;rpl:boolean);
 var
 wtickb0,
 wtickb1,
@@ -629,9 +626,7 @@ units_now   : integer;
 begin
    wudata_card(g_tick,rpl);
 
-   cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
-
-   //writeln(g_tick,' ',wtickb0,' ',wtickb1,' ',wtickb2);
+   cl_calcWTicks(@wtickb0,@wtickb1,@wtickb2,rpl);
 
    if(rpl)or(POVPlayer>LastPlayer)then
    begin
@@ -659,7 +654,8 @@ begin
    bs_alive    :=0;
    units_ingame:=0;
    for i:=0 to LastPlayer do
-     if(not GetBBit(@bs_observer,i))and(not GetBBit(@bs_defeated,i))then
+     if (not GetBBit(@bs_observer,i))
+     and(not GetBBit(@bs_defeated,i))then
      begin
         SetBBit(@bs_alive,i,true);
         units_ingame+=MaxPlayerUnits;
@@ -674,9 +670,7 @@ begin
       units_now:=mm3i(1,units_now,255);
       wudata_byte(byte(units_now),rpl);
 
-      if(units_now<=0)then exit;
-
-      units_now:=min2i(units_ingame,units_now*4);
+      units_now:=min2i(units_ingame,units_now*2);
 
       if(wtickb2)then
       begin
@@ -1146,6 +1140,7 @@ begin
    true : replay_ReadBlock(     SizeOf(rudata_byte),@rudata_byte);
    false: net_BufferBlock(false,SizeOf(rudata_byte),@rudata_byte);
    end;
+   //debuglog_addline(b2s(rudata_byte));
 end;
 
 function rudata_word(rpl:boolean;def:word):word;
@@ -1155,6 +1150,7 @@ begin
    true : replay_ReadBlock(     SizeOf(rudata_word),@rudata_word);
    false: net_BufferBlock(false,SizeOf(rudata_word),@rudata_word);
    end;
+   //debuglog_addline(w2s(rudata_word));
 end;
 
 function rudata_sint(rpl:boolean;def:shortint):shortint;
@@ -1164,6 +1160,7 @@ begin
    true : replay_ReadBlock(     SizeOf(rudata_sint),@rudata_sint);
    false: net_BufferBlock(false,SizeOf(rudata_sint),@rudata_sint);
    end;
+   //debuglog_addline(i2s(rudata_sint));
 end;
 
 function rudata_int(rpl:boolean;def:integer):integer;
@@ -1173,6 +1170,7 @@ begin
    true : replay_ReadBlock(     SizeOf(rudata_int),@rudata_int);
    false: net_BufferBlock(false,SizeOf(rudata_int),@rudata_int);
    end;
+   //debuglog_addline(i2s(rudata_int));
 end;
 
 function rudata_lint(rpl:boolean;def:longint):longint;
@@ -1182,6 +1180,7 @@ begin
    true : replay_ReadBlock(     SizeOf(rudata_lint),@rudata_lint);
    false: net_BufferBlock(false,SizeOf(rudata_lint),@rudata_lint);
    end;
+   //debuglog_addline(li2s(rudata_lint));
 end;
 
 function rudata_card(rpl:boolean;def:cardinal):cardinal;
@@ -1191,6 +1190,7 @@ begin
    true : replay_ReadBlock(     SizeOf(rudata_card),@rudata_card);
    false: net_BufferBlock(false,SizeOf(rudata_card),@rudata_card);
    end;
+   //debuglog_addline(c2s(rudata_card));
 end;
 
 function rudata_string(rpl:boolean):shortstring;
@@ -1208,6 +1208,7 @@ begin
          sl-=1;
       end;
    end;
+   //debuglog_addline(rudata_string);
 end;
 
 procedure  rudata_log(p:byte;rpl:boolean);
@@ -1290,6 +1291,7 @@ begin
       a_weap:=255;
       level :=0;
 
+      //debuglog_pref:='  byte1 ';
       byte1:=rudata_byte(rpl,0);
 
       iscomplete:=GetBBit(@byte1,0);
@@ -1359,6 +1361,7 @@ end;
 
 function rudata_reload(r:pinteger;rpl:boolean):byte;
 begin
+   //debuglog_pref:='  rudata_reload ';
    rudata_reload:=rudata_byte(rpl,0);
    if(rudata_reload=0)
    then r^:=0
@@ -1393,6 +1396,7 @@ tu: PTUnit;
 begin
    rudata_UnitTar:=false;
    i:=x^;
+   //debuglog_pref:='  UnitTar1 ';
    x^:=rudata_int(rpl,0);
    if(i<>x^)then rudata_UnitTar:=true;
    if(IsUnitRange(-x^,@tu))then
@@ -1405,6 +1409,7 @@ begin
    begin
       i:=y^;
       tar^:=0;
+      //debuglog_pref:='  UnitTar2 ';
       y^  :=rudata_int(rpl,0);
       if(i<>y^)then rudata_UnitTar:=true;
    end;
@@ -1428,7 +1433,9 @@ begin
          ua_amove   : rudata_UnitTar(@uo_tar,@uo_x,@uo_y,rpl);
          ua_patrol,
          ua_apatrol : begin
+                         //debuglog_pref:='  UnitOrderTar uo_x ';
                          uo_x:=rudata_int(rpl,x);
+                         //debuglog_pref:='  UnitOrderTar uo_y ';
                          uo_y:=rudata_int(rpl,y);
                       end;
          ua_ability1,
@@ -1436,14 +1443,18 @@ begin
          ua_ability3: with g_aids[unit_UO2Ability(pu,uo)] do
                         if(ua_type=uat_point)then
                         begin
+                           //debuglog_pref:='  UnitOrderTar uo_x ';
                            uo_x:=rudata_int(rpl,x);
+                           //debuglog_pref:='  UnitOrderTar uo_y ';
                            uo_y:=rudata_int(rpl,y);
                         end;
          end;
          case uo of
          ua_patrol,
          ua_apatrol : begin
+                         //debuglog_pref:='  UnitOrderTar uo_bx ';
                          uo_bx:=rudata_int(rpl,-1);
+                         //debuglog_pref:='  UnitOrderTar uo_by ';
                          uo_by:=rudata_int(rpl,-1);
                       end;
          end;
@@ -1464,6 +1475,7 @@ begin
    with uu^  do
    with uid^ do
    begin
+      //debuglog_pref:='  owner b ';
       b:=rudata_byte(rpl,0);
 
       if(rpl)
@@ -1508,6 +1520,7 @@ begin
       cycle_order:=unum mod order_period;
       playeri:=(unum-1) div MaxPlayerUnits;
       player :=@g_PlayersGame[playeri];
+      //debuglog_pref:='  unum         '+i2s(unum)+'        hits  ';
       if(not DEAD)
       then sh:=rudata_sint(rpl,-128)
       else
@@ -1518,6 +1531,7 @@ begin
       if(sh>-127)then
       begin
          i   :=uidi;
+         //debuglog_pref:='  uidi ';
          uidi:=rudata_byte(rpl,0);
          if(i<>uidi)then
          begin
@@ -1530,18 +1544,23 @@ begin
 
          if(transportU>0)then
          begin
+            //debuglog_pref:='  transportU ';
             transportU:=rudata_int(rpl,0);
             if(not IsUnitRange(transportU,nil))then transportU:=0;
          end
          else
            if(sh>0)then
            begin
+              //debuglog_pref:='  x ';
               x:=rudata_int(rpl,x);
+              //debuglog_pref:='  y ';
               y:=rudata_int(rpl,y);
            end
            else
            begin
+              //debuglog_pref:='  x1b ';
               x:=integer(rudata_byte(rpl,0) shl 5)+(x mod 32);
+              //debuglog_pref:='  y1b ';
               y:=integer(rudata_byte(rpl,0) shl 5)+(y mod 32);
            end;
 
@@ -1550,6 +1569,7 @@ begin
             if(iscomplete)then
               if(transformTimer>0)then
               begin
+                 //debuglog_pref:='  transformUID ';
                  transformUID:=rudata_byte(rpl,0);
                  rudata_reload(@transformTimer,rpl);
               end
@@ -1557,13 +1577,16 @@ begin
               begin
                  if(a_tar=-1)then
                  begin
+                    //debuglog_pref:='  weapon ';
                     wt    :=rudata_word(rpl,0);
                     a_tar :=integer(wt and %0000001111111111);
                     a_weap:=(wt and %1111110000000000) shr 10;
                  end;
                  if(uid^.uid_ability_isradar)and(buffs[ub_Cast]>0)then
                  begin
+                    //debuglog_pref:='  r uo_x ';
                     uo_x:=integer(rudata_byte(rpl,0) shl 5);
+                    //debuglog_pref:='  r uo_y ';
                     uo_y:=integer(rudata_byte(rpl,0) shl 5);
                  end;
               end;
@@ -1656,6 +1679,7 @@ begin
    end;
 end;
 begin
+   //debuglog_pref:='kpi ';
    a  :=rudata_byte(rpl,0);
    kpi:=a and %00011111;
 
@@ -1688,7 +1712,7 @@ begin
      end;
 end;
 
-procedure rclinet_gframe(POVPlayer,dataPeriod:byte;rpl,fast_skip:boolean);
+procedure rclinet_gframe(POVPlayer:byte;rpl,fast_skip:boolean);
 var
 wtickb0,
 wtickb1,
@@ -1703,12 +1727,16 @@ units_now,
 lastUnit   : integer;
 begin
    rpoint_ChangeAnnoncer:=false;
+   //debuglog_pref:='g_tick ';
    g_tick:=rudata_card(rpl,g_tick);
 
-   cl_calcWTicks(dataPeriod,@wtickb0,@wtickb1,@wtickb2,rpl);
+   cl_calcWTicks(@wtickb0,@wtickb1,@wtickb2,rpl);
 
+   //debuglog_pref:='bs_defeated ';
    bs_defeated :=rudata_byte(rpl,255);
+   //debuglog_pref:='bs_observer ';
    bs_observer :=rudata_byte(rpl,0);
+
    bs_alive    :=0;
    units_ingame:=0;
    for i:=0 to LastPlayer do
@@ -1725,7 +1753,8 @@ begin
 
    if(bs_alive>0)then
    begin
-      units_now:=rudata_byte(rpl,0)*4;
+      //debuglog_pref:='units_now ';
+      units_now:=rudata_byte(rpl,0)*2;
 
       if(units_now<=0)then exit;
 
@@ -1735,7 +1764,7 @@ begin
       begin
          rpls_pnu:=units_now;
          if(rpls_pnu<=0)then rpls_pnu:=1;
-         UnitStepTicks:=round(units_ingame/rpls_pnu*dataPeriod)+1;
+         UnitStepTicks:=round(units_ingame/rpls_pnu)+1;
          if(UnitStepTicks=0)then UnitStepTicks:=1;
       end;
 
@@ -1781,12 +1810,14 @@ begin
              rpdata_BuildCDRes(POVPlayer,rpl);
 
          rpdata_Upgrades(rpl,bs_alive);
+         //debuglog_pref:='isrevealed ';
          bs:=rudata_byte(rpl,0);
          for i:=0 to LastPlayer do
            with g_PlayersGame[i] do
              isrevealed:=GetBBit(@bs,i);
       end;
 
+      //debuglog_pref:='lastUnit ';
       lastUnit:=rudata_int(rpl,0);
       for i:=1 to units_now do
       begin

@@ -220,7 +220,7 @@ begin
 
    players_SetDefaults;
 
-   UnitStepTicks := 8;
+   UnitStepTicks := UnitVX2XStepTicks;
 
    g_royal_RCur  := g_royal_RCur.MaxValue;
 

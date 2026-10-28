@@ -915,7 +915,7 @@ begin
         begin
            circleColor(vid_screen,ix,iy,uid_r  ,c_gray);
            circleColor(vid_screen,ix,iy,srange,c_white);
-           if(isselected)then
+           if(isselected)or(m_UnitTargetN=unum)then
            begin
               //lineColor(vid_screen,ix,iy,ui_mapx+pf_mv_nx-ui_cam_x  ,ui_mapy+pf_mv_ny-ui_cam_y  ,c_red );
               //lineColor(vid_screen,ix,iy,ui_mapx+move_x    -ui_cam_x+1,ui_mapy+move_y    -ui_cam_y+1,c_lime);
@@ -925,7 +925,12 @@ begin
 
                //rectangleColor(vid_screen,ix,iy,ix+_rx2y_r*2*ugrid_cellw+ugrid_cellw,iy+_rx2y_r*2*ugrid_cellw+ugrid_cellw,c_red);
 
-              lineColor(vid_screen,ix+1,iy+1,uo_x+ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
+              draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_LU,255, PlayerGetColorDef(playeri));
+              draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColorDef(playeri));
+              //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
+              draw_text(vid_screen,ix,iy+20,b2s(uo_tar), ta_LU,255, PlayerGetColorDef(playeri));
+
+              lineColor(vid_screen,ix+1,iy+1,uo_x-ui_cam_x  ,uo_y-ui_cam_y  ,c_white);
 
               if(aiu_alarm_d<32000)then
               lineColor(vid_screen,ix,iy,aiu_alarm_x+ui_cam_x  ,aiu_alarm_y+ui_cam_y  ,c_red );
@@ -935,8 +940,8 @@ begin
            draw_text(vid_screen,ix,iy   ,i2s(u)     , ta_LU,255, PlayerGetColorDef(playeri));
            draw_text(vid_screen,ix,iy+10,i2s(hits)  , ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+20,i2s(_unit_SpriteDepth(g_punits[u]) ), ta_LU,255, PlayerGetColor(playeri));
-           draw_text(vid_screen,ix,iy+20,b2s(uo_id), ta_LU,255, PlayerGetColorDef(playeri));
-           draw_text(vid_screen,ix,iy+30,i2s(buffs[ub_Cast]), ta_LU,255, PlayerGetColorDef(playeri));
+           draw_text(vid_screen,ix,iy+20,b2s(uo_tar), ta_LU,255, PlayerGetColorDef(playeri));
+           //draw_text(vid_screen,ix,iy+30,i2s(buffs[ub_Cast]), ta_LU,255, PlayerGetColorDef(playeri));
            //draw_text(vid_screen,ix,iy+40,li2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));
 
 //           draw_text(vid_screen,ix,iy+40,i2s(uid_LevelBonusArmor), ta_LU,255, PlayerGetColor(playeri));

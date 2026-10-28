@@ -432,7 +432,6 @@ begin
      end;
 
    // SENDING
-   net_TimerBase:=(net_TimerBase+1) mod net_SendTimeServer;
    net_TimerPing:=(net_TimerPing+1) mod net_SendTimePing;
 
    for pid:=0 to LastPlayer do
@@ -443,13 +442,13 @@ begin
        with g_PlayersTemp[pid] do
          if(state=ps_human)and(net_ttl<fr_fps1)then
          begin
-            if(g_started)and(net_TimerBase=0)then
+            if(g_started)then
             begin
                net_clearbuffer;
                net_writebyte(nmid_GameData);
                net_writebyte(g_status);
                case g_status of
-               gs_running    : wclinet_gframe(pid,net_SendTimeServer,false);
+               gs_running    : wclinet_gframe(pid,false);
                gs_waitplayers: net_WritePlayersDelay;
                end;
                if(game_IsEnded)then wudata_PlayersScores(false);
@@ -707,7 +706,7 @@ nmid_GameData    : if(g_started)then
                       i:=g_status;
                       g_status:=net_readbyte;
                       case g_status of
-                      gs_running    : rclinet_gframe(LocalPlayer,net_SendTimeServer,false,false);
+                      gs_running    : rclinet_gframe(LocalPlayer,false,false);
                       gs_waitplayers: net_ReadPlayersDelay;
                       end;
                       if(game_IsEnded)then

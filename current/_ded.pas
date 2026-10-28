@@ -1,6 +1,7 @@
 
 const
 ded_ConsoleBaseLine = '                                                                                          ';
+ded_logY            = 21;
 
 procedure dedicated_Lang;
 begin
@@ -171,13 +172,16 @@ begin
    GotoXY(x,y);
 end;
 
-procedure dedicated_Line1(s1:shortstring='');
+procedure dedicated_Line1(pY:byte;s1:shortstring='');
 begin
+   GotoXY(1,pY);
    dedicated_ClearLine;
    writeln(s1);
+   GotoXY(1,ded_logY);
 end;
 
-procedure dedicated_Line5(s1:shortstring;x1:byte;
+procedure dedicated_Line5(pY:byte;
+                          s1:shortstring;x1:byte;
                           s2:shortstring;x2:byte;
                           s3:shortstring;x3:byte;
                           s4:shortstring;x4:byte;
@@ -199,6 +203,7 @@ begin
    end;
 end;
 begin
+   GotoXY(1,pY);
    s:=ded_ConsoleBaseLine;
    if(x1>0)then ss(@s1,x1);
    if(x2>0)then ss(@s2,x2);
@@ -207,9 +212,10 @@ begin
    if(x5>0)then ss(@s5,x5);
    if(x6>0)then ss(@s6,x6);
    writeln(s);
+   GotoXY(1,ded_logY);
 end;
 
-procedure PlayerDataLine(p:byte);
+procedure PlayerDataLine(pY,p:byte);
 function PlayerGetPINGStr:shortstring;
 begin
    PlayerGetPINGStr:='';
@@ -217,15 +223,14 @@ begin
    with g_PlayersTemp[p] do
      if(state=ps_human)then PlayerGetPINGStr:=w2s(net_ping);
 end;
-
 begin
    with g_PlayersGame[p] do
      if(state=ps_none)
-     then   dedicated_Line5(b2s(p+1),1,player_GetStateString(p),3,name,11,'',29,'',39,'',49)
+     then   dedicated_Line5(pY,b2s(p+1),1,player_GetStateString(p),3,name,11,'',29,'',39,'',49)
      else
        if(isobserver)
-       then dedicated_Line5(b2s(p+1),1,player_GetStateString(p),3,name,11,str_observer   ,29, ''         ,39, PlayerGetPINGStr,49)
-       else dedicated_Line5(b2s(p+1),1,player_GetStateString(p),3,name,11,str_race[mrace],29, b2s(team+1),39, PlayerGetPINGStr,49);
+       then dedicated_Line5(pY,b2s(p+1),1,player_GetStateString(p),3,name,11,str_observer   ,29, ''         ,39, PlayerGetPINGStr,49)
+       else dedicated_Line5(pY,b2s(p+1),1,player_GetStateString(p),3,name,11,str_race[mrace],29, b2s(team+1),39, PlayerGetPINGStr,49);
 end;
 
 function Dedicated_GameStatusStr:shortstring;
@@ -266,25 +271,25 @@ begin
    if(console_y<=ded_ScreenUpdatePause)then
    begin
       case console_y of
-      0 : dedicated_Line1(str_wcaption+' '+str_copyright+str_net_UDPPort+w2s(net_ServerPort));
-      2 : dedicated_Line1(str_gstat_Status+Dedicated_GameStatusStr);
-      4 : dedicated_Line1(str_Caption_GOptions);
-      6 : dedicated_Line5(str_GO_FixedStarts   ,1, str_GO_AISlots,22, str_GO_NewObservers,40, str_SR_RecordGames,72,'',55,'',70);
-      8 : dedicated_Line5(b2c[g_FixedPositions],1, g_AISlotsStr  ,22, b2c[g_NewObservers],40, b2c[rpls_Record]  ,72,'',55,'',70);
-      10: dedicated_Line1;
-      12: dedicated_Line1(str_Caption_Map);
-      14: dedicated_Line5(str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);
-      16: dedicated_Line5(str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generatorT],15, c2s(map_seed),30, i2s(map_Size1),45, str_map_TemplateL[map_Template],55, str_map_SymmetryL[map_symmetry],70);
-      18: dedicated_Line1;
-      20: dedicated_Line5('#',1,str_State                ,3, str_Player,11,str_srace,29,str_team ,39, str_ping,49);   // captions
-      22: PlayerDataLine(0);
-      24: PlayerDataLine(1);
-      26: PlayerDataLine(2);
-      28: PlayerDataLine(3);
-      30: PlayerDataLine(4);
-      32: PlayerDataLine(5);
-      34: PlayerDataLine(6);
-      36: PlayerDataLine(7);
+      0 : dedicated_Line1(1 ,str_wcaption+' '+str_copyright+str_net_UDPPort+w2s(net_ServerPort));
+      2 : dedicated_Line1(2 ,str_gstat_Status+Dedicated_GameStatusStr);
+      4 : dedicated_Line1(3 ,str_Caption_GOptions);
+      6 : dedicated_Line5(4 ,str_GO_FixedStarts   ,1, str_GO_AISlots,22, str_GO_NewObservers,40, str_SR_RecordGames,72,'',55,'',70);
+      8 : dedicated_Line5(5 ,b2c[g_FixedPositions],1, g_AISlotsStr  ,22, b2c[g_NewObservers],40, b2c[rpls_Record]  ,72,'',55,'',70);
+      10: dedicated_Line1(6 );
+      12: dedicated_Line1(7 ,str_Caption_Map);
+      14: dedicated_Line5(8 ,str_map_Scenario               ,1, str_map_Generators                 ,15, str_map_Seed ,30, str_map_Size  ,45, str_map_Template               ,55, str_map_Symmetry               ,70);
+      16: dedicated_Line5(9 ,str_map_ScenarioL[map_scenario],1, str_map_GeneratorsL[map_generatorT],15, c2s(map_seed),30, i2s(map_Size1),45, str_map_TemplateL[map_Template],55, str_map_SymmetryL[map_symmetry],70);
+      18: dedicated_Line1(10);
+      20: dedicated_Line5(11,'#',1,str_State                ,3, str_Player,11,str_srace,29,str_team ,39, str_ping,49);   // captions
+      22: PlayerDataLine(12,0);
+      24: PlayerDataLine(13,1);
+      26: PlayerDataLine(14,2);
+      28: PlayerDataLine(15,3);
+      30: PlayerDataLine(16,4);
+      32: PlayerDataLine(17,5);
+      34: PlayerDataLine(18,6);
+      36: PlayerDataLine(19,7);
       end;
 
       console_y+=1;

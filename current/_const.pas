@@ -299,7 +299,6 @@ net_MaxPing               = word.MaxValue-fr_FrameMS;
 net_SendTimePing          = fr_fps2;
 net_SendTimeClient1       = fr_fpsq;
 net_SendTimeClient2       = fr_fpsd10;
-net_SendTimeServer        = fr_fps1 div 30;
 MaxNetBuffer              = 8192;
 
 net_svLanAdv_port         = 63666; // local servers advertisement port
@@ -976,6 +975,8 @@ psi_Last               = 2;
 //  OTHER
 //
 
+UnitVX2XStepTicks      = 8;
+
 PlayerMaxBuilders      = 4;
 
 UACGeneralsMax         = 4;
@@ -1089,8 +1090,6 @@ DefaultTargetWeight    = 100;
 //
 rpls_none              = 0;
 rpls_write             = 1;
-
-rpls_WriteTimeServer   = fr_fps1 div 30;
 
 rpls_RecordTriesMax    = 2;
 rpls_RecordTryPauseMax = fr_fps1;

@@ -104,7 +104,7 @@ begin
   // ' '+b2c[ui_uibtn_sabilityu=nil]+
    //' '+b2c[ui_uibtn_pabilityu=nil]+
    //' '+b2c[ui_fog_CheckXY(mouse_map_x-ui_cam_x,mouse_map_y-ui_cam_y,@i,@n)]+   ui_CheckMapPointFogVision(mouse_map_x,mouse_map_y,true)
-   ' '+tc_green+w2s(map_GetZone(mouse_map_x,mouse_map_y))+
+   ' '+tc_green+i2s(mouse_map_x)+','+i2s(mouse_map_y)+'  '+w2s(map_GetZone(mouse_map_x,mouse_map_y))+
    ' '+tc_aqua+b2s(menu_ItemSelected)+' '+b2c[map_AI_BusyCenterR]+' '+i2s(map_AI_RB_r)+' '+i2s(map_DistToObstacleEdge(mouse_map_x,mouse_map_y,0,0,true))
    {' '+i2s(mouse_map_x div pf_pathmap_w)+
    ' '+i2s(mouse_map_y div pf_pathmap_w)+

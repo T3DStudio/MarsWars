@@ -1725,6 +1725,36 @@ end;
 
 {$IFDEF _FULLGAME}
 
+{procedure debuglog_clear;
+begin
+   debuglog_b:=not debuglog_b;
+   writeln('debuglog_clear ',debuglog_b);
+   if(not debuglog_b)then exit;
+   debuglog_i:=0;
+   setlength(debuglog_l,debuglog_i);
+end;
+procedure debuglog_addline(line:shortstring);
+begin
+   if(not debuglog_b)
+   or(length(debuglog_pref)=0)then exit;
+   debuglog_i+=1;
+   setlength(debuglog_l,debuglog_i);
+   debuglog_l[debuglog_i-1]:=debuglog_pref+line;
+   debuglog_pref:='';
+end;
+procedure debuglog_write;
+var f:text;
+    i:cardinal;
+begin
+   writeln('debuglog_write ',debuglog_i);
+   assign(f,'debuglog.txt');
+   rewrite(f);
+   if(debuglog_i>0)then
+     for i:=0 to debuglog_i-1 do
+       writeln(f,debuglog_l[i]);
+   close(f);
+end; }
+
 procedure WriteLog(mess:shortstring);
 var f:Text;
 begin

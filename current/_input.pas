@@ -1520,8 +1520,10 @@ begin
    {$IFDEF TESTMODE}
    if(TestMode>0)then
    begin
-      //if(InputActionPressed(iAct_test_debug0      ))then net_debug_resolv;
-      if(InputActionPressed(iAct_test_debug1      ))then TestMode:=0;
+      //if(InputActionPressed(iAct_test_debug0))then debuglog_Clear;
+      //if(InputActionPressed(iAct_test_debug1))then debuglog_Write;
+      if(InputActionPressed(iAct_test_debug1))then TestMode:=0;
+
    end;
    {$ENDIF}
 

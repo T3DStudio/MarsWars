@@ -85,7 +85,7 @@ map_Start2GeneratorStep: integer = 50;
 //  OTHER BASE
 //
 
-UnitStepTicks     : byte = 10;
+UnitStepTicks     : byte = UnitVX2XStepTicks;
 
 LastCreatedUnit   : integer = 0;
 LastCreatedUnitP  : PTUnit;
@@ -115,7 +115,6 @@ rpls_str_path     : shortstring = '';
 rpls_player       : byte = 0;
 rpls_GameStatus   : byte = 0;
 rpls_PlayersScore : boolean = false;
-rpls_Ticks        : cardinal = 0;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_head_itemn   : integer = 0;
 rpls_file_head_size
@@ -163,17 +162,23 @@ u_royal_d         : integer;
 
 ai_names_l        : array[0..ai_names_max-1] of shortstring;
 
-{$IFDEF TESTMODE}
-test_InstaProd    : boolean = false;
-test_w            : word = 0;
-TestMode          : byte = 0;
-{$ENDIF}
-
 {$IFDEF _FULLGAME}
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   CLIENT GAME VARS
 //
+
+
+{$IFDEF TESTMODE}
+test_InstaProd    : boolean = false;
+test_w            : word = 0;
+TestMode          : byte = 0;
+
+{debuglog_i        : cardinal = 0;
+debuglog_l        : array of shortstring;
+debuglog_b        : boolean = false;
+debuglog_pref     : shortstring = '';  }
+{$ENDIF}
 
 
 //sys_WindowFocus   : boolean = true;
