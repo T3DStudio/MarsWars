@@ -546,7 +546,7 @@ end;
 
 UID_Engineer:
 begin
-   uid_AnimStepWalk:=15;
+   uid_AnimStepWalk:=16;
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Engineer);
    setCommandSND(snd_engineer_ready   ,snd_engineer_move   ,snd_engineer_move     ,snd_engineer_select  ,snd_engineer_select   );
@@ -558,7 +558,7 @@ begin
 end;
 UID_Medic:
 begin
-   uid_AnimStepWalk:=15;
+   uid_AnimStepWalk:=16;
    uid_AnimStepDeath:=8;
    setMWSModel(0,@spr_Medic);
    setCommandSND(snd_medic_ready,snd_medic_move,snd_medic_move,snd_medic_annoy,snd_medic_select);

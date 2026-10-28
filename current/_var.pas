@@ -73,8 +73,10 @@ map_ObstaclesGrid : array[0..MapObstaclesGridN,0..MapObstaclesGridN] of TObstacl
 map_KeyPointsN    : byte = 0;
 map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
 map_NeedTransport : boolean = false;
-map_BusyCenter    : boolean = false;
 map_GenOnObstacle : boolean = true;
+
+map_AI_BusyCenterR: boolean = false;
+map_AI_RB_r       : integer = 0;
 
 map_Start2GeneratorStep: integer = 50;
 

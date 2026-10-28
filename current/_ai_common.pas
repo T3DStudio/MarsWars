@@ -41,6 +41,7 @@ ai_available_HKeep,
 ai_HaveTransport,
 ai_SmartTarget,
 ai_useInvis,
+ai_NeedMaxTowers,
 ai_KotH
                      : boolean;
 

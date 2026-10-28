@@ -47,6 +47,8 @@ end;
 
 {$ENDIF}
 
+
+
 procedure map_RefreshObstaclesGrid;
 var d,
 dx0,dy0,
@@ -195,10 +197,11 @@ begin
        if(o_rO>0)and(o_rI>0)then
        begin
           map_NeedTransport:=true;
-          exit;
+          break;
        end;
 
-   map_BusyCenter:=map_GetZone(map_SizeH,map_SizeH)=zone_solid;
+   map_AI_BusyCenterR:=map_GetZone(map_SizeH,map_SizeH)=zone_solid;
+   map_AI_RB_r       :=map_DistToObstacleEdge(map_SizeH,map_SizeH,0,0,true);
 end;
 
 function map_ObstacleR(obs_f:byte):integer;
@@ -357,7 +360,7 @@ begin
          end;
 end;
 
-function map_DistToObstacleEdge(x,y,r:integer;skipR:integer=0):integer;
+function map_DistToObstacleEdge(x,y,r:integer;skipR:integer=0;onlyInner:boolean=false):integer;
 var
 dx0,dy0,
 dx1,dy1,
@@ -379,8 +382,15 @@ begin
              with oc_l[i]^ do
                if(o_rO>0)then
                begin
+                  if(onlyInner)and(o_ri<=0)then continue;
                   if(o_rO<skipR)then continue;
                   d:=point_dist_int(o_x,o_y,x,y);
+                  if(onlyInner)then
+                  begin
+                     if(d<=o_ri)then
+                       map_DistToObstacleEdge:=min2i(o_ri-d,map_DistToObstacleEdge);
+                     continue;
+                  end;
                   o:=abs(d-o_rO);
                   map_DistToObstacleEdge:=min2i(o,map_DistToObstacleEdge);
                   if(o_ri<=0)then continue;

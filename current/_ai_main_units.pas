@@ -450,8 +450,13 @@ begin
                                        if(ai_ScoutCandidate_u<>pu)and(ai_BaseOwn_d<base_r1)
                                        then group:=aic_group_Home;
           aic_group_GenAssault,
-          aic_group_GenWait        : if(not ICanCaptureGenerators)
-                                     then group:=aic_group_Home
+          aic_group_GenWait        : if(not ICanCaptureGenerators)then
+                                     begin
+                                        if(ai_GroupAll_ulimit[aic_group_AttackWait]>0)
+                                        or(ai_GroupAll_ulimit[aic_group_AttackNow ]>0)
+                                        then group:=aic_group_AttackNow
+                                        else group:=aic_group_Home;
+                                     end
                                      else
                                        if(isfly)
                                        then group:=aic_group_GenAssault

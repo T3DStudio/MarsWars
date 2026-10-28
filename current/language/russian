@@ -504,7 +504,7 @@ str_name[UID_HTeleport]         = 'Телепорт'
 str_dscr[UID_HTeleport]         = ''
 str_name[UID_HAltar]            = 'Алтарь боли'
 str_dscr[UID_HAltar]            = 'Использует ресурс "'+str_ui_HellLoot+'" для применения специальных способностей. '
-                                  'Генерирует ресурс "'+str_ui_HellLoot+'": '+str_HellLoot_Add1+' в сек. с каждого здания. '
+                                  'Генерирует ресурс "'+str_ui_HellLoot+'": '+str_HellLoot_AddPerB+' в сек. с каждого здания. '
                                   str_hint_MaxQuantity+str_scirmish_MaxHAltar
 str_name[UID_HCommandCenter]    = 'Адский командный центр'
 str_dscr[UID_HCommandCenter]    = 'Проклятый командный центр'

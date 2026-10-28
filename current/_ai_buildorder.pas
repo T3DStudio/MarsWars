@@ -50,6 +50,11 @@ begin
          if(g_tick<aic_DetectionBuildDelay)and(ai_need_detect>ul1)then ai_need_detect:=ul1;
       end;
 
+      //
+      ai_NeedMaxTowers:=((ai_enemy_d<base_r2)and(aiu_limitaround_ally<aiu_limitaround_enemy))
+                      or(ai_KotH and(ai_keypoint_d<=keyPoint_KotR))
+                      or((map_scenario=mc_royale)and(u_royal_cd<base_r1h));
+
      { if(isselected)or(m_UnitTargetN=unum)then
       begin
          //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds)
@@ -275,32 +280,35 @@ begin
    with player^ do
    begin
       single_adv:=(units_builders_e=1)and(res_energyl_max=1000);
-      if (units_builders_e<needN)
-      and(units_builders_e<aip_MaxBuilders )
-      and(units_builders_e<PlayerMaxBuilders)
-      and(ai_BuildersInTransform   =0)
-      and(ai_BuildersInConstruction=0)
-      and(not ai_earlyAttack)then
-        if((ai_curr_UnitProds>=2)and((units_bld_l[false]>=aip_MaxUnitMinPart)or single_adv))
-        or(uid^.uid_req_EnergyLevel=0)then
-        begin
-           if(not single_adv)then
-             checkExtraEnergy:=550;
-           case race of
-           r_hell: if(ai_available_HKeep)
-                  and(units_builders_e=(aip_MaxBuilders-1))
-                  and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
-                   then SetBuildUID1(UID_HKeep)
-                   else
-                   begin
-                      if (units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])>(units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])then
-                        SetBuildUID1(UID_HCommandCenter);
-                      SetBuildUID1(UID_HKeep)
-                   end;
-           r_uac : SetBuildUID1(UID_UCommandCenter);
-           end;
-           checkExtraEnergy:=0;
-        end;
+
+      if(u_royal_d>base_r1h)
+      or(map_scenario<>mc_royale)then
+        if (units_builders_e<needN)
+        and(units_builders_e<aip_MaxBuilders )
+        and(units_builders_e<PlayerMaxBuilders)
+        and(ai_BuildersInTransform   =0)
+        and(ai_BuildersInConstruction=0)
+        and(not ai_earlyAttack)then
+          if((ai_curr_UnitProds>=2)and((units_bld_l[false]>=aip_MaxUnitMinPart)or single_adv))
+          or(uid^.uid_req_EnergyLevel=0)then
+          begin
+             if(not single_adv)then
+               checkExtraEnergy:=550;
+             case race of
+             r_hell: if(ai_available_HKeep)
+                    and(units_builders_e=(aip_MaxBuilders-1))
+                    and((units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])=0)
+                     then SetBuildUID1(UID_HKeep)
+                     else
+                     begin
+                        if (units_uid_e[UID_HKeep]+units_uid_e[UID_HAKeep])>(units_uid_e[UID_HCommandCenter]+units_uid_e[UID_HACommandCenter])then
+                          SetBuildUID1(UID_HCommandCenter);
+                        SetBuildUID1(UID_HKeep)
+                     end;
+             r_uac : SetBuildUID1(UID_UCommandCenter);
+             end;
+             checkExtraEnergy:=0;
+          end;
    end;
 end;
 procedure SetDetectors(needL:longint);
@@ -325,17 +333,19 @@ begin
 
    with pBuilder^  do
    with player^ do
-     case race of
-     r_hell: case g_random(3) of
-             0: SetBuildUID1(UID_HPentagram,1);
-             1: SetBuildUID1(UID_HMonastery,1);
-             2: SetBuildUID1(UID_HFortress ,1);
-             end;
-     r_uac : case g_random(2) of
-             0: SetBuildUID1(UID_UScienceCenter  ,1);
-             1: SetBuildUID1(UID_UComputerStation,1);
-             end;
-     end;
+     if(u_royal_d>base_r2)
+     or(map_scenario<>mc_royale)then
+       case race of
+       r_hell: case g_random(3) of
+               0: SetBuildUID1(UID_HPentagram,1);
+               1: SetBuildUID1(UID_HMonastery,1);
+               2: SetBuildUID1(UID_HFortress ,1);
+               end;
+       r_uac : case g_random(2) of
+               0: SetBuildUID1(UID_UScienceCenter  ,1);
+               1: SetBuildUID1(UID_UComputerStation,1);
+               end;
+       end;
 end;
 procedure SetTeleport(need:integer);
 begin
@@ -364,18 +374,11 @@ begin
      r_uac : begin
                 if(res_UACLoot >1000)then SetBuildUID1(UID_UAcademy    ,1);
                 if(res_HellLoot>1000)then SetBuildUID1(UID_UHArtStorage,1);
-                SetBuildUID1(UID_URMStation,aip_MaxSuper);
+                if(u_royal_d>base_r2)
+                or(map_scenario<>mc_royale)then SetBuildUID1(UID_URMStation,aip_MaxSuper);
              end;
      end;
 end;
-function NeedMaxTowers:boolean;
-begin
-   with pBuilder^  do
-     NeedMaxTowers:=((ai_enemy_d<base_r2)and(aiu_limitaround_ally<aiu_limitaround_enemy))
-                  or(ai_KotH and(ai_keypoint_d<=keyPoint_KotR))
-                  or((map_scenario=mc_royale)and(u_royal_cd<base_r1h));
-end;
-
 begin
    build_uid:=0;
    build_x  :=0;
@@ -389,7 +392,7 @@ begin
       // Define UID to build
       if((aip_flags and aif_base_smart_order)>0)then
       begin
-         if(NeedMaxTowers)then
+         if(ai_NeedMaxTowers)then
            SetTowers(aip_MaxTowers);
          SetDetectors(ai_need_detect);
          if(aiu_alarm_d=NOTSET)then
@@ -643,7 +646,7 @@ uprod_smart      : begin
                       exit;
                    end;
 uprod_base       : begin
-                      if(map_scenario=mc_royale)and(map_BusyCenter)then
+                      if(map_scenario=mc_royale)and(map_AI_BusyCenterR)then
                         if(ai_armylimit_fly<ul30)then
                           if(ai_Barrack(pBarrack,uprod_randomFly))then exit;
 

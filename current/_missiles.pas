@@ -310,8 +310,8 @@ begin
           if(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
             case m_homing of
 mh_magnetic : begin
-                 m_tox:=tu^.x+(sign(tu^.x-m_tox)*tu^.uid^.uid_missileR);
-                 m_toy:=tu^.y+(sign(tu^.y-m_toy)*tu^.uid^.uid_missileR);
+                 m_tox:=tu^.x-(sign(tu^.x-m_tox)*tu^.uid^.uid_missileR);
+                 m_toy:=tu^.y-(sign(tu^.y-m_toy)*tu^.uid^.uid_missileR);
                  m_mfe:=tu^.isfly;
               end;
 mh_homing   : begin

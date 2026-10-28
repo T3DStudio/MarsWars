@@ -119,7 +119,7 @@ The "Evil Eye Nest" itself also "detectors" invisible units around it;
 - the maximum level of basic unit attack/defense upgrades has been reduced from 5 to 4, the bonus from each level has been proportionally increased, and prices have been adjusted: the first level has become more expensive, while the last level is slightly cheaper.
 - upgrades for improving the teleporter and transport now require an advanced builder instead of a special "technological" building;
 - "Pain Elemental" now has a new attack type, "devouring". This attack can only target enemy Lost Souls and Phantoms. The elemental quickly pulls the target unit to itself, instantly killing it;
-- "Lost Soul" and "Phantom" are no longer affected by the PainState threshold upgrade.
+- "Lost Soul" and "Phantom" are no longer affected by the "Pain Threshold" upgrade.
 
 53:
 General:

@@ -183,9 +183,11 @@ begin
       and(not tu^.isfly)
       and(pfcheck)
       and(tu<>pu)then
-        if(playeri<>tu^.playeri)
-        then setNearestTarget(@ai_BaseAlly_u,@ai_BaseAlly_d,ud-uid_r-tu^.uid^.uid_r)
-        else setNearestTarget(@ai_BaseOwn_u ,@ai_BaseOwn_d ,ud-uid_r-tu^.uid^.uid_r);
+        if(map_scenario<>mc_royale)
+        or(not game_CheckRoyalBattlePoint(tu^.x,tu^.y,base_r1h))then
+          if(playeri<>tu^.playeri)
+          then setNearestTarget(@ai_BaseAlly_u,@ai_BaseAlly_d,ud-uid_r-tu^.uid^.uid_r)
+          else setNearestTarget(@ai_BaseOwn_u ,@ai_BaseOwn_d ,ud-uid_r-tu^.uid^.uid_r);
 
       if(tu^.uidi=UID_HEye)
       or(tu^.uidi=UID_HEyeNest)then

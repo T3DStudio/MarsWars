@@ -22,6 +22,7 @@ procedure ai_Global_InitVars(pu:PTUnit);forward;
 procedure ai_Global_CollectData(pu,tu:PTUnit;ud:integer;tu_transport:PTUnit;isattackable:boolean);forward;
 procedure ai_Global_Code(pu:PTUnit);forward;
 
+function map_DistToObstacleEdge(x,y,r:integer;skipR:integer=0;onlyInner:boolean=false):integer;   forward;
 function map_GetZone(mx,my:integer;mr:integer=0):word;forward;
 procedure map_SymmetryPoints(startx,starty:integer;resultx,resulty:pinteger);forward;
 

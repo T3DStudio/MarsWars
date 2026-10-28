@@ -146,6 +146,8 @@ function ai_IsTowerUsefull(pTower:PTUnit):boolean;
 begin
    ai_IsTowerUsefull:=true;
 
+   if(ai_NeedMaxTowers)then exit;
+
    if(ai_generator_d<NOTSET)then
      if (ai_generator_d<ai_generator_kp^.kp_RCapture)
      and(ai_generator_d>ai_generator_kp^.kp_RNoBuild)then exit;
@@ -537,9 +539,8 @@ ldir,lx,ly:integer;
 alarmType :byte;
 function RoyalCR:integer;
 begin
-   RoyalCR:=min2i(g_royal_RCur div 3,base_r1h);
+   RoyalCR:=min2i(g_royal_RCur-base_r2,map_AI_RB_r);
 end;
-
 function moveEventType:byte;
 begin
    moveEventType:=0;
@@ -560,19 +561,21 @@ begin
                          moveEventType:=met_koth;
                          exit;
                       end;
-   mc_royale: case pBuilder^.isfly of
-              true : if(u_royal_d<base_r1h)then
-                     begin
-                        moveEventType:=met_royale;
-                        exit;
-                     end;
-              false: if(u_royal_d<base_r1)then
-                     begin
-                        moveEventType:=met_royale;
-                        exit;
-                     end;
-              end;
-
+   mc_royale: if(ai_choosen)
+              then moveEventType:=met_royale
+              else
+                case pBuilder^.isfly of
+                true : if(u_royal_cd>RoyalCR)then
+                       begin
+                          moveEventType:=met_royale;
+                          exit;
+                       end;
+                false: if(u_royal_d<base_r1 )then
+                       begin
+                          moveEventType:=met_royale;
+                          exit;
+                       end;
+                end;
    end;
 
    with pBuilder^ do
@@ -601,7 +604,8 @@ begin
    begin
       if(point_dist_int(uo_x,uo_y,lx,ly)>=lr)then exit;
       if(map_scenario=mc_royale)then
-        if(base_r1h>(g_royal_RCur-point_dist_int(uo_x,uo_y,g_royal_Rx,g_royal_Ry)))then exit;
+        if(game_CheckRoyalBattlePoint(uo_x,uo_y,base_r1h))then exit;
+        //if(base_r1h>(g_royal_RCur-point_dist_int(uo_x,uo_y,g_royal_Rx,g_royal_Ry)))then exit;
       if(CheckCollisionR(uo_x,uo_y,uid_r,unum,uid_isbuilding,true,255,nil)<>cbr_no)then exit;
    end;
    checkLandingPlace:=true;
@@ -652,13 +656,15 @@ begin
                                                                       kp_y+g_randomr(keyPoint_KotRW));
                           met_royale: begin
                                          lx:=RoyalCR;
-                                         ai_ability_KeepShift(pBuilder,g_royal_Rx+g_randomr(lx),
-                                                                       g_royal_Ry+g_randomr(lx));
+                                         if(lx<u_royal_cd)then
+                                           ai_ability_KeepShift(pBuilder,g_royal_Rx+g_randomr(lx),
+                                                                         g_royal_Ry+g_randomr(lx));
                                       end;
                           met_hits  : begin
                                          lx:=g_random(map_size1);
                                          ly:=g_random(map_size1);
-                                         if(not ai_alarm_CheckPoint(pBuilder,lx,ly,base_r2))then
+                                         if (not ai_alarm_CheckPoint(pBuilder,lx,ly,base_r2))
+                                         and(not game_CheckRoyalBattlePoint(lx,ly,base_r2))then
                                            ai_ability_KeepShift(pBuilder,lx,ly);
                                       end;
                           met_build : begin
@@ -679,9 +685,12 @@ begin
                                    met_koth  : with ai_keypoint_kp^ do
                                                  setLandingPlace(kp_x,kp_y,ai_keypoint_d,keyPoint_KotRW);
                                    met_royale: begin
-                                                  lx:=min2i(g_royal_RCur div 3,base_r1h);
-                                                  setLandingPlace(g_royal_Rx,g_royal_Ry,u_royal_cd,lx);
+                                                  lx:=RoyalCR;
+                                                  if(u_royal_cd>lx)
+                                                  then ai_RunTo(pBuilder,nil,g_royal_Rx,g_royal_Ry,u_royal_cd,lx)
+                                                  else setLandingPlace(x,y,0,base_r1h);
                                                end;
+
                                    met_hits  : ai_RunFrom(pBuilder,ai_enemy_u,0,0,ai_enemy_d);
                                    // met_build
                                    else
@@ -692,7 +701,12 @@ begin
                                         then setLandingPlace(ai_BaseAlly_u^.x,ai_BaseAlly_u^.y,ai_BaseAlly_d,base_r1)
                                         else setLandingPlace(x,y,0,base_r1h);
                                    end;
-                            false: if(alarmType>0)then ai_ability_CCLift(pBuilder);
+                            false: case alarmType of
+                                   0         : ;
+                                   met_royale: if(RoyalCR<u_royal_cd)then
+                                               ai_ability_CCLift(pBuilder);
+                                   else        ai_ability_CCLift(pBuilder);
+                                   end;
                             end;
      end;
 end;
@@ -718,10 +732,8 @@ begin
          end
          else
            if(not iscomplete)then
-             if((energyCur_BldGens>0)and(uid_gen_EnergyLevel=0))
-             or(uid_gen_EnergyLevel=0)
-             //if((uid_gen_EnergyLevel>0)and(energyCur_BldGens >0))
-             //or((uid_gen_EnergyLevel=0)and(energyCur_BldOther>0))
+             if(uid_gen_EnergyLevel=0)
+             or(energyCur_BldOther=0)
              then ai_Suicide(pu);
 end;
 
