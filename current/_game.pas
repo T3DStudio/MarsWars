@@ -228,7 +228,10 @@ begin
    g_cycle_regen := 0;
    g_LobbyTimer  := 0;
 
-   menu_update:=true;
+   menu_update   := true;
+
+   rpls_pstate   := rpls_none;
+   rpls_RecordTries:=0;
 
    {$IFDEF _FULLGAME}
    {$IFDEF DEBUG0}
@@ -267,8 +270,8 @@ begin
    m_brush:=co_empty;
 
    svld_str_fname:='';
+
    rpls_pnu    :=0;
-   rpls_pstate :=rpls_none;
 
    PlayersUpdateColorSchema(LocalPlayer);
    {$ENDIF}

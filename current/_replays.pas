@@ -129,6 +129,9 @@ begin
          if(vi>rpls_ForwardSkip.MaxValue)
          then rpls_ForwardSkip:=rpls_ForwardSkip.MaxValue
          else rpls_ForwardSkip:=integer(vi);
+
+         FillChar(ui_alarms,SizeOf(ui_alarms),0);
+         FillChar(g_effects,SizeOf(g_effects),0);
       end;
       exit;
    end;
@@ -146,6 +149,8 @@ begin
 
       g_tick:=rp_gtick;
       rpls_file_pos:=rp_fpos;
+      FillChar(ui_alarms,SizeOf(ui_alarms),0);
+      FillChar(g_effects,SizeOf(g_effects),0);
    end;
    rpls_ForwardSkip:=2;
    for i:=1 to MaxUnits do
@@ -258,7 +263,7 @@ begin
    ui_SysMassageAdd(msg,0);
    {$ELSE}
    GameLog_Chat(255,255,msg);
-   writeln(msg);
+   dedicated_Line1(255,msg);
    {$ENDIF}
 end;
 
@@ -332,8 +337,8 @@ begin
       rpls_player      :={$IFDEF _FULLGAME}LocalPlayer{$ELSE}255{$ENDIF};
       rpls_GameStatus  :=255;
       rpls_PlayersScore:=false;
-      {$IFDEF _FULLGAME}
       rpls_log_c       :=0;
+      {$IFDEF _FULLGAME}
       ui_playerPOV     :=false;
       {$ELSE}
       rpls_Quality     :=0;
@@ -370,12 +375,12 @@ begin
    camy:=byte(ui_cam_cy shr rpls_UIcamXYt1b);
    apm :=g_PlayerAPM.apm_cur;
 
-   if(rpls_log_c>0)then i:=i or %10000000;
    if(rpls_vidx<>camx)
    or(rpls_vidy<>camy)
    or(rpls_apm <>apm )then
      if(gs=gs_running)then i:=i or %01000000;
    {$ENDIF}
+   if(rpls_log_c>0)then i:=i or %10000000;
    if(not rpls_PlayersScore)then
      if(game_IsEnded)then i:=i or %00100000;
 
@@ -384,8 +389,8 @@ begin
    or(rpls_GameStatus<>gs)then
    begin
       wudata_byte(i,true);
+      if((i and %10000000)>0)then wudata_log({$IFDEF _FULLGAME}rpls_player{$ELSE}0{$ENDIF},@rpls_log_c,true);
       {$IFDEF _FULLGAME}
-      if((i and %10000000)>0)then wudata_log(rpls_player,@rpls_log_c,true);
       if((i and %01000000)>0)then
       begin
          rpls_vidx:=camx;

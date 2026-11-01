@@ -1458,13 +1458,16 @@ mi_camp_Difficulty     : if(not check)then ScrollByte(@camp_diff,false,0,camp_Ma
    end;
 end;
 
-function menu_ChatSize:integer;
+{function menu_ChatSize:integer;
+var i:byte;
 begin
+   menu_ChatSize:=0;
    with g_PlayersGame[LocalPlayer] do
-     if(log_n<MaxPlayerLog)
-     then menu_ChatSize:=integer(log_n)
-     else menu_ChatSize:=MaxPlayerLog;
-end;
+     for i:=0 to MaxPlayerLog do
+       with log_l[i] do
+         if(lm_type in lmts_menu_chat)then
+           menu_ChatSize+=1;
+end;}
 
 function menu_Controls_MWD(item:byte;check:boolean):boolean;
 begin

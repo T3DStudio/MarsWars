@@ -273,6 +273,8 @@ UID_UWeaponFactory: if(u_royal_d>base_r3)
                         UID_UWeaponFactory: ai_UnitAbility(pu,uab_ToUWeaponFactory,0,0,0);
                         end;
 
+uid_HFTower       : ai_UnitAbility(pu,uab_ToHTotem       ,0,0,0);
+
 UID_URadar        : ai_UnitAbility(pu,uab_LvlUpURadar    ,0,0,0);
 UID_URMStation    : ai_UnitAbility(pu,uab_LvlUpURMStation,0,0,0);
      end;

@@ -28,6 +28,7 @@ begin
         MID_SSShot,
         MID_Bullet,
         MID_SChaingun,
+        MID_TChaingun,
         MID_Chaingun      : setEID(@spr_u_p1           ,sms_death);
         MID_BFG           : setEID(@spr_u_p2           ,sms_death);
         MID_Flyer         : setEID(@spr_u_p3           ,sms_death);
@@ -39,6 +40,7 @@ begin
         MID_URocket,
         MID_Revenant      : setEID(@spr_h_p4           ,sms_death);
         MID_YPlasma       : setEID(@spr_h_p7           ,sms_death);
+        MID_FTower        : setEID(@spr_h_p8           ,sms_death);
 
         EID_BFG           : setEID(@spr_eff_bfg        ,sms_death);
 
@@ -170,6 +172,7 @@ MID_BPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_SShot,
 MID_SSShot,
 MID_Bullet,
+MID_TChaingun,
 MID_SChaingun,
 MID_Chaingun      : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_BFG           : setEff(6 ,0 ,-1 ,-1       ,false,0 );
@@ -181,6 +184,7 @@ MID_Cacodemon     : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Baron,
 MID_URocketS,
 MID_URocket,
+MID_FTower,
 MID_Revenant      : setEff(7 ,0 , 8 ,-1       ,false,0 );
 MID_YPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 

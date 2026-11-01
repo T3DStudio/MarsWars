@@ -146,8 +146,8 @@ begin
         if(not ui_CheckUnitUIPlayerVision(pu,true))then exit;
 
       if(uid_eid_Pain>0)then
-        effect_add(vx-random(uid_missileR)+random(uid_missileR),
-                   vy-random(uid_missileR)+random(uid_missileR),draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_Pain);
+        effect_add(vx-random(uid_missileR1)+random(uid_missileR1),
+                   vy-random(uid_missileR1)+random(uid_missileR1),draw_DefaultSpriteDepth(vy+1,isfly),uid_eid_Pain);
       snd_SoundPlayUnit(uid_snd_Pain,nil,nil);
    end;
 end;
@@ -863,8 +863,8 @@ begin
                         pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_r1)then exit;
 
       unit_Teleport2Point(pTarget,
-      pTeleporter^.rpoint_x+g_random(uid_missileR),
-      pTeleporter^.rpoint_y+g_random(uid_missileR)
+      pTeleporter^.rpoint_x+g_random(uid_missileR1),
+      pTeleporter^.rpoint_y+g_random(uid_missileR1)
       {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
       if(pTeleporter^.player^.upgrs_cur[upgr_hell_T2TNoCD]>0)and(pTBeacon^.uidi=pTeleporter^.uidi)
       then
@@ -2827,8 +2827,8 @@ begin
                    begin
                       transportC-=tu^.uid^.uid_TransportSize;
                       tu^.transportU:=0;
-                      tu^.x     :=x-g_randomr(uid^.uid_missileR);
-                      tu^.y     :=y-g_randomr(uid^.uid_missileR);
+                      tu^.x     :=x-g_randomr(uid^.uid_missileR1);
+                      tu^.y     :=y-g_randomr(uid^.uid_missileR1);
                       tu^.uo_x  :=tu^.x;
                       tu^.uo_y  :=tu^.y;
                       tu^.uo_tar:=0;
@@ -2854,7 +2854,7 @@ begin
              if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
                for i:=1 to uid_DeathUIDn do
                  if(player_UIDLimitCheck(player,uid_DeathUID))then
-                   if(unit_add(x-g_randomr(uid_missileR),y-g_randomr(uid_missileR),0,uid_DeathUID,playeri,true,true,0))then
+                   if(unit_add(x-g_randomr(uid_missileR1),y-g_randomr(uid_missileR1),0,uid_DeathUID,playeri,true,true,0))then
                      game_ScoresAddC(playeri,psc_units_summoned);
 
            if(units_all_c<=0)then player_SetDefeat(player);
@@ -2918,9 +2918,6 @@ begin
 
       case uidi of
       UID_UTransport: if(transportM>uid_TransportMax_Base)
-                      then level:=1
-                      else level:=0;
-      UID_UGTurret  : if(upgrs_cur[upgr_uac_TurretPlasma]>0)
                       then level:=1
                       else level:=0;
       end;

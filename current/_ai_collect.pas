@@ -515,8 +515,10 @@ begin
 
       if(tu^.uid^.uid_ZombieUID>0)and(pfcheck)then
         if(hits_fdead<tu^.hits)and(tu^.hits<=tu^.uid^.uid_ZombieHits)then
-          if(ai_VisionOnUnit(pu,tu,false))then
-            setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
+          if(tu^.hits<=0)
+          or(team<>tu^.player^.team)then
+            if(ai_VisionOnUnit(pu,tu,false))then
+              setNearestTarget(@ai_ZombieTarget_u,@ai_ZombieTarget_d,ud);
    end;
 end;
 

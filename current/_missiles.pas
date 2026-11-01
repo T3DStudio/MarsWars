@@ -16,11 +16,13 @@ MID_Baron      : mid_SpriteModel:=@spr_h_p2;
 MID_UACStrike  : mid_SpriteModel:=@spr_u_rs;
 MID_CyberRocket: mid_SpriteModel:=@spr_h_p3;
 MID_Revenant   : mid_SpriteModel:=@spr_h_p4;
+MID_FTower     : mid_SpriteModel:=@spr_h_p8;
 MID_Mancubus   : mid_SpriteModel:=@spr_h_p5;
 MID_YPlasma    : mid_SpriteModel:=@spr_h_p7;
 MID_BPlasma    : mid_SpriteModel:=@spr_u_p0;
 MID_Bullet,
 MID_SChaingun,
+MID_TChaingun,
 MID_Chaingun   : mid_SpriteModel:=@spr_u_p9;
 MID_SShot,
 MID_SSShot     : mid_SpriteModel:=@spr_u_p1s;
@@ -55,6 +57,7 @@ MID_UACStrike   : begin
 MID_Mancubus,
 MID_YPlasma,
 MID_BPlasma,
+MID_FTower,
 MID_Imp,
 MID_Cacodemon,
 MID_Baron     : mid_snd_death[false]:=snd_explode_plasma;
@@ -67,6 +70,7 @@ MID_URocket,
 MID_Revenant  : mid_snd_death[false]:=snd_explode;
 MID_Bullet,
 MID_SChaingun,
+MID_TChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot    : begin
@@ -99,6 +103,7 @@ MID_URocketS  : begin
                 end;
 MID_Bullet,
 MID_SChaingun,
+MID_TChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot    : begin
@@ -218,8 +223,8 @@ begin
 
               if(tu<>nil)then
               begin
-                 m_tox-=sign(tu^.x-m_x)*g_random(tu^.uid^.uid_missileR);
-                 m_toy-=sign(tu^.y-m_y)*g_random(tu^.uid^.uid_missileR);
+                 m_tox-=sign(tu^.x-m_x)*g_random(tu^.uid^.uid_missileR1);
+                 m_toy-=sign(tu^.y-m_y)*g_random(tu^.uid^.uid_missileR1);
               end;
 
               if(m_tar<=0)or(mid_base_SplashR>0)
@@ -303,23 +308,23 @@ begin
    begin
       tu:=nil;
       if(IsUnitRange(m_tar,@tu))then
-       if(m_homing>mh_none)then
-        if(tu^.buffs[ub_Teleported]>0)
-        then m_homing:=mh_none
-        else
-          if(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR)then
-            case m_homing of
-mh_magnetic : begin
-                 m_tox:=tu^.x-(sign(tu^.x-m_tox)*tu^.uid^.uid_missileR);
-                 m_toy:=tu^.y-(sign(tu^.y-m_toy)*tu^.uid^.uid_missileR);
-                 m_mfe:=tu^.isfly;
+        if(m_homing>mh_none)then
+          if(tu^.buffs[ub_Teleported]>0)
+          then m_homing:=mh_none
+          else
+            if(max2i(abs(tu^.x-m_tox),abs(tu^.y-m_toy))>tu^.uid^.uid_missileR1)then
+              case m_homing of
+              mh_magnetic : begin
+                               m_tox:=tu^.x-(sign(tu^.x-m_tox)*tu^.uid^.uid_missileRh);
+                               m_toy:=tu^.y-(sign(tu^.y-m_toy)*tu^.uid^.uid_missileRh);
+                               m_mfe:=tu^.isfly;
+                            end;
+              mh_homing   : begin
+                               m_tox:=tu^.x;
+                               m_toy:=tu^.y;
+                               m_mfe:=tu^.isfly;
+                            end;
               end;
-mh_homing   : begin
-                 m_tox:=tu^.x;
-                 m_toy:=tu^.y;
-                 m_mfe:=tu^.isfly;
-              end;
-            end;
 
       if(m_mid=MID_UACStrike)then
       begin

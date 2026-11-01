@@ -133,7 +133,7 @@ begin
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_isbuilder       := true;
-   uid_prod_Buildings  := [UID_HKeep..UID_HCommandCenter]-[UID_HAKeep,UID_HACommandCenter,UID_HBarracks,UID_HEye];
+   uid_prod_Buildings  := [UID_HKeep..UID_HCommandCenter]-[UID_HAKeep,UID_HACommandCenter,UID_HBarracks,UID_HEye,UID_HTotem];
    uid_ability1        := uab_HKeepShift;
    uid_ability2        := uab_HKeepAura;
 
@@ -316,7 +316,7 @@ end;
 
 UID_HFTower:
 begin
-   uid_MaxHits1        := 3000;
+   uid_MaxHits1        := 4000;
    uid_req_EnergyLevel := 250;
    uid_r               := 20;
    uid_SightR_Base     := 300;
@@ -327,34 +327,39 @@ begin
    uid_Regen_Base      := BaseRegenh;
    uid_Regen_Upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
+   uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
    uid_ability1        := uab_HTowerBlink;
+   uid_ability3        := uab_ToHTotem;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_islight         := true;
 
-   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpst,MID_Cacodemon,0,upgr_hell_FTowerAMech,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive_mech,wpr_any,uids_all-[UID_Cacodemon],[],0,-26,0,dm_AntiUnitMech2    );
-   SetWeapon(1,wpt_missle,aw_srange,0,0 ,fr_fpst,MID_Imp      ,0,0                    ,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive     ,wpr_any,uids_all-[UID_Imp      ],[],0,-26,0,dm_AntiUnitBioHeavy2);
+
+   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpst,MID_FTower,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[],0,-26,0,0);
 end;
 UID_HTotem:
 begin
    uid_MaxHits1        := 3000;
    uid_req_EnergyLevel := 350;
    uid_r               := 20;
-   uid_SightR_Base     := 350;
+   uid_SightR_Base     := 300;
    uid_SightR_upgr     := upgr_hell_TowerR;
    uid_SightR_upgrV    := 25;
    uid_uibtn           := 7;
    uid_ProdTimeSec     := ptime1h;
    uid_req_uid1        := UID_HFortress;
    uid_ability1        := uab_HTowerBlink;
-   uid_ability3        := uab_HHTShroud;
+   uid_ability2        := uab_HHTShroud;
+   uid_ability3        := uab_ToHFTower;
    uid_isbuilding      := true;
    uid_ismech          := true;
-   uid_islight         := true;
+   uid_islight         := false;
    uid_Regen_Base      := BaseRegenh;
    uid_Regen_upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
-   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_fps2,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,dm_AntiHeavy2);
+   uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
+   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_archvile_s,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,0);
+   uid_arms_BonusAntiUnitRange:=50;
 end;
 
 UID_HMarker:
@@ -533,9 +538,8 @@ begin
    uid_DeathUID        := UID_LostSoul;
    uid_DeathUIDn       := 3;
    uid_AI_TargetWeight := DefaultTargetWeight+10;
-   SetWeapon(0,wpt_consume,aw_fsr+50,0,0 ,fr_fpsh,0           ,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,[UID_Phantom,UID_LostSoul],[3,6,9,12,15,18,21,24,27,30,33,36],0,0,0,0);
-   SetWeapon(1,wpt_unit   ,aw_fsr+50,0,0 ,fr_fps3,UID_Phantom ,0,upgr_hell_Phantoms,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
-   SetWeapon(2,wpt_unit   ,aw_fsr+50,0,0 ,fr_fps3,UID_LostSoul,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
+   SetWeapon(0,wpt_unit   ,aw_fsr+50,0,0 ,fr_fps3,UID_Phantom ,0,upgr_hell_Phantoms,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
+   SetWeapon(1,wpt_unit   ,aw_fsr+50,0,0 ,fr_fps3,UID_LostSoul,0,0                 ,0,0,wtrset_enemy_alive,wpr_any,uids_all,[],0,0,0,0);
 
    uid_FastDeathHits:=1;
 end;
@@ -650,7 +654,7 @@ end;
 UID_Phantom,
 UID_LostSoul  :
 begin
-   uid_MaxHits1        := 1000;
+   uid_MaxHits1        := 500;
    uid_r               := 10;
    uid_MSpeed_Base     := 25;
    uid_Armor_upgr1     := upgr_hell_UnitArmor;
@@ -668,14 +672,14 @@ begin
    case i of
 UID_LostSoul: begin
               uid_uibtn          := 12;
-              uid_req_EnergyLevel:= 100;
-              uid_ProdTimeSec    := ptimeh;
+              uid_req_EnergyLevel:= 50;
+              uid_ProdTimeSec    := ptimeq;
               uid_TargetWeight   := DefaultTargetWeight-20;
               end;
 UID_Phantom : begin
               uid_uibtn          := 13;
-              uid_req_EnergyLevel:= 200;
-              uid_ProdTimeSec    := ptime1;
+              uid_req_EnergyLevel:= 100;
+              uid_ProdTimeSec    := ptimeh;
               uid_TargetWeight   := DefaultTargetWeight-10;
               SetWeapon(0,wpt_directdmgZ,aw_dmelee,0,BaseDamaget,fr_fps1,0,0,upgr_hell_Phantoms,upgr_hell_MeleeDamage,UpgradeDamageBonus1,wtrset_all,wpr_any,uids_all,[],0,0,0,dm_Lost);
               end;
@@ -1284,7 +1288,7 @@ end;
 // STAT DEF
 UID_UGTurret:
 begin
-   uid_MaxHits1        := 3000;
+   uid_MaxHits1        := 4000;
    uid_req_EnergyLevel := 250;
    uid_r               := 15;
    uid_SightR_Base     := 300;
@@ -1294,18 +1298,18 @@ begin
    uid_ProdTimeSec     := ptime1q;
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_Armor_upgr2     := upgr_uac_TurretArmor;
+   uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
    uid_ismech          := true;
    uid_islight         := true;
    uid_ability2        := uab_ToUAATurret;
    uid_ability3        := uab_ToUACDron;
-   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_BPlasma ,0,upgr_uac_TurretPlasma,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground_mech,wpr_any,uids_all,[],0,-11,2,dm_AntiUnitMech2  );
-   SetWeapon(1,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_Chaingun,0,0                    ,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground     ,wpr_any,uids_all,[],0,-11,2,dm_AntiUnitBioLight2);
+   SetWeapon(0,wpt_missle,aw_srange,0,0 ,fr_fpss,MID_TChaingun,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_ground     ,wpr_any,uids_all,[],0,-11,2,0);
 end;
 UID_UATurret:
 begin
-   uid_MaxHits1        := 3000;
+   uid_MaxHits1        := 4000;
    uid_req_EnergyLevel := 250;
    uid_r               := 15;
    uid_SightR_Base     := 300;
@@ -1315,6 +1319,7 @@ begin
    uid_ProdTimeSec     := ptime1q;
    uid_Armor_upgr1     := upgr_uac_BuildArmor;
    uid_Armor_upgr2     := upgr_uac_TurretArmor;
+   uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
    uid_CanAttack       := true;
    uid_isbuilding      := true;
    uid_ismech          := true;
@@ -1322,7 +1327,7 @@ begin
    uid_ability1        := uab_ToUAGTurret;
    uid_ability2        := uab_UAASplash;
    uid_ability3        := uab_ToUACDron;
-   SetWeapon(0,wpt_missle,aw_fsr+(uid_r*2),0,0 ,fr_fpst,MID_URocket ,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,0,dm_AntiFly2);
+   SetWeapon(0,wpt_missle,aw_fsr+(uid_r*2),0,0 ,fr_fpsq,MID_URocket,0,0,upgr_uac_DistDamage,UpgradeDamageBonus1,wtrset_enemy_alive_fly,wpr_any ,uids_all,[],0,-14,0,0);
 end;
 
 //  UAC MECH UNITS ///////////////////////////////////////////////////
@@ -1508,9 +1513,9 @@ end;
       if(uid_Armor_upgr1>0)
       or(uid_Armor_upgr2>0)then
         if(uid_Armor_upgrV=0)then
-          if(uid_isbuilding)
-          then uid_Armor_upgrV:=UpgradeBuildArmorBonus
-          else uid_Armor_upgrV:=UpgradeUnitArmorBonus;
+          if(not uid_isbuilding)
+          then uid_Armor_upgrV:=UpgradeUnitArmorBonus
+          else uid_Armor_upgrV:=UpgradeBuildArmorOBonus;
       if(uid_SightR_upgr>0)then
         if(uid_SightR_upgrV=0)then
           uid_SightR_upgrV:=25;
@@ -1518,7 +1523,8 @@ end;
         if(uid_MSpeed_upgrV=0)then
           uid_MSpeed_upgrV:=UpgradeUnitSpeedBonus;
 
-      uid_missileR:=trunc(uid_r/1.41);
+      uid_missileR1:=trunc(uid_r/1.41);
+      uid_missileRh:=uid_missileR1 div 2;
       if(uid_MaxHits1<1)then uid_MaxHits1:=1;
       uid_MaxHitsh:=uid_MaxHits1 div 2; if(uid_MaxHitsh<1)then uid_MaxHitsh:=1;
       uid_MaxHitsq:=uid_MaxHitsh div 2; if(uid_MaxHitsq<1)then uid_MaxHitsq:=1;
@@ -1656,7 +1662,7 @@ begin
    for m:=0 to 255 do
    with g_mids[m] do
    begin
-      mid_size      := 2;
+      mid_size      := 0;
       mid_homing    := mh_magnetic;
       mid_TeamDamage:= true;
 
@@ -1665,6 +1671,7 @@ case m of
 MID_ArchFire       : mid_speed       :=32000;
 MID_Tank           : mid_speed       :=100;
 MID_SChaingun,
+MID_TChaingun,
 MID_Chaingun,
 MID_SShot,
 MID_SSShot,
@@ -1677,6 +1684,7 @@ MID_Mancubus,
 MID_YPlasma,
 MID_BPlasma,
 MID_CyberRocket    : mid_speed       :=13;
+MID_FTower,
 MID_Revenant,
 MID_URocketS,
 MID_URocket,
@@ -1698,6 +1706,8 @@ MID_Granade,
 MID_Cacodemon,
 MID_Tank,
 MID_SShot          : mid_base_damage :=BaseDamage1;
+MID_TChaingun,
+MID_FTower,
 MID_Flyer,
 MID_Revenant       : mid_base_damage :=BaseDamage1h;
 MID_Baron,
@@ -1722,6 +1732,7 @@ end;
 
 // homing
 case m of
+MID_FTower,
 MID_Revenant,
 MID_URocket,
 MID_URocketS       : mid_homing      :=mh_homing;
@@ -1858,7 +1869,6 @@ begin
    setUPGR(r_hell,upgr_hell_TotemInvis  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress       );
    setUPGR(r_hell,upgr_hell_BuildRestore,60 ,0,0 ,4   ,600 ,0,300 ,0            ,UID_HFortress       );
    setUPGR(r_hell,upgr_hell_TowerBlink  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress       );
-   setUPGR(r_hell,upgr_hell_FTowerAMech ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_HFortress       );
 
    u:=0;
    setUPGR(r_uac ,upgr_uac_DistDamage   ,60 ,0,50,4   ,1000,0,1000,0            ,0                   );
@@ -1881,7 +1891,6 @@ begin
    setUPGR(r_uac ,upgr_uac_MechArmor    ,60 ,0,40,4   ,800 ,0,800 ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_TerAAWeapon  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UScienceCenter  );
    setUPGR(r_uac ,upgr_uac_RadarR       ,60 ,0,0 ,3   ,300 ,0,300 ,0            ,UID_UComputerStation);
-   setUPGR(r_uac ,upgr_uac_TurretPlasma ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation);
    setUPGR(r_uac ,upgr_uac_TurretArmor  ,60 ,0,0 ,1   ,600 ,0,0   ,0            ,UID_UComputerStation);
 end;
 
@@ -2044,6 +2053,7 @@ uab_ToHAKeep,
 uab_ToHACommandCenter
                     : ua_type            := uat_NoTarget;
 
+uab_ToHTotem,
 uab_ToHGate,
 uab_ToHPools,
 uab_ToHBarracks     : begin
@@ -2052,6 +2062,7 @@ uab_ToHBarracks     : begin
                       end;
 
 uab_ToUACommandCenter,
+uab_ToHFTower,
 uab_ToUAGTurret,
 uab_ToUAATurret     : ua_type            := uat_NoTarget;
 
@@ -2147,7 +2158,6 @@ begin
                                 if(dm_TargetFlags<>0)then
                                   if(CheckUIDBaseFlags(uid_tar,dm_TargetFlags))then DamageFactor_UWeapon2UID*=(dm_factor/100);
                        end;
-       wpt_consume   : DamageFactor_UWeapon2UID:=5;
        wpt_directdmgZ: if(g_uids[uid_tar].uid_ZombieUID>0)then DamageFactor_UWeapon2UID:=2;
        wpt_unit      : DamageFactor_UWeapon2UID:=DamageFactor_UID2UID(aw_object_id,uid_tar);
        end;

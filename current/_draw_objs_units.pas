@@ -678,12 +678,8 @@ begin
 
          vy+=float_y;
          case uidi of
-         UID_UGTurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then
-                               if(upgrs_cur[upgr_uac_TurretPlasma]>0)
-                               then SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b7_a,spr_alpha)
-                               else SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b4_a,spr_alpha);
-         UID_UATurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then
-                                    SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b9_a,spr_alpha);
+         UID_UGTurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b4_a,spr_alpha);
+         UID_UATurret      : if(upgrs_cur[upgr_uac_TurretArmor]>0)then SpriteList_AddUnit(vx,vy,spr_depth,0,0,0,@spr_b9_a,spr_alpha);
          UID_UACommandCenter,
          UID_UCommandCenter: if(upgrs_cur[upgr_uac_CCAttack]>0)then
                                with uid_arms[0] do

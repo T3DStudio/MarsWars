@@ -1095,7 +1095,6 @@ begin
    gfx_LoadMWSModel(@spr_UTurret            ,folder_RaceBuildings[r_uac ] +'u_b4_'     ,smt_turret   );
    gfx_LoadMWSModel(@spr_URadar             ,folder_RaceBuildings[r_uac ] +'u_b5_'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_UTechCenter        ,folder_RaceBuildings[r_uac ] +'u_b13_'    ,smt_buiding  );
-   gfx_LoadMWSModel(@spr_UPTurret           ,folder_RaceBuildings[r_uac ] +'u_b7_'     ,smt_turret   );
    gfx_LoadMWSModel(@spr_URocketL           ,folder_RaceBuildings[r_uac ] +'u_b8_'     ,smt_buiding  );
    gfx_LoadMWSModel(@spr_URTurret           ,folder_RaceBuildings[r_uac ] +'u_b9_'     ,smt_turret2  );
    gfx_LoadMWSModel(@spr_UNuclearPlant      ,folder_RaceBuildings[r_uac ] +'u_b10_'    ,smt_buiding  );
@@ -1129,6 +1128,7 @@ begin
    gfx_LoadMWSModel(@spr_h_p5               ,folder_RaceMissiles[r_hell]+'h_p5_'       ,smt_missile);
    gfx_LoadMWSModel(@spr_h_p6               ,folder_RaceMissiles[r_hell]+'h_p6_'       ,smt_effect );
    gfx_LoadMWSModel(@spr_h_p7               ,folder_RaceMissiles[r_hell]+'h_p7_'       ,smt_effect );
+   gfx_LoadMWSModel(@spr_h_p8               ,folder_RaceMissiles[r_hell]+'h_p8_'       ,smt_missile);
    gfx_LoadMWSModel(@spr_u_p0               ,folder_RaceMissiles[r_uac ]+'u_p0_'       ,smt_effect );
    gfx_LoadMWSModel(@spr_u_p1               ,folder_RaceMissiles[r_uac ]+'u_p1_'       ,smt_effect );
    gfx_LoadMWSModel(@spr_u_p2               ,folder_RaceMissiles[r_uac ]+'u_p2_'       ,smt_effect );
@@ -1153,7 +1153,6 @@ begin
    gfx_LoadMWTexture(@spr_ptur              ,folder_Race[r_uac ]+'ptur'                ,true);
 
    gfx_LoadMWTexture(@spr_b4_a              ,folder_RaceBuildings[r_uac ]+'u_b4_a'     ,true);
-   gfx_LoadMWTexture(@spr_b7_a              ,folder_RaceBuildings[r_uac ]+'u_b7_a'     ,true);
    gfx_LoadMWTexture(@spr_b9_a              ,folder_RaceBuildings[r_uac ]+'u_b9_a'     ,true);
 
    gfx_LoadMWTexture(@spr_buff_SphereInvuln ,folder_effects+'buff_SphereInvuln'        ,true);

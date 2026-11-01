@@ -893,12 +893,9 @@ begin
         then str_UnitArmDPS+='x'+i2s(ocount);
      end;
 
-     if(aw_type=wpt_consume)
-     then sps:=fr_fps1/aw_reload
-     else
-       if(aw_FakeShotsN>0)
-       then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
-       else sps:= fr_fps1*n/aw_reload ;
+     if(aw_FakeShotsN>0)
+     then sps:=(fr_fps1*n/aw_reload)/aw_FakeShotsN
+     else sps:= fr_fps1*n/aw_reload;
      STRADD(@str_UnitArmDPS,str_uarm_ShotsPerSec+Float2Str(sps),sep_scomma);
   end;
 end;
@@ -921,7 +918,6 @@ begin
       wpt_resurect  :      STRADD(@str_UnitArmLine,'- '+str_uarm_ressurect,sep_scomma);
       wpt_heal      :      STRADD(@str_UnitArmLine,'- '+str_uarm_heal     ,sep_scomma);
       wpt_unit      :      STRADD(@str_UnitArmLine,'- '+str_uarm_spawn+' "'+g_uids[aw_object_id].uid_str_name+'"',sep_scomma);
-      wpt_consume   :      STRADD(@str_UnitArmLine,'- '+str_uarm_consume  ,sep_scomma);
       end;
 
       if(aw_min_range>0)then
@@ -954,16 +950,11 @@ begin
         with g_mids[aw_object_id] do
           if(mid_base_SplashR>0)then  STRADD(@str_UnitArmLine,str_uarm_SplashDamageR+i2s(mid_base_SplashR),sep_scomma);
 
-      {if(aw_type=wpt_suicide)and(uid_DeathMissile>0)then
-        with g_mids[uid_DeathMissile] do
-          if(mid_base_SplashR>0)then  STRADD(@str_UnitArmLine,str_uarm_SplashDamageR+i2s(mid_base_SplashR),sep_scomma);  }
-
       if(aw_impact_upgr>0)then
         STRADD(@str_UnitArmLine,str_uarm_Upgrade+str_UpgradeNameBonus(aw_impact_upgr,aw_impact_upgrStep),sep_scomma);
 
       dmod_str:='';
       case aw_type of
-      //wpt_suicide   : if(uid_DeathMissile>0)then dmod_str:=str_DamageMod(uid_DeathMissile_dmod);
       wpt_missle,
       wpt_directdmg,
       wpt_directdmgZ: if(aw_impact_dmod>0)then dmod_str:=str_DamageMod(aw_impact_dmod);

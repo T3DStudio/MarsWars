@@ -618,7 +618,6 @@ begin
    'str_uarm_zombie'                    : lang_Key2StrVar:= @str_uarm_zombie;
    'str_uarm_ressurect'                 : lang_Key2StrVar:= @str_uarm_ressurect;
    'str_uarm_heal'                      : lang_Key2StrVar:= @str_uarm_heal;
-   'str_uarm_consume'                   : lang_Key2StrVar:= @str_uarm_consume;
    'str_uarm_spawn'                     : lang_Key2StrVar:= @str_uarm_spawn;
    'str_uarm_targets'                   : lang_Key2StrVar:= @str_uarm_targets;
    'str_uarm_BaseImpact'                : lang_Key2StrVar:= @str_uarm_BaseImpact;
@@ -820,6 +819,8 @@ begin
    'str_name[uab_ToHPools]'             : lang_Key2StrVar:= @g_aids[uab_ToHPools         ].ua_str_name;
    'str_name[uab_ToHACommandCenter]'    : lang_Key2StrVar:= @g_aids[uab_ToHACommandCenter].ua_str_name;
    'str_name[uab_ToHBarracks]'          : lang_Key2StrVar:= @g_aids[uab_ToHBarracks      ].ua_str_name;
+   'str_name[uab_ToHFTower]'            : lang_Key2StrVar:= @g_aids[uab_ToHFTower        ].ua_str_name;
+   'str_name[uab_ToHTotem]'             : lang_Key2StrVar:= @g_aids[uab_ToHTotem         ].ua_str_name;
 
    'str_name[uab_ToUACommandCenter]'    : lang_Key2StrVar:= @g_aids[uab_ToUACommandCenter].ua_str_name;
    'str_name[uab_ToUBarracks]'          : lang_Key2StrVar:= @g_aids[uab_ToUBarracks      ].ua_str_name;
@@ -874,6 +875,8 @@ begin
    'str_dscr[uab_ToHPools]'             : lang_Key2StrVar:= @g_aids[uab_ToHPools         ].ua_str_Descript;
    'str_dscr[uab_ToHACommandCenter]'    : lang_Key2StrVar:= @g_aids[uab_ToHACommandCenter].ua_str_Descript;
    'str_dscr[uab_ToHBarracks]'          : lang_Key2StrVar:= @g_aids[uab_ToHBarracks      ].ua_str_Descript;
+   'str_dscr[uab_ToHFTower]'            : lang_Key2StrVar:= @g_aids[uab_ToHFTower        ].ua_str_Descript;
+   'str_dscr[uab_ToHTotem]'             : lang_Key2StrVar:= @g_aids[uab_ToHTotem         ].ua_str_Descript;
 
    'str_dscr[uab_ToUACommandCenter]'    : lang_Key2StrVar:= @g_aids[uab_ToUACommandCenter].ua_str_Descript;
    'str_dscr[uab_ToUBarracks]'          : lang_Key2StrVar:= @g_aids[uab_ToUBarracks      ].ua_str_Descript;
@@ -1093,8 +1096,6 @@ begin
    'str_dscr[upgr_hell_TowerBlink]'     : lang_Key2StrVar:= @g_upgrs[upgr_hell_TowerBlink  ].upgr_str_Descript;
    'str_name[upgr_hell_Resurrect]'      : lang_Key2StrVar:= @g_upgrs[upgr_hell_Resurrect   ].upgr_str_Name;
    'str_dscr[upgr_hell_Resurrect]'      : lang_Key2StrVar:= @g_upgrs[upgr_hell_Resurrect   ].upgr_str_Descript;
-   'str_name[upgr_hell_FTowerAMech]'    : lang_Key2StrVar:= @g_upgrs[upgr_hell_FTowerAMech ].upgr_str_Name;
-   'str_dscr[upgr_hell_FTowerAMech]'    : lang_Key2StrVar:= @g_upgrs[upgr_hell_FTowerAMech ].upgr_str_Descript;
    'str_name[upgr_uac_DistDamage]'      : lang_Key2StrVar:= @g_upgrs[upgr_uac_DistDamage   ].upgr_str_Name;
    'str_dscr[upgr_uac_DistDamage]'      : lang_Key2StrVar:= @g_upgrs[upgr_uac_DistDamage   ].upgr_str_Descript;
    'str_name[upgr_uac_BioArmor]'        : lang_Key2StrVar:= @g_upgrs[upgr_uac_BioArmor     ].upgr_str_Name;
@@ -1133,8 +1134,6 @@ begin
    'str_dscr[upgr_uac_Transport]'       : lang_Key2StrVar:= @g_upgrs[upgr_uac_Transport    ].upgr_str_Descript;
    'str_name[upgr_uac_RadarR]'          : lang_Key2StrVar:= @g_upgrs[upgr_uac_RadarR       ].upgr_str_Name;
    'str_dscr[upgr_uac_RadarR]'          : lang_Key2StrVar:= @g_upgrs[upgr_uac_RadarR       ].upgr_str_Descript;
-   'str_name[upgr_uac_TurretPlasma]'    : lang_Key2StrVar:= @g_upgrs[upgr_uac_TurretPlasma ].upgr_str_Name;
-   'str_dscr[upgr_uac_TurretPlasma]'    : lang_Key2StrVar:= @g_upgrs[upgr_uac_TurretPlasma ].upgr_str_Descript;
    'str_name[upgr_uac_TowerR]'          : lang_Key2StrVar:= @g_upgrs[upgr_uac_TowerR       ].upgr_str_Name;
    'str_dscr[upgr_uac_TowerR]'          : lang_Key2StrVar:= @g_upgrs[upgr_uac_TowerR       ].upgr_str_Descript;
    'str_name[upgr_uac_TurretArmor]'     : lang_Key2StrVar:= @g_upgrs[upgr_uac_TurretArmor  ].upgr_str_Name;

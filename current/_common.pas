@@ -65,7 +65,7 @@ procedure menu_msgBox_Off;forward;
 
 function menu_MouseXY2Item:byte; forward;
 function menu_ReadyButtonEnabled:boolean;forward;
-function menu_ChatSize:integer;  forward;
+//function menu_ChatSize:integer;  forward;
 
 function PlayerNameChangeble  :boolean;forward;
 
@@ -108,6 +108,10 @@ end;
 function str_AbilityHintName(aid,uipos:byte):shortstring;forward;
 function str_GTick2Time(gtick:cardinal):shortstring;forward;
 function str_SpaceSize(str:shortstring;newSize:byte):shortstring;forward;
+{$ELSE}
+
+procedure dedicated_Line1(pY:byte;s1:shortstring=''); forward;
+
 {$ENDIF}
 
 
@@ -657,9 +661,15 @@ lmt_markAttack       : if(player_LogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype
            lm_tick  :=g_tick;
         end;
 
-        {$IFDEF _FULLGAME}
-        if(ptarget=rpls_player)and(rpls_log_c<MaxPlayerLog)and(rpls_fstate=rpls_write)then rpls_log_c+=1;
+        if(rpls_fstate=rpls_write)and(rpls_log_c<MaxPlayerLog)then
+          {$IFDEF _FULLGAME}
+          if(ptarget=rpls_player)then
+          {$ELSE}
+          if(ptarget=0)and(amtype in lmts_common_list)then
+          {$ENDIF}
+            rpls_log_c+=1;
 
+        {$IFDEF _FULLGAME}
         if(not ServerSide)then
           case g_started of
           false: case amtype of
@@ -694,7 +704,9 @@ lmt_markAttack       : if(player_LogCheckNearEvent(ptarget,fr_fps1,ax,ay,[amtype
 
            menu_update:=true;
 
-           if(LogMes2UIAlarm(POVPlayer))then snd_SoundLogUIPlayer(POVPlayer);
+           if(rpls_pstate<>rpls_read)
+           or(rpls_ForwardSkip<=1)then
+             if(LogMes2UIAlarm(POVPlayer))then snd_SoundLogUIPlayer(POVPlayer);
 
            if(rpls_pstate<rpls_read)and(g_type<>gt_campaing)then
              if((amtype=lmt_player_defeated)and(g_NewObservers)and(adatau=UIPlayer))
@@ -2538,15 +2550,15 @@ begin
      end;
 end;
 
-function ParseLogMessage(ptlog:PTLogMes;mcolor:pTMWColor):shortstring;
+function RenderLogMessage(ptlog:PTLogMes;mcolor:pTMWColor):shortstring;
 procedure AddDataStr;
 begin
    with ptlog^ do
      if(lm_data_u>0)then
        case lm_data_t of
-       lmt_argt_unit   : with g_uids [lm_data_u] do ParseLogMessage+=' ('+uid_str_name +')';
-       lmt_argt_upgrade: with g_upgrs[lm_data_u] do ParseLogMessage+=' ('+upgr_str_Name+')';
-       lmt_argt_ability: ParseLogMessage+=' ('+str_AbilityHintName(lm_data_u,255)+')';
+       lmt_argt_unit   : with g_uids [lm_data_u] do RenderLogMessage+=' ('+uid_str_name +')';
+       lmt_argt_upgrade: with g_upgrs[lm_data_u] do RenderLogMessage+=' ('+upgr_str_Name+')';
+       lmt_argt_ability: RenderLogMessage+=' ('+str_AbilityHintName(lm_data_u,255)+')';
        end;
 end;
 function Team2Name(ateam:byte):shortstring;
@@ -2572,7 +2584,7 @@ begin
      else Team2Name:=str_PT_Team+' #'+b2s(ateam+1);
 end;
 begin
-   ParseLogMessage:='';
+   RenderLogMessage:='';
    mcolor^:=c_white;
    with ptlog^ do
      case lm_type of
@@ -2582,16 +2594,16 @@ lmt_chat_player7      : if(length(lm_string)>0)then
                            mcolor^:=PlayerGetColorDef(lm_type-lmt_chat_player0);
                            case lm_data_t of
                            1:   if(MainMenu)
-                                then ParseLogMessage:=lm_string
-                                else ParseLogMessage:=str_ui_ChatAll   +'> '+lm_string;
-                           2:        ParseLogMessage:=str_ui_ChatAllies+'> '+lm_string;
-                           else      ParseLogMessage:=lm_string;
+                                then RenderLogMessage:=lm_string
+                                else RenderLogMessage:=str_ui_ChatAll   +'> '+lm_string;
+                           2:        RenderLogMessage:=str_ui_ChatAllies+'> '+lm_string;
+                           else      RenderLogMessage:=lm_string;
                            end;
                         end;
-lmt_chat_local        : ParseLogMessage:=lm_string;
-lmt_Req_Limit         : ParseLogMessage:=str_warn_MaxLimitReached;
-lmt_Req_MaxCount      : ParseLogMessage:=str_warn_MaxCountReached;
-lmt_Req_MaxBuilders   : ParseLogMessage:=str_warn_MaxBuildersReached;
+lmt_chat_local        : RenderLogMessage:=lm_string;
+lmt_Req_Limit         : RenderLogMessage:=str_warn_MaxLimitReached;
+lmt_Req_MaxCount      : RenderLogMessage:=str_warn_MaxCountReached;
+lmt_Req_MaxBuilders   : RenderLogMessage:=str_warn_MaxBuildersReached;
 lmt_Req_Common,
 lmt_Req_Energy,
 lmt_Req_HellLoot,
@@ -2602,45 +2614,45 @@ lmt_prod_BadOrder,
 lmt_prod_CD,
 lmt_prod_BadPlace     : begin
                            case lm_type of
-                           lmt_Req_Common      : ParseLogMessage:=str_warn_Req_Common;
-                           lmt_Req_Energy      : ParseLogMessage:=str_warn_Req_Energy;
-                           lmt_Req_HellLoot    : ParseLogMessage:=str_warn_Req_HellLoot;
-                           lmt_Req_UACLoot     : ParseLogMessage:=str_warn_Req_UACLoot;
-                           lmt_unit_MaxLevel   : ParseLogMessage:=str_warn_unit_MaxLevel;
-                           lmt_prod_Unavailable: ParseLogMessage:=str_warn_prod_Unavailable;
-                           lmt_prod_BadOrder   : ParseLogMessage:=str_warn_prod_BadOrder;
-                           lmt_prod_CD         : ParseLogMessage:=str_warn_prod_CD;
-                           lmt_prod_BadPlace   : ParseLogMessage:=str_warn_prod_BadPlace;
+                           lmt_Req_Common      : RenderLogMessage:=str_warn_Req_Common;
+                           lmt_Req_Energy      : RenderLogMessage:=str_warn_Req_Energy;
+                           lmt_Req_HellLoot    : RenderLogMessage:=str_warn_Req_HellLoot;
+                           lmt_Req_UACLoot     : RenderLogMessage:=str_warn_Req_UACLoot;
+                           lmt_unit_MaxLevel   : RenderLogMessage:=str_warn_unit_MaxLevel;
+                           lmt_prod_Unavailable: RenderLogMessage:=str_warn_prod_Unavailable;
+                           lmt_prod_BadOrder   : RenderLogMessage:=str_warn_prod_BadOrder;
+                           lmt_prod_CD         : RenderLogMessage:=str_warn_prod_CD;
+                           lmt_prod_BadPlace   : RenderLogMessage:=str_warn_prod_BadPlace;
                            end;
                            AddDataStr;
                         end;
-lmt_prod_AllBusy      : ParseLogMessage:=str_warn_prod_AllBusy;
+lmt_prod_AllBusy      : RenderLogMessage:=str_warn_prod_AllBusy;
 
-lmt_player_connected  : ParseLogMessage:=lm_string+str_gmsg_PlayerConnected;
-lmt_player_leave      : ParseLogMessage:=lm_string+str_gmsg_PlayerLeave;
-lmt_player_timeout    : ParseLogMessage:=lm_string+str_gmsg_PlayerTimeOut;
-lmt_player_surrender  : ParseLogMessage:=lm_string+str_gmsg_PlayerSurrender;
-lmt_player_defeated   : ParseLogMessage:=lm_string+str_gmsg_PlayerDefeat;
+lmt_player_connected  : RenderLogMessage:=lm_string+str_gmsg_PlayerConnected;
+lmt_player_leave      : RenderLogMessage:=lm_string+str_gmsg_PlayerLeave;
+lmt_player_timeout    : RenderLogMessage:=lm_string+str_gmsg_PlayerTimeOut;
+lmt_player_surrender  : RenderLogMessage:=lm_string+str_gmsg_PlayerSurrender;
+lmt_player_defeated   : RenderLogMessage:=lm_string+str_gmsg_PlayerDefeat;
 lmt_player_revealed   : if(lm_data_t>0)
-                        then ParseLogMessage:=lm_string+str_gmsg_PlayerRevealed
-                        else ParseLogMessage:=lm_string+str_gmsg_PlayerNoRevealed;
+                        then RenderLogMessage:=lm_string+str_gmsg_PlayerRevealed
+                        else RenderLogMessage:=lm_string+str_gmsg_PlayerNoRevealed;
 lmt_player_ready,
-lmt_player_nready     : ParseLogMessage:=lm_string+str_lobby_PlayerReady[lm_type=lmt_player_ready];
-lmt_game_Paused       : ParseLogMessage:=lm_string+str_gmsg_PlayerPaused;
-lmt_game_Resumed      : ParseLogMessage:=lm_string+str_gmsg_PlayerResumed;
-lmt_game_message      : ParseLogMessage:=lm_string;
+lmt_player_nready     : RenderLogMessage:=lm_string+str_lobby_PlayerReady[lm_type=lmt_player_ready];
+lmt_game_Paused       : RenderLogMessage:=lm_string+str_gmsg_PlayerPaused;
+lmt_game_Resumed      : RenderLogMessage:=lm_string+str_gmsg_PlayerResumed;
+lmt_game_message      : RenderLogMessage:=lm_string;
 lmt_game_end          : if(lm_data_u<=LastPlayer)and(UIPlayer<=LastPlayer)then
                           if(lm_data_u=g_PlayersGame[UIPlayer].team)
-                          then ParseLogMessage:=str_gstat_Win
-                          else ParseLogMessage:=str_gstat_Lose;
-lmt_game_ReadyToStart : ParseLogMessage:=str_lobby_ReadyToStart;
-lmt_game_BreakStarting: ParseLogMessage:=str_lobby_BreakStarting;
-lmt_game_StartsIn     : ParseLogMessage:=str_lobby_GameStartIn+b2s(lm_data_u);
-lmt_game_ResetIn      : ParseLogMessage:=str_lobby_GameResetIn+b2s(lm_data_u);
+                          then RenderLogMessage:=str_gstat_Win
+                          else RenderLogMessage:=str_gstat_Lose;
+lmt_game_ReadyToStart : RenderLogMessage:=str_lobby_ReadyToStart;
+lmt_game_BreakStarting: RenderLogMessage:=str_lobby_BreakStarting;
+lmt_game_StartsIn     : RenderLogMessage:=str_lobby_GameStartIn+b2s(lm_data_u);
+lmt_game_ResetIn      : RenderLogMessage:=str_lobby_GameResetIn+b2s(lm_data_u);
 
-lmt_upgrade_InProgress: ParseLogMessage:=str_warn_upgrade_InProgress;
+lmt_upgrade_InProgress: RenderLogMessage:=str_warn_upgrade_InProgress;
 lmt_upgrade_complete  : begin
-                           with g_upgrs[lm_data_u] do ParseLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
+                           with g_upgrs[lm_data_u] do RenderLogMessage:=str_warn_upgrade_complete+' ('+upgr_str_Name+')';
                            mcolor^:=c_yellow;
                         end;
 lmt_unit_readyU,
@@ -2648,40 +2660,40 @@ lmt_unit_readyB       : begin
                            with g_uids[lm_data_u] do
                              case lm_data_t of
                              lmt_argt_unit : if(uid_isbuilding)
-                                             then ParseLogMessage:=str_warn_building_complete+' ('+uid_str_name+')'
-                                             else ParseLogMessage:=str_warn_unit_complete    +' ('+uid_str_name+')';
+                                             then RenderLogMessage:=str_warn_building_complete+' ('+uid_str_name+')'
+                                             else RenderLogMessage:=str_warn_unit_complete    +' ('+uid_str_name+')';
                              end;
                            mcolor^:=c_green;
                         end;
 lmt_unit_resurrected  : begin
                            mcolor^:=c_dorange;
-                           ParseLogMessage:=str_warn_unit_resurrected;
+                           RenderLogMessage:=str_warn_unit_resurrected;
                            AddDataStr;
                         end;
 lmt_unit_captured     : begin
-                           ParseLogMessage:=str_warn_unit_captured;
+                           RenderLogMessage:=str_warn_unit_captured;
                            AddDataStr;
                         end;
 lmt_unit_lost         : begin
-                           ParseLogMessage:=str_warn_unit_lost;
+                           RenderLogMessage:=str_warn_unit_lost;
                            AddDataStr;
                         end;
 lmt_unit_LevelUp      : begin
-                           with g_uids[lm_data_u] do ParseLogMessage:=str_warn_unit_Levelup+' ('+uid_str_name+')';
+                           with g_uids[lm_data_u] do RenderLogMessage:=str_warn_unit_Levelup+' ('+uid_str_name+')';
                            mcolor^:=c_blue;
                         end;
 lmt_allies_attackedU,
 lmt_allies_attackedB  : begin
                            with g_uids[lm_data_u] do
-                             ParseLogMessage:=str_warn_allies_attacked+' ('+uid_str_name+')';
+                             RenderLogMessage:=str_warn_allies_attacked+' ('+uid_str_name+')';
                            mcolor^:=c_orange;
                         end;
 lmt_unit_attackedU,
 lmt_unit_attackedB    : begin
                            with g_uids[lm_data_u] do
                              case lm_type of
-                             lmt_unit_attackedU: ParseLogMessage:=str_warn_unit_attacked+' ('+uid_str_name+')';
-                             lmt_unit_attackedB: ParseLogMessage:=str_warn_base_attacked+' ('+uid_str_name+')';
+                             lmt_unit_attackedU: RenderLogMessage:=str_warn_unit_attacked+' ('+uid_str_name+')';
+                             lmt_unit_attackedB: RenderLogMessage:=str_warn_base_attacked+' ('+uid_str_name+')';
                              end;
                            mcolor^:=c_red;
                         end;
@@ -2691,12 +2703,12 @@ lmt_kpoint_Captured,
 lmt_koth_CaptureStart,
 lmt_koth_Alarm        : begin
                            case lm_type of
-                           lmt_kpoint_CaptureStart: ParseLogMessage:=Team2Name(lm_data_u)+str_warn_kpoint_CaptureStart+b2s(lm_data_t+1);
+                           lmt_kpoint_CaptureStart: RenderLogMessage:=Team2Name(lm_data_u)+str_warn_kpoint_CaptureStart+b2s(lm_data_t+1);
                            lmt_kpoint_Captured    : if(map_scenario=mc_koth)
-                                                    then ParseLogMessage:=Team2Name(lm_data_u)+str_ui_KotHWinner
-                                                    else ParseLogMessage:=Team2Name(lm_data_u)+str_warn_kpoint_Captured+b2s(lm_data_t+1);
-                           lmt_koth_CaptureStart  : ParseLogMessage:=Team2Name(lm_data_u)+str_warn_koth_CaptureStart;
-                           lmt_koth_Alarm         : ParseLogMessage:=str_warn_koth_Alarm+lm_string;
+                                                    then RenderLogMessage:=Team2Name(lm_data_u)+str_ui_KotHWinner
+                                                    else RenderLogMessage:=Team2Name(lm_data_u)+str_warn_kpoint_Captured+b2s(lm_data_t+1);
+                           lmt_koth_CaptureStart  : RenderLogMessage:=Team2Name(lm_data_u)+str_warn_koth_CaptureStart;
+                           lmt_koth_Alarm         : RenderLogMessage:=str_warn_koth_Alarm+lm_string;
                            end;
                            if(UIPlayer>LastPlayer)
                            then mcolor^:=c_ltgray
@@ -2711,10 +2723,10 @@ lmt_ngen_captured,
 lmt_ngen_Alarm,
 lmt_ngen_lost         : begin
                            case lm_type of
-                           lmt_ngen_exh     : ParseLogMessage:=str_warn_ngen_exh;
-                           lmt_ngen_captured: ParseLogMessage:=str_warn_ngen_captured;
-                           lmt_ngen_Alarm   : ParseLogMessage:=str_warn_ngen_Alarm;
-                           lmt_ngen_lost    : ParseLogMessage:=str_warn_ngen_lost;
+                           lmt_ngen_exh     : RenderLogMessage:=str_warn_ngen_exh;
+                           lmt_ngen_captured: RenderLogMessage:=str_warn_ngen_captured;
+                           lmt_ngen_Alarm   : RenderLogMessage:=str_warn_ngen_Alarm;
+                           lmt_ngen_lost    : RenderLogMessage:=str_warn_ngen_lost;
                            end;
                            mcolor^:=c_aqua;
                         end;
@@ -2728,42 +2740,42 @@ lmt_ability_ReqUACNear,
 lmt_ability_ReqHelNear,
 lmt_ability_Tar2Close : begin
                            case lm_type of
-                           lmt_Invalid_Order     : ParseLogMessage:=str_warn_Invalid_Order;
-                           lmt_unit_NeedProdUnit : ParseLogMessage:=str_warn_NeedProdUnit;
-                           lmt_unit_NeedBuilder  : ParseLogMessage:=str_warn_NeedBuilder;
-                           lmt_ability_BadPlace  : ParseLogMessage:=str_warn_AbilityBadPlace;
-                           lmt_ability_reload    : ParseLogMessage:=str_warn_AbilityReload;
-                           lmt_ability_Casting   : ParseLogMessage:=str_warn_AbilityCasting;
-                           lmt_ability_ReqUACNear: ParseLogMessage:=str_warn_AbilityReqUACNear;
-                           lmt_ability_ReqHelNear: ParseLogMessage:=str_warn_AbilityReqHelNear;
-                           lmt_ability_Tar2Close : ParseLogMessage:=str_warn_AbilityTar2Close;
+                           lmt_Invalid_Order     : RenderLogMessage:=str_warn_Invalid_Order;
+                           lmt_unit_NeedProdUnit : RenderLogMessage:=str_warn_NeedProdUnit;
+                           lmt_unit_NeedBuilder  : RenderLogMessage:=str_warn_NeedBuilder;
+                           lmt_ability_BadPlace  : RenderLogMessage:=str_warn_AbilityBadPlace;
+                           lmt_ability_reload    : RenderLogMessage:=str_warn_AbilityReload;
+                           lmt_ability_Casting   : RenderLogMessage:=str_warn_AbilityCasting;
+                           lmt_ability_ReqUACNear: RenderLogMessage:=str_warn_AbilityReqUACNear;
+                           lmt_ability_ReqHelNear: RenderLogMessage:=str_warn_AbilityReqHelNear;
+                           lmt_ability_Tar2Close : RenderLogMessage:=str_warn_AbilityTar2Close;
                            end;
                            AddDataStr;
                         end;
-lmt_invalid_Target    : ParseLogMessage:=str_warn_Invalid_Target;
+lmt_invalid_Target    : RenderLogMessage:=str_warn_Invalid_Target;
 lmt_markLook          : begin
                            mcolor^:=c_ltgray;
-                           ParseLogMessage:=lm_string+str_warn_markLook;
+                           RenderLogMessage:=lm_string+str_warn_markLook;
                         end;
 lmt_markAttack        : begin
                            mcolor^:=c_ltred;
-                           ParseLogMessage:=lm_string+str_warn_markAttack;
+                           RenderLogMessage:=lm_string+str_warn_markAttack;
                         end;
 lmt_other_UACStrike   : begin
                            if(lm_data_u<=LastPlayer)
-                           then ParseLogMessage:=g_PlayersGame[lm_data_u].name
-                           else ParseLogMessage:='???';
-                           ParseLogMessage+=str_warn_UACStrike;
+                           then RenderLogMessage:=g_PlayersGame[lm_data_u].name
+                           else RenderLogMessage:='???';
+                           RenderLogMessage+=str_warn_UACStrike;
                            mcolor^:=c_brown;
                         end;
 lmt_other_UACScan     : begin
-                           ParseLogMessage:=str_warn_UACScan;
+                           RenderLogMessage:=str_warn_UACScan;
                            if(lm_data_u<=LastPlayer)
-                           then ParseLogMessage+=g_PlayersGame[lm_data_u].name
-                           else ParseLogMessage+='???';
+                           then RenderLogMessage+=g_PlayersGame[lm_data_u].name
+                           else RenderLogMessage+='???';
                            mcolor^:=c_lime;
                         end;
-     else               ParseLogMessage:='UNKNOWN MESSAGE TYPE';
+     else               RenderLogMessage:='UNKNOWN MESSAGE TYPE';
                         mcolor^:=c_purple;
      end;
 end;
@@ -2816,7 +2828,7 @@ begin
            acolor:=c_white;
            atype :=log_l[i].lm_type;
            if(atype in logTypes)
-           then aline:=ParseLogMessage(@log_l[i],@acolor)
+           then aline:=RenderLogMessage(@log_l[i],@acolor)
            else aline:='';
            lineL:=length(aline);
            if(i=0)

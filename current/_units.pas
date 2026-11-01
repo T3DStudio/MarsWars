@@ -1086,8 +1086,8 @@ begin
         pTransport^.buffs[ub_SpecPause]:=fr_fpsq;
         pTransport^.transportC-=uid^.uid_TransportSize;
         transportU:=0;
-        x     :=pTransport^.x-g_randomr(pTransport^.uid^.uid_missileR);
-        y     :=pTransport^.y-g_randomr(pTransport^.uid^.uid_missileR);
+        x     :=pTransport^.x-g_randomr(pTransport^.uid^.uid_missileR1);
+        y     :=pTransport^.y-g_randomr(pTransport^.uid^.uid_missileR1);
         uo_x  :=x;
         uo_y  :=y;
         uo_tar:=0;
@@ -1268,8 +1268,8 @@ begin
    begin
       if(not IsUnitRange(pTarget^.transportU,nil))then
         if((g_tick mod fr_fpst)=0)
-        or(now)then effect_add(pTarget^.vx-random(pTarget^.uid^.uid_missileR)+random(pTarget^.uid^.uid_missileR),
-                               pTarget^.vy-random(pTarget^.uid^.uid_missileR)+random(pTarget^.uid^.uid_missileR),
+        or(now)then effect_add(pTarget^.vx-random(pTarget^.uid^.uid_missileR1)+random(pTarget^.uid^.uid_missileR1),
+                               pTarget^.vy-random(pTarget^.uid^.uid_missileR1)+random(pTarget^.uid^.uid_missileR1),
                                draw_DefaultSpriteDepth(pTarget^.vy+1,pTarget^.isfly),aw_eid_target);
 
       if(aw_snd_target<>nil)then
@@ -1502,29 +1502,6 @@ wpt_resurect    : begin
 wpt_heal        : begin
                      damage:=round((aw_object_count+upgradd)*impactX);
                      pTarget^.hits:=mm3i(1,pTarget^.hits+damage,pTarget^.uid^.uid_MaxHits1);
-                  end;
-wpt_consume     : begin
-                     if(pTarget^.buffs[ub_PainState]<=0)then
-                     begin
-                        {$IFDEF _FULLGAME}
-                        effect_UnitPain(pTarget,nil);
-                        {$ENDIF}
-                        pTarget^.buffs[ub_PainState]:=aw_reload*2;
-                     end;
-                     pTarget^.dir:=dir;
-                     pTarget^.isfly:=isfly;
-                     c:=dir_MOD360(dir+23) div 45;
-                     damage:=max2i(1,(aw_reload-a_rld));
-
-                     kx:=x+dir_stepX[c]*uid_MissileR;
-                     ky:=y+dir_stepX[c]*uid_MissileR;
-
-                     if(abs(pTarget^.x-kx)<=damage)then pTarget^.x:=kx else pTarget^.x-=sign(pTarget^.x-kx)*damage;
-                     if(abs(pTarget^.y-ky)<=damage)then pTarget^.y:=ky else pTarget^.y-=sign(pTarget^.y-ky)*damage;
-
-                     if((point_dist_int(x,y,pTarget^.vx,pTarget^.vy)-uid_r)<=0)then
-                       unit_damage(pTarget,pTarget^.hits,playeri,true);
-
                   end;
                 end;
             end;
@@ -1916,13 +1893,17 @@ begin
       uab_ToHGate          : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HGate          ,true);
       uab_ToHPools         : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HPools         ,true);
       uab_ToHBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HBarracks      ,true);
+      uab_ToHFTower        : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HFTower        ,true);
+      uab_ToHTotem         : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_HTotem         ,true);
 
       uab_ToUACommandCenter: unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UACommandCenter,true);
       uab_ToUBarracks      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UBarracks      ,true);
       uab_ToUFactory       : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UFactory       ,true);
       uab_ToUWeaponFactory : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UWeaponFactory ,true);
-      uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
-      uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
+      uab_ToUAGTurret      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UGTurret       ,true,true);
+      uab_ToUAATurret      : unit_AbilityCheck:=unit_TransformStart(pCaster,uid_UATurret       ,true,true);
+      //uab_ToUAGTurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,true);
+      //uab_ToUAATurret      : unit_AbilityCheck:=unit_morph(pCaster,uid_UATurret ,false,-2,level,true);
       uab_ToUACDron        : unit_AbilityCheck:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,true);
 
       uab_ToUATurretTo,
@@ -2104,6 +2085,8 @@ begin
       uab_ToHGate,
       uab_ToHPools,
       uab_ToHBarracks,
+      uab_ToHFTower,
+      uab_ToHTotem,
 
       uab_ToUACommandCenter,
       uab_ToUBarracks,
@@ -2120,13 +2103,17 @@ begin
                               uab_ToHGate          : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HGate          ,false);
                               uab_ToHPools         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HPools         ,false);
                               uab_ToHBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HBarracks      ,false);
+                              uab_ToHFTower        : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HFTower        ,false);
+                              uab_ToHTotem         : unit_AbilityExec:=unit_TransformStart(pCaster,uid_HTotem         ,false);
 
                               uab_ToUACommandCenter: unit_AbilityExec:=unit_TransformStart(pCaster,uid_UACommandCenter,false);
                               uab_ToUBarracks      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UBarracks      ,false);
                               uab_ToUFactory       : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UFactory       ,false);
                               uab_ToUWeaponFactory : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UWeaponFactory ,false);
-                              uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
-                              uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
+                              uab_ToUAGTurret      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGTurret       ,false,true);
+                              uab_ToUAATurret      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UATurret       ,false,true);
+                              //uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
+                              //uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
                               uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,false);
 
                               uab_LvlUpURadar      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
@@ -2415,7 +2402,7 @@ begin
              begin
                 u_royal_cd:=point_dist_int(x,y,g_royal_Rx,g_royal_Ry);
                 u_royal_d :=g_royal_RCur-u_royal_cd;
-                if(u_royal_d<uid_missileR)then
+                if(u_royal_d<uid_missileR1)then
                 begin
                    unit_kill(pu,false,false,true,true,false);
                    exit;

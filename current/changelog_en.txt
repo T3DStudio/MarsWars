@@ -118,8 +118,13 @@ The "Evil Eye Nest" itself also "detectors" invisible units around it;
 - activating "active" detection and reconnaissance abilities (UAC's "Radar" ability and Hell's "Evil Eye Nest" abilities) now requires a separate upgrade;
 - the maximum level of basic unit attack/defense upgrades has been reduced from 5 to 4, the bonus from each level has been proportionally increased, and prices have been adjusted: the first level has become more expensive, while the last level is slightly cheaper.
 - upgrades for improving the teleporter and transport now require an advanced builder instead of a special "technological" building;
-- "Pain Elemental" now has a new attack type, "devouring". This attack can only target enemy Lost Souls and Phantoms. The elemental quickly pulls the target unit to itself, instantly killing it;
-- "Lost Soul" and "Phantom" are no longer affected by the "Pain Threshold" upgrade.
+- "Lost Soul" and "Phantom" are no longer affected by the "Pain Threshold" upgrade; health has been reduced to 500;
+- reworked "static defense" (Hell towers and UAC turrets):
+-- now defensive structures have more damage and health, but an upgrade to increase the armor of buildings gives them a smaller bonus than other structures;
+-- they no longer have any damage modifiers;
+-- the "Anti-ground Plasmagun" upgrade for the UAC anti-ground turret has been removed from the game;
+-- "Totem Of Horror" can no longer be built as an independent building - the "Fire Tower" turns into it; attack speed almost doubled.
+
 
 53:
 General:

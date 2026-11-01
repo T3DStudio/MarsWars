@@ -101,15 +101,15 @@ begin
    end;
 end;
 
-function wudata_log(p:byte;plog_n_cl:pcardinal;rpl:boolean):boolean;
+function wudata_log(ptarget:byte;plog_n_cl:pcardinal;rpl:boolean):boolean;
 var
 t,s,
 i  :cardinal;
 b  :byte;
 begin
    wudata_log:=false;
-   if(p<=LastPlayer)then
-     with g_PlayersGame[p] do
+   if(ptarget<=LastPlayer)then
+     with g_PlayersGame[ptarget] do
      begin
         s:=0;
         if(not rpl)then
@@ -1211,13 +1211,13 @@ begin
    //debuglog_addline(rudata_string);
 end;
 
-procedure  rudata_log(p:byte;rpl:boolean);
+procedure  rudata_log(ptarget:byte;rpl:boolean);
 var
 s,b,
 mtype,
 argt,
-argx,
-x,y  :byte;
+argx :byte;
+x,y  :integer;
 str  :shortstring;
 begin
    s:=rudata_byte(rpl,0);
@@ -1242,10 +1242,19 @@ begin
             x:=rudata_byte(rpl,0);
             y:=rudata_byte(rpl,0);
          end;
+         if(x=255)then x:=-1 else x:=x shl 5;
+         if(y=255)then y:=-1 else y:=y shl 5;
 
-         if(x=255)
-         then player_LogAdd(p,mtype,argt,argx,str,-1     ,-1     )
-         else player_LogAdd(p,mtype,argt,argx,str,x shl 5,y shl 5);
+         {if(ptarget>LastPlayer)
+         then
+         else
+           if(x=255)
+           then player_LogAdd(ptarget,mtype,argt,argx,str,-1     ,-1     )
+           else player_LogAdd(ptarget,mtype,argt,argx,str,x shl 5,y shl 5); }
+
+         if(ptarget>LastPlayer)
+         then players_LogAdd(255,255,mtype,argt,argx,str,x,y)
+         else  player_LogAdd(ptarget,mtype,argt,argx,str,x,y);
 
          s-=1;
       end;

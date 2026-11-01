@@ -174,9 +174,12 @@ end;
 
 procedure dedicated_Line1(pY:byte;s1:shortstring='');
 begin
+   if(pY=255)then pY:=Wherey;
    GotoXY(1,pY);
    dedicated_ClearLine;
    writeln(s1);
+   if(length(s1)>length(ded_ConsoleBaseLine))then
+     setlength(s1,length(ded_ConsoleBaseLine));
    GotoXY(1,ded_logY);
 end;
 

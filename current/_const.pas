@@ -278,6 +278,31 @@ lmt_argt_unit          = 0;
 lmt_argt_upgrade       = 1;
 lmt_argt_ability       = 2;
 
+lmts_common_list       = [    // ded server replay & all-players-UI-list
+                          lmt_chat_player0..
+                          lmt_chat_player7,
+                          lmt_chat_local,
+                          lmt_game_message,
+                          lmt_game_end,
+                          lmt_game_ReadyToStart,
+                          lmt_game_BreakStarting,
+                          lmt_game_StartsIn,
+                          lmt_game_ResetIn,
+                          lmt_game_Paused,
+                          lmt_game_Resumed,
+                          lmt_player_connected,
+                          lmt_player_leave,
+                          lmt_player_timeout,
+                          lmt_player_defeated,
+                          lmt_player_revealed,
+                          lmt_player_surrender,
+                          lmt_player_ready,
+                          lmt_player_nready,
+                          lmt_other_UACStrike,
+                          lmt_koth_CaptureStart,
+                          lmt_koth_Alarm
+                         ];
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  NETGAME
@@ -436,7 +461,6 @@ wpt_heal               = 3;
 wpt_unit               = 4;
 wpt_directdmg          = 5;
 wpt_directdmgZ         = 6;
-wpt_consume            = 7;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -557,7 +581,6 @@ upgr_hell_EvilEyeR     = 19; // hell Eye time
 upgr_hell_TotemInvis   = 20; // totem and eye invisible
 upgr_hell_BuildRestore = 21; // build restoration
 upgr_hell_TowerBlink   = 22; // teleport towers
-upgr_hell_FTowerAMech  = 23; // Fire tower caco weapon
 
 
 upgr_uac_DistDamage    = 31; // distance attack               // "t1"
@@ -581,8 +604,7 @@ upgr_uac_MechArmor     = 47; // mech arm
 upgr_uac_TerAAWeapon   = 48; // termintator anti-air weapon
 upgr_uac_Transport     = 49; // transport capacity upgrade
 upgr_uac_RadarR        = 50; // Radar
-upgr_uac_TurretPlasma  = 51; // plasma weapons fro anti-ground turret
-upgr_uac_TurretArmor   = 52; // turrets armor
+upgr_uac_TurretArmor   = 51; // turrets armor
 
 
 upgr_fprod_build       = 251;
@@ -617,7 +639,9 @@ MID_Flyer              = 117;
 MID_URocket            = 119;
 MID_URocketS           = 120;
 MID_Chaingun           = 121;
-MID_SChaingun          = 122;
+MID_TChaingun          = 122;
+MID_SChaingun          = 123;
+MID_FTower             = 124;
 
 
 mh_none                = 0;
@@ -718,7 +742,8 @@ UpgradeUnitSpeedBonus  = 2;
 UpgradeDamageBonus1    = 8;
 UpgradeArmorBonus1     = 8;
 UpgradeUnitArmorBonus  = UpgradeArmorBonus1;
-UpgradeBuildArmorBonus = UpgradeArmorBonus1*2+(UpgradeArmorBonus1 div 2);
+UpgradeBuildArmorOBonus= UpgradeArmorBonus1*2+(UpgradeArmorBonus1 div 2); // other
+UpgradeBuildArmorDBonus= (UpgradeBuildArmorOBonus+UpgradeArmorBonus1) div 2; // stat defence
 
 BaseHeal1              = BaseRegen1*4;
 BaseHealBonus1         = BaseHeal1 div 3;
@@ -895,12 +920,14 @@ uab_ToUGTurretTo       = 50;
 uab_ToUATurretTo       = 51;
 uab_LvlUpURadar        = 52;
 uab_LvlUpURMStation    = 53;
+uab_ToHFTower          = 54;
+uab_ToHTotem           = 55;
 
-uab_HSpecter           = 55;
-uab_HStealth           = 56;
-uab_HHTShroud          = 57;
-uab_HT2TNoCD           = 58;
-uab_UAASplash          = 59;
+uab_HSpecter           = 60;
+uab_HStealth           = 61;
+uab_HHTShroud          = 62;
+uab_HT2TNoCD           = 63;
+uab_UAASplash          = 64;
 
 
 ////////////////////////////////////////////////////////////////////////////////

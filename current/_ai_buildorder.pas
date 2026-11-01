@@ -192,7 +192,7 @@ begin
       if(aiu_alarm_d=NOTSET)then exit;
 
       case race of
-      r_hell: SetBuildUID2(UID_HFTower,UID_HTotem);
+      r_hell: SetBuildUID1(UID_HFTower);
       r_uac : begin
                  if(aiu_alarm_d<base_r2)then
                    if(ai_enemylimit_baseR2_grd>0)
@@ -551,7 +551,7 @@ begin
                     end;
                  end;
 
-                 SetUpgrade(upgr_uac_DistDamage  +g_random(21),aip_MaxUpgradeLevel);
+                 SetUpgrade(upgr_uac_DistDamage+g_random(21),aip_MaxUpgradeLevel);
               end;
       end;
 

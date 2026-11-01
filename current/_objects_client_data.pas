@@ -272,11 +272,9 @@ begin
    setEffectEID (0,0,0,u,0);
    setEffectSND (  nil,snd_pain_death,snd_pain_death,snd_pain_pain );
 
-   setWeaponESND(0,snd_pain_consume,nil,0,0);
-   setWeaponESND(1,nil,nil,0,0);
-   setWeaponTEID(0,nil,0,[0..255]);
-   with uid_arms[1] do
-   setWeaponTEID(1,nil,0,[aw_reload-fr_fps1..aw_reload]);
+   setWeaponESND(0,nil,nil,0,0);
+   with uid_arms[0] do
+   setWeaponTEID(0,nil,0,[aw_reload-fr_fps1..aw_reload]);
 end;
 UID_Revenant:
 begin
@@ -455,7 +453,7 @@ begin
 
    setMWSModel(0,@spr_HFTower);
    setBuildingSND(snd_hell_htower);
-   setWeaponESND(0,nil,snd_hell_attack    ,0,MID_Imp);
+   setWeaponESND(0,nil,snd_shot_fire   ,0,MID_Imp);
    uid_eid_bcrater_y:=15;
 end;
 UID_HTeleport:
@@ -748,11 +746,9 @@ UID_UGTurret:
 begin
    uid_AnimStepWalk    := 6;
    setMWSModel(0,@spr_UTurret);
-   setMWSModel(1,@spr_UPTurret);
    setBuildingSND(snd_uac_ctower);
    uid_eid_bcrater_y:=1;
-   setWeaponESND(0,nil,snd_shot_plasma,0,0);
-   setWeaponESND(1,nil,snd_shot_pistol,0,0);
+   setWeaponESND(0,nil,snd_shot_pistol,0,0);
 end;
 UID_UATurret:
 begin
@@ -942,7 +938,6 @@ begin
    setBTN(upgr_hell_TotemInvis  ,r_hell,16);
    setBTN(upgr_hell_BuildRestore,r_hell,17);
    setBTN(upgr_hell_TowerBlink  ,r_hell,18);
-   setBTN(upgr_hell_FTowerAMech ,r_hell,21);
 
    setBTN(upgr_uac_DistDamage   ,r_uac ,0 );
    setBTN(upgr_uac_BioArmor     ,r_uac ,1 );
@@ -964,7 +959,6 @@ begin
    setBTN(upgr_uac_TerAAWeapon  ,r_uac ,17);
    setBTN(upgr_uac_Transport    ,r_uac ,6 );
    setBTN(upgr_uac_RadarR       ,r_uac ,8 );
-   setBTN(upgr_uac_TurretPlasma ,r_uac ,5 );
    setBTN(upgr_uac_TurretArmor  ,r_uac ,18);
 end;
 
@@ -1048,6 +1042,8 @@ uab_ToHPools         : ua_mbrush_r:=-UID_HPools;
 uab_ToHBarracks      : ua_mbrush_r:=-UID_HBarracks;
 
 uab_ToUACommandCenter: ua_mbrush_r:=-UID_UACommandCenter;
+uab_ToHFTower        : ua_mbrush_r:=-UID_HFTower;
+uab_ToHTotem         : ua_mbrush_r:=-UID_HTotem;
 uab_ToUAGTurret      : ua_mbrush_r:=-UID_UGTurret;
 uab_ToUAATurret      : ua_mbrush_r:=-UID_UATurret;
 uab_ToUACDron        : ua_mbrush_r:=-UID_UACDron;
@@ -1070,6 +1066,8 @@ uab_ToHGate,
 uab_ToHPools,
 uab_ToHBarracks,
 uab_ToUACommandCenter,
+uab_ToHFTower,
+uab_ToHTotem,
 uab_ToUAGTurret,
 uab_ToUAATurret,
 uab_ToUACDron,
@@ -1080,6 +1078,8 @@ uab_ToUWeaponFactory : ua_mbrush_hint:=byte(-ua_mbrush_r);
 
       case a of
 uab_ToUACDron,
+uab_ToHFTower,
+uab_ToHTotem,
 uab_ToUAGTurret,
 uab_ToUAATurret,
 uab_ToUGTurretTo,

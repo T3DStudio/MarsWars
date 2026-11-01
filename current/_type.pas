@@ -453,7 +453,8 @@ TUID = record
    uid_MaxHitsq          : longint;
    uid_r,
    uid_RoyalBattleAutoOutR,
-   uid_missileR,
+   uid_missileR1,
+   uid_missileRh,
    uid_req_HellLoot,
    uid_req_UACLoot,
    uid_req_EnergyLevel,

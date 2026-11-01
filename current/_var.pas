@@ -114,6 +114,7 @@ rpls_NamePrefix   : shortstring = 'LastReplay';
 rpls_str_path     : shortstring = '';
 rpls_player       : byte = 0;
 rpls_GameStatus   : byte = 0;
+rpls_log_c        : cardinal = 0;
 rpls_PlayersScore : boolean = false;
 rpls_head_items   : array of TSaveLoadItem;
 rpls_head_itemn   : integer = 0;
@@ -474,6 +475,7 @@ menu_msg_Body     : shortstring;
 menu_image        : pSDL_Surface = nil;
 menu_image_caption: shortstring;
 
+menu_ChatSize     : integer = 0;
 menu_hint_pos     : array[byte] of byte;
 
 menu_ResolutionWi,
@@ -592,7 +594,6 @@ rpls_FastSkip     : boolean = false;
 rpls_file_size    : cardinal = 0;
 rpls_pnu          : integer = 0;
 rpls_showlog      : boolean = false;
-rpls_log_c        : cardinal = 0;
 rpls_vidx         : byte = 0;
 rpls_vidy         : byte = 0;
 rpls_apm          : word = 0;
@@ -852,7 +853,6 @@ spr_UAcademy,
 spr_UHPowerConductor,
 
 spr_UTechCenter,
-spr_UPTurret,
 spr_URTurret,
 spr_UNuclearPlant,
 spr_URocketL,
@@ -883,6 +883,7 @@ spr_h_p4,
 spr_h_p5,
 spr_h_p6,
 spr_h_p7,
+spr_h_p8,
 spr_u_p0,
 spr_u_p1,
 spr_u_p1s,
@@ -902,7 +903,6 @@ spr_pdmodel          : PTMWSModel; // default empty model
 
 spr_RallyPoint       : array[1..r_count] of TMWTexture;
 spr_b4_a,
-spr_b7_a,
 spr_b9_a,
 spr_ptur,
 spr_buff_Scan,
@@ -1211,7 +1211,6 @@ str_uarm_ranged,
 str_uarm_zombie,
 str_uarm_ressurect,
 str_uarm_heal,
-str_uarm_consume,
 str_uarm_spawn,
 str_uarm_targets,
 str_uarm_BaseImpact,
@@ -1619,7 +1618,6 @@ snd_revenant_move,
 snd_pain_ready,
 snd_pain_death,
 snd_pain_pain,
-snd_pain_consume,
 
 snd_mastermind_ready,
 snd_mastermind_death,
@@ -1670,7 +1668,7 @@ snd_shot_shotgun,
 snd_shot_ssg,
 snd_shot_plasma,
 snd_shot_bfg,
-snd_explode_bfg,
+
 snd_Healing,
 snd_repairing,
 snd_JetPackOn,
@@ -1678,14 +1676,16 @@ snd_click,
 snd_chat,
 snd_rico,
 snd_shot_flyer,
-snd_explode_flyer,
 snd_shot_rocket,
+snd_shot_fire,
 snd_CCenterLiftUp,
 snd_bomblaunch,
 snd_Gibs,
-snd_explode_building,
 snd_Transport,
 snd_Teleport,
+snd_explode_flyer,
+snd_explode_building,
+snd_explode_bfg,
 snd_explode_plasma,
 snd_explode,
 snd_mapmark,

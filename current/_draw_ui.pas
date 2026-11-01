@@ -688,7 +688,7 @@ begin
    if(req=0)then exit;
    FillChar(tlog,SizeOf(tlog),0);
    tlog.lm_type:=req;
-   s1:=ParseLogMessage(@tlog,@tcolor);
+   s1:=RenderLogMessage(@tlog,@tcolor);
    if(length(s1)>0)then
    begin
       UIHintAdd_Line(nil);
@@ -959,7 +959,9 @@ begin
    // last events and chat
    if(ui_InGameChat>0)or(rpls_showlog)then
    begin
-      draw_UILog(tar,ui_logx,ui_logy-txt_line_h3,ta_LB,logPov,ui_log_LineLen,ui_log_ListSize,lmts_menu_chat);
+      if(logPov<=LastPlayer)
+      then draw_UILog(tar,ui_logx,ui_logy-txt_line_h3,ta_LB,logPov     ,ui_log_LineLen,ui_log_ListSize,lmts_menu_chat  )
+      else draw_UILog(tar,ui_logx,ui_logy-txt_line_h3,ta_LB,LocalPlayer,ui_log_LineLen,ui_log_ListSize,lmts_common_list);
       if(ui_InGameChat>0)then
       begin
          case ui_InGameChat of
@@ -976,7 +978,9 @@ begin
      if(ui_log_LastTimer>0)then // last messages
      begin
         ui_log_LastTimer-=1;
-        draw_UILog(tar,ui_logx,ui_logy,ta_LB,logPov,ui_log_LineLen,(ui_log_LastTimer div ui_log_TimeLast)+1,lmts_last_events);
+        if(logPov<=LastPlayer)
+        then draw_UILog(tar,ui_logx,ui_logy,ta_LB,logPov     ,ui_log_LineLen,(ui_log_LastTimer div ui_log_TimeLast)+1,lmts_last_events)
+        else draw_UILog(tar,ui_logx,ui_logy,ta_LB,LocalPlayer,ui_log_LineLen,(ui_log_LastTimer div ui_log_TimeLast)+1,lmts_common_list)
      end;
 
    // resources
