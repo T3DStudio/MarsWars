@@ -355,10 +355,10 @@ str_uarm_targets              = 'цели: '
 str_uarm_BaseImpact           = 'базовое воздействие'
 str_uarm_MinRange             = 'мин. радиус: '
 str_uarm_MaxRange             = 'макс. радиус: '
-str_uarm_BonusAFlyR           = 'доп. радиус против воздуха: '
-str_uarm_BonusAGroundR        = 'доп. радиус против земли: '
-str_uarm_BonusAUnitR          = 'доп. радиус против юнитов: '
-str_uarm_BonusABuildingR      = 'доп. радиус против зданий: '
+str_uarm_BonusAFlyR           = 'Доп. радиус против воздуха'
+str_uarm_BonusAGroundR        = 'Доп. радиус против земли'
+str_uarm_BonusAUnitR          = 'Доп. радиус против юнитов'
+str_uarm_BonusABuildingR      = 'Доп. радиус против зданий'
 str_uarm_SplashDamageR        = 'радиус урона по области: '
 str_uarm_Upgrade              = str_hint_upgrade+': '
 str_uarm_Factor               = ', моддификатор: '
@@ -511,8 +511,6 @@ str_name[UID_HACommandCenter]   = 'Улучшенный адский коман�
 str_dscr[UID_HACommandCenter]   = 'Проклятый улучшенный адский командный центр'
 str_name[UID_HBarracks]         = 'Зомби-бараки'
 str_dscr[UID_HBarracks]         = 'Проклятые бараки'
-str_name[UID_HMarker]           = 'Адский маркер'
-str_dscr[UID_HMarker]           = ''
 str_name[UID_LostSoul]          = 'Потерянная душа'
 str_dscr[UID_LostSoul]          = str_hint_MaxQuantity+str_scirmish_MaxLost
 str_name[UID_Phantom]           = 'Фантом'
@@ -755,11 +753,11 @@ str_name[upgr_hell_DistDamage1]    = 'Адский огонь'
 str_dscr[upgr_hell_DistDamage1]    = 'Увеличение урона дальних атак, наносимых юнитами '+str_upgr_hell_DistDamage1_uids
 str_name[upgr_hell_UnitArmor]      = 'Боевая шкура'
 str_dscr[upgr_hell_UnitArmor]      = 'Увеличение брони всех юнитов Hell'
-str_name[upgr_hell_BuildArmor]     = 'Каменные стены'
+str_name[upgr_hell_BuildArmor]     = 'Улучшенная каменная кладка'
 str_dscr[upgr_hell_BuildArmor]     = 'Увеличение брони для всех зданий Hell'
-str_name[upgr_hell_MeleeDamage]    = 'Когти и клыки'
+str_name[upgr_hell_MeleeDamage]    = 'Усиление когтей и клыков'
 str_dscr[upgr_hell_MeleeDamage]    = 'Увеличение урона ближнего боя для всех юнитов Hell'
-str_name[upgr_hell_Regeneration]   = 'Регенерация'
+str_name[upgr_hell_Regeneration]   = 'Регенерация плоти'
 str_dscr[upgr_hell_Regeneration]   = 'Активация и улучшение регенерации здоровья для всех юнитов Hell'
 str_name[upgr_hell_PainFactor]     = 'Болевой порог'
 str_dscr[upgr_hell_PainFactor]     = 'Юниты Hell могут выдержать больше ударов, прежде чем у них случится "состояние боли"'
@@ -778,35 +776,35 @@ str_name[upgr_hell_UnitSightR]     = 'Адское зрение'
 str_dscr[upgr_hell_UnitSightR]     = 'Увеличение радиуса обзора и атаки для всех юнитов Hell'
 str_name[upgr_hell_Phantoms]       = 'Фантомы'
 str_dscr[upgr_hell_Phantoms]       = 'Элементаль боли создание Фантомов вместо Потерянных душ'
-str_name[upgr_hell_DistDamage2]    = 'Вооружение демонов'
+str_name[upgr_hell_DistDamage2]    = 'Улучшение демонического оружия'
 str_dscr[upgr_hell_DistDamage2]    = 'Увеличение урона дальних атак, наносимых юнитами '+str_upgr_hell_DistDamage2_uids
 str_name[upgr_hell_TeleportCD]     = 'Улучшение Телепорта'
 str_dscr[upgr_hell_TeleportCD]     = 'Уменьшение времени перезарядки способностей Телепорта'
 str_name[upgr_hell_T2TNoCD]        = str_name[uab_HT2TNoCD]
 str_dscr[upgr_hell_T2TNoCD]        = str_dscr[uab_HT2TNoCD]
-str_name[upgr_hell_EvilEyeR]       = 'Улучшение Злого глаза'
+str_name[upgr_hell_EvilEyeR]       = 'Злая чувствительность'
 str_dscr[upgr_hell_EvilEyeR]       = 'Увеличение радиуса обзора Злого глаза'
 str_name[upgr_hell_TotemInvis]     = str_name[uab_HHTShroud]
 str_dscr[upgr_hell_TotemInvis]     = 'Тотем ужаса становится невидимым'
 str_name[upgr_hell_BuildRestore]   = 'Самовосстановление зданий'
 str_dscr[upgr_hell_BuildRestore]   = 'Активация и улучшение регенерации здоровья для всех зданий Hell'
 str_tmp1=str_UnitsNamesList([UID_HFTower,UID_HTotem])
-str_name[upgr_hell_TowerR]         = 'Демонические духи'
+str_name[upgr_hell_TowerR]         = 'Демонические духи-наблюдатели'
 str_dscr[upgr_hell_TowerR]         = 'Увеличение радиуса обзора и атаки для зданий '+str_tmp1
 str_name[upgr_hell_TowerBlink]     = str_name[uab_HTowerBlink]
 str_dscr[upgr_hell_TowerBlink]     = 'Активация способности "'+str_name[uab_HTowerBlink]+'" для зданий '+str_tmp1
 str_name[upgr_hell_Resurrect]      = 'Воскрешение'
 str_dscr[upgr_hell_Resurrect]      = 'Активация способности юнита '+str_name[UID_Archvile]+' воскрешать убитых монстров'
 
-str_name[upgr_uac_DistDamage]      = 'Улучшение вооружения'
+str_name[upgr_uac_DistDamage]      = 'Улучшение вооружения UAC'
 str_dscr[upgr_uac_DistDamage]      = 'Увеличение урона дальних атак, наносимых всеми юнитами и защитными сооружениями UAC'
-str_name[upgr_uac_BioArmor]        = 'Увеличение защиты юнитов, производимых в Бараках'
+str_name[upgr_uac_BioArmor]        = 'Увеличение защиты пехоты'
 str_dscr[upgr_uac_BioArmor]        = 'Увеличение защиты юнитов, производимых в Бараках'
-str_name[upgr_uac_BuildArmor]      = 'Бетонные стены'
+str_name[upgr_uac_BuildArmor]      = 'Усиленные бетонные стены'
 str_dscr[upgr_uac_BuildArmor]      = 'Увеличение брони всех зданий UAC'
 str_name[upgr_uac_RepairTools]     = 'Продвинутые инструменты'
 str_dscr[upgr_uac_RepairTools]     = 'Улучшение эффективности лечения/починки для юнитов '+str_UnitsNamesList([UID_Medic,UID_Engineer])
-str_name[upgr_uac_BioSpeed]        = 'Легкая броня'
+str_name[upgr_uac_BioSpeed]        = 'Легкая пехотная броня'
 str_dscr[upgr_uac_BioSpeed]        = 'Увеличение скорости передвижения юнитов, производимых в Бараках'
 str_name[upgr_uac_SSMWeapon]       = 'Снаряды земля-земля'
 str_dscr[upgr_uac_SSMWeapon]       = 'Анти-наземное оружие для юнита '+str_name[UID_Antiaircrafter]
@@ -815,7 +813,7 @@ str_dscr[upgr_uac_ADetection]      = 'Активация способности 
 str_tmp1=str_UnitsNamesList([UID_UCommandCenter,UID_UACommandCenter])
 str_name[upgr_uac_CCFly]           = 'Летные двигатели'
 str_dscr[upgr_uac_CCFly]           = 'Активация способностей полета для зданий '+str_tmp1
-str_name[upgr_uac_CCAttack]        = 'Встроенная плазменная турель'
+str_name[upgr_uac_CCAttack]        = 'Встроенная турель'
 str_dscr[upgr_uac_CCAttack]        = 'Вооружение для зданий '+str_tmp1
 str_name[upgr_uac_BuilderR]        = 'Улучшение строителей'
 str_dscr[upgr_uac_BuilderR]        = 'Увеличение области обзора и строительства для зданий '+str_tmp1
@@ -834,6 +832,8 @@ str_name[upgr_uac_MechArmor]       = 'Улучшение защиты техни
 str_dscr[upgr_uac_MechArmor]       = 'Увеличение защиты юнитов, производимых в Заводе техники'
 str_name[upgr_uac_TerAAWeapon]     = 'Анти-воздушное оружие'
 str_dscr[upgr_uac_TerAAWeapon]     = 'Анти-воздушное вооружение для юнита '+str_name[UID_Terminator]
+str_name[upgr_uac_SiedgeMarineR]   = 'Улучшенный баллистический расчет'
+str_dscr[upgr_uac_SiedgeMarineR]   = 'Увеличение радиуса атаки по зданиям для '+str_name[UID_SiegeMarine]
 str_name[upgr_uac_Transport]       = 'Улучшение транспорта'
 str_dscr[upgr_uac_Transport]       = 'Увеличение вместимости юнита '+str_name[UID_UTransport]
 str_name[upgr_uac_RadarR]          = 'Улучшение Радара'
@@ -1411,11 +1411,12 @@ tc_docbr
 tc_lime+ПОДСКАЗКИ И СОВЕТЫ+tc_default+:
 tc_lime+*+tc_default+ В данной миссии вам следует действовать быстро - волна лавы, уничтожающая все на своем пути, будет распространятся из левого верхнего угла карты. Захватывайте ближайшие генераторы и развивайтесь как можно быстрее.
 Ваши оппоненты будут заняты войной друг с другом.
-tc_lime+*+tc_default+Уничтожение одного из врагов даст вам возможность производить новые виды юнитов и зданий.
+tc_lime+*+tc_default+Каждый враг имеет несколько видов уникальных юнитов и зданий - его унитожение даст вам доступ к этим технологиям.
 tc_lime+*+tc_default+Технология телепортации Адской крепости вам пока не доступна, так что единственный способ сохранить вашу базу - строить новые Адские крепости по направлению в правый нижний угол и перестраивать производящие здания дальше от волны.
+tc_lime+*+tc_default+Каждый юнит имеет специальный приказ "Самоуничтожение" - используйте его для унитожения ближайших к лавовой волне Адских крепостей для перестройких их в новом месте. 
+Этот приказ так же может быть полезен что бы освободить лимит от неиспользуемых юнитов или зданий.
 tc_lime+*+tc_default+Баланс в игре во многом строится на том, что одни виды юнитов наносят больше урона по другим и получают больше урона от третьих. Ваши оппоненты имеют разные составы армий - ваш успех зависит от правильно подобранных контр-юнитов.
 Вы можете посмотреть информацию о балансе в разделе "'+str_menu_Help+'" -> "'+str_help_BalanceTable+'".'
-tc_lime+*+tc_default+Каждый юнит имеет особый приказ - "самоуничтожение" - используйте его, чтобы освободить лимит от бесполезных юнитов или зданий.
 tc_lime+*+tc_default+Не забывайте исследовать улучшения для вашей армии.
 
 //////////     HELL VS HELL    3
@@ -1427,13 +1428,37 @@ str_camp_1_miss_3_obj  = '- '+tc_CO1+'Вы и ваши союзники не д�
         tc_default+tc_nl+'- '+tc_CO2+'Уничтожте вражеские племена'
 
 str_camp_1_miss_3_plot = 
-Выжив в Долине Страха, вы подходите к вратам Нечестивого Собора. По легенде - пройти в эти врата могут три вождя, окропившие площадь перед Собором кровью своих врагов.
-По ту сторону площади находятся трое командиров, уже выполнивших условие - и все, что им осталось - пройти врата и лишить вас возможности вознестись на еще один десяток циклов.
-Похоже, ситуация вынуждает вас объединить усилия с другими племенами и не позволить этому случиться!
+Выжив в Долине Страха, вы подходите к вратам Нечестивого Собора. По легенде - пройти в эти врата могут три вождя, окропившие их кровью своих врагов.
+Вы видите 5 лагерей около озера перед Вратами - и трое из них уже заключили союз друг с другом.
+Похоже, ситуация вынуждает вас объединить усилия с двумя другими!
 tc_docbr
 tc_docbr
 tc_lime+ПОДСКАЗКИ И СОВЕТЫ+tc_default+:
 tc_lime+*+tc_default+В этой миссии вам нужно научится трем важным в игре вещам:
-взаимодействие с союзниками;
-применение способностей детекции(раскрытие невидимых юнитов - у врагов будут такие, но ваши союзники не имеют технологий детекции)
-использование Телепорта - технологии адской рассы для перемещения войск в другие области карты;
+- взаимодействие с союзниками - нападать на врагов эффективнее вместе;
+- применение способностей детекции(раскрытие невидимых юнитов) - у врагов будут такие, но ваши союзники не имеют технологий их детекции;
+- использование Телепорта - технологии расы ада для перемещения войск в другие области карты.
+tc_lime+*+tc_default+Применение Телепорта: постройте несколько Телепортов рядом друг с другом; укажите вашим войскам двигаться на один из них; выберите все Телепорты и 
+укажите "пункт сбора" (правой кнопкой мыши или специальным приказом) на своего или союзного юнита, который находится в месте, куда требуется переместить ваши войска.
+Для возвращения войск на базу используйте способность "Призыв" которая есть у Телепортов.
+
+//////////     HELL VS HELL    4
+
+str_camp_1_miss_4_name = 'Дом боли'
+str_camp_1_miss_4_loc  = str_tmp1+str_camp_1_miss_4_name
+
+str_camp_1_miss_4_obj  = '- '+tc_CO1+'Сохраните хотя бы одну Адскую крепость'
+        tc_default+tc_nl+'- '+tc_CO2+'Захватите 4 ключа'
+        tc_default+tc_nl+'- '+tc_CO3+'Недопустите захват ключей врагами'
+
+str_camp_1_miss_4_plot = 
+
+
+//////////     HELL VS HELL    5
+
+str_camp_1_miss_3_name = 'Нечестивый собор'
+str_camp_1_miss_3_loc  = str_tmp1+str_camp_1_miss_3_name
+
+str_camp_1_miss_3_obj  = '- '+tc_CO1+'Вы и ваши союзники не должны потерять все Адские крепости'
+        tc_default+tc_nl+'- '+tc_CO2+'Уничтожте вражеские племена'
+

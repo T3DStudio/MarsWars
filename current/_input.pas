@@ -666,6 +666,7 @@ begin
                  else exit;
                  end;
      co_empty,
+     co_setRPoint,
      co_move,
      co_amove:; // allowed any units
      else exit;
@@ -684,6 +685,7 @@ begin
 
           case mbrush of
           co_empty,
+          co_setRPoint,
           co_move,
           co_amove   :; // allowed any units
           -255..-1   : if(not ability_CheckTarget(-mbrush,pUIPlayer,player))then continue;

@@ -559,9 +559,9 @@ uinfo_text   : begin
           else
           end;
 
-        if(length(text_lt )>0)then draw_text(tar,x0+2,y0+1       ,text_lt ,ta_LU,255,c_white);
+        if(length(text_lt )>0)then draw_text(tar,x0+2,y0+2       ,text_lt ,ta_LU,255,c_white);
         if(length(text_lt2)>0)then draw_text(tar,x0+2,y0+font_w1h,text_lt2,ta_LU,255,c_white);
-        if(length(text_rt )>0)then draw_text(tar,x1-1,y0+1       ,text_rt ,ta_RU,255,c_white);
+        if(length(text_rt )>0)then draw_text(tar,x1-1,y0+2       ,text_rt ,ta_RU,255,c_white);
         if(length(text_rd )>0)then draw_text(tar,x1-1,y1-1       ,text_rd ,ta_RB,255,c_white);
         if(length(text_ld )>0)then draw_text(tar,x0+2,y1-1       ,text_ld ,ta_LB,255,c_white);
      end;

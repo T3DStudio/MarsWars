@@ -540,6 +540,17 @@ begin
       atset+=[upgr];
    end;
 end;
+function abilityCheckUpgr(aid:byte):byte;
+begin
+   abilityCheckUpgr:=0;
+   if(aid>0)then
+     with g_aids[aid] do
+     with pu^.player^ do
+     begin
+        if(ua_req_upgr   >0)then abilityCheckUpgr+=upgrs_cur[ua_req_upgr];
+        if(ua_rldDec_upgr>0)then abilityCheckUpgr+=upgrs_cur[ua_rldDec_upgr];
+     end;
+end;
 begin
    with pu^     do
    with g_unitsVis[unum] do
@@ -590,9 +601,14 @@ begin
       lvlstr_s:='';
       if(uid_Regen_upgr       >0)then sl+=upgrs_cur[uid_Regen_upgr       ];
       if(uid_SightR_upgr      >0)then sl+=upgrs_cur[uid_SightR_upgr      ];
+      if(uid_arms_BonusAntiBuildingRangeUpgr
+                              >0)then sl+=upgrs_cur[uid_arms_BonusAntiBuildingRangeUpgr];
       if(uid_PainState_upgr   >0)then sl+=upgrs_cur[uid_PainState_upgr   ];
       if(uid_TransportMax_upgr>0)then sl+=upgrs_cur[uid_TransportMax_upgr];
       if(uid_MSpeed_upgr      >0)then sl+=upgrs_cur[uid_MSpeed_upgr      ];
+      sl+=abilityCheckUpgr(uid_ability1);
+      sl+=abilityCheckUpgr(uid_ability2);
+      sl+=abilityCheckUpgr(uid_ability3);
       if(sl>0)then
         lvlstr_s:=tc_yellow+i2s6(sl,true)+tc_default;
    end;

@@ -36,8 +36,10 @@ begin
         MID_Imp           : setEID(@spr_h_p0           ,sms_death);
         MID_Cacodemon     : setEID(@spr_h_p1           ,sms_death);
         MID_Baron         : setEID(@spr_h_p2           ,sms_death);
-        MID_URocketS,
-        MID_URocket,
+        MID_URocket1S,
+        MID_URocket1,
+        MID_URocket2S,
+        MID_URocket2,
         MID_Revenant      : setEID(@spr_h_p4           ,sms_death);
         MID_YPlasma       : setEID(@spr_h_p7           ,sms_death);
         MID_FTower        : setEID(@spr_h_p8           ,sms_death);
@@ -182,8 +184,10 @@ MID_Imp           : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 MID_Cacodemon     : setEff(6 ,0 ,-1 ,-1       ,false,0 );
 
 MID_Baron,
-MID_URocketS,
-MID_URocket,
+MID_URocket1S,
+MID_URocket1,
+MID_URocket2S,
+MID_URocket2,
 MID_FTower,
 MID_Revenant      : setEff(7 ,0 , 8 ,-1       ,false,0 );
 MID_YPlasma       : setEff(6 ,0 ,-1 ,-1       ,false,0 );

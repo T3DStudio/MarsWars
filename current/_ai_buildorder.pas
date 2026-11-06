@@ -52,7 +52,7 @@ begin
 
       //
       ai_NeedMaxTowers:=((ai_enemy_d<base_r2)and(aiu_limitaround_ally<aiu_limitaround_enemy))
-                      or(ai_KotH and(ai_keypoint_d<=keyPoint_KotR))
+                      or(ai_KotH and(ai_keypoint_d<=keyPoint_KotHR))
                       or((map_scenario=mc_royale)and(u_royal_cd<base_r1h));
 
      { if(isselected)or(m_UnitTargetN=unum)then
@@ -207,7 +207,7 @@ begin
 
       if(build_uid=0)then exit;
 
-      if(ai_KotH and(ai_keypoint_d<=keyPoint_KotR))
+      if(ai_KotH and(ai_keypoint_d<=keyPoint_KotHR))
       or((map_scenario=mc_royale)and(u_royal_cd<base_r1h))then
       begin
          // default
@@ -551,7 +551,7 @@ begin
                     end;
                  end;
 
-                 SetUpgrade(upgr_uac_DistDamage+g_random(21),aip_MaxUpgradeLevel);
+                 SetUpgrade(upgr_uac_DistDamage+g_random(22),aip_MaxUpgradeLevel);
               end;
       end;
 

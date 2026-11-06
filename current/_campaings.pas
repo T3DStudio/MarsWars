@@ -180,7 +180,7 @@ begin
          camp_SetBaseLevelUnitUpgrades(p,level);
 end;
 
-procedure camp_AIFlagDel(ap:byte;flag:cardinal);
+{procedure camp_AIFlagDel(ap:byte;flag:cardinal);
 begin
    with g_PlayersGame[ap] do
      if((aip_flags and flag)>0)then aip_flags:=aip_flags xor flag;
@@ -188,51 +188,67 @@ end;
 procedure camp_AIFlagSel(ap:byte;flag:cardinal);
 begin
    with g_PlayersGame[ap] do aip_flags:=aip_flags or flag;
-end;
+end; }
 
-procedure camp_SetAI(ap,alevel:byte;attackDelay,attackPause:integer);
+procedure camp_SetAI(ap,alevel_build,
+                        alevel_res,
+                        alevel_upgr,
+                        alevel_attack,
+                        alevel_magic :byte;attackDelay,attackPause:integer;aiflags:cardinal);
 begin
+   // ITYTD NTR HMP UV NM
    with g_PlayersGame[ap] do
-     case alevel of
-     0..4           // ITYTD NTR HMP UV NM
-       : begin
-            if(alevel>3)then alevel:=3; // UV = NM
-            case alevel of
-            0 :  aip_skill:=1;
-            1 :  aip_skill:=3;
-            else aip_skill:=5;
-            end;
-            ai_PlayerSetSkirmishSettings(ap);
-            case alevel of
-            2: begin // HMP
-                  res_energyl_cur:=1000;
-                  res_energyl_max:=1000;
-               end;
-            3: begin // UV,NM
-                  res_energyl_cur:=3000;
-                  res_energyl_max:=3000;
-                  upgrs_cur[upgr_fprod_build]:=1;
-               end;
-            end;
-            if(alevel>1)then
-              camp_SetBaseLevelUnitUpgrades(ap,(alevel-1)*2);
-            aip_MaxUpgradeLevel:=alevel*2;
+   begin
+      aip_skill:=5;
+      aip_flags:=aiflags;
 
-            camp_AIFlagDel(ap,aif_base_suicide      );
-            camp_AIFlagDel(ap,aif_army_early_attack0);
-            camp_AIFlagDel(ap,aif_army_early_attack1);
-            camp_AIFlagDel(ap,aif_army_scout);
-            aip_flags:=aip_flags or aif_cheat_VisBuildings;
+      if(alevel_build >3)then alevel_build :=3; // UV = NM
+      if(alevel_res   >3)then alevel_res   :=3;
+      if(alevel_upgr  >3)then alevel_upgr  :=3;
+      if(alevel_attack>3)then alevel_attack:=3;
+      if(alevel_magic >3)then alevel_magic :=3;
 
-            case attackPause of
-            -1 : aip_pause_attack:=-fr_fps1*max2i(1,180-45*alevel); // 45 90 135 180
-            1..attackPause.MaxValue
-               : aip_pause_attack:=-fr_fps1*attackPause;
-            end;
+      ai_SetBaseOpt(ap,
+                    1000+alevel_build*2000, // energy
+                    1+alevel_build*2,       // builders
+                    3+alevel_build*6,       // barracks
+                    1+alevel_build  ,       // forges
+                    2+alevel_build*3,       // detectors
+                    2+alevel_build*2,       // min towers
+                    6+alevel_build*2,       // max towers
+                    alevel_build    ,       // max super
+                    5+15*alevel_attack,     // attack limit
+                    20+alevel_build*20,     // max army limit
+                    0               ,       // attack pause
+                    90 -(alevel_magic*30),  // detection pause
+                    90 -(alevel_magic*30),  // magic pause
+                    120-(alevel_magic*30)); // super pause
 
-            if(attackDelay>=0)then aip_delay_attack:= fr_fps1*attackDelay;
+      case alevel_res of
+      2: begin // HMP
+            res_energyl_cur:=1000;
+            res_energyl_max:=1000;
          end;
-     end;
+      3: begin // UV,NM
+            res_energyl_cur:=3000;
+            res_energyl_max:=3000;
+            upgrs_cur[upgr_fprod_build]:=1;
+         end;
+      end;
+
+      if(alevel_upgr>1)then
+        camp_SetBaseLevelUnitUpgrades(ap,(alevel_upgr-1)*2);
+      aip_MaxUpgradeLevel:=alevel_upgr*2;
+
+      case attackPause of
+      -1 : aip_pause_attack:=-fr_fps1*max2i(1,180-45*alevel_attack); // 45 90 135 180
+      1..attackPause.MaxValue
+         : aip_pause_attack:=-fr_fps1*attackPause;
+      end;
+
+      aip_delay_attack:=0;
+      if(attackDelay>=0)then aip_delay_attack:= fr_fps1*attackDelay;
+   end;
 end;
 
 procedure camp_CreateUnit(playeri:byte;ux,uy:integer;uuid:byte;initVisionTime:integer=0);
@@ -255,22 +271,15 @@ begin
    end;
 end;
 
-procedure camp_CreateMarker(playeri:byte;ux,uy:integer);
-begin
-   case g_PlayersGame[LocalPlayer].race of
-   r_hell: unit_add(ux,uy,0,UID_HMarker,playeri,true,false,0);
-   r_uac :;
-   end;
-end;
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //   MISSIONS START
 //
 
 procedure cmp_StartMission;
-var p:byte;
+var
+p      :byte;
+aiflags:cardinal;
 begin
    game_DefaultAll;
    g_FixedPositions:=true;
@@ -329,12 +338,19 @@ begin
 
                  camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_CoB);
 
-                 camp_SetAI(p,cd_camp_skill,210,-1);
+                 camp_SetAI(p,cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,210,-1,aif_base_smart_order+
+                                                   aif_base_DefendOwn+
+                                                   aif_army_scout+
+                                                   aif_cheat_VisBuildings);
                  with g_PlayersGame[p] do
                  begin
                     aip_MaxUnitLimit  :=ul30;
-                    aip_MaxAttackLimit:=0;//ul2+ul2*camp_skill; //ul2..ul10
-                    aip_MaxTowers     :=6;
+                    aip_MaxAttackLimit:=0;
+                    aip_MaxTowers     :=4+cd_camp_skill*2;
                     aip_MaxEnergy     :=4000;
                  end;
 
@@ -378,6 +394,14 @@ begin
                  cd_p_enemy1:=3;
                  cd_p_enemy2:=1;
 
+                 aiflags:=aif_base_smart_order+
+                          aif_base_advanceMain+
+                          aif_base_DefendOwn+
+                          aif_army_scout+
+                          aif_army_smart_order+
+                          aif_ability_detection+
+                          aif_cheat_VisBuildings;
+
                  // PLAYER
 
                  p:=cd_p_player;
@@ -413,13 +437,17 @@ begin
                  camp_SetPStart(p,(map_Size1 div 5)*2,map_Size1-(map_Size1 div 4));
 
                  camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_EE);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
                  with g_PlayersGame[p] do
                  begin
-                    aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
-                    aip_MaxTowers     :=2+cd_camp_skill*2;
+                    aip_MaxUnitLimit:=(60+cd_camp_skill*10)*ul1;
+                    aip_MaxAttackLimit:=(5+7*cd_camp_skill)*ul1;
                  end;
-                 camp_AIFlagDel(p,aif_base_smart_order);
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]-100,UID_HAKeep,60);
                  camp_CreateUnit(p,map_PlayerStartX[p]-110,map_PlayerStartY[p]+100,UID_HAKeep,60);
@@ -450,15 +478,16 @@ begin
                  camp_SetPStart(p,map_Size1-(map_Size1 div 5),map_Size1-(map_Size1 div 4));
 
                  camp_SetPlayer(p,r_hell,2,ps_AI   ,str_Camp_HE_PoA);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
                  with g_PlayersGame[p] do
                  begin
-                    aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
-                    aip_MaxTowers     :=2+cd_camp_skill;
-                    aip_flags:= aip_flags or aif_base_advanceMain;
-                    aip_flags:= aip_flags or aif_base_advanceOther;
+                    aip_MaxUnitLimit:=(60+cd_camp_skill*10)*ul1;
+                    aip_MaxAttackLimit:=(5+7*cd_camp_skill)*ul1;
                  end;
-                 camp_AIFlagDel(p,aif_base_smart_order);
 
                  camp_CreateUnit(p,map_PlayerStartX[p]+110,map_PlayerStartY[p]-110,UID_HAKeep,60);
                  camp_CreateUnit(p,map_PlayerStartX[p]-100,map_PlayerStartY[p]+110,UID_HAKeep,60);
@@ -509,6 +538,21 @@ begin
                  cd_p_enemy2:=2;
                  cd_p_enemy3:=6;
 
+                 aiflags:=aif_base_smart_order+
+                          aif_base_advanceMain+
+                          aif_base_advanceOther+
+                          aif_base_DefendOwn+
+                          aif_base_DefendAlly+
+                          aif_army_scout+
+                          aif_army_scoutAggr+
+                          aif_army_smart_order+
+                          aif_upgr_smart_order+
+                          aif_ability_detection+
+                          aif_ability_other+
+                          aif_ability_TowerRush+
+                          aif_ability_invis+
+                          aif_cheat_VisBuildings;
+
                  // PLAYER
 
                  p:=cd_p_player;
@@ -518,8 +562,8 @@ begin
                  camp_SetPStart(p,map_Size1-(map_Size1 div 5),(map_Size1 div 5));
 
                  camp_CreateUnit(p,map_PlayerStartX[p],map_PlayerStartY[p],UID_HAKeep);
-                 camp_CreateUnit(p,map_PlayerStartX[p]-g_uids[UID_HKeep].uid_r*2,map_PlayerStartY[p],UID_HKeep);
-                 camp_CreateUnit(p,map_PlayerStartX[p]+g_uids[UID_HKeep].uid_r*2,map_PlayerStartY[p],UID_HKeep);
+                 camp_CreateUnit(p,map_PlayerStartX[p]-g_uids[UID_HKeep].uid_r*2,map_PlayerStartY[p],UID_HAKeep);
+                 camp_CreateUnit(p,map_PlayerStartX[p]+g_uids[UID_HKeep].uid_r*2,map_PlayerStartY[p],UID_HKeep );
                  camp_CreateUnit(p,map_PlayerStartX[p],map_PlayerStartY[p]+150,UID_HGate);
                  camp_CreateUnit(p,map_PlayerStartX[p],map_PlayerStartY[p]-150,UID_HPools);
 
@@ -527,6 +571,7 @@ begin
                  camp_CreateUnitAreaR(p,3,map_PlayerStartX[p]-100,map_PlayerStartY[p]-100,100,UID_Demon   );
                  camp_CreateUnitAreaR(p,5,map_PlayerStartX[p]-100,map_PlayerStartY[p]-100,100,UID_Revenant);
                  camp_CreateUnitAreaR(p,2,map_PlayerStartX[p]-100,map_PlayerStartY[p]-100,100,UID_Baron   );
+                 camp_CreateUnitAreaR(p,5,map_PlayerStartX[p]-100,map_PlayerStartY[p]-100,100,UID_Cacodemon);
 
                  player_SetAllowedUnits   (p,[ UID_HKeep,
                                                UID_HAKeep,
@@ -568,7 +613,17 @@ begin
                  camp_SetPStart(p ,map_Size1-(map_Size1 div 7),map_Size1 div 2);
 
                  camp_SetPlayer(p,r_hell,0,ps_AI   ,str_Camp_HE_SoF);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
+                 with g_PlayersGame[p] do
+                 begin
+                    aip_MaxUnitLimit  :=70*ul1;
+                    aip_MaxAttackLimit:=ul10+ul10*cd_camp_skill;
+                 end;
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]    ,UID_HAKeep);
                  camp_CreateUnit(p,map_PlayerStartX[p]-200,map_PlayerStartY[p]    ,UID_HAKeep);
@@ -614,7 +669,16 @@ begin
                  camp_SetPStart(p ,map_Size1-(map_Size1 div 5),map_Size1-(map_Size1 div 5));
 
                  camp_SetPlayer(p,r_hell,0,ps_AI   ,str_Camp_HE_CB);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
+                 with g_PlayersGame[p] do
+                 begin
+                    aip_MaxUnitLimit  :=70*ul1;
+                    aip_MaxAttackLimit:=ul10+ul10*cd_camp_skill;
+                 end;
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]    ,UID_HAKeep);
                  camp_CreateUnit(p,map_PlayerStartX[p]-200,map_PlayerStartY[p]    ,UID_HAKeep);
@@ -653,16 +717,38 @@ begin
                                                 upgr_hell_BuildRestore], 4       ,true);
 
                  // ENEMY 1    Blood Squad
+
+                 aiflags:=aif_base_smart_order+
+                          aif_base_advanceMain+
+                          aif_base_advanceOther+
+                          aif_base_DefendOwn+
+                          aif_army_scout+
+                          aif_army_scoutAggr+
+                          aif_army_smart_order+
+                          aif_upgr_smart_order+
+                          aif_ability_detection+
+                          aif_ability_other+
+                          aif_ability_TowerRush+
+                          aif_ability_invis+
+                          aif_cheat_VisBuildings;
+
+
                  p:=cd_p_enemy1;
                  camp_SetPStart(p ,(map_Size1 div 5),(map_Size1 div 5));
 
                  camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_BS);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
                  with g_PlayersGame[p] do
                  begin
                     aip_MaxTowers     :=2+cd_camp_skill*2;
                     aip_MinTowers     :=aip_MaxTowers;
                     upgrs_cur[upgr_hell_Spectre]:=1;
+                    aip_MaxUnitLimit  :=70*ul1;
+                    aip_MaxAttackLimit:=ul10+ul10*cd_camp_skill;
                  end;
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]    ,UID_HAKeep);
@@ -707,13 +793,19 @@ begin
                  camp_SetPStart(p ,(map_Size1 div 7),map_Size1 div 2);
 
                  camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_LoH);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
                  with g_PlayersGame[p] do
                  begin
                     aip_MaxTowers     :=5+cd_camp_skill*2;
                     aip_MinTowers     :=aip_MaxTowers;
                     upgrs_cur[upgr_hell_TowerBlink]:=1;
                     upgrs_cur[upgr_hell_TotemInvis]:=1;
+                    aip_MaxUnitLimit  :=70*ul1;
+                    aip_MaxAttackLimit:=ul10+ul10*cd_camp_skill;
                  end;
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]    ,UID_HAKeep);
@@ -762,14 +854,18 @@ begin
 
 
                  camp_SetPlayer(p,r_hell,1,ps_AI   ,str_Camp_HE_CoBS);
-                 camp_SetAI(p,cd_camp_skill,0  ,-1);
+                 camp_SetAI(p,3,
+                              3,
+                              cd_camp_skill,
+                              cd_camp_skill,
+                              cd_camp_skill,0  ,-1, aiflags);
                  with g_PlayersGame[p] do
                  begin
                     aip_MaxTowers     :=2+cd_camp_skill*2;
                     aip_MinTowers     :=aip_MaxTowers;
-                    aip_flags := aip_flags or aif_ability_other;
+                    aip_MaxUnitLimit  :=70*ul1;
+                    aip_MaxAttackLimit:=ul10+ul10*cd_camp_skill;
                  end;
-                 camp_AIFlagDel(p,aif_army_smart_micro);
 
                  camp_CreateUnit(p,map_PlayerStartX[p]    ,map_PlayerStartY[p]    ,UID_HAKeep);
                  camp_CreateUnit(p,map_PlayerStartX[p]+200,map_PlayerStartY[p]    ,UID_HAKeep);
@@ -802,6 +898,7 @@ begin
                                                 upgr_hell_MeleeDamage,
                                                 upgr_hell_Regeneration,
                                                 upgr_hell_PainFactor ,
+                                                upgr_hell_DecayAura,
                                                 upgr_hell_BuilderR,
                                                 upgr_hell_TowerR    ,
                                                 upgr_hell_UnitSightR,
@@ -862,10 +959,11 @@ begin
        0 : begin      //  HELL vs HELL #1
               with g_PlayersGame[cd_p_enemy1] do
               begin
-                 if(g_PlayersGame[cd_p_player].units_bld_lc[false]>=ul30)and(aip_MaxAttackLimit<=ul10)then
+                 if(g_PlayersGame[cd_p_player].units_bld_lc[false]>=ul30)and(aip_MaxAttackLimit<=0)then
                  begin
                     aip_MaxUnitLimit  +=ul20*cd_camp_skill;
-                    aip_MaxAttackLimit+=aip_MaxUnitLimit div 3;
+                    aip_MaxAttackLimit:=aip_MaxUnitLimit div 3;
+                    //writeln(aip_MaxUnitLimit,' ',aip_MaxAttackLimit);
                     upgrs_cur[upgr_fprod_unit]:=1;
                  end;
                  //writeln(' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);

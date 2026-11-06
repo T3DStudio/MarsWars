@@ -115,7 +115,6 @@ begin
    begin
       if(buffs[ub_SphereInvuln]>0)
       or(hits<=0)
-      or(uid_ismarker)
       then exit;
 
       if(damage<=0)then
@@ -600,8 +599,7 @@ begin
    if(checkVis)then
      if(not CheckUnitTeamVision(pAttacker^.player^.team,pTarget,false))then exit;
    if(armN>LastUnitArms)then exit;
-   if(pTarget^.hits<=hits_fdead)
-   or(pTarget^.uid^.uid_ismarker)then exit;
+   if(pTarget^.hits<=hits_fdead)then exit;
    if(udist<0)then udist:=point_dist_int(pAttacker^.x,pAttacker^.y,pTarget^.x,pTarget^.y);
 
    with pAttacker^ do
@@ -689,9 +687,14 @@ wpt_heal     : if(pTarget^.hits<=0)
          if(pTarget^.isfly)
          then awr-=uid_arms_BonusAntiFlyRange
          else awr-=uid_arms_BonusAntiGroundRange;
-         if(pTarget^.uid^.uid_isbuilding)
-         then awr-=uid_arms_BonusAntiBuildingRange
-         else awr-=uid_arms_BonusAntiUnitRange;
+         if(not pTarget^.uid^.uid_isbuilding)
+         then awr-=uid_arms_BonusAntiUnitRange
+         else
+         begin
+            awr-=uid_arms_BonusAntiBuildingRange;
+            if(uid_arms_BonusAntiBuildingRangeUpgr>0)then
+              awr-=upgrs_cur[uid_arms_BonusAntiBuildingRangeUpgr]*uid_arms_BonusAntiBuildingRangeUpgrV;
+         end;
       end;
       canmove:=(speed>0)and(uo_id<>ua_hold);
       pfcheck:=(isfly)or(uid_FlyLevelLikeTarget)or(mapZone=pTarget^.mapZone);
@@ -726,8 +729,7 @@ begin
    if(not CheckUnitTeamVision(pAttacker^.player^.team,pTarget,false))then exit;
 
    if(pTarget^.hits<=hits_fdead)
-   or(pTarget^.buffs[ub_SphereInvuln]>0)
-   or(pTarget^.uid^.uid_ismarker)then exit;
+   or(pTarget^.buffs[ub_SphereInvuln]>0)then exit;
 
    if(udist<0)then udist:=point_dist_int(pAttacker^.x,pAttacker^.y,pTarget^.x,pTarget^.y);
    if(LastArm>LastUnitArms)then LastArm:=LastUnitArms;
@@ -856,7 +858,6 @@ begin
 UID_HAKeep,
 UID_HKeep     : if(udist<srange)
                and(not pTarget^.uid^.uid_isbuilding)
-               and(not pTarget^.uid^.uid_ismarker)
                and(pTarget^.iscomplete)
                and(team<>pTarget^.player^.team)then
                   if(pTarget^.buffs[ub_DecayAura]<=fr_fpsh)and(upgrs_cur[upgr_hell_DecayAura]>0)then
@@ -973,8 +974,6 @@ begin
               IsUnitRange(tu^.transportU,@tu_transport);
 
               if(tu_transport=nil)then unit_detect(pu,tu,udi);
-
-              if(tu^.uid^.uid_ismarker)then continue;
 
               isattackable:=false;
               if(attack_target)then
@@ -1597,10 +1596,13 @@ begin
    with pu^ do
    begin
       if(IsUnitRange(rpoint_tar,@ptar))then
-      begin
-         rpoint_x:=ptar^.vx;
-         rpoint_y:=ptar^.vy;
-      end;
+        if(ptar^.player^.team<>player^.team)
+        then rpoint_tar:=0
+        else
+        begin
+           rpoint_x:=ptar^.vx;
+           rpoint_y:=ptar^.vy;
+        end;
       rpoint_x:=mm3i(1,rpoint_x,map_Size1);
       rpoint_y:=mm3i(1,rpoint_y,map_Size1);
    end;
@@ -2463,8 +2465,7 @@ begin
            begin
               if(cycle_order=g_cycle_order)then
                 unit_Bonuses(pu);
-              if(not uid^.uid_ismarker)then
-                unit_BehaviorBase(pu);
+              unit_BehaviorBase(pu);
            end
            else unit_death(pu);
 

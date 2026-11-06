@@ -521,6 +521,11 @@ TUID = record
    uid_SightR_upgrV      : integer;
    uid_SightR_upgr       : byte;
 
+   uid_arms_BonusAntiBuildingRangeUpgr
+                         : byte;
+   uid_arms_BonusAntiBuildingRangeUpgrV
+                         : integer;
+
    uid_CanAttackGround,
    uid_CanAttackAir,
    uid_CanAttack         : boolean;
@@ -550,7 +555,6 @@ TUID = record
    uid_HaveRallyPoint,
    uid_HaveAbility,
    uid_OutUnitsTeleBuff,
-   uid_ismarker,
    uid_isbuilding,
    uid_ismech,
    uid_islight,

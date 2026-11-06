@@ -77,12 +77,12 @@ function player_TeamScroll(PlayerTarget,PlayerRequestor:byte;forward,check:boole
 
 procedure saveload_SaveWrite(fn:shortstring);forward;
 function saveload_SaveInit  (check:boolean):boolean;forward;
-function saveload_Load  (check:boolean):boolean;forward;
+function saveload_Load      (check:boolean):boolean;forward;
 function saveload_DeleteInit(check:boolean):boolean;forward;
 
 procedure replay_SavePlayPosition; forward;
-function replay_DeleteInit(check:boolean):boolean;forward;
-function replay_Play  (check:boolean):boolean;forward;
+function replay_DeleteInit  (check:boolean):boolean;forward;
+function replay_Play        (check:boolean):boolean;forward;
 function replay_TogglePause (check:boolean):boolean;forward;
 function replay_IsPaused:boolean;  forward;
 function replay_GetProgress:single;forward;
@@ -1388,6 +1388,7 @@ begin
         or(upgr=uid_MSpeed_upgr   )
         or(upgr=uid_PainState_upgr)
         or(upgr=uid_SightR_upgr      )
+        or(upgr=uid_arms_BonusAntiBuildingRangeUpgr)
         or(upgr=uid_TransportMax_upgr)
         or(upgr=g_aids[uid_ability1].ua_req_upgr   )
         or(upgr=g_aids[uid_ability1].ua_rldDec_upgr)
@@ -2982,7 +2983,7 @@ function menudoc_ValidForTableUnit(uid:byte;forBalance:boolean):boolean;
 begin
    menudoc_ValidForTableUnit:=false;
    with g_uids[uid] do
-     if(uid_r>0)and(not uid_ismarker)then
+     if(uid_r>0)then
      begin
         if(forBalance)then
         begin

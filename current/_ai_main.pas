@@ -582,7 +582,7 @@ begin
 
    with pBuilder^ do
      if(not ai_KotH)
-     or(ai_keypoint_d>keyPoint_KotR)then
+     or(ai_keypoint_d>keyPoint_KotHR)then
        if (ai_enemy_d<base_r2)
        and(hits<uid^.uid_MaxHitsh)then
        begin
@@ -654,8 +654,8 @@ begin
      UID_HKeep,
      UID_HAKeep         : case alarmType of
                           met_koth  : with ai_keypoint_kp^ do
-                                        ai_ability_KeepShift(pBuilder,kp_x+g_randomr(keyPoint_KotRW),
-                                                                      kp_y+g_randomr(keyPoint_KotRW));
+                                        ai_ability_KeepShift(pBuilder,kp_x+g_randomr(keyPoint_KotHRW),
+                                                                      kp_y+g_randomr(keyPoint_KotHRW));
                           met_royale: begin
                                          lx:=RoyalCR;
                                          if(lx<u_royal_cd)then
@@ -685,7 +685,7 @@ begin
                             case isfly of
                             true : case alarmType of
                                    met_koth  : with ai_keypoint_kp^ do
-                                                 setLandingPlace(kp_x,kp_y,ai_keypoint_d,keyPoint_KotRW);
+                                                 setLandingPlace(kp_x,kp_y,ai_keypoint_d,keyPoint_KotHRW);
                                    met_royale: begin
                                                   lx:=RoyalCR;
                                                   if(u_royal_cd>lx)

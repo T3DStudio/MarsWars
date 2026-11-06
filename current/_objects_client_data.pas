@@ -498,7 +498,6 @@ begin
    //setEffectEID(0,EID_Teleport  ,0,0,0  );
    //setEffectSND(  snd_Teleport,nil,nil,nil);
 end;
-UID_HMarker,
 UID_HEye:
 begin
    setMWSModel(0,@spr_HEye);
@@ -957,6 +956,7 @@ begin
    setBTN(upgr_uac_MechSpeed    ,r_uac ,15);
    setBTN(upgr_uac_MechArmor    ,r_uac ,16);
    setBTN(upgr_uac_TerAAWeapon  ,r_uac ,17);
+   setBTN(upgr_uac_SiedgeMarineR,r_uac ,22);
    setBTN(upgr_uac_Transport    ,r_uac ,6 );
    setBTN(upgr_uac_RadarR       ,r_uac ,8 );
    setBTN(upgr_uac_TurretArmor  ,r_uac ,18);

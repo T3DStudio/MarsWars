@@ -306,7 +306,7 @@ begin
    with g_PlayersGame[aplayer] do
    begin
       aip_MaxEnergy        :=aMaxEnergy;
-      aip_MaxBuilders      :=aMaxBuilders;
+      aip_MaxBuilders      :=min2i(aMaxBuilders,PlayerMaxBuilders);
       aip_MaxBarracks      :=aMaxBarracks;
       aip_MaxForges        :=aMaxForges;
       aip_MaxDetectors     :=aMaxDetectors*ul1;
@@ -775,6 +775,8 @@ begin
              or(kp_y<=0)
              or(kp_x>=map_Size1)
              or(kp_y>=map_Size1)then continue;
+
+             if(map_scenario=mc_KotH)and(i=0)and(g_tick<keyPoint_KotH_pause)then continue;
 
              d:=point_dist_int(kp_x,kp_y,x,y);
 

@@ -638,7 +638,7 @@ begin
    KeyPoints_Clear;
 
    case map_scenario of
-mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_KotR,0,0,keyPoint_CTime_KotH_Tick,0,map_generators_LimitS);
+mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_KotHR,0,0,keyPoint_CTime_KotH_Tick,0,map_generators_LimitS);
 mc_KeyPoints: begin
                  for i:=1 to keyPoint_mcN do map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_DefR,0,0,keyPoint_CTime_Def_Tick,0,map_generators_LimitS);
                  map_KeyPoints_UpdatePos;
@@ -1114,7 +1114,7 @@ begin
    mapt_lake   : begin
                     map_CalcLakeR(@io,@ii);
                     case map_scenario of
-                    mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR);
+                    mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotHR);
                     mc_royale: map_Obstacle_Add(map_SizeH,map_SizeH,io,base_r2      );
                     else       map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
                     end;
@@ -1128,7 +1128,7 @@ begin
    mapt_temple : begin
                     io:=map_Size1 div 4;
                     case map_scenario of
-                    mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotR);
+                    mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotHR);
                     mc_royale: map_Obstacle_Add(map_SizeH,map_SizeH,io,base_r2      );
                     else       map_Obstacle_Add(map_SizeH,map_SizeH,io,0            );
                     end;
@@ -1149,7 +1149,7 @@ begin
    end;
 
    case map_scenario of
-   mc_koth  : map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotR-1,0);
+   mc_koth  : map_Obstacle_Remove(map_SizeH,map_SizeH,keyPoint_KotHR-1,0);
    //mc_royale: map_Obstacle_Remove(map_SizeH,map_SizeH,base_r1        ,0,200);
    end;
 

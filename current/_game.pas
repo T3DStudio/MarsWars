@@ -260,6 +260,8 @@ begin
    FillChar(ui_alarms,SizeOf(ui_alarms),0);
    FillChar(g_effects,SizeOf(g_effects),0);
    FillChar(g_PlayerAPM,SizeOf(g_PlayerAPM),0);
+   FillChar(ui_SysMessages,SizeOf(ui_SysMessages),0);
+
 
    net_chat_str:='';
    net_cl_svttl:=0;
@@ -899,11 +901,11 @@ begin
                           end
                       else
                         case o_x0 of
-                        co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_unit_NeedProdUnit ,-1,-1);
+                        co_supgrade: GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_upgrade,lmt_unit_NeedProdUnit,-1,-1);
                         co_cupgrade: ;
-                        co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_unit_NeedProdUnit ,-1,-1);
+                        co_sunit   : GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_unit   ,lmt_unit_NeedProdUnit,-1,-1);
                         co_cunit   : ;
-                        co_pcancle : GameLog_ReqMsg(tPlayer,0   ,255             ,lmt_Invalid_Order,-1,-1);
+                        co_pcancle : GameLog_ReqMsg(tPlayer,0   ,255             ,lmt_Invalid_Order    ,-1,-1);
                         co_ability : if(toall_n=0)and(toall_msg>0)then
                                        if(g_aids[o_a0].ua_OrderToAll)then
                                          GameLog_ReqMsg(tPlayer,o_a0,lmt_argt_ability,toall_msg,toall_msgx,toall_msgy);

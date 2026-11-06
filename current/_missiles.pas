@@ -31,16 +31,20 @@ MID_ArchFire   : ;
 MID_Flyer      : mid_SpriteModel:=@spr_u_p3;
 MID_Tank,
 MID_Granade,
-MID_URocketS,
-MID_URocket    : mid_SpriteModel:=@spr_u_p8;
+MID_URocket2S,
+MID_URocket2,
+MID_URocket1S,
+MID_URocket1    : mid_SpriteModel:=@spr_u_p8;
       end;
 
       // tracer
       case m of
 MID_Granade,
 MID_CyberRocket,
-MID_URocketS,
-MID_URocket,
+MID_URocket1S,
+MID_URocket1,
+MID_URocket2S,
+MID_URocket2,
 MID_Revenant   : begin
                  mid_eid_FlyTrace:=MID_Bullet;
                  mid_eid_FlyStep :=4;
@@ -66,7 +70,8 @@ MID_UACStrike,
 MID_Tank,
 MID_Granade,
 MID_CyberRocket,
-MID_URocket,
+MID_URocket1,
+MID_URocket2,
 MID_Revenant  : mid_snd_death[false]:=snd_explode;
 MID_Bullet,
 MID_SChaingun,
@@ -93,7 +98,8 @@ MID_Flyer     : mid_snd_death[false]:=snd_explode_flyer;
 
       // death sound and effect
       case m of
-MID_URocketS  : begin
+MID_URocket1S,
+MID_URocket2S  : begin
                    mid_snd_death [true ]:=snd_explode;
                    mid_eid_DeathN[true ]:=4;
                    mid_eid_DeathR[true ]:=20;
@@ -206,7 +212,11 @@ begin
            m_damage:=adddmg;
            if(m_playeri<=LastPlayer)and(tu<>nil)then
              with g_PlayersGame[m_playeri] do
-               if(m_mid=MID_URocket)and(tu^.isfly)and(upgrs_cur[upgr_uac_AASplash]>0)then m_mid:=MID_URocketS;
+               if(tu^.isfly)and(upgrs_cur[upgr_uac_AASplash]>0)then
+                 case m_mid of
+                 MID_URocket1: m_mid:=MID_URocket1S;
+                 MID_URocket2: m_mid:=MID_URocket2S;
+                 end;
 
            with g_mids[m_mid] do
            begin

@@ -527,28 +527,6 @@ begin
    else str_ProductionHotKey:='';
 end;
 
-{procedure str_SetAbilityBaseHint(aid:byte;NAME,DESCR:shortstring);
-begin
-  with g_aids[aid] do
-  begin
-     ua_str_name    :=NAME;
-     if(ua_mbrush_hint>0)then
-       with g_uids[ua_mbrush_hint] do
-         ua_str_name+='"'+uid_str_name+'"';
-     ua_str_Descript:=DESCR;
-     str_EndDot(@ua_str_Descript);
-  end;
-end;
-
-procedure str_SetUnitBaseHint(uid:byte;NAME,DESCR:shortstring);
-begin
-   with g_uids[uid] do
-   begin
-      uid_str_name        :=NAME;
-      uid_str_BaseDescript:=DESCR;
-      str_EndDot(@uid_str_BaseDescript);
-   end;
-end;   }
 procedure str_SetUnitBalanceHint(uids:TSoB;hintG,hintB,hintU:shortstring;force:boolean);
 var u:byte;
 begin
@@ -561,25 +539,6 @@ begin
      end;
 end;
 
-{procedure str_SetUpgrBaseHint(upid:byte;NAME,DESCR:shortstring);
-begin
-   with g_upgrs[upid] do
-   begin
-      upgr_str_Name    :=NAME;
-      upgr_str_Descript:=DESCR;
-      str_EndDot(@upgr_str_Descript);
-   end;
-end;
-
-procedure str_SetActionBaseHint(action:byte;hint:shortstring);
-var hk:shortstring;
-begin
-   hk:=input_actions[action].ik_str_HK;
-   str_action_name[action]:=hint;
-   if(length(hk)>0)
-   then str_action_hint[action]:=hint+' ('+hk+')'
-   else str_action_hint[action]:=hint;
-end;  }
 
 function str_UpgradeNameForReq(upid:byte):shortstring;
 begin
@@ -1103,14 +1062,13 @@ begin
    //   iActs
    for uid:=0 to 255 do
      if(length(input_actions[uid].ik_str_HK)>0)then
-       str_action_hint[uid]:=str_action_hint[uid]+' ('+input_actions[uid].ik_str_HK+')';
+       str_action_hint[uid]:=str_action_name[uid]+' ('+input_actions[uid].ik_str_HK+')';
 
    /////////////////////////////////////////////////////////////////////////////
    //   UNITS
    for uid:=0 to 255 do
      with g_uids[uid] do
-     if (uid_r>0)
-     and(not uid_ismarker)then
+     if (uid_r>0)then
      begin
         // Basics
         ITEMP :='';
@@ -1144,10 +1102,10 @@ begin
         uid_str_ArmsCommon:='';
         if(uid_CanAttack)then
         begin
-           if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAFlyR     +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
-           if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAGroundR  +i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
-           if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAUnitR    +i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
-           if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusABuildingR+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
+           if(uid_arms_BonusAntiFlyRange     <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAFlyR     +': '+i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+           if(uid_arms_BonusAntiGroundRange  <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAGroundR  +': '+i2sSign(uid_arms_BonusAntiFlyRange     ),sep_scomma);
+           if(uid_arms_BonusAntiUnitRange    <>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusAUnitR    +': '+i2sSign(uid_arms_BonusAntiUnitRange    ),sep_scomma);
+           if(uid_arms_BonusAntiBuildingRange<>0)then STRADD(@uid_str_ArmsCommon,str_uarm_BonusABuildingR+': '+i2sSign(uid_arms_BonusAntiBuildingRange),sep_scomma);
         end;
 
         str_StringListClear(@uid_HintDoc    );
@@ -1234,6 +1192,8 @@ begin
         AddLineUnitDocHint(str_DocUpgradeLine('- '+str_doc_UpgrSpeed    ,uid_MSpeed_upgr      ,uid_MSpeed_upgrV      ));
         AddLineUnitDocHint(str_DocUpgradeLine('- '+str_doc_UpgrPainS    ,uid_PainState_upgr   ,uid_PainState_upgrV   ));
         AddLineUnitDocHint(str_DocUpgradeLine('- '+str_doc_UpgrSightR   ,uid_SightR_upgr      ,uid_SightR_upgrV      ));
+        AddLineUnitDocHint(str_DocUpgradeLine('- '+str_uarm_BonusABuildingR+': ',uid_arms_BonusAntiBuildingRangeUpgr,
+                                                                                               uid_arms_BonusAntiBuildingRangeUpgrV));
         AddLineUnitDocHint(str_DocUpgradeLine('- '+str_doc_UpgrTransport,uid_TransportMax_upgr,uid_TransportMax_upgrV));
      end;
 
@@ -1288,7 +1248,7 @@ begin
         AddLineUpgradeDocHint(str_doc_UpgrAffectedUIDs);
         ITEMP:='';
         for arm in upgrade_GetAffectedUIDs(uid) do
-          if((length(ITEMP)+length(g_uids[arm].uid_str_name))<254)
+          if((length(ITEMP)+length(g_uids[arm].uid_str_name))<250)
           then STRADD(@ITEMP,g_uids[arm].uid_str_name,sep_scomma)
           else
           begin
@@ -1296,7 +1256,7 @@ begin
              ITEMP:='';
           end;
         if(length(ITEMP)>0)then
-        AddLineUpgradeDocHint(ITEMP);
+          AddLineUpgradeDocHint(ITEMP);
      end;
 
    /////////////////////////////////////////////////////////////////////////////
@@ -1367,7 +1327,7 @@ begin
    //   UNITS ABITIES (DOC)
    for uid:=0 to 255 do
      with g_uids[uid] do
-     if(uid_r>0)and(not uid_ismarker)then
+     if(uid_r>0)then
      begin
 
         str_StringListClear(@uid_HintInGame );

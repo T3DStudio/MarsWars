@@ -659,7 +659,7 @@ nmid_ping_Request: begin
                       net_writecard(tping1);
                       net_send(net_cl_svip,net_cl_svport);
                    end;
-nmid_LobbyInfo    : begin
+nmid_LobbyInfo   : begin
                       svstarted:=net_readbool;
 
                       for i:=0 to LastPlayer do

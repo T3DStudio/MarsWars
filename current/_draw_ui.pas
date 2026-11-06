@@ -658,10 +658,7 @@ begin
      with m_UnitTargetP^ do
      if(hits>0)then
        with uid^ do
-         if(uid_ismarker)
-         then UIHintAdd_Line(@uid_str_name)
-         else
-           with g_unitsVis[unum] do
+         with g_unitsVis[unum] do
            with player^ do
            begin
               UIHintAdd_Line(@uid_str_name);
@@ -724,7 +721,7 @@ begin
                                                    UIHintAdd_Line(@str_ui_BuildHint);
                                 end;
                                 UIHintAdd_Line(@str_ui_RightClickCancel);
-                             end
+                             end;
                  else
                    s1:='';
                    case m_brush of

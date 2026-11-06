@@ -930,8 +930,6 @@ begin
    'str_dscr[UID_HACommandCenter]'      : lang_Key2StrVar:= @g_uids[UID_HACommandCenter  ].uid_str_BaseDescript;
    'str_name[UID_HBarracks]'            : lang_Key2StrVar:= @g_uids[UID_HBarracks        ].uid_str_name;
    'str_dscr[UID_HBarracks]'            : lang_Key2StrVar:= @g_uids[UID_HBarracks        ].uid_str_BaseDescript;
-   'str_name[UID_HMarker]'              : lang_Key2StrVar:= @g_uids[UID_HMarker          ].uid_str_name;
-   'str_dscr[UID_HMarker]'              : lang_Key2StrVar:= @g_uids[UID_HMarker          ].uid_str_BaseDescript;
    'str_name[UID_LostSoul]'             : lang_Key2StrVar:= @g_uids[UID_LostSoul         ].uid_str_name;
    'str_dscr[UID_LostSoul]'             : lang_Key2StrVar:= @g_uids[UID_LostSoul         ].uid_str_BaseDescript;
    'str_name[UID_Phantom]'              : lang_Key2StrVar:= @g_uids[UID_Phantom          ].uid_str_name;
@@ -1130,6 +1128,8 @@ begin
    'str_dscr[upgr_uac_MechArmor]'       : lang_Key2StrVar:= @g_upgrs[upgr_uac_MechArmor    ].upgr_str_Descript;
    'str_name[upgr_uac_TerAAWeapon]'     : lang_Key2StrVar:= @g_upgrs[upgr_uac_TerAAWeapon  ].upgr_str_Name;
    'str_dscr[upgr_uac_TerAAWeapon]'     : lang_Key2StrVar:= @g_upgrs[upgr_uac_TerAAWeapon  ].upgr_str_Descript;
+   'str_name[upgr_uac_SiedgeMarineR]'   : lang_Key2StrVar:= @g_upgrs[upgr_uac_SiedgeMarineR].upgr_str_Name;
+   'str_dscr[upgr_uac_SiedgeMarineR]'   : lang_Key2StrVar:= @g_upgrs[upgr_uac_SiedgeMarineR].upgr_str_Descript;
    'str_name[upgr_uac_Transport]'       : lang_Key2StrVar:= @g_upgrs[upgr_uac_Transport    ].upgr_str_Name;
    'str_dscr[upgr_uac_Transport]'       : lang_Key2StrVar:= @g_upgrs[upgr_uac_Transport    ].upgr_str_Descript;
    'str_name[upgr_uac_RadarR]'          : lang_Key2StrVar:= @g_upgrs[upgr_uac_RadarR       ].upgr_str_Name;
@@ -1140,61 +1140,61 @@ begin
    'str_dscr[upgr_uac_TurretArmor]'     : lang_Key2StrVar:= @g_upgrs[upgr_uac_TurretArmor  ].upgr_str_Descript;
 
    // iActs
-   'str_dscr[iAct_Control_UAMove]'      : lang_Key2StrVar:= @str_action_hint[iAct_Control_UAMove];
-   'str_dscr[iAct_Control_UAStop]'      : lang_Key2StrVar:= @str_action_hint[iAct_Control_UAStop];
-   'str_dscr[iAct_Control_UAPatrol]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_UAPatrol];
+   'str_dscr[iAct_Control_UAMove]'      : lang_Key2StrVar:= @str_action_name[iAct_Control_UAMove];
+   'str_dscr[iAct_Control_UAStop]'      : lang_Key2StrVar:= @str_action_name[iAct_Control_UAStop];
+   'str_dscr[iAct_Control_UAPatrol]'    : lang_Key2StrVar:= @str_action_name[iAct_Control_UAPatrol];
 
-   'str_dscr[iAct_Control_UMove]'       : lang_Key2StrVar:= @str_action_hint[iAct_Control_UMove];
-   'str_dscr[iAct_Control_UStop]'       : lang_Key2StrVar:= @str_action_hint[iAct_Control_UStop];
-   'str_dscr[iAct_Control_UPatrol]'     : lang_Key2StrVar:= @str_action_hint[iAct_Control_UPatrol];
+   'str_dscr[iAct_Control_UMove]'       : lang_Key2StrVar:= @str_action_name[iAct_Control_UMove];
+   'str_dscr[iAct_Control_UStop]'       : lang_Key2StrVar:= @str_action_name[iAct_Control_UStop];
+   'str_dscr[iAct_Control_UPatrol]'     : lang_Key2StrVar:= @str_action_name[iAct_Control_UPatrol];
 
-   'str_dscr[iAct_Control_UProdCncl]'   : lang_Key2StrVar:= @str_action_hint[iAct_Control_UProdCncl];
-   'str_dscr[iAct_Control_UDestroy]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_UDestroy];
+   'str_dscr[iAct_Control_UProdCncl]'   : lang_Key2StrVar:= @str_action_name[iAct_Control_UProdCncl];
+   'str_dscr[iAct_Control_UDestroy]'    : lang_Key2StrVar:= @str_action_name[iAct_Control_UDestroy];
 
-   'str_dscr[iAct_Control_USelBase]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_USelBase];
-   'str_dscr[iAct_Control_USelArmy]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_USelArmy];
+   'str_dscr[iAct_Control_USelBase]'    : lang_Key2StrVar:= @str_action_name[iAct_Control_USelBase];
+   'str_dscr[iAct_Control_USelArmy]'    : lang_Key2StrVar:= @str_action_name[iAct_Control_USelArmy];
 
-   'str_dscr[iAct_Control_USetRPoint]'  : lang_Key2StrVar:= @str_action_hint[iAct_Control_USetRPoint];
+   'str_dscr[iAct_Control_USetRPoint]'  : lang_Key2StrVar:= @str_action_name[iAct_Control_USetRPoint];
 
-   'str_dscr[iAct_Control_MarkLook]'    : lang_Key2StrVar:= @str_action_hint[iAct_Control_MarkLook];
-   'str_dscr[iAct_Control_MarkAttack]'  : lang_Key2StrVar:= @str_action_hint[iAct_Control_MarkAttack];
-   'str_dscr[iAct_Control_ScoreBoard]'  : lang_Key2StrVar:= @str_action_hint[iAct_Control_ScoreBoard];
+   'str_dscr[iAct_Control_MarkLook]'    : lang_Key2StrVar:= @str_action_name[iAct_Control_MarkLook];
+   'str_dscr[iAct_Control_MarkAttack]'  : lang_Key2StrVar:= @str_action_name[iAct_Control_MarkAttack];
+   'str_dscr[iAct_Control_ScoreBoard]'  : lang_Key2StrVar:= @str_action_name[iAct_Control_ScoreBoard];
 
-   'str_dscr[iAct_InGamePause]'         : lang_Key2StrVar:= @str_action_hint[iAct_InGamePause];
-   'str_dscr[iAct_InGameMenu]'          : lang_Key2StrVar:= @str_action_hint[iAct_InGameMenu];
+   'str_dscr[iAct_InGamePause]'         : lang_Key2StrVar:= @str_action_name[iAct_InGamePause];
+   'str_dscr[iAct_InGameMenu]'          : lang_Key2StrVar:= @str_action_name[iAct_InGameMenu];
 
-   'str_dscr[iAct_Replay_Fast]'         : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Fast];
-   'str_dscr[iAct_Replay_Pause]'        : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Pause];
-   'str_dscr[iAct_Replay_Back2]'        : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Back2];
-   'str_dscr[iAct_Replay_Back10]'       : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Back10];
-   'str_dscr[iAct_Replay_Back60]'       : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Back60];
-   'str_dscr[iAct_Replay_Forward2]'     : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Forward2];
-   'str_dscr[iAct_Replay_Forward10]'    : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Forward10];
-   'str_dscr[iAct_Replay_Forward60]'    : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Forward60];
-   'str_dscr[iAct_Replay_POV]'          : lang_Key2StrVar:= @str_action_hint[iAct_Replay_POV];
-   'str_dscr[iAct_Replay_Log]'          : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Log];
-   'str_dscr[iAct_Replay_Fog]'          : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Fog];
-   'str_dscr[iAct_Replay_PlayerAll]'    : lang_Key2StrVar:= @str_action_hint[iAct_Replay_PlayerAll];
-   'str_dscr[iAct_Replay_Player0]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player0];
-   'str_dscr[iAct_Replay_Player1]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player1];
-   'str_dscr[iAct_Replay_Player2]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player2];
-   'str_dscr[iAct_Replay_Player3]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player3];
-   'str_dscr[iAct_Replay_Player4]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player4];
-   'str_dscr[iAct_Replay_Player5]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player5];
-   'str_dscr[iAct_Replay_Player6]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player6];
-   'str_dscr[iAct_Replay_Player7]'      : lang_Key2StrVar:= @str_action_hint[iAct_Replay_Player7];
+   'str_dscr[iAct_Replay_Fast]'         : lang_Key2StrVar:= @str_action_name[iAct_Replay_Fast];
+   'str_dscr[iAct_Replay_Pause]'        : lang_Key2StrVar:= @str_action_name[iAct_Replay_Pause];
+   'str_dscr[iAct_Replay_Back2]'        : lang_Key2StrVar:= @str_action_name[iAct_Replay_Back2];
+   'str_dscr[iAct_Replay_Back10]'       : lang_Key2StrVar:= @str_action_name[iAct_Replay_Back10];
+   'str_dscr[iAct_Replay_Back60]'       : lang_Key2StrVar:= @str_action_name[iAct_Replay_Back60];
+   'str_dscr[iAct_Replay_Forward2]'     : lang_Key2StrVar:= @str_action_name[iAct_Replay_Forward2];
+   'str_dscr[iAct_Replay_Forward10]'    : lang_Key2StrVar:= @str_action_name[iAct_Replay_Forward10];
+   'str_dscr[iAct_Replay_Forward60]'    : lang_Key2StrVar:= @str_action_name[iAct_Replay_Forward60];
+   'str_dscr[iAct_Replay_POV]'          : lang_Key2StrVar:= @str_action_name[iAct_Replay_POV];
+   'str_dscr[iAct_Replay_Log]'          : lang_Key2StrVar:= @str_action_name[iAct_Replay_Log];
+   'str_dscr[iAct_Replay_Fog]'          : lang_Key2StrVar:= @str_action_name[iAct_Replay_Fog];
+   'str_dscr[iAct_Replay_PlayerAll]'    : lang_Key2StrVar:= @str_action_name[iAct_Replay_PlayerAll];
+   'str_dscr[iAct_Replay_Player0]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player0];
+   'str_dscr[iAct_Replay_Player1]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player1];
+   'str_dscr[iAct_Replay_Player2]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player2];
+   'str_dscr[iAct_Replay_Player3]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player3];
+   'str_dscr[iAct_Replay_Player4]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player4];
+   'str_dscr[iAct_Replay_Player5]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player5];
+   'str_dscr[iAct_Replay_Player6]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player6];
+   'str_dscr[iAct_Replay_Player7]'      : lang_Key2StrVar:= @str_action_name[iAct_Replay_Player7];
 
-   'str_dscr[iAct_Observer_Fog]'        : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Fog];
-   'str_dscr[iAct_Observer_POV]'        : lang_Key2StrVar:= @str_action_hint[iAct_Observer_POV];
-   'str_dscr[iAct_Observer_PlayerAll]'  : lang_Key2StrVar:= @str_action_hint[iAct_Observer_PlayerAll];
-   'str_dscr[iAct_Observer_Player0]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player0];
-   'str_dscr[iAct_Observer_Player1]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player1];
-   'str_dscr[iAct_Observer_Player2]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player2];
-   'str_dscr[iAct_Observer_Player3]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player3];
-   'str_dscr[iAct_Observer_Player4]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player4];
-   'str_dscr[iAct_Observer_Player5]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player5];
-   'str_dscr[iAct_Observer_Player6]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player6];
-   'str_dscr[iAct_Observer_Player7]'    : lang_Key2StrVar:= @str_action_hint[iAct_Observer_Player7];
+   'str_dscr[iAct_Observer_Fog]'        : lang_Key2StrVar:= @str_action_name[iAct_Observer_Fog];
+   'str_dscr[iAct_Observer_POV]'        : lang_Key2StrVar:= @str_action_name[iAct_Observer_POV];
+   'str_dscr[iAct_Observer_PlayerAll]'  : lang_Key2StrVar:= @str_action_name[iAct_Observer_PlayerAll];
+   'str_dscr[iAct_Observer_Player0]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player0];
+   'str_dscr[iAct_Observer_Player1]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player1];
+   'str_dscr[iAct_Observer_Player2]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player2];
+   'str_dscr[iAct_Observer_Player3]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player3];
+   'str_dscr[iAct_Observer_Player4]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player4];
+   'str_dscr[iAct_Observer_Player5]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player5];
+   'str_dscr[iAct_Observer_Player6]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player6];
+   'str_dscr[iAct_Observer_Player7]'    : lang_Key2StrVar:= @str_action_name[iAct_Observer_Player7];
    end;
 
 

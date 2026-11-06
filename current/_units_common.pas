@@ -528,8 +528,7 @@ begin
      or(hits<=0)
      or(player^.team<>CasterTeam)
      or(buffs[ub_HellVision]>0)
-     or(buffs[ub_Detector  ]>0)
-     or(uid^.uid_ismarker)then exit;
+     or(buffs[ub_Detector  ]>0)then exit;
    ability_CheckTarget_HellVision:=true;
 end;
 
@@ -544,8 +543,7 @@ begin
      or(IsUnitRange(TransportU,nil))
      or(not iscomplete)
      or(uid_isbuilding)
-     or(buffs[ub_SphereSoul]>0)
-     or(uid_ismarker)then exit;
+     or(buffs[ub_SphereSoul]>0)then exit;
    ability_CheckTarget_SphereSoul:=true;
 end;
 
@@ -561,8 +559,7 @@ begin
      or(not iscomplete)
      or(uid_isbuilding)
      or(buffs[ub_SphereInvis ]>0)
-     or(buffs[ub_Invisibility]>0)
-     or(uid_ismarker)then exit;
+     or(buffs[ub_Invisibility]>0)then exit;
 
    ability_CheckTarget_SphereInvis:=true;
 end;
@@ -578,8 +575,7 @@ begin
      or(player^.team<>CasterTeam)
      or(not iscomplete)
      or(uid_isbuilding)
-     or(buffs[ub_SphereInvuln]>0)
-     or(uid_ismarker)then exit;
+     or(buffs[ub_SphereInvuln]>0)then exit;
 
    ability_CheckTarget_SphereInvuln:=true;
 end;
@@ -594,8 +590,7 @@ begin
      or(IsUnitRange(TransportU,nil))
      or(player^.team<>CasterTeam)
      or(buffs[ub_SphereRDamage]>0)
-     or(buffs[ub_Heroic       ]>0)
-     or(uid_ismarker)then exit;
+     or(buffs[ub_Heroic       ]>0)then exit;
 
    ability_CheckTarget_SphereRDamage:=true;
 end;
@@ -613,8 +608,7 @@ begin
      or(transformTimer>0)
      or(not unit_CheckActiveWeapons(pTarget))
      or(buffs[ub_SphereDDamage]>0)
-     or(buffs[ub_Heroic       ]>0)
-     or(uid_ismarker)then exit;
+     or(buffs[ub_Heroic       ]>0)then exit;
 
    ability_CheckTarget_SphereDDamage:=true;
 end;
@@ -630,8 +624,7 @@ begin
       or(IsUnitRange(TransportU,nil))
       or(buffs[ub_Heroic     ]>0)
       or(buffs[ub_SphereTurbo]>0)
-      or(player^.team<>CasterTeam)
-      or(uid_ismarker)then exit;
+      or(player^.team<>CasterTeam)then exit;
 
       if not(
       (unit_CheckActiveWeapons(pTarget))or
@@ -659,8 +652,7 @@ begin
      or(IsUnitRange(TransportU,nil))
      or(uid_race<>r_uac)
      or(uid_isbuilding)
-     or(buffs[ub_Heroic]>0)
-     or(uid_ismarker)then exit;
+     or(buffs[ub_Heroic]>0)then exit;
 
    ability_CheckTarget_UACGeneral:=true;
 end;
@@ -678,8 +670,7 @@ begin
      or(IsUnitRange(TransportU,nil))
      or(uid_race<>r_uac)
      or(buffs[ub_Heroic]>0)
-     or(uid_isbuilding<>target_building)
-     or(uid_ismarker)then exit;
+     or(uid_isbuilding<>target_building)then exit;
 
    ability_CheckTarget_Bribe:=true;
 end;
@@ -697,7 +688,6 @@ begin
      or(hits<=0)
      or(buffs[ub_Teleported]>0)
      or(TeleporterPlayer<>playeri)
-     or(uid_ismarker)
      then exit;
 
    ability_CheckTarget_Recall:=true;
@@ -841,7 +831,6 @@ begin
       or(not pTeleporter^.iscomplete)
       or(pTeleporter^.transformTimer>0)
       or(playeri<>pTeleporter^.playeri)
-      or(uid_ismarker)
       then exit;
 
       tard-=melee_r;

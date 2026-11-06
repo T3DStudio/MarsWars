@@ -503,7 +503,6 @@ aif_ability_TowerRush  : cardinal = 1 shl 17;
 aif_ability_invis      : cardinal = 1 shl 18;
 aif_cheat_VisBuildings : cardinal = 1 shl 19;
 aif_cheat_VisUnits     : cardinal = 1 shl 20;
-aif_camp_IgnoreKotH    : cardinal = 1 shl 21;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -602,9 +601,10 @@ upgr_uac_AASplash      = 45; // anti-air missiles splash
 upgr_uac_MechSpeed     = 46; // mech speed
 upgr_uac_MechArmor     = 47; // mech arm
 upgr_uac_TerAAWeapon   = 48; // termintator anti-air weapon
-upgr_uac_Transport     = 49; // transport capacity upgrade
-upgr_uac_RadarR        = 50; // Radar
-upgr_uac_TurretArmor   = 51; // turrets armor
+upgr_uac_SiedgeMarineR = 49; // additional anti-building radius for siedge marine
+upgr_uac_Transport     = 50; // transport capacity upgrade
+upgr_uac_RadarR        = 51; // Radar
+upgr_uac_TurretArmor   = 52; // turrets armor
 
 
 upgr_fprod_build       = 251;
@@ -636,12 +636,14 @@ MID_Tank               = 114;
 MID_UACStrike          = 115;
 MID_ArchFire           = 116;
 MID_Flyer              = 117;
-MID_URocket            = 119;
-MID_URocketS           = 120;
-MID_Chaingun           = 121;
-MID_TChaingun          = 122;
-MID_SChaingun          = 123;
-MID_FTower             = 124;
+MID_URocket1           = 119;
+MID_URocket1S          = 120;
+MID_URocket2           = 121;
+MID_URocket2S          = 122;
+MID_Chaingun           = 123;
+MID_TChaingun          = 124;
+MID_SChaingun          = 125;
+MID_FTower             = 126;
 
 
 mh_none                = 0;
@@ -775,7 +777,6 @@ UID_HAltar             = 13;
 UID_HCommandCenter     = 14;
 UID_HACommandCenter    = 15;
 UID_HBarracks          = 16;
-UID_HMarker            = 17;
 
 UID_LostSoul           = 20;
 UID_Phantom            = 21;
@@ -952,19 +953,19 @@ KeyPointLifeClientXC   = (60*20)/KeyPointLifeClientMax;
 keyPoint_CTime_Def_Sec = ptimeh;
 keyPoint_CTime_Def_Tick= fr_fps1*keyPoint_CTime_Def_Sec;
 keyPoint_CTime_Gen_Tick= fr_fps1*ptimeh;
-keyPoint_CTime_KotH_Sec= ptime3;
-keyPoint_CTime_KotH_Tick= fr_fps1*keyPoint_CTime_KotH_Sec;
+keyPoint_CTime_KotH_Sec= ptime1*6;
+keyPoint_CTime_KotH_Tick=fr_fps1*keyPoint_CTime_KotH_Sec;
 keyPoint_DefR          = 100;
 keyPoint_GenR          = 75;
 keyPoint_GenNB         = keyPoint_GenR-25;
-keyPoint_KotR          = 350;
-keyPoint_KotRW         = round(keyPoint_KotR/1.44);
+keyPoint_KotHR         = 350;
+keyPoint_KotHRW        = round(keyPoint_KotHR/1.44);
+keyPoint_KotH_pause_sec= 60*6;
+keyPoint_KotH_pause    = fr_fps1*keyPoint_KotH_pause_sec;
 
 keyPoint_mcN           = 4;
 keyPoint_mcDirStep     = 360 div keyPoint_mcN;
 
-keyPoint_KotH_pause_sec= 60*5;
-keyPoint_KotH_pause    = fr_fps1*keyPoint_KotH_pause_sec;
 
 
 ////////////////////////////////////////////////////////////////////////////////
