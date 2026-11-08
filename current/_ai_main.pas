@@ -194,7 +194,7 @@ begin
                                  end;
 
                                  i:=ai_GetLevel(pu);
-                                 if(uid_isbarrack)and((ai_curr_UnitProds-i-4)>ai_need_UnitProds)then ai_NeedSuicide:=true;
+                                 if(uid_isbarrack)and((ai_curr_UnitProds-i-6)>ai_need_UnitProds)then ai_NeedSuicide:=true;
                                  if(uid_isforge  )and((ai_curr_UpgrProds-i-2)>ai_need_UpgrProds)then ai_NeedSuicide:=true;
                               end;
        UID_HFTower,

@@ -1309,17 +1309,23 @@ begin
    if(ai_HTeleportNearest_u=nil)
    then
    else
-     if(newu^.rld<ai_HTeleportNearest_u^.rld)
+     if(newu^.iscomplete>ai_HTeleportNearest_u^.iscomplete)
      then
      else
-     if(newu^.rld>ai_HTeleportNearest_u^.rld)
+     if(newu^.iscomplete<ai_HTeleportNearest_u^.iscomplete)
      then exit
      else
-       if(ud<ai_HTeleportNearest_d)
+       if(newu^.rld<ai_HTeleportNearest_u^.rld)
        then
        else
-       if(ud>ai_HTeleportNearest_d)
-       then exit;
+       if(newu^.rld>ai_HTeleportNearest_u^.rld)
+       then exit
+       else
+         if(ud<ai_HTeleportNearest_d)
+         then
+         else
+         if(ud>ai_HTeleportNearest_d)
+         then exit;
 
    ai_HTeleportNearest_u  :=newu;
    ai_HTeleportNearest_d  :=ud;
@@ -1362,15 +1368,15 @@ limit_Home:longint;
 begin
    with g_PlayersGame[playerN] do
    begin
-      {if(g_cycle_order=playerN)and(playerN=UIPlayer)then
+     { if(g_cycle_order=playerN)and(playerN=UIPlayer)then
       begin                                                                                                                                                                    //,' ',aip_MaxUnitLimit,' ',units_bld_l[false],' ',units_bld_l[true]
          //writeln(playerN,' pause=',aip_pause_attack,' timer=',aip_timer_attack,' - armyL=',armylimit,' maxLimitB=',aic_MaxLimitBorder,' : curLimitC=',units_bld_lc[false],' MaxUnitLimit=',aip_MaxUnitLimit);
          //writeln(aip_timer_detection);
          //writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
-         writeln(playerN,' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' aip_pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);
+         writeln(playerN,' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' aip_pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false],' bld_l[true]=',units_bld_l[true],' bld_l[false]',units_bld_l[false]);
         // writeln('aip_MaxUpgradeLevel=',aip_MaxUpgradeLevel,' isrevealed=',isrevealed);
         // writeln('aip_timer_detection=',aip_timer_detection,' aip_timer_magic=',aip_timer_magic,' aip_timer_superweapon=',aip_timer_superweapon);
-      end;     }
+      end;   }
 
       if(aip_timer_detection  >0)then aip_timer_detection  -=1;
       if(aip_timer_magic      >0)then aip_timer_magic      -=1;
@@ -1446,7 +1452,7 @@ begin
                  or((units_bld_l[false]+prod_unit_Limit)>=aip_MaxAttackLimit)
                  then aip_timer_attack:=1;
         end
-        else
+        else   // set attack
         begin
            aip_timer_attack-=1;
            if(aip_timer_attack<=0)then
@@ -1462,6 +1468,7 @@ begin
                   else limit_AGroup:=aip_MaxAttackLimit;
 
               limit_Attack:=ai_player_SetAttackWave(playerN,limit_AGroup);
+             // writeln(pnum,'  ',limit_AGroup,' attack wave ',limit_Attack);
 
               if(aip_pause_attack<0)
               then aip_timer_attack:=-aip_pause_attack

@@ -403,7 +403,7 @@ begin
       if(tu^.iscomplete)then
       begin
          if (not tu^.uid^.uid_isbuilding)
-         and(not tu^.uid^.uid_CanAttack)
+         and(    tu^.uid^.uid_CanAttack)
          and(tu^.isfly)
          and(tu^.group=aic_group_AttackNow)then ai_AttackGroupFlyLimit+=tu^.uid^.uid_LimitUse;
 

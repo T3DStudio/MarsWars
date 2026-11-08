@@ -14,8 +14,8 @@
       <Unit1>
         <Filename Value="_const.pas"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="72"/>
-        <CursorPos X="13" Y="86"/>
+        <TopLine Value="471"/>
+        <CursorPos X="17" Y="486"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit1>
@@ -142,8 +142,8 @@
       <Unit17>
         <Filename Value="_campaings.pas"/>
         <EditorIndex Value="36"/>
-        <TopLine Value="1254"/>
-        <CursorPos X="56" Y="1267"/>
+        <TopLine Value="1464"/>
+        <CursorPos X="37" Y="1483"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit17>
@@ -174,8 +174,8 @@
       <Unit21>
         <Filename Value="_units.pas"/>
         <EditorIndex Value="28"/>
-        <TopLine Value="303"/>
-        <CursorPos X="73" Y="322"/>
+        <TopLine Value="986"/>
+        <CursorPos X="43" Y="1000"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -237,7 +237,7 @@
       <Unit29>
         <Filename Value="_draw_game.pas"/>
         <EditorIndex Value="18"/>
-        <TopLine Value="544"/>
+        <TopLine Value="887"/>
         <CursorPos X="82" Y="552"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -261,7 +261,7 @@
       <Unit32>
         <Filename Value="_draw_objs_units.pas"/>
         <EditorIndex Value="19"/>
-        <TopLine Value="177"/>
+        <TopLine Value="172"/>
         <CursorPos X="73" Y="188"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
@@ -269,8 +269,8 @@
       <Unit33>
         <Filename Value="_objects_main_data.pas"/>
         <EditorIndex Value="11"/>
-        <TopLine Value="1706"/>
-        <CursorPos X="52" Y="352"/>
+        <TopLine Value="432"/>
+        <CursorPos X="84" Y="445"/>
         <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit33>
@@ -291,10 +291,9 @@
       </Unit35>
       <Unit36>
         <Filename Value="_ai_main.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="31"/>
-        <TopLine Value="673"/>
-        <CursorPos X="55" Y="677"/>
+        <TopLine Value="946"/>
+        <CursorPos X="63" Y="950"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit36>
@@ -324,25 +323,26 @@
       </Unit39>
       <Unit40>
         <Filename Value="_ai_common.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="29"/>
-        <TopLine Value="1364"/>
-        <CursorPos X="17" Y="1373"/>
+        <TopLine Value="1461"/>
+        <CursorPos X="16" Y="1471"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="_ai_collect.pas"/>
         <EditorIndex Value="30"/>
-        <TopLine Value="170"/>
-        <CursorPos X="47" Y="189"/>
+        <TopLine Value="384"/>
+        <CursorPos X="48" Y="401"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="_ai_main_units.pas"/>
         <EditorIndex Value="33"/>
-        <TopLine Value="397"/>
-        <CursorPos X="11" Y="7"/>
+        <TopLine Value="369"/>
+        <CursorPos X="33" Y="388"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit42>
@@ -356,7 +356,7 @@
       <Unit44>
         <Filename Value="_ai_buildorder.pas"/>
         <EditorIndex Value="32"/>
-        <TopLine Value="813"/>
+        <TopLine Value="658"/>
         <CursorPos X="71" Y="228"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
@@ -364,124 +364,124 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="_draw_ui.pas"/>
-        <Caret Line="920" Column="88" TopLine="893"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="344" Column="27" TopLine="326"/>
       </Position1>
       <Position2>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2169" Column="27" TopLine="2165"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="348" Column="19" TopLine="344"/>
       </Position2>
       <Position3>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2188" Column="62" TopLine="2164"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="355" Column="41" TopLine="344"/>
       </Position3>
       <Position4>
-        <Filename Value="_draw_ui.pas"/>
-        <Caret Line="911" Column="38" TopLine="893"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="359" Column="28" TopLine="353"/>
       </Position4>
       <Position5>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2188" Column="62" TopLine="2168"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="366" Column="44" TopLine="353"/>
       </Position5>
       <Position6>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2156" Column="69" TopLine="2133"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="367" Column="44" TopLine="353"/>
       </Position6>
       <Position7>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2166" Column="53" TopLine="2142"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="368" Column="44" TopLine="353"/>
       </Position7>
       <Position8>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2152" Column="79" TopLine="2143"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="369" Column="44" TopLine="353"/>
       </Position8>
       <Position9>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2153" Column="79" TopLine="2143"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="371" Column="31" TopLine="353"/>
       </Position9>
       <Position10>
-        <Filename Value="_common.pas"/>
-        <Caret Line="2156" Column="69" TopLine="2143"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="381" Column="36" TopLine="357"/>
       </Position10>
       <Position11>
-        <Filename Value="_game.pas"/>
-        <Caret Line="1465" Column="107" TopLine="1456"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="382" Column="25" TopLine="358"/>
       </Position11>
       <Position12>
-        <Filename Value="_game.pas"/>
-        <Caret Line="173" Column="29" TopLine="151"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="378" Column="38" TopLine="364"/>
       </Position12>
       <Position13>
-        <Filename Value="_game.pas"/>
-        <Caret Line="174" Column="29" TopLine="151"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="381" Column="36" TopLine="367"/>
       </Position13>
       <Position14>
-        <Filename Value="_game.pas"/>
-        <Caret Line="175" Column="29" TopLine="151"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="382" Column="36" TopLine="367"/>
       </Position14>
       <Position15>
-        <Filename Value="_game.pas"/>
-        <Caret Line="176" Column="29" TopLine="151"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="388" Column="68" TopLine="367"/>
       </Position15>
       <Position16>
-        <Filename Value="_game.pas"/>
-        <Caret Line="177" Column="29" TopLine="151"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="390" Column="15" TopLine="393"/>
       </Position16>
       <Position17>
-        <Filename Value="_game.pas"/>
-        <Caret Line="178" Column="29" TopLine="151"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="408" Column="29" TopLine="399"/>
       </Position17>
       <Position18>
-        <Filename Value="_game.pas"/>
-        <Caret Line="179" Column="29" TopLine="152"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="412" Column="39" TopLine="399"/>
       </Position18>
       <Position19>
-        <Filename Value="_game.pas"/>
-        <Caret Line="180" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="413" Column="39" TopLine="399"/>
       </Position19>
       <Position20>
-        <Filename Value="_game.pas"/>
-        <Caret Line="173" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="414" Column="28" TopLine="399"/>
       </Position20>
       <Position21>
-        <Filename Value="_game.pas"/>
-        <Caret Line="174" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="415" Column="28" TopLine="399"/>
       </Position21>
       <Position22>
-        <Filename Value="_game.pas"/>
-        <Caret Line="175" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="446" Column="19" TopLine="433"/>
       </Position22>
       <Position23>
-        <Filename Value="_game.pas"/>
-        <Caret Line="176" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="448" Column="28" TopLine="433"/>
       </Position23>
       <Position24>
-        <Filename Value="_game.pas"/>
-        <Caret Line="177" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="451" Column="30" TopLine="433"/>
       </Position24>
       <Position25>
-        <Filename Value="_game.pas"/>
-        <Caret Line="178" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="453" Column="21" TopLine="433"/>
       </Position25>
       <Position26>
-        <Filename Value="_game.pas"/>
-        <Caret Line="179" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="454" Column="46" TopLine="433"/>
       </Position26>
       <Position27>
-        <Filename Value="_game.pas"/>
-        <Caret Line="180" Column="29" TopLine="153"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="455" Column="20" TopLine="433"/>
       </Position27>
       <Position28>
-        <Filename Value="_game.pas"/>
-        <Caret Line="147" Column="121" TopLine="144"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="456" Column="20" TopLine="433"/>
       </Position28>
       <Position29>
-        <Filename Value="_draw_ui.pas"/>
-        <Caret Line="920" Column="30" TopLine="896"/>
+        <Filename Value="_ai_main_units.pas"/>
+        <Caret Line="459" Column="51" TopLine="434"/>
       </Position29>
       <Position30>
         <Filename Value="_ai_collect.pas"/>
-        <Caret Line="349" Column="118" TopLine="344"/>
+        <Caret Line="387" Column="71" TopLine="384"/>
       </Position30>
     </JumpHistory>
     <RunParams>

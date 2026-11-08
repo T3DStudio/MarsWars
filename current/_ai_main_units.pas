@@ -373,7 +373,8 @@ begin
            end;
 
          if (ai_KotH)
-         and(g_tick>=keyPoint_KotH_pause)then
+         and(g_tick>=keyPoint_KotH_pause)
+         and(aip_pause_attack=0)then
            with ai_keypoint_kp^ do
            begin
               if(kp_zone=mapZone)or(isfly)
@@ -401,6 +402,20 @@ begin
       CheckSetGeneratorGuard;
    end;
 end;
+procedure SetGroupFromNonAttack;
+begin
+   with pu^ do
+   with uid^ do
+   with player^ do
+   begin
+      if(aip_pause_attack<>0)
+      or((ai_GroupAll_ulimit[aic_group_AttackWait]=0)
+      and(ai_GroupAll_ulimit[aic_group_AttackNow ]=0))
+      then group:=aic_group_Home
+      else group:=aic_group_AttackNow;
+   end;
+end;
+
 ////
 begin
    with pu^ do
@@ -440,7 +455,7 @@ begin
           aic_group_AttackNow,
           aic_group_AttackWait     : begin
                                         MainTargetSetDefault;
-                                        if(tar_dist =NOTSET)
+                                        if(tar_dist=NOTSET)
                                         then group:=aic_group_AttackWait
                                         else group:=aic_group_AttackNow;
                                      end;
@@ -450,13 +465,8 @@ begin
                                        if(ai_ScoutCandidate_u<>pu)and(ai_BaseOwn_d<base_r1)
                                        then group:=aic_group_Home;
           aic_group_GenAssault,
-          aic_group_GenWait        : if(not ICanCaptureGenerators)then
-                                     begin
-                                        if(ai_GroupAll_ulimit[aic_group_AttackWait]>0)
-                                        or(ai_GroupAll_ulimit[aic_group_AttackNow ]>0)
-                                        then group:=aic_group_AttackNow
-                                        else group:=aic_group_Home;
-                                     end
+          aic_group_GenWait        : if(not ICanCaptureGenerators)
+                                     then SetGroupFromNonAttack
                                      else
                                        if(isfly)
                                        then group:=aic_group_GenAssault
@@ -466,21 +476,13 @@ begin
                                          else
                                            if(group=aic_group_GenWait)
                                            then group:=aic_group_GenAssault;
-          aic_group_GenGuard       : if(ai_generator_d=NOTSET)then
-                                     begin
-                                        if(aip_MaxAttackLimit>0)
-                                        then group:=aic_group_AttackNow
-                                        else group:=aic_group_Home;
-                                     end
+          aic_group_GenGuard       : if(ai_generator_d=NOTSET)
+                                     then SetGroupFromNonAttack
                                      else
                                        if (ai_energy_future>=aip_MaxEnergy)
                                        and(ai_generator_d<=ai_generator_kp^.kp_RCapture)
-                                       and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit)then
-                                       begin
-                                          if(aip_MaxAttackLimit>0)
-                                          then group:=aic_group_AttackNow
-                                          else group:=aic_group_Home;
-                                       end
+                                       and(ai_nearGenDudesLimit<ai_generator_kp^.kp_CaptureLimit)
+                                       then SetGroupFromNonAttack
                                        else
                                          if(ai_generator_d>srange)
                                          or((ai_generator_kp^.kp_Zone<>mapZone)and(not isfly))

@@ -239,11 +239,10 @@ begin
 
       aip_MaxUpgradeLevel:=alevel_upgr*2;
 
-      case attackPause of
-      -1 : aip_pause_attack:=-fr_fps1*max2i(1,180-45*alevel_attack); // 45 90 135 180
-      1..attackPause.MaxValue
-         : aip_pause_attack:=-fr_fps1*attackPause;
-      end;
+      aip_pause_attack:=0;
+      if(attackPause<0)
+      then aip_pause_attack:=-fr_fps1*max2i(1,180-45*alevel_attack) // default 45 90 135 180
+      else aip_pause_attack:=-fr_fps1*attackPause;
 
       aip_delay_attack:=0;
       if(attackDelay>=0)then aip_delay_attack:= fr_fps1*attackDelay;
@@ -925,6 +924,7 @@ begin
                  cd_p_enemy2:=3;
 
                  aiflags:=aif_base_smart_order+
+                          aif_base_suicide+
                           aif_base_advanceMain+
                           aif_base_advanceOther+
                           aif_base_BuilderMove+
@@ -1162,7 +1162,7 @@ begin
                  map_Seed         :=10666;
                  map_scenario     :=mc_koth;
                  map_GeneratorT   :=0;
-                 map_Size1        :=7000;
+                 map_Size1        :=8000;
                  map_Template     :=mapt_island;
                  map_Symmetry     :=maps_none;
                  map_MaxPlayers   :=8;
@@ -1178,6 +1178,7 @@ begin
                  cd_p_enemy3:=3;
 
                  aiflags:=aif_base_smart_order+
+                          aif_base_suicide+
                           aif_base_advanceMain+
                           aif_base_advanceOther+
                           aif_base_BuilderMove+
@@ -1215,7 +1216,7 @@ begin
                        camp_SetPlayer(p,r_hell,p,ps_AI,b2s(p));
                        camp_SetAI(p,3,
                                     3,
-                                    cd_camp_skill,
+                                    3,
                                     cd_camp_skill,
                                     cd_camp_skill,0  ,-1, aiflags);
                        with g_PlayersGame[p] do
@@ -1226,8 +1227,10 @@ begin
                           aip_MaxAttackLimit:=ul15+ul15*cd_camp_skill;
 
                           upgrs_cur[upgr_fprod_unit]:=1;
+                          upgrs_cur[upgr_fprod_upgr]:=1;
+                          upgrs_cur[upgr_fprod_build]:=1;
                        end;
-                       camp_SetBaseLevelUnitUpgrades(p,10);
+                       //camp_SetBaseLevelUnitUpgrades(p,4);
                     end;
 
                     camp_CreateUnit(p,map_PlayerStartX[p]-tx*2,map_PlayerStartY[p]-ty*2,UID_HAKeep,60);
@@ -1297,22 +1300,23 @@ begin
                                                    upgr_hell_T2TNoCD,
                                                    upgr_hell_BuildRestore,
                                                    upgr_hell_TowerBlink  ], 4       ,true);
-
-                    PlayerSetCurrentUpgrades (p ,[ upgr_hell_DistDamage1,
-                                                   upgr_hell_UnitArmor ,
-                                                   upgr_hell_BuildArmor,
-                                                   upgr_hell_MeleeDamage,
-                                                   upgr_hell_Regeneration,
-                                                   upgr_hell_ADetection,
-                                                   upgr_hell_PainFactor ,
-                                                   upgr_hell_BuilderR,
-                                                   upgr_hell_TowerR    ,
-                                                   upgr_hell_UnitSightR,
-                                                   upgr_hell_DistDamage2,
-                                                   upgr_hell_TeleportCD,
-                                                   upgr_hell_EvilEyeR,
-                                                   upgr_hell_BuildRestore], 4       ,false);
                  end;
+
+                 PlayerSetCurrentUpgrades (cd_p_player
+                                             ,[ upgr_hell_DistDamage1,
+                                                upgr_hell_UnitArmor ,
+                                                upgr_hell_BuildArmor,
+                                                upgr_hell_MeleeDamage,
+                                                upgr_hell_Regeneration,
+                                                upgr_hell_ADetection,
+                                                upgr_hell_PainFactor ,
+                                                upgr_hell_BuilderR,
+                                                upgr_hell_TowerR    ,
+                                                upgr_hell_UnitSightR,
+                                                upgr_hell_DistDamage2,
+                                                upgr_hell_TeleportCD,
+                                                upgr_hell_EvilEyeR,
+                                                upgr_hell_BuildRestore], 4       ,false);
 
                  g_PlayersGame[1].name:=str_Camp_HE_1;
                  g_PlayersGame[2].name:=str_Camp_HE_2;
@@ -1322,9 +1326,9 @@ begin
                  g_PlayersGame[6].name:=str_Camp_HE_6;
                  g_PlayersGame[7].name:=str_Camp_HE_7;
 
-                 g_PlayersGame[2].team:=1;
-                 g_PlayersGame[6].team:=7;
-                 g_PlayersGame[5].team:=3;
+                 g_PlayersGame[2].team:=g_PlayersGame[1].team;
+                 g_PlayersGame[5].team:=g_PlayersGame[3].team;
+                 g_PlayersGame[7].team:=g_PlayersGame[6].team;
               end;
           end;
        end;

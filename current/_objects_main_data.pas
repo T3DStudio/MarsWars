@@ -351,14 +351,13 @@ begin
    uid_ability2        := uab_HHTShroud;
    uid_ability3        := uab_ToHFTower;
    uid_isbuilding      := true;
-   uid_ismech          := true;
+   uid_ismech          := false;
    uid_islight         := false;
    uid_Regen_Base      := BaseRegenh;
    uid_Regen_upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
    SetWeapon(0,wpt_missle,aw_srange,0,0,fr_archvile_s,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,0);
-   //uid_arms_BonusAntiUnitRange:=50;
 end;
 
 //////////////////////////////
@@ -449,7 +448,7 @@ begin
    uid_SightR_Base     := 275;
    uid_SightR_upgr     := upgr_hell_UnitSightR;
    uid_uibtn           := 3;
-   uid_PainState_Base  := 10;
+   uid_PainState_Base  := 12;
    uid_PainState_upgr  := upgr_hell_PainFactor;
    uid_ProdTimeSec     := ptime1h;
    uid_LimitUse        := ul4;

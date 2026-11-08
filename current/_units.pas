@@ -998,7 +998,7 @@ begin
                    if (udi<base_r1)
                    and(tu^.playeri=playeri)
                    and(tu^.uidi=NearTeleport_tu^.uidi)
-                   and(tu^.rld<NearTeleport_tu^.rld)
+                   and((tu^.rld<NearTeleport_tu^.rld)or(tu^.iscomplete>NearTeleport_tu^.iscomplete))
                    and(tu^.iscomplete)
                    and(tu^.transformTimer<=0)then
                      if((0<tu^.rpoint_tar)and(tu^.rpoint_tar<=MaxUnits)and(tu^.rpoint_tar=NearTeleport_tu^.rpoint_tar))
@@ -1251,7 +1251,7 @@ end;
 function unit_attack(pAttacker:PTUnit):boolean;
 var arm,a   : byte;
 pTarget     : PTUnit;
-damage,kx,ky,
+damage,
 upgradd,c   : integer;
 fakemissile,
 attackinmove: boolean;
@@ -2114,8 +2114,6 @@ begin
                               uab_ToUWeaponFactory : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UWeaponFactory ,false);
                               uab_ToUAGTurret      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UGTurret       ,false,true);
                               uab_ToUAATurret      : unit_AbilityExec:=unit_TransformStart(pCaster,uid_UATurret       ,false,true);
-                              //uab_ToUAGTurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UGTurret ,false,-2,level,false);
-                              //uab_ToUAATurret      : unit_AbilityExec:=unit_morph(pCaster,uid_UATurret ,false,-2,level,false);
                               uab_ToUACDron        : unit_AbilityExec:=unit_morph(pCaster,uid_UACDron  ,false,-2,0    ,false);
 
                               uab_LvlUpURadar      : unit_AbilityExec:=unit_AddExp(pCaster,0,true,false);
