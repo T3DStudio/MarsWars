@@ -2403,15 +2403,18 @@ begin
            exit;
         end;
 
-      if(units_uid_m[tarUID]<=0)then
+      if(tarUID<>uidi)then
       begin
-         unit_TransformStart:=lmt_prod_Unavailable;
-         exit;
-      end;
-      if(units_uid_e[tarUID]>=units_uid_m[tarUID])then
-      begin
-         unit_TransformStart:=lmt_Req_MaxCount;
-         exit;
+         if(units_uid_m[tarUID]<=0)then
+         begin
+            unit_TransformStart:=lmt_prod_Unavailable;
+            exit;
+         end;
+         if((units_uid_e[tarUID]+trans_unit_uid[tarUID])>=units_uid_m[tarUID])then
+         begin
+            unit_TransformStart:=lmt_Req_MaxCount;
+            exit;
+         end;
       end;
 
       if(ptarUID^.uid_req_HellLoot>0)and(res_HellLoot<ptarUID^.uid_req_HellLoot)then begin unit_TransformStart:=lmt_Req_HellLoot;exit;end;
@@ -2453,6 +2456,8 @@ begin
 
       transformUID  :=tarUID;
       transformTimer:=ptarUID^.uid_ProdTimeTick;
+      if(transformUID<>uidi)then
+        trans_unit_uid[transformUID]+=1;
       if(halfTime)then transformTimer:=max2i(1,transformTimer div 2);
 
       {$IFDEF _FULLGAME}
@@ -2478,6 +2483,8 @@ begin
       res_energyl_cur     +=g_uids[transformUID].uid_req_EnergyLevel;
       res_HellLoot        +=g_uids[transformUID].uid_req_HellLoot;
       res_UACLoot         +=g_uids[transformUID].uid_req_UACLoot;
+      if(transformUID<>uidi)then
+        trans_unit_uid[transformUID]-=1;
       transformTimer:=0;
    end;
 end;

@@ -507,7 +507,7 @@ begin
           with g_upgrs[i] do upgrs_max[i]:=min2b(upgr_max,lvl);
    end;
 end;
-{procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
+procedure PlayerSetCurrentUpgrades(p:byte;g:TSob;lvl:integer;new:boolean);  // current upgrades
 var i:byte;
 begin
    with g_PlayersGame[p] do
@@ -517,9 +517,9 @@ begin
        for i:=0 to 255 do
         if(i in g)then
          with g_upgrs[i] do
-          upgrs_cur[i]:=min3i(upgrs_max[i],upgr_max,lvl);
+          upgrs_cur[i]:=min2i(upgrs_max[i],min2i(upgr_max,lvl));
    end;
-end;}
+end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -1274,6 +1274,9 @@ begin
         if(ServerSide)then
         {$ENDIF}
         begin
+           {$IFDEF _FULLGAME}
+           if(g_type<>gt_campaing)then
+           {$ENDIF}
            GameLog_PlayerDefeated(pnum);
            game_ScoresAddC(pnum,psc_InGameTime,g_tick);
         end;
@@ -1496,7 +1499,7 @@ false : if(units_unitProds_c<=0)then begin unit_CheckReqs:=lmt_unit_NeedProdUnit
       if((uid_isbuilder)and(units_builders_e>=PlayerMaxBuilders))then
       begin unit_CheckReqs:=lmt_Req_MaxBuilders;exit;end;
 
-      if((units_uid_e[uid]+prod_unit_uid[uid])>=units_uid_m[uid])then
+      if((units_uid_e[uid]+prod_unit_uid[uid]+trans_unit_uid[uid])>=units_uid_m[uid])then
       begin unit_CheckReqs:=lmt_Req_MaxCount;exit;end;
 
       if((uid_req_uid1>0)and(units_uid_c[uid_req_uid1]<uid_req_uid1n))
@@ -2150,7 +2153,7 @@ begin
             t:=PlayerGetCurrentTeam(p);
             case t of
             0,2,4,6: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[(t+6) mod MaxPlayers];
-            1,3,5,7: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[ t   mod MaxPlayers];
+            1,3,5,7: PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[ t    mod MaxPlayers];
             end;
          end;
       else PlayerColorsSchemeCurNormal[p]:=PlayerColorsSchemeDefault[p];
@@ -2171,7 +2174,7 @@ var isobs:boolean;
 begin
    isobs:=false;
    if(player>LastPlayer)
-   or(player>=map_MaxPlayers)
+   or((player>=map_MaxPlayers)and(g_type=gt_scirmish))
    then isobs:=true
    else
      with g_PlayersGame[player] do
@@ -2706,7 +2709,7 @@ lmt_koth_Alarm        : begin
                            case lm_type of
                            lmt_kpoint_CaptureStart: RenderLogMessage:=Team2Name(lm_data_u)+str_warn_kpoint_CaptureStart+b2s(lm_data_t+1);
                            lmt_kpoint_Captured    : if(map_scenario=mc_koth)
-                                                    then RenderLogMessage:=Team2Name(lm_data_u)+str_ui_KotHWinner
+                                                    then RenderLogMessage:=Team2Name(lm_data_u)+str_ui_KotHWinnerScir
                                                     else RenderLogMessage:=Team2Name(lm_data_u)+str_warn_kpoint_Captured+b2s(lm_data_t+1);
                            lmt_koth_CaptureStart  : RenderLogMessage:=Team2Name(lm_data_u)+str_warn_koth_CaptureStart;
                            lmt_koth_Alarm         : RenderLogMessage:=str_warn_koth_Alarm+lm_string;

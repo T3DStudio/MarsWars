@@ -547,7 +547,8 @@ begin
    'str_ui_UnitGroups'                  : lang_Key2StrVar:= @str_ui_UnitGroups;
    'str_ui_KothTime'                    : lang_Key2StrVar:= @str_ui_KothTime;
    'str_ui_KotHTime_act'                : lang_Key2StrVar:= @str_ui_KotHTime_act;
-   'str_ui_KotHWinner'                  : lang_Key2StrVar:= @str_ui_KotHWinner;
+   'str_ui_KotHWinnerScir'              : lang_Key2StrVar:= @str_ui_KotHWinnerScir;
+   'str_ui_KotHWinnerCamp'              : lang_Key2StrVar:= @str_ui_KotHWinnerCamp;
    'str_ui_ChatAll'                     : lang_Key2StrVar:= @str_ui_ChatAll;
    'str_ui_ChatAllies'                  : lang_Key2StrVar:= @str_ui_ChatAllies;
    'str_ui_Tab[tab_Buildings]'          : lang_Key2StrVar:= @str_ui_Tab[tab_Buildings];
@@ -761,6 +762,13 @@ begin
    'str_Camp_HE_BS'                     : lang_Key2StrVar:= @str_Camp_HE_BS;
    'str_Camp_HE_LoH'                    : lang_Key2StrVar:= @str_Camp_HE_LoH;
    'str_Camp_HE_CoBS'                   : lang_Key2StrVar:= @str_Camp_HE_CoBS;
+   'str_Camp_HE_1'                      : lang_Key2StrVar:= @str_Camp_HE_1;
+   'str_Camp_HE_2'                      : lang_Key2StrVar:= @str_Camp_HE_2;
+   'str_Camp_HE_3'                      : lang_Key2StrVar:= @str_Camp_HE_3;
+   'str_Camp_HE_4'                      : lang_Key2StrVar:= @str_Camp_HE_4;
+   'str_Camp_HE_5'                      : lang_Key2StrVar:= @str_Camp_HE_5;
+   'str_Camp_HE_6'                      : lang_Key2StrVar:= @str_Camp_HE_6;
+   'str_Camp_HE_7'                      : lang_Key2StrVar:= @str_Camp_HE_7;
 
    'str_camp_1'                         : lang_Key2StrVar:= @camp_list[0];
 

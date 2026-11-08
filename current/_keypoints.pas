@@ -296,12 +296,13 @@ begin
        end;
 end;
 
-procedure Scenario_KeyPointsEndConditions;
+function Scenario_KeyPointsEndConditions(check:boolean=false):boolean;
 var i,
 wteam  ,
 wteam_n,
 kp_captured_n:integer;
 begin
+   Scenario_KeyPointsEndConditions:=false;
    // VICTORY CONDITIONS
    wteam        :=255;
    wteam_n      :=0;
@@ -324,6 +325,10 @@ begin
        end;
 
    if(kp_captured_n>0)and(wteam_n=kp_captured_n)and(wteam<=LastPlayer)then
-     game_SetStatusWinnerTeam(wteam);
+   begin
+      Scenario_KeyPointsEndConditions:=true;
+      if(not check)then
+        game_SetStatusWinnerTeam(wteam);
+   end;
 end;
 

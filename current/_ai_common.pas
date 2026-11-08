@@ -1367,10 +1367,10 @@ begin
          //writeln(playerN,' pause=',aip_pause_attack,' timer=',aip_timer_attack,' - armyL=',armylimit,' maxLimitB=',aic_MaxLimitBorder,' : curLimitC=',units_bld_lc[false],' MaxUnitLimit=',aip_MaxUnitLimit);
          //writeln(aip_timer_detection);
          //writeln(playerN,' ',aip_timer_attack,' ',(aip_flags and aif_army_early_attack0)>0,' ',(aip_flags and aif_army_early_attack1)>0,' ',aip_MaxUnitMinPart);
-         //writeln(playerN,' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' aip_pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);
+         writeln(playerN,' delay_attack=',aip_delay_attack,' timer_attack=',aip_timer_attack,' aip_pause_attack=',aip_pause_attack,' MaxAttackLimit=',aip_MaxAttackLimit,' LP.units_bld_lc=',g_PlayersGame[LocalPlayer].units_bld_lc[false]);
         // writeln('aip_MaxUpgradeLevel=',aip_MaxUpgradeLevel,' isrevealed=',isrevealed);
-         writeln('aip_timer_detection=',aip_timer_detection,' aip_timer_magic=',aip_timer_magic,' aip_timer_superweapon=',aip_timer_superweapon);
-      end;}
+        // writeln('aip_timer_detection=',aip_timer_detection,' aip_timer_magic=',aip_timer_magic,' aip_timer_superweapon=',aip_timer_superweapon);
+      end;     }
 
       if(aip_timer_detection  >0)then aip_timer_detection  -=1;
       if(aip_timer_magic      >0)then aip_timer_magic      -=1;

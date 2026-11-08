@@ -202,6 +202,11 @@ begin
        UID_UGTurret,
        UID_UATurret       : if (upgrs_cur[upgr_uac_DronTurret]=0)
                             and(not ai_IsTowerUsefull(pu))then ai_NeedSuicide:=true;
+
+       UID_LostSoul,
+       UID_Phantom        : if (buffs[ub_damaged  ]>0)
+                            and(buffs[ub_DecayAura]>0)
+                            and(buffs[ub_PainState]>0)then ai_NeedSuicide:=true;
        end;
 end;
 
@@ -665,6 +670,12 @@ begin
                           met_hits  : begin
                                          lx:=g_random(map_size1);
                                          ly:=g_random(map_size1);
+                                         if(ai_BaseAlly_d<NOTSET)then
+                                           if(ai_BaseAlly_u^.aiu_alarm_d>base_r2)then
+                                           begin
+                                              lx:=ai_BaseAlly_u^.x+g_randomr(base_r2);
+                                              ly:=ai_BaseAlly_u^.y+g_randomr(base_r2);
+                                           end;
                                          if (not ai_alarm_CheckPoint(pBuilder,lx,ly,base_r2))
                                          and(not game_CheckRoyalBattlePoint(lx,ly,base_r2))then
                                            ai_ability_KeepShift(pBuilder,lx,ly);

@@ -230,10 +230,22 @@ begin
              build_step:=srange-g_random(g_uids[build_uid].uid_r);
           end
           else
-            case g_random(2) of
-            0: build_step:=srange;
-            1: build_step:=uid^.uid_r;
-            end;
+            {$IFDEF _FULLGAME}
+            if(g_type=gt_campaing)and(aiu_alarm_d<NOTSET)then
+            begin
+               build_dir :=point_dir(x,y,aiu_alarm_x,aiu_alarm_y);
+               build_dirs:=35;
+               case g_random(2) of
+               0: build_step:=srange;
+               1: build_step:=uid^.uid_r;
+               end;
+            end
+            else
+            {$ENDIF}
+              case g_random(2) of
+              0: build_step:=srange;
+              1: build_step:=uid^.uid_r;
+              end;
    end;
 end;
 

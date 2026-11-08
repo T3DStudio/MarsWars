@@ -358,7 +358,7 @@ begin
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
    SetWeapon(0,wpt_missle,aw_srange,0,0,fr_archvile_s,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,0);
-   uid_arms_BonusAntiUnitRange:=50;
+   //uid_arms_BonusAntiUnitRange:=50;
 end;
 
 //////////////////////////////

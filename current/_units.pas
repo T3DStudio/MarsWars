@@ -2210,7 +2210,8 @@ begin
       UID_HCommandCenter,
       UID_HACommandCenter,
       UID_UCommandCenter,
-      UID_UACommandCenter   : if(not iscomplete)or(transformTimer>0)then
+      UID_UACommandCenter   : if(not iscomplete)
+                              or(transformTimer>0)then
                               begin
                                  speed:=0;
                                  isfly:=uf_ground;
@@ -2257,7 +2258,8 @@ begin
                                 end;
       end;
       if(uid_FlyLevelLikeTarget)then
-        if(not iscomplete)or(transformTimer>0)
+        if(not iscomplete)
+        or(transformTimer>0)
         then isfly:=uid_isfly
         else
         begin
@@ -2337,6 +2339,8 @@ begin
                begin
                   energyCur_transforms-=g_uids[transformUID].uid_req_EnergyLevel;
                   res_energyl_cur     +=g_uids[transformUID].uid_req_EnergyLevel;
+                  if(transformUID<>uidi)then
+                    trans_unit_uid[transformUID]-=1;
                   transformTimer:=0;
                   if(transformUID<>uidi)
                   then unit_morph(pu,transformUID,true,integer.MaxValue,0,false,false)

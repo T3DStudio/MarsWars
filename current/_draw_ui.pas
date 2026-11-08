@@ -908,7 +908,7 @@ begin
           kpowner:=ui_TeamRace(team,race)+name;
 
       if(kptd_Timer<=0)or(ui_blink2_colorb)
-      then kpcolor:=PlayerGetColorCur(kptd_OwnerPlayer     ,false)
+      then kpcolor:=PlayerGetColorCur(kptd_OwnerPlayer   ,false)
       else
       begin
          kpcolor:=PlayerGetColorCur(kptd_TimerOwnerPlayer,false);
@@ -927,7 +927,7 @@ limit :integer;
 logPov:byte;
   str :shortstring;
   col :TMWColor;
-procedure draw_KotH;
+procedure draw_KotH(winstr:shortstring);
 begin
    with map_KeyPointsL[0] do
     if(g_tick<keyPoint_KotH_pause)
@@ -935,7 +935,7 @@ begin
     else
       with kp_TeamData[MaxPlayers] do
         if(kptd_OwnerPlayer<=LastPlayer)
-        then draw_text(tar,ui_objectivesx,y,g_PlayersGame[kptd_OwnerPlayer].name+str_ui_KotHWinner,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
+        then draw_text(tar,ui_objectivesx,y,g_PlayersGame[kptd_OwnerPlayer].name+winstr,ta_LU,ui_Objectives_LineLen,PlayerGetColorCur(kptd_OwnerPlayer,false),@y)
         else
           if(kptd_Timer<=0)
           then draw_text(tar,ui_objectivesx,y,str_ui_KothTime+'---',ta_LU,ui_Objectives_LineLen,c_white,@y)
@@ -1062,7 +1062,7 @@ begin
                               y+=txt_line_h2;
                               draw_text(tar,ui_objectivesx,y,str_objective_KotH  ,ta_LU,ui_Objectives_LineLen,c_white,@y);
                               y+=txt_line_h2;
-                              draw_KotH;
+                              draw_KotH(str_ui_KotHWinnerScir);
                               end;
                 mc_KeyPoints: begin
                               draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white,@y);
@@ -1083,10 +1083,16 @@ begin
                    if(0<=camp_sel)and(camp_sel<camp_size)then
                      if(0<=camp_mis_sel)and(camp_mis_sel<camp_mis_size[camp_sel])then
                        draw_text(tar,ui_objectivesx,y,camp_obj_object[camp_sel][camp_mis_sel],ta_LU,ui_Objectives_LineLen,c_white,@y);
-                   if(map_scenario=mc_KotH)then
-                   begin
-                      y+=txt_line_h2;
-                      draw_KotH;
+                   y+=txt_line_h2;
+                   case map_scenario of
+                   mc_KotH     : draw_KotH(str_ui_KotHWinnerCamp);
+                   mc_KeyPoints: begin
+
+                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,0);y+=txt_line_h2;
+                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,1);y+=txt_line_h2;
+                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,2);y+=txt_line_h2;
+                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,3);
+                                 end;
                    end;
                 end;
    end;

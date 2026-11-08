@@ -788,6 +788,7 @@ TPlayerDataGame = record
    prod_unit_Now   : integer;                           // current now in proggress
    prod_unit_ucl,
    prod_unit_uid   : array[byte] of integer;
+   trans_unit_uid  : array[byte] of integer;
 
    prod_upgr_Max,
    prod_upgr_Now   : integer;

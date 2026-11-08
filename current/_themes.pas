@@ -537,9 +537,9 @@ begin
               theme_liquid_style:=tcs_default;
               theme_crater_style:=tcs_default;
 
-              SetThemeTerrains('23');
+              SetThemeTerrains('8');
               SetThemeLiquidsB('1' );
-              SetThemeCraters ('27');
+              SetThemeCraters ('23');
               SetThemeLiquidsF('4' );
            end;
        1 : begin
@@ -573,6 +573,34 @@ begin
               SetThemeLiquidsF('10');
 
               theme_map_RBattleFront:=8;
+           end;
+       3 : begin
+              SetThemeDecals  ('-4,-4,-4,-4,-4,1_3,18_20,30,33,34');
+              SetThemeObs0    ('13,16,20,21,106,112');
+              SetThemeObs1    ('103_105,107_111');
+              SetThemeObs2    ('117_120');
+
+              theme_liquid_style:=tcs_smooth;
+              theme_crater_style:=tcs_square;
+
+              SetThemeTerrains('34');
+              SetThemeLiquidsB('21');
+              SetThemeCraters ('32');
+              SetThemeLiquidsF('10');
+           end;
+       4 : begin
+              SetThemeDecals  ('-4_-3,-4_-3,8,10_20,23_25,28');
+              SetThemeObs0    ('14,15,17,42_47');
+              SetThemeObs1    ('76,78_80,93_95,102,113_116');
+              SetThemeObs2    ('54,59_64,68,71_74');
+
+              theme_liquid_style:=tcs_default;
+              theme_crater_style:=tcs_default;
+
+              SetThemeTerrains('14');
+              SetThemeLiquidsB('29');
+              SetThemeCraters ('30');
+              SetThemeLiquidsF('17');
            end;
        end;
    end;

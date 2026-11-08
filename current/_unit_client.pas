@@ -751,7 +751,11 @@ begin
          else
          begin
             if(transformTimer>0)then
-              res_energyl_cur-=g_uids[transformUID].uid_req_EnergyLevel;
+            begin
+               res_energyl_cur-=g_uids[transformUID].uid_req_EnergyLevel;
+               if(transformUID<>uidi)then
+                 trans_unit_uid[transformUID]+=1;
+            end;
 
             unit_IncCounters_Complete(pu);
 
@@ -822,7 +826,11 @@ begin
          else
          begin
             if(transformTimer>0)then
-              res_energyl_cur+=g_uids[transformUID].uid_req_EnergyLevel;
+            begin
+               res_energyl_cur+=g_uids[transformUID].uid_req_EnergyLevel;
+               if(transformUID<>uidi)then
+                 trans_unit_uid[transformUID]-=1;
+            end;
 
             res_energyl_cur-=uid_gen_EnergyLevel;
             res_energyl_max-=uid_gen_EnergyLevel;
