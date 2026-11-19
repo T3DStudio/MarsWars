@@ -27,7 +27,7 @@ begin
    else IsPOVPlayerObserver:=g_PlayersGame[POVPlayer].isobserver;
 end;
 
-function byte2s(b:byte):shortstring;
+{function byte2s(b:byte):shortstring;
 begin
    byte2s:='00000000';
    if(b and %00000001)>0 then byte2s[8]:='1';
@@ -38,7 +38,7 @@ begin
    if(b and %00100000)>0 then byte2s[3]:='1';
    if(b and %01000000)>0 then byte2s[2]:='1';
    if(b and %10000000)>0 then byte2s[1]:='1';
-end;
+end;  }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -269,15 +269,21 @@ begin
      end;
 end;
 
-procedure wudata_UnitTar(tar,x,y:pinteger;rpl:boolean);
+procedure wudata_UnitTar(tar,x,y,def_x,def_y:integer;rpl:boolean);
 begin
-   if(IsUnitRange(tar^,nil))
-   then wudata_int(-tar^,rpl)
+   if(IsUnitRange(tar,nil))
+   then wudata_int(-tar,rpl)
    else
-   begin
-      wudata_int(mm3i(0,x^,map_size1),rpl);
-      wudata_int(mm3i(0,y^,map_size1),rpl);
-   end;
+     if(IsKPRange(tar,nil))
+     then wudata_int(tar-MaxUnits,rpl)
+     else
+       if(x=def_x)and(y=def_y)
+       then wudata_int(0,rpl)
+       else
+       begin
+          wudata_int(mm3i(1,x,map_size1),rpl);
+          wudata_int(mm3i(1,y,map_size1),rpl);
+       end;
 end;
 
 procedure wudata_UnitOrderTar(pu:PTUnit;uo:byte;rpl:boolean);
@@ -289,7 +295,7 @@ begin
      begin
         case uo of
         ua_move,
-        ua_amove   : wudata_UnitTar(@uo_tar,@uo_x,@uo_y,rpl);
+        ua_amove   : wudata_UnitTar(uo_tar,uo_x,uo_y,x,y,rpl);
         ua_patrol,
         ua_apatrol : begin
                         wudata_int(uo_x,rpl);
@@ -381,7 +387,7 @@ begin
 
       if(uid_HaveRallyPoint)then
         if(not rpl or isselected)then
-          wudata_UnitTar(@rpoint_tar,@rpoint_x,@rpoint_y,rpl);
+          wudata_UnitTar(rpoint_tar,rpoint_x,rpoint_y,x,y,rpl);
    end;
 end;
 
@@ -1406,30 +1412,50 @@ begin
          end;
 end;
 
-function rudata_UnitTar(tar,x,y:pinteger;rpl:boolean):boolean;
+function rudata_UnitTar(tar,x,y:pinteger;def_x,def_y:integer;rpl:boolean):boolean;
 var
 i : integer;
 tu: PTUnit;
+tkp:PTKeyPoint;
 begin
-   rudata_UnitTar:=false;
-   i:=x^;
-   //debuglog_pref:='  UnitTar1 ';
+   i :=x^;
    x^:=rudata_int(rpl,0);
-   if(i<>x^)then rudata_UnitTar:=true;
-   if(IsUnitRange(-x^,@tu))then
+   rudata_UnitTar:=x^<>i;
+
+   i:=-x^;
+   if(IsUnitRange(i,@tu))then
    begin
+      rudata_UnitTar:=tar^<>i;
       tar^:=-x^;
       x^  :=tu^.vx;
       y^  :=tu^.vy;
-   end
-   else
-   begin
-      i:=y^;
-      tar^:=0;
-      //debuglog_pref:='  UnitTar2 ';
-      y^  :=rudata_int(rpl,0);
-      if(i<>y^)then rudata_UnitTar:=true;
+      exit;
    end;
+
+   i:=x^+MaxUnits;
+   if(IsKPRange(i,@tkp))then
+   begin
+      rudata_UnitTar:=tar^<>i;
+      tar^:=i;
+      x^  :=tkp^.kp_x;
+      y^  :=tkp^.kp_y;
+      exit;
+   end;
+
+   if(x^=0)then
+   begin
+      rudata_UnitTar:=(x^<>def_x)
+                    or(y^<>def_y);
+      tar^:=0;
+      x^  :=def_x;
+      y^  :=def_y;
+      exit;
+   end;
+
+   tar^:=0;
+   i   :=y^;
+   y^  :=rudata_int(rpl,0);
+   rudata_UnitTar:=(i<>y^);
 end;
 
 procedure rudata_UnitOrderTar(pu:PTUnit;uo:byte;rpl:boolean);
@@ -1447,7 +1473,7 @@ begin
 
          case uo of
          ua_move,
-         ua_amove   : rudata_UnitTar(@uo_tar,@uo_x,@uo_y,rpl);
+         ua_amove   : rudata_UnitTar(@uo_tar,@uo_x,@uo_y,x,y,rpl);
          ua_patrol,
          ua_apatrol : begin
                          //debuglog_pref:='  UnitOrderTar uo_x ';
@@ -1514,7 +1540,7 @@ begin
 
       if(uid_HaveRallyPoint)then
         if(not rpl or isselected)then
-          if(rudata_UnitTar(@rpoint_tar,@rpoint_x,@rpoint_y,rpl))and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
+          if(rudata_UnitTar(@rpoint_tar,@rpoint_x,@rpoint_y,x,y,rpl))and(rpl)and(playeri=UIPlayer)then rpoint_ChangeAnnoncer:=true;
    end;
 end;
 
