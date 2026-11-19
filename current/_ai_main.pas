@@ -29,16 +29,16 @@ begin
         if(ow<0)then
         begin
            if(ox=x)
-           then uo_x:=ox+g_randomr(-ow)
-           else uo_x:=ox+(sign(ox-x)*g_random(-ow));
+           then uo_x:=ox+g_global_randomr(-ow)
+           else uo_x:=ox+(sign(ox-x)*g_global_random(-ow));
            if(oy=y)
-           then uo_x:=oy+g_randomr(-ow)
-           else uo_y:=oy+(sign(oy-y)*g_random(-ow));
+           then uo_x:=oy+g_global_randomr(-ow)
+           else uo_y:=oy+(sign(oy-y)*g_global_random(-ow));
         end
         else
         begin
-           uo_x:=ox-g_randomr(ow);
-           uo_y:=oy-g_randomr(ow);
+           uo_x:=ox-g_global_randomr(ow);
+           uo_y:=oy-g_global_randomr(ow);
         end;
       uo_tar:=0;
    end;
@@ -54,8 +54,8 @@ begin
       or(force)
       or(not isfly and (mapZone<>map_GetZone(uo_x,uo_y)))
       or(game_CheckRoyalBattlePoint(uo_x,uo_y,base_r1))
-      then ai_RunTo(pu,nil,g_random(map_Size1),
-                           g_random(map_Size1),NOTSET,0);
+      then ai_RunTo(pu,nil,g_global_random(map_Size1),
+                           g_global_random(map_Size1),NOTSET,0);
    end;
 end;
 
@@ -86,8 +86,8 @@ begin
          then ai_RunTo(pu,nil,aiu_alarm_x,aiu_alarm_y,aiu_alarm_d,0)
          else
            if(point_dist_rint(x,y,uo_x,uo_y)<idle_r)then
-             ai_RunTo(pu,nil,g_random(map_Size1),
-                             g_random(map_Size1),NOTSET,0);
+             ai_RunTo(pu,nil,g_global_random(map_Size1),
+                             g_global_random(map_Size1),NOTSET,0);
 end;
 
 procedure ai_RunFrom(pu,tu:PTUnit;tx,ty,td:integer);
@@ -393,11 +393,11 @@ begin
                             end;
 
                           if(cd<NOTSET)
-                          then ai_ability_TowerBlink2Dir(pCaster,cx,cy,cd,g_randomr(30))  //srange
+                          then ai_ability_TowerBlink2Dir(pCaster,cx,cy,cd,g_global_randomr(30))  //srange
                           else
                             if(srange<ai_BaseOwn_d)and(ai_BaseOwn_d<NOTSET)then
                               if(aiu_alarm_d=NOTSET)then
-                                ai_ability_TowerBlink2Dir(pCaster,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,min2i(cd,srange),g_randomr(30));
+                                ai_ability_TowerBlink2Dir(pCaster,ai_BaseOwn_u^.x,ai_BaseOwn_u^.y,min2i(cd,srange),g_global_randomr(30));
                        end;
      UID_HTeleport   : if(ai_enemy_battle_d<base_r1h)and(ai_HTeleportRecall_u<>nil)then
                          if(ai_HTeleportRecall_u^.aiu_alarm_d>base_r2)then
@@ -433,7 +433,7 @@ begin
      UID_Pain        : if {((units_bld_l[false]+prod_unit_Limit)<aip_MaxUnitLimit)
                        and}((MaxPlayerLimit-armylimit-prod_unit_Limit)>ul1)then
                        begin
-                          //if(isselected)or(m_UnitTargetN=unum)then writeln('UID_Pain ability');
+                          //if(isselected)or(m_TargetID=unum)then writeln('UID_Pain ability');
                           if(upgrs_cur[upgr_hell_Phantoms]>0)
                           then cx:=UID_Phantom
                           else cx:=UID_LostSoul;
@@ -525,7 +525,7 @@ begin
                       end;
 
                       if(aiu_alarm_d=NOTSET)then
-                        ai_UnitAbility(pCaster,uab_UACScan,0,g_random(map_Size1),g_random(map_Size1));
+                        ai_UnitAbility(pCaster,uab_UACScan,0,g_global_random(map_Size1),g_global_random(map_Size1));
                    end;
      end;
 end;
@@ -638,8 +638,8 @@ begin
        end
        else
        begin
-          uo_x:=lx-g_randomr(lr);
-          uo_y:=ly-g_randomr(lr);
+          uo_x:=lx-g_global_randomr(lr);
+          uo_y:=ly-g_global_randomr(lr);
           math_push_out(uo_x,uo_y,uid_r,unum,@uo_x,@uo_y,true,playeri );
        end;
 end;
@@ -659,22 +659,22 @@ begin
      UID_HKeep,
      UID_HAKeep         : case alarmType of
                           met_koth  : with ai_keypoint_kp^ do
-                                        ai_ability_KeepShift(pBuilder,kp_x+g_randomr(keyPoint_KotHRW),
-                                                                      kp_y+g_randomr(keyPoint_KotHRW));
+                                        ai_ability_KeepShift(pBuilder,kp_x+g_global_randomr(keyPoint_KotHRW),
+                                                                      kp_y+g_global_randomr(keyPoint_KotHRW));
                           met_royale: begin
                                          lx:=RoyalCR;
                                          if(lx<u_royal_cd)then
-                                           ai_ability_KeepShift(pBuilder,g_royal_Rx+g_randomr(lx),
-                                                                         g_royal_Ry+g_randomr(lx));
+                                           ai_ability_KeepShift(pBuilder,g_royal_Rx+g_global_randomr(lx),
+                                                                         g_royal_Ry+g_global_randomr(lx));
                                       end;
                           met_hits  : begin
-                                         lx:=g_random(map_size1);
-                                         ly:=g_random(map_size1);
+                                         lx:=g_global_random(map_size1);
+                                         ly:=g_global_random(map_size1);
                                          if(ai_BaseAlly_d<NOTSET)then
                                            if(ai_BaseAlly_u^.aiu_alarm_d>base_r2)then
                                            begin
-                                              lx:=ai_BaseAlly_u^.x+g_randomr(base_r2);
-                                              ly:=ai_BaseAlly_u^.y+g_randomr(base_r2);
+                                              lx:=ai_BaseAlly_u^.x+g_global_randomr(base_r2);
+                                              ly:=ai_BaseAlly_u^.y+g_global_randomr(base_r2);
                                            end;
                                          if (not ai_alarm_CheckPoint(pBuilder,lx,ly,base_r2))
                                          and(not game_CheckRoyalBattlePoint(lx,ly,base_r2))then
@@ -682,8 +682,8 @@ begin
                                       end;
                           met_build : begin
                                          if(aiu_alarm_d<base_r4)
-                                         then ldir:=point_dir(aiu_alarm_x,aiu_alarm_y,x,y)-g_randomr(45)
-                                         else ldir:=g_random(360);
+                                         then ldir:=point_dir(aiu_alarm_x,aiu_alarm_y,x,y)-g_global_randomr(45)
+                                         else ldir:=g_global_random(360);
                                          ai_ability_KeepShift(pBuilder,
                                             x+trunc((srange+uid_r)*cos(ldir*degtorad)),
                                             y-trunc((srange+uid_r)*sin(ldir*degtorad)));
@@ -909,7 +909,7 @@ begin
       //if(isselected)then
       //  if(ai_HTeleportNearest_u<>nil)then UnitsInfo_AddLine(x,y,ai_HTeleportNearest_u^.x,ai_HTeleportNearest_u^.y,c_lime);
       //if(isselected)then writeln('ai_selfUID_minLevel=',ai_selfUID_minLevel,'  ai_selfUID_nocomplete=',ai_selfUID_nocomplete);
-     { if(isselected)or(m_UnitTargetN=unum)then
+     { if(isselected)or(m_TargetID=unum)then
       begin
          writeln(ai_HTeleportTarget_u<>nil,' ',ai_HTeleportTarKOTH_u<>nil,' ',aiu_alarm_d,' ',aiu_alarm_zone);
          //writeln(aiu_alarm_timer,' ',aic_TowerLifeTime);

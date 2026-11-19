@@ -55,7 +55,7 @@ begin
                       or(ai_KotH and(ai_keypoint_d<=keyPoint_KotHR))
                       or((map_scenario=mc_royale)and(u_royal_cd<base_r1h));
 
-     { if(isselected)or(m_UnitTargetN=unum)then
+     { if(isselected)or(m_TargetID=unum)then
       begin
          //writeln('ai_need_UnitProds=',ai_need_UnitProds,' ai_curr_UnitProds=',ai_curr_UnitProds)
          writeln('ai_need_detect=',ai_need_detect,' ai_curr_Detect=',ai_curr_Detect,' ',(ai_enemy_inv_u<>nil),' ',(ai_need_heye_u<>nil));
@@ -211,15 +211,15 @@ begin
       or((map_scenario=mc_royale)and(u_royal_cd<base_r1h))then
       begin
          // default
-         build_step:=-1;//srange-g_random(g_uids[build_uid].uid_r);
+         build_step:=-1;//srange-g_global_random(g_uids[build_uid].uid_r);
       end
       else
         if(ai_generator_d<srange)then
         begin
            with ai_generator_kp^ do
            begin
-              build_x:=kp_x-g_randomr(kp_RCapture);
-              build_y:=kp_y-g_randomr(kp_RCapture);
+              build_x:=kp_x-g_global_randomr(kp_RCapture);
+              build_y:=kp_y-g_global_randomr(kp_RCapture);
            end;
         end
         else
@@ -227,7 +227,7 @@ begin
           begin
              build_dir :=point_dir(x,y,aiu_alarm_x,aiu_alarm_y);
              build_dirs:=22;
-             build_step:=srange-g_random(g_uids[build_uid].uid_r);
+             build_step:=srange-g_global_random(g_uids[build_uid].uid_r);
           end
           else
             {$IFDEF _FULLGAME}
@@ -235,14 +235,14 @@ begin
             begin
                build_dir :=point_dir(x,y,aiu_alarm_x,aiu_alarm_y);
                build_dirs:=35;
-               case g_random(2) of
+               case g_global_random(2) of
                0: build_step:=srange;
                1: build_step:=uid^.uid_r;
                end;
             end
             else
             {$ENDIF}
-              case g_random(2) of
+              case g_global_random(2) of
               0: build_step:=srange;
               1: build_step:=uid^.uid_r;
               end;
@@ -348,12 +348,12 @@ begin
      if(u_royal_d>base_r2)
      or(map_scenario<>mc_royale)then
        case race of
-       r_hell: case g_random(3) of
+       r_hell: case g_global_random(3) of
                0: SetBuildUID1(UID_HPentagram,1);
                1: SetBuildUID1(UID_HMonastery,1);
                2: SetBuildUID1(UID_HFortress ,1);
                end;
-       r_uac : case g_random(2) of
+       r_uac : case g_global_random(2) of
                0: SetBuildUID1(UID_UScienceCenter  ,1);
                1: SetBuildUID1(UID_UComputerStation,1);
                end;
@@ -419,7 +419,7 @@ begin
          SetTowers    (aip_MinTowers    );
       end
       else
-        case g_random(8) of
+        case g_global_random(8) of
         0 : SetTowers     (aip_MaxTowers   );
         1 : SetBarracks   (aip_MaxBarracks );
         2 : SetForges     (aip_MaxForges   );
@@ -443,11 +443,11 @@ begin
       // build
       if(build_x=0)then
       begin
-         if(build_dir <0)then build_dir :=g_random(360);
-         if(build_step<0)then build_step:=g_random(min2i(uid^.uid_r+(aiu_BuildAttempts div 5)*35,srange));
+         if(build_dir <0)then build_dir :=g_global_random(360);
+         if(build_step<0)then build_step:=g_global_random(min2i(uid^.uid_r+(aiu_BuildAttempts div 5)*35,srange));
 
          if(build_dirs>0)then
-           build_dir+=g_randomr(build_dirs);
+           build_dir+=g_global_randomr(build_dirs);
 
          rad_dir:=build_dir*degtorad;
          build_x:=x+trunc(build_step*cos(rad_dir));
@@ -457,7 +457,7 @@ begin
 
       i:=unit_start_build(build_x,build_y,build_uid,playeri,true);
 
-      {if(isselected)or(m_UnitTargetN=unum)then
+      {if(isselected)or(m_TargetID=unum)then
       begin
          writeln('build_uid=',build_uid,' build_step=',build_step,' build_dir=',build_dir,' aiu_BuildAttempts=',aiu_BuildAttempts,' i=',i);
          UnitsInfo_AddLine(x,y,build_x,build_y,c_orange);
@@ -534,7 +534,7 @@ begin
                       end;
                  end;
 
-                 SetUpgrade(upgr_hell_DistDamage1+g_random(22),aip_MaxUpgradeLevel);
+                 SetUpgrade(upgr_hell_DistDamage1+g_global_random(22),aip_MaxUpgradeLevel);
               end;
       r_uac : begin
                  if((aip_flags and aif_upgr_smart_order)>0)then
@@ -563,7 +563,7 @@ begin
                     end;
                  end;
 
-                 SetUpgrade(upgr_uac_DistDamage+g_random(22),aip_MaxUpgradeLevel);
+                 SetUpgrade(upgr_uac_DistDamage+g_global_random(22),aip_MaxUpgradeLevel);
               end;
       end;
 
@@ -715,7 +715,7 @@ uprod_AgroundMech: begin
                    end;
 uprod_AgroundBio :    case race of
                       r_hell: if(not ai_Barrack(pBarrack,UID_Mastermind))then
-                                case g_random(5) of
+                                case g_global_random(5) of
                                 0: tuid:=UID_Imp;
                                 1: tuid:=UID_Demon;
                                 2: tuid:=UID_Knight;
@@ -723,7 +723,7 @@ uprod_AgroundBio :    case race of
                                 4: tuid:=UID_ZBFGMarine;
                                 end;
                       r_uac : if(not ai_Barrack(pBarrack,UID_Terminator))then
-                                case g_random(5) of
+                                case g_global_random(5) of
                                 0: tuid:=UID_Sergant;
                                 1: tuid:=UID_SSergant;
                                 2: tuid:=UID_Commando;
@@ -735,12 +735,12 @@ uprod_AgroundBio :    case race of
                       end;
 
 uprod_Sidge      :    case race of
-                      r_hell:   case g_random(3) of
+                      r_hell:   case g_global_random(3) of
                                 0: tuid:=UID_Cyberdemon;
                                 1: tuid:=UID_Mancubus;
                                 2: tuid:=UID_ZSiegeMarine;
                                 end;
-                      r_uac :   case g_random(2) of
+                      r_uac :   case g_global_random(2) of
                                 0: tuid:=UID_SiegeMarine;
                                 1: tuid:=UID_Tank;
                                 end;
@@ -770,14 +770,14 @@ uprod_Special    : begin
                       exit;
                    end;
 uprod_randomFly  :    case race of
-                      r_hell: case g_random(3) of
+                      r_hell: case g_global_random(3) of
                               0: tuid:=UID_Cacodemon;
                               1: tuid:=UID_Pain;
                               2: tuid:=UID_ZFPlasmagunner;
                               //3: tuid:=UID_LostSoul;
                               //4: tuid:=UID_Phantom;
                               end;
-                      r_uac : case g_random(2) of
+                      r_uac : case g_global_random(2) of
                               0: tuid:=UID_FPlasmagunner;
                               1: tuid:=UID_Flyer;
                               end;
@@ -786,7 +786,7 @@ uprod_random     :    case race of
                       r_hell: if(ai_Barrack(pBarrack,uprod_randomFly))
                               then exit
                               else
-                                case g_random(23) of
+                                case g_global_random(23) of
                                      0 : tuid:=UID_Imp;
                                      1 : tuid:=UID_Demon;
                                      2 : tuid:=UID_Cacodemon;
@@ -817,7 +817,7 @@ uprod_random     :    case race of
                                 if(ai_Barrack(pBarrack,uprod_randomFly))
                                 then exit
                                 else
-                                case g_random(13) of
+                                case g_global_random(13) of
                                      0 : tuid:=UID_Medic;
                                      1 : tuid:=UID_Engineer;
                                      2 : tuid:=UID_Sergant;

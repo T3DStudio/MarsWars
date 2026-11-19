@@ -525,7 +525,7 @@ procedure local_ClickEffect(color:TMWColor);
 begin
    ui_click_eff(ox,oy,fr_fpsq,color);
 end;
-procedure local_UnitMarkEffect;
+procedure local_TargetMarkEffect;
 begin
    ui_umark_u:=otar;
    ui_umark_t:=fr_fpsh;
@@ -585,15 +585,26 @@ begin
                         uat_UnitAny,
                         uat_UnitOwn,
                         uat_UnitAlly,
-                        uat_UnitEnemy: if(not IsUnitRange(otar,nil))then local_UnitMarkEffect;
+                        uat_UnitEnemy: if(not IsUnitRange(otar,nil))then local_TargetMarkEffect;
                         end;
-        co_move,
+
         co_patrol   : local_ClickEffect(c_lime);
         co_apatrol  : local_ClickEffect(c_red );
+        co_move,
         co_amove,
-        co_rcamove  : if(not IsUnitRange(otar,nil))then local_ClickEffect(c_red   ) else local_UnitMarkEffect;
-        co_rcmove   : if(not IsUnitRange(otar,nil))then local_ClickEffect(c_lime  ) else local_UnitMarkEffect;
-        co_setRPoint: if(not IsUnitRange(otar,nil))then local_ClickEffect(c_orange) else local_UnitMarkEffect;
+        co_rcamove,
+        co_rcmove,
+        co_setRPoint: if(IsUnitRange(otar,nil))
+                      or(IsKPRange  (otar,nil))
+                      then local_TargetMarkEffect
+                      else
+                        case cmd of
+                        co_move,
+                        co_rcmove   : local_ClickEffect(c_lime  );
+                        co_amove,
+                        co_rcamove  : local_ClickEffect(c_red   );
+                        co_setRPoint: local_ClickEffect(c_orange);
+                        end;
         end;
      end;
 end;
@@ -641,19 +652,12 @@ begin
    end;
 end;
 
-function mouse_BrushTarget(tx,ty,mbrush:integer):integer;
+function mouse_BrushTargetUnit(tx,ty,mbrush:integer;pUIPlayer:PTPlayerGameData):integer;
 var
-u        : integer;
-btar_pu  : PTUnit;
-pUIPlayer: PTPlayerGameData;
+u      : integer;
+btar_pu: PTUnit;
 begin
-   mouse_BrushTarget:=0;
-
-   if(not PointInCam(tx,ty))then exit;
-
-   if(UIPlayer<=LastPlayer)
-   then pUIPlayer:=@g_PlayersGame[UIPlayer]
-   else pUIPlayer:=nil;
+   mouse_BrushTargetUnit:=0;
 
    if(pUIPlayer<>nil)then
      case mbrush of
@@ -714,9 +718,72 @@ begin
                   then exit;
 
           btar_pu:=g_punits[u];
-          mouse_BrushTarget:=u;
+          mouse_BrushTargetUnit:=u;
        end;
 end;
+
+function mouse_BrushTarget(tx,ty,mbrush:integer):integer;
+var
+pUIPlayer: PTPlayerGameData;
+pteam    : byte;
+kpr,i    : integer;
+begin
+   mouse_BrushTarget:=0;
+
+   if(not PointInCam(tx,ty))then exit;
+
+   if(UIPlayer<=LastPlayer)
+   then pUIPlayer:=@g_PlayersGame[UIPlayer]
+   else pUIPlayer:=nil;
+
+   mouse_BrushTarget:=mouse_BrushTargetUnit(tx,ty,mbrush,pUIPlayer);
+   if(mouse_BrushTarget<>0)
+   or(map_KeyPointsN=0)then exit;
+
+   if(pUIPlayer<>nil)then
+     case mbrush of
+     co_empty,
+     co_setRPoint: ;
+     else exit;
+     end;
+
+   if(UIPlayer<=LastPlayer)
+   then pteam:=g_PlayersGame[UIPlayer].team
+   else pteam:=MaxPlayers;
+
+   for i:=0 to map_KeyPointsN-1 do
+     with map_KeyPointsL[i] do
+       with kp_TeamData[pteam] do
+         if(kptd_Active)then
+         begin
+            if(map_scenario=mc_koth)and(i=0)then continue;
+
+            if(kp_RNoBuild>0)
+            then kpr:=kp_RNoBuild
+            else kpr:=kp_RCapture;
+            if(point_dist_int(kp_x,kp_y,tx,ty)<=kpr)then
+            begin
+               mouse_BrushTarget:=-(i+1);
+               break;
+            end;
+         end;
+end;
+ {
+function mouse_BrushTargetKeyPoint(tx,ty,mbrush:integer):integer;
+var i:integer;
+begin
+   mouse_BrushTargetKeyPoint:=0;
+
+   if(not PointInCam(tx,ty))then exit;
+
+   if(UIPlayer<=LastPlayer)
+   then pUIPlayer:=@g_PlayersGame[UIPlayer]
+   else pUIPlayer:=nil;
+
+
+
+map_KeyPointsL    : array[0..LastKeyPoint] of TKeyPoint;
+end;}
 
 procedure mouse_BrushCheck(logErrors:boolean);
 var
@@ -1108,28 +1175,28 @@ procedure input_SingleClickLMB;
 begin
    if(InputAction(iact_Control))then
    begin
-      if(m_UnitTargetP<>nil)then
-        if(m_UnitTargetP^.playeri=UIPlayer)then
+      if(m_TargetUnitID<>nil)then
+        if(m_TargetUnitID^.playeri=UIPlayer)then
         begin
-           units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi,byte(unit_F2SelectFilter(m_UnitTargetP)) );
+           units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_TargetUnitID^.uidi,byte(unit_F2SelectFilter(m_TargetUnitID)) );
            exit;
         end;
    end
    else
      if(InputActionDPressed(iact_MLB))then
      begin
-        if(m_UnitTargetP<>nil)then
-          if (m_UnitTargetP^.playeri=UIPlayer)
-          and(m_UnitTargetPrev=m_UnitTargetN)then
+        if(m_TargetUnitID<>nil)then
+          if (m_TargetUnitID^.playeri=UIPlayer)
+          and(m_TargetIDPrev=m_TargetID)then
           begin
-             units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_UnitTargetP^.uidi,byte(unit_F2SelectFilter(m_UnitTargetP)) );
+             units_SelectRect(InputAction(iact_Shift),ui_cam_x,ui_cam_y, ui_cam_x+ui_cam_w,ui_cam_y+ui_cam_h,m_TargetUnitID^.uidi,byte(unit_F2SelectFilter(m_TargetUnitID)) );
              exit;
           end;
      end
      else
      begin
-        if(m_UnitTargetP<>nil)then
-          if(ui_UpdateUIPlayer(m_UnitTargetN))then exit;
+        if(m_TargetUnitID<>nil)then
+          if(ui_UpdateUIPlayer(m_TargetID))then exit;
      end;
    mouse_select_xs0:=mouse_map_x;
    mouse_select_ys0:=mouse_map_y;
@@ -1198,15 +1265,14 @@ begin
 
    mouse_BrushCheck(false);
 
-   m_UnitTargetN:=0;
-   m_UnitTargetP:=nil;
+   m_TargetID    :=0;
+   m_TargetUnitID:=nil;
    if(m_uifocus=mf_Map)then
      if(mouse_select_xs0=NOTSET)
      or(CheckPointClick(mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y))then
      begin
-        m_UnitTargetN:=mouse_BrushTarget(mouse_map_x,mouse_map_y,m_brush);
-        if(m_UnitTargetN>0)then
-          m_UnitTargetP:=g_punits[m_UnitTargetN];
+        m_TargetID:=mouse_BrushTarget(mouse_map_x,mouse_map_y,m_brush);
+        IsUnitRange(m_TargetID,@m_TargetUnitID);
      end;
 
    if(InputActionPressed(iact_MLB))then                // LMB down
@@ -1221,7 +1287,7 @@ begin
                     co_move,
                     co_amove,
                     co_patrol,
-                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
+                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_TargetID);
                     co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
                     co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
                     end;
@@ -1231,7 +1297,7 @@ begin
                     co_move,
                     co_amove,
                     co_patrol,
-                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_UnitTargetN);
+                    co_apatrol   : ui_MBrush2Command(m_brushx,m_brushy,m_TargetID);
                     co_markLook  : MapMarker(mouse_map_x,mouse_map_y,m_brush);
                     co_markAttack: MapMarker(mouse_map_x,mouse_map_y,m_brush);
                     else           if(not ui_playerPOV)then m_mmap_move:=true;
@@ -1250,9 +1316,9 @@ begin
                     2 : ui_ExecInGameAction(iAct_InGamePause       ,pct_left,@clickSound);
                     end;
       end;
-      if(m_UnitTargetP<>nil)
-      then m_UnitTargetPrev:=m_UnitTargetN
-      else m_UnitTargetPrev:=0;
+      if(m_TargetUnitID<>nil)
+      then m_TargetIDPrev:=m_TargetID
+      else m_TargetIDPrev:=0;
    end;
 
    case m_uifocus of
@@ -1270,8 +1336,8 @@ begin
 
       if(mouse_select_xs0<>NOTSET)then //select
       begin
-         if(m_UnitTargetP<>nil)
-         then units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,-m_UnitTargetP^.unum,255)
+         if(m_TargetUnitID<>nil)
+         then units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,-m_TargetUnitID^.unum,255)
          else units_SelectRect(InputAction(iact_Shift),mouse_select_xs0,mouse_select_ys0,mouse_map_x,mouse_map_y,0                   ,255);
 
          mouse_select_xs0:=NOTSET;
@@ -1290,7 +1356,7 @@ begin
      else
        case m_uifocus of
        mf_map,
-       mf_minimap  : ui_MBrush2Command(mouse_map_x,mouse_map_y,m_UnitTargetN);
+       mf_minimap  : ui_MBrush2Command(mouse_map_x,mouse_map_y,m_TargetID);
        mf_CtrlPanel: ui_ControlPanel_click(pct_right,@clickSound);     // panel
        end;
 

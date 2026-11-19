@@ -345,6 +345,8 @@ str_hint_UnitArming           = 'Arming: '
 str_hint_Abilities            = 'Abilities: '
 str_hint_SightR               = 'sight range'
 str_hint_MaxQuantity          = 'Maximum quantity: '
+str_hint_Generator            = 'Generator'
+str_hint_KeyPoint             = 'Key Point'
 
 str_uarm_melee                = 'melee attack'
 str_uarm_ranged               = 'ranged attack'
@@ -862,6 +864,7 @@ str_dscr[iAct_Control_USelBase]    = 'Select all builders'
 str_dscr[iAct_Control_USelArmy]    = 'Select all not busy battle units; "not busy battle units" criterias:'+tc_nl+
                                      '- alive, completed, can attack, can move, NOT ['+str_attr_building+'];'+tc_nl+
                                      '- no "Patrol, *" or "'+str_dscr[iAct_Control_UStop]+'" orders;'+tc_nl+
+                                     '- no order to capture a Key Point or Generator;'+tc_nl+
                                      '- no order to use an ability;'+tc_nl+
                                      '- no order to teleport or transport;'
 str_dscr[iAct_Control_USetRPoint]  = 'Set rally point'

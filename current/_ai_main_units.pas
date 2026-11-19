@@ -367,10 +367,12 @@ begin
               +ai_GroupAll_ulimit[aic_group_Scout     ])>=aip_MaxUnitMinPart)
            or((ai_GroupAll_ulimit[aic_group_GenAssault]
               +ai_GroupAll_ulimit[aic_group_GenWait   ])> 0)then
-           begin
-              group:=aic_group_GenAssault;
-              exit;
-           end;
+             if(ai_GroupFlyLimitHome<=0)
+             or(isfly)then
+             begin
+                group:=aic_group_GenAssault;
+                exit;
+             end;
 
          if (ai_KotH)
          and(g_tick>=keyPoint_KotH_pause)
@@ -384,8 +386,7 @@ begin
            end;
       end;
 
-      if(units_bld_l[true]<=0)
-      or((ai_AttackGroupFlyLimit=0)and(ai_GroupAll_ulimit[aic_group_AttackWait]>0)and(uid_CanAttack)and(isfly))then
+      if(race=r_hell)and(ai_GroupFlyLimitAttack=0)and(ai_GroupAll_ulimit[aic_group_AttackWait]>0)and(uid_CanAttack)and(isfly)then
       begin
          group:=aic_group_AttackNow;
          exit;

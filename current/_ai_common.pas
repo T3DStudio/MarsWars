@@ -63,7 +63,9 @@ ai_armylimit_alive_u,
 ai_armylimit_alive_b,
 ai_armylimit_fly,
 
-ai_AttackGroupFlyLimit,
+ai_GroupFlyLimitHome,
+ai_GroupFlyLimitAttack,
+ai_GroupFlyLimitGenAssault,
 
 ai_curr_detect,
 ai_need_detect,
@@ -580,7 +582,9 @@ begin
 
    ai_nearGenDudesLimit    := 0;
 
-   ai_AttackGroupFlyLimit  := 0;
+   ai_GroupFlyLimitHome    := 0;
+   ai_GroupFlyLimitAttack  := 0;
+   ai_GroupFlyLimitGenAssault:=0;
 
    // transport & other
    ai_transport_cur        := 0;
@@ -797,6 +801,8 @@ begin
                   if (not uid_isbuilder)
                   and(not uid_isbarrack)
                   and(not uid_CanAttack)then continue;
+
+                  if(kp_Energy>0)and(res_energyl_max>=aip_MaxEnergy)then continue;
 
                   if(not koth_point)then
                   begin
@@ -1281,6 +1287,9 @@ begin
    true : if((pu^.player^.aip_flags and aif_base_DefendOwn )=0)then exit;
    false: if((pu^.player^.aip_flags and aif_base_DefendAlly)=0)then exit;
    end;
+
+   if(map_scenario=mc_koth)and(g_tick>=keyPoint_KotH_pause)and(ai_keypoint_d<NOTSET)then
+     if(point_dist_rint(newu^.x,newu^.y,ai_keypoint_kp^.kp_x,ai_keypoint_kp^.kp_y)<ai_keypoint_kp^.kp_RCapture)then exit;
 
    if(ai_BaseDef_u=nil)
    then

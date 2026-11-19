@@ -233,8 +233,9 @@ begin
 
               if(tu<>nil)then
               begin
-                 m_tox-=sign(tu^.x-m_x)*g_random(tu^.uid^.uid_missileR1);
-                 m_toy-=sign(tu^.y-m_y)*g_random(tu^.uid^.uid_missileR1);
+                 g_local_randomI:=byte(g_tick+word(m));
+                 m_tox-=sign(tu^.x-m_x)*g_local_random(tu^.uid^.uid_missileR1);
+                 m_toy-=sign(tu^.y-m_y)*g_local_random(tu^.uid^.uid_missileR1);
               end;
 
               if(m_tar<=0)or(mid_base_SplashR>0)

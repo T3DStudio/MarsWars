@@ -412,7 +412,7 @@ begin
           if(IsUnitRange(transportU,@tu))then
           begin
              if(tu^.isselected)
-             or((ctab in [tcc_replay,tcc_observer])and(m_UnitTargetN=tu^.unum))then ui_units_inapc[uidi]+=1;
+             or((ctab in [tcc_replay,tcc_observer])and(m_TargetID=tu^.unum))then ui_units_inapc[uidi]+=1;
           end
           else unit_UICounters(pu);
    end;
@@ -452,7 +452,7 @@ begin
            end;
          // rally points
          if(uid_HaveRallyPoint)then
-           if(isselected)or(m_UnitTargetN=unum)then
+           if(isselected)or(m_TargetID=unum)then
            begin
               UnitsInfo_AddLine(x,y,rpoint_x,rpoint_y,ui_blink_color1[ui_blink2_colorb]);
               SpriteList_AddMarker(rpoint_x,rpoint_y,@spr_RallyPoint[uid_race]);
@@ -464,7 +464,7 @@ begin
           case uo_id of
           ua_move,
           ua_amove   : if(uo_bx>0)then    // patrol
-                         if(isselected)or(m_UnitTargetN=unum)then
+                         if(isselected)or(m_TargetID=unum)then
                            UnitsInfo_AddLine(uo_bx,uo_by,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
           ua_ability1,
           ua_ability2,
@@ -482,7 +482,7 @@ begin
                                                      UnitsInfo_AddCircle(uo_x,uo_y,t,ui_blink2_color_BY);
                                                 end;
 
-                                                if(isselected)or(m_UnitTargetN=unum)then
+                                                if(isselected)or(m_TargetID=unum)then
                                                   UnitsInfo_AddLine(vx,vy,uo_x,uo_y,ui_blink_color1[ui_blink2_colorb]);
                                              end;
                               uat_UnitAny,

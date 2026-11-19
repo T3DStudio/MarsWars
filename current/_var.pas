@@ -22,6 +22,8 @@ g_royal_RCur      : integer  = 0;
 g_royal_Rx        : integer  = 0;
 g_royal_Ry        : integer  = 0;
 
+g_KeyPoints_max   : byte = 4;
+
 g_PlayersGame     : TPList;
 g_PlayersTemp     : array[0..LastPlayer ] of TPlayerDataTemp;
 g_PlayersScore    : array[0..LastPlayer ] of TPlayerDataScore;
@@ -39,8 +41,9 @@ g_mids            : array[byte] of TMID;
 g_DamageMods      : array[byte] of TDamageMod;
 g_aids            : array[byte] of TUnitAbility;
 
-g_random_i        : word    = 0;
-g_random_p        : byte    = 0;
+g_global_randomI  : word    = 0;
+g_global_randomP  : byte    = 0;
+g_local_RandomI   : byte    = 0;
 
 g_LobbyTimer      : integer = 0;
                   // [team,alarmN]
@@ -57,7 +60,6 @@ map_GeneratorT    : byte     = 0;
 map_seed          : cardinal = 1;
 map_Size1         : integer  = 5000;
 map_Sizeh         : integer  = 2500;
-map_SizeKPCR      : integer  = 100;
 map_Template      : byte     = mapt_lake;
 map_ObstaclesGap  : integer  = 40;
 map_PStartsGap    : integer  = base_r1;
@@ -172,7 +174,7 @@ ai_names_l        : array[0..ai_names_max-1] of shortstring;
 
 {$IFDEF TESTMODE}
 test_InstaProd    : boolean = false;
-test_w            : word = 0;
+test_ScreenSpritesS            : word = 0;
 TestMode          : byte = 0;
 
 {debuglog_i        : cardinal = 0;
@@ -521,7 +523,7 @@ map_KeyPointsVis  : array[0..LastKeyPoint] of TKeyPointVis;
 //  CAMPAINGS
 //
 
-camp_diff      : byte = 1;
+camp_diff      : byte = 0;
 camp_data      : TCampaignData;
 camp_ObjStat   : byte = 0;
 camp_size      : integer = 0;
@@ -626,9 +628,9 @@ m_DragCamMove     : boolean = false;
 m_RightClickAct   : boolean = true;
 m_mmap_move       : boolean = false;
 
-m_UnitTargetN     : integer = 0;
-m_UnitTargetP     : PTUnit = nil;
-m_UnitTargetPrev  : integer = 0;
+m_TargetID        : integer = 0;
+m_TargetUnitID    : PTUnit = nil;
+m_TargetIDPrev    : integer = 0;
 
 
 input_actions     : array[byte] of TInputKey;
@@ -1193,6 +1195,9 @@ str_hint_requirements,
 str_hint_req,
 str_hint_uprod,
 str_hint_bprod,
+str_hint_Generator,
+str_hint_KeyPoint,
+
 
 str_ability_passive,
 str_ability_active,

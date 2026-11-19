@@ -223,6 +223,7 @@ begin
    UnitStepTicks := UnitVX2XStepTicks;
 
    g_royal_RCur  := g_royal_RCur.MaxValue;
+   g_KeyPoints_max:=keyPoint_mcN;
 
    g_cycle_order := 0;
    g_cycle_regen := 0;
@@ -606,7 +607,8 @@ begin
           wassel:=isselected;
 
           if(not add)then isselected:=false;
-          if(not add)or(not wassel and add)then
+          if(not add)
+          or(not wassel and add)then
             if(sel_opt=0)
             or((sel_opt=uidi)and ( (f2filter=255)or(f2filter=byte(unit_F2SelectFilter(g_punits[u]))) ) )
             or(-sel_opt=unum)then
@@ -1416,6 +1418,7 @@ end;
 procedure game_Main;
 begin
    {$IFDEF _FULLGAME}
+ 
    snd_SoundControl;
 
    case net_status of

@@ -220,8 +220,8 @@ end;
 
 procedure map_Seed2RandomBase;
 begin
-   g_random_i:= word(map_seed);
-   g_random_p:= byte(map_seed);
+   g_global_randomI:= word(map_seed);
+   g_global_randomP:= byte(map_seed);
 end;
 
 procedure map_BaseVars(setRandom:boolean);
@@ -231,7 +231,6 @@ begin
 
    map_Size1   := mm3i(map_MinSize,map_Size1,map_MaxSize);
    map_Sizeh   := map_Size1 div 2;
-   map_SizeKPCR:= map_Sizeh-(map_Sizeh div 3);
 
    case map_symmetry of
    maps_lineV: if((map_seed mod 2)=0)
@@ -302,7 +301,7 @@ begin
    ro^:=t1;
    t0:=round(map_SizeH/2.5);
    t1:=round(map_SizeH/1.8);
-   ri^:=t0+g_random(t1-t0);
+   ri^:=t0+g_global_random(t1-t0);
 end;
 
 
@@ -439,37 +438,42 @@ end;
 procedure map_KeyPoints_UpdatePos;
 var
 kpi  : byte;
-cd,
-cx,cy: integer;
-cdir,
-odir : single;
-stick,
-itick: cardinal;
-function circleI(i,m:integer):integer;
+stick: cardinal;
+cdir : single;
+function period(x:longint;step:integer):integer;
 begin
-   if(i<0)
-   then circleI:=-i mod m
-   else
-     if(i>m)
-     then circleI:=m-(i mod m)
-     else circleI:=i;
+   period:=x mod step;
+   if(((x div step) mod 2)=0)
+   then period:=step-period;
 end;
 begin
-   stick:=g_tick;
-   itick:=stick div 3;
-   if(longint(itick)<map_SizeKPCR)
-   then cd:=integer(itick)
-   else cd:=map_SizeKPCR;
-   cdir:=(stick mod 109000)/300+(map_seed mod 360);
-   cx  :=map_sizeH+round(cd*cos(cdir*DEGTORAD));
-   cy  :=map_sizeH+round(cd*sin(cdir*DEGTORAD));
-   odir:=map_SymmetryDir+(stick mod 119000)/600;
-   for kpi:=0 to keyPoint_mcN-1 do
+   if(g_KeyPoints_max=0)then exit;
+
+   cdir:=((map_seed mod 360)-(g_tick/200))*DEGTORAD;
+   for kpi:=0 to g_KeyPoints_max-1 do
      with map_KeyPointsL[kpi] do
      begin
-        odir+=keyPoint_mcDirStep;
-        kp_x   :=circleI(cx+round(map_SizeKPCR*cos(odir*DEGTORAD)),map_size1);
-        kp_y   :=circleI(cy-round(map_SizeKPCR*sin(odir*DEGTORAD)),map_size1);
+        case kpi of
+        0 : begin
+               stick:=(map_seed mod word(map_size1))+g_tick div 3;
+               kp_x:=period(longint(stick      ),map_size1);
+               kp_y:=period(longint(stick div 4),map_size1);
+            end;
+        1 : begin
+               stick:=(map_seed mod word(map_size1))+(g_tick div 3)+word(map_sizeh);
+               kp_x:=period(longint(stick div 3),map_size1);
+               kp_y:=period(longint(stick      ),map_size1);
+            end;
+        2  :begin
+               kp_x:=map_sizeH+round((map_sizeH-kp_RCapture)*cos(cdir));
+               kp_y:=map_sizeH-round((map_sizeH-kp_RCapture)*sin(cdir));
+            end;
+        3  :begin
+               cdir+=180*DEGTORAD;
+               kp_x:=map_sizeH+round((map_sizeH-kp_RCapture-base_r1)*sin(cdir));
+               kp_y:=map_sizeH-round((map_sizeH-kp_RCapture-base_r1)*cos(cdir));
+            end;
+        end;
         kp_Zone:=map_GetZone(kp_x,kp_y,kp_RCapture);
         {$IFDEF _FULLGAME}
         with map_KeyPointsVis[kpi] do
@@ -608,8 +612,8 @@ begin
       while(attempts<max_attempts)do
       begin
          attempts+=1;
-         ix:=u+g_random(b);
-         iy:=u+g_random(b);
+         ix:=u+g_global_random(b);
+         iy:=u+g_global_random(b);
 
          map_symmetryPoints2(@ix,@iy,@sx,@sy,base_r1);
 
@@ -640,7 +644,8 @@ begin
    case map_scenario of
 mc_KotH     : map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_KotHR,0,0,keyPoint_CTime_KotH_Tick,0,map_generators_LimitS);
 mc_KeyPoints: begin
-                 for i:=1 to keyPoint_mcN do map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_DefR,0,0,keyPoint_CTime_Def_Tick,0,map_generators_LimitS);
+                 if(g_KeyPoints_max>0)then
+                   for i:=1 to g_KeyPoints_max do map_KeyPoints_Add(map_Sizeh,map_Sizeh,keyPoint_DefR,0,0,keyPoint_CTime_Def_Tick,0,map_generators_LimitS);
                  map_KeyPoints_UpdatePos;
               end;
    end;
@@ -702,9 +707,10 @@ begin
        end;
 end;
 
-procedure map_Starts_Circle(cx,cy,sdir,r:integer);   //map_MaxPlayers
+procedure map_Starts_Circle(cx,cy,sdir,r:integer;dispR:integer=0);   //map_MaxPlayers
 var
 p,ph,pn:byte;
+dispD,
 dstep  :integer;
 begin
    if(map_MaxPlayers=0)then exit;
@@ -719,8 +725,12 @@ begin
       if(map_Symmetry>maps_none)and(p>=ph)then break;
 
       sdir+=dstep;
-      map_PlayerStartX[p]:=cx+trunc(r*cos(sdir*degtorad));
-      map_PlayerStartY[p]:=cy-trunc(r*sin(sdir*degtorad));
+      if(dispR>1)
+      then dispD:=sdir+(sdir mod dispR)
+      else dispD:=sdir;
+
+      map_PlayerStartX[p]:=cx+trunc(r*cos(dispD*degtorad));
+      map_PlayerStartY[p]:=cy-trunc(r*sin(dispD*degtorad));
       if(map_Symmetry>maps_none)then
         map_symmetryPoints(map_PlayerStartX[p   ], map_PlayerStartY[p   ],
                           @map_PlayerStartX[p+ph],@map_PlayerStartY[p+ph]);
@@ -823,8 +833,8 @@ begin
          attempts+=1;
          if(attempts>=max_attempts)then exit;
 
-         ix:=bb0+g_random(bb1);
-         iy:=bb0+g_random(bb1);
+         ix:=bb0+g_global_random(bb1);
+         iy:=bb0+g_global_random(bb1);
 
          map_symmetryPoints(ix,iy,@sx,@sy);
 
@@ -939,8 +949,8 @@ begin
    while(attempts>0)do
    begin
       attempts-=1;
-      ix:=g_randomx(ix,map_Size1);
-      iy:=g_randomx(iy,map_Size1);
+      ix:=g_global_randomx(ix,map_Size1);
+      iy:=g_global_randomx(iy,map_Size1);
       borderDist:=min2i(min2i(ix-irO,map_size1-(ix+irO)),min2i(iy-irO,map_size1-(iy+irO)));
       if(0<=borderDist)and(borderDist<=map_ObstaclesGap)then continue;
 
@@ -1127,6 +1137,9 @@ begin
                  end;
    mapt_temple : begin
                     io:=map_Size1 div 4;
+                    {$IFDEF _FULLGAME}
+                    if(g_type=gt_scirmish)then
+                    {$ENDIF}
                     case map_scenario of
                     mc_koth  : map_Obstacle_Add(map_SizeH,map_SizeH,io,keyPoint_KotHR);
                     mc_royale: map_Obstacle_Add(map_SizeH,map_SizeH,io,base_r2      );

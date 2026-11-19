@@ -652,17 +652,18 @@ begin
    then str_AddToUIStringList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,tc_docbr)
    else str_AddToUIStringList(@ui_MouseHintL,ui_HintLineLenUnit,false,false,pstr^);
 end;
-procedure UIHintAdd_BrushUnitTarget;
+procedure UIHintAdd_BrushTarget;
+var ptarkp:PTKeyPoint;
 begin
-   if(m_UnitTargetP<>nil)then
-     with m_UnitTargetP^ do
+   if(m_TargetUnitID<>nil)then
+     with m_TargetUnitID^ do
      if(hits>0)then
        with uid^ do
          with g_unitsVis[unum] do
            with player^ do
            begin
               UIHintAdd_Line(@uid_str_name);
-              s1:=str_UnitAttributes(m_UnitTargetP,0);
+              s1:=str_UnitAttributes(m_TargetUnitID,0);
               UIHintAdd_Line(@s1);
               s1:='';
               STRADD(@s1,lvlstr_w,sep_wdash);
@@ -675,7 +676,16 @@ begin
               UIHintAdd_Line(@s1);
               s1:=tc_white+'('+ui_TeamRace(team,race)+chr(playeri)+name+tc_white+')';
               UIHintAdd_Line(@s1);
+              exit;
            end;
+   if(IsKPRange(m_TargetID,@ptarkp))then
+     with ptarkp^ do
+     begin
+        if(kp_Energy>0)
+        then s1:=str_hint_Generator+' '+tc_aqua+'+'+i2s(kp_Energy)+tc_default
+        else s1:=str_hint_KeyPoint+' #'+i2s(-m_TargetID);
+        UIHintAdd_Line(@s1);
+     end;
 end;
 procedure UIHintAdd_ReqLine(req:byte);
 var
@@ -715,7 +725,7 @@ begin
                                 uat_UnitAny,
                                 uat_UnitOwn,
                                 uat_UnitAlly,
-                                uat_UnitEnemy: UIHintAdd_BrushUnitTarget;
+                                uat_UnitEnemy: UIHintAdd_BrushTarget;
                                 uat_Point    : if(ui_CommandercPU<>nil)then
                                                  if(unit_AbilityGetUIDRef(byte(-m_brush),ui_CommandercPU^.uidi)>0)then
                                                    UIHintAdd_Line(@str_ui_BuildHint);
@@ -744,7 +754,7 @@ begin
                    co_markAttack,
                    co_apatrol,
                    co_patrol    : ;
-                   else UIHintAdd_BrushUnitTarget;
+                   else UIHintAdd_BrushTarget;
                    end;
                  end;
 
@@ -944,6 +954,17 @@ begin
             then draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,c_white,@y)
             else draw_timer(tar,ui_objectivesx,y,kp_CaptureTime-kptd_Timer,ta_LU,ui_Objectives_LineLen,str_ui_KothTime,PlayerGetColorCur(kptd_TimerOwnerPlayer,false),@y);
 end;
+procedure draw_KeyPoints;
+var c:byte;
+begin
+   if(g_KeyPoints_max=0)then exit;
+
+   for c:=0 to g_KeyPoints_max-1 do
+   begin
+      draw_UITextKeyPoint(tar,ui_objectivesx,y,c);
+      y+=txt_line_h2;
+   end;
+end;
 begin
    // replay progress bar
    if(rpls_pstate=rpls_read)then
@@ -1067,10 +1088,7 @@ begin
                 mc_KeyPoints: begin
                               draw_text(tar,ui_objectivesx,y,str_objective_KeyPoints  ,ta_LU,ui_Objectives_LineLen,c_white,@y);
                               y+=txt_line_h2;
-                              draw_UITextKeyPoint(tar,ui_objectivesx,y,0);y+=txt_line_h2;
-                              draw_UITextKeyPoint(tar,ui_objectivesx,y,1);y+=txt_line_h2;
-                              draw_UITextKeyPoint(tar,ui_objectivesx,y,2);y+=txt_line_h2;
-                              draw_UITextKeyPoint(tar,ui_objectivesx,y,3);
+                              draw_KeyPoints;
                               end;
                 mc_royale   : begin
                               draw_text(tar,ui_objectivesx,y,str_objective_RoyalBattle,ta_LU,ui_Objectives_LineLen,c_white);y+=txt_line_h2;
@@ -1086,13 +1104,7 @@ begin
                    y+=txt_line_h2;
                    case map_scenario of
                    mc_KotH     : draw_KotH(str_ui_KotHWinnerCamp);
-                   mc_KeyPoints: begin
-
-                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,0);y+=txt_line_h2;
-                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,1);y+=txt_line_h2;
-                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,2);y+=txt_line_h2;
-                                 draw_UITextKeyPoint(tar,ui_objectivesx,y,3);
-                                 end;
+                   mc_KeyPoints: draw_KeyPoints;
                    end;
                 end;
    end;

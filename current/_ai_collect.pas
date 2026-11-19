@@ -403,9 +403,14 @@ begin
       if(tu^.iscomplete)then
       begin
          if (not tu^.uid^.uid_isbuilding)
-         and(    tu^.uid^.uid_CanAttack)
-         and(tu^.isfly)
-         and(tu^.group=aic_group_AttackNow)then ai_AttackGroupFlyLimit+=tu^.uid^.uid_LimitUse;
+         and(    tu^.uid^.uid_CanAttack)then
+           if(tu^.isfly)then
+             case tu^.group of
+             aic_group_Home      : ai_GroupFlyLimitHome      +=tu^.uid^.uid_LimitUse;
+             aic_group_AttackNow : ai_GroupFlyLimitAttack    +=tu^.uid^.uid_LimitUse;
+             aic_group_GenAssault: ai_GroupFlyLimitGenAssault+=tu^.uid^.uid_LimitUse;
+             end;
+
 
          if(uidi=tu^.uidi)then
          begin

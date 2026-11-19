@@ -379,7 +379,7 @@ begin
    with uid^  do
    with usmodel^ do
    begin
-      choosen:=(m_UnitTargetN=unum)or(ui_umark_u=unum);
+      choosen:=(m_TargetID=unum)or(ui_umark_u=unum);
       srect  :=((isselected)and( (playeri=UIPlayer)or(UIPlayer>LastPlayer) ))
              or(InputAction(iact_Alt))
              or(choosen);
@@ -658,6 +658,17 @@ begin
           colorN:=KeyPoint_GetColor(t,false);
           colorS:=KeyPoint_GetColor(t,true );
 
+          y:=-(t+1);
+          if(m_TargetID=y)or(ui_umark_u=y)then
+          begin
+             if(kp_RNoBuild>0)
+             then i:=kp_RNoBuild
+             else i:=kp_RCapture;
+             if(ui_umark_u=0)
+             then UnitsInfo_AddCircle(kp_x,kp_y,i,ui_blink2_color_BY)
+             else UnitsInfo_AddCircle(kp_x,kp_y,i,ui_blink_color1[ui_blink1_colorb]);
+          end;
+
           if(kp_Energy>0)then
           begin
              SpriteList_AddEffect(kp_x,kp_y,sd_decals+kp_y  ,colorS,@spr_kp_outG  ,255);
@@ -915,7 +926,7 @@ begin
         begin
            circleColor(vid_screen,ix,iy,uid_r  ,c_gray);
            circleColor(vid_screen,ix,iy,srange,c_white);
-           if(isselected)or(m_UnitTargetN=unum)then
+           if(isselected)or(m_TargetID=unum)then
            begin
               //lineColor(vid_screen,ix,iy,ui_mapx+pf_mv_nx-ui_cam_x  ,ui_mapy+pf_mv_ny-ui_cam_y  ,c_red );
               //lineColor(vid_screen,ix,iy,ui_mapx+move_x    -ui_cam_x+1,ui_mapy+move_y    -ui_cam_y+1,c_lime);

@@ -255,6 +255,7 @@ begin
    AddItem(@g_FixedPositions,SizeOf(g_FixedPositions));
    AddItem(@g_royal_Rx      ,SizeOf(g_royal_Rx      ));
    AddItem(@g_royal_Ry      ,SizeOf(g_royal_Ry      ));
+   AddItem(@g_KeyPoints_max ,SizeOf(g_KeyPoints_max ));
 end;
 
 procedure replay_SysNotify(msg:shortstring);

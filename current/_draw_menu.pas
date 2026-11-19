@@ -752,7 +752,7 @@ begin
 
    {$IFDEF TESTMODE}
    if(TestMode>0)then
-   draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
+     draw_text(tar,menu_hw,0,'TEST MODE '+b2s(TestMode),ta_MU,255,c_white);
    {$ENDIF}
 
    // MENU ITEMS

@@ -851,9 +851,10 @@ begin
       if(point_dist_int(pTeleporter^.x,
                         pTeleporter^.y,pTeleporter^.rpoint_x,pTeleporter^.rpoint_y)<base_r1)then exit;
 
+      g_local_randomI:=byte(g_tick+word(unum));
       unit_Teleport2Point(pTarget,
-      pTeleporter^.rpoint_x+g_random(uid_missileR1),
-      pTeleporter^.rpoint_y+g_random(uid_missileR1)
+      pTeleporter^.rpoint_x+g_local_random(uid_missileR1),
+      pTeleporter^.rpoint_y+g_local_random(uid_missileR1)
       {$IFDEF _FULLGAME},EID_Teleport,EID_Teleport,snd_Teleport{$ENDIF});
       if(pTeleporter^.player^.upgrs_cur[upgr_hell_T2TNoCD]>0)and(pTBeacon^.uidi=pTeleporter^.uidi)
       then
@@ -2823,8 +2824,9 @@ begin
                    begin
                       transportC-=tu^.uid^.uid_TransportSize;
                       tu^.transportU:=0;
-                      tu^.x     :=x-g_randomr(uid^.uid_missileR1);
-                      tu^.y     :=y-g_randomr(uid^.uid_missileR1);
+                      g_local_randomI:=byte(g_tick+word(unum));
+                      tu^.x     :=x-g_local_randomr(uid^.uid_missileR1);
+                      tu^.y     :=y-g_local_randomr(uid^.uid_missileR1);
                       tu^.uo_x  :=tu^.x;
                       tu^.uo_y  :=tu^.y;
                       tu^.uo_tar:=0;
@@ -2846,11 +2848,14 @@ begin
            then hits:=hits_fdead
            else hits:=0;
 
+           g_local_randomI:=byte(g_tick+word(unum));
+
            with uid^ do
              if(uid_DeathUID>0)and(uid_DeathUIDn>0)then
                for i:=1 to uid_DeathUIDn do
                  if(player_UIDLimitCheck(player,uid_DeathUID))then
-                   if(unit_add(x-g_randomr(uid_missileR1),y-g_randomr(uid_missileR1),0,uid_DeathUID,playeri,true,true,0))then
+                   if(unit_add(x-g_local_randomr(uid_missileR1),
+                               y-g_local_randomr(uid_missileR1),0,uid_DeathUID,playeri,true,true,0))then
                      game_ScoresAddC(playeri,psc_units_summoned);
 
            if(units_all_c<=0)then player_SetDefeat(player);

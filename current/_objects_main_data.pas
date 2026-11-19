@@ -317,7 +317,7 @@ end;
 UID_HFTower:
 begin
    uid_MaxHits1        := 4000;
-   uid_req_EnergyLevel := 250;
+   uid_req_EnergyLevel := 200;
    uid_r               := 20;
    uid_SightR_Base     := 300;
    uid_SightR_upgr     := upgr_hell_TowerR;
@@ -339,7 +339,7 @@ end;
 UID_HTotem:
 begin
    uid_MaxHits1        := 3000;
-   uid_req_EnergyLevel := 600;
+   uid_req_EnergyLevel := 1000;
    uid_r               := 20;
    uid_SightR_Base     := 300;
    uid_SightR_upgr     := upgr_hell_TowerR;
@@ -357,7 +357,7 @@ begin
    uid_Regen_upgr      := upgr_hell_BuildRestore;
    uid_Armor_upgr1     := upgr_hell_BuildArmor;
    uid_Armor_upgrV     := UpgradeBuildArmorDBonus;
-   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_archvile_s,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[fr_archvile_s],0,0,0,0);
+   SetWeapon(0,wpt_missle,aw_srange,0,0,fr_archvile_s,MID_ArchFire,0,0,upgr_hell_DistDamage1,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any,uids_all,[3],0,0,0,0);
 end;
 
 //////////////////////////////
@@ -552,7 +552,7 @@ begin
    uid_req_uid1        := UID_HMonastery;
    uid_LimitUse        := ul3;
    uid_arms_BonusAntiBuildingRange:=50;
-   SetWeapon(0,wpt_missle,aw_srange,0,-9,fr_mancubus_rld,MID_Mancubus,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,0,dm_Siege4);
+   SetWeapon(0,wpt_missle,aw_srange,0,-9,fr_mancubus_rld,MID_Mancubus,0,0,upgr_hell_DistDamage2,UpgradeDamageBonus1,wtrset_enemy_alive,wpr_any ,uids_all-[UID_Mancubus],[fr_mancubus_rld_s1,fr_mancubus_rld_s2,fr_mancubus_rld_s3],0,0,0,dm_Mancubus);
 end;
 UID_Archvile:
 begin
@@ -1278,7 +1278,7 @@ end;
 UID_UGTurret:
 begin
    uid_MaxHits1        := 4000;
-   uid_req_EnergyLevel := 250;
+   uid_req_EnergyLevel := 200;
    uid_r               := 15;
    uid_SightR_Base     := 300;
    uid_SightR_upgr     := upgr_uac_TowerR;
@@ -1299,7 +1299,7 @@ end;
 UID_UATurret:
 begin
    uid_MaxHits1        := 4000;
-   uid_req_EnergyLevel := 250;
+   uid_req_EnergyLevel := 200;
    uid_r               := 15;
    uid_SightR_Base     := 300;
    uid_SightR_upgr     := upgr_uac_TowerR;
@@ -1804,6 +1804,8 @@ begin
    SetDMOD(dm_AntiFly2         ,0,200,                                wtr_fly   );
    SetDMOD(dm_AntiGroundLight2 ,0,200,                      wtr_light+wtr_ground);
    SetDMOD(dm_RSMShot          ,0,400,wtr_building                              );
+   SetDMOD(dm_Mancubus         ,0,400,wtr_building                              );
+   SetDMOD(dm_Mancubus         ,1,150,wtr_unit    +wtr_bio +wtr_heavy+wtr_ground);
    SetDMOD(dm_Siege4           ,0,300,wtr_building                              );
    SetDMOD(dm_Lost             ,0, 50,             wtr_mech                     );
    SetDMOD(dm_BFG              ,0, 50,wtr_building                              );
@@ -1947,7 +1949,7 @@ uab_HEyeSpawn       : begin
                       end;
 uab_HTowerBlink     : begin
                          ua_type         := uat_Point;
-                         ua_reload       := 30*fr_fps1;
+                         ua_reload       := 45*fr_fps1;
                          ua_req_upgr     := upgr_hell_TowerBlink;
                       end;
 uab_HKeepAura       : begin

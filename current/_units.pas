@@ -331,17 +331,21 @@ begin
       begin
          AddToInt(@pUObstacle^.TeamVision[player^.team],MinVisionTime);
 
+         g_local_randomI:=byte(g_tick+word(unum));
          if((pUObstacle^.x=x)and(pUObstacle^.y=y))then
          begin
-            case g_random(4) of
+            case g_local_random(4) of
             0: unit_SetXY(pUnit,x-ud,y   ,mvxy_none,isfly);
             1: unit_SetXY(pUnit,x+ud,y   ,mvxy_none,isfly);
             2: unit_SetXY(pUnit,x   ,y-ud,mvxy_none,isfly);
             3: unit_SetXY(pUnit,x   ,y+ud,mvxy_none,isfly);
             end;
          end
-         else unit_SetXY(pUnit,x+round(uds*(pUObstacle^.x-x)/t)+g_randomr(2),
-                               y+round(uds*(pUObstacle^.y-y)/t)+g_randomr(2),mvxy_none,isfly);
+         else
+         begin
+            unit_SetXY(pUnit,x+round(uds*(pUObstacle^.x-x)/t)+g_local_randomr(2),
+                             y+round(uds*(pUObstacle^.y-y)/t)+g_local_randomr(2),mvxy_none,isfly);
+         end;
 
          vstp+=round(uds/speed*UnitStepTicks);
 
@@ -380,17 +384,18 @@ begin
 
       udi:=round(uds);
 
+      g_local_randomI:=byte(g_tick+word(unum));
       if((pObstacle^.o_x=x)and(pObstacle^.o_y=y))then
       begin
-         case g_random(4) of
+         case g_local_random(4) of
          0: unit_SetXY(pu,x-udi,y   ,mvxy_none,false);
          1: unit_SetXY(pu,x+udi,y   ,mvxy_none,false);
          2: unit_SetXY(pu,x   ,y-udi,mvxy_none,false);
          3: unit_SetXY(pu,x   ,y+udi,mvxy_none,false);
          end;
       end
-      else unit_SetXY(pu,x+round(udi*(pObstacle^.o_x-x)/t)+g_randomr(2),
-                         y+round(udi*(pObstacle^.o_y-y)/t)+g_randomr(2),mvxy_none,false);
+      else unit_SetXY(pu,x+round(udi*(pObstacle^.o_x-x)/t)+g_local_randomr(2),
+                         y+round(udi*(pObstacle^.o_y-y)/t)+g_local_randomr(2),mvxy_none,false);
 
       vstp+=round(uds/speed*UnitStepTicks);
 
@@ -523,7 +528,7 @@ begin
           else
           begin
              if(mdist>70)
-             then mdist:=8+g_random(25)
+             then mdist:=30
              else mdist:=50;
 
              dir:=dir_turn(dir,point_dir(x,y,move_x,move_y),mdist);
@@ -1085,8 +1090,9 @@ begin
         pTransport^.buffs[ub_SpecPause]:=fr_fpsq;
         pTransport^.transportC-=uid^.uid_TransportSize;
         transportU:=0;
-        x     :=pTransport^.x-g_randomr(pTransport^.uid^.uid_missileR1);
-        y     :=pTransport^.y-g_randomr(pTransport^.uid^.uid_missileR1);
+        g_local_randomI:=byte(g_tick+word(unum));
+        x     :=pTransport^.x-g_local_randomr(pTransport^.uid^.uid_missileR1);
+        y     :=pTransport^.y-g_local_randomr(pTransport^.uid^.uid_missileR1);
         uo_x  :=x;
         uo_y  :=y;
         uo_tar:=0;
@@ -1110,67 +1116,89 @@ end;
 // target units
 procedure unit_uo_tar(pu:PTUnit);
 var
-pTar  : PTUnit;
+pTarU : PTUnit;
+pTarKP: PTKeyPoint;
 a, w  : byte;
 td,tdm: integer;
 begin
-   pTar:=nil;
+   pTarU:=nil;
    with pu^  do
    with uid^ do
    if(uo_tar=unum)
    then uo_tar:=0
    else
-      if(IsUnitRange(uo_tar,@pTar))then
-      begin
-         if(IsUnitRange(pTar^.transportU,nil))
-         or(not CheckUnitTeamVision(player^.team,pTar,false))then
-         begin
-            uo_tar:=0;
-            //uo_id :=ua_amove;
-            exit;
-         end;
+     if(IsKPRange(uo_tar,@pTarKP))then
+     begin
+        td:=point_dist_int(x,y,pTarKP^.kp_x,pTarKP^.kp_y);
+        with pTarKP^ do
+          if(not kp_TeamData[player^.team].kptd_Active)
+          then uo_tar:=0
+          else
+            if(td>kp_RCapture)then
+            begin
+               uo_x:=kp_x;
+               uo_y:=kp_y;
+            end
+            else
+              if(cycle_order=g_cycle_regen)then
+              begin
+                 uo_id:=ua_amove;
+                 g_local_randomI:=byte(g_tick+word(unum));
+                 uo_x :=kp_x+g_local_randomr(kp_RCapture div 2);
+                 uo_y :=kp_y;
+              end;
+     end
+     else
+       if(IsUnitRange(uo_tar,@pTarU))then
+       begin
+          if(IsUnitRange(pTarU^.transportU,nil))
+          or(not CheckUnitTeamVision(player^.team,pTarU,false))then
+          begin
+             uo_tar:=0;
+             exit;
+          end;
 
-         td :=point_dist_int(x,y,pTar^.x,pTar^.y);
-         if(pTar^.uid^.uid_issolid)
-         then tdm:=td-      (uid_r+pTar^.uid^.uid_r)
-         else tdm:=td- min2i(uid_r,pTar^.uid^.uid_r);
+          td :=point_dist_int(x,y,pTarU^.x,pTarU^.y);
+          if(pTarU^.uid^.uid_issolid)
+          then tdm:=td-      (uid_r+pTarU^.uid^.uid_r)
+          else tdm:=td- min2i(uid_r,pTarU^.uid^.uid_r);
 
-         if(tdm<melee_r)then
-         begin
-            if(unit_Load(pu,pTar))then exit;
-            if(unit_Load(pTar,pu))then exit;
-         end;
+          if(tdm<melee_r)then
+          begin
+             if(unit_Load(pu,pTarU))then exit;
+             if(unit_Load(pTarU,pu))then exit;
+          end;
 
-         if(uid_ability_isteleport)then
-           if(pTar^.player^.team<>player^.team )then begin uo_tar:=0;exit; end;
+          if(uid_ability_isteleport)then
+            if(pTarU^.player^.team<>player^.team )then begin uo_tar:=0;exit; end;
 
-         if(pTar^.uid^.uid_ability_isteleport)then
-           if(unit_ability_teleport(pu,pTar,td))then exit;//team
+          if(pTarU^.uid^.uid_ability_isteleport)then
+            if(unit_ability_teleport(pu,pTarU,td))then exit;//team
 
-         w:=unit_target2arm(pu,pTar,td,255,@a);
-         if(w<=LastUnitArms)then
-         begin
-            a_tar :=uo_tar;
-            uo_id :=ua_amove;
-         end;
+          w:=unit_target2arm(pu,pTarU,td,255,@a);
+          if(w<=LastUnitArms)then
+          begin
+             a_tar:=uo_tar;
+             uo_id:=ua_amove;
+          end;
 
-         if(tdm<=melee_r)then
-         begin
-            uo_x:=x;
-            uo_y:=y;
-            exit;
-         end;
+          if(tdm<=melee_r)then
+          begin
+             uo_x:=x;
+             uo_y:=y;
+             exit;
+          end;
 
-         if(player=pTar^.player)and(pTar^.isfly)then
-           if(unit_CheckTransport(pTar,pu))and(not IsUnitRange(pTar^.uo_tar,nil))and(pTar^.uo_x=pTar^.x)and(pTar^.uo_y=pTar^.y)then
-           begin
-              pTar^.uo_x:=x;
-              pTar^.uo_y:=y;
-           end;
+          if(player=pTarU^.player)and(pTarU^.isfly)then
+            if(unit_CheckTransport(pTarU,pu))and(not IsUnitRange(pTarU^.uo_tar,nil))and(pTarU^.uo_x=pTarU^.x)and(pTarU^.uo_y=pTarU^.y)then
+            begin
+               pTarU^.uo_x:=x;
+               pTarU^.uo_y:=y;
+            end;
 
-         uo_x:=pTar^.vx;
-         uo_y:=pTar^.vy;
-      end;
+          uo_x:=pTarU^.vx;
+          uo_y:=pTarU^.vy;
+       end;
 end;
 
 function unit_TryZombification(pPhantom,pTarget:PTUnit):boolean;
@@ -1361,8 +1389,9 @@ begin
                            if(not attackinmove)or(uo_bx<=0)then
                              if(x=pTarget^.x)and(y=pTarget^.y)then
                              begin
-                                move_x:=x-g_randomr(2);
-                                move_y:=y-g_randomr(2);
+                                g_local_randomI:=byte(g_tick+word(unum));
+                                move_x:=x-g_local_randomr(2);
+                                move_y:=y-g_local_randomr(2);
                              end
                              else
                              begin
@@ -1591,17 +1620,26 @@ end;
 
 procedure unit_UpdateRPointTar(pu:PTUnit);
 var
-ptar:PTUnit;
+ptaru :PTUnit;
+ptarkp:PTKeyPoint;
 begin
    with pu^ do
    begin
-      if(IsUnitRange(rpoint_tar,@ptar))then
-        if(ptar^.player^.team<>player^.team)
+      if(IsUnitRange(rpoint_tar,@ptaru))then
+        if(ptaru^.player^.team<>player^.team)
         then rpoint_tar:=0
         else
         begin
-           rpoint_x:=ptar^.vx;
-           rpoint_y:=ptar^.vy;
+           rpoint_x:=ptaru^.vx;
+           rpoint_y:=ptaru^.vy;
+        end;
+      if(IsKPRange(rpoint_tar,@ptarkp))then
+        if(not ptarkp^.kp_TeamData[player^.team].kptd_Active)
+        then rpoint_tar:=0
+        else
+        begin
+           rpoint_x:=ptarkp^.kp_x;
+           rpoint_y:=ptarkp^.kp_y;
         end;
       rpoint_x:=mm3i(1,rpoint_x,map_Size1);
       rpoint_y:=mm3i(1,rpoint_y,map_Size1);
@@ -2446,7 +2484,7 @@ begin
         if(hits>hits_dead)then
         begin
            {$IFDEF _FULLGAME}
-           if(ServerSide)then
+           if(ServerSide)and(g_type=gt_scirmish)then
            {$ENDIF}
              if(not game_IsEnded)then
                with player^ do

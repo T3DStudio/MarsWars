@@ -19,7 +19,7 @@ begin
 
    draw_LayerTerrain   (vid_screen);
    {$IFDEF TESTMODE}
-   test_w :=vid_ScreenSpritesS;
+   if(TestMode>1)then test_ScreenSpritesS :=vid_ScreenSpritesS;
    {$ENDIF}
    draw_LayerSpriteList(vid_screen);
 
@@ -31,7 +31,7 @@ begin
    draw_LayerUnitsInfo(vid_screen);
    draw_LayerUI       (vid_screen);
    {$IFDEF TESTMODE}
-   if(TestMode>1)and(net_status=0)then draw_debug;
+   if(TestMode>1)then draw_debug;
    {$ENDIF}
 end;
 
@@ -64,8 +64,8 @@ begin
    then draw_Menu
    else draw_Game;
 
-   //_drawMWSModel(@spr_HCommandCenter);
    {$IFDEF TESTMODE}
+   //_drawMWSModel(@spr_HCommandCenter);
    if(TestMode>1)then
    begin
 
@@ -99,7 +99,7 @@ begin
      n:=50;
 
    draw_text(vid_screen,ui_cam_w,ui_cam_h-30,
-    w2s(test_w)+' '+tc_nl1+
+    w2s(test_ScreenSpritesS)+' '+tc_nl1+
   //     c2s(fr_FPSSecondC)+'('+c2s(fr_FPSSecondU)+')'+
   // ' '+b2c[ui_uibtn_sabilityu=nil]+
    //' '+b2c[ui_uibtn_pabilityu=nil]+

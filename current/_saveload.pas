@@ -181,13 +181,14 @@ begin
    AddItem(@g_units             ,SizeOf(g_units            ));
    AddItem(@g_missiles          ,SizeOf(g_missiles         ));
    AddItem(@g_effects           ,SizeOf(g_effects          ));
-   AddItem(@g_random_i          ,SizeOf(g_random_i         ));
-   AddItem(@g_random_p          ,SizeOf(g_random_p         ));
+   AddItem(@g_global_randomI    ,SizeOf(g_global_randomI   ));
+   AddItem(@g_global_randomP    ,SizeOf(g_global_randomP   ));
    AddItem(@g_status            ,SizeOf(g_status           ));
    AddItem(@g_cycle_order       ,SizeOf(g_cycle_order      ));
    AddItem(@g_cycle_regen       ,SizeOf(g_cycle_regen      ));
    AddItem(@g_royal_Rx          ,SizeOf(g_royal_Rx         ));
    AddItem(@g_royal_Ry          ,SizeOf(g_royal_Ry         ));
+   AddItem(@g_KeyPoints_max     ,SizeOf(g_KeyPoints_max    ));
    AddItem(@g_PlayersScore      ,SizeOf(g_PlayersScore     ));
    AddItem(@ai_TeamAlarms       ,SizeOf(ai_TeamAlarms      ));
    AddItem(@map_KeyPointsN      ,SizeOf(map_KeyPointsN     ));

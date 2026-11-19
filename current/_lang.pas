@@ -613,6 +613,8 @@ begin
    'str_hint_Abilities'                 : lang_Key2StrVar:= @str_hint_Abilities;
    'str_hint_SightR'                    : lang_Key2StrVar:= @str_hint_SightR;
    'str_hint_MaxQuantity'               : lang_Key2StrVar:= @str_hint_MaxQuantity;
+   'str_hint_Generator'                 : lang_Key2StrVar:= @str_hint_Generator;
+   'str_hint_KeyPoint'                  : lang_Key2StrVar:= @str_hint_KeyPoint;
 
    'str_uarm_melee'                     : lang_Key2StrVar:= @str_uarm_melee;
    'str_uarm_ranged'                    : lang_Key2StrVar:= @str_uarm_ranged;

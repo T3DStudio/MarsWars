@@ -307,7 +307,7 @@ begin
    else ts:=theme_spr_liquidL[theme_map_RBattleFront].surf;
 
    wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
-   hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
+   hsp:=(ts^.h div 4)*((abs(g_global_randomI) mod 3)-1);
    if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
 
    for a:=1 to LiquidAnimCount do
@@ -359,7 +359,7 @@ begin
    case theme_liquid_animStyle of
    tas_liquid: begin
                   wsp:=(ts^.w div 4)*((map_seed mod 3)-1);
-                  hsp:=(ts^.h div 4)*((abs(g_random_i) mod 3)-1);
+                  hsp:=(ts^.h div 4)*((abs(g_global_randomI) mod 3)-1);
                   if(wsp=0)and(hsp=0)then wsp:=(ts^.w div 4);
                end;
    else

@@ -63,7 +63,7 @@ begin
         with kp_TeamData[p] do
         begin
            if((map_scenario=mc_koth     )and(kpi=0))
-           or((map_scenario=mc_KeyPoints)and(kpi<keyPoint_mcN))
+           or((map_scenario=mc_KeyPoints)and(kpi<g_KeyPoints_Max))
            //or(not ui_fog)
            or(pkptv^.kptd_TimerOwnerTeam=p)
            or(pkptv^.kptd_OwnerTeam     =p)
